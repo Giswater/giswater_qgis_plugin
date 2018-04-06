@@ -347,8 +347,7 @@ class ManageNewPsector(ParentManage):
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
             path = folder_path + '/' + file_name
-            compass_rotation = float(utils_giswater.getWidgetText(previous_dialog.rotation))
-            self.generate_composer(path, compass_rotation, dialog)
+            self.generate_composer(path, dialog)
 
         # Generate csv detail
         if utils_giswater.isChecked(dialog.chk_csv_detail):
@@ -377,11 +376,10 @@ class ManageNewPsector(ParentManage):
                 file_name += '.csv'
             path = folder_path + '/' + file_name
             self.generate_csv(path, viewname, previous_dialog)
-
         self.set_prev_dialog(dialog, previous_dialog)
 
 
-    def generate_composer(self, path, compass_rotation, dialog=None):
+    def generate_composer(self, path,  dialog=None):
 
         index = utils_giswater.get_item_data(dialog.cmb_templates, 0)
         comp_view = self.iface.activeComposers()[index]
@@ -389,8 +387,6 @@ class ManageNewPsector(ParentManage):
         if my_comp is not None:
             my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
             try:
-                compass = my_comp.getComposerItemById('compass')
-                compass.setPictureRotation(compass_rotation)
                 result = my_comp.exportAsPDF(path)
                 if result:
                     message = "Document PDF created in"
