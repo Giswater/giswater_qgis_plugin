@@ -94,7 +94,7 @@ class Master(ParentAction):
         self.controller.show_info(message)
 
         self.fill_table(qtbl_psm, "plan_psector")
-        #self.set_table_columns(qtbl_psm, "plan_psector")
+        self.set_table_columns(qtbl_psm, "plan_psector")
         self.set_label_current_psector()
         self.open_dialog(self.dlg)
 
