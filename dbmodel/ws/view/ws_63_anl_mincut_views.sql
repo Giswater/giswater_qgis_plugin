@@ -177,9 +177,11 @@ anl_mincut_result_hydrometer.id,
 anl_mincut_result_hydrometer.result_id,
 anl_mincut_result_cat.work_order,
 anl_mincut_result_hydrometer.hydrometer_id,
-ext_rtc_hydrometer.code AS hydrometer_customer_code
+ext_rtc_hydrometer.code AS hydrometer_customer_code,
+rtc_hydrometer_x_connec.connec_id
 FROM anl_mincut_result_selector, anl_mincut_result_hydrometer
 JOIN ext_rtc_hydrometer ON anl_mincut_result_hydrometer.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+JOIN rtc_hydrometer_x_connec ON anl_mincut_result_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
 JOIN anl_mincut_result_cat ON anl_mincut_result_hydrometer.result_id=anl_mincut_result_cat.id
 WHERE ((anl_mincut_result_selector.result_id::text) = (anl_mincut_result_hydrometer.result_id::text))
 AND anl_mincut_result_selector.cur_user="current_user"() ;

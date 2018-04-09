@@ -166,7 +166,10 @@ BEGIN
 	INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (result_id_arg, cur_user_var);
 
 	INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
-	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg;
+	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
+	
+	INSERT INTO anl_mincut_result_hydrometer (result_id, hydrometer_id)
+	SELECT result_id_arg,hydrometer_id FROM rtc_hydrometer_x_connec JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id WHERE result_id=result_id_arg;
 	
 
    END IF;
