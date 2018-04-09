@@ -46,6 +46,11 @@ ALTER TABLE "cat_pavement" DROP CONSTRAINT IF EXISTS "cat_pavement_m2_cost_fkey"
 
 ALTER TABLE "cat_brand_model" DROP CONSTRAINT IF EXISTS "cat_brand_model_catbrand_id_fkey";
 
+ALTER TABLE "cat_arc_class_cat" DROP CONSTRAINT IF EXISTS "cat_arc_class_class_type_fkey";
+
+ALTER TABLE "cat_arc_class" DROP CONSTRAINT IF EXISTS "cat_arc_class_classtype_id_fkey";
+ALTER TABLE "cat_arc_class" DROP CONSTRAINT IF EXISTS  "cat_arc_class_catclass_id_fkey";
+
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_sector_id_fkey";
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_state_fkey";
 ALTER TABLE "vnode" DROP CONSTRAINT IF EXISTS "vnode_verified_fkey";
@@ -153,6 +158,11 @@ ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key2_fkey" FOREIGN KEY ("
 ALTER TABLE "cat_pavement" ADD CONSTRAINT "cat_pavement_m2_cost_fkey" FOREIGN KEY ("m2_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "cat_brand_model" ADD CONSTRAINT "cat_brand_model_catbrand_id_fkey" FOREIGN KEY ("catbrand_id") REFERENCES "cat_brand" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "cat_arc_class_cat" ADD CONSTRAINT "cat_arc_class_class_type_fkey" FOREIGN KEY ("class_type") REFERENCES "cat_arc_class_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_classtype_id_fkey" FOREIGN KEY ("class_type") REFERENCES "cat_arc_class_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_catclass_id_fkey" FOREIGN KEY ("catclass_id") REFERENCES "cat_arc_class_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "value_state_type" ADD CONSTRAINT "value_state_type_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

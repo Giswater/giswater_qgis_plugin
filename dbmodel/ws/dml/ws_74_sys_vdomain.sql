@@ -50,6 +50,9 @@ INSERT INTO sys_feature_cat VALUES ('ELEMENT', 'ELEMENT', NULL, 'v_edit_element'
 -- ----------------------------
 -- Records of audit_cat_table
 -- ----------------------------
+INSERT INTO audit_cat_table VALUES ('cat_arc_class', 'Catalog', 'Arc classification', 'role_edit', 0, NULL, NULL, NULL, NULL, 'cat_arc_class_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('cat_arc_class_cat', 'Catalog', 'Categorys of classification', 'role_admin', 1, '>2', NULL, NULL, NULL, 'cat_arc_class_cat_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('cat_arc_class_type', 'Catalog', 'Types of classification', 'role_admin', 3, '2', NULL, NULL, NULL, 'cat_arc_class_type_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('v_edit_macrosector', 'GIS feature', 'Shows editable information about macrosector.', 'role_basic', 0, NULL, 'role_basic', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_connec', 'Mincut', 'View with aggregated information of the results of mincut analysis (connec)', 'role_om', 0, NULL, 'role_om', 2, 'Mincut button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_hydrometer', 'Mincut', 'View with aggregated information of the results of mincut analysis (hydrometers)', 'role_om', 0, NULL, 'role_om', 2, 'Mincut button', NULL, NULL);

@@ -145,6 +145,31 @@ CREATE TABLE sys_feature_cat (
 -- Table: Catalogs
 -- ----------------------------
 
+CREATE TABLE "cat_arc_class" (
+"id" serial PRIMARY KEY,
+"arc_id" varchar(30),
+"class_type" integer,
+"catclass_id" integer
+);
+
+
+CREATE TABLE "cat_arc_class_cat" (
+"id" serial PRIMARY KEY,
+"class_type" integer,
+"catclass_id" integer,
+"name" varchar(50),
+"from_val" text,
+"to_val" text,
+"observ" text
+);
+
+
+CREATE TABLE "cat_arc_class_type" (
+"id" serial PRIMARY KEY,
+"name" varchar(50),
+"observ" text
+);
+
 CREATE TABLE "cat_mat_element" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,

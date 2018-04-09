@@ -29,13 +29,7 @@ ALTER TABLE "cat_arc_shape" DROP CONSTRAINT IF EXISTS "cat_arc_shape_epa_fkey";
 ALTER TABLE "cat_arc_shape" DROP CONSTRAINT IF EXISTS "cat_arc_shape_curve_id_fkey";
 ALTER TABLE "cat_arc_shape" DROP CONSTRAINT IF EXISTS "cat_arc_shape_tsect_id_fkey";
 
---ALTER TABLE "cat_arc_class" DROP CONSTRAINT IF EXISTS "cat_arc_class_class_type_id_fkey";
 
-ALTER TABLE "cat_arc_class_cat" DROP CONSTRAINT IF EXISTS "cat_arc_class_class_type_fkey";
-
-
-ALTER TABLE "cat_arc_class" DROP CONSTRAINT IF EXISTS "cat_arc_class_classtype_id_fkey";
-ALTER TABLE "cat_arc_class" DROP CONSTRAINT IF EXISTS  "cat_arc_class_catclass_id_fkey";
 
 ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_matcat_id_fkey";
 ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_cost_unit_fkey";
@@ -250,13 +244,6 @@ ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_epa_fkey" FOREIGN KEY 
 ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_curve_id_fkey" FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_tsect_id_fkey" FOREIGN KEY ("tsect_id") REFERENCES "inp_transects_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
---ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_class_type_id_fkey" FOREIGN KEY ("class_type","catclass_id") REFERENCES "cat_arc_class_cat" ("class_type","catclass_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "cat_arc_class_cat" ADD CONSTRAINT "cat_arc_class_class_type_fkey" FOREIGN KEY ("class_type") REFERENCES "cat_arc_class_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-
-ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_classtype_id_fkey" FOREIGN KEY ("class_type") REFERENCES "cat_arc_class_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "cat_arc_class" ADD CONSTRAINT "cat_arc_class_catclass_id_fkey" FOREIGN KEY ("catclass_id") REFERENCES "cat_arc_class_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 ALTER TABLE "cat_node" ADD CONSTRAINT "cat_node_shape_fkey" FOREIGN KEY ("shape") REFERENCES "cat_node_shape" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -379,7 +366,7 @@ ALTER TABLE "connec" ADD CONSTRAINT "connec_location_type_feature_type_fkey" FOR
 ALTER TABLE "gully" ADD CONSTRAINT "gully_matcat_id_fkey" FOREIGN KEY ("matcat_id") REFERENCES "cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "gully" ADD CONSTRAINT "gully_type_id_fkey" FOREIGN KEY ("gully_type") REFERENCES "gully_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "gully" ADD CONSTRAINT "gully_gratecat_id_fkey" FOREIGN KEY ("gratecat_id") REFERENCES "cat_grate" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "gully" ADD CONSTRAINT "gully_connec_arccat_id_fkey" FOREIGN KEY ("connec_arccat_id") REFERENCES "cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "gully" ADD CONSTRAINT "gully_connec_arccat_id_fkey" FOREIGN KEY ("connec_arccat_id") REFERENCES "cat_connec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "gully" ADD CONSTRAINT "gully_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "gully" ADD CONSTRAINT "gully_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "gully" ADD CONSTRAINT "gully_dma_id_fkey" FOREIGN KEY ("dma_id") REFERENCES "dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
