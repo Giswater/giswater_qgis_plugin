@@ -9,6 +9,8 @@ or (at your option) any later version.
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from PyQt4.QtGui import QAbstractItemView, QTableView
+from qgis.core import QgsExpression, QgsFeatureRequest
 from functools import partial
 
 import utils_giswater
@@ -139,7 +141,7 @@ class ManageWorkcatEnd(ParentManage):
             
         #self.dlg.close()
 
-        geom_type = "arc"
+        #geom_type = "arc"
         #widget = "tbl_cat_work_x_" + geom_type
         #tablename = "v_edit_" + geom_type
         #widget = utils_giswater.getWidget(widget)
@@ -154,25 +156,33 @@ class ManageWorkcatEnd(ParentManage):
         ids_list = ids_list[:-1]
         sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations"
                " WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
+        self.controller.log_info(str(sql))
         row = self.controller.get_row(sql)
+
+        # Hardcoded
+        row = ['A156','A229']
+        selected_list = ['A155']
+
         if row:
             self.dlg_work = WorkcatEndList()
             utils_giswater.setDialog(self.dlg_work)
             self.load_settings(self.dlg_work)
 
-            '''
+            self.dlg_work.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_work))
+            self.dlg_work.btn_accept.pressed.connect(self.exec_downgrade)
+
+            self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
+            self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
             table_relations = "v_ui_arc_x_relations"
             filter = ""
             for row in selected_list:
                 filter += "arc_id = '" + str(row) + "' OR "
             filter = filter[:-3] + ""
-            filter +="AND arc_state = '1' "
-            self.controller.log_info(str(filter))
-            self.fill_table(self.dlg_work.tbl_arc_x_relations, self.schema_name + "." + table_relations, filter)
+            filter += " AND arc_state = '1' "
+            self.fill_table(self.tbl_arc_x_relations, table_relations, filter)
 
-            table_object =
-            self.dlg_work.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object,self.dlg_work.tbl_arc_x_relations,table_object))
-            '''
+            # table_object =
+            self.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object, self.tbl_arc_x_relations))
 
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
@@ -218,14 +228,16 @@ class ManageWorkcatEnd(ParentManage):
         self.controller.execute_sql(sql, log_sql=True)
 
 
-    def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+    def fill_table(self, widget, table_name, filter):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(self.schema_name+"."+table_name)
-        self.model.setEditStrategy(set_edit_strategy)
+        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        if filter:
+            self.model.setFilter(filter)
         self.model.setSort(0, 0)
         self.model.select()
 
@@ -236,7 +248,7 @@ class ManageWorkcatEnd(ParentManage):
         widget.setModel(self.model)
 
 
-    def open_selected_object(self, widget, table_object):
+    def open_selected_object(self, widget):
         """ Open object form with selected record of the table """
 
         selected_list = widget.selectionModel().selectedRows()
@@ -246,7 +258,74 @@ class ManageWorkcatEnd(ParentManage):
             return
 
         row = selected_list[0].row()
+        feature_id = widget.model().record(row).value("arc_id")
 
-        #todo
-        #open form of selected row
-        # zoom selected
+        self.open_arc_form(feature_id)
+
+
+    def open_arc_form(self, arc_id):
+        """ Open form corresponding to start or end node of the current arc """
+
+        # Get sys_feature_cat.id from cat_feature.id
+        sql = ("SELECT sys_type"
+               " FROM " + self.schema_name + ".v_edit_arc"
+               " WHERE arc_id = '" + arc_id + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        arc_type = row[0].lower()
+        arc_table = "v_edit_man_" + arc_type
+        layer_arc= self.controller.get_layer_by_tablename(arc_table)
+
+        aux = "\"arc_id\" = "
+        aux += "'" + str(arc_id) + "'"
+        expr = QgsExpression(aux)
+
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
+            return
+
+        if layer_arc:
+            # Get a featureIterator from this expression:
+            it = layer_arc.getFeatures(QgsFeatureRequest(expr))
+            self.controller.log_info(str(it))
+            id_list = [i for i in it]
+
+            # if id_list:
+                # self.iface.openFeatureForm(layer_arc, id_list[0])
+
+        # Zoom to object
+        canvas = self.iface.mapCanvas()
+        layer_arc.selectByIds([id_list[0].id()])
+        canvas.zoomToSelected(layer_arc)
+        canvas.zoomIn()
+
+
+    def exec_downgrade(self):
+
+        # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
+        sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
+               " WHERE parameter = 'edit_arc_downgrade_force'")
+        row = self.controller.get_row(sql, log_info=False)
+        if row:
+            sql = ("UPDATE " + self.schema_name + ".config_param_user "
+                   " SET value = True "
+                   " WHERE parameter = 'edit_arc_downgrade_force'")
+            self.controller.execute_sql(sql, log_sql=True)
+        else:
+            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (edit_arc_downgrade_force)"
+                   " VALUES (True)")
+            self.controller.execute_sql(sql, commit=self.autocommit)
+
+        # TODO
+        # Make downgrade (select as is)
+
+
+        # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
+        sql = ("UPDATE " + self.schema_name + ".config_param_user "
+               " SET value = False "
+               " WHERE parameter = 'edit_arc_downgrade_force'")
+        self.controller.execute_sql(sql, log_sql=True)
+        pass
