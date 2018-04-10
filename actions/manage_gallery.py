@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QLineEdit, QImage
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QLineEdit
 from PyQt4.QtCore import Qt
 import urllib2
 import urlparse

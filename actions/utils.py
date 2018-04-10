@@ -339,7 +339,6 @@ class Utils(ParentAction):
             utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_review, "tab_25")
 
             # Edit WS
-
             self.populate_combo_ws("wtpcat_vdefault", "WTP")
             self.populate_combo_ws("hydrantcat_vdefault", "HYDRANT")
             self.populate_combo_ws("filtercat_vdefault", "FILTER")
@@ -916,8 +915,7 @@ class Utils(ParentAction):
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = '" + value + "'")
         row = self.controller.get_row(sql)
-
-        if row is not None:
+        if row:
             parameter = row[0]
             sql = ("SELECT " + sel +" FROM " + self.schema_name + "." + table + ""
                    " WHERE " + atribute + "::text = '" + str(parameter) + "'" )
@@ -1223,29 +1221,37 @@ class Utils(ParentAction):
         else:
             self.delete_config_param_system(parameter)
 
+
     def filter_dma_vdefault(self):
         """ Filter QComboBox @dma_vdefault according QComboBox @exploitation_vdefault """
+        
         sql = ("SELECT DISTINCT(dma_id),name FROM " + self.schema_name + ".dma"
                " WHERE expl_id = '"+str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault,0)) +"'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.dma_vdefault, rows, 1)
 
+
     def filter_presszone_vdefault(self):
         """ Filter QComboBox @presszone_vdefault according QComboBox @exploitation_vdefault """
+        
         sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_presszone"
                " WHERE expl_id = '"+str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault,0)) +"'")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("presszone_vdefault", rows, False)
 
+
     def filter_statetype_vdefault(self):
         """ Filter QComboBox @statetype_vdefault according  @state_vdefault """
+        
         sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state::text = "
                "(SELECT state FROM " + self.schema_name + ".value_state_type"
                " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "')::text")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
 
+
     def populate_cmb_templates(self, combo):
+        
         composers = self.iface.activeComposers()
         index = 0
         records = []
@@ -1254,3 +1260,5 @@ class Utils(ParentAction):
             records.append(elem)
             index = index +1
         utils_giswater.set_item_data(combo, records, 1)
+        
+        

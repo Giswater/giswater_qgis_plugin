@@ -6,16 +6,17 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QDoubleValidator
 from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2
 from qgis.core import QgsProject, QgsSingleSymbolRendererV2
 from qgis.gui import QgsVertexMarker
+from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtGui import QDoubleValidator
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui_manager import Cad_add_circle
 from functools import partial
+
 
 class CadAddCircle(ParentMapTool):
     """ Button 71: Add circle """
@@ -55,7 +56,6 @@ class CadAddCircle(ParentMapTool):
             self.radius = 0.1
         self.delete_prev = utils_giswater.isChecked(self.dlg_create_circle.chk_delete_prev)
 
-
         if self.layer_circle:
             self.layer_circle.startEditing()
             self.close_dialog(self.dlg_create_circle)
@@ -74,6 +74,7 @@ class CadAddCircle(ParentMapTool):
 
                 provider.addFeatures([feature])
             self.layer_circle.commitChanges()
+            
         else:
             self.iface.actionPan().trigger()
             self.cancel_circle = False
@@ -207,3 +208,4 @@ class CadAddCircle(ParentMapTool):
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
+        

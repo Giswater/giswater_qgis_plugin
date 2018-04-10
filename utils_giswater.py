@@ -7,11 +7,11 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 ''' Module with utility functions to interact with dialog and its widgets '''
+from qgis.gui import QgsDateTimeEdit
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
 from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime
-from qgis.gui import QgsDateTimeEdit
 
 from functools import partial
 import inspect
@@ -477,9 +477,9 @@ def get_item_data(widget, index=0):
     return code
 
 
-
 def set_item_data(combo, rows, index_to_show=0, combo_clear=True):
     """ Populate @combo with list @rows and show field @index_to_show """
+    
     records = []
     if rows is None:
         return
@@ -496,8 +496,13 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True):
         combo.addItem(record[index_to_show], record)
         combo.blockSignals(False)
 
+
 def remove_tab_by_tabName(tab_widget, tab_name):
+    """ Look in @tab_widget for a tab with @tab_name and remove it """
+    
     for x in range(0, tab_widget.count()):
         if tab_widget.widget(x).objectName() == tab_name:
             tab_widget.removeTab(x)
             break
+        
+        

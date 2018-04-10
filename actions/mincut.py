@@ -6,13 +6,14 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
 from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtXml import QDomDocument
 
+import os
 import operator
 from functools import partial
 
@@ -26,7 +27,6 @@ from ui_manager import Mincut_add_hydrometer
 from ui_manager import Mincut_add_connec     
 from ui_manager import MincutComposer
 
-import os
 
 
 class MincutParent(ParentAction, MultipleSelection):

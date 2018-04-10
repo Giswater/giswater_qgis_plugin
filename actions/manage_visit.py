@@ -6,20 +6,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-from PyQt4.QtCore import (
-    Qt,
-    QDate,
-    pyqtSignal,
-    QObject)
-from PyQt4.QtGui import (
-    QCompleter,
-    QLineEdit,
-    QTableView,
-    QStringListModel,
-    QPushButton,
-    QComboBox,
-    QTabWidget,
-    QDialogButtonBox)
+from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
+from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget, QDialogButtonBox
 from PyQt4.QtSql import QSqlTableModel
 
 import os

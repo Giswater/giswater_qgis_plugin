@@ -6,29 +6,14 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.Qt import QDate
-from PyQt4.QtGui import (
-    QCompleter,
-    QStringListModel,
-    QAbstractItemView,
-    QTableView,
-    QDateEdit,
-    QLineEdit,
-    QTextEdit,
-    QDateTimeEdit,
-    QComboBox
-)
-from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtCore import Qt
 from qgis.core import QgsFeatureRequest
 from qgis.gui import QgsMapToolEmitPoint
+from PyQt4.Qt import QDate
+from PyQt4.QtGui import QCompleter, QStringListModel, QAbstractItemView, QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
+from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtCore import Qt
 
-import os
-import sys
 from functools import partial
-
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 
 import utils_giswater
 from parent import ParentAction

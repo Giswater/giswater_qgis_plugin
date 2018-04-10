@@ -6,19 +6,16 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from qgis.core import QgsExpression
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from qgis.core import QgsExpression
 
 import os
 import sys
 import webbrowser
 import ConfigParser
 from functools import partial
-
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater    
 
 

@@ -13,7 +13,7 @@
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition
 from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
-from PyQt4.QtGui import QListWidget, QListWidgetItem, QPushButton, QLineEdit, QCheckBox, QFileDialog, QComboBox
+from PyQt4.QtGui import QListWidget, QListWidgetItem, QLineEdit
 from PyQt4.QtXml import QDomDocument
 
 from functools import partial
@@ -1543,3 +1543,4 @@ class DrawProfiles(ParentMapTool):
         self.start_end_node.pop(1)
         # Reload path
         self.exec_path()
+        

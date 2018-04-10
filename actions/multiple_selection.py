@@ -107,8 +107,7 @@ class MultipleSelection(QgsMapTool):
                     # Check feature
                     for snap_point in result:
                         # Get the point. Leave selection
-                        #point = QgsPoint(snap_point.snappedVertex)
-                        snapp_feat = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                        snapp_feat = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))   #@UnusedVariable
                         snap_point.layer.select([snap_point.snappedAtGeometry])
 
         self.rubber_band.hide()

@@ -10,14 +10,9 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QStringListModel, QCompleter, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 
-import os
-import sys
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
-
 from ui_manager import Multi_selector
 from ui_manager import Mincut_edit
 from parent import ParentAction

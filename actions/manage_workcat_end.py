@@ -11,7 +11,6 @@ from PyQt4.Qt import QDate
 from functools import partial
 
 import utils_giswater
-
 from ui_manager import WorkcatEnd
 from actions.parent_manage import ParentManage
 

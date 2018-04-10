@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QDoubleValidator
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint
 from qgis.core import QgsProject, QgsSingleSymbolRendererV2, QgsMarkerSymbolV2, QgsMapToPixel
-
 from qgis.gui import QgsVertexMarker
+from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtGui import QDoubleValidator
+
 import utils_giswater
 from map_tools.parent import ParentMapTool
 from ui_manager import Cad_add_point
@@ -25,6 +25,7 @@ class CadAddPoint(ParentMapTool):
         self.point_1 = None
         self.point_2 = None
         self.snap_to_selected_layer = False
+
 
     def init_create_point_form(self, point_1=None, point_2=None):
 
@@ -47,6 +48,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def get_values(self, point_1, point_2):
+        
         self.dist_x = self.dlg_create_point.dist_x.text()
         if not self.dist_x:
             self.dist_x = 0
@@ -54,6 +56,7 @@ class CadAddPoint(ParentMapTool):
         if not self.dist_y:
             self.dist_y = 0
         self.delete_prev = utils_giswater.isChecked(self.dlg_create_point.chk_delete_prev)
+        
         if self.layer_points:
             self.layer_points.startEditing()
             self.close_dialog(self.dlg_create_point)
@@ -73,8 +76,8 @@ class CadAddPoint(ParentMapTool):
                    "('" + str(point_1) + "', '" + str(point_2) + "', " + str(self.dist_x) + ", "
                    + str(self.dist_y) + ", "+str(self.direction)+", "+str(self.delete_prev)+" )")
             self.controller.execute_sql(sql)
-
             self.layer_points.commitChanges()
+            
         else:
             self.iface.actionPan().trigger()
             self.cancel_point = False
@@ -93,6 +96,7 @@ class CadAddPoint(ParentMapTool):
 
 
     """ QgsMapTools inherited event functions """
+    
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
@@ -166,8 +170,10 @@ class CadAddPoint(ParentMapTool):
 
 
     def activate(self):
+        
         # Get SRID
         self.srid = self.controller.plugin_settings_value('srid')
+        
         # Check button
         self.action().setChecked(True)
 
@@ -184,7 +190,6 @@ class CadAddPoint(ParentMapTool):
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()
-
 
         self.layer_points = self.controller.get_layer_by_tablename('v_edit_cad_auxpoint', True)
         if self.layer_points is None:
@@ -209,8 +214,12 @@ class CadAddPoint(ParentMapTool):
 
 
     def deactivate(self):
+        
         self.point_1 = None
         self.point_2 = None
+        
         # Call parent method
         ParentMapTool.deactivate(self)
         self.iface.setActiveLayer(self.current_layer)
+        
+        
