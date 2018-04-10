@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from PyQt4.QtGui import QAbstractItemView, QTableView
+from PyQt4.QtGui import QAbstractItemView, QTableView, QCompleter, QStringListModel
 from qgis.core import QgsExpression, QgsFeatureRequest
 from functools import partial
 
@@ -160,8 +160,8 @@ class ManageWorkcatEnd(ParentManage):
         row = self.controller.get_row(sql)
 
         # Hardcoded
-        row = ['A156','A229']
-        selected_list = ['A155']
+        row = ['A154','A153']
+        self.selected_list = ['A154', 'A153']
 
         if row:
             self.dlg_work = WorkcatEndList()
@@ -171,11 +171,16 @@ class ManageWorkcatEnd(ParentManage):
             self.dlg_work.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_work))
             self.dlg_work.btn_accept.pressed.connect(self.exec_downgrade)
 
+            self.set_completer()
+
+            table_object = "arc"
+            #self.dlg_work.arc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_object))
+
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
             self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
             table_relations = "v_ui_arc_x_relations"
             filter = ""
-            for row in selected_list:
+            for row in self.selected_list:
                 filter += "arc_id = '" + str(row) + "' OR "
             filter = filter[:-3] + ""
             filter += " AND arc_state = '1' "
@@ -329,3 +334,15 @@ class ManageWorkcatEnd(ParentManage):
                " WHERE parameter = 'edit_arc_downgrade_force'")
         self.controller.execute_sql(sql, log_sql=True)
         pass
+
+
+    def set_completer(self):
+        """ Set autocompleters of the form """
+
+        # Adding auto-completion to a QLineEdit - visit_id
+        self.completer = QCompleter()
+        self.dlg_work.arc_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        model.setStringList(self.selected_list)
+        self.completer.setModel(model)
