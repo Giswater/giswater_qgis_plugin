@@ -173,12 +173,12 @@ class ManageWorkcatEnd(ParentManage):
 
             self.set_completer()
 
-            table_object = "arc"
-            #self.dlg_work.arc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_object))
+            table_relations = "v_ui_arc_x_relations"
+            self.dlg_work.arc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_relations))
 
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
             self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
-            table_relations = "v_ui_arc_x_relations"
+
             filter = ""
             for row in self.selected_list:
                 filter += "arc_id = '" + str(row) + "' OR "
@@ -346,3 +346,40 @@ class ManageWorkcatEnd(ParentManage):
 
         model.setStringList(self.selected_list)
         self.completer.setModel(model)
+
+
+    def filter_by_id(self, table, widget_txt, tablename):
+
+        id_ = utils_giswater.getWidgetText(widget_txt)
+        if id_ != 'null':
+            expr = " arc_id = '" + id_ + "'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table_relations(table, self.schema_name + "." + tablename)
+
+
+    def fill_table_relations(self, widget, table_name):
+        """ Set a model with selected filter. Attach that model to selected table """
+
+        filter = ""
+        for row in self.selected_list:
+            filter += "arc_id = '" + str(row) + "' OR "
+        filter = filter[:-3] + ""
+        filter += " AND arc_state = '1' "
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setFilter(filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+        widget.show()
