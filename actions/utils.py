@@ -308,19 +308,6 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.dma_vdefault, rows, 1)
 
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'virtual_layer_polygon'")
-        rows = self.controller.get_row(sql)
-        utils_giswater.setText(self.dlg.virtual_layer_polygon, rows)
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'virtual_layer_point'")
-        rows = self.controller.get_row(sql)
-        utils_giswater.setText(self.dlg.virtual_layer_point, rows)
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'virtual_layer_line'")
-        rows = self.controller.get_row(sql)
-        utils_giswater.setText(self.dlg.virtual_layer_line, rows)
-
         layers = self.iface.mapCanvas().layers()
         layers_list = []
         for layer in layers:
@@ -517,12 +504,7 @@ class Utils(ParentAction):
         self.manage_config_param_user("dim_tooltip", True)
         self.manage_config_param_user("edit_arc_division_dsbl", True)
         self.manage_config_param_user("plan_arc_vdivision_dsbl", True)
-        self.manage_config_param_user("virtual_layer_polygon")
-        self.manage_config_param_user("virtual_layer_point")
-        self.manage_config_param_user("virtual_layer_line")
         self.manage_config_param_user("cad_tools_base_layer_vdefault_1")
-        self.manage_config_param_user("cad_tools_base_layer_vdefault_2")
-        self.manage_config_param_user("cad_tools_base_layer_vdefault_3")
 
         # MasterPlan
         self.manage_config_param_user("psector_vdefault")

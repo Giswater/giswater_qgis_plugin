@@ -54,7 +54,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -202,8 +202,8 @@
       <widget class="QComboBox" name="composer_om_vdefault">
        <property name="geometry">
         <rect>
-         <x>225</x>
-         <y>65</y>
+         <x>224</x>
+         <y>62</y>
          <width>186</width>
          <height>22</height>
         </rect>
@@ -213,7 +213,7 @@
        <property name="geometry">
         <rect>
          <x>14</x>
-         <y>65</y>
+         <y>62</y>
          <width>177</width>
          <height>22</height>
         </rect>
@@ -248,8 +248,8 @@
       <widget class="QCheckBox" name="chk_composer_om_vdefault">
        <property name="geometry">
         <rect>
-         <x>195</x>
-         <y>65</y>
+         <x>194</x>
+         <y>62</y>
          <width>17</width>
          <height>21</height>
         </rect>
@@ -3173,173 +3173,6 @@
       <attribute name="title">
        <string>Utils</string>
       </attribute>
-      <widget class="QLabel" name="label_visitcat_5">
-       <property name="geometry">
-        <rect>
-         <x>14</x>
-         <y>96</y>
-         <width>166</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Virtual layer line</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_visitcat_3">
-       <property name="geometry">
-        <rect>
-         <x>14</x>
-         <y>36</y>
-         <width>166</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Virtual layer polygon</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="virtual_layer_point">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>66</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="chk_virtual_layer_line">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>96</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_visitcat_4">
-       <property name="geometry">
-        <rect>
-         <x>14</x>
-         <y>66</y>
-         <width>166</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Virtual layer point</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="virtual_layer_polygon">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>36</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="chk_virtual_layer_polygon">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>36</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="chk_virtual_layer_point">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>66</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="chk_cad_tools_base_layer_vdefault_1">
        <property name="geometry">
         <rect>
@@ -3360,16 +3193,6 @@
          <y>6</y>
          <width>201</width>
          <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="virtual_layer_line">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>96</y>
-         <width>201</width>
-         <height>20</height>
         </rect>
        </property>
       </widget>
