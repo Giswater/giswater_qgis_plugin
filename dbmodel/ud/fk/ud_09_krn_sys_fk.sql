@@ -257,7 +257,7 @@ ALTER TABLE "cat_connec" ADD CONSTRAINT "cat_connec_matcat_id_fkey" FOREIGN KEY 
 ALTER TABLE "cat_connec" ADD CONSTRAINT "cat_connec_brand_fkey" FOREIGN KEY ("brand") REFERENCES "cat_brand" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_connec" ADD CONSTRAINT "cat_connec_model_fkey" FOREIGN KEY ("model") REFERENCES "cat_brand_model" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "cat_grate" ADD CONSTRAINT "cat_grate_matcat_id_fkey" FOREIGN KEY ("matcat_id") REFERENCES "cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "cat_grate" ADD CONSTRAINT "cat_grate_matcat_id_fkey" FOREIGN KEY ("matcat_id") REFERENCES "cat_mat_gully" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "cat_grate" ADD CONSTRAINT "cat_grate_brand_fkey" FOREIGN KEY ("brand") REFERENCES "cat_brand" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_grate" ADD CONSTRAINT "cat_grate_model_fkey" FOREIGN KEY ("model") REFERENCES "cat_brand_model" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

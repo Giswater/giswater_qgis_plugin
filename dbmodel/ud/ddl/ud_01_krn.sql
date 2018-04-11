@@ -56,6 +56,13 @@ CREATE TABLE "cat_mat_node" (
 CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE "cat_mat_gully" (
+"id" varchar(30)  ,
+"descript" varchar(512)  ,
+"link" varchar(512)  ,
+CONSTRAINT cat_mat_gully_pkey PRIMARY KEY (id)
+);
+
 
 CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
