@@ -36,11 +36,11 @@ BEGIN
 	-- Grant generic permissions
 	FOR table_record IN SELECT * FROM sys_role
 	LOOP
-		query_text:= 'GRANT ALL ON SCHEMA '||ws_aux||' TO '||table_record.id||';'; 
+		query_text:= 'GRANT ALL ON SCHEMA '||schema_name_aux||' TO '||table_record.id||';'; 
 		EXECUTE query_text;
-		query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||ws_aux||' TO '||table_record.id||';'; 
+		query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||schema_name_aux||' TO '||table_record.id||';'; 
 		EXECUTE query_text;
-		query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||ws_aux||' TO "role_basic";'; 
+		query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||schema_name_aux||' TO "role_basic";'; 
 		EXECUTE query_text;
 	END LOOP;
 
