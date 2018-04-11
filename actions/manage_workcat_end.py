@@ -127,42 +127,25 @@ class ManageWorkcatEnd(ParentManage):
 
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
-        
+
         self.enddate = utils_giswater.getCalendarDate("enddate")
         self.workcat_id_end = utils_giswater.getWidgetText("workcat_id_end")
 
-        # Update tablename of every geom_type
-        self.update_geom_type("arc")
-        self.update_geom_type("node")
-        self.update_geom_type("connec")
-        self.update_geom_type("element")
-        if self.project_type == 'ud':        
-            self.update_geom_type("gully")
-            
-        #self.dlg.close()
-
-        #geom_type = "arc"
-        #widget = "tbl_cat_work_x_" + geom_type
-        #tablename = "v_edit_" + geom_type
-        #widget = utils_giswater.getWidget(widget)
         selected_list = self.dlg.tbl_cat_work_x_arc.model()
+        self.selected_list = []
         ids_list = ""
         if selected_list is None:
             return
         for x in range(0, selected_list.rowCount()):
             index = selected_list.index(x, 0)
             id_ = selected_list.data(index)
+            self.selected_list.append(id_)
             ids_list = ids_list + "'" + id_ + "'" + ","
         ids_list = ids_list[:-1]
+
         sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations"
                " WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
-        self.controller.log_info(str(sql))
         row = self.controller.get_row(sql)
-
-        # Hardcoded
-        row = ['A154','A153']
-        self.selected_list = ['A154', 'A153']
-
         if row:
             self.dlg_work = WorkcatEndList()
             utils_giswater.setDialog(self.dlg_work)
@@ -170,7 +153,6 @@ class ManageWorkcatEnd(ParentManage):
 
             self.dlg_work.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_work))
             self.dlg_work.btn_accept.pressed.connect(self.exec_downgrade)
-
             self.set_completer()
 
             table_relations = "v_ui_arc_x_relations"
@@ -179,11 +161,13 @@ class ManageWorkcatEnd(ParentManage):
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
             self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
 
+            self.controller.log_info(str(self.selected_list))
             filter = ""
             for row in self.selected_list:
                 filter += "arc_id = '" + str(row) + "' OR "
             filter = filter[:-3] + ""
             filter += " AND arc_state = '1' "
+            self.controller.log_info(str(filter))
             self.fill_table(self.tbl_arc_x_relations, table_relations, filter)
 
             # table_object =
@@ -192,8 +176,13 @@ class ManageWorkcatEnd(ParentManage):
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
         else:
-            pass
-
+            # Update tablename of every geom_type
+            self.update_geom_type("arc")
+            self.update_geom_type("node")
+            self.update_geom_type("connec")
+            self.update_geom_type("element")
+            if self.project_type == 'ud':
+                self.update_geom_type("gully")
 
         self.dlg.close()
 
@@ -208,20 +197,6 @@ class ManageWorkcatEnd(ParentManage):
         if selected_list is None:
             return
 
-        #update( or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        sql = ("SELECT * FROM " + self.schema_name + ".config_param_user "
-               " WHERE parameter = 'edit_arc_downgrade_force' ")
-        row = self.controller.get_row(sql)
-        if row:
-            sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                   " SET value = True "
-                   " WHERE parameter = 'edit_arc_downgrade_force'")
-            self.controller.execute_sql(sql, log_sql=True)
-        else:
-            pass
-            #todo if doesn't exist insert
-
-
         sql = ""
         for x in range(0, selected_list.rowCount()):
             index = selected_list.index(x,0)
@@ -229,8 +204,9 @@ class ManageWorkcatEnd(ParentManage):
                    " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
                    " enddate = '" + str(self.enddate) + "'"
                    " WHERE " + geom_type + "_id = '" + str(selected_list.data(index)) + "';\n")
-        
-        self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql, log_sql=True)
+        if status:
+            self.controller.show_info("Geometry updated successfully!")
 
 
     def fill_table(self, widget, table_name, filter):
@@ -298,8 +274,10 @@ class ManageWorkcatEnd(ParentManage):
             self.controller.log_info(str(it))
             id_list = [i for i in it]
 
-            # if id_list:
-                # self.iface.openFeatureForm(layer_arc, id_list[0])
+            if id_list:
+                # TODO
+                #self.dlg_work.close()
+                #self.iface.openFeatureForm(layer_arc, id_list[0])
 
         # Zoom to object
         canvas = self.iface.mapCanvas()
@@ -324,16 +302,19 @@ class ManageWorkcatEnd(ParentManage):
                    " VALUES (True)")
             self.controller.execute_sql(sql, commit=self.autocommit)
 
-        # TODO
-        # Make downgrade (select as is)
-
+        # Update tablename of every geom_type
+        self.update_geom_type("arc")
+        self.update_geom_type("node")
+        self.update_geom_type("connec")
+        self.update_geom_type("element")
+        if self.project_type == 'ud':
+            self.update_geom_type("gully")
 
         # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
         sql = ("UPDATE " + self.schema_name + ".config_param_user "
                " SET value = False "
                " WHERE parameter = 'edit_arc_downgrade_force'")
         self.controller.execute_sql(sql, log_sql=True)
-        pass
 
 
     def set_completer(self):
