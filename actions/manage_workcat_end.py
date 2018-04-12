@@ -275,9 +275,8 @@ class ManageWorkcatEnd(ParentManage):
             id_list = [i for i in it]
 
             if id_list:
-                # TODO
-                #self.dlg_work.close()
-                #self.iface.openFeatureForm(layer_arc, id_list[0])
+                self.dlg_work.close()
+                self.iface.openFeatureForm(layer_arc, id_list[0])
 
         # Zoom to object
         canvas = self.iface.mapCanvas()
