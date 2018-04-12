@@ -161,16 +161,14 @@ class ManageWorkcatEnd(ParentManage):
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
             self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-            self.controller.log_info(str(self.selected_list))
             filter = ""
             for row in self.selected_list:
                 filter += "arc_id = '" + str(row) + "' OR "
             filter = filter[:-3] + ""
             filter += " AND arc_state = '1' "
-            self.controller.log_info(str(filter))
+
             self.fill_table(self.tbl_arc_x_relations, table_relations, filter)
 
-            # table_object =
             self.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object, self.tbl_arc_x_relations))
 
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -189,21 +187,15 @@ class ManageWorkcatEnd(ParentManage):
 
     def update_geom_type(self, geom_type):
         """ Get elements from @geom_type and update his corresponding table """
-        
-        widget = "tbl_cat_work_x_" + geom_type
-        tablename = "v_edit_" + geom_type
-        widget = utils_giswater.getWidget(widget)
-        selected_list = widget.model()
-        if selected_list is None:
-            return
 
-        sql = ""
-        for x in range(0, selected_list.rowCount()):
-            index = selected_list.index(x,0)
-            sql += ("UPDATE " + self.schema_name + "." + tablename + ""
+        tablename = "v_edit_" + geom_type
+        if self.selected_list is None:
+            return
+        for id in self.selected_list:
+            sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                    " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
                    " enddate = '" + str(self.enddate) + "'"
-                   " WHERE " + geom_type + "_id = '" + str(selected_list.data(index)) + "';\n")
+                   " WHERE " + geom_type + "_id = '" + str(id) + "'")
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.controller.show_info("Geometry updated successfully!")
@@ -271,11 +263,8 @@ class ManageWorkcatEnd(ParentManage):
         if layer_arc:
             # Get a featureIterator from this expression:
             it = layer_arc.getFeatures(QgsFeatureRequest(expr))
-            self.controller.log_info(str(it))
             id_list = [i for i in it]
-
             if id_list:
-                self.dlg_work.close()
                 self.iface.openFeatureForm(layer_arc, id_list[0])
 
         # Zoom to object
@@ -287,33 +276,42 @@ class ManageWorkcatEnd(ParentManage):
 
     def exec_downgrade(self):
 
-        # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'edit_arc_downgrade_force'")
-        row = self.controller.get_row(sql, log_info=False)
-        if row:
+        message = "Are you sure you want to disconnect these elements?"
+        title = "Disconect elements"
+        #answer = self.controller.ask_question(message, title, inf_text)
+        answer = self.controller.ask_question(message, title)
+        if answer:
+            # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
+            sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
+                   " WHERE parameter = 'edit_arc_downgrade_force'")
+            row = self.controller.get_row(sql, log_info=False)
+            if row:
+                sql = ("UPDATE " + self.schema_name + ".config_param_user "
+                       " SET value = True "
+                       " WHERE parameter = 'edit_arc_downgrade_force'")
+                self.controller.execute_sql(sql, log_sql=True)
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".config_param_user (edit_arc_downgrade_force)"
+                       " VALUES (True)")
+                self.controller.execute_sql(sql, commit=self.autocommit)
+
+            # Update tablename of every geom_type
+            self.update_geom_type("arc")
+            self.update_geom_type("node")
+            self.update_geom_type("connec")
+            self.update_geom_type("element")
+            if self.project_type == 'ud':
+                self.update_geom_type("gully")
+
+            # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
             sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                   " SET value = True "
+                   " SET value = False "
                    " WHERE parameter = 'edit_arc_downgrade_force'")
             self.controller.execute_sql(sql, log_sql=True)
+            self.dlg_work.close()
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (edit_arc_downgrade_force)"
-                   " VALUES (True)")
-            self.controller.execute_sql(sql, commit=self.autocommit)
-
-        # Update tablename of every geom_type
-        self.update_geom_type("arc")
-        self.update_geom_type("node")
-        self.update_geom_type("connec")
-        self.update_geom_type("element")
-        if self.project_type == 'ud':
-            self.update_geom_type("gully")
-
-        # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
-        sql = ("UPDATE " + self.schema_name + ".config_param_user "
-               " SET value = False "
-               " WHERE parameter = 'edit_arc_downgrade_force'")
-        self.controller.execute_sql(sql, log_sql=True)
+            self.dlg_work.close()
+            self.dlg.open()
 
 
     def set_completer(self):
