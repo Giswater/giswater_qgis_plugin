@@ -38,6 +38,12 @@ INSERT INTO cat_mat_node VALUES ('FD', 'FD');
 INSERT INTO cat_mat_node VALUES ('Iron', 'Iron');
 
 
+INSERT INTO cat_mat_gully VALUES ('N/I', 'N/I');
+INSERT INTO cat_mat_gully VALUES ('FD', 'FD');
+INSERT INTO cat_mat_gully VALUES ('Iron', 'Iron');
+INSERT INTO cat_mat_gully VALUES ('Concret', 'Concret');
+
+
 INSERT INTO cat_arc VALUES ('CON-CC100', 'Concret', 'CIRCULAR', 1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Concret conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 1.30, 0.7854, 2.20, 0.15, 'm', 'A_CON_DN100', 'S_REP', 'S_NULL', true);
 INSERT INTO cat_arc VALUES ('PVC-CC040', 'PVC', 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'PVC conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 0.52, 0.1257, 1.60, 0.06, 'm', 'A_PVC_DN40', 'S_REP', 'S_NULL', true);
 INSERT INTO cat_arc VALUES ('PVC-CC060', 'PVC', 'CIRCULAR', 0.6000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'PVC conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 0.78, 0.2827, 1.80, 0.09, 'm', 'A_PVC_DN60', 'S_REP', 'S_NULL', true);
