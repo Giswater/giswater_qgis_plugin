@@ -919,7 +919,7 @@ class DaoController():
         """ Check if current user belongs to @role_name """
         
         if not self.check_role(role_name):
-            return True
+            return False
         
         sql = ("SELECT pg_has_role('" + self.user + "', '" + role_name + "', 'MEMBER');")
         row = self.get_row(sql)
@@ -960,10 +960,10 @@ class DaoController():
         """ Check roles of this user to show or hide toolbars """
         
         role_admin = False
-        role_master = self.check_role_user("rol_master")
-        role_epa = self.check_role_user("rol_epa")
-        role_edit = self.check_role_user("rol_edit")
-        role_om = self.check_role_user("rol_om")
+        role_master = self.check_role_user("role_master")
+        role_epa = self.check_role_user("role_epa")
+        role_edit = self.check_role_user("role_edit")
+        role_om = self.check_role_user("role_om")
         
         if role_admin:
             pass
