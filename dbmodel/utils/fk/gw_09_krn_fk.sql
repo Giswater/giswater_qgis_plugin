@@ -152,8 +152,8 @@ ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m3fill_cost_fkey" FOREIGN KEY ("
 ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m3excess_cost_fkey" FOREIGN KEY ("m3excess_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_soil" ADD CONSTRAINT "cat_soil_m2trenchl_cost_fkey" FOREIGN KEY ("m2trenchl_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key1_fkey" FOREIGN KEY ("workid_key1") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key2_fkey" FOREIGN KEY ("workid_key2") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key1_fkey" FOREIGN KEY ("workid_key1") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--ALTER TABLE "cat_work" ADD CONSTRAINT "cat_work_workid_key2_fkey" FOREIGN KEY ("workid_key2") REFERENCES "cat_work" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "cat_pavement" ADD CONSTRAINT "cat_pavement_m2_cost_fkey" FOREIGN KEY ("m2_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

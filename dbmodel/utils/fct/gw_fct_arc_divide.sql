@@ -98,9 +98,14 @@ BEGIN
 		-- In function of states and user's variables proceed.....
 		IF (state_aux=1 AND state_node_arg=1) OR (state_aux=2 AND state_node_arg=2) THEN 
 		
-			--    Insert new record into arc table
+			-- Insert new records into arc table
+			-- downgrade temporary the state_topocontrol to prevent conflicts	
+			UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
 			INSERT INTO v_edit_arc SELECT rec_aux1.*;
 			INSERT INTO v_edit_arc SELECT rec_aux2.*;
+			-- restore the state_topocontrol variable
+			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
+	
 			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 			
 			SELECT 
@@ -217,3 +222,5 @@ RETURN return_aux;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ALTER FUNCTION SCHEMA_NAME.gw_fct_arc_divide(character varying)
+  OWNER TO postgres;
