@@ -655,7 +655,7 @@ class ManageVisit(ParentManage, QObject):
             if row:
                 # if int then look for default row ans set it
                 try:
-                    utils_giswater.set_combo_itemData(self.dlg.visitcat_id, row[0], 0)
+                    utils_giswater.set_combo_itemData(self.dlg.visitcat_id, row[0], 0, 1)
                     for i in range(0, self.dlg.visitcat_id.count()):
                         elem = self.dlg.visitcat_id.itemData(i)
                         if str(row[0]) == str(elem[0]):                         
