@@ -54,7 +54,7 @@ class ManageWorkcatEnd(ParentManage):
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Remove all previous selections
-        self.remove_selection(True)
+        #self.remove_selection(True)
         
         # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
@@ -276,7 +276,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def exec_downgrade(self):
 
-        message = "Are you sure you want to disconnect these elements?"
+        message = "Are you sure you want to disconnect this elements?"
         title = "Disconect elements"
         #answer = self.controller.ask_question(message, title, inf_text)
         answer = self.controller.ask_question(message, title)
