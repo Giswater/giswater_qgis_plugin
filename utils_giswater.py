@@ -369,17 +369,6 @@ def fillWidget(widget):
         widget.setText("")
 
 
-def set_combo_itemData(combo, value, item1, item2):
-    """ Set text to combobox populate with more than 1 item for row
-        @item1: element to compare
-        @item2: element to show
-    """
-    for i in range(0, combo.count()):
-        elem = combo.itemData(i)
-        if value == elem[item1]:
-            setWidgetText(combo, (elem[item2]))
-
-
 def get_reg(reg_hkey, reg_path, reg_name):
     
     if 'nt' in sys.builtin_module_names:     
@@ -475,6 +464,17 @@ def get_item_data(widget, index=0):
             code = elem[index]            
 
     return code
+
+
+def set_combo_itemData(combo, value, item1):
+    """ Set text to combobox populate with more than 1 item for row
+        @item1: element to compare
+        @item2: element to show
+    """
+    for i in range(0, combo.count()):
+        elem = combo.itemData(i)
+        if value == elem[item1]:
+            combo.setCurrentIndex(i)
 
 
 def set_item_data(combo, rows, index_to_show=0, combo_clear=True):
