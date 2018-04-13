@@ -43,7 +43,6 @@ class Utils(ParentAction):
         utils_giswater.setDialog(self.dlg_toolbox)
         self.load_settings(self.dlg_toolbox)
         project_type = self.controller.get_project_type()
-        cur_user = self.controller.get_current_user()
 
         # Remove tab WS or UD
         if project_type == 'ws':
@@ -52,12 +51,21 @@ class Utils(ParentAction):
             utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.tabWidget_3, "tab_8")
 
         # Remove tab for rol
-        if cur_user == 'user_edit':
+        role_admin = False
+        role_master = self.controller.check_role_user("role_master")
+        role_epa = self.controller.check_role_user("role_epa")
+        role_edit = self.controller.check_role_user("role_edit")
+        role_om = self.controller.check_role_user("role_om")
+        role_basic = self.controller.check_role_user("role_basic")
+
+        if role_admin:
+            pass
+        elif role_master:
+            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab")
+        elif role_edit:
             for i in range(2):
                 utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab_2")
-                utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab")
-        elif cur_user == 'user_master':
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab")
+        utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab")
 
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
@@ -201,29 +209,39 @@ class Utils(ParentAction):
         self.project_type = self.controller.get_project_type()
 
         # TODO: Parametrize it.
-        cur_user = self.controller.get_current_user()
-        if cur_user == 'user_basic':
+        role_admin = False
+        role_master = self.controller.check_role_user("role_master")
+        role_epa = self.controller.check_role_user("role_epa")
+        role_edit = self.controller.check_role_user("role_edit")
+        role_om = self.controller.check_role_user("role_om")
+        role_basic = self.controller.check_role_user("role_basic")
+
+        if role_admin:
+            pass
+        elif role_master:
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+        elif role_epa:
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+        elif role_edit:
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+        elif role_om:
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_7")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_13")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+
+        elif role_basic:
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_5")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_7")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_13")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
-        elif cur_user == 'user_om':
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_7")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_13")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
-        elif cur_user == 'user_edit':
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
-        elif cur_user == 'user_epa':
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
-        elif cur_user == 'user_master':
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+
 
         # Hide empty tabs
         utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_3")
