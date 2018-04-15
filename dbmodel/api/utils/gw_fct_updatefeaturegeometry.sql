@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_updatefeaturegeometry"(table_id varchar, srid int4, id int8, value_new varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatefeaturegeometry"(table_id varchar, srid int4, id int8, value_new varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -14,7 +14,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -25,15 +25,23 @@ BEGIN
 --    Get table coordinates
     SRID_var := Find_SRID(schemas_array[1]::TEXT, table_id, 'the_geom');
 
+    RAISE NOTICE '1';
+
 --    Transform from device EPSG to database EPSG
     insert_geom := ST_Transform(insert_geom , SRID_var);    
+
+    RAISE NOTICE '2';
+
 
 --    Get id column
     EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
         INTO table_pkey
         USING table_id;
 
---    For views is the first column
+    RAISE NOTICE '3';
+
+
+--    For views is the fir1t column
     IF table_pkey ISNULL THEN
         EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND ordinal_position = 1'
         INTO table_pkey

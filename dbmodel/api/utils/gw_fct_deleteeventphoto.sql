@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_deleteeventphoto"(value_arg text) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_deleteeventphoto"(value_arg text) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
     res_delete boolean;
@@ -7,7 +7,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari", public;    
+    SET search_path = "SCHEMA_NAME", public;    
 
 
 --    Get parameter id

@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_getparameteridfromparametertype"(parameter_type varchar, element_type varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getparameteridfromparametertype"(parameter_type varchar, element_type varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -9,14 +9,14 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari", public;    
+    SET search_path = "SCHEMA_NAME", public;    
 
 
 --    COMMON TASKS:
 
 
 --    Get parameter id
-    EXECUTE 'SELECT array_to_json(array_agg(json_data)) FROM (SELECT row_to_json(t) AS json_data FROM (SELECT id FROM om_visit_parameter 
+    EXECUTE 'SELECT array_to_json(array_agg(json_data)) FROM (SELECT row_to_json(t) AS json_data FROM (SELECT id, descript AS "name" FROM om_visit_parameter 
     WHERE parameter_type = ' || quote_literal(parameter_type) || ' AND LOWER(feature_type) = '|| quote_literal(element_type) || ') t  ) r'   
     INTO query_result_parameter_id_options;
 

@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_getreview"(id int8, element_type varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getreview"(id int8, element_type varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -10,7 +10,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --    Get event data
 

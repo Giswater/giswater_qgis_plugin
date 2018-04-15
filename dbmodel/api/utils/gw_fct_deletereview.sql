@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_deleteevent"(event_id int4) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_deletereview"(element_type varchar, id int8) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
     res_delete boolean;
@@ -12,8 +12,8 @@ BEGIN
 
 
 --    Get parameter id
-    EXECUTE 'SELECT EXISTS(SELECT 1 FROM om_visit_event WHERE id = $1)'
-    USING event_id
+    EXECUTE 'SELECT EXISTS(SELECT 1 FROM review_' || element_type || ' WHERE ' || element_type || '_id = $1)'
+    USING id
     INTO res_delete;
 
 
@@ -21,12 +21,12 @@ BEGIN
 --    Return
     IF res_delete THEN
 
-        EXECUTE 'DELETE FROM om_visit_event WHERE id = $1'
-            USING event_id;
+        EXECUTE 'DELETE FROM review_' || element_type || ' WHERE ' || element_type || '_id = $1'
+            USING id;
 
         RETURN ('{"status":"Accepted"}')::json;
     ELSE
-        RETURN ('{"status":"Failed","message":"event_id ' || event_id || ' does not exist"}')::json;
+        RETURN ('{"status":"Failed","message":"' || element_type || '_id ' || id || ' does not exist"}')::json;
     END IF;
 
 --    Exception handling

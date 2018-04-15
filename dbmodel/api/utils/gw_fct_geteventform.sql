@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_geteventform"(parameter_id varchar, arc_id varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_geteventform"(parameter_id varchar, arc_id varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -18,7 +18,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 
 --    Get web form:
@@ -55,7 +55,7 @@ BEGIN
     IF arc_id IS NOT NULL THEN
 
 --        Get node_1
-        EXECUTE 'SELECT array_to_json(ARRAY[node_1, node_2]) FROM arbrat_viari.arc WHERE arc_id = $1'
+        EXECUTE 'SELECT array_to_json(ARRAY[node_1, node_2]) FROM SCHEMA_NAME.arc WHERE arc_id = $1'
             INTO position
             USING arc_id;
 
@@ -79,7 +79,7 @@ RAISE NOTICE 'Res: %', formToDisplay;
     
 
 --    Get combo rows
-    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, name, type, dv_table, dv_key_column, dv_value_column, ROW_NUMBER() OVER() AS rownum 
+    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, name, type, dv_table, dv_id_column, dv_name_column, ROW_NUMBER() OVER() AS rownum 
         FROM config_web_fields WHERE table_id = $1) a WHERE name != $2 AND type = $3'
     INTO combo_rows
     USING formToDisplay, 'position_id', 'combo';
@@ -90,14 +90,14 @@ RAISE NOTICE 'Res: %', formToDisplay;
     LOOP
 
 --        Get combo values
-        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_key_column') || ')) FROM ' || (aux_json->>'dv_table')::TEXT
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM ' || (aux_json->>'dv_table')::TEXT
         INTO combo_json; 
 
 --        Update array
         fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboValues', combo_json);
 
 --        Get combo id's
-        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_value_column') || ')) FROM ' || (aux_json->>'dv_table')::TEXT
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM ' || (aux_json->>'dv_table')::TEXT
         INTO combo_json; 
 
         fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboKeys', combo_json);

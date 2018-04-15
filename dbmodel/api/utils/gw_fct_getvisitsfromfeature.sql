@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_getvisitsfromfeature"(element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getvisitsfromfeature"(element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -10,7 +10,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --    Get query for visits
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat(''v_ui_om_visitman_x_'',$1) AND device = $2'
@@ -27,10 +27,10 @@ BEGIN
         query_result := query_result || ' AND visit_start > ' || quote_literal(visit_start::TIMESTAMP(6));
     END IF;
 
---    Add visit_start filter
-    IF visit_end IS NOT NULL THEN
-        query_result := query_result || ' AND visit_end < ' || quote_literal(visit_end::TIMESTAMP(6));
-    END IF;
+--    Add visit_end filter
+--    IF visit_end IS NOT NULL THEN
+--        query_result := query_result || ' AND visit_end < ' || quote_literal(visit_end::TIMESTAMP(6));
+--    END IF;
     
 --    Get visits
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ') a'

@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_updatefeature"(table_id varchar, id int8, column_name varchar, value_new varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatefeature"(table_id varchar, id int8, column_name varchar, value_new varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -12,7 +12,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -55,8 +55,8 @@ RAISE NOTICE 'Res: %', sql_query;
     RETURN ('{"status":"Accepted"}')::json;    
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
+   -- EXCEPTION WHEN OTHERS THEN 
+    --    RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
 
 
 END;

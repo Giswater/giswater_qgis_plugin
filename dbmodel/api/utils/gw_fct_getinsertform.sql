@@ -1,10 +1,9 @@
-﻿CREATE OR REPLACE FUNCTION "arbrat_viari"."gw_fct_getinsertform"(table_id varchar, lang varchar, id varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinsertform"(table_id varchar, lang varchar, id varchar, formtodisplay varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
     column_type character varying;
     query_result character varying;
-    formToDisplay character varying;
     position json;
     fields json;
     fields_array json[];
@@ -24,33 +23,22 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
     
 
---    Get web form name:
-    formToDisplayName := table_id;
-
---    Get web form number:
-    EXECUTE 'SELECT formid FROM config_web_layer_tab WHERE table_id = $1 LIMIT 1'
-        INTO formToDisplay
-        USING table_id; 
-
-
---    Get form fields
+--    Get fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = $1) a'
         INTO fields_array
-        USING formToDisplayName;    
-
-
+        USING table_id;    
 
 --    Get combo rows
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, name, type, dv_table, dv_id_column, dv_name_column, ROW_NUMBER() OVER() AS rownum 
         FROM config_web_fields WHERE table_id = $1) a WHERE type = $2'
     INTO combo_rows
-    USING formToDisplayName, 'combo';
+    USING table_id, 'combo';
     combo_rows := COALESCE(combo_rows, '{}');
 
 
@@ -58,8 +46,8 @@ BEGIN
     FOREACH aux_json IN ARRAY combo_rows
     LOOP
 
---        Get combo values
-        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM ' || (aux_json->>'dv_table')::TEXT
+--        Get combo id's
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' || quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
         INTO combo_json; 
 
 --        Update array
@@ -70,8 +58,8 @@ BEGIN
             fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
         END IF;
 
---        Get combo id's
-        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM ' || (aux_json->>'dv_table')::TEXT
+--        Get combo values
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM ' || quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
         INTO combo_json; 
         combo_json := COALESCE(combo_json, '[]');
 
@@ -79,7 +67,6 @@ BEGIN
         fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
 
     END LOOP;
-
 
 
 --    Get existing values for the element
@@ -144,8 +131,8 @@ BEGIN
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+  --  EXCEPTION WHEN OTHERS THEN 
+  --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
