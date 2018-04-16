@@ -269,8 +269,8 @@ class Utils(ParentAction):
         sql = "SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.state_vdefault, rows, 1)
-        sql = ("SELECT DISTINCT(id),name FROM " + self.schema_name + ".value_state_type"
-               " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "'")
+        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type "
+               "WHERE state = '" + str(utils_giswater.get_item_data(self.dlg.state_vdefault)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
         sql = "SELECT id, name FROM " + self.schema_name + ".value_state_type WHERE state=0 ORDER BY name"
@@ -1260,8 +1260,7 @@ class Utils(ParentAction):
 
     def filter_statetype_vdefault(self):
         """ Filter QComboBox @statetype_vdefault according  @state_vdefault """
-        value = str(utils_giswater.get_item_data(self.dlg.state_vdefault))
-        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state = '"+value+"'")
+        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state = '"+str(utils_giswater.get_item_data(self.dlg.state_vdefault))+"'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
 
