@@ -34,7 +34,7 @@ class ManageWorkcatEnd(ParentManage):
         self.load_settings(self.dlg)
 
         # Capture the current layer to return it at the end of the operation
-        cur_active_layer = self.iface.activeLayer()
+        self.cur_active_layer = self.iface.activeLayer()
 
         self.set_selectionbehavior(self.dlg)
 
@@ -53,29 +53,26 @@ class ManageWorkcatEnd(ParentManage):
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
-        # Remove all previous selections
-        #self.remove_selection(True)
-        
         # Set icons
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
 
         # Adding auto-completion to a QLineEdit
-        table_object = "cat_work"
-        self.set_completer_object(table_object)
+        self.table_object = "cat_work"
+        self.set_completer_object(self.table_object)
 
         # Set signals
         self.dlg.btn_accept.pressed.connect(partial(self.manage_workcat_end_accept))
-        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
-        self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))
+        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
+        self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
 
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))
+        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, self.table_object))
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.table_object))
+        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, self.table_object))
 
         self.dlg.workcat_id_end.activated.connect(partial(self.fill_workids))
-        self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
+        self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.table_object))
 
         # Set values
         self.fill_fields()
@@ -88,7 +85,7 @@ class ManageWorkcatEnd(ParentManage):
         # Set default tab 'arc'
         self.dlg.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(table_object)
+        self.tab_feature_changed(self.table_object)
 
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)     
@@ -135,6 +132,7 @@ class ManageWorkcatEnd(ParentManage):
         self.selected_list = []
         ids_list = ""
         if selected_list is None:
+            self.manage_close(self.table_object, self.cur_active_layer)
             return
         for x in range(0, selected_list.rowCount()):
             index = selected_list.index(x, 0)
@@ -151,7 +149,7 @@ class ManageWorkcatEnd(ParentManage):
             utils_giswater.setDialog(self.dlg_work)
             self.load_settings(self.dlg_work)
 
-            self.dlg_work.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_work))
+            self.dlg_work.btn_cancel.pressed.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
             self.dlg_work.btn_accept.pressed.connect(self.exec_downgrade)
             self.set_completer()
 
@@ -171,18 +169,14 @@ class ManageWorkcatEnd(ParentManage):
 
             self.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object, self.tbl_arc_x_relations))
 
+            self.manage_close(self.table_object, self.cur_active_layer)
+
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
         else:
             # Update tablename of every geom_type
             self.update_geom_type("arc")
-            self.update_geom_type("node")
-            self.update_geom_type("connec")
-            self.update_geom_type("element")
-            if self.project_type == 'ud':
-                self.update_geom_type("gully")
-
-        self.dlg.close()
+            self.manage_close(self.table_object, self.cur_active_layer)
 
 
     def update_geom_type(self, geom_type):
@@ -191,14 +185,14 @@ class ManageWorkcatEnd(ParentManage):
         tablename = "v_edit_" + geom_type
         if self.selected_list is None:
             return
-        for id in self.selected_list:
+        for id_ in self.selected_list:
             sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                    " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
                    " enddate = '" + str(self.enddate) + "'"
-                   " WHERE " + geom_type + "_id = '" + str(id) + "'")
-        status = self.controller.execute_sql(sql, log_sql=True)
-        if status:
-            self.controller.show_info("Geometry updated successfully!")
+                   " WHERE " + geom_type + "_id = '" + str(id_) + "'")
+            status = self.controller.execute_sql(sql, log_sql=True)
+            if status:
+                self.controller.show_info("Geometry updated successfully!")
 
 
     def fill_table(self, widget, table_name, filter):
@@ -277,8 +271,7 @@ class ManageWorkcatEnd(ParentManage):
     def exec_downgrade(self):
 
         message = "Are you sure you want to disconnect this elements?"
-        title = "Disconect elements"
-        #answer = self.controller.ask_question(message, title, inf_text)
+        title = "Disconnect elements"
         answer = self.controller.ask_question(message, title)
         if answer:
             # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
@@ -297,21 +290,17 @@ class ManageWorkcatEnd(ParentManage):
 
             # Update tablename of every geom_type
             self.update_geom_type("arc")
-            self.update_geom_type("node")
-            self.update_geom_type("connec")
-            self.update_geom_type("element")
-            if self.project_type == 'ud':
-                self.update_geom_type("gully")
 
             # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
             sql = ("UPDATE " + self.schema_name + ".config_param_user "
                    " SET value = False "
                    " WHERE parameter = 'edit_arc_downgrade_force'")
             self.controller.execute_sql(sql, log_sql=True)
+            self.remove_selection(True)
+            self.canvas.refresh()
             self.dlg_work.close()
         else:
-            self.dlg_work.close()
-            self.dlg.open()
+            pass
 
 
     def set_completer(self):
@@ -361,3 +350,31 @@ class ManageWorkcatEnd(ParentManage):
         # Attach model to table view
         widget.setModel(model)
         widget.show()
+
+
+    def close_dialog_workcat_list(self, dlg=None):
+        """ Close dialog """
+
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            self.save_settings(dlg)
+            dlg.close()
+            map_tool = self.canvas.mapTool()
+            # If selected map tool is from the plugin, set 'Pan' as current one
+            if map_tool.toolName() == '':
+                self.iface.actionPan().trigger()
+        except AttributeError:
+            pass
+
+        self.dlg.open()
+
+
+    def manage_close(self, table_object, cur_active_layer=None):
+        """ Close dialog and disconnect snapping """
+
+        self.close_dialog()
+        self.hide_generic_layers()
+        self.disconnect_snapping()
+        self.disconnect_signal_selection_changed()
+
