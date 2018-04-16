@@ -1122,9 +1122,8 @@ class Utils(ParentAction):
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
-                    sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
-                            " WHERE name = '" + str(value) + "')"
-                            " WHERE parameter = 'state_vdefault' AND cur_user = current_user")
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
+                            " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 elif widget.objectName() == 'municipality_vdefault':
                     sql += ("(SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
                             " WHERE name = '" + str(value) + "')"
@@ -1159,9 +1158,8 @@ class Utils(ParentAction):
             else:
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                 if widget.objectName() == 'state_vdefault':
-                    sql += (" VALUES ('" + parameter + "',"
-                            " (SELECT id FROM " + self.schema_name + ".value_state"
-                            " WHERE name ='" + str(value) + "'), current_user)")
+                    sql += (" VALUES ('" + parameter + "', '" + str(
+                        utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'municipality_vdefault':
                     sql += (" VALUES ('" + parameter + "',"
                             " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
