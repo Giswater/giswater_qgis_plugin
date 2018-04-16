@@ -965,6 +965,10 @@ class DaoController():
         role_edit = self.check_role_user("role_edit")
         role_om = self.check_role_user("role_om")
         
+        # Manage user 'postgres'
+        if self.user == 'postgres':
+            role_master = True
+        
         if role_admin:
             pass
         elif role_master:

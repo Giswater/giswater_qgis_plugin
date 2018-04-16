@@ -57,6 +57,10 @@ class Utils(ParentAction):
         role_edit = self.controller.check_role_user("role_edit")
         role_om = self.controller.check_role_user("role_om")
         role_basic = self.controller.check_role_user("role_basic")
+        
+        # Manage user 'postgres'
+        if self.controller.user == 'postgres':
+            role_master = True
 
         if role_admin:
             pass
@@ -208,13 +212,17 @@ class Utils(ParentAction):
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
         self.project_type = self.controller.get_project_type()
 
-        # TODO: Parametrize it.
+        # Manage roles
         role_admin = False
         role_master = self.controller.check_role_user("role_master")
         role_epa = self.controller.check_role_user("role_epa")
         role_edit = self.controller.check_role_user("role_edit")
         role_om = self.controller.check_role_user("role_om")
         role_basic = self.controller.check_role_user("role_basic")
+
+        # Manage user 'postgres'
+        if self.controller.user == 'postgres':
+            role_master = True
 
         if role_admin:
             pass
@@ -233,7 +241,6 @@ class Utils(ParentAction):
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
-
         elif role_basic:
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_5")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_7")
@@ -241,7 +248,6 @@ class Utils(ParentAction):
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
             utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
-
 
         # Hide empty tabs
         utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_3")
