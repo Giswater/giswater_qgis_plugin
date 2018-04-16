@@ -1147,10 +1147,26 @@ class MincutParent(ParentAction, MultipleSelection):
 
         sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
                " WHERE result_id = " + str(result_mincut_id) + ";\n")
+        self.controller.execute_sql(sql)
         for element_id in self.connec_list:
-            sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
-                    " (result_id, " + str(element) + "_id) "
-                    " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
+            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+                   " (result_id, " + str(element) + "_id) "
+                   " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
+            self.controller.execute_sql(sql)
+            # Get hydrometer_id of selected connec
+            sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
+                   " WHERE connec_id = '" + str(element_id) + "'")
+            row = self.controller.get_row(sql)
+            if row:
+                # Hydrometers associated to selected connecs inserted to the table anl_mincut_result_hydrometer
+                sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_hydrometer"
+                        " (result_id, hydrometer_id) "
+                        " VALUES ('" + str(result_mincut_id) + "', '" + str(row[0]) + "');\n")
+                status = self.controller.execute_sql(sql)
+                if status:
+                    # Show message to user
+                    message = "Values has been updated"
+                    self.controller.show_info(message)
         
         self.sql_connec = sql
         self.dlg.btn_start.setDisabled(False)
