@@ -266,9 +266,9 @@ class Utils(ParentAction):
         self.populate_cmb_templates(self.dlg.composer_om_vdefault)
 
         # Edit
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
+        sql = "SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("state_vdefault", rows, False)
+        utils_giswater.set_item_data(self.dlg.state_vdefault, rows, 1)
         sql = ("SELECT DISTINCT(id),name FROM " + self.schema_name + ".value_state_type"
                " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "'")
         rows = self.controller.get_rows(sql)
@@ -1260,10 +1260,8 @@ class Utils(ParentAction):
 
     def filter_statetype_vdefault(self):
         """ Filter QComboBox @statetype_vdefault according  @state_vdefault """
-        
-        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state::text = "
-               "(SELECT state FROM " + self.schema_name + ".value_state_type"
-               " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "')::text")
+        value = str(utils_giswater.get_item_data(self.dlg.state_vdefault))
+        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state = '"+value+"'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
 
