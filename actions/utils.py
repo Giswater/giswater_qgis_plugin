@@ -871,13 +871,6 @@ class Utils(ParentAction):
         self.save_settings_values()
 
 
-    def get_data_from_combo(self, combo, position):
-
-        elem = combo.itemData(combo.currentIndex())
-        data = str(elem[position])
-        return data
-
-
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
 
         if roles is None:

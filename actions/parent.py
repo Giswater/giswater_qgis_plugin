@@ -22,7 +22,7 @@ import utils_giswater
 class ParentAction(object):
 
     def __init__(self, iface, settings, controller, plugin_dir):  
-        ''' Class constructor '''
+        """ Class constructor """
 
         # Initialize instance attributes
         self.giswater_version = "3.0"
@@ -52,7 +52,7 @@ class ParentAction(object):
         
     
     def get_plugin_version(self):
-        ''' Get plugin version from metadata.txt file '''
+        """ Get plugin version from metadata.txt file """
                
         # Check if metadata file exists    
         metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
@@ -72,7 +72,7 @@ class ParentAction(object):
                
        
     def get_giswater_jar(self):
-        ''' Get executable Giswater file and build version from windows registry '''
+        """ Get executable Giswater file and build version from windows registry """
              
         reg_hkey = "HKEY_LOCAL_MACHINE"
         reg_path = "SOFTWARE\\Giswater\\"+self.giswater_version
@@ -126,7 +126,7 @@ class ParentAction(object):
     
            
     def get_java_exe(self):
-        ''' Get executable Java file from windows registry '''
+        """ Get executable Java file from windows registry """
 
         reg_hkey = "HKEY_LOCAL_MACHINE"
         reg_path = "SOFTWARE\\JavaSoft\\Java Runtime Environment"
@@ -169,7 +169,7 @@ class ParentAction(object):
                         
 
     def execute_giswater(self, parameter):
-        ''' Executes giswater with selected parameter '''
+        """ Executes giswater with selected parameter """
 
         if self.giswater_file_path is None or self.java_exe is None:
             return               
@@ -504,13 +504,6 @@ class ParentAction(object):
         widget.setModel(self.model)
 
 
-    def update_combobox_values(self, widget, combo, x):
-        """ Insert combobox.currentText into widget (QTableView) """
-
-        index = widget.model().index(x, 4)
-        widget.model().setData(index, combo.currentText())
-
-
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
@@ -595,11 +588,6 @@ class ParentAction(object):
     def set_cursor_wait(self):
         """ Change cursor to 'WaitCursor' """
         QApplication.setOverrideCursor(Qt.WaitCursor)
-
-
-    def set_cursor_arrow(self):
-        """ Change cursor to 'ArrowCursor' """
-        QApplication.setOverrideCursor(Qt.ArrowCursor)        
             
             
     def set_cursor_restore(self):
@@ -678,6 +666,7 @@ class ParentAction(object):
 
 
     def set_label_current_psector(self):
+
         sql = ("SELECT t1.name FROM " + self.schema_name + ".plan_psector AS t1 "
                " INNER JOIN " + self.schema_name + ".config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='psector_vdefault' AND cur_user = current_user")
@@ -685,4 +674,4 @@ class ParentAction(object):
         if not row:
             return
         utils_giswater.setWidgetText('lbl_vdefault_psector', row[0])
-        
+

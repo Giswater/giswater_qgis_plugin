@@ -36,7 +36,6 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         super(FlowTraceFlowExitMapTool, self).__init__(iface, settings, action, index_action)
         
 
-
     """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
@@ -165,7 +164,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             self.controller.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
-        if self.canvas.currentLayer() == None:
+        if self.canvas.currentLayer() is None:
             self.iface.setActiveLayer(self.layer_node_man[0])
 
 
@@ -173,5 +172,4 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
         # Call parent method     
         ParentMapTool.deactivate(self)
-                
-        
+

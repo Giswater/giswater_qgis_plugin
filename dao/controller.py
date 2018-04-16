@@ -51,10 +51,7 @@ class DaoController():
         self.qgis_settings = qgis_settings       
         
     def set_plugin_dir(self, plugin_dir):
-        self.plugin_dir = plugin_dir       
-                
-    def set_plugin_name(self, plugin_name):
-        self.plugin_name = plugin_name
+        self.plugin_dir = plugin_dir
         
         
     def set_logger(self, logger_name):
@@ -105,12 +102,7 @@ class DaoController():
             key = str(index).zfill(2)
         if key in self.actions:
             action = self.actions[key]
-            action.setChecked(check)     
-    
-    
-    def get_schema_name(self):
-        self.schema_name = self.plugin_settings_value('schema_name')
-        return self.schema_name
+            action.setChecked(check)
     
     
     def set_database_connection(self):

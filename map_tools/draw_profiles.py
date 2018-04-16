@@ -162,7 +162,7 @@ class DrawProfiles(ParentMapTool):
         
         
     def load_profile(self):
-        ''' Open dialog load_profiles.ui '''
+        """ Open dialog load_profiles.ui """
 
         self.dlg_load = LoadProfiles()
         utils_giswater.setDialog(self.dlg_load)
@@ -185,7 +185,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def open_profile(self):
-        ''' Open selected profile from dialog load_profiles.ui '''
+        """ Open selected profile from dialog load_profiles.ui """
     
         # Selected item from list 
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
