@@ -266,11 +266,11 @@ class Utils(ParentAction):
         self.populate_cmb_templates(self.dlg.composer_om_vdefault)
 
         # Edit
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
+        sql = "SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("state_vdefault", rows, False)
-        sql = ("SELECT DISTINCT(id),name FROM " + self.schema_name + ".value_state_type"
-               " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "'")
+        utils_giswater.set_item_data(self.dlg.state_vdefault, rows, 1)
+        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type "
+               "WHERE state = '" + str(utils_giswater.get_item_data(self.dlg.state_vdefault)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
         sql = "SELECT id, name FROM " + self.schema_name + ".value_state_type WHERE state=0 ORDER BY name"
@@ -1122,9 +1122,8 @@ class Utils(ParentAction):
             if exist_param:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                 if widget.objectName() == 'state_vdefault':
-                    sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
-                            " WHERE name = '" + str(value) + "')"
-                            " WHERE parameter = 'state_vdefault' AND cur_user = current_user")
+                    sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
+                            " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 elif widget.objectName() == 'municipality_vdefault':
                     sql += ("(SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
                             " WHERE name = '" + str(value) + "')"
@@ -1159,9 +1158,8 @@ class Utils(ParentAction):
             else:
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                 if widget.objectName() == 'state_vdefault':
-                    sql += (" VALUES ('" + parameter + "',"
-                            " (SELECT id FROM " + self.schema_name + ".value_state"
-                            " WHERE name ='" + str(value) + "'), current_user)")
+                    sql += (" VALUES ('" + parameter + "', '" + str(
+                        utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'municipality_vdefault':
                     sql += (" VALUES ('" + parameter + "',"
                             " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
@@ -1260,15 +1258,13 @@ class Utils(ParentAction):
 
     def filter_statetype_vdefault(self):
         """ Filter QComboBox @statetype_vdefault according  @state_vdefault """
-        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state::text = "
-               "(SELECT state FROM " + self.schema_name + ".value_state_type"
-               " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "')::text")
+        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state = '"+str(utils_giswater.get_item_data(self.dlg.state_vdefault))+"'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
 
 
     def populate_cmb_templates(self, combo):
-        
+
         composers = self.iface.activeComposers()
         index = 0
         records = []
@@ -1277,5 +1273,5 @@ class Utils(ParentAction):
             records.append(elem)
             index = index +1
         utils_giswater.set_item_data(combo, records, 1)
-        
+
         
