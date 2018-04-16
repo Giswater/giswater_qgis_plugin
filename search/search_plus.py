@@ -182,6 +182,15 @@ class SearchPlus(QObject):
         return rows
 
 
+    def psector_populate(self, combo):
+        """ Fill @combo """
+
+        sql = ("SELECT name FROM " + self.controller.schema_name + ".plan_psector ")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(combo, rows)
+        return rows
+
+
     def update_selector_workcat(self, workcat_id):
         """  Update table selector_workcat """
         
@@ -612,6 +621,11 @@ class SearchPlus(QObject):
         status = self.network_geom_type_populate()
         if not status:
             self.dlg.tab_main.removeTab(0)
+
+        # Tab 'Document'
+        status = self.psector_populate(self.dlg.psector_id_2)
+        #if not status:
+        #    self.dlg.tab_main.removeTab(3)
 
         return True
     
