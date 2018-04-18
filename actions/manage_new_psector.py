@@ -24,6 +24,7 @@ from ui_manager import Plan_psector
 from ui_manager import Psector_rapport
 from actions.parent_manage import ParentManage
 from actions.multiple_selection import MultipleSelection
+from actions.manage_document import ManageDocument
 
 
 class ManageNewPsector(ParentManage):
@@ -1099,12 +1100,11 @@ class ManageNewPsector(ParentManage):
     def manage_document(self):
         """Access GUI to manage documents e.g Execute action of button 34 """
         self.controller.log_info("manage document")
-        '''
-        manage_document = ManageDocument(
-            self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+
+        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document()
         dlg_docman.btn_accept.pressed.connect(partial(self.set_completer_object, 'doc'))
-        '''
+
 
     def document_open(self):
         """Open selected document."""
