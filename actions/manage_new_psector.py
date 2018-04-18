@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import  QgsComposition
-from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence
+from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence, QCompleter, QStringListModel
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
 from PyQt4.QtCore import Qt
@@ -246,6 +246,8 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_doc_delete.pressed.connect(self.document_delete)
         self.dlg.btn_doc_new.pressed.connect(self.manage_document)
         self.dlg.btn_open_doc.pressed.connect(self.document_open)
+
+        self.set_completer()
 
         sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + "." + self.plan_om + "_psector "
                " WHERE psector_id = '" + str(psector_id) + "'")
@@ -1135,3 +1137,22 @@ class ManageNewPsector(ParentManage):
             opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, path])
         '''
+
+
+    def set_completer(self):
+        """ Set autocompleter """
+
+        # Adding auto-completion to a QLineEdit - document_id
+        self.completer = QCompleter()
+        self.dlg.doc_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_document"
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        values = []
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
