@@ -63,6 +63,10 @@ class ManageNewPsector(ParentManage):
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
+        self.set_icon(self.dlg.btn_doc_insert, "111")
+        self.set_icon(self.dlg.btn_doc_delete, "112")
+        self.set_icon(self.dlg.btn_doc_new, "34")
+        self.set_icon(self.dlg.btn_open_doc, "170")
 
         table_object = "psector"
 
