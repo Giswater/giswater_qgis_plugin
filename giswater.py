@@ -910,7 +910,7 @@ class Giswater(QObject):
         """ Set SearchPlus object """
 
         try:         
-            self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
+            self.search_plus = SearchPlus(self.iface, self.srid, self.controller, self.settings, self.plugin_dir)
             self.basic.search_plus = self.search_plus
             status = self.search_plus.init_config()
             self.actions['32'].setVisible(status) 

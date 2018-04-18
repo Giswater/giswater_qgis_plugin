@@ -18,13 +18,15 @@ import utils_giswater
 from search.ui.list_items import ListItems
 from search.ui.hydro_info import HydroInfo
 from search.ui.search_plus_dockwidget import SearchPlusDockWidget
+from actions.manage_new_psector import ManageNewPsector
 
 
 class SearchPlus(QObject):
 
-    def __init__(self, iface, srid, controller):
+    def __init__(self, iface, srid, controller, settings, plugin_dir):
         """ Constructor """
-        
+
+        self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.iface = iface
         self.srid = srid
         self.controller = controller
@@ -84,6 +86,7 @@ class SearchPlus(QObject):
             self.filter_by_list(self.dlg.hydro_id)
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
+        self.dlg.psector_id_2.activated.connect(partial(self.open_plan_psector))
 
         return True
 
@@ -626,7 +629,6 @@ class SearchPlus(QObject):
         status = self.psector_populate(self.dlg.psector_id_2)
         #if not status:
         #    self.dlg.tab_main.removeTab(3)
-
         return True
     
 
@@ -1307,5 +1309,19 @@ class SearchPlus(QObject):
             if len(id_list) > 0:
                 layer.selectByIds(id_list)   
             else:
-                layer.removeSelection()  
+                layer.removeSelection()
+
+
+    def open_plan_psector(self):
+
+        psector_name = self.dlg.psector_id_2.currentText()
+        sql = ("SELECT psector_id"
+               " FROM " + self.schema_name + ".plan_psector"
+               " WHERE name = '" + str(psector_name)+"'")
+        row =  self.controller.get_row(sql)
+        psector_id =  row[0]
+        self.manage_new_psector.new_psector(psector_id, 'plan')
+
+
+
                                    

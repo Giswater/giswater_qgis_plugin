@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>513</width>
-    <height>630</height>
+    <width>509</width>
+    <height>627</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,12 +18,12 @@
     <rect>
      <x>10</x>
      <y>16</y>
-     <width>490</width>
+     <width>486</width>
      <height>571</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -364,7 +364,7 @@
     <widget class="QComboBox" name="sector_id">
      <property name="geometry">
       <rect>
-       <x>324</x>
+       <x>320</x>
        <y>75</y>
        <width>154</width>
        <height>22</height>
@@ -405,7 +405,7 @@
     <widget class="QComboBox" name="priority">
      <property name="geometry">
       <rect>
-       <x>324</x>
+       <x>320</x>
        <y>45</y>
        <width>154</width>
        <height>22</height>
@@ -637,7 +637,7 @@
     <widget class="QComboBox" name="result_id">
      <property name="geometry">
       <rect>
-       <x>324</x>
+       <x>320</x>
        <y>105</y>
        <width>154</width>
        <height>22</height>
@@ -1654,7 +1654,7 @@
     <widget class="QPushButton" name="btn_doc_new">
      <property name="geometry">
       <rect>
-       <x>256</x>
+       <x>405</x>
        <y>13</y>
        <width>28</width>
        <height>24</height>
@@ -1688,7 +1688,7 @@
     <widget class="QPushButton" name="btn_open_doc">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>440</x>
        <y>13</y>
        <width>28</width>
        <height>24</height>
@@ -1708,19 +1708,19 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>18</x>
+       <x>10</x>
        <y>53</y>
-       <width>301</width>
-       <height>397</height>
+       <width>461</width>
+       <height>486</height>
       </rect>
      </property>
     </widget>
     <widget class="QLineEdit" name="doc_id">
      <property name="geometry">
       <rect>
-       <x>19</x>
+       <x>12</x>
        <y>15</y>
-       <width>163</width>
+       <width>166</width>
        <height>20</height>
       </rect>
      </property>
