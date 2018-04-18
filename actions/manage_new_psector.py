@@ -85,6 +85,14 @@ class ManageNewPsector(ParentManage):
         atlas_id = self.dlg.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
 
+        # tab 'Document'
+        # self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+        # self.btn_doc_insert = self.dlg.findChild(QPushButton, "btn_doc_insert")
+        # self.btn_doc_delete = self.dlg.findChild(QPushButton, "btn_doc_delete")
+        # self.btn_doc_new = self.dlg.findChild(QPushButton, "btn_doc_new")
+        # self.btn_open_doc = self.dlg.findChild(QPushButton, "btn_open_doc")
+        # self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
@@ -233,6 +241,11 @@ class ManageNewPsector(ParentManage):
         self.dlg.gexpenses.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'gexpenses'))
         self.dlg.vat.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'vat'))
         self.dlg.other.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'other'))
+
+        self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
+        self.dlg.btn_doc_delete.pressed.connect(self.document_delete)
+        self.dlg.btn_doc_new.pressed.connect(self.manage_document)
+        self.dlg.btn_open_doc.pressed.connect(self.document_open)
 
         sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + "." + self.plan_om + "_psector "
                " WHERE psector_id = '" + str(psector_id) + "'")
@@ -1021,3 +1034,104 @@ class ManageNewPsector(ParentManage):
             if str(widget.model().record(row).value('psector_id')) != utils_giswater.getWidgetText('psector_id'):
                 widget.hideRow(i)
 
+
+    def document_insert(self):
+        """Insert a docmet related to the current visit."""
+        self.controller.log_info("document insert")
+
+        '''
+        doc_id = self.doc_id.text()
+        visit_id = self.visit_id.text()
+        if not doc_id:
+            message = "You need to insert doc_id"
+            self.controller.show_warning(message)
+            return
+        if not visit_id:
+            message = "You need to insert visit_id"
+            self.controller.show_warning(message)
+            return
+
+        # Insert into new table
+        sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
+                                                   " VALUES (" + str(doc_id) + ", " + str(visit_id) + ")")
+        status = self.controller.execute_sql(sql, commit=self.autocommit)
+        if status:
+            message = "Document inserted successfully"
+            self.controller.show_info(message)
+
+        self.dlg.tbl_document.model().select()
+        '''
+
+    def document_delete(self):
+        """Delete record from selected rows in tbl_document."""
+        self.controller.log_info("document delete")
+        '''
+        # Get selected rows. 0 is the column of the pk 0 'id'
+        selected_list = self.tbl_document.selectionModel().selectedRows(0)
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+
+        selected_id = []
+        for index in selected_list:
+            doc_id = index.data()
+            selected_id.append(str(doc_id))
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, ','.join(selected_id))
+        if answer:
+            sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
+                                                       " WHERE id IN ({})".format(','.join(selected_id)))
+            status = self.controller.execute_sql(sql)
+            if not status:
+                message = "Error deleting data"
+                self.controller.show_warning(message)
+                return
+            else:
+                message = "Event deleted"
+                self.controller.show_info(message)
+                self.dlg.tbl_document.model().select()
+        '''
+
+    def manage_document(self):
+        """Access GUI to manage documents e.g Execute action of button 34 """
+        self.controller.log_info("manage document")
+        '''
+        manage_document = ManageDocument(
+            self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        dlg_docman = manage_document.manage_document()
+        dlg_docman.btn_accept.pressed.connect(partial(self.set_completer_object, 'doc'))
+        '''
+
+    def document_open(self):
+        """Open selected document."""
+        self.controller.log_info("document opent")
+        '''
+        # Get selected rows
+        field_index = self.tbl_document.model().fieldIndex('path')
+        selected_list = self.dlg.tbl_document.selectionModel().selectedRows(
+            field_index)
+        if not selected_list:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+        elif len(selected_list) > 1:
+            message = "More then one document selected. Select just one document."
+            self.controller.show_warning(message)
+            return
+
+        path = selected_list[0].data()
+        # Check if file exist
+        if not os.path.exists(path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=path)
+            return
+
+        # Open the document
+        if sys.platform == "win32":
+            os.startfile(path)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, path])
+        '''
