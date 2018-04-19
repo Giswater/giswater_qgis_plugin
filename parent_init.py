@@ -1407,6 +1407,14 @@ class ParentDialog(QDialog):
 
     def catalog(self, wsoftware, geom_type, node_type=None):
 
+        # Get key
+        layer = self.iface.activeLayer()
+        viewname = self.controller.get_layer_source_table_name(layer)
+        sql = ("SELECT id FROM " + self.schema_name + ".sys_feature_cat"
+               " WHERE tablename = '" + str(viewname) + "'")
+        row = self.controller.get_row(sql)
+        self.sys_type = str(row[0])
+
         # Set dialog depending water software
         if wsoftware == 'ws':
             self.dlg_cat = WScatalog()
@@ -1435,7 +1443,7 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id IN"
             sql += " (SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type"
-            sql += " WHERE type = '" + self.layer.name().upper() + "')"
+            sql += " WHERE type = '" + str(self.sys_type) + "')"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
@@ -1445,7 +1453,7 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id IN"
             sql += " (SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type"
-            sql += " WHERE type = '" + self.layer.name().upper() + "')"
+            sql += " WHERE type = '" + str(self.sys_type) + "')"
         sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
@@ -1456,7 +1464,7 @@ class ParentDialog(QDialog):
                 sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
                 sql += " FROM "+self.schema_name+".cat_"+geom_type+" WHERE "+self.field2 + " LIKE '%"+self.dlg_cat.filter2.currentText()+"%' "
                 sql += " AND matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' AND "+geom_type+"type_id IN "
-                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
                 sql += " ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
                 sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
@@ -1498,7 +1506,7 @@ class ParentDialog(QDialog):
             else:
                 sql_where += " AND "
             sql_where += geom_type + "type_id IN (SELECT DISTINCT (id) AS id FROM " + self.schema_name + "." + geom_type + "_type "
-            sql_where += " WHERE type = '" + self.layer.name().upper() + "')"
+            sql_where += " WHERE type = '" + str(self.sys_type) + "')"
         if sql_where is not None:
             sql += str(sql_where) + " ORDER BY " + str(self.field2)
         else:
@@ -1519,14 +1527,14 @@ class ParentDialog(QDialog):
                 sql += " WHERE ("+self.field2 + " LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
                 sql += " AND (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' OR matcat_id is null)"
                 sql += " AND "+geom_type+"type_id IN "
-                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
                 sql += " ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
                 sql = "SELECT "+self.field3
                 sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
                 sql += " FROM "+self.schema_name+".cat_"+geom_type
                 sql += " WHERE "+geom_type+"type_id IN "
-                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
                 sql += " AND (" + self.field2 + " LIKE '%" + self.dlg_cat.filter2.currentText() + "%' OR " + self.field2 + " is null) "
                 sql += " AND (matcat_id LIKE '%" + self.dlg_cat.matcat_id.currentText() + "%' OR matcat_id is null)"
                 sql += " ORDER BY x) AS "+self.field3
@@ -1554,8 +1562,8 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws':
             sql_where = (" WHERE " + geom_type + "type_id IN"
                          " (SELECT DISTINCT (id) FROM " + self.schema_name + "." + geom_type + "_type"
-                         " WHERE type = '" + self.layer.name().upper() + "')")
-            
+                         " WHERE type = '" + str(self.sys_type) + "')")
+
         if self.dlg_cat.matcat_id.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
