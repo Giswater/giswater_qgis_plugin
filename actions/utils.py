@@ -303,9 +303,9 @@ class Utils(ParentAction):
         sql = "SELECT expl_id, name FROM " + self.schema_name + ".exploitation ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.exploitation_vdefault, rows, 1)
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".ext_municipality ORDER BY name"
+        sql = "SELECT DISTINCT(muni_id),name FROM " + self.schema_name + ".ext_municipality ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("municipality_vdefault", rows, False)
+        utils_giswater.set_item_data(self.dlg.municipality_vdefault, rows, 1)
         sql = "SELECT sector_id, name FROM " + self.schema_name + ".sector ORDER BY name"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.sector_vdefault, rows, 1)
@@ -327,8 +327,7 @@ class Utils(ParentAction):
             utils_giswater.setChecked(self.dlg.chk_edit_arc_division_dsbl, row)
 
         sql = ("SELECT DISTINCT(dma_id),name FROM " + self.schema_name + ".dma"
-               " WHERE expl_id = '" + str(
-            utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
+               " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.dma_vdefault, rows, 1)
 
@@ -927,18 +926,20 @@ class Utils(ParentAction):
         utils_giswater.fillComboBox(widget, rows, False)
 
 
-    def utils_sql(self, sel, table, atribute, value):
+    def utils_sql(self, sel, table, atribute, widget):
 
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = '" + value + "'")
+               " WHERE cur_user = current_user AND parameter = '" + widget + "'")
         row = self.controller.get_row(sql)
         if row:
             parameter = row[0]
             sql = ("SELECT " + sel +" FROM " + self.schema_name + "." + table + ""
                    " WHERE " + atribute + "::text = '" + str(parameter) + "'" )
             row = self.controller.get_row(sql)
+
             if row:
-                utils_giswater.setWidgetText(value, str(row[0]))
+                cmb = utils_giswater.getWidget(widget)
+                utils_giswater.set_combo_itemData(cmb, row[0],1)
 
 
     def upsert_config_param_system(self, parameter,add_check=False):
@@ -1145,7 +1146,8 @@ class Utils(ParentAction):
                 elif widget.objectName() == 'sector_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                                " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
-                elif widget.objectName() == 'dma_vdefault' or widget.objectName() == 'exploitation_vdefault':
+                elif widget.objectName() == 'dma_vdefault' or widget.objectName() == 'exploitation_vdefault' or \
+                        widget.objectName() == 'municipality_vdefault' :
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                                " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
                 elif widget.objectName() == 'composer_plan_vdefault' or widget.objectName() == 'composer_om_vdefault':
@@ -1175,7 +1177,8 @@ class Utils(ParentAction):
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'sector_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
-                elif widget.objectName() == 'dma_vdefault' or widget.objectName() == 'exploitation_vdefault':
+                elif widget.objectName() == 'dma_vdefault' or widget.objectName() == 'exploitation_vdefault' or \
+                        widget.objectName() == 'municipality_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'composer_plan_vdefault' or widget.objectName() == 'composer_om_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 1)) + "', current_user)")
