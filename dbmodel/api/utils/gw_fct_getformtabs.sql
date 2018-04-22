@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getformtabs"(class_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, user_id varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getformtabs"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, user_id varchar, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -11,9 +11,11 @@ DECLARE
     feature_cat_arg text;
     formid_arg text;
     table_id_parent_arg text;
-    parent_view_arg text;
-    parent_table_arg text;
+    tableparent_id_arg text;
     parent_child_relation boolean;
+
+    -- future parameter passed by client
+    inforole_id_arg integer:=1;
 
 BEGIN
 
@@ -22,89 +24,79 @@ BEGIN
 
     parent_child_relation = false;
 
---    Check if request coherence againts class_id_arg & table_id_arg (if exists it means direct click)
-    IF (SELECT class_id FROM config_web_layer WHERE layer_id=table_id_arg)=class_id_arg THEN
+--    Check if request coherence againts alias_id_arg & table_id_arg (if not exists it means navigation)
+    IF (SELECT alias_id FROM config_web_layer WHERE layer_id=table_id_arg)!=alias_id_arg THEN
+
+   
+        -- Get real layer from alias
+        EXECUTE 'SELECT layer_id from config_web_layer WHERE alias_id=$1 LIMIT 1'
+            INTO table_id_arg
+            USING alias_id_arg;
+
+           raise notice' Layer navigation %' , table_id_arg;
+
+
+    END IF;
 
 --        Get form for the layer 
         -- to build json
         EXECUTE 'SELECT row_to_json(row) FROM (SELECT formname AS "formName", formid AS "formId" 
-            FROM config_web_layer_form WHERE layer_id = $1 LIMIT 1) row'
+            FROM config_web_layer WHERE layer_id = $1 LIMIT 1) row'
             INTO form_info
             USING table_id_arg; 
-            
+
+           
 --        Get tabs for the layer
         EXECUTE 'SELECT array_agg(formtab) FROM config_web_layer_tab WHERE layer_id = $1'
             INTO form_tabs
             USING table_id_arg;
 
---        Check if is parent table
-        IF table_id_arg IN (SELECT table_parent FROM config_web_layer_child) THEN
+          raise notice' table_id_arg %' , table_id_arg;
+
+
+--        Check if it is parent table (is_parent is true)
+        IF table_id_arg IN (SELECT layer_id FROM config_web_layer WHERE is_parent IS TRUE) THEN
 
             -- parent-child relation exits    
-            parent_child_relation:=true;
+        parent_child_relation:=true;
 
             -- check parent_view
-            EXECUTE 'SELECT parent_id from config_web_layer_parent WHERE layer_id=$1'
-                INTO parent_view_arg
+        EXECUTE 'SELECT tableparent_id from config_web_layer WHERE layer_id=$1'
+                INTO tableparent_id_arg
                 USING table_id_arg;
+                
+        raise notice'Parent-Child. Table parent: %' , tableparent_id_arg;
 
-            -- Identify featurecat_id
-            EXECUTE 'SELECT table_name FROM cat_feature 
-            WHERE id=(SELECT custom_type FROM '||parent_view_arg||' WHERE nid::text=$1)'
-                INTO feature_cat_arg
-                USING id;
 
-            -- identify child view to proceed
-            table_id_arg:=(SELECT table_child FROM config_web_layer_child WHERE id=feature_cat_arg);
-
-        END IF;
-
-    -- Check if request coherence againts class_id_arg & table_id_arg (if not exists it means navigation)
-    ELSE
-    
-        -- identify layer from class
-        EXECUTE 'SELECT layer_id from config_web_layer WHERE layer_id=$1 LIMIT 1'
+            -- Identify tableinforole_id 
+        EXECUTE' SELECT tableinforole_id FROM config_web_layer_child
+        JOIN config_web_tableinfo_x_inforole ON config_web_layer_child.tableinfo_id=config_web_tableinfo_x_inforole.tableinfo_id 
+        WHERE featurecat_id= (SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1) 
+        AND inforole_id=$2'
             INTO table_id_arg
-            USING class_id_arg;
+            USING id, inforole_id_arg;
 
---        Check if is parent table
-        IF table_id_arg IN (SELECT table_parent FROM config_web_layer_child) THEN
+        raise notice'Parent-Child. Table: %' , table_id_arg;
 
-            -- parent-child relation exits    
-            parent_child_relation:=true;
+--        Check if it is not editable layer (is_editable is false)
+        ELSIF table_id_arg IN (SELECT layer_id FROM config_web_layer WHERE is_editable IS FALSE) THEN
 
-            -- check parent_view
-            EXECUTE 'SELECT parent_id from config_web_layer_parent WHERE layer_id=$1'
-                INTO parent_view_arg
-                USING table_id_arg;
+            -- Identify tableinforole_id 
+        EXECUTE 'SELECT tableinforole_id FROM config_web_layer
+        JOIN config_web_tableinfo_x_inforole ON config_web_layer.tableinfo_id=config_web_tableinfo_x_inforole.tableinfo_id 
+        WHERE layer_id=$1 AND inforole_id=$2'
+                INTO table_id_arg
+            USING table_id_arg, inforole_id_arg;
 
-            -- Identify featurecat_id
-            EXECUTE 'SELECT table_name FROM cat_feature 
-            WHERE id=(SELECT custom_type FROM '||parent_view_arg||' WHERE nid::text=$1)'
-                INTO feature_cat_arg
-                USING id;
-
-            -- identify child view to proceed
-            table_id_arg:=(SELECT table_child FROM config_web_layer_child WHERE id=feature_cat_arg);
+        raise notice'No parent-child and no editable table: %' , table_id_arg;
 
         END IF;
-
-        -- Get form for the layer
-        EXECUTE 'SELECT row_to_json(row) FROM (SELECT formname AS "formName", formid AS "formId" 
-            FROM config_web_layer_form WHERE layer_id = $1 LIMIT 1) row'
-            INTO form_info
-            USING table_id_arg; 
-
-        -- Get tabs for the layer
-        EXECUTE 'SELECT array_agg(formtab) FROM config_web_layer_tab WHERE layer_id = $1'
-            INTO form_tabs
-            USING table_id_arg;
         
-    END IF;
 
-    EXECUTE 'SELECT formid FROM config_web_layer_form WHERE layer_id = $1 LIMIT 1'
+--  Take form_id 
+    EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
         INTO formid_arg
-        USING table_id_arg; 
+        USING alias_id_arg; 
             
 --    Check generic
     IF form_info ISNULL THEN
@@ -113,10 +105,11 @@ BEGIN
     END IF;
 
 --    Add default tab
-    form_tabs_json := array_to_json(array_append(form_tabs, 'tabInfo'));
+      form_tabs_json := array_to_json(array_append(form_tabs, 'tabInfo'));
+
 
 --    Join json
-    form_info := gw_fct_json_object_set_key(form_info, 'formTabs', form_tabs_json);
+     form_info := gw_fct_json_object_set_key(form_info, 'formTabs', form_tabs_json);
 
 
 --    if editable layer
@@ -129,6 +122,7 @@ BEGIN
 
 --    IF no editable layer
     ELSE
+
         -- call getinfoform using table information
         EXECUTE 'SELECT gw_fct_getinfoform($1, $2, $3, $4)'
             INTO editable_data
@@ -147,8 +141,8 @@ BEGIN
 
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+ --   EXCEPTION WHEN OTHERS THEN 
+  --      RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

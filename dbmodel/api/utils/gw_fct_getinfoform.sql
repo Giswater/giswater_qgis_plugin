@@ -30,18 +30,8 @@ BEGIN
 --    Get schema name
     schemas_array := current_schemas(FALSE);
     
-/*
---    chek if it is parent layer
-    IF table_id IN (SELECT parent_id FROM config_web_layer_child) THEN
 
-        -- check view to use
-        EXECUTE 'SELECT table_name FROM cat_feature WHERE id=(SELECT custom_type FROM '||class_id_var||' WHERE nid::text=$1)'
-            INTO table_id
-            USING id;
-             
-    END IF;
-
-*/
+   raise notice 'table_id %, id %, formtodisplay %', table_id, id, formtodisplay;
         
 --    Get form fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
@@ -101,8 +91,8 @@ BEGIN
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+ --   EXCEPTION WHEN OTHERS THEN 
+ --       RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

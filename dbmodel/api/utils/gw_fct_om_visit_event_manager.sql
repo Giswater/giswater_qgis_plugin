@@ -1,6 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_event_manager(visit_id_aux integer)
-  RETURNS text AS
-$BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_om_visit_event_manager"(visit_id_aux int4) RETURNS pg_catalog.text AS $BODY$
 DECLARE
 rec_parameter record;
 id_last integer;
@@ -26,13 +24,13 @@ BEGIN
 
 
 --  Search path
-    SET search_path = "arbrat_viari", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     count=0;
 
     -- select main values (stardate, node_id, mu_id)
     SELECT startdate INTO startdate_aux FROM om_visit WHERE id=visit_id_aux; 
-    SELECT mu_id, node.node_id INTO mu_id_aux, node_id_aux FROM node JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id 
+    SELECT mu_id, node.node_id INTO mu_id_aux, node_id_aux FROM node JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id::text
     WHERE visit_id=visit_id_aux;
 
     --  Delete previous parameters with cost (if exists on the referenced node due with this update will insert again the same values
@@ -161,7 +159,5 @@ RETURN concat_agg;
 END;
 
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_om_visit_event_manager(integer)
-  OWNER TO geoadmin;
+LANGUAGE 'plpgsql' VOLATILE COST 100;
+

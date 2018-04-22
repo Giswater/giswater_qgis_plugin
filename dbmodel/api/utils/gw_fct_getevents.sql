@@ -16,12 +16,15 @@ BEGIN
         INTO query_result
         USING element_type, device;
 
+raise notice '1 %', query_result;
+
 --    Add visit_id filter
     query_result := query_result || ' WHERE visit_id' || ' = ' || visit_id;
     
 --    Get visits
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ') a'
         INTO query_result_visits;
+raise notice '1 %', query_result;
 
 
 --    Control NULL's
@@ -33,8 +36,8 @@ BEGIN
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+  --  EXCEPTION WHEN OTHERS THEN 
+    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 

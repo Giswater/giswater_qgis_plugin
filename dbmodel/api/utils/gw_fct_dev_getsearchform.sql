@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getformsearch(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformsearch(
     tab_id_arg integer,
     filterval_arg character varying)
   RETURNS json AS
@@ -33,7 +33,7 @@ BEGIN
 
 
 --  Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  Get schema name
     schemas_array := current_schemas(FALSE);

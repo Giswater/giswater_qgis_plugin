@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_upsertvisit"(x float8, y float8, srid_arg int4, element_type varchar, id varchar, device int4, cur_user varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_upsertvisit_mod"(x float8, y float8, srid_arg int4, element_type varchar, id varchar, device int4, visitcat_id_aux int4, cur_user varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -29,7 +29,11 @@ BEGIN
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT id::TEXT, name FROM om_visit_cat) a' INTO query_result_cat_visits;
 
 --    Get user default
-    EXECUTE 'SELECT value FROM config_param_user WHERE parameter=''visicat_vdefault'' AND cur_user=$1 LIMIT 1' USING cur_user INTO query_result_def_visit;
+    IF visitcat_id_aux IS NULL THEN
+        EXECUTE 'SELECT value FROM config_param_user WHERE parameter=''visicat_vdefault'' AND cur_user=$1 LIMIT 1' USING cur_user INTO query_result_def_visit;
+    ELSE 
+        query_result_def_visit=visitcat_id_aux;
+    END IF;
 
 --    Get parameter type
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT DISTINCT parameter_type FROM om_visit_parameter) a' INTO query_result_parameter_type;

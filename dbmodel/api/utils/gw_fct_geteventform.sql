@@ -46,7 +46,7 @@ BEGIN
 
 
 --    Get form fields
-    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = $1) a'
+    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = $1 ORDER BY orderby) a'
         INTO fields_array
         USING formToDisplay;    
 
@@ -55,7 +55,7 @@ BEGIN
     IF arc_id IS NOT NULL THEN
 
 --        Get node_1
-        EXECUTE 'SELECT array_to_json(ARRAY[node_1, node_2]) FROM SCHEMA_NAME.arc WHERE arc_id = $1'
+        EXECUTE 'SELECT array_to_json(ARRAY[node_1, node_2]) FROM arc WHERE arc_id::text = $1'
             INTO position
             USING arc_id;
 
@@ -122,8 +122,8 @@ RAISE NOTICE 'Res: %', formToDisplay;
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+ --   EXCEPTION WHEN OTHERS THEN 
+  --      RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
