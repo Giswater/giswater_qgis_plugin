@@ -46,6 +46,8 @@ doc.id,
 om_visit.id
 FROM doc, om_visit;
 
+refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
+
 
 
 
