@@ -94,8 +94,8 @@ INSERT INTO audit_cat_table VALUES ('v_value_cat_connec', 'System value domain v
 INSERT INTO audit_cat_table VALUES ('v_anl_arc', 'Analysis', 'View with the results of the topology process of arcs (arc results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_pool', 'GIS feature', 'Shows editable information about pools.', 'role_edit', 0, NULL, 'role_edit', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_plan_psector', 'Masterplan', 'Shows editable information about plan sector.', 'role_master', 0, NULL, 'role_master', 2, 'Basic operation', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_element_x_connec', 'User interface view', 'Contains the elements related to connec. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_element_x_node', 'User interface view', 'Contains the elements related to node. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_element_x_connec', 'User interface view', 'Contains the elements related to connec. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_element_x_node', 'User interface view', 'Contains the elements related to node. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_node', 'User interface view', 'Shows the visits related to management of node elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_pattern', 'Hydraulic input data', 'Shows information about time patterns.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_valve_fl', 'Hydraulic input data', 'Shows the information about the valves regulated by the flow', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -122,9 +122,9 @@ INSERT INTO audit_cat_table VALUES ('v_edit_link', 'GIS feature', 'Shows editabl
 INSERT INTO audit_cat_table VALUES ('v_edit_man_wjoin', 'GIS feature', 'Shows editable information about wjoin', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_inp_demand', 'Hydraulic feature', 'Shows editable information about the hydraulic model demand', 'role_epa', 0, NULL, 'role_epa', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_arc', 'Mincut', 'View with aggregated information of the results of mincut analysis (arc)', 'role_om', 0, NULL, 'role_om', 2, 'Mincut button', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_arc', 'User interface view', 'Shows the information of document related to arcs. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_connec', 'User interface view', 'Shows the information of document related to connects. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_node', 'User interface view', 'Shows the information of document related to nodes. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_arc', 'User interface view', 'Shows the information of document related to arcs. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_connec', 'User interface view', 'Shows the information of document related to connects. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_node', 'User interface view', 'Shows the information of document related to nodes. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_mincut_connec', 'User interface view', 'Shows the mincut results related to connecs', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_mincut_hydrometer', 'User interface view', 'Shows the mincut results related to hydrometers', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_arc', 'User interface view', 'Shows the visits related to arc elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -187,8 +187,8 @@ INSERT INTO audit_cat_table VALUES ('rpt_arc', 'Hydraulic result data', 'Contain
 INSERT INTO audit_cat_table VALUES ('v_anl_arc_point', 'Analysis', 'View with the results of the topology process of arcs (point results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node_point', 'Analysis', 'View with the results of the topology process of arcs interacting againts nodes (point results)', 'role_edit', 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_arc_x_node', 'User interface view', 'View that joins arcs and nodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_visit', 'User interface view', 'Shows the information of document related to visits. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_element_x_arc', 'User interface view', 'Contains the elements related to arc. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_visit', 'User interface view', 'Shows the information of document related to visits. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_element_x_arc', 'User interface view', 'Contains the elements related to arc. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_scada_x_node', 'User interface view', 'Shows the scada data related to the node. User interface table.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ext_plot', 'streeter', 'Shows information about urban properties and related to them connecs.', NULL, 0, NULL, 'role_basic', 2, 'Search button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_demand', 'Hydraulic input data', 'Shows the information about node''s demand', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);

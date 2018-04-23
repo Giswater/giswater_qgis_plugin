@@ -119,7 +119,7 @@ INSERT INTO audit_cat_table VALUES ('audit_cat_error', 'System', 'Catalog of err
 INSERT INTO audit_cat_table VALUES ('audit_cat_function', 'System', 'Catalog of functions', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_table_x_column', 'System', 'Table with the information of columns of the project', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_arc_type', 'Hydraulic input data', 'Domain data with arc''s geometry', 'role_admin', 3, '=6', 'role_admin', 1, 'Custom forms values', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_element_x_arc', 'User interface view', 'Contains the elements related to arc. User Interface view.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_element_x_arc', 'User interface view', 'Contains the elements related to arc. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_node', 'User interface view', 'Shows the visits related to node elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_connec', 'User interface view', 'Shows the visits related to management of connec elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_flow_node', 'Analysis', 'View with the result of flow trace and flow exit results (node)', NULL, 0, NULL, 'role_om', 2, 'Flow trace tool', NULL, NULL);
@@ -131,8 +131,8 @@ INSERT INTO audit_cat_table VALUES ('v_node_x_arc', 'Auxiliar', 'Shows the relat
 INSERT INTO audit_cat_table VALUES ('v_state_arc', 'System', 'View that filter arcs for state and exploitation', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_state_node', 'System', 'View that filter nodes for state and exploitation', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_state_dimensions', 'System', 'View that filter dimensions for state', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_visit', 'Document management', 'Shows the information of document related to visits. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_gully', 'User interface view', 'Shows the information of document related to gully. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_visit', 'Document management', 'Shows the information of document related to visits. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_gully', 'User interface view', 'Shows the information of document related to gully. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rpt_comp_outfallflow_sum', 'Hydraulic result data', 'Shows the result selecteb by the comparision selector in order to show into GIS project the data from result_selector and result_comparisor to compare between outfall flow simulations results..', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rpt_nodedepth_sum', 'Hydraulic results data', 'Shows the results of depth of nodes', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rpt_lidperfomance_sum', 'Hydraulic results data', 'Shows the results of LID performance simulations.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -215,7 +215,7 @@ INSERT INTO audit_cat_table VALUES ('v_edit_inp_virtual', 'Hydraulic feature', '
 INSERT INTO audit_cat_table VALUES ('man_manhole', 'Additional info of GIS feature', 'Additional information for manhole management', 'role_edit', 2, '=node JOIN node_type ON id=node_type WHERE type=''MANHOLE''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_wwtp', 'Additional info of GIS feature', 'Additional information for wastewater treatment plant management', 'role_edit', 2, '=node JOIN node_type ON id=node_type WHERE type=''WWTP''', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('man_netgully', 'Additional info of GIS feature', 'Additional information for netgully management', 'role_edit', 2, '=node JOIN node_type ON id=node_type WHERE type=''NETGULLY''', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_element_x_connec', 'User interface view', 'Contains the elements related to connec. User Interface view.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_element_x_connec', 'User interface view', 'Contains the elements related to connec. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_arc', 'User interface view', 'Shows the visits related to arc elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_arc', 'Analysis', 'View with the results of the topology process of arcs (arc results)', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('price_cat_simple', 'Prices', 'Catalog of prices (imported using csv import file button)', 'role_master', 1, '=1', NULL, 0, NULL, NULL, NULL);
@@ -227,7 +227,7 @@ INSERT INTO audit_cat_table VALUES ('v_anl_connec', 'Analysis', 'View with the r
 INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node_point', 'Analysis', 'View with the results of the topology process of arcs interacting againts nodes (point results)', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_arc_x_node', 'Analysis', 'View with the results of the topology process of arcs interacting againts nodes (arc results)', NULL, 0, NULL, 'role_edit', 2, 'Topology tools button', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ext_address', 'Streeter', 'Shows information about entrance numbers', NULL, 0, NULL, 'role_basic', 2, 'Search button', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_arc', 'User interface view', 'Shows the information of document related to arcs. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_arc', 'User interface view', 'Shows the information of document related to arcs. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_vnode', 'GIS feature', 'Shows editable information about virtual nodes.', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('rpt_condsurcharge_sum', 'Hydraulic result data', 'Contains the results of conduit surcharge simulations.', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('rpt_lidperformance_sum', 'Hydraulic result data', 'Contains the results of LID performance simulations.', 'role_epa', 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -404,7 +404,7 @@ INSERT INTO audit_cat_table VALUES ('v_inp_evap_fl', 'Hydraulic input data', 'Sh
 INSERT INTO audit_cat_table VALUES ('v_inp_infiltration_cu', 'Hydraulic input data', 'Shows the information about the infiltration using Curve-Number method', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_inflows_flow', 'Hydraulic input data', 'Shows the information about the inflows related in terms of flow, to nodes (if the user has defined it)', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_pgrouting_arc', 'Analysis', 'View used by system to calculate profile using pgrouting extension', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_node', 'User interface view', 'Shows the information of document related to nodes. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_node', 'User interface view', 'Shows the information of document related to nodes. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_outfall_ts', 'Hydraulic input data', 'Shows the information about outfalls with timeseries format type', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_evap_pa', 'Hydraulic input data', 'Shows the information about the evaporation with the pan format type', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_outfall_nm', 'Hydraulic input data', 'Shows the information about outfalls with normal format type', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -597,13 +597,13 @@ INSERT INTO audit_cat_table VALUES ('om_psector_x_node', 'O&M information', 'Con
 INSERT INTO audit_cat_table VALUES ('om_psector_x_other', 'O&M information', 'Contains arcs related to om psector', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_x_other_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('v_ui_node_x_connection_upstream', 'User interface view', 'View that relates arcs and nodes upstrem', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_node_x_connection_downstream', 'User interface view', 'View that relates arcs and nodes downstrem', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_element_x_node', 'User interface view', 'Contains the elements related to node. User Interface view.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_element_x_gully', 'User interface view', 'Contains the elements related to gully. User Interface view.', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_element_x_node', 'User interface view', 'Contains the elements related to node. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_element_x_gully', 'User interface view', 'Contains the elements related to gully. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_review_audit_gully', 'Review', 'Used to edit the review information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_review_gully', 'Review', 'Used to edit the review information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_param_user', 'System', 'Catalog of user parameters', 'role_admin', 2, '=9999', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_aux_arc_gully', 'masterplan', 'Auxiliar view to calculate costs', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_connec', 'User interface view', 'Shows the information of document related to connects. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_connec', 'User interface view', 'Shows the information of document related to connects. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_gully', 'User interface view', 'Shows the visits related to management of gully elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_arc', 'User interface view', 'Shows the visits related to management of arc elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_gully', 'User interface view', 'Shows the visits related to gully elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
