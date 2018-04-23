@@ -1322,6 +1322,44 @@ class SearchPlus(QObject):
         psector_id =  row[0]
         self.manage_new_psector.new_psector(psector_id, 'plan')
 
+        self.zoom_to_psector(self.dlg.psector_id_2, 'v_edit_plan_psector', 'name')
 
 
-                                   
+    def zoom_to_psector(self, widget, layer_name, field_id):
+
+        polygon_name = utils_giswater.getWidgetText(widget)
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if not layer:
+            return
+
+        # Check if the expression is valid
+        field_id = "name"
+        expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
+        #self.controller.log_info(str(expr_filter))
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+
+        # Select features of @layer applying @expr
+        if expr is None:
+            layer.removeSelection()
+        else:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
+
+        # If any feature found, zoom it and exit function
+        if layer.selectedFeatureCount() > 0:
+            self.iface.setActiveLayer(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.iface.actionZoomToSelected().trigger()
+            layer.removeSelection()
+
+
+
+
+
