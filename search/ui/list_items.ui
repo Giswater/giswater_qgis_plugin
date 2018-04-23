@@ -120,13 +120,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="clear_workcat">
-       <property name="text">
-        <string>Clear Workat</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="btn_close">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">

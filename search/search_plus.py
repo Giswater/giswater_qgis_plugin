@@ -84,6 +84,7 @@ class SearchPlus(QObject):
             self.filter_by_list(self.dlg.hydro_id)
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
+        self.dlg.btn_clear_workcat.pressed.connect(self.clear_workcat)
 
         return True
 
@@ -198,16 +199,16 @@ class SearchPlus(QObject):
         layer = self.controller.get_layer_by_tablename(layer_name)
         if not layer:
             return
-        
+
         # Check if the expression is valid
         expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
-            return               
-        
-        # Select features of @layer applying @expr        
+            return
+
+        # Select features of @layer applying @expr
         self.select_features_by_expr(layer, expr)
-                        
+
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
@@ -1293,5 +1294,24 @@ class SearchPlus(QObject):
             if len(id_list) > 0:
                 layer.selectByIds(id_list)   
             else:
-                layer.removeSelection()  
+                layer.removeSelection()
+
+
+    def clear_workcat(self):
+
+        sql = ("DELETE FROM " + self.schema_name + ".selector_workcat")
+        self.controller.log_info(str(sql))
+        status = self.controller.execute_sql(sql)
+        if status:
+            message = "Workcat cleared successfully"
+            self.controller.show_info(message)
+
+            # Clear combo workcat_id
+            utils_giswater.setWidgetText(self.dlg.workcat_id, "")
+            # Get layer by table_name
+            layer = self.iface.activeLayer()
+            # Remove selection
+            self.iface.legendInterface().setLayerVisible(layer, False)
+
+
                                    
