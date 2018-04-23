@@ -278,6 +278,19 @@
       <string>Clear Workat</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="btn_refresh_workcat">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>50</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Refresh</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>
