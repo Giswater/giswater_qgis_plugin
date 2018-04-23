@@ -21,6 +21,9 @@ BEGIN
         INTO query_result_docs
         USING id;
 
+--    Control NULL's
+    query_result_docs := COALESCE(query_result_docs, '');
+
 --    Return
     RETURN ('{"status":"Accepted","docs":' || query_result_docs || '}')::json;
     RETURN query_result_docs;

@@ -67,8 +67,6 @@ INSERT INTO config_web_forms VALUES (320, 'v_ui_om_visitman_x_arc', 'SELECT visi
 INSERT INTO config_web_forms VALUES (325, 'v_ui_om_visitman_x_gully', 'SELECT visit_id AS sys_id, visitcat_name, visit_start, visit_end, user_name FROM v_ui_om_visitman_x_gully', 1);
 INSERT INTO config_web_forms VALUES (326, 'v_ui_om_visitman_x_gully', 'SELECT visit_id AS sys_id, visitcat_name, visit_start, visit_end, user_name FROM v_ui_om_visitman_x_gully', 2);
 INSERT INTO config_web_forms VALUES (327, 'v_ui_om_visitman_x_gully', 'SELECT visit_id AS sys_id, visitcat_name, visit_start, visit_end, user_name FROM v_ui_om_visitman_x_gully', 3);
-INSERT INTO config_web_forms VALUES (50, 'review_arc', NULL, NULL);
-INSERT INTO config_web_forms VALUES (51, 'review_arc', 'SELECT arc_id AS sys_id, y1, y2, arc_type, matcat_id, shape, geom1, geom2, annotation, observ, field_checked FROM review_arc', NULL);
 INSERT INTO config_web_forms VALUES (42, 'v_ui_element', 'SELECT element_id, elementcat_id, num_elements, comment, state, observ, function_type, category_type, location_type, fluid_type, ownercat_id, workcat_id, builtdate, enddate, workcat_id_end, link    FROM v_ui_element', 2);
 INSERT INTO config_web_forms VALUES (43, 'v_ui_element', 'SELECT element_id, elementcat_id, num_elements, comment, state, observ, function_type, category_type, location_type, fluid_type, ownercat_id, workcat_id, builtdate, enddate, workcat_id_end, link    FROM v_ui_element', 3);
 INSERT INTO config_web_forms VALUES (15, 'v_ui_om_visit_x_node', 'SELECT visit_id, event_id AS sys_id, parameter_id, parameter_type, value as valor FROM v_ui_om_visit_x_node', 3);

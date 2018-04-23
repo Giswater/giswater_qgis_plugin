@@ -1,10 +1,9 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, id varchar, formtodisplay text) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, id varchar, formToDisplay text) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
     column_type character varying;
     query_result character varying;
-    formToDisplay character varying;
     position json;
     fields json;
     fields_array json[];
@@ -31,7 +30,7 @@ BEGIN
     schemas_array := current_schemas(FALSE);
     
 
-   raise notice 'table_id %, id %, formtodisplay %', table_id, id, formtodisplay;
+   raise notice 'table_id %, id %, formToDisplay %', table_id, id, formToDisplay;
         
 --    Get form fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
