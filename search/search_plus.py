@@ -26,6 +26,7 @@ class SearchPlus(QObject):
         """ Constructor """
         
         self.iface = iface
+        self.canvas = self.iface.mapCanvas()
         self.srid = srid
         self.controller = controller
         self.schema_name = self.controller.schema_name
@@ -85,6 +86,7 @@ class SearchPlus(QObject):
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
         self.dlg.btn_clear_workcat.pressed.connect(self.clear_workcat)
+        self.dlg.btn_refresh_workcat.pressed.connect(self.refresh_workcat)
 
         return True
 
@@ -1300,7 +1302,6 @@ class SearchPlus(QObject):
     def clear_workcat(self):
 
         sql = ("DELETE FROM " + self.schema_name + ".selector_workcat")
-        self.controller.log_info(str(sql))
         status = self.controller.execute_sql(sql)
         if status:
             message = "Workcat cleared successfully"
@@ -1314,4 +1315,22 @@ class SearchPlus(QObject):
             self.iface.legendInterface().setLayerVisible(layer, False)
 
 
+    def refresh_workcat(self):
+
+        sql = ("refresh materialized view " + self.schema_name + ".v_ui_workcat_polygon_aux")
+        status = self.controller.execute_sql(sql)
+        if status:
+            message = "Polygon refreshed successfully"
+            self.controller.show_info(message)
+
+            # Refresh canvas
+            self.refresh_map_canvas()
+
+
+    def refresh_map_canvas(self):
+        """ Refresh all layers present in map canvas """
+
+        self.canvas.refreshAllLayers()
+        for layer_refresh in self.canvas.layers():
+            layer_refresh.triggerRepaint()
                                    
