@@ -14,5 +14,5 @@ ALTER TABLE "anl_mincut_cat_class" DROP CONSTRAINT IF EXISTS "anl_mincut_cat_cla
 
 -- ADD CHECK
 
-ALTER TABLE SCHEMA_NAME.anl_mincut_cat_state ADD CONSTRAINT anl_mincut_cat_state_check CHECK (id IN (0,1,2));
-ALTER TABLE SCHEMA_NAME.anl_mincut_cat_class ADD CONSTRAINT anl_mincut_cat_class_check CHECK (id IN (1,2,3));
+ALTER TABLE anl_mincut_cat_state ADD CONSTRAINT anl_mincut_cat_state_check CHECK (id IN (0,1,2));
+ALTER TABLE anl_mincut_cat_class ADD CONSTRAINT anl_mincut_cat_class_check CHECK (id IN (1,2,3));

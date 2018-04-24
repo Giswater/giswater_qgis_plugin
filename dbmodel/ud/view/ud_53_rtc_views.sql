@@ -13,7 +13,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
     rtc_hydrometer_x_connec.connec_id,
     connec.customer_code AS connec_customer_code,
 	connec.expl_id,
-	value_state.name AS state,
+	value_state.name,
 	exploitation.name AS expl_name,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
     ext_rtc_hydrometer.hydrometer_category,
