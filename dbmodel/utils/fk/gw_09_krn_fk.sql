@@ -96,10 +96,10 @@ ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_ownercat_id_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_verified_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_feature_type_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_state_type_fkey";
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_function_type_feature_type_fkey;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_category_type_feature_type_fkey;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_fluid_type_feature_type_fkey;
-ALTER TABLE element DROP CONSTRAINT IF EXISTS  element_location_type_feature_type_fkey;
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS  element_function_type_feature_type_fkey;
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS  element_category_type_feature_type_fkey;
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS  element_fluid_type_feature_type_fkey;
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS  element_location_type_feature_type_fkey;
 
 ALTER TABLE "element_x_arc" DROP CONSTRAINT IF EXISTS "element_x_arc_element_id_fkey";
 ALTER TABLE "element_x_arc" DROP CONSTRAINT IF EXISTS "element_x_arc_arc_id_fkey";
@@ -114,7 +114,7 @@ ALTER TABLE "man_addfields_value" DROP CONSTRAINT IF EXISTS "man_addfields_value
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS  "man_addfields_parameter_cat_feature_id_fkey";
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_widgettype_id_fkey";
 ALTER TABLE "man_addfields_parameter" DROP CONSTRAINT IF EXISTS "man_addfields_parameter_datetype_id_fkey";
-ALTER TABLE "man_addfields_cat_combo" DROP CONSTRAINT IF EXISTS "man_addfields_cat_combo_cat_feature_id_fkey";
+ALTER TABLE "man_addfields_cat_combo" DROP CONSTRAINT IF EXISTS "man_addfields_cat_combo_parameter_id_fkey";
 
 
 
