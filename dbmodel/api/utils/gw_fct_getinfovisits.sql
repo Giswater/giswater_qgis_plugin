@@ -76,7 +76,7 @@ BEGIN
     IF query_result_visits_dates ISNULL THEN
 
         IF parameter_type ISNULL THEN
-            parameter_type := json_extract_path_text( parameter_type_options->1,'id');
+            parameter_type := (SELECT id FROM om_visit_parameter LIMIT 1);
         END IF;
     
         EXECUTE 'SELECT array_to_json(array_agg(json_data)) FROM (SELECT row_to_json(t) AS json_data FROM (SELECT id, descript AS "name" FROM om_visit_parameter 
