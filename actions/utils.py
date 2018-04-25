@@ -450,7 +450,10 @@ class Utils(ParentAction):
                         date = QDate.fromString(row[1], 'yyyy-MM-dd')
                         utils_giswater.setCalendarDate(widget, date)
                     else:
-                        utils_giswater.set_combo_itemData(widget, row[1], 0)
+                        if widget.objectName() == 'cad_tools_base_layer_vdefault_1':
+                            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+                        else:
+                            utils_giswater.set_combo_itemData(widget, row[1], 0)
                     utils_giswater.setChecked("chk_" + str(row[0]), True)
 
 
@@ -1097,6 +1100,8 @@ class Utils(ParentAction):
                 if widget.objectName() == 'composer_plan_vdefault' or widget.objectName() == 'composer_om_vdefault':
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 1)) + "' "
                         " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
+                elif widget.objectName() == 'cad_tools_base_layer_vdefault_1':
+                    sql += ("'" + str(value) + "' WHERE cur_user = current_user AND parameter = '" + parameter + "'")
                 else:
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                             " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
@@ -1111,6 +1116,8 @@ class Utils(ParentAction):
                             " WHERE name ='" + str(value) + "'), current_user)")
                 elif widget.objectName() == 'composer_plan_vdefault' or widget.objectName() == 'composer_om_vdefault':
                     sql += (" VALUES ('" + parameter + "', '" + str(utils_giswater.get_item_data(widget, 1)) + "', current_user)")
+                elif widget.objectName() == 'cad_tools_base_layer_vdefault_1':
+                    sql += (" VALUES ('" + parameter + "', '" + str(value) + "', current_user)")
                 else:
                     sql += (" VALUES ('" + parameter + "', '" + str(
                         utils_giswater.get_item_data(widget, 0)) + "', current_user)")
