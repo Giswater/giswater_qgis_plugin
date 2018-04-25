@@ -34,7 +34,7 @@ DECLARE
     count_aux1 smallint;
     count_aux2 smallint;
     return_aux smallint;
-	arc_divide_tolerance_aux float;
+	arc_divide_tolerance_aux float =0.01;
 	plan_arc_vdivision_dsbl_aux boolean;
 
 	
@@ -51,7 +51,6 @@ BEGIN
 	SELECT state INTO state_node_arg FROM node WHERE node_id=node_id_arg;
 
     -- Get node tolerance from config table
-	SELECT node_proximity INTO arc_divide_tolerance_aux FROM config;
 	SELECT value::boolean INTO plan_arc_vdivision_dsbl_aux FROM config_param_user WHERE "parameter"='plan_arc_vdivision_dsbl' AND cur_user=current_user;
 	
 	-- State control
