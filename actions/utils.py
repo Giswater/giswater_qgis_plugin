@@ -46,21 +46,17 @@ class Utils(ParentAction):
 
         # Remove tab WS or UD
         if project_type == 'ws':
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.tabWidget_3,"tab_14")
+            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.tabWidget_3, "tab_edit_ud")
         elif project_type == 'ud':
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.tabWidget_3, "tab_8")
+            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.tabWidget_3, "tab_edit_ws")
 
-        # Remove tab for rol
-        role_admin = False
+        role_admin = self.controller.check_role_user("role_admin")
         role_master = self.controller.check_role_user("role_master")
-        role_epa = self.controller.check_role_user("role_epa")
         role_edit = self.controller.check_role_user("role_edit")
-        role_om = self.controller.check_role_user("role_om")
-        role_basic = self.controller.check_role_user("role_basic")
         
         # Manage user 'postgres'
         if self.controller.user == 'postgres':
-            role_master = True
+            role_admin = True
 
         if role_admin:
             pass
@@ -222,35 +218,35 @@ class Utils(ParentAction):
 
         # Manage user 'postgres'
         if self.controller.user == 'postgres':
-            role_master = True
+            role_admin = True
 
         if role_admin:
             pass
         elif role_master:
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_admin")
         elif role_epa:
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_master")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_admin")
         elif role_edit:
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_epa")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_master")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_admin")
         elif role_om:
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_7")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_13")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_edit")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_cad")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_epa")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_master")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_admin")
         elif role_basic:
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_5")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_7")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_13")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_9")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_4")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_om")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_edit")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_cad")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_epa")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_master")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_admin")
 
         # Hide empty tabs
-        utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_3")
+        utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_basic")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_27")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_28")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_admin, "tab_2")
@@ -355,11 +351,11 @@ class Utils(ParentAction):
         if self.controller.get_project_type() == 'ws':
 
             self.dlg.exploitation_vdefault.currentIndexChanged.connect(partial(self.filter_presszone_vdefault))
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_edit, "tab_22")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_8")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_29")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_topology, "tab_24")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_review, "tab_25")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_edit, "tab_edit_ud")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_epa")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_epa_ud")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_topology, "tab_admin_topology_ud")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_review, "tab_admin_review_ud")
 
             # Edit WS
             self.populate_combo_ws(self.dlg.wtpcat_vdefault, "WTP")
@@ -414,10 +410,10 @@ class Utils(ParentAction):
 
         elif self.controller.get_project_type() == 'ud':
 
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_edit, "tab_21")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_28")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_topology, "tab_11")
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_review, "tab_18")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_edit, "tab_edit_ws")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_epa_ws")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_topology, "tab_admin_topology_ws")
+            utils_giswater.remove_tab_by_tabName(self.dlg.tab_admin_review, "tab_admin_review_ws")
 
             # Epa
             sql = "SELECT id, id FROM" + self.schema_name + ".inp_typevalue_outfall"
@@ -492,7 +488,6 @@ class Utils(ParentAction):
                         utils_giswater.setChecked(widget, True)
                     else:
                         utils_giswater.setChecked(widget, False)
-
 
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)
