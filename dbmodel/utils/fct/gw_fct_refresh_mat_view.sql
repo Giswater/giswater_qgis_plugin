@@ -9,21 +9,15 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_refresh_mat_view()
-RETURNS integer AS $BODY$
-DECLARE
-
-
+RETURNS integer SECURITY DEFINER AS $BODY$
 BEGIN
 
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
-
 	REFRESH MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 	
-	
 	RETURN 1;
-	
 	
 END;
 $BODY$
