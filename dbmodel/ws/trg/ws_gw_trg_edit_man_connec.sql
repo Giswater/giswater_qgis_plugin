@@ -127,9 +127,9 @@ BEGIN
         END IF;
 		
 		-- Presszone
-        --IF (NEW.presszonecat_id IS NULL) THEN
+        IF (NEW.presszonecat_id IS NULL) THEN
             NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        --END IF;
+        END IF;
 		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
