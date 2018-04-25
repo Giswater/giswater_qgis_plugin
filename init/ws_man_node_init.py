@@ -169,7 +169,6 @@ class ManNodeDialog(ParentDialog):
 
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
-        self.load_pressure_zone(presszonecat_id, self.geom_type)
 
 
     def get_topology_parameters(self):
