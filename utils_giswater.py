@@ -443,7 +443,7 @@ def set_combo_itemData(combo, value, item1):
     """
     for i in range(0, combo.count()):
         elem = combo.itemData(i)
-        if value == elem[item1]:
+        if value == str(elem[item1]):
             combo.setCurrentIndex(i)
 
 

@@ -210,7 +210,7 @@ class ManNodeDialog(ParentDialog):
         sql = "SELECT node_proximity, node2arc FROM " + self.schema_name + ".config"
         row = self.controller.get_row(sql)
         if row:
-            self.node_proximity = row['node_proximity']   
+            self.node_proximity = row['node_proximity']    
             
 
     def check_topology_arc(self):
