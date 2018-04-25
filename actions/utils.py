@@ -58,14 +58,14 @@ class Utils(ParentAction):
         if self.controller.user == 'postgres':
             role_admin = True
 
+        # Remove tab for role
         if role_admin:
             pass
         elif role_master:
-            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab")
+            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab_admin")
         elif role_edit:
-            for i in range(2):
-                utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab_2")
-        utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab")
+            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab_admin")
+            utils_giswater.remove_tab_by_tabName(self.dlg_toolbox.Admin, "tab_master")
 
         # Set signals
         self.dlg_toolbox.btn_accept.clicked.connect(self.utils_arc_topo_repair_accept)
