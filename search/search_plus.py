@@ -1306,7 +1306,6 @@ class SearchPlus(QObject):
         if status:
             message = "Workcat cleared successfully"
             self.controller.show_info(message)
-
             # Clear combo workcat_id
             utils_giswater.setWidgetText(self.dlg.workcat_id, "")
             # Get layer by table_name
@@ -1317,13 +1316,11 @@ class SearchPlus(QObject):
 
     def refresh_workcat(self):
 
-        sql = ("refresh materialized view " + self.schema_name + ".v_ui_workcat_polygon_aux")
+        sql = "SELECT " + self.schema_name + ".gw_fct_refresh_mat_view();"
         status = self.controller.execute_sql(sql)
         if status:
             message = "Polygon refreshed successfully"
             self.controller.show_info(message)
-
-            # Refresh canvas
             self.refresh_map_canvas()
 
 
