@@ -213,7 +213,7 @@ class Utils(ParentAction):
         self.project_type = self.controller.get_project_type()
 
         # Manage roles
-        role_admin = False
+        role_admin = self.controller.check_role_user("role_admin")
         role_master = self.controller.check_role_user("role_master")
         role_epa = self.controller.check_role_user("role_epa")
         role_edit = self.controller.check_role_user("role_edit")
@@ -452,6 +452,8 @@ class Utils(ParentAction):
                     else:
                         if widget.objectName() == 'cad_tools_base_layer_vdefault_1':
                             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+                        elif widget.objectName() == 'composer_plan_vdefault' or widget.objectName() == 'composer_om_vdefault':
+                            utils_giswater.set_combo_itemData(widget, row[1], 1)
                         else:
                             utils_giswater.set_combo_itemData(widget, row[1], 0)
                     utils_giswater.setChecked("chk_" + str(row[0]), True)
