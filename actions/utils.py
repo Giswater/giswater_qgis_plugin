@@ -915,22 +915,6 @@ class Utils(ParentAction):
         utils_giswater.set_item_data(widget, rows, 1)
 
 
-    def utils_sql(self, sel, table, atribute, widget):
-
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = '" + widget + "'")
-        row = self.controller.get_row(sql)
-        if row:
-            parameter = row[0]
-            sql = ("SELECT " + sel +" FROM " + self.schema_name + "." + table + ""
-                   " WHERE " + atribute + "::text = '" + str(parameter) + "'" )
-            row = self.controller.get_row(sql)
-
-            if row:
-                cmb = utils_giswater.getWidget(widget)
-                utils_giswater.set_combo_itemData(cmb, row[0],1)
-
-
     def upsert_config_param_system(self, parameter,add_check=False):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
 
