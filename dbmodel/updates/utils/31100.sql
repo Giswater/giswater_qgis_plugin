@@ -8,3 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+CREATE TABLE "psector_x_visit"(
+id serial NOT NULL PRIMARY KEY,
+doc_id character varying(30),
+psector_id integer 
+);
+
