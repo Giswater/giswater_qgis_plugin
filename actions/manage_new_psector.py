@@ -11,6 +11,7 @@ from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTabl
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
 from PyQt4.QtCore import Qt
+from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys
@@ -92,7 +93,11 @@ class ManageNewPsector(ParentManage):
         # self.btn_doc_delete = self.dlg.findChild(QPushButton, "btn_doc_delete")
         # self.btn_doc_new = self.dlg.findChild(QPushButton, "btn_doc_new")
         # self.btn_open_doc = self.dlg.findChild(QPushButton, "btn_open_doc")
-        # self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+        self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+        #self.tbl_document.doubleClicked.connect(partial(self.document_open)).
+        #self.fill_table_visit(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
+        self.fill_table_doc(self.tbl_document, self.schema_name + ".doc_x_psector")
+
 
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
@@ -1156,3 +1161,24 @@ class ManageNewPsector(ParentManage):
 
         model.setStringList(values)
         self.completer.setModel(model)
+
+
+    #def fill_table_doc(self, widget, table_name, filter_):
+    def fill_table_doc(self, widget, table_name):
+        """ Set a model with selected filter. Attach that model to selected table """
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        #model.setFilter(filter_)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+        widget.show()
+
