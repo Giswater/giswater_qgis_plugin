@@ -96,8 +96,7 @@ class ManageNewPsector(ParentManage):
         self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
         #self.tbl_document.doubleClicked.connect(partial(self.document_open)).
         #self.fill_table_visit(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
-        self.fill_table_doc(self.tbl_document, self.schema_name + ".doc_x_psector")
-
+        self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector")
 
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
@@ -1119,12 +1118,10 @@ class ManageNewPsector(ParentManage):
 
     def document_open(self):
         """Open selected document."""
-        self.controller.log_info("document opent")
-        '''
+
         # Get selected rows
         field_index = self.tbl_document.model().fieldIndex('path')
-        selected_list = self.dlg.tbl_document.selectionModel().selectedRows(
-            field_index)
+        selected_list = self.dlg.tbl_document.selectionModel().selectedRows(field_index)
         if not selected_list:
             message = "Any record selected"
             self.controller.show_info_box(message)
@@ -1147,7 +1144,6 @@ class ManageNewPsector(ParentManage):
         else:
             opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, path])
-        '''
 
 
     def set_completer(self):
