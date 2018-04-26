@@ -88,7 +88,7 @@ class ManageNewPsector(ParentManage):
         atlas_id.setValidator(QIntValidator())
 
         # tab 'Document'
-        # self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
         # self.btn_doc_insert = self.dlg.findChild(QPushButton, "btn_doc_insert")
         # self.btn_doc_delete = self.dlg.findChild(QPushButton, "btn_doc_delete")
         # self.btn_doc_new = self.dlg.findChild(QPushButton, "btn_doc_new")
@@ -1045,30 +1045,38 @@ class ManageNewPsector(ParentManage):
 
     def document_insert(self):
         """Insert a docmet related to the current visit."""
-        self.controller.log_info("document insert")
 
-        '''
         doc_id = self.doc_id.text()
-        visit_id = self.visit_id.text()
+        psector_id = self.psector_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
             self.controller.show_warning(message)
             return
-        if not visit_id:
-            message = "You need to insert visit_id"
+        if not psector_id:
+            message = "You need to insert psector_id"
             self.controller.show_warning(message)
             return
+        # Check if document already exist
+        sql = ("SELECT doc_id"
+               " FROM " + self.schema_name + ".doc_x_psector"
+               " WHERE doc_id = '" + str(doc_id) + "'")
+        row = self.controller.get_row(sql, commit=self.autocommit)
+        if row:
+            message = "Document already exist"
+            self.controller.show_info(message)
+            return
+
 
         # Insert into new table
-        sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
-                                                   " VALUES (" + str(doc_id) + ", " + str(visit_id) + ")")
+        sql = ("INSERT INTO " + self.schema_name + ".doc_x_psector (doc_id, psector_id)"
+               " VALUES ('" + str(doc_id) + "', " + str(psector_id) + ")")
         status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
             message = "Document inserted successfully"
             self.controller.show_info(message)
 
         self.dlg.tbl_document.model().select()
-        '''
+
 
     def document_delete(self):
         """Delete record from selected rows in tbl_document."""
@@ -1104,7 +1112,6 @@ class ManageNewPsector(ParentManage):
 
     def manage_document(self):
         """Access GUI to manage documents e.g Execute action of button 34 """
-        self.controller.log_info("manage document")
 
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document()
