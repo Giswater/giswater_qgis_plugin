@@ -1041,7 +1041,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Insert into new table
         sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
-               " VALUES (" + str(doc_id) + ", " + str(visit_id) + ")")
+               " VALUES ('" + str(doc_id) + "', " + str(visit_id) + ")")
         status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
             message = "Document inserted successfully"
