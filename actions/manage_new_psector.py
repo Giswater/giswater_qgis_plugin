@@ -1080,8 +1080,7 @@ class ManageNewPsector(ParentManage):
 
     def document_delete(self):
         """Delete record from selected rows in tbl_document."""
-        self.controller.log_info("document delete")
-        '''
+
         # Get selected rows. 0 is the column of the pk 0 'id'
         selected_list = self.tbl_document.selectionModel().selectedRows(0)
         if len(selected_list) == 0:
@@ -1097,8 +1096,8 @@ class ManageNewPsector(ParentManage):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, ','.join(selected_id))
         if answer:
-            sql = ("DELETE FROM " + self.schema_name + ".doc_x_visit"
-                                                       " WHERE id IN ({})".format(','.join(selected_id)))
+            sql = ("DELETE FROM " + self.schema_name + ".doc_x_psector"
+            " WHERE id IN ({})".format(','.join(selected_id)))
             status = self.controller.execute_sql(sql)
             if not status:
                 message = "Error deleting data"
@@ -1108,7 +1107,7 @@ class ManageNewPsector(ParentManage):
                 message = "Event deleted"
                 self.controller.show_info(message)
                 self.dlg.tbl_document.model().select()
-        '''
+
 
     def manage_document(self):
         """Access GUI to manage documents e.g Execute action of button 34 """
