@@ -247,6 +247,8 @@ class Utils(ParentAction):
 
         # Hide empty tabs
         utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_basic")
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_epa_utils")
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_epa_ws")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_27")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_28")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_admin, "tab_2")
