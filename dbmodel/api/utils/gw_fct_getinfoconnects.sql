@@ -21,7 +21,7 @@ BEGIN
     IF element_type = 'arc' THEN
 
 --        Get query for connects
-        EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''v_ui_arc_x_connection'' AND device = $1'
+        EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''v_ui_arc_x_relations'' AND device = $1'
             INTO query_result
             USING device;
 
