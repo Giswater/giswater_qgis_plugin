@@ -17,7 +17,7 @@ BEGIN
         USING device;
 
 --    Get elements
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE element_id = $1) a'
+    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE id = $1) a'
         INTO query_result_element
         USING element_id;
 
