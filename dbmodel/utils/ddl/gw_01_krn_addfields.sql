@@ -61,3 +61,7 @@ CONSTRAINT man_addfields_cat_combo_pkey PRIMARY KEY (value, parameter_id)
 
 
 
+CREATE INDEX man_addfields_value_feature_id_index ON man_addfields_value USING btree (feature_id);
+CREATE INDEX man_addfields_value_parameter_id_index ON man_addfields_value USING btree (parameter_id);
+
+
