@@ -51,7 +51,7 @@
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <property name="topMargin">
-      <number>50</number>
+      <number>0</number>
      </property>
      <item row="6" column="0">
       <layout class="QGridLayout" name="gridLayout_5">
@@ -59,21 +59,21 @@
         <number>0</number>
        </property>
        <item row="1" column="1">
-        <widget class="QLabel" name="lbl_total_elements">
+        <widget class="QLabel" name="lbl_total_element">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="lbl_total_gullys">
+        <widget class="QLabel" name="lbl_total_gully">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="lbl_total_nodes">
+        <widget class="QLabel" name="lbl_total_node">
          <property name="text">
           <string/>
          </property>
@@ -87,21 +87,21 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="lbl_total_connecs">
+        <widget class="QLabel" name="lbl_total_connec">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="lbl_total_arcs">
+        <widget class="QLabel" name="lbl_total_arc">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="label_10">
+        <widget class="QLabel" name="lbl_length">
          <property name="text">
           <string/>
          </property>
@@ -171,7 +171,7 @@
      <item row="6" column="2">
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="1" column="1">
-        <widget class="QLabel" name="lbl_total_elements_end">
+        <widget class="QLabel" name="lbl_total_element_end">
          <property name="text">
           <string/>
          </property>
@@ -185,35 +185,35 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="lbl_total_arcs_end">
+        <widget class="QLabel" name="lbl_total_arc_end">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="lbl_total_nodes_2">
+        <widget class="QLabel" name="lbl_total_node_end">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="lbl_total_gullys_end">
+        <widget class="QLabel" name="lbl_total_gully_end">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="lbl_total_length_end">
+        <widget class="QLabel" name="lbl_length_end">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="lbl_total_connecs_end">
+        <widget class="QLabel" name="lbl_total_connec_end">
          <property name="text">
           <string/>
          </property>
