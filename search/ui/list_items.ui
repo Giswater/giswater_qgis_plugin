@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>list_items</class>
- <widget class="QDialog" name="list_items">
+ <class>lbl_total_length</class>
+ <widget class="QDialog" name="lbl_total_length">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -50,30 +50,66 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="3" column="0">
-      <widget class="QTableView" name="tbl_psm"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="txt_name_end"/>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_end">
-       <property name="text">
-        <string>End - Feature_id</string>
+     <property name="topMargin">
+      <number>50</number>
+     </property>
+     <item row="6" column="0">
+      <layout class="QGridLayout" name="gridLayout_5">
+       <property name="topMargin">
+        <number>0</number>
        </property>
-      </widget>
+       <item row="1" column="1">
+        <widget class="QLabel" name="lbl_total_elements">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="lbl_total_gullys">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lbl_total_nodes">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="label_21">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="lbl_total_connecs">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="lbl_total_arcs">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_init">
-       <property name="text">
-        <string>Init - Feature_id</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLineEdit" name="txt_name"/>
-     </item>
-     <item row="3" column="1">
+     <item row="3" column="2">
       <widget class="QTableView" name="tbl_psm_end"/>
      </item>
      <item row="2" column="0">
@@ -89,7 +125,30 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="1" column="0">
+      <widget class="QLineEdit" name="txt_name"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QTableView" name="tbl_psm"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLineEdit" name="txt_name_end"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_end">
+       <property name="text">
+        <string>End - Feature_id</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_init">
+       <property name="text">
+        <string>Init - Feature_id</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
       <widget class="QLabel" name="label_5">
        <property name="font">
         <font>
@@ -101,6 +160,66 @@
         <string>Features ended with the selected workcat</string>
        </property>
       </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="1" column="1">
+        <widget class="QLabel" name="lbl_total_elements_end">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="lbl_total_arcs_end">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lbl_total_nodes_2">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="lbl_total_gullys_end">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="lbl_total_length_end">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="lbl_total_connecs_end">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
