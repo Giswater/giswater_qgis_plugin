@@ -313,9 +313,12 @@ class SearchPlus(QObject):
 
             widget = self.items_dialog.findChild(QLabel, str(widget_name))
 
+            if self.project_type == 'ws' and feature == 'GULLY':
+                widget.hide()
+
             total = len(rows)
             # Add data to workcat search form
-            widget.setText("Total " + str(feature.lower()) + "s: " + str(total))
+            widget.setText(str(feature.lower().title()) + "s: " + str(total))
 
             length = 0
             if feature == 'ARC':

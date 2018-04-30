@@ -54,25 +54,29 @@
       <number>0</number>
      </property>
      <item row="6" column="0">
-      <layout class="QGridLayout" name="gridLayout_5">
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <item row="1" column="1">
-        <widget class="QLabel" name="lbl_total_element">
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_2">
          <property name="text">
-          <string/>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Total numbers:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="2">
         <widget class="QLabel" name="lbl_total_gully">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="1" column="1">
+        <widget class="QLabel" name="lbl_total_connec">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
         <widget class="QLabel" name="lbl_total_node">
          <property name="text">
           <string/>
@@ -80,27 +84,20 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="label_21">
+        <widget class="QLabel" name="lbl_total_element">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="lbl_total_connec">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="lbl_total_arc">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="2" column="2">
         <widget class="QLabel" name="lbl_length">
          <property name="text">
           <string/>
@@ -169,51 +166,51 @@
       </widget>
      </item>
      <item row="6" column="2">
-      <layout class="QGridLayout" name="gridLayout_4">
+      <layout class="QGridLayout" name="gridLayout_8">
        <item row="1" column="1">
-        <widget class="QLabel" name="lbl_total_element_end">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="lbl_total_arc_end">
+        <widget class="QLabel" name="lbl_total_connec_end">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="lbl_total_node_end">
+        <widget class="QLabel" name="lbl_total_arc_end">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
+        <widget class="QLabel" name="lbl_total_node_end">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
         <widget class="QLabel" name="lbl_total_gully_end">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="lbl_length_end">
+       <item row="2" column="1">
+        <widget class="QLabel" name="lbl_total_element_end">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="lbl_total_connec_end">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Total numbers:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="lbl_length_end">
          <property name="text">
           <string/>
          </property>
