@@ -87,17 +87,6 @@ class ManageNewPsector(ParentManage):
         atlas_id = self.dlg.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
 
-        # tab 'Document'
-        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
-        # self.btn_doc_insert = self.dlg.findChild(QPushButton, "btn_doc_insert")
-        # self.btn_doc_delete = self.dlg.findChild(QPushButton, "btn_doc_delete")
-        # self.btn_doc_new = self.dlg.findChild(QPushButton, "btn_doc_new")
-        # self.btn_open_doc = self.dlg.findChild(QPushButton, "btn_open_doc")
-        self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
-        #self.tbl_document.doubleClicked.connect(partial(self.document_open)).
-        #self.fill_table_visit(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
-        self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector")
-
         self.populate_combos(self.dlg.psector_type, 'name', 'id', self.plan_om + '_psector_cat_type', False)
         self.populate_combos(self.cmb_expl_id, 'name', 'expl_id', 'exploitation', False)
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector', False)
@@ -215,6 +204,14 @@ class ManageNewPsector(ParentManage):
                        " WHERE cur_user = current_user AND psector_id='" +utils_giswater.getWidgetText(self.dlg.psector_id) + "'")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+
+            # tab 'Document'
+            self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+            self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+            filter = "psector_id = '" + str(psector_id) + "'"
+            self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter)
+            self.tbl_document.doubleClicked.connect(partial(self.document_open))
+
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         self.all_states = rows
@@ -1058,11 +1055,11 @@ class ManageNewPsector(ParentManage):
         # Check if document already exist
         sql = ("SELECT doc_id"
                " FROM " + self.schema_name + ".doc_x_psector"
-               " WHERE doc_id = '" + str(doc_id) + "'")
+               " WHERE doc_id = '" + str(doc_id) + "' AND psector_id = '" + str(psector_id) + "'")
         row = self.controller.get_row(sql, commit=self.autocommit)
         if row:
             message = "Document already exist"
-            self.controller.show_info(message)
+            self.controller.show_warning(message)
             return
 
 
@@ -1165,15 +1162,15 @@ class ManageNewPsector(ParentManage):
         self.completer.setModel(model)
 
 
-    #def fill_table_doc(self, widget, table_name, filter_):
-    def fill_table_doc(self, widget, table_name):
+    def fill_table_doc(self, widget, table_name, filter_):
+    #def fill_table_doc(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
 
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        #model.setFilter(filter_)
+        model.setFilter(filter_)
         model.select()
 
         # Check for errors

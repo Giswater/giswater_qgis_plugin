@@ -1335,7 +1335,6 @@ class SearchPlus(QObject):
         # Check if the expression is valid
         field_id = "name"
         expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
-        #self.controller.log_info(str(expr_filter))
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
