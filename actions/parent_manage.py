@@ -129,6 +129,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText("path", "")
             utils_giswater.setWidgetText("rotation", "")                                    
             utils_giswater.setWidgetText("verified", "")
+            utils_giswater.setWidgetText(self.dlg.num_elements, "")
                     
     
     def fill_widgets(self, table_object, row):    
@@ -156,8 +157,9 @@ class ParentManage(ParentAction, object):
                        " WHERE expl_id = '" + str(row['expl_id']) + "'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
-                    expl_id = row_aux[0]                
+                    expl_id = row_aux[0]
 
+            utils_giswater.setWidgetText("num_elements", row['num_elements'])
             utils_giswater.setWidgetText("state", state)
             utils_giswater.setWidgetText("expl_id", expl_id)
             utils_giswater.setWidgetText("elementcat_id", row['elementcat_id'])
@@ -224,7 +226,12 @@ class ParentManage(ParentAction, object):
 
         # If object_id not found: Clear data
         if not row:    
-            self.reset_widgets(table_object)            
+            self.reset_widgets(table_object)
+            if table_object == 'element':
+                self.set_combo('state', 'value_state', 'state_vdefault', field_name='name')
+                self.set_combo('expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id',field_name='name')
+                self.set_calendars('builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
+                self.set_combo('workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
             if hasattr(self, 'single_tool_mode'):
                 # some tools can work differently if standalone or integrated in
                 # another tool

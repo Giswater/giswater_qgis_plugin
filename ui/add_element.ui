@@ -788,6 +788,16 @@
       </rect>
      </property>
     </widget>
+    <widget class="QLineEdit" name="num_elements">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>12</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
