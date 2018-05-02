@@ -70,6 +70,9 @@ class ManageElement(ParentManage):
         sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".v_edit_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("element_type", rows, False)
+        sql = "SELECT DISTINCT(elementcat_id) FROM " + self.schema_name + ".v_edit_element ORDER BY elementcat_id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("elementcat_id", rows, False)
         self.populate_combo("state", "value_state", "name")
         self.populate_combo("expl_id", "exploitation", "name")
         sql = ("SELECT location_type"
