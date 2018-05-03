@@ -1,4 +1,10 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoconnects"(element_type varchar, id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
+﻿
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfoconnects(
+    element_type character varying,
+    id character varying,
+    device integer)
+  RETURNS json AS
+$BODY$
 DECLARE
 
 --    Variables
@@ -14,7 +20,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 
 
 --    Query depends on element type
@@ -31,12 +37,12 @@ BEGIN
             USING id;
 
 --        Get node_1
-        EXECUTE 'SELECT row_to_json(a) FROM (SELECT node_1 AS sys_id, ST_X(node.the_geom) AS sys_x, ST_Y(node.the_geom) AS sys_y FROM arc JOIN node ON (node_1 = node_id) WHERE arc_id::text = $1) a'
+        EXECUTE 'SELECT row_to_json(a) FROM (SELECT node_1 AS sys_id, ST_X(node.the_geom) AS sys_x, ST_Y(node.the_geom) AS sys_y FROM arc JOIN node ON (node_1 = node_id) WHERE arc.arc_id::text = $1) a'
             INTO query_result_node_1
             USING id;
 
 --        Get node_2
-        EXECUTE 'SELECT row_to_json(a) FROM (SELECT node_2 AS sys_id, ST_X(node.the_geom) AS sys_x, ST_Y(node.the_geom) AS sys_y FROM arc JOIN node ON (node_2 = node_id) WHERE arc_id::text = $1) a'
+        EXECUTE 'SELECT row_to_json(a) FROM (SELECT node_2 AS sys_id, ST_X(node.the_geom) AS sys_x, ST_Y(node.the_geom) AS sys_y FROM arc JOIN node ON (node_2 = node_id) WHERE arc.arc_id::text = $1) a'
             INTO query_result_node_2
             USING id;
 
@@ -91,10 +97,16 @@ BEGIN
     RETURN ('{"status":"Failed","error":"error in function gw_fct_getinfoconnects"}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-       RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+ --   EXCEPTION WHEN OTHERS THEN 
+  --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
-LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer)
+  OWNER TO geoadmin;
+GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer) TO public;
+GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer) TO geoadmin;
+GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer) TO user_dev;
+GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer) TO rol_dev;

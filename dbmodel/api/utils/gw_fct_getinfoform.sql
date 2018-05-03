@@ -1,8 +1,8 @@
 ﻿
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoform(
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfoform(
     table_id character varying,
     lang character varying,
-    id character varying,
+    p_id character varying,
     formtodisplay text)
   RETURNS json AS
 $BODY$
@@ -31,13 +31,13 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
     
 
-   raise notice 'table_id %, id %, formtodisplay %', table_id, id, formtodisplay;
+   raise notice 'table_id %, id %, formtodisplay %', table_id, p_id, formtodisplay;
         
 --    Get form fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
@@ -49,6 +49,7 @@ WHERE a.attnum > 0
   AND NOT a.attisdropped
   AND t.relname = $1 
   AND s.nspname = $2
+  AND a.atttypid != 150381
 ORDER BY a.attnum) a'
         INTO fields_array
         USING table_id, schemas_array[1];    
@@ -99,7 +100,7 @@ raise notice '4 %', column_type;
         array_index := array_index + 1;
 
 --        Get field values
-        EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || (table_id) || ' WHERE ' || (table_pkey) || ' = CAST(' || (id) || ' AS ' || column_type || ')' 
+        EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || (table_id) || ' WHERE ' || (table_pkey) || ' = CAST(' || quote_literal(p_id) || ' AS ' || column_type || ')' 
         
        INTO field_value; 
        	raise notice 'table_pkey % ' , table_pkey;
@@ -131,17 +132,17 @@ raise notice '5';
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-       RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+  --  EXCEPTION WHEN OTHERS THEN 
+  --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
-
-
-
-END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  COST 100;
+ALTER FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text)
+  OWNER TO geoadmin;
+GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text) TO public;
+GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text) TO geoadmin;
+GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text) TO user_dev;
+GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text) TO rol_dev;

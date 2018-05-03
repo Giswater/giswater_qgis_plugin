@@ -1,4 +1,4 @@
-
+﻿
 /*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -33,5 +33,3 @@ ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_type_fkey" FOR
 ALTER TABLE "config_web_layer_cat_form" ADD CONSTRAINT "config_web_layer_cat_form_name_unique" UNIQUE  ("name");
 
 ALTER TABLE "config_web_layer_tab" ADD CONSTRAINT "config_web_layer_formtab_fkey" FOREIGN KEY ("formtab") REFERENCES "config_web_layer_cat_formtab" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE "config_web_layer_tab" ADD CONSTRAINT "config_web_layer_formid_fkey" FOREIGN KEY ("formid") REFERENCES "config_web_layer_cat_form" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE "config_web_layer_tab" ADD CONSTRAINT "config_web_layer_formname_fkey" FOREIGN KEY ("formname") REFERENCES "config_web_layer_cat_form" ("name") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

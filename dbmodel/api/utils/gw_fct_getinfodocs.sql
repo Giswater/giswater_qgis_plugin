@@ -22,7 +22,7 @@ BEGIN
         USING id;
 
 --    Control NULL's
-    query_result_docs := COALESCE(query_result_docs, '');
+    query_result_docs := COALESCE(query_result_docs, '{}');
 
 --    Return
     RETURN ('{"status":"Accepted","docs":' || query_result_docs || '}')::json;

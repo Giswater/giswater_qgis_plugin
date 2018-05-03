@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -9,6 +9,25 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+
+
+CREATE TABLE "config_web_fields_cat_datatype" (
+id text PRIMARY KEY
+);
+
+
+CREATE TABLE "config_web_layer_cat_formtab" (
+id text PRIMARY KEY
+);
+
+CREATE TABLE "config_web_layer_cat_form" (
+id text PRIMARY KEY,
+name  text);
+
+
+CREATE TABLE "config_web_fields_cat_type" (
+id text PRIMARY KEY
+);
 
 
 CREATE TABLE config_web_layer(
@@ -43,7 +62,7 @@ CREATE TABLE config_web_layer_tab(
   CONSTRAINT config_web_layer_tab_pkey PRIMARY KEY (id),
   CONSTRAINT config_web_layer_formtab_fkey FOREIGN KEY (formtab)
       REFERENCES config_web_layer_cat_formtab (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT)
+      ON UPDATE CASCADE ON DELETE RESTRICT);
 
 	  
 	  
@@ -89,22 +108,3 @@ CONSTRAINT config_client_forms_web_pkey PRIMARY KEY (id)
 );
 
 
-
-
-CREATE TABLE "config_web_fields_cat_datatype" (
-id text PRIMARY KEY
-);
-
-
-CREATE TABLE "config_web_layer_cat_formtab" (
-id text PRIMARY KEY
-);
-
-CREATE TABLE "config_web_layer_cat_form" (
-id text PRIMARY KEY,
-name  text);
-
-
-CREATE TABLE "config_web_fields_cat_type" (
-id text PRIMARY KEY
-);
