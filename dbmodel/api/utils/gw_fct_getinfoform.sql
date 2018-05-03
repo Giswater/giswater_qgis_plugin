@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfoform(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoform(
     table_id character varying,
     lang character varying,
     p_id character varying,
@@ -31,7 +31,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -140,9 +140,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text)
-  OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text) TO public;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text) TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text) TO user_dev;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoform(character varying, character varying, character varying, text) TO rol_dev;

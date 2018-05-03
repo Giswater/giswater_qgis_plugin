@@ -3192,7 +3192,7 @@ INSERT INTO ext_rtc_hydrometer VALUES ('3199', '11199', '2', NULL, NULL, NULL, N
 --
 -- TOC entry 22475 (class 0 OID 3192585)
 -- Dependencies: 4505
--- Data for Name: ext_rtc_hydrometer_x_data; Type: TABLE DATA; Schema: ws_sample; Owner: postgres
+-- Data for Name: ext_rtc_hydrometer_x_data; Type: TABLE DATA; Schema: SCHEMA_NAME; Owner: postgres
 --
 
 INSERT INTO ext_rtc_hydrometer_x_data VALUES (8593, '3195', 0, 0.017951015531660699, 0.0035902031063321399, 9.6159999999999997, NULL, '7');

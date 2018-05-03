@@ -38,14 +38,14 @@ INSERT INTO config_web_layer_tab VALUES (115, 'v_edit_gully', 'tabDoc');
 
 --inserts on config_web_layer_child (dinamyc insert)
 INSERT INTO config_web_layer_child
-SELECT cat_feature.id, tablename FROM ws_sample.cat_feature JOIN ws_sample.sys_feature_cat ON system_id=sys_feature_cat.id
+SELECT cat_feature.id, tablename FROM SCHEMA_NAME.cat_feature JOIN SCHEMA_NAME.sys_feature_cat ON system_id=sys_feature_cat.id
 
 
 --inserts on config_web_tableinfo_x_inforole (dinamyc insert)
-insert into ws_sample.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
-select tableinfo_id, 1, tableinfo_id  FROM ws_sample.config_web_layer 
+insert into SCHEMA_NAME.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
+select tableinfo_id, 1, tableinfo_id  FROM SCHEMA_NAME.config_web_layer 
 
-insert into ws_sample.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
-select tableinfo_id, 1, tableinfo_id  FROM ws_sample.config_web_layer_child 
+insert into SCHEMA_NAME.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
+select tableinfo_id, 1, tableinfo_id  FROM SCHEMA_NAME.config_web_layer_child 
 
 

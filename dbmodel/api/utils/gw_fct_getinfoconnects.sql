@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfoconnects(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoconnects(
     element_type character varying,
     id character varying,
     device integer)
@@ -20,7 +20,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 
 --    Query depends on element type
@@ -104,9 +104,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer)
-  OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer) TO public;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer) TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer) TO user_dev;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfoconnects(character varying, character varying, integer) TO rol_dev;

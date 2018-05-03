@@ -1,6 +1,6 @@
-﻿DROP FUNCTION ws_sample.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint);
+﻿DROP FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint);
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfovisits(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(
     element_type character varying,
     id character varying,
     device integer,
@@ -25,7 +25,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 
 
@@ -136,9 +136,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint)
-  OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint) TO public;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint) TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint) TO user_dev;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint) TO rol_dev;

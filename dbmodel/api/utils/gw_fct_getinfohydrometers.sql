@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfohydrometers(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfohydrometers(
     element_type character varying,
     id character varying,
     device integer)
@@ -15,7 +15,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --    Get query for elements
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat(''v_ui_hydrometer_x_'',$1) AND device = $2'
@@ -42,9 +42,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_fct_getinfoelements(character varying, character varying, integer)
-  OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfohydro(character varying, character varying, integer) TO public;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfohydro(character varying, character varying, integer) TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfohydro(character varying, character varying, integer) TO user_dev;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_getinfohydro(character varying, character varying, integer) TO rol_dev;
