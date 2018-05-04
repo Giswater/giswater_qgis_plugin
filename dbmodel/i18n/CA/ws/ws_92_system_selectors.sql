@@ -10,34 +10,34 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Default values of state selection
 -- ----------------------------
-INSERT INTO inp_selector_state VALUES ('EN_SERVEI');
+-- INSERT INTO inp_selector_state VALUES ('EN_SERVEI');
 
 
 -- ----------------------------
 -- Records of plan_selector_state
 -- ----------------------------
-INSERT INTO plan_selector_state VALUES ('EN_SERVEI');
-INSERT INTO plan_selector_state VALUES ('RECONSTRUIR');
-INSERT INTO plan_selector_state VALUES ('SUBSTITUIR');
-INSERT INTO plan_selector_state VALUES ('PLANIFICAT');
+-- INSERT INTO plan_selector_state VALUES ('EN_SERVEI');
+-- INSERT INTO plan_selector_state VALUES ('RECONSTRUIR');
+-- INSERT INTO plan_selector_state VALUES ('SUBSTITUIR');
+-- INSERT INTO plan_selector_state VALUES ('PLANIFICAT');
 
 
 -- ----------------------------
 -- Records of man_selector_state
 -- ----------------------------
-INSERT INTO "man_selector_state" VALUES ('EN_SERVEI');
+-- INSERT INTO man_selector_state VALUES ('EN_SERVEI');
 
 
 -- ----------------------------
 -- Records of anl_selector_state
 -- ----------------------------
-INSERT INTO "anl_selector_state" VALUES ('EN_SERVEI');
+-- INSERT INTO anl_selector_state VALUES ('EN_SERVEI');
 
 
 
 -- ----------------------------
 -- Default values of valve selection
 -- ----------------------------
-INSERT INTO anl_mincut_selector_valve VALUES ('VALVULA');
+INSERT INTO anl_mincut_selector_valve VALUES ('GEN-PURP.VALVE');
 
 
