@@ -26,6 +26,7 @@ class SearchPlus(QObject):
 
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.iface = iface
+        self.canvas = self.iface.mapCanvas()
         self.srid = srid
         self.controller = controller
         self.schema_name = self.controller.schema_name
@@ -84,6 +85,8 @@ class SearchPlus(QObject):
             self.filter_by_list(self.dlg.hydro_id)
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
+        self.dlg.btn_clear_workcat.pressed.connect(self.clear_workcat)
+        self.dlg.btn_refresh_workcat.pressed.connect(self.refresh_workcat)
         self.dlg.psector_id_2.activated.connect(partial(self.open_plan_psector))
 
         return True
@@ -208,16 +211,16 @@ class SearchPlus(QObject):
         layer = self.controller.get_layer_by_tablename(layer_name)
         if not layer:
             return
-        
+
         # Check if the expression is valid
         expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
-            return               
-        
-        # Select features of @layer applying @expr        
+            return
+
+        # Select features of @layer applying @expr
         self.select_features_by_expr(layer, expr)
-                        
+
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
@@ -1310,6 +1313,39 @@ class SearchPlus(QObject):
                 layer.removeSelection()
 
 
+    def clear_workcat(self):
+
+        sql = ("DELETE FROM " + self.schema_name + ".selector_workcat")
+        status = self.controller.execute_sql(sql)
+        if status:
+            message = "Workcat cleared successfully"
+            self.controller.show_info(message)
+            # Clear combo workcat_id
+            utils_giswater.setWidgetText(self.dlg.workcat_id, "")
+            # Get layer by table_name
+            layer = self.iface.activeLayer()
+            # Remove selection
+            self.iface.legendInterface().setLayerVisible(layer, False)
+
+
+    def refresh_workcat(self):
+
+        sql = "SELECT " + self.schema_name + ".gw_fct_refresh_mat_view();"
+        status = self.controller.execute_sql(sql)
+        if status:
+            message = "Polygon refreshed successfully"
+            self.controller.show_info(message)
+            self.refresh_map_canvas()
+
+
+    def refresh_map_canvas(self):
+        """ Refresh all layers present in map canvas """
+
+        self.canvas.refreshAllLayers()
+        for layer_refresh in self.canvas.layers():
+            layer_refresh.triggerRepaint()
+                                   
+
     def open_plan_psector(self):
 
         psector_name = self.dlg.psector_id_2.currentText()
@@ -1355,5 +1391,4 @@ class SearchPlus(QObject):
             self.iface.legendInterface().setLayerVisible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
-
 
