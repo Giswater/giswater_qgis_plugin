@@ -418,6 +418,7 @@ class ParentDialog(QDialog):
         utils_giswater.setWidgetText("element_id", elem.element_id)
         self.add_object(self.tbl_element, "element", "v_ui_element")
 
+        self.tbl_element.model().select()
 
     def delete_records(self, widget, table_name):
         """ Delete selected objects (elements or documents) of the @widget """
