@@ -2,9 +2,7 @@
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from PyQt4 import uic
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
-from PyQt4.QtGui import QFileDialog
-from PyQt4.QtGui import QLineEdit
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QLineEdit
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
 
@@ -1357,8 +1355,5 @@ class SearchPlus(QObject):
             self.iface.legendInterface().setLayerVisible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
-
-
-
 
 
