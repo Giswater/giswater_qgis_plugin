@@ -1156,17 +1156,18 @@ class MincutParent(ParentAction, MultipleSelection):
             # Get hydrometer_id of selected connec
             sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
                    " WHERE connec_id = '" + str(element_id) + "'")
-            row = self.controller.get_row(sql)
-            if row:
-                # Hydrometers associated to selected connecs inserted to the table anl_mincut_result_hydrometer
-                sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_hydrometer"
-                        " (result_id, hydrometer_id) "
-                        " VALUES ('" + str(result_mincut_id) + "', '" + str(row[0]) + "');\n")
-                status = self.controller.execute_sql(sql)
-                if status:
-                    # Show message to user
-                    message = "Values has been updated"
-                    self.controller.show_info(message)
+            rows = self.controller.get_rows(sql)
+            if rows:
+                for row in rows:
+                    # Hydrometers associated to selected connecs inserted to the table anl_mincut_result_hydrometer
+                    sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_hydrometer"
+                            " (result_id, hydrometer_id) "
+                            " VALUES ('" + str(result_mincut_id) + "', '" + str(row[0]) + "');\n")
+                    status = self.controller.execute_sql(sql)
+                    if status:
+                        # Show message to user
+                        message = "Values has been updated"
+                        self.controller.show_info(message)
         
         self.sql_connec = sql
         self.dlg.btn_start.setDisabled(False)
