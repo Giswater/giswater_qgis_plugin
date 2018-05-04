@@ -1,12 +1,12 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
-''' Module with utility functions to interact with dialog and its widgets '''
+""" Module with utility functions to interact with dialog and its widgets """
 from qgis.gui import QgsDateTimeEdit
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
 from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
@@ -59,25 +59,6 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
                     widget.addItem(elem, user_data)
             except:
                 widget.addItem(str(elem), user_data)
-                
-                
-def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
-
-    if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QComboBox, widget)    
-    if widget is None:
-        return None
-
-    # Populate combo with values stored in dictionary variable
-    if allow_nulls:
-        widget.addItem('') 
-    for key, value in dict_object.iteritems():   # @UnusedVariable 
-        # Get variables of selected objects
-        # Search for the one specified in parameter <dict_field>
-        aux = inspect.getmembers(value)
-        for elem in aux:
-            if elem[0] == dict_field:
-                widget.addItem(elem[1])          
         
         
 def fillComboBoxList(widget, list_object, allow_nulls=True, clear_combo=True):
@@ -300,17 +281,6 @@ def setCurrentIndex(widget, index):
         widget.setCurrentIndex(index);        
 
 
-def isNull(widget):
-
-    if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QLineEdit, widget)    
-    empty = True    
-    if widget:    
-        if widget.text():
-            empty = False
-    return empty    
-
-
 def setWidgetVisible(widget, visible=True):
 
     if type(widget) is str or type(widget) is unicode:
@@ -328,7 +298,7 @@ def setWidgetEnabled(widget, enabled=True):
                 
 
 def setImage(widget,cat_shape):
-    ''' Set pictures for UD'''
+    """ Set pictures for UD"""
     
     element = cat_shape.lower()
     if type(widget) is str or type(widget) is unicode:
@@ -369,17 +339,6 @@ def fillWidget(widget):
         widget.setText("")
 
 
-def set_combo_itemData(combo, value, item1, item2):
-    """ Set text to combobox populate with more than 1 item for row
-        @item1: element to compare
-        @item2: element to show
-    """
-    for i in range(0, combo.count()):
-        elem = combo.itemData(i)
-        if value == elem[item1]:
-            setWidgetText(combo, (elem[item2]))
-
-
 def get_reg(reg_hkey, reg_path, reg_name):
     
     if 'nt' in sys.builtin_module_names:     
@@ -402,7 +361,7 @@ def get_reg(reg_hkey, reg_path, reg_name):
         
         
 def get_settings_value(settings, parameter):
-    ''' Function that fix problem with network units in Windows '''
+    """ Function that fix problem with network units in Windows """
     
     file_aux = ""
     try:
@@ -475,6 +434,17 @@ def get_item_data(widget, index=0):
             code = elem[index]            
 
     return code
+
+
+def set_combo_itemData(combo, value, item1):
+    """ Set text to combobox populate with more than 1 item for row
+        @item1: element to compare
+        @item2: element to show
+    """
+    for i in range(0, combo.count()):
+        elem = combo.itemData(i)
+        if value == str(elem[item1]):
+            combo.setCurrentIndex(i)
 
 
 def set_item_data(combo, rows, index_to_show=0, combo_clear=True):

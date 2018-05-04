@@ -160,7 +160,11 @@ class ParentManage(ParentAction, object):
 
             utils_giswater.setWidgetText("state", state)
             utils_giswater.setWidgetText("expl_id", expl_id)
-            utils_giswater.setWidgetText("elementcat_id", row['elementcat_id'])
+            sql = ("SELECT elementtype_id FROM " + self.schema_name + ".cat_element"
+                   " WHERE id = '" + str(row['elementcat_id']) + "'")
+            row_type = self.controller.get_row(sql)
+            if row_type:
+                utils_giswater.setWidgetText("element_type", row_type[0])
             utils_giswater.setWidgetText("ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText("location_type", row['location_type'])
             utils_giswater.setWidgetText("buildercat_id", row['buildercat_id'])
@@ -1029,3 +1033,24 @@ class ParentManage(ParentAction, object):
                     widget.setCurrentIndex(index)
                     continue
 
+
+    def set_model_to_table(self, widget, table_name, expr_filter):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        if widget:
+            widget.setModel(model)
+        else:
+            self.controller.log_info("set_model_to_table: widget not found")

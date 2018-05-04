@@ -51,10 +51,7 @@ class DaoController():
         self.qgis_settings = qgis_settings       
         
     def set_plugin_dir(self, plugin_dir):
-        self.plugin_dir = plugin_dir       
-                
-    def set_plugin_name(self, plugin_name):
-        self.plugin_name = plugin_name
+        self.plugin_dir = plugin_dir
         
         
     def set_logger(self, logger_name):
@@ -105,12 +102,7 @@ class DaoController():
             key = str(index).zfill(2)
         if key in self.actions:
             action = self.actions[key]
-            action.setChecked(check)     
-    
-    
-    def get_schema_name(self):
-        self.schema_name = self.plugin_settings_value('schema_name')
-        return self.schema_name
+            action.setChecked(check)
     
     
     def set_database_connection(self):
@@ -919,7 +911,7 @@ class DaoController():
         """ Check if current user belongs to @role_name """
         
         if not self.check_role(role_name):
-            return True
+            return False
         
         sql = ("SELECT pg_has_role('" + self.user + "', '" + role_name + "', 'MEMBER');")
         row = self.get_row(sql)
@@ -960,10 +952,14 @@ class DaoController():
         """ Check roles of this user to show or hide toolbars """
         
         role_admin = False
-        role_master = self.check_role_user("rol_master")
-        role_epa = self.check_role_user("rol_epa")
-        role_edit = self.check_role_user("rol_edit")
-        role_om = self.check_role_user("rol_om")
+        role_master = self.check_role_user("role_master")
+        role_epa = self.check_role_user("role_epa")
+        role_edit = self.check_role_user("role_edit")
+        role_om = self.check_role_user("role_om")
+        
+        # Manage user 'postgres'
+        if self.user == 'postgres':
+            role_master = True
         
         if role_admin:
             pass
@@ -978,9 +974,19 @@ class DaoController():
             elif self.giswater.wsoftware == 'ud':                
                 self.giswater.enable_toolbar("om_ud")
         elif role_epa:
+            if self.giswater.wsoftware == 'ws':            
+                 self.giswater.enable_toolbar("om_ws")
+            elif self.giswater.wsoftware == 'ud':                
+                self.giswater.enable_toolbar("om_ud")
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
             self.giswater.enable_toolbar("utils")            
             self.giswater.enable_toolbar("epa")
         elif role_edit:
+            if self.giswater.wsoftware == 'ws':            
+                self.giswater.enable_toolbar("om_ws")
+            elif self.giswater.wsoftware == 'ud':                
+                self.giswater.enable_toolbar("om_ud")
             self.giswater.enable_toolbar("utils")            
             self.giswater.enable_toolbar("edit")
             self.giswater.enable_toolbar("cad")

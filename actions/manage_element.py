@@ -13,7 +13,6 @@ from ui_manager import AddElement
 from ui_manager import ElementManagement
 from actions.parent_manage import ParentManage
 
-
 class ManageElement(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -310,8 +309,13 @@ class ManageElement(ParentManage):
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.element_id = element_id
-            self.manage_close(table_object)           
-      
+            self.manage_close(table_object)
+            #TODO Reload table tbl_element
+            filter = "node_id = '" + str(feature_id) + "'"
+            self.controller.log_info(str(filter))
+            table_element = "v_ui_element_x_node"
+            self.set_model_to_table(self.tbl_element, table_element, filter)
+
       
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """

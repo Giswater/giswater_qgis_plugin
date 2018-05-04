@@ -2,9 +2,7 @@
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from PyQt4 import uic
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
-from PyQt4.QtGui import QFileDialog
-from PyQt4.QtGui import QLineEdit, QLabel
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QLineEdit, QLabel
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
 
@@ -46,7 +44,7 @@ class SearchPlus(QObject):
 
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_main,'tab')
         # Check address parameters
         message = "Parameter not found"
         if not 'street_field_expl' in self.params:
@@ -701,7 +699,7 @@ class SearchPlus(QObject):
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
         if expl_name is None:
             expl_name = ""
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, name "
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
@@ -890,7 +888,7 @@ class SearchPlus(QObject):
         if expl_name == "null" or expl_name is None:
             expl_name = ""
         list_hydro = []
-        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, name"
+        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, state"
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
@@ -1420,8 +1418,4 @@ class SearchPlus(QObject):
             self.iface.legendInterface().setLayerVisible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
-
-
-
-
 

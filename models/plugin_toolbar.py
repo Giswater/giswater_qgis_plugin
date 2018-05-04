@@ -2,7 +2,7 @@
 
 
 class PluginToolbar():
-    ''' Keep data related with every toolbar of the plugin '''
+    """ Keep data related with every toolbar of the plugin """
     
     def __init__(self, toolbar_id, name, enabled, toolbar=None, list_actions=[]):
         """ 

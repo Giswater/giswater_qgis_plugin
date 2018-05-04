@@ -20,7 +20,6 @@ import operator
 from functools import partial
 
 import utils_giswater
-
 from ui_manager import Plan_psector
 from ui_manager import Psector_rapport
 from actions.parent_manage import ParentManage
@@ -165,9 +164,9 @@ class ManageNewPsector(ParentManage):
                 return
             
             self.psector_id.setText(str(row['psector_id']))
-            utils_giswater.set_combo_itemData(self.cmb_psector_type, row['psector_type'], 0, 1)
-            utils_giswater.set_combo_itemData(self.cmb_expl_id, row['expl_id'], 0, 1)
-            utils_giswater.set_combo_itemData(self.cmb_sector_id, row['sector_id'], 0, 1)
+            utils_giswater.set_combo_itemData(self.cmb_psector_type, row['psector_type'], 0)
+            utils_giswater.set_combo_itemData(self.cmb_expl_id, row['expl_id'], 0)
+            utils_giswater.set_combo_itemData(self.cmb_sector_id, row['sector_id'], 0)
 
             utils_giswater.setRow(row)
             utils_giswater.setChecked("active", row['active'])
@@ -208,8 +207,8 @@ class ManageNewPsector(ParentManage):
             # tab 'Document'
             self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
             self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
-            filter = "psector_id = '" + str(psector_id) + "'"
-            self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter)
+            filter_ = "psector_id = '" + str(psector_id) + "'"
+            self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
@@ -269,10 +268,6 @@ class ManageNewPsector(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)
 
-        # Set QTableview columns from table config_client_forms
-        # self.set_table_columns(self.qtbl_arc, self.plan_om + "_psector_x_arc")
-        # self.set_table_columns(self.qtbl_node, self.plan_om + "_psector_x_node")
-        
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)     
 
@@ -326,7 +321,9 @@ class ManageNewPsector(ParentManage):
         # Open dialog
         self.open_dialog(self.dlg_psector_rapport, maximize_button=False)     
 
+
     def populate_cmb_templates(self):
+        
         composers = self.iface.activeComposers()
         index = 0
         records = []
@@ -335,12 +332,13 @@ class ManageNewPsector(ParentManage):
             records.append(elem)
             index = index +1
         utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
-        sql = ("SELECT value FROM "+self.schema_name+".config_param_user "
-               " WHERE parameter = 'composer_"+self.plan_om+"_vdefault' AND cur_user= current_user")
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               " WHERE parameter = 'composer_" + self.plan_om + "_vdefault' AND cur_user= current_user")
         row = self.controller.get_row(sql)
         if not row:
             return
         utils_giswater.setWidgetText(self.dlg_psector_rapport.cmb_templates, row[0])
+
 
     def set_prev_dialog(self, current_dialog, previous_dialog):
         """ Close current dialog and set previous dialog as current dialog"""
@@ -400,7 +398,7 @@ class ManageNewPsector(ParentManage):
         self.set_prev_dialog(dialog, previous_dialog)
 
 
-    def generate_composer(self, path,  dialog=None):
+    def generate_composer(self, path, dialog=None):
 
         index = utils_giswater.get_item_data(dialog.cmb_templates, 0)
         comp_view = self.iface.activeComposers()[index]
@@ -428,7 +426,6 @@ class ManageNewPsector(ParentManage):
                " WHERE table_name = '" + "v_" + self.plan_om + "_psector'"
                " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
                " ORDER BY ordinal_position")
-
         rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
@@ -520,8 +517,8 @@ class ManageNewPsector(ParentManage):
     def calulate_percents(self, tablename, psector_id, field):
         
         sql = ("UPDATE " + self.schema_name + "." + tablename + " "
-               " SET "+field+"='"+utils_giswater.getText(field)+"' "
-               " WHERE psector_id='"+str(psector_id)+"'")
+               " SET " + field + " = '" + utils_giswater.getText(field) + "'"
+               " WHERE psector_id = '" + str(psector_id) + "'")
         self.controller.execute_sql(sql)
         self.populate_budget(psector_id)
 
@@ -553,15 +550,6 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_insert.setEnabled(enabled)
         self.dlg.btn_delete.setEnabled(enabled)
         self.dlg.btn_snapping.setEnabled(enabled)
-
-
-    def delete_feature_at_plan_psector(self, geom_type, list_id, plan_om):
-        """ Delete features_id to table plan_@geom_type_x_psector"""
-
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("DELETE FROM " + self.schema_name + "." + plan_om + "_psector_x_" + geom_type + ""
-               " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id = '" + str(value) + "'")
-        self.controller.execute_sql(sql)
 
 
     def selection_init(self, table_object, query=True):
@@ -618,13 +606,12 @@ class ManageNewPsector(ParentManage):
         self.insert_or_update_new_psector(tablename='v_edit_'+self.plan_om + '_psector', close_dlg=False)
         self.update = True
         if self.dlg.tabWidget.currentIndex() == 2:
-
             tableleft = "v_price_compost"
             tableright = "v_edit_" + self.plan_om + "_psector_x_other"
             field_id_right = "price_id"
             self.price_selector(self.dlg, tableleft, tableright, field_id_right)
             self.update_total(self.dlg.selected_rows)
-        if self.dlg.tabWidget.currentIndex() == 3:
+        elif self.dlg.tabWidget.currentIndex() == 3:
             self.populate_budget(utils_giswater.getWidgetText('psector_id'))
 
         sql = ("SELECT other, gexpenses, vat"
@@ -842,6 +829,7 @@ class ManageNewPsector(ParentManage):
             self.reload_states_selector()
             self.close_dialog()
 
+
     def price_selector(self, dialog, tableleft, tableright,  field_id_right):
 
         # fill QTableView all_rows
@@ -938,6 +926,7 @@ class ManageNewPsector(ParentManage):
 
 
     def rows_unselector(self, tbl_selected_rows, tableright, field_id_right):
+        
         query = ("DELETE FROM " + self.schema_name + "." + tableright + ""
                " WHERE  " + tableright + "." + field_id_right + " = ")
         selected_list = tbl_selected_rows.selectionModel().selectedRows()
