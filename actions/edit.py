@@ -49,11 +49,6 @@ class Edit(ParentAction):
     def edit_add_file(self):
         """ Button 34: Add document """   
         self.manage_document.manage_document()
-
-
-    def add_new_doc(self):
-        """ Call function of button Add document """
-        self.edit_add_file()
         
     
     def edit_document(self):
@@ -70,4 +65,3 @@ class Edit(ParentAction):
         """ Button 68: Edit end feature """
         self.manage_workcat_end.manage_workcat_end()
 
-            

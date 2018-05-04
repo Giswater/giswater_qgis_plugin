@@ -247,6 +247,8 @@ class Utils(ParentAction):
 
         # Hide empty tabs
         utils_giswater.remove_tab_by_tabName(self.dlg.tabWidget, "tab_basic")
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_epa_utils")
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_epa_ws")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_27")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_epa, "tab_28")
         utils_giswater.remove_tab_by_tabName(self.dlg.tab_config_admin, "tab_2")
@@ -268,11 +270,11 @@ class Utils(ParentAction):
         self.populate_cmb_templates(self.dlg.composer_om_vdefault)
 
         # Edit
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
+        sql = "SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state ORDER BY name"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("state_vdefault", rows, False)
-        sql = ("SELECT DISTINCT(id),name FROM " + self.schema_name + ".value_state_type"
-               " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "'")
+        utils_giswater.set_item_data(self.dlg.state_vdefault, rows, 1)
+        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type "
+               "WHERE state = '" + str(utils_giswater.get_item_data(self.dlg.state_vdefault)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
         sql = "SELECT id, name FROM " + self.schema_name + ".value_state_type WHERE state=0 ORDER BY name"
@@ -490,7 +492,7 @@ class Utils(ParentAction):
                         utils_giswater.setChecked(widget, False)
 
         # Open dialog
-        self.open_dialog(self.dlg, maximize_button=False)  
+        self.open_dialog(self.dlg, maximize_button=False)
 
 
     def utils_config_accept(self):
@@ -675,7 +677,7 @@ class Utils(ParentAction):
         self.dlg_csv.progressBar.setVisible(False)
 
         # Open dialog
-        self.open_dialog(self.dlg_csv, maximize_button=False)  
+        self.open_dialog(self.dlg_csv, maximize_button=False)
 
 
     def populate_cmb_unicodes(self, combo):
@@ -697,9 +699,9 @@ class Utils(ParentAction):
         """ Load QGIS settings related with csv options """
 
         cur_user = self.controller.get_current_user()
-        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv, 
+        utils_giswater.setWidgetText(self.dlg_csv.txt_file_csv,
             self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
-        utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list, 
+        utils_giswater.setWidgetText(self.dlg_csv.cmb_unicode_list,
             self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_' + cur_user))
         if self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user).title() == 'True':
             self.dlg_csv.rb_comma.setChecked(True)
@@ -711,13 +713,13 @@ class Utils(ParentAction):
         """ Save QGIS settings related with csv options """
 
         cur_user = self.controller.get_current_user()
-        self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_" + cur_user, 
+        self.controller.plugin_settings_set_value("Csv2Pg_txt_file_csv_" + cur_user,
             utils_giswater.getWidgetText('txt_file_csv'))
-        self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_" + cur_user, 
+        self.controller.plugin_settings_set_value("Csv2Pg_cmb_unicode_list_" + cur_user,
             utils_giswater.getWidgetText('cmb_unicode_list'))
-        self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_" + cur_user, 
+        self.controller.plugin_settings_set_value("Csv2Pg_rb_comma_" + cur_user,
             bool(self.dlg_csv.rb_comma.isChecked()))
-        self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon_" + cur_user, 
+        self.controller.plugin_settings_set_value("Csv2Pg_rb_semicolon_" + cur_user,
             bool(self.dlg_csv.rb_semicolon.isChecked()))
 
 
@@ -860,13 +862,6 @@ class Utils(ParentAction):
         self.save_settings_values()
 
 
-    def get_data_from_combo(self, combo, position):
-
-        elem = combo.itemData(combo.currentIndex())
-        data = str(elem[position])
-        return data
-
-
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
 
         if roles is None:
@@ -936,7 +931,7 @@ class Utils(ParentAction):
             message = "Widget not found"
             self.controller.log_info(message, parameter=parameter)
             return
-        
+
         tablename = "config_param_system"
         sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
                " WHERE parameter = '" + str(parameter) + "'")
@@ -961,7 +956,7 @@ class Utils(ParentAction):
             else:
                 sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value)"
                        " VALUES ('" + parameter + "', '" + str(value) + "')")
-                
+
         else:
             value = utils_giswater.getWidgetText(widget)
             if value == "":
@@ -1016,19 +1011,19 @@ class Utils(ParentAction):
 
     def update_config(self, columnname):
         """ Update value of @parameter in table 'config' """
-        
+
         widget = utils_giswater.getWidget(columnname)
         if widget is None:
             message = "Widget not found"
             self.controller.log_info(message, parameter=columnname)
             return
-        
+
         tablename = "config"
         if not self.controller.check_column(tablename, columnname):
             message = "Column not found"
-            self.controller.log_info(message, parameter=columnname)            
+            self.controller.log_info(message, parameter=columnname)
             return
-        
+
         if type(widget) is QDoubleSpinBox:
             set_value = " = 0.000"
             value = utils_giswater.getWidgetText(columnname)
@@ -1040,18 +1035,18 @@ class Utils(ParentAction):
                 return
 
         elif type(widget) is QCheckBox:
-            if utils_giswater.isChecked(widget): 
+            if utils_giswater.isChecked(widget):
                 set_value = " = True"
             else:
                 set_value = " = False"
-                
+
         if columnname == "node_duplicated_tolerance" and utils_giswater.isChecked(str(columnname) + "_control") == False:
             set_value = " = 0.000"
         elif columnname == "connec_duplicated_tolerance" and utils_giswater.isChecked(str(columnname) + "_control") == False:
             set_value = " = 0.000"
         elif columnname == "node2arc" and utils_giswater.isChecked(str(columnname) + "_control") == False:
             set_value = " = 0.000"
-            
+
         sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                " SET " + columnname + set_value)
         self.controller.execute_sql(sql)
@@ -1059,7 +1054,7 @@ class Utils(ParentAction):
 
     def upsert_config_param_user(self, parameter, add_check=False):
         """ Insert or update value of @parameter in table 'config_param_user' with current_user control """
-        
+
         if add_check:
             widget = utils_giswater.getWidget('chk_' + str(parameter))
         else:
@@ -1069,7 +1064,7 @@ class Utils(ParentAction):
             message = "Widget not found"
             self.controller.log_info(message, parameter=parameter)
             return
-        
+
         tablename = "config_param_user"
         sql = ("SELECT parameter FROM " + self.schema_name + "." + tablename + ""
                " WHERE cur_user = current_user AND parameter = '" + str(parameter) + "'")
@@ -1085,7 +1080,7 @@ class Utils(ParentAction):
             else:
                 sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                        " VALUES ('" + parameter + "', '" + _date + "', current_user)")
-                
+
         elif type(widget) == QCheckBox:
             value = utils_giswater.isChecked(widget)
             if exist_param:
@@ -1095,7 +1090,7 @@ class Utils(ParentAction):
             else:
                 sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                        " VALUES ('" + parameter + "', '" + str(value) + "', current_user)")
-                
+
         else:
             value = utils_giswater.getWidgetText(widget)
             if value == '':
@@ -1114,13 +1109,12 @@ class Utils(ParentAction):
                 else:
                     sql += (" '" + str(utils_giswater.get_item_data(widget, 0)) + "' "
                             " WHERE parameter = '" + widget.objectName() + "' AND cur_user = current_user")
-            
+
             else:
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                 if widget.objectName() == 'state_vdefault':
-                    sql += (" VALUES ('" + parameter + "',"
-                            " (SELECT id FROM " + self.schema_name + ".value_state"
-                            " WHERE name ='" + str(value) + "'), current_user)")
+                    sql += (" VALUES ('" + parameter + "', '" + str(
+                        utils_giswater.get_item_data(widget, 0)) + "', current_user)")
                 elif widget.objectName() == 'municipality_vdefault':
                     sql += (" VALUES ('" + parameter + "',"
                             " (SELECT muni_id FROM " + self.schema_name + ".ext_municipality"
@@ -1159,8 +1153,8 @@ class Utils(ParentAction):
             sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user)"
                    " VALUES (" + str(fprocesscat_id) + ", current_user);")
         self.controller.execute_sql(sql)
-        
-        
+
+
     def delete_config_param_system(self, parameter):
         """ Delete value of @parameter in table 'config_param_user' with current_user control """
 
@@ -1168,8 +1162,8 @@ class Utils(ParentAction):
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + ""
                " WHERE parameter = '" + parameter + "'")
         self.controller.execute_sql(sql)
-                
-                
+
+
     def manage_config_param_user(self, parameter, add_check=False):
         """ Manage @parameter in table 'config_param_user' """
 
@@ -1178,11 +1172,11 @@ class Utils(ParentAction):
             self.upsert_config_param_user(parameter, add_check)
         else:
             self.delete_config_param_user(parameter)
-          
-                
+
+
     def manage_config_param_system(self, parameter, add_check=False):
         """ Manage @parameter in table 'config_param_system' """
-        
+
         chk_widget = "chk_" + str(parameter)
         if utils_giswater.isChecked(chk_widget):
             self.upsert_config_param_system(parameter,add_check)
@@ -1192,34 +1186,32 @@ class Utils(ParentAction):
 
     def filter_dma_vdefault(self):
         """ Filter QComboBox @dma_vdefault according QComboBox @exploitation_vdefault """
-        
+
         sql = ("SELECT DISTINCT(dma_id),name FROM " + self.schema_name + ".dma"
-               " WHERE expl_id = '"+str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault,0)) +"'")
+               " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.dma_vdefault, rows, 1)
 
 
     def filter_presszone_vdefault(self):
         """ Filter QComboBox @presszone_vdefault according QComboBox @exploitation_vdefault """
-        
+
         sql = ("SELECT DISTINCT(id), id FROM " + self.schema_name + ".cat_presszone"
-               " WHERE expl_id = '"+str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault,0)) +"'")
+               " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg.exploitation_vdefault, 0)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.presszone_vdefault, rows, False)
 
 
     def filter_statetype_vdefault(self):
         """ Filter QComboBox @statetype_vdefault according  @state_vdefault """
-        
-        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type WHERE state::text = "
-               "(SELECT state FROM " + self.schema_name + ".value_state_type"
-               " WHERE name = '" + utils_giswater.getWidgetText("state_vdefault") + "')::text")
+        sql = ("SELECT DISTINCT(id), name FROM " + self.schema_name + ".value_state_type"
+               " WHERE state = '" + str(utils_giswater.get_item_data(self.dlg.state_vdefault)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg.statetype_vdefault, rows, 1)
 
 
     def populate_cmb_templates(self, combo):
-        
+
         composers = self.iface.activeComposers()
         index = 0
         records = []
@@ -1228,5 +1220,5 @@ class Utils(ParentAction):
             records.append(elem)
             index = index +1
         utils_giswater.set_item_data(combo, records, 1)
-        
+
         

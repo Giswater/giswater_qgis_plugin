@@ -552,8 +552,6 @@ class Giswater(QObject):
         self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
-
-
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()   
         
@@ -577,6 +575,9 @@ class Giswater(QObject):
         
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()
+        
+        # Manage project variable 'expl_id'
+        self.manage_expl_id()           
         
         # Log it
         message = "Project read successfully"

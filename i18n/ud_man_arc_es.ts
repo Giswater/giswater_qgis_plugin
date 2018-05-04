@@ -529,7 +529,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_siphon.ui" line="6272"/>
         <source>m3/ml Excess:</source>
-        <translation>m3/ml Excedente:</translation>
+        <translation>m3/ml Exced:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_siphon.ui" line="6309"/>

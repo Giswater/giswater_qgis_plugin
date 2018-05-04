@@ -159,9 +159,9 @@ class ManageNewPsector(ParentManage):
                 return
             
             self.psector_id.setText(str(row['psector_id']))
-            utils_giswater.set_combo_itemData(self.cmb_psector_type, row['psector_type'], 0, 1)
-            utils_giswater.set_combo_itemData(self.cmb_expl_id, row['expl_id'], 0, 1)
-            utils_giswater.set_combo_itemData(self.cmb_sector_id, row['sector_id'], 0, 1)
+            utils_giswater.set_combo_itemData(self.cmb_psector_type, row['psector_type'], 0)
+            utils_giswater.set_combo_itemData(self.cmb_expl_id, row['expl_id'], 0)
+            utils_giswater.set_combo_itemData(self.cmb_sector_id, row['sector_id'], 0)
 
             utils_giswater.setRow(row)
             utils_giswater.setChecked("active", row['active'])
@@ -248,10 +248,6 @@ class ManageNewPsector(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)
 
-        # Set QTableview columns from table config_client_forms
-        # self.set_table_columns(self.qtbl_arc, self.plan_om + "_psector_x_arc")
-        # self.set_table_columns(self.qtbl_node, self.plan_om + "_psector_x_node")
-        
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)     
 
@@ -534,15 +530,6 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_snapping.setEnabled(enabled)
 
 
-    def delete_feature_at_plan_psector(self, geom_type, list_id, plan_om):
-        """ Delete features_id to table plan_@geom_type_x_psector"""
-
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("DELETE FROM " + self.schema_name + "." + plan_om + "_psector_x_" + geom_type + ""
-               " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id = '" + str(value) + "'")
-        self.controller.execute_sql(sql)
-
-
     def selection_init(self, table_object, query=True):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
@@ -597,13 +584,12 @@ class ManageNewPsector(ParentManage):
         self.insert_or_update_new_psector(tablename='v_edit_'+self.plan_om + '_psector', close_dlg=False)
         self.update = True
         if self.dlg.tabWidget.currentIndex() == 2:
-
             tableleft = "v_price_compost"
             tableright = "v_edit_" + self.plan_om + "_psector_x_other"
             field_id_right = "price_id"
             self.price_selector(self.dlg, tableleft, tableright, field_id_right)
             self.update_total(self.dlg.selected_rows)
-        if self.dlg.tabWidget.currentIndex() == 3:
+        elif self.dlg.tabWidget.currentIndex() == 3:
             self.populate_budget(utils_giswater.getWidgetText('psector_id'))
 
         sql = ("SELECT other, gexpenses, vat"
