@@ -46,7 +46,7 @@ class SearchPlus(QObject):
 
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_main,'tab')
         # Check address parameters
         message = "Parameter not found"
         if not 'street_field_expl' in self.params:
