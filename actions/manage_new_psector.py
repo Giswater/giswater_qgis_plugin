@@ -11,6 +11,7 @@ from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTabl
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
 from PyQt4.QtCore import Qt
+from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys

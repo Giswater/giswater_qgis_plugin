@@ -2,7 +2,7 @@
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from PyQt4 import uic
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QLineEdit
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QLineEdit, QLabel
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
 
@@ -277,9 +277,72 @@ class SearchPlus(QObject):
         expr = "workcat_id_end ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
+
+        # Add data to workcat search form
+        table_name = "v_ui_workcat_x_feature"
+        table_name_end = "v_ui_workcat_x_feature_end"
+        extension = '_end'
+        self.fill_label_data(table_name)
+        self.fill_label_data(table_name_end, extension)
+
         self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
         self.items_dialog.open()
-        
+
+
+    def fill_label_data(self, table_name, extension = None):
+
+        workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
+        if workcat_id == "null":
+            return
+
+        features = ['NODE','CONNEC','GULLY','ELEMENT','ARC']
+        for feature in features:
+            sql = ("SELECT feature_id "
+                   " FROM " + self.schema_name + "." + str(table_name) + "")
+            if extension != None:
+                   sql += (" WHERE workcat_id_end = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            else:
+                   sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            rows = self.controller.get_rows(sql)
+            if not rows:
+                pass
+
+            if extension != None:
+                widget_name = "lbl_total_" + str(feature.lower()) + str(extension)
+            else:
+                widget_name = "lbl_total_" + str(feature.lower())
+
+            widget = self.items_dialog.findChild(QLabel, str(widget_name))
+
+            if self.project_type == 'ws' and feature == 'GULLY':
+                widget.hide()
+
+            total = len(rows)
+            # Add data to workcat search form
+            widget.setText(str(feature.lower().title()) + "s: " + str(total))
+
+            length = 0
+            if feature == 'ARC':
+                for row in rows:
+                    arc_id = str(row[0])
+                    sql = ("SELECT gis_length "
+                           " FROM " + self.schema_name + ".v_arc"
+                           " WHERE arc_id = '" + arc_id + "'")
+                    row = self.controller.get_row(sql)
+                    if row:
+                        length = length + row[0]
+                    else:
+                        message = "Some data is missing. Check gis_length for arc"
+                        self.controller.show_warning(message, parameter = arc_id)
+                        return
+                if extension != None:
+                    widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
+                else:
+                    widget = self.items_dialog.findChild(QLabel, "lbl_length")
+
+                # Add data to workcat search form
+                widget.setText("Total arcs length: " + str(length))
+
 
     def export_to_csv(self, qtable_1=None, qtable_2=None, path=None):
 
