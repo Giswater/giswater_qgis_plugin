@@ -552,8 +552,6 @@ class Giswater(QObject):
         self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
-
-
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()   
         
@@ -577,6 +575,9 @@ class Giswater(QObject):
         
         # Check roles of this user to show or hide toolbars 
         self.controller.check_user_roles()
+        
+        # Manage project variable 'expl_id'
+        self.manage_expl_id()           
         
         # Log it
         message = "Project read successfully"
@@ -806,12 +807,7 @@ class Giswater(QObject):
             self.set_layer_custom_form(self.layer_gully, 'gully') 
         if self.layer_man_gully:       
             self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
-         
-        if self.layer_pgully:       
-            self.set_layer_custom_form(self.layer_pgully, 'gully')
-        if self.layer_man_pgully:       
-            self.set_layer_custom_form(self.layer_man_pgully, 'man_gully')   
-        
+
         # Set custom for layer dimensions 
         self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
                 
@@ -910,7 +906,7 @@ class Giswater(QObject):
         """ Set SearchPlus object """
 
         try:         
-            self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
+            self.search_plus = SearchPlus(self.iface, self.srid, self.controller, self.settings, self.plugin_dir)
             self.basic.search_plus = self.search_plus
             status = self.search_plus.init_config()
             self.actions['32'].setVisible(status) 

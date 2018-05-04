@@ -9,7 +9,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'search_p
 class SearchPlusDockWidget(QtGui.QDockWidget, FORM_CLASS):
     
     def __init__(self, parent=None):
-        ''' Constructor '''
+        """ Constructor """
         super(SearchPlusDockWidget, self).__init__(parent)
         
         # Set up the user interface from Designer.

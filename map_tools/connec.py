@@ -26,11 +26,11 @@ from map_tools.parent import ParentMapTool
 
 
 class ConnecMapTool(ParentMapTool):
-    ''' Button 20: User select connections from layer 'connec'
-    Execute SQL function: 'gw_fct_connect_to_network' '''    
+    """ Button 20: User select connections from layer 'connec'
+    Execute SQL function: 'gw_fct_connect_to_network' """    
 
     def __init__(self, iface, settings, action, index_action):
-        ''' Class constructor '''
+        """ Class constructor """
 
         # Call ParentMapTool constructor
         super(ConnecMapTool, self).__init__(iface, settings, action, index_action)
@@ -42,10 +42,10 @@ class ConnecMapTool(ParentMapTool):
 
 
 
-    ''' QgsMapTools inherited event functions '''
+    """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
-        ''' With left click the digitizing is finished '''
+        """ With left click the digitizing is finished """
 
         if event.buttons() == Qt.LeftButton:
 
@@ -90,7 +90,7 @@ class ConnecMapTool(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        ''' With left click the digitizing is finished '''
+        """ With left click the digitizing is finished """
         
         if event.button() == Qt.LeftButton:
 
@@ -206,7 +206,7 @@ class ConnecMapTool(ParentMapTool):
 
 
     def link_selected_features(self, geom_type, layers):
-        ''' Link selected @geom_type to the pipe '''
+        """ Link selected @geom_type to the pipe """
 
         # Check features selected
         number_features = 0
