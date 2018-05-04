@@ -713,7 +713,6 @@ class Giswater(QObject):
 
                 if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
-                    self.layer_gully_man_ud.append(cur_layer)                    
                     
                 if self.table_pgully == uri_table:
                     self.layer_pgully = cur_layer
@@ -807,12 +806,7 @@ class Giswater(QObject):
             self.set_layer_custom_form(self.layer_gully, 'gully') 
         if self.layer_man_gully:       
             self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
-         
-        if self.layer_pgully:       
-            self.set_layer_custom_form(self.layer_pgully, 'gully')
-        if self.layer_man_pgully:       
-            self.set_layer_custom_form(self.layer_man_pgully, 'man_gully')   
-        
+
         # Set custom for layer dimensions 
         self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
                 

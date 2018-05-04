@@ -500,28 +500,6 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="arc_id">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>0</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_soilcat_id">
         <property name="geometry">
          <rect>
@@ -1154,7 +1132,7 @@
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>26</y>
+          <y>25</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1172,14 +1150,27 @@
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="QLineEdit" name="arc_id">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>0</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_8">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1240,8 +1231,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1934,8 +1925,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>263</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4127,7 +4118,6 @@
   <tabstop>buildercat_id</tabstop>
   <tabstop>workcat_id</tabstop>
   <tabstop>builtdate</tabstop>
-  <tabstop>arc_id</tabstop>
   <tabstop>parent_id</tabstop>
   <tabstop>soilcat_id</tabstop>
   <tabstop>category_type</tabstop>

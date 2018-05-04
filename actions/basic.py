@@ -7,12 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 import os
-import sys
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
-
 from ui_manager import Multirow_selector
 from parent import ParentAction
 

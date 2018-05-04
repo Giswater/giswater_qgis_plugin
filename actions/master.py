@@ -10,15 +10,10 @@ from PyQt4.QtGui import QDateEdit, QLineEdit, QDoubleValidator, QTableView, QAbs
 from PyQt4.QtSql import QSqlTableModel
 from PyQt4.QtCore import Qt
 
-import os
-import sys
 import operator
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
-                   
 from actions.manage_new_psector import ManageNewPsector
 from ui_manager import Psector_management
 from ui_manager import EstimateResultNew
@@ -94,7 +89,7 @@ class Master(ParentAction):
         self.controller.show_info(message)
 
         self.fill_table(qtbl_psm, "plan_psector")
-        #self.set_table_columns(qtbl_psm, "plan_psector")
+        self.set_table_columns(qtbl_psm, "plan_psector")
         self.set_label_current_psector()
         self.open_dialog(self.dlg)
 

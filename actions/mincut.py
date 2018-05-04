@@ -6,13 +6,14 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
 from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtXml import QDomDocument
 
+import os
 import operator
 from functools import partial
 
@@ -26,7 +27,6 @@ from ui_manager import Mincut_add_hydrometer
 from ui_manager import Mincut_add_connec     
 from ui_manager import MincutComposer
 
-import os
 
 
 class MincutParent(ParentAction, MultipleSelection):
@@ -124,11 +124,11 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.fillComboBox("cause", rows, False)
 
         # Fill ComboBox assigned_to and exec_user
-        sql = ("SELECT name"
+        sql = ("SELECT id, name"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY name;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("assigned_to", rows, False)
+        utils_giswater.set_item_data(self.dlg.assigned_to, rows, 1)
         utils_giswater.fillComboBox("exec_user", rows, False)
         self.dlg.exec_user.setVisible(False)
 
@@ -295,7 +295,7 @@ class MincutParent(ParentAction, MultipleSelection):
                " ORDER BY name;")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("exec_user", rows, False)
-        assigned_to = str(self.dlg.assigned_to.currentText())
+        assigned_to = utils_giswater.get_item_data(self.dlg.assigned_to, 1)
         utils_giswater.setWidgetText("exec_user", str(assigned_to))
 
         date_start = self.dlg.cbx_date_start.date()
@@ -375,7 +375,7 @@ class MincutParent(ParentAction, MultipleSelection):
         received_time = self.dlg.cbx_recieved_time.time()
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
-        assigned_to = self.dlg.assigned_to.currentText()
+        assigned_to = utils_giswater.get_item_data(self.dlg.assigned_to, 0)
         cur_user = self.controller.get_project_user()
         appropiate_status = utils_giswater.isChecked("appropiate")
 
@@ -1541,11 +1541,14 @@ class MincutParent(ParentAction, MultipleSelection):
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
 
-        sql = ("SELECT anl_mincut_result_cat.*, anl_mincut_cat_state.name AS state_name"
+        sql = ("SELECT anl_mincut_result_cat.*, anl_mincut_cat_state.name AS state_name, cat_users.name AS assigned_to_name"
                " FROM " + self.schema_name + ".anl_mincut_result_cat"
                " INNER JOIN " + self.schema_name + ".anl_mincut_cat_state"
                " ON anl_mincut_result_cat.mincut_state = anl_mincut_cat_state.id"
+               " INNER JOIN" + self.schema_name + ".cat_users" 
+               " ON cat_users.id = anl_mincut_result_cat.assigned_to"
                " WHERE anl_mincut_result_cat.id = '" + str(result_mincut_id) + "'")
+
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -1565,8 +1568,8 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setWidgetText("real_description", row['exec_descript'])
         utils_giswater.setWidgetText("distance", row['exec_from_plot'])
         utils_giswater.setWidgetText("depth", row['exec_depth'])
-        utils_giswater.setWidgetText("assigned_to", row['assigned_to'])
-                        
+        utils_giswater.setWidgetText("assigned_to", row['assigned_to_name'])
+
         # Update table 'anl_mincut_result_selector'
         self.update_result_selector(result_mincut_id)
 

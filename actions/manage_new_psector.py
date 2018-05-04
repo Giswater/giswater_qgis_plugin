@@ -301,10 +301,25 @@ class ManageNewPsector(ParentManage):
             else:
                 plugin_dir = os.path.expanduser("~")
             utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, plugin_dir)
-
+        self.populate_cmb_templates()
         # Open dialog
         self.open_dialog(self.dlg_psector_rapport, maximize_button=False)     
-        
+
+    def populate_cmb_templates(self):
+        composers = self.iface.activeComposers()
+        index = 0
+        records = []
+        for comp_view in composers:
+            elem = [index, comp_view.composerWindow().windowTitle()]
+            records.append(elem)
+            index = index +1
+        utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
+        sql = ("SELECT value FROM "+self.schema_name+".config_param_user "
+               " WHERE parameter = 'composer_"+self.plan_om+"_vdefault' AND cur_user= current_user")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        utils_giswater.setWidgetText(self.dlg_psector_rapport.cmb_templates, row[0])
 
     def set_prev_dialog(self, current_dialog, previous_dialog):
         """ Close current dialog and set previous dialog as current dialog"""
@@ -332,8 +347,7 @@ class ManageNewPsector(ParentManage):
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
             path = folder_path + '/' + file_name
-            compass_rotation = float(utils_giswater.getWidgetText(previous_dialog.rotation))
-            self.generate_composer(path, compass_rotation)
+            self.generate_composer(path, dialog)
 
         # Generate csv detail
         if utils_giswater.isChecked(dialog.chk_csv_detail):
@@ -362,41 +376,28 @@ class ManageNewPsector(ParentManage):
                 file_name += '.csv'
             path = folder_path + '/' + file_name
             self.generate_csv(path, viewname, previous_dialog)
-
         self.set_prev_dialog(dialog, previous_dialog)
 
 
-    def generate_composer(self, path, compass_rotation):
+    def generate_composer(self, path,  dialog=None):
 
-        composers = self.iface.activeComposers()
-        index = 0
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == 'composer_plan' and self.plan_om == 'plan':
-                break
-            if comp_view.composerWindow().windowTitle() == 'composer_om' and self.plan_om == 'om':
-                break
-            index += 1
-
-        if index >= len(composers):
-            message = 'Composer not found. Name should be "composer_plan" or "composer_om"'
-            self.controller.show_warning(str(message))
-            return
-
+        index = utils_giswater.get_item_data(dialog.cmb_templates, 0)
         comp_view = self.iface.activeComposers()[index]
-
         my_comp = comp_view.composition()
         if my_comp is not None:
             my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
-            compass = my_comp.getComposerItemById('compass')
-            compass.setPictureRotation(compass_rotation)
-            result = my_comp.exportAsPDF(path)
-            if result:
-                message = "Document PDF created in"
-                self.controller.show_info(message, parameter=path)
-                os.startfile(path)
-            else:
-                message = "Cannot create file, check if its open"
-                self.controller.show_warning(message, parameter=path)
+            try:
+                result = my_comp.exportAsPDF(path)
+                if result:
+                    message = "Document PDF created in"
+                    self.controller.show_info(message, parameter=path)
+                    os.startfile(path)
+                else:
+                    message = "Cannot create file, check if its open"
+                    self.controller.show_warning(message, parameter=path)
+            except:
+                msg = "Cannot create file, check if selected composer is the correct composer"
+                self.controller.show_warning(msg, parameter=path)
 
 
     def generate_csv(self, path, viewname, previous_dialog):
@@ -813,6 +814,7 @@ class ManageNewPsector(ParentManage):
             self.controller.execute_sql(sql, log_sql=True)
             
         self.dlg.tabWidget.setTabEnabled(1, True)
+        self.delete_psector_selector(self.plan_om+'_psector_selector')
         self.insert_psector_selector(self.plan_om+'_psector_selector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
 
         if close_dlg:

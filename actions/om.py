@@ -10,14 +10,9 @@ from PyQt4.QtCore import QDate, Qt
 from PyQt4.QtGui import QTableView, QAbstractItemView, QLineEdit, QDateEdit, QPushButton
 
 from datetime import datetime
-import os
-import sys
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
 import utils_giswater
-
 from parent import ParentAction
 from actions.manage_visit import ManageVisit
 from actions.manage_new_psector import ManageNewPsector

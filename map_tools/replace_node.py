@@ -121,6 +121,7 @@ class ReplaceNodeMapTool(ParentMapTool):
                 current_user = self.controller.get_project_user()
                 sql = ("DELETE FROM " + self.schema_name + ".selector_state"
                        " WHERE state_id = 1 AND cur_user='" + str(current_user) + "';")
+                self.controller.execute_sql(sql)
                 sql = ("\nINSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
                        "VALUES (1, '" + str(current_user) + "');")
                 self.controller.execute_sql(sql)

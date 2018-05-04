@@ -6,20 +6,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-from PyQt4.QtCore import (
-    Qt,
-    QDate,
-    pyqtSignal,
-    QObject)
-from PyQt4.QtGui import (
-    QCompleter,
-    QLineEdit,
-    QTableView,
-    QStringListModel,
-    QPushButton,
-    QComboBox,
-    QTabWidget,
-    QDialogButtonBox)
+from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
+from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget, QDialogButtonBox
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -1053,7 +1041,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Insert into new table
         sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
-               " VALUES (" + str(doc_id) + ", " + str(visit_id) + ")")
+               " VALUES ('" + str(doc_id) + "', " + str(visit_id) + ")")
         status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
             message = "Document inserted successfully"

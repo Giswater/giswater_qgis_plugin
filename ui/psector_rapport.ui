@@ -189,7 +189,7 @@
     <property name="title">
      <string>      Composer pdf file:</string>
     </property>
-    <widget class="QComboBox" name="comboBox">
+    <widget class="QComboBox" name="cmb_templates">
      <property name="geometry">
       <rect>
        <x>165</x>

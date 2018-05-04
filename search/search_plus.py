@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from PyQt4 import uic
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
 from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QLineEdit
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 
 from functools import partial
 import operator
@@ -622,7 +622,7 @@ class SearchPlus(QObject):
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
         if expl_name is None:
             expl_name = ""
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, name "
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
@@ -631,7 +631,7 @@ class SearchPlus(QObject):
             return False
         self.list_hydro.append("")
         for row in rows:
-            self.list_hydro.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]))
+            self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
         self.list_hydro = sorted(set(self.list_hydro))
         self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
 
@@ -777,7 +777,7 @@ class SearchPlus(QObject):
 
         list_codes = ['']
         for row in rows:
-            list_codes.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]) + " . " + str(row[3]) + " . " + str(row[4]))
+            list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4])
 
         return list_codes       
         
@@ -811,7 +811,7 @@ class SearchPlus(QObject):
         if expl_name == "null" or expl_name is None:
             expl_name = ""
         list_hydro = []
-        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, name"
+        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, state"
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
@@ -820,7 +820,7 @@ class SearchPlus(QObject):
             return False
         
         for row in rows:
-            list_hydro.append(str(row[0]) + " . " + str(row[1]) + " . " + str(row[2]))
+            list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
         list_hydro = sorted(set(list_hydro))
         self.set_model_by_list(list_hydro, self.dlg.hydro_id)
 
