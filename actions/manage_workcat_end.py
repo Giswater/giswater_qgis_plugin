@@ -63,7 +63,7 @@ class ManageWorkcatEnd(ParentManage):
         self.set_completer_object(self.table_object)
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.manage_workcat_end_accept))
+        self.dlg.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
         self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
 
