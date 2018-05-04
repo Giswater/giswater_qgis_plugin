@@ -6,18 +6,19 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from qgis.core import QgsExpression, QgsFeatureRequest
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
-from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from PyQt4.QtSql import QSqlTableModel
 from PyQt4.QtGui import QAbstractItemView, QTableView, QCompleter, QStringListModel
-from qgis.core import QgsExpression, QgsFeatureRequest
+
 from functools import partial
 
 import utils_giswater
-
-from ui_manager import WorkcatEnd
 from actions.parent_manage import ParentManage
+from ui_manager import WorkcatEnd
 from ui_manager import WorkcatEndList
+
 
 class ManageWorkcatEnd(ParentManage):
     
@@ -144,6 +145,7 @@ class ManageWorkcatEnd(ParentManage):
         sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations"
                " WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
         row = self.controller.get_row(sql)
+        
         if row:
             self.dlg_work = WorkcatEndList()
             utils_giswater.setDialog(self.dlg_work)
@@ -159,20 +161,19 @@ class ManageWorkcatEnd(ParentManage):
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
             self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-            filter = ""
+            filter_ = ""
             for row in self.selected_list:
-                filter += "arc_id = '" + str(row) + "' OR "
-            filter = filter[:-3] + ""
-            filter += " AND arc_state = '1' "
+                filter_ += "arc_id = '" + str(row) + "' OR "
+            filter_ = filter_[:-3] + ""
+            filter_ += " AND arc_state = '1' "
 
             self.fill_table(self.tbl_arc_x_relations, table_relations, filter)
-
             self.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object, self.tbl_arc_x_relations))
-
             self.manage_close(self.table_object, self.cur_active_layer)
 
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
+            
         else:
             # Update tablename of every geom_type
             self.update_geom_type("arc")
@@ -185,17 +186,20 @@ class ManageWorkcatEnd(ParentManage):
         tablename = "v_edit_" + geom_type
         if self.selected_list is None:
             return
+        
+        sql = ""
         for id_ in self.selected_list:
-            sql = ("UPDATE " + self.schema_name + "." + tablename + ""
-                   " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
-                   " enddate = '" + str(self.enddate) + "'"
-                   " WHERE " + geom_type + "_id = '" + str(id_) + "'")
-            status = self.controller.execute_sql(sql, log_sql=True)
-            if status:
-                self.controller.show_info("Geometry updated successfully!")
+            sql += ("UPDATE " + self.schema_name + "." + tablename + ""
+                    " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
+                    " enddate = '" + str(self.enddate) + "'"
+                    " WHERE " + geom_type + "_id = '" + str(id_) + "';\n")
+            
+        status = self.controller.execute_sql(sql, log_sql=True)
+        if status:
+            self.controller.show_info("Geometry updated successfully!")
 
 
-    def fill_table(self, widget, table_name, filter):
+    def fill_table(self, widget, table_name, filter_):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
@@ -203,14 +207,15 @@ class ManageWorkcatEnd(ParentManage):
         self.model = QSqlTableModel()
         self.model.setTable(self.schema_name+"."+table_name)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        if filter:
-            self.model.setFilter(filter)
+        if filter_:
+            self.model.setFilter(filter_)
         self.model.setSort(0, 0)
         self.model.select()
 
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
+            
         # Attach model to table view
         widget.setModel(self.model)
 
@@ -248,7 +253,6 @@ class ManageWorkcatEnd(ParentManage):
         aux = "\"arc_id\" = "
         aux += "'" + str(arc_id) + "'"
         expr = QgsExpression(aux)
-
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.show_warning(message, parameter=expr.parserErrorString())
@@ -273,34 +277,34 @@ class ManageWorkcatEnd(ParentManage):
         message = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
         answer = self.controller.ask_question(message, title)
-        if answer:
-            # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-            sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
-                   " WHERE parameter = 'edit_arc_downgrade_force'")
-            row = self.controller.get_row(sql, log_info=False)
-            if row:
-                sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                       " SET value = True "
-                       " WHERE parameter = 'edit_arc_downgrade_force'")
-                self.controller.execute_sql(sql, log_sql=True)
-            else:
-                sql = ("INSERT INTO " + self.schema_name + ".config_param_user (edit_arc_downgrade_force)"
-                       " VALUES (True)")
-                self.controller.execute_sql(sql, commit=self.autocommit)
-
-            # Update tablename of every geom_type
-            self.update_geom_type("arc")
-
-            # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
+        if not answer:
+            return
+        
+        # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
+        sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
+               " WHERE parameter = 'edit_arc_downgrade_force'")
+        row = self.controller.get_row(sql, log_info=False)
+        if row:
             sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                   " SET value = False "
+                   " SET value = True "
                    " WHERE parameter = 'edit_arc_downgrade_force'")
             self.controller.execute_sql(sql, log_sql=True)
-            self.remove_selection(True)
-            self.canvas.refresh()
-            self.dlg_work.close()
         else:
-            pass
+            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (edit_arc_downgrade_force)"
+                   " VALUES (True)")
+            self.controller.execute_sql(sql, commit=self.autocommit)
+
+        # Update tablename of every geom_type
+        self.update_geom_type("arc")
+
+        # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
+        sql = ("UPDATE " + self.schema_name + ".config_param_user "
+               " SET value = False "
+               " WHERE parameter = 'edit_arc_downgrade_force'")
+        self.controller.execute_sql(sql, log_sql=True)
+        self.remove_selection(True)
+        self.canvas.refresh()
+        self.dlg_work.close()
 
 
     def set_completer(self):
@@ -330,17 +334,17 @@ class ManageWorkcatEnd(ParentManage):
     def fill_table_relations(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
 
-        filter = ""
+        filter_ = ""
         for row in self.selected_list:
-            filter += "arc_id = '" + str(row) + "' OR "
-        filter = filter[:-3] + ""
-        filter += " AND arc_state = '1' "
+            filter_ += "arc_id = '" + str(row) + "' OR "
+        filter_ = filter_[:-3] + ""
+        filter_ += " AND arc_state = '1' "
 
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.setFilter(filter)
+        model.setFilter(filter_)
         model.select()
 
         # Check for errors
