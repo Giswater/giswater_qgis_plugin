@@ -2,9 +2,7 @@
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from PyQt4 import uic
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
-from PyQt4.QtGui import QFileDialog
-from PyQt4.QtGui import QLineEdit
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QLineEdit
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
 
@@ -18,13 +16,15 @@ import utils_giswater
 from search.ui.list_items import ListItems
 from search.ui.hydro_info import HydroInfo
 from search.ui.search_plus_dockwidget import SearchPlusDockWidget
+from actions.manage_new_psector import ManageNewPsector
 
 
 class SearchPlus(QObject):
 
-    def __init__(self, iface, srid, controller):
+    def __init__(self, iface, srid, controller, settings, plugin_dir):
         """ Constructor """
-        
+
+        self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.iface = iface
         self.srid = srid
         self.controller = controller
@@ -44,7 +44,7 @@ class SearchPlus(QObject):
 
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_main,'tab')
         # Check address parameters
         message = "Parameter not found"
         if not 'street_field_expl' in self.params:
@@ -84,6 +84,7 @@ class SearchPlus(QObject):
             self.filter_by_list(self.dlg.hydro_id)
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
+        self.dlg.psector_id_2.activated.connect(partial(self.open_plan_psector))
 
         return True
 
@@ -177,6 +178,15 @@ class SearchPlus(QObject):
             sql += (" UNION"
                     " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".gully"
                     " WHERE workcat_id LIKE '%%' or workcat_id is NULL")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(combo, rows)
+        return rows
+
+
+    def psector_populate(self, combo):
+        """ Fill @combo """
+
+        sql = ("SELECT name FROM " + self.controller.schema_name + ".plan_psector ")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(combo, rows)
         return rows
@@ -613,6 +623,10 @@ class SearchPlus(QObject):
         if not status:
             self.dlg.tab_main.removeTab(0)
 
+        # Tab 'Document'
+        status = self.psector_populate(self.dlg.psector_id_2)
+        #if not status:
+        #    self.dlg.tab_main.removeTab(3)
         return True
     
 
@@ -1293,5 +1307,53 @@ class SearchPlus(QObject):
             if len(id_list) > 0:
                 layer.selectByIds(id_list)   
             else:
-                layer.removeSelection()  
-                                   
+                layer.removeSelection()
+
+
+    def open_plan_psector(self):
+
+        psector_name = self.dlg.psector_id_2.currentText()
+        sql = ("SELECT psector_id"
+               " FROM " + self.schema_name + ".plan_psector"
+               " WHERE name = '" + str(psector_name)+"'")
+        row =  self.controller.get_row(sql)
+        psector_id =  row[0]
+        self.manage_new_psector.new_psector(psector_id, 'plan')
+
+        self.zoom_to_psector(self.dlg.psector_id_2, 'v_edit_plan_psector', 'name')
+
+
+    def zoom_to_psector(self, widget, layer_name, field_id):
+
+        polygon_name = utils_giswater.getWidgetText(widget)
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if not layer:
+            return
+
+        # Check if the expression is valid
+        field_id = "name"
+        expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+
+        # Select features of @layer applying @expr
+        if expr is None:
+            layer.removeSelection()
+        else:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
+
+        # If any feature found, zoom it and exit function
+        if layer.selectedFeatureCount() > 0:
+            self.iface.setActiveLayer(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.iface.actionZoomToSelected().trigger()
+            layer.removeSelection()
+
+
