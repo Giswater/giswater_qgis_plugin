@@ -32,7 +32,7 @@ id text PRIMARY KEY
 
 CREATE TABLE config_web_layer(
   layer_id text NOT NULL,
-  alias_id text NOT NULL,
+  alias_id text,
   is_parent boolean,
   tableparent_id text,
   is_editable boolean,
@@ -40,6 +40,7 @@ CREATE TABLE config_web_layer(
   formid text,
   formname text,
   orderby integer,
+  link_id text,
   CONSTRAINT config_web_layer_pkey PRIMARY KEY (layer_id)
 );
 
