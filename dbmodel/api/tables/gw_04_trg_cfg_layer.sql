@@ -9,9 +9,15 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- inserts on config_web_layer
-INSERT INTO config_web_layer VALUES ('v_edit_arc', 'arc', true, 'v_web_parent_arc', false, 'v_edit_arc', 'F13', 'Arc', 2);
-INSERT INTO config_web_layer VALUES ('v_edit_connec', 'connec', true, 'v_web_parent_connec', false, 'v_edit_connec', 'F14', 'Connec', 3);
-INSERT INTO config_web_layer VALUES ('v_edit_node', 'node', true, 'v_web_parent_node', false, 'v_edit_node', 'F11', 'Node', 1);
+INSERT INTO config_web_layer VALUES ('v_edit_arc', 'arc', true, 'v_web_parent_arc', false, 'v_edit_arc', 'F13', 'Arc', 2, link);
+INSERT INTO config_web_layer VALUES ('v_edit_connec', 'connec', true, 'v_web_parent_connec', false, 'v_edit_connec', 'F14', 'Connec', 3, link);
+INSERT INTO config_web_layer VALUES ('v_edit_node', 'node', true, 'v_web_parent_node', false, 'v_edit_node', 'F11', 'Node', 1, link);
+
+INSERT INTO config_web_layer VALUES ('v_edit_man_pipe', 'arc', false, null, true, null, 'F13', 'Pipe', 4, link);
+INSERT INTO config_web_layer VALUES ('v_edit_man_wjoin', 'connec', false, null, true, null, 'F14', 'Wjoin', 5, link);
+INSERT INTO config_web_layer VALUES ('v_edit_man_junction', 'node', false, null, true, null, 'F11', 'junction', 6, link);
+
+
 
 
 -- inserts on config_web_layer_tab
