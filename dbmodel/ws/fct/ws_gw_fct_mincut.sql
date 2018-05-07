@@ -152,9 +152,9 @@ BEGIN
 	ELSE
 		SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
 	END IF;
-	
-    -- Update the rest of the values of not proposed valves to FALSE
-    UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
+
+    -- Delete valves not proposed, not unaccessible, not closed and not broken
+    DELETE FROM anl_mincut_result_valve WHERE (proposed IS NULL AND unaccess IS FALSE AND closed IS FALSE AND broken IS FALSE) AND result_id=result_id_arg;
 
     -- Check tempopary overlap control against other planified mincuts 
     SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;
