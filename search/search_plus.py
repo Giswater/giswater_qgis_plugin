@@ -32,7 +32,6 @@ class SearchPlus(QObject):
         self.schema_name = self.controller.schema_name
         self.project_type = self.controller.get_project_type()
         self.feature_cat = {}
-        self.refresh_data = False
 
 
     def init_config(self):
@@ -926,11 +925,7 @@ class SearchPlus(QObject):
 
 
     def network_geom_type_changed(self):
-        """ Get 'geom_type' to filter 'code' values """
-           
-        if self.refresh_data:
-            self.network_code_create_lists()
-            self.refresh_data = False            
+        """ Get 'geom_type' to filter 'code' values """        
             
         geom_type = utils_giswater.getWidgetText(self.dlg.network_geom_type)
         list_codes = []
@@ -1478,4 +1473,11 @@ class SearchPlus(QObject):
             self.iface.legendInterface().setLayerVisible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
+
+
+    def refresh_data(self):
+        
+        self.network_code_create_lists()            
+        if self.project_type == 'ws':
+            self.populate_combo('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
 

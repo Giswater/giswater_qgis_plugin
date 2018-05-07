@@ -98,6 +98,5 @@ class Basic(ParentAction):
     def close_dialog(self):   
         
         ParentAction.close_dialog(self)
-        self.search_plus.refresh_data = True
-        
+        self.search_plus.refresh_data()
         
