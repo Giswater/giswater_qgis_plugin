@@ -382,3 +382,9 @@ class WStimes(QtGui.QDialog, FORM_CLASS):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
 
+
+FORM_CLASS = get_ui_class('workcat_end_list.ui')
+class WorkcatEndList(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)

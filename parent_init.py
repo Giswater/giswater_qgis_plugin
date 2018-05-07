@@ -124,9 +124,6 @@ class ParentDialog(QDialog):
             state = self.dialog.findChild(QComboBox, 'state')
             state_type = self.dialog.findChild(QComboBox, 'state_type')
             self.filter_dma(expl_id, dma_id)
-            if self.project_type == 'ws':
-                presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
-                self.filter_presszonecat_id(expl_id, presszonecat_id)
             self.filter_state_type(state, state_type)
 
        
@@ -248,9 +245,7 @@ class ParentDialog(QDialog):
             feature_id = self.feature.attribute(self.geom_type + '_id')
             self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
             self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)
-            if self.project_type == 'ws':
-                self.update_pressure_zone('cat_presszone', 'id', self.geom_type, 'presszonecat_id', feature_id)
-                
+
         # Close dialog
         if close_dialog:
             self.close_dialog()
@@ -423,6 +418,7 @@ class ParentDialog(QDialog):
         utils_giswater.setWidgetText("element_id", elem.element_id)
         self.add_object(self.tbl_element, "element", "v_ui_element")
 
+        self.tbl_element.model().select()
 
     def delete_records(self, widget, table_name):
         """ Delete selected objects (elements or documents) of the @widget """
@@ -1407,6 +1403,14 @@ class ParentDialog(QDialog):
 
     def catalog(self, wsoftware, geom_type, node_type=None):
 
+        # Get key
+        layer = self.iface.activeLayer()
+        viewname = self.controller.get_layer_source_table_name(layer)
+        sql = ("SELECT id FROM " + self.schema_name + ".sys_feature_cat"
+               " WHERE tablename = '" + str(viewname) + "'")
+        row = self.controller.get_row(sql)
+        self.sys_type = str(row[0])
+
         # Set dialog depending water software
         if wsoftware == 'ws':
             self.dlg_cat = WScatalog()
@@ -1435,7 +1439,7 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id IN"
             sql += " (SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type"
-            sql += " WHERE type = '" + self.layer.name().upper() + "')"
+            sql += " WHERE type = '" + str(self.sys_type) + "')"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
@@ -1445,7 +1449,7 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws' and geom_type == 'node':
             sql += " WHERE " + geom_type + "type_id IN"
             sql += " (SELECT DISTINCT (id) AS id FROM " + self.schema_name+"."+geom_type+"_type"
-            sql += " WHERE type = '" + self.layer.name().upper() + "')"
+            sql += " WHERE type = '" + str(self.sys_type) + "')"
         sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
@@ -1456,7 +1460,7 @@ class ParentDialog(QDialog):
                 sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
                 sql += " FROM "+self.schema_name+".cat_"+geom_type+" WHERE "+self.field2 + " LIKE '%"+self.dlg_cat.filter2.currentText()+"%' "
                 sql += " AND matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' AND "+geom_type+"type_id IN "
-                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
                 sql += " ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
                 sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
@@ -1470,8 +1474,8 @@ class ParentDialog(QDialog):
                 sql += " FROM "+self.schema_name+".cat_"+geom_type
                 sql += " ORDER BY "+self.field3
             elif geom_type == 'arc':
-                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
-                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+                sql = "SELECT DISTINCT("+self.field3+") "
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY " + self.field3
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
         self.fill_catalog_id(wsoftware, geom_type)
@@ -1498,7 +1502,7 @@ class ParentDialog(QDialog):
             else:
                 sql_where += " AND "
             sql_where += geom_type + "type_id IN (SELECT DISTINCT (id) AS id FROM " + self.schema_name + "." + geom_type + "_type "
-            sql_where += " WHERE type = '" + self.layer.name().upper() + "')"
+            sql_where += " WHERE type = '" + str(self.sys_type) + "')"
         if sql_where is not None:
             sql += str(sql_where) + " ORDER BY " + str(self.field2)
         else:
@@ -1519,14 +1523,14 @@ class ParentDialog(QDialog):
                 sql += " WHERE ("+self.field2 + " LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
                 sql += " AND (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' OR matcat_id is null)"
                 sql += " AND "+geom_type+"type_id IN "
-                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
                 sql += " ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
                 sql = "SELECT "+self.field3
                 sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
                 sql += " FROM "+self.schema_name+".cat_"+geom_type
                 sql += " WHERE "+geom_type+"type_id IN "
-                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%"+self.layer.name().upper()+"%')"
+                sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
                 sql += " AND (" + self.field2 + " LIKE '%" + self.dlg_cat.filter2.currentText() + "%' OR " + self.field2 + " is null) "
                 sql += " AND (matcat_id LIKE '%" + self.dlg_cat.matcat_id.currentText() + "%' OR matcat_id is null)"
                 sql += " ORDER BY x) AS "+self.field3
@@ -1554,8 +1558,8 @@ class ParentDialog(QDialog):
         if wsoftware == 'ws':
             sql_where = (" WHERE " + geom_type + "type_id IN"
                          " (SELECT DISTINCT (id) FROM " + self.schema_name + "." + geom_type + "_type"
-                         " WHERE type = '" + self.layer.name().upper() + "')")
-            
+                         " WHERE type = '" + str(self.sys_type) + "')")
+
         if self.dlg_cat.matcat_id.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
@@ -2355,16 +2359,3 @@ class ParentDialog(QDialog):
                    " WHERE " + geom_type + "_id = '" + feature_id + "'")
             self.controller.execute_sql(sql)
 
-
-    def update_pressure_zone(self, table_name, field_id, geom_type, widget, feature_id):
-        """ @widget is the field to SET """
-
-        sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
-               " WHERE descript = '" + str(utils_giswater.getWidgetText(widget)) + "'")
-        row = self.controller.get_row(sql)
-        if row:
-            sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
-                   " SET " + widget + " = '" + str(row[0]) + "'"
-                   " WHERE " + geom_type + "_id = '" + feature_id + "'")
-            self.controller.execute_sql(sql)
-            

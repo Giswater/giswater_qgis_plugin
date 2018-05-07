@@ -643,7 +643,7 @@ class ManageVisit(ParentManage, QObject):
             if row:
                 # if int then look for default row ans set it
                 try:
-                    utils_giswater.set_combo_itemData(self.dlg.visitcat_id, row[0], 0, 1)
+                    utils_giswater.set_combo_itemData(self.dlg.visitcat_id, row[0], 0)
                     for i in range(0, self.dlg.visitcat_id.count()):
                         elem = self.dlg.visitcat_id.itemData(i)
                         if str(row[0]) == str(elem[0]):                         
@@ -1041,7 +1041,7 @@ class ManageVisit(ParentManage, QObject):
 
         # Insert into new table
         sql = ("INSERT INTO " + self.schema_name + ".doc_x_visit (doc_id, visit_id)"
-               " VALUES (" + str(doc_id) + ", " + str(visit_id) + ")")
+               " VALUES ('" + str(doc_id) + "', " + str(visit_id) + ")")
         status = self.controller.execute_sql(sql, commit=self.autocommit)
         if status:
             message = "Document inserted successfully"

@@ -7,10 +7,11 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import  QgsComposition
-from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence
+from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence, QCompleter, QStringListModel
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
 from PyQt4.QtCore import Qt
+from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys
@@ -19,11 +20,11 @@ import operator
 from functools import partial
 
 import utils_giswater
-
 from ui_manager import Plan_psector
 from ui_manager import Psector_rapport
 from actions.parent_manage import ParentManage
 from actions.multiple_selection import MultipleSelection
+from actions.manage_document import ManageDocument
 
 
 class ManageNewPsector(ParentManage):
@@ -63,6 +64,10 @@ class ManageNewPsector(ParentManage):
         self.set_icon(self.dlg.btn_insert, "111")
         self.set_icon(self.dlg.btn_delete, "112")
         self.set_icon(self.dlg.btn_snapping, "137")
+        self.set_icon(self.dlg.btn_doc_insert, "111")
+        self.set_icon(self.dlg.btn_doc_delete, "112")
+        self.set_icon(self.dlg.btn_doc_new, "34")
+        self.set_icon(self.dlg.btn_open_doc, "170")
 
         table_object = "psector"
 
@@ -159,9 +164,9 @@ class ManageNewPsector(ParentManage):
                 return
             
             self.psector_id.setText(str(row['psector_id']))
-            utils_giswater.set_combo_itemData(self.cmb_psector_type, row['psector_type'], 0, 1)
-            utils_giswater.set_combo_itemData(self.cmb_expl_id, row['expl_id'], 0, 1)
-            utils_giswater.set_combo_itemData(self.cmb_sector_id, row['sector_id'], 0, 1)
+            utils_giswater.set_combo_itemData(self.cmb_psector_type, row['psector_type'], 0)
+            utils_giswater.set_combo_itemData(self.cmb_expl_id, row['expl_id'], 0)
+            utils_giswater.set_combo_itemData(self.cmb_sector_id, row['sector_id'], 0)
 
             utils_giswater.setRow(row)
             utils_giswater.setChecked("active", row['active'])
@@ -198,6 +203,14 @@ class ManageNewPsector(ParentManage):
                        " WHERE cur_user = current_user AND psector_id='" +utils_giswater.getWidgetText(self.dlg.psector_id) + "'")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
+
+            # tab 'Document'
+            self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+            self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+            filter_ = "psector_id = '" + str(psector_id) + "'"
+            self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
+            self.tbl_document.doubleClicked.connect(partial(self.document_open))
+
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         self.all_states = rows
@@ -230,6 +243,13 @@ class ManageNewPsector(ParentManage):
         self.dlg.vat.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'vat'))
         self.dlg.other.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'other'))
 
+        self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
+        self.dlg.btn_doc_delete.pressed.connect(self.document_delete)
+        self.dlg.btn_doc_new.pressed.connect(self.manage_document)
+        self.dlg.btn_open_doc.pressed.connect(self.document_open)
+
+        self.set_completer()
+
         sql = ("SELECT other, gexpenses, vat FROM " + self.schema_name + "." + self.plan_om + "_psector "
                " WHERE psector_id = '" + str(psector_id) + "'")
         row = self.controller.get_row(sql)
@@ -248,10 +268,6 @@ class ManageNewPsector(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(table_object)
 
-        # Set QTableview columns from table config_client_forms
-        # self.set_table_columns(self.qtbl_arc, self.plan_om + "_psector_x_arc")
-        # self.set_table_columns(self.qtbl_node, self.plan_om + "_psector_x_node")
-        
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)     
 
@@ -305,7 +321,9 @@ class ManageNewPsector(ParentManage):
         # Open dialog
         self.open_dialog(self.dlg_psector_rapport, maximize_button=False)     
 
+
     def populate_cmb_templates(self):
+        
         composers = self.iface.activeComposers()
         index = 0
         records = []
@@ -314,12 +332,13 @@ class ManageNewPsector(ParentManage):
             records.append(elem)
             index = index +1
         utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
-        sql = ("SELECT value FROM "+self.schema_name+".config_param_user "
-               " WHERE parameter = 'composer_"+self.plan_om+"_vdefault' AND cur_user= current_user")
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               " WHERE parameter = 'composer_" + self.plan_om + "_vdefault' AND cur_user= current_user")
         row = self.controller.get_row(sql)
         if not row:
             return
         utils_giswater.setWidgetText(self.dlg_psector_rapport.cmb_templates, row[0])
+
 
     def set_prev_dialog(self, current_dialog, previous_dialog):
         """ Close current dialog and set previous dialog as current dialog"""
@@ -379,7 +398,7 @@ class ManageNewPsector(ParentManage):
         self.set_prev_dialog(dialog, previous_dialog)
 
 
-    def generate_composer(self, path,  dialog=None):
+    def generate_composer(self, path, dialog=None):
 
         index = utils_giswater.get_item_data(dialog.cmb_templates, 0)
         comp_view = self.iface.activeComposers()[index]
@@ -407,7 +426,6 @@ class ManageNewPsector(ParentManage):
                " WHERE table_name = '" + "v_" + self.plan_om + "_psector'"
                " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
                " ORDER BY ordinal_position")
-
         rows = self.controller.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
@@ -499,8 +517,8 @@ class ManageNewPsector(ParentManage):
     def calulate_percents(self, tablename, psector_id, field):
         
         sql = ("UPDATE " + self.schema_name + "." + tablename + " "
-               " SET "+field+"='"+utils_giswater.getText(field)+"' "
-               " WHERE psector_id='"+str(psector_id)+"'")
+               " SET " + field + " = '" + utils_giswater.getText(field) + "'"
+               " WHERE psector_id = '" + str(psector_id) + "'")
         self.controller.execute_sql(sql)
         self.populate_budget(psector_id)
 
@@ -532,15 +550,6 @@ class ManageNewPsector(ParentManage):
         self.dlg.btn_insert.setEnabled(enabled)
         self.dlg.btn_delete.setEnabled(enabled)
         self.dlg.btn_snapping.setEnabled(enabled)
-
-
-    def delete_feature_at_plan_psector(self, geom_type, list_id, plan_om):
-        """ Delete features_id to table plan_@geom_type_x_psector"""
-
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
-        sql = ("DELETE FROM " + self.schema_name + "." + plan_om + "_psector_x_" + geom_type + ""
-               " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id = '" + str(value) + "'")
-        self.controller.execute_sql(sql)
 
 
     def selection_init(self, table_object, query=True):
@@ -597,13 +606,12 @@ class ManageNewPsector(ParentManage):
         self.insert_or_update_new_psector(tablename='v_edit_'+self.plan_om + '_psector', close_dlg=False)
         self.update = True
         if self.dlg.tabWidget.currentIndex() == 2:
-
             tableleft = "v_price_compost"
             tableright = "v_edit_" + self.plan_om + "_psector_x_other"
             field_id_right = "price_id"
             self.price_selector(self.dlg, tableleft, tableright, field_id_right)
             self.update_total(self.dlg.selected_rows)
-        if self.dlg.tabWidget.currentIndex() == 3:
+        elif self.dlg.tabWidget.currentIndex() == 3:
             self.populate_budget(utils_giswater.getWidgetText('psector_id'))
 
         sql = ("SELECT other, gexpenses, vat"
@@ -821,6 +829,7 @@ class ManageNewPsector(ParentManage):
             self.reload_states_selector()
             self.close_dialog()
 
+
     def price_selector(self, dialog, tableleft, tableright,  field_id_right):
 
         # fill QTableView all_rows
@@ -917,6 +926,7 @@ class ManageNewPsector(ParentManage):
 
 
     def rows_unselector(self, tbl_selected_rows, tableright, field_id_right):
+        
         query = ("DELETE FROM " + self.schema_name + "." + tableright + ""
                " WHERE  " + tableright + "." + field_id_right + " = ")
         selected_list = tbl_selected_rows.selectionModel().selectedRows()
@@ -1016,4 +1026,147 @@ class ManageNewPsector(ParentManage):
             row = selected_list[i].row()
             if str(widget.model().record(row).value('psector_id')) != utils_giswater.getWidgetText('psector_id'):
                 widget.hideRow(i)
+
+
+    def document_insert(self):
+        """Insert a docmet related to the current visit."""
+
+        doc_id = self.doc_id.text()
+        psector_id = self.psector_id.text()
+        if not doc_id:
+            message = "You need to insert doc_id"
+            self.controller.show_warning(message)
+            return
+        if not psector_id:
+            message = "You need to insert psector_id"
+            self.controller.show_warning(message)
+            return
+        # Check if document already exist
+        sql = ("SELECT doc_id"
+               " FROM " + self.schema_name + ".doc_x_psector"
+               " WHERE doc_id = '" + str(doc_id) + "' AND psector_id = '" + str(psector_id) + "'")
+        row = self.controller.get_row(sql, commit=self.autocommit)
+        if row:
+            message = "Document already exist"
+            self.controller.show_warning(message)
+            return
+
+
+        # Insert into new table
+        sql = ("INSERT INTO " + self.schema_name + ".doc_x_psector (doc_id, psector_id)"
+               " VALUES ('" + str(doc_id) + "', " + str(psector_id) + ")")
+        status = self.controller.execute_sql(sql, commit=self.autocommit)
+        if status:
+            message = "Document inserted successfully"
+            self.controller.show_info(message)
+
+        self.dlg.tbl_document.model().select()
+
+
+    def document_delete(self):
+        """Delete record from selected rows in tbl_document."""
+
+        # Get selected rows. 0 is the column of the pk 0 'id'
+        selected_list = self.tbl_document.selectionModel().selectedRows(0)
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+
+        selected_id = []
+        for index in selected_list:
+            doc_id = index.data()
+            selected_id.append(str(doc_id))
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, ','.join(selected_id))
+        if answer:
+            sql = ("DELETE FROM " + self.schema_name + ".doc_x_psector"
+            " WHERE id IN ({})".format(','.join(selected_id)))
+            status = self.controller.execute_sql(sql)
+            if not status:
+                message = "Error deleting data"
+                self.controller.show_warning(message)
+                return
+            else:
+                message = "Event deleted"
+                self.controller.show_info(message)
+                self.dlg.tbl_document.model().select()
+
+
+    def manage_document(self):
+        """Access GUI to manage documents e.g Execute action of button 34 """
+
+        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        dlg_docman = manage_document.manage_document()
+        dlg_docman.btn_accept.pressed.connect(partial(self.set_completer_object, 'doc'))
+
+
+    def document_open(self):
+        """Open selected document."""
+
+        # Get selected rows
+        field_index = self.tbl_document.model().fieldIndex('path')
+        selected_list = self.dlg.tbl_document.selectionModel().selectedRows(field_index)
+        if not selected_list:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+        elif len(selected_list) > 1:
+            message = "More then one document selected. Select just one document."
+            self.controller.show_warning(message)
+            return
+
+        path = selected_list[0].data()
+        # Check if file exist
+        if not os.path.exists(path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=path)
+            return
+
+        # Open the document
+        if sys.platform == "win32":
+            os.startfile(path)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, path])
+
+
+    def set_completer(self):
+        """ Set autocompleter """
+
+        # Adding auto-completion to a QLineEdit - document_id
+        self.completer = QCompleter()
+        self.dlg.doc_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_document"
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        values = []
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
+
+
+    def fill_table_doc(self, widget, table_name, filter_):
+    #def fill_table_doc(self, widget, table_name):
+        """ Set a model with selected filter. Attach that model to selected table """
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setFilter(filter_)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+        widget.show()
 

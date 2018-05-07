@@ -93,4 +93,11 @@ class Basic(ParentAction):
                     self.controller.show_warning(message, duration=20)   
         except RuntimeError:
             pass
+     
+     
+    def close_dialog(self):   
+        
+        ParentAction.close_dialog(self)
+        self.search_plus.refresh_data = True
+        
         

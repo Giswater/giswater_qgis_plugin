@@ -21,10 +21,10 @@ from ui_manager import NodeReplace
 
 
 class ReplaceNodeMapTool(ParentMapTool):
-    ''' Button 44: User select one node. Execute SQL function: 'gw_fct_node_replace' '''
+    """ Button 44: User select one node. Execute SQL function: 'gw_fct_node_replace' """
 
     def __init__(self, iface, settings, action, index_action):
-        ''' Class constructor '''
+        """ Class constructor """
 
         # Call ParentMapTool constructor
         super(ReplaceNodeMapTool, self).__init__(iface, settings, action, index_action)
@@ -166,7 +166,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.close_dialog(dialog, set_action_pan=False)
 
 
-    ''' QgsMapTools inherited event functions '''
+    """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:

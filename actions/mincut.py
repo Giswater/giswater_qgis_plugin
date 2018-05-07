@@ -1046,7 +1046,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def delete_records_connec(self):  
-        ''' Delete selected rows of the table '''
+        """ Delete selected rows of the table """
                 
         self.disconnect_signal_selection_changed()   
                         
@@ -1096,7 +1096,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def delete_records_hydro(self):  
-        ''' Delete selected rows of the table '''
+        """ Delete selected rows of the table """
         
         # Get selected rows
         widget = self.dlg_hydro.tbl_hydro    
@@ -2125,7 +2125,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def mincut_composer(self):
-        ''' Open Composer '''
+        """ Open Composer """
 
         # Set dialog add_connec
         self.dlg_comp = MincutComposer()

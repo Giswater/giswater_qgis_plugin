@@ -2,9 +2,7 @@
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from PyQt4 import uic
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView
-from PyQt4.QtGui import QFileDialog
-from PyQt4.QtGui import QLineEdit
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QLineEdit, QLabel
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
 
@@ -18,19 +16,23 @@ import utils_giswater
 from search.ui.list_items import ListItems
 from search.ui.hydro_info import HydroInfo
 from search.ui.search_plus_dockwidget import SearchPlusDockWidget
+from actions.manage_new_psector import ManageNewPsector
 
 
 class SearchPlus(QObject):
 
-    def __init__(self, iface, srid, controller):
+    def __init__(self, iface, srid, controller, settings, plugin_dir):
         """ Constructor """
-        
+
+        self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.iface = iface
+        self.canvas = self.iface.mapCanvas()
         self.srid = srid
         self.controller = controller
         self.schema_name = self.controller.schema_name
         self.project_type = self.controller.get_project_type()
         self.feature_cat = {}
+        self.refresh_data = False
 
 
     def init_config(self):
@@ -44,7 +46,8 @@ class SearchPlus(QObject):
 
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_main, 'tab')
+        
         # Check address parameters
         message = "Parameter not found"
         if not 'street_field_expl' in self.params:
@@ -84,6 +87,9 @@ class SearchPlus(QObject):
             self.filter_by_list(self.dlg.hydro_id)
         self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
+        self.dlg.btn_clear_workcat.pressed.connect(self.clear_workcat)
+        self.dlg.btn_refresh_workcat.pressed.connect(self.refresh_workcat)
+        self.dlg.psector_id_2.activated.connect(partial(self.open_plan_psector))
 
         return True
 
@@ -182,6 +188,15 @@ class SearchPlus(QObject):
         return rows
 
 
+    def psector_populate(self, combo):
+        """ Fill @combo """
+
+        sql = ("SELECT name FROM " + self.controller.schema_name + ".plan_psector ")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(combo, rows)
+        return rows
+
+
     def update_selector_workcat(self, workcat_id):
         """  Update table selector_workcat """
         
@@ -198,16 +213,16 @@ class SearchPlus(QObject):
         layer = self.controller.get_layer_by_tablename(layer_name)
         if not layer:
             return
-        
+
         # Check if the expression is valid
         expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
-            return               
-        
-        # Select features of @layer applying @expr        
+            return
+
+        # Select features of @layer applying @expr
         self.select_features_by_expr(layer, expr)
-                        
+
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
@@ -264,9 +279,72 @@ class SearchPlus(QObject):
         expr = "workcat_id_end ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
+
+        # Add data to workcat search form
+        table_name = "v_ui_workcat_x_feature"
+        table_name_end = "v_ui_workcat_x_feature_end"
+        extension = '_end'
+        self.fill_label_data(table_name)
+        self.fill_label_data(table_name_end, extension)
+
         self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
         self.items_dialog.open()
-        
+
+
+    def fill_label_data(self, table_name, extension = None):
+
+        workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
+        if workcat_id == "null":
+            return
+
+        features = ['NODE','CONNEC','GULLY','ELEMENT','ARC']
+        for feature in features:
+            sql = ("SELECT feature_id "
+                   " FROM " + self.schema_name + "." + str(table_name) + "")
+            if extension is not None:
+                sql += (" WHERE workcat_id_end = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            else:
+                sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            rows = self.controller.get_rows(sql)
+            if not rows:
+                pass
+
+            if extension is not None:
+                widget_name = "lbl_total_" + str(feature.lower()) + str(extension)
+            else:
+                widget_name = "lbl_total_" + str(feature.lower())
+
+            widget = self.items_dialog.findChild(QLabel, str(widget_name))
+
+            if self.project_type == 'ws' and feature == 'GULLY':
+                widget.hide()
+
+            total = len(rows)
+            # Add data to workcat search form
+            widget.setText(str(feature.lower().title()) + "s: " + str(total))
+
+            length = 0
+            if feature == 'ARC':
+                for row in rows:
+                    arc_id = str(row[0])
+                    sql = ("SELECT gis_length "
+                           " FROM " + self.schema_name + ".v_arc"
+                           " WHERE arc_id = '" + arc_id + "'")
+                    row = self.controller.get_row(sql)
+                    if row:
+                        length = length + row[0]
+                    else:
+                        message = "Some data is missing. Check gis_length for arc"
+                        self.controller.show_warning(message, parameter = arc_id)
+                        return
+                if extension != None:
+                    widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
+                else:
+                    widget = self.items_dialog.findChild(QLabel, "lbl_length")
+
+                # Add data to workcat search form
+                widget.setText("Total arcs length: " + str(length))
+
 
     def export_to_csv(self, qtable_1=None, qtable_2=None, path=None):
 
@@ -613,6 +691,9 @@ class SearchPlus(QObject):
         if not status:
             self.dlg.tab_main.removeTab(0)
 
+        # Tab 'Document'
+        status = self.psector_populate(self.dlg.psector_id_2)
+        
         return True
     
 
@@ -622,13 +703,14 @@ class SearchPlus(QObject):
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
         if expl_name is None:
             expl_name = ""
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, name "
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
-               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
-        rows = self.controller.get_rows(sql)
+               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             return False
+            
         self.list_hydro.append("")
         for row in rows:
             self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
@@ -765,13 +847,16 @@ class SearchPlus(QObject):
             field_type = viewname_parts[2] + "_type"
 
         self.field_to_search = self.params['network_field_' + str(feature_type) + '_code']
-        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1."+str(feature_type)+"_id, t1." + str(field_type) + ", t2.name , t3.name"
+        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1." + str(feature_type) + "_id,"
+               " t1." + str(field_type) + ", t2.name , t3.name"
                " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
-               " INNER JOIN " +self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
-               " INNER JOIN " +self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
+               " INNER JOIN " + self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
+               " INNER JOIN " + self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
                " WHERE " + str(self.field_to_search) + " IS NOT NULL"
-               " ORDER BY " + str(self.field_to_search) + "")
-        rows = self.controller.get_rows(sql)
+               " AND t1.expl_id IN "
+               " (SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user = current_user)"
+               " ORDER BY " + str(self.field_to_search))
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             return False
 
@@ -811,7 +896,7 @@ class SearchPlus(QObject):
         if expl_name == "null" or expl_name is None:
             expl_name = ""
         list_hydro = []
-        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, name"
+        sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, state"
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
@@ -828,6 +913,10 @@ class SearchPlus(QObject):
     def network_geom_type_changed(self):
         """ Get 'geom_type' to filter 'code' values """
            
+        if self.refresh_data:
+            self.network_code_create_lists()
+            self.refresh_data = False            
+            
         geom_type = utils_giswater.getWidgetText(self.dlg.network_geom_type)
         list_codes = []
         if geom_type == self.controller.tr('Arc'):
@@ -1293,5 +1382,85 @@ class SearchPlus(QObject):
             if len(id_list) > 0:
                 layer.selectByIds(id_list)   
             else:
-                layer.removeSelection()  
+                layer.removeSelection()
+
+
+    def clear_workcat(self):
+
+        sql = ("DELETE FROM " + self.schema_name + ".selector_workcat")
+        status = self.controller.execute_sql(sql)
+        if status:
+            message = "Workcat cleared successfully"
+            self.controller.show_info(message)
+            # Clear combo workcat_id
+            utils_giswater.setWidgetText(self.dlg.workcat_id, "")
+            # Get layer by table_name
+            layer = self.iface.activeLayer()
+            # Remove selection
+            self.iface.legendInterface().setLayerVisible(layer, False)
+
+
+    def refresh_workcat(self):
+
+        sql = "SELECT " + self.schema_name + ".gw_fct_refresh_mat_view();"
+        status = self.controller.execute_sql(sql)
+        if status:
+            message = "Polygon refreshed successfully"
+            self.controller.show_info(message)
+            self.refresh_map_canvas()
+
+
+    def refresh_map_canvas(self):
+        """ Refresh all layers present in map canvas """
+
+        self.canvas.refreshAllLayers()
+        for layer_refresh in self.canvas.layers():
+            layer_refresh.triggerRepaint()
                                    
+
+    def open_plan_psector(self):
+
+        psector_name = self.dlg.psector_id_2.currentText()
+        sql = ("SELECT psector_id"
+               " FROM " + self.schema_name + ".plan_psector"
+               " WHERE name = '" + str(psector_name)+"'")
+        row =  self.controller.get_row(sql)
+        psector_id =  row[0]
+        self.manage_new_psector.new_psector(psector_id, 'plan')
+
+        self.zoom_to_psector(self.dlg.psector_id_2, 'v_edit_plan_psector', 'name')
+
+
+    def zoom_to_psector(self, widget, layer_name, field_id):
+
+        polygon_name = utils_giswater.getWidgetText(widget)
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if not layer:
+            return
+
+        # Check if the expression is valid
+        field_id = "name"
+        expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+
+        # Select features of @layer applying @expr
+        if expr is None:
+            layer.removeSelection()
+        else:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
+
+        # If any feature found, zoom it and exit function
+        if layer.selectedFeatureCount() > 0:
+            self.iface.setActiveLayer(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.iface.actionZoomToSelected().trigger()
+            layer.removeSelection()
+

@@ -25,7 +25,7 @@
    <property name="currentIndex">
     <number>0</number>
    </property>
-   <widget class="QWidget" name="tab_3">
+   <widget class="QWidget" name="tab_edit">
     <attribute name="title">
      <string>Edit</string>
     </attribute>
@@ -41,7 +41,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_12">
+     <widget class="QWidget" name="tab_edit_utils">
       <attribute name="title">
        <string>Utils</string>
       </attribute>
@@ -228,7 +228,7 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="tab_8">
+     <widget class="QWidget" name="tab_edit_ws">
       <attribute name="title">
        <string>WS</string>
       </attribute>
@@ -259,7 +259,7 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="tab_14">
+     <widget class="QWidget" name="tab_edit_ud">
       <attribute name="title">
        <string>UD</string>
       </attribute>
@@ -370,7 +370,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_2">
+   <widget class="QWidget" name="tab_master">
     <attribute name="title">
      <string>Master</string>
     </attribute>
@@ -492,7 +492,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab">
+   <widget class="QWidget" name="tab_admin">
     <attribute name="title">
      <string>Admin</string>
     </attribute>

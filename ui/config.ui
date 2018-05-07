@@ -56,12 +56,12 @@
    <property name="currentIndex">
     <number>0</number>
    </property>
-   <widget class="QWidget" name="tab_3">
+   <widget class="QWidget" name="tab_basic">
     <attribute name="title">
      <string>Basic</string>
     </attribute>
    </widget>
-   <widget class="QWidget" name="tab_5">
+   <widget class="QWidget" name="tab_om">
     <attribute name="title">
      <string>Om</string>
     </attribute>
@@ -261,7 +261,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_7">
+   <widget class="QWidget" name="tab_edit">
     <attribute name="title">
      <string>Edit</string>
     </attribute>
@@ -282,7 +282,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_20">
+     <widget class="QWidget" name="tab_edit_utils">
       <attribute name="title">
        <string>Utils</string>
       </attribute>
@@ -1306,7 +1306,7 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="tab_21">
+     <widget class="QWidget" name="tab_edit_ws">
       <attribute name="title">
        <string>WS</string>
       </attribute>
@@ -2733,7 +2733,7 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="tab_22">
+     <widget class="QWidget" name="tab_edit_ud">
       <attribute name="title">
        <string>UD</string>
       </attribute>
@@ -3153,7 +3153,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_13">
+   <widget class="QWidget" name="tab_cad">
     <attribute name="title">
      <string>CAD</string>
     </attribute>
@@ -3235,7 +3235,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_8">
+   <widget class="QWidget" name="tab_epa">
     <attribute name="title">
      <string>Epa</string>
     </attribute>
@@ -3251,17 +3251,17 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_27">
+     <widget class="QWidget" name="tab_epa_utils">
       <attribute name="title">
        <string>Utils</string>
       </attribute>
      </widget>
-     <widget class="QWidget" name="tab_28">
+     <widget class="QWidget" name="tab_epa_ws">
       <attribute name="title">
        <string>WS</string>
       </attribute>
      </widget>
-     <widget class="QWidget" name="tab_29">
+     <widget class="QWidget" name="tab_epa_ud">
       <attribute name="title">
        <string>UD</string>
       </attribute>
@@ -3528,7 +3528,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_9">
+   <widget class="QWidget" name="tab_master">
     <attribute name="title">
      <string>Masterplan</string>
     </attribute>
@@ -4185,7 +4185,7 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_4">
+   <widget class="QWidget" name="tab_admin">
     <attribute name="title">
      <string>Admin</string>
     </attribute>
@@ -4824,7 +4824,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_11">
+       <widget class="QWidget" name="tab_admin_topology_ws">
         <attribute name="title">
          <string>WS</string>
         </attribute>
@@ -4897,7 +4897,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_24">
+       <widget class="QWidget" name="tab_admin_topology_ud">
         <attribute name="title">
          <string>UD</string>
         </attribute>
@@ -4972,9 +4972,9 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
-       <widget class="QWidget" name="tab_18">
+       <widget class="QWidget" name="tab_admin_review_ws">
         <attribute name="title">
          <string>WS</string>
         </attribute>
@@ -5115,7 +5115,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="tab_25">
+       <widget class="QWidget" name="tab_admin_review_ud">
         <attribute name="title">
          <string>UD</string>
         </attribute>

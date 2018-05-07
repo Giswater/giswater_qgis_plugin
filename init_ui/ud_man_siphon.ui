@@ -3229,15 +3229,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -3249,15 +3249,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLineEdit" name="doc_id">
@@ -3398,15 +3398,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_from">
@@ -3559,15 +3559,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_to">
@@ -3755,8 +3755,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4104,9 +4104,9 @@
        <widget class="QLabel" name="label_cost_length">
         <property name="geometry">
          <rect>
-          <x>180</x>
-          <y>228</y>
-          <width>51</width>
+          <x>155</x>
+          <y>230</y>
+          <width>55</width>
           <height>22</height>
          </rect>
         </property>
@@ -4193,9 +4193,9 @@
        <widget class="QLabel" name="label_cost_budget">
         <property name="geometry">
          <rect>
-          <x>370</x>
+          <x>325</x>
           <y>265</y>
-          <width>55</width>
+          <width>100</width>
           <height>22</height>
          </rect>
         </property>
@@ -4361,9 +4361,9 @@
        <widget class="QLabel" name="label_cost_unitary_cost">
         <property name="geometry">
          <rect>
-          <x>345</x>
-          <y>228</y>
-          <width>81</width>
+          <x>325</x>
+          <y>230</y>
+          <width>100</width>
           <height>22</height>
          </rect>
         </property>
@@ -4508,7 +4508,7 @@
        <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
-          <x>235</x>
+          <x>210</x>
           <y>230</y>
           <width>101</width>
           <height>18</height>
@@ -5193,7 +5193,7 @@
        <widget class="QLineEdit" name="other_budget">
         <property name="geometry">
          <rect>
-          <x>235</x>
+          <x>210</x>
           <y>265</y>
           <width>101</width>
           <height>18</height>
@@ -5222,9 +5222,9 @@
        <widget class="QLabel" name="label_cost_total_budget">
         <property name="geometry">
          <rect>
-          <x>342</x>
-          <y>297</y>
-          <width>82</width>
+          <x>325</x>
+          <y>300</y>
+          <width>100</width>
           <height>22</height>
          </rect>
         </property>
@@ -5277,9 +5277,9 @@
        <widget class="QLabel" name="label_cost_other_budget">
         <property name="geometry">
          <rect>
-          <x>45</x>
-          <y>264</y>
-          <width>187</width>
+          <x>25</x>
+          <y>265</y>
+          <width>190</width>
           <height>22</height>
          </rect>
         </property>
@@ -5319,8 +5319,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5329,9 +5329,9 @@
        <widget class="QLabel" name="label_cost_bulk">
         <property name="geometry">
          <rect>
-          <x>36</x>
+          <x>20</x>
           <y>149</y>
-          <width>37</width>
+          <width>65</width>
           <height>22</height>
          </rect>
         </property>
@@ -5354,6 +5354,9 @@
         </property>
         <property name="scaledContents">
          <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
         <property name="margin">
          <number>3</number>
@@ -5844,9 +5847,9 @@
        <widget class="QLabel" name="label_cost_area">
         <property name="geometry">
          <rect>
-          <x>8</x>
+          <x>20</x>
           <y>183</y>
-          <width>61</width>
+          <width>65</width>
           <height>22</height>
          </rect>
         </property>
@@ -5869,6 +5872,9 @@
         </property>
         <property name="scaledContents">
          <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
         <property name="margin">
          <number>3</number>
@@ -5950,9 +5956,9 @@
        <widget class="QLabel" name="label_cost_y_param">
         <property name="geometry">
          <rect>
-          <x>40</x>
+          <x>20</x>
           <y>85</y>
-          <width>53</width>
+          <width>65</width>
           <height>22</height>
          </rect>
         </property>
@@ -5975,6 +5981,9 @@
         </property>
         <property name="scaledContents">
          <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
         <property name="margin">
          <number>3</number>
@@ -6027,7 +6036,7 @@
         <property name="geometry">
          <rect>
           <x>405</x>
-          <y>143</y>
+          <y>157</y>
           <width>45</width>
           <height>15</height>
          </rect>
@@ -6106,7 +6115,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>95</x>
+          <x>100</x>
           <y>240</y>
           <width>45</width>
           <height>15</height>
@@ -6147,7 +6156,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>95</x>
+          <x>100</x>
           <y>280</y>
           <width>45</width>
           <height>15</height>
@@ -6188,7 +6197,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>95</x>
+          <x>100</x>
           <y>300</y>
           <width>45</width>
           <height>15</height>
@@ -6229,7 +6238,7 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>95</x>
+          <x>100</x>
           <y>260</y>
           <width>45</width>
           <height>15</height>
@@ -6267,9 +6276,9 @@
        <widget class="QLabel" name="label_cost_exc">
         <property name="geometry">
          <rect>
-          <x>13</x>
+          <x>5</x>
           <y>275</y>
-          <width>80</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -6304,9 +6313,9 @@
        <widget class="QLabel" name="label_cost_excav">
         <property name="geometry">
          <rect>
-          <x>13</x>
+          <x>5</x>
           <y>235</y>
-          <width>80</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -6341,9 +6350,9 @@
        <widget class="QLabel" name="label_cost_fill">
         <property name="geometry">
          <rect>
-          <x>13</x>
+          <x>5</x>
           <y>255</y>
-          <width>80</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>
@@ -6380,7 +6389,7 @@
          <rect>
           <x>3</x>
           <y>295</y>
-          <width>90</width>
+          <width>97</width>
           <height>22</height>
          </rect>
         </property>

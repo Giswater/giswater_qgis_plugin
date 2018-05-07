@@ -419,7 +419,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_pipe.ui" line="5228"/>
         <source>m3/ml Excess:</source>
-        <translation>m3/ml Excedente:</translation>
+        <translation>m3/ml Exced:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_pipe.ui" line="5318"/>

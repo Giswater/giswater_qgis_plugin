@@ -169,19 +169,17 @@ class ManNodeDialog(ParentDialog):
 
         self.load_state_type(state_type, self.geom_type)
         self.load_dma(dma_id, self.geom_type)
-        self.load_pressure_zone(presszonecat_id, self.geom_type)
 
 
     def get_topology_parameters(self):
         """ Get parameters 'node_proximity' and 'node2arc' from config table """
         
-        self.node_proximity = 0.5
-        self.node2arc = 0.5
+        self.node_proximity = 0.1
+        self.node2arc = 0.01
         sql = "SELECT node_proximity, node2arc FROM " + self.schema_name + ".config"
         row = self.controller.get_row(sql)
         if row:
             self.node_proximity = row['node_proximity'] 
-            self.node2arc = row['node2arc']   
             
         
     def check_topology_arc(self):
