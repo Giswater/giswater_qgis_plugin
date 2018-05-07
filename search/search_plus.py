@@ -32,6 +32,7 @@ class SearchPlus(QObject):
         self.schema_name = self.controller.schema_name
         self.project_type = self.controller.get_project_type()
         self.feature_cat = {}
+        self.refresh_data = False
 
 
     def init_config(self):
@@ -45,7 +46,8 @@ class SearchPlus(QObject):
 
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-        utils_giswater.remove_tab_by_tabName(self.dlg.tab_main,'tab')
+        utils_giswater.remove_tab_by_tabName(self.dlg.tab_main, 'tab')
+        
         # Check address parameters
         message = "Parameter not found"
         if not 'street_field_expl' in self.params:
@@ -299,15 +301,15 @@ class SearchPlus(QObject):
         for feature in features:
             sql = ("SELECT feature_id "
                    " FROM " + self.schema_name + "." + str(table_name) + "")
-            if extension != None:
-                   sql += (" WHERE workcat_id_end = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            if extension is not None:
+                sql += (" WHERE workcat_id_end = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
             else:
-                   sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+                sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
             rows = self.controller.get_rows(sql)
             if not rows:
                 pass
 
-            if extension != None:
+            if extension is not None:
                 widget_name = "lbl_total_" + str(feature.lower()) + str(extension)
             else:
                 widget_name = "lbl_total_" + str(feature.lower())
@@ -691,8 +693,7 @@ class SearchPlus(QObject):
 
         # Tab 'Document'
         status = self.psector_populate(self.dlg.psector_id_2)
-        #if not status:
-        #    self.dlg.tab_main.removeTab(3)
+        
         return True
     
 
@@ -705,10 +706,11 @@ class SearchPlus(QObject):
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
-               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']) + "")
-        rows = self.controller.get_rows(sql)
+               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             return False
+            
         self.list_hydro.append("")
         for row in rows:
             self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
@@ -845,13 +847,16 @@ class SearchPlus(QObject):
             field_type = viewname_parts[2] + "_type"
 
         self.field_to_search = self.params['network_field_' + str(feature_type) + '_code']
-        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1."+str(feature_type)+"_id, t1." + str(field_type) + ", t2.name , t3.name"
+        sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1." + str(feature_type) + "_id,"
+               " t1." + str(field_type) + ", t2.name , t3.name"
                " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
-               " INNER JOIN " +self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
-               " INNER JOIN " +self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
+               " INNER JOIN " + self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
+               " INNER JOIN " + self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
                " WHERE " + str(self.field_to_search) + " IS NOT NULL"
-               " ORDER BY " + str(self.field_to_search) + "")
-        rows = self.controller.get_rows(sql)
+               " AND t1.expl_id IN "
+               " (SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user = current_user)"
+               " ORDER BY " + str(self.field_to_search))
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             return False
 
@@ -908,6 +913,10 @@ class SearchPlus(QObject):
     def network_geom_type_changed(self):
         """ Get 'geom_type' to filter 'code' values """
            
+        if self.refresh_data:
+            self.network_code_create_lists()
+            self.refresh_data = False            
+            
         geom_type = utils_giswater.getWidgetText(self.dlg.network_geom_type)
         list_codes = []
         if geom_type == self.controller.tr('Arc'):
