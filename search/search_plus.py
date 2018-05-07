@@ -131,7 +131,7 @@ class SearchPlus(QObject):
                " WHERE cur_user = current_user;\n")
         for row in self.current_expls:
             sql += ("INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
-                   " VALUES(" + str(row[0]) + ", current_user);\n")
+                    " VALUES(" + str(row[0]) + ", current_user);\n")
         self.controller.execute_sql(sql)
 
 
@@ -153,7 +153,7 @@ class SearchPlus(QObject):
         sql = ""
         for row in rows:
             sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
-                   " VALUES(" + str(row[0]) + ", current_user);\n")
+                    " VALUES(" + str(row[0]) + ", current_user);\n")
         self.controller.execute_sql(sql)
 
 
@@ -164,7 +164,7 @@ class SearchPlus(QObject):
                " WHERE cur_user = current_user;\n")
         for row in self.current_selector:
             sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
-                   " VALUES(" + str(row[0]) + ", current_user);\n")
+                    " VALUES(" + str(row[0]) + ", current_user);\n")
         self.controller.execute_sql(sql)
 
 
@@ -713,7 +713,12 @@ class SearchPlus(QObject):
             
         self.list_hydro.append("")
         for row in rows:
-            self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
+            append_to_list = True
+            for x in range(0, len(row)):
+                if row[x] is None:
+                    append_to_list = False
+            if append_to_list:
+                self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
         self.list_hydro = sorted(set(self.list_hydro))
         self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
 
@@ -862,7 +867,12 @@ class SearchPlus(QObject):
 
         list_codes = ['']
         for row in rows:
-            list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4])
+            append_to_list = True
+            for x in range(0, len(row)):
+                if row[x] is None:
+                    append_to_list = False
+            if append_to_list:
+                list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4])
 
         return list_codes       
         
@@ -905,7 +915,12 @@ class SearchPlus(QObject):
             return False
         
         for row in rows:
-            list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
+            append_to_list = True
+            for x in range(0, len(row)):
+                if row[x] is None:
+                    append_to_list = False
+            if append_to_list:
+                list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
         list_hydro = sorted(set(list_hydro))
         self.set_model_by_list(list_hydro, self.dlg.hydro_id)
 
@@ -1424,8 +1439,8 @@ class SearchPlus(QObject):
         sql = ("SELECT psector_id"
                " FROM " + self.schema_name + ".plan_psector"
                " WHERE name = '" + str(psector_name)+"'")
-        row =  self.controller.get_row(sql)
-        psector_id =  row[0]
+        row = self.controller.get_row(sql)
+        psector_id = row[0]
         self.manage_new_psector.new_psector(psector_id, 'plan')
 
         self.zoom_to_psector(self.dlg.psector_id_2, 'v_edit_plan_psector', 'name')
