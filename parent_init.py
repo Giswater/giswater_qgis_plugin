@@ -1474,8 +1474,8 @@ class ParentDialog(QDialog):
                 sql += " FROM "+self.schema_name+".cat_"+geom_type
                 sql += " ORDER BY "+self.field3
             elif geom_type == 'arc':
-                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
-                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+                sql = "SELECT DISTINCT("+self.field3+") "
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY " + self.field3
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
         self.fill_catalog_id(wsoftware, geom_type)
