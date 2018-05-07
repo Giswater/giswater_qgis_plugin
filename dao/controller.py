@@ -975,7 +975,7 @@ class DaoController():
                 self.giswater.enable_toolbar("om_ud")
         elif role_epa:
             if self.giswater.wsoftware == 'ws':            
-                 self.giswater.enable_toolbar("om_ws")
+                self.giswater.enable_toolbar("om_ws")
             elif self.giswater.wsoftware == 'ud':                
                 self.giswater.enable_toolbar("om_ud")
             self.giswater.enable_toolbar("edit")
@@ -1015,14 +1015,32 @@ class DaoController():
         return value
 
 
+    def get_value_config_param_user(self, parameter, show_warning=True):
+        """ Get value of @parameter from table 'config_param_user' """
+
+        value = None
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
+        row = self.get_row(sql)
+        if row:
+            value = row[0]
+        elif not row and show_warning:
+            message = "Parameter not found in table 'config_param_user'"
+            self.show_warning(message, parameter=parameter)
+            return value
+
+        return value
+
+
     def get_columns_list(self, tablename):
         """  Return list of all columns in @tablename """
+        
         sql = ("SELECT column_name FROM information_schema.columns"
                " WHERE table_name = '" + tablename + "'"
                " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
                " ORDER BY ordinal_position")
-        column_name = self.get_rows(sql)
-        return column_name
+        column_names = self.get_rows(sql)
+        return column_names
     
     
     def get_log_folder(self):
