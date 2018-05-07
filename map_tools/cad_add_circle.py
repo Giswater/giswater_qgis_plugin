@@ -42,8 +42,8 @@ class CadAddCircle(ParentMapTool):
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_circle.radius.setValidator(validator)
 
-        self.dlg_create_circle.btn_accept.pressed.connect(partial(self.get_radius, point))
-        self.dlg_create_circle.btn_cancel.pressed.connect(self.cancel)
+        self.dlg_create_circle.btn_accept.clicked.connect(partial(self.get_radius, point))
+        self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
 
         self.dlg_create_circle.exec_()

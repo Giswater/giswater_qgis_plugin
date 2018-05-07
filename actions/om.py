@@ -66,7 +66,7 @@ class Om(ParentAction):
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
         # Set signals
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         self.dlg.rejected.connect(self.close_dialog)
         self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
         self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))

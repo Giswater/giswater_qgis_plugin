@@ -41,8 +41,8 @@ class CadAddPoint(ParentMapTool):
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_point.dist_y.setValidator(validator)
         self.dlg_create_point.dist_x.setFocus()
-        self.dlg_create_point.btn_accept.pressed.connect(partial(self.get_values, point_1, point_2))
-        self.dlg_create_point.btn_cancel.pressed.connect(self.cancel)
+        self.dlg_create_point.btn_accept.clicked.connect(partial(self.get_values, point_1, point_2))
+        self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
 
         self.open_dialog(self.dlg_create_point, maximize_button=False)
 

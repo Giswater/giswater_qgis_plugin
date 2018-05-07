@@ -203,8 +203,8 @@ class Utils(ParentAction):
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
 
-        self.dlg.btn_accept.pressed.connect(self.utils_config_accept)
-        self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
+        self.dlg.btn_accept.clicked.connect(self.utils_config_accept)
+        self.dlg.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg))
         self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
         self.project_type = self.controller.get_project_type()
 

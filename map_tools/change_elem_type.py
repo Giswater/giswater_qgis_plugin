@@ -75,8 +75,8 @@ class ChangeElemType(ParentMapTool):
         self.fill_filter3(wsoftware, geom_type)
 
         # Set signals and open dialog
-        self.dlg_cat.btn_ok.pressed.connect(self.fill_geomcat_id)
-        self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
+        self.dlg_cat.btn_ok.clicked.connect(self.fill_geomcat_id)
+        self.dlg_cat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cat))
         self.dlg_cat.rejected.connect(partial(self.close_dialog, self.dlg_cat))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
@@ -330,9 +330,9 @@ class ChangeElemType(ParentMapTool):
  
         self.dlg.node_node_type.setText(node_type)
         self.dlg.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)        
-        self.dlg.btn_catalog.pressed.connect(partial(self.open_catalog_form, project_type, 'node'))
-        self.dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)         
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.btn_catalog.clicked.connect(partial(self.open_catalog_form, project_type, 'node'))
+        self.dlg.btn_accept.clicked.connect(self.edit_change_elem_type_accept)         
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"

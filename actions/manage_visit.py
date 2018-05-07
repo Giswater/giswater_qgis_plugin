@@ -148,20 +148,20 @@ class ManageVisit(ParentManage, QObject):
         self.dlg.rejected.connect(self.manage_rejected)
         self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
         self.dlg.accepted.connect(self.manage_accepted)
-        self.dlg.btn_event_insert.pressed.connect(self.event_insert)
-        self.dlg.btn_event_delete.pressed.connect(self.event_delete)
-        self.dlg.btn_event_update.pressed.connect(self.event_update)
-        self.dlg.btn_feature_insert.pressed.connect(partial(self.insert_feature, self.tbl_relation))
-        self.dlg.btn_feature_delete.pressed.connect(partial(self.delete_records, self.tbl_relation))
-        self.dlg.btn_feature_snapping.pressed.connect(partial(self.selection_init, self.tbl_relation))
+        self.dlg.btn_event_insert.clicked.connect(self.event_insert)
+        self.dlg.btn_event_delete.clicked.connect(self.event_delete)
+        self.dlg.btn_event_update.clicked.connect(self.event_update)
+        self.dlg.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.tbl_relation))
+        self.dlg.btn_feature_delete.clicked.connect(partial(self.delete_records, self.tbl_relation))
+        self.dlg.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed))
         self.visit_id.textChanged.connect(self.manage_visit_id_change)
-        self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
-        self.dlg.btn_doc_delete.pressed.connect(self.document_delete)
-        self.dlg.btn_doc_new.pressed.connect(self.manage_document)
-        self.dlg.btn_open_doc.pressed.connect(self.document_open)
+        self.dlg.btn_doc_insert.clicked.connect(self.document_insert)
+        self.dlg.btn_doc_delete.clicked.connect(self.document_delete)
+        self.dlg.btn_doc_new.clicked.connect(self.manage_document)
+        self.dlg.btn_open_doc.clicked.connect(self.document_open)
         self.tbl_document.doubleClicked.connect(partial(self.document_open))
-        self.dlg.btn_add_geom.pressed.connect(self.add_point)        
+        self.dlg.btn_add_geom.clicked.connect(self.add_point)        
 
         # Fill combo boxes of the form and related events
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
@@ -580,7 +580,7 @@ class ManageVisit(ParentManage, QObject):
         # Set dignals
         self.dlg_man.tbl_visit.doubleClicked.connect(
             partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.btn_open.pressed.connect(
+        self.dlg_man.btn_open.clicked.connect(
             partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
@@ -728,7 +728,7 @@ class ManageVisit(ParentManage, QObject):
         manage_document = ManageDocument(
             self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document()
-        dlg_docman.btn_accept.pressed.connect(partial(self.set_completer_object, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, 'doc'))
 
 
     def fill_table_visit(self, widget, table_name, filter_):
@@ -804,7 +804,7 @@ class ManageVisit(ParentManage, QObject):
 
         # check return
         if not ret:
-            # pressed cancel
+            # clicked cancel
             return
 
         # create an empty Event

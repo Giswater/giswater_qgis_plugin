@@ -64,7 +64,7 @@ class Go2Epa(ParentAction):
         self.dlg.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg.btn_accept.clicked.connect(self.go2epa_accept)
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         self.dlg.rejected.connect(self.close_dialog)
         if self.project_type == 'ws':
             self.dlg.btn_hs_ds.setText("Dscenario Selector")
@@ -74,12 +74,12 @@ class Go2Epa(ParentAction):
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
             field_id_right = "sector_id"
-            self.dlg.btn_sector_selection.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_sector_selection.clicked.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
             tableleft = "cat_dscenario"
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
-            self.dlg.btn_hs_ds.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_hs_ds.clicked.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
         if self.project_type == 'ud':
             self.dlg.btn_hs_ds.setText("Hydrology selector")
@@ -90,7 +90,7 @@ class Go2Epa(ParentAction):
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
             field_id_right = "sector_id"
-            self.dlg.btn_sector_selection.pressed.connect(
+            self.dlg.btn_sector_selection.clicked.connect(
                 partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
         # Open dialog
@@ -130,7 +130,7 @@ class Go2Epa(ParentAction):
         dlg_psector_sel = Multirow_selector()
         utils_giswater.setDialog(dlg_psector_sel)
         self.load_settings(dlg_psector_sel)
-        dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
+        dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
         dlg_psector_sel.setWindowTitle("Selector")
         if tableleft == 'sector':
             utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Sector name', context_name='labels'))
@@ -239,9 +239,9 @@ class Go2Epa(ParentAction):
             partial(self.enable_linetext, "valve_mode", "valve_mode_mincut_result", "MINCUT RESULTS"))
         self.dlg_wsoptions.chk_enabled.stateChanged.connect(self.enable_per_coef)
 
-        self.dlg_wsoptions.btn_accept.pressed.connect(
+        self.dlg_wsoptions.btn_accept.clicked.connect(
             partial(self.update_table, 'inp_options', self.dlg_wsoptions))
-        self.dlg_wsoptions.btn_cancel.pressed.connect(self.dlg_wsoptions.close)
+        self.dlg_wsoptions.btn_cancel.clicked.connect(self.dlg_wsoptions.close)
         self.go2epa_options_get_data('inp_options')
         self.dlg_wsoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_wsoptions.exec_()
@@ -257,8 +257,8 @@ class Go2Epa(ParentAction):
         sql = "SELECT id FROM "+self.schema_name+".inp_value_times ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("statistic", rows, False)
-        dlg_wstimes.btn_accept.pressed.connect(partial(self.update_table, 'inp_times', dlg_wstimes))
-        dlg_wstimes.btn_cancel.pressed.connect(dlg_wstimes.close)
+        dlg_wstimes.btn_accept.clicked.connect(partial(self.update_table, 'inp_times', dlg_wstimes))
+        dlg_wstimes.btn_cancel.clicked.connect(dlg_wstimes.close)
         self.go2epa_options_get_data('inp_times')
         dlg_wstimes.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_wstimes.exec_()
@@ -323,8 +323,8 @@ class Go2Epa(ParentAction):
         utils_giswater.fillComboBox("ignore_groundwater", rows, False)
         utils_giswater.fillComboBox("ignore_routing", rows, False)
         utils_giswater.fillComboBox("ignore_quality", rows, False)
-        dlg_udoptions.btn_accept.pressed.connect(partial(self.update_table, 'inp_options', dlg_udoptions))
-        dlg_udoptions.btn_cancel.pressed.connect(dlg_udoptions.close)
+        dlg_udoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', dlg_udoptions))
+        dlg_udoptions.btn_cancel.clicked.connect(dlg_udoptions.close)
         self.go2epa_options_get_data('inp_options')
         dlg_udoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_udoptions.exec_()
@@ -337,8 +337,8 @@ class Go2Epa(ParentAction):
         utils_giswater.setDialog(dlg_udtimes)
         self.load_settings(dlg_udtimes)
         dlg_udtimes.dry_days.setValidator(QIntValidator())
-        dlg_udtimes.btn_accept.pressed.connect(partial(self.update_table, 'inp_options', dlg_udtimes))
-        dlg_udtimes.btn_cancel.pressed.connect(dlg_udtimes.close)
+        dlg_udtimes.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', dlg_udtimes))
+        dlg_udtimes.btn_cancel.clicked.connect(dlg_udtimes.close)
         self.go2epa_options_get_data('inp_options')
         dlg_udtimes.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_udtimes.exec_()
@@ -351,7 +351,7 @@ class Go2Epa(ParentAction):
         utils_giswater.setDialog(self.dlg_hydrology_selector)
         self.load_settings(self.dlg_hydrology_selector)
 
-        self.dlg_hydrology_selector.btn_accept.pressed.connect(self.save_hydrology)
+        self.dlg_hydrology_selector.btn_accept.clicked.connect(self.save_hydrology)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
         self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
 
@@ -658,8 +658,8 @@ class Go2Epa(ParentAction):
         self.dlg = EpaResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
-        self.dlg.btn_accept.pressed.connect(self.result_selector_accept)
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.btn_accept.clicked.connect(self.result_selector_accept)
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         self.dlg.rejected.connect(self.close_dialog)
 
         # Set values from widgets of type QComboBox
@@ -766,7 +766,7 @@ class Go2Epa(ParentAction):
         self.set_table_columns(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
-        self.dlg_manager.btn_close.pressed.connect(partial(self.close_dialog, self.dlg_manager))
+        self.dlg_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)
 

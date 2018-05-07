@@ -56,7 +56,7 @@ class Master(ParentAction):
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         self.dlg.rejected.connect(self.close_dialog)
         self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
         self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
@@ -214,7 +214,7 @@ class Master(ParentAction):
         self.dlg = Multirow_selector()
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
-        self.dlg.btn_ok.pressed.connect(self.close_dialog)
+        self.dlg.btn_ok.clicked.connect(self.close_dialog)
         self.dlg.setWindowTitle("Psector")
         utils_giswater.setWidgetText(self.dlg.lbl_filter, self.controller.tr('Filter by: Psector name', context_name='labels'))
         utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Unselected psectors', context_name='labels'))
@@ -448,7 +448,7 @@ class Master(ParentAction):
 
         # Set signals
         self.dlg_merm.tbl_om_result_cat.doubleClicked.connect(partial(self.charge_plan_estimate_result, self.dlg_merm))
-        self.dlg_merm.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_merm))
+        self.dlg_merm.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.rejected.connect(partial(self.close_dialog, self.dlg_merm))
         self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
