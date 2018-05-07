@@ -857,8 +857,10 @@ class SearchPlus(QObject):
                " INNER JOIN " + self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
                " INNER JOIN " + self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
                " WHERE " + str(self.field_to_search) + " IS NOT NULL"
-               " AND t1.expl_id IN "
+               " AND t1.expl_id IN"
                " (SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user = current_user)"
+               " AND t1.state IN "
+               " (SELECT state_id FROM " + self.controller.schema_name + ".selector_state WHERE cur_user = current_user)"               
                " ORDER BY " + str(self.field_to_search))
         rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
