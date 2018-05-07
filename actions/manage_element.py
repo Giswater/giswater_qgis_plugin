@@ -311,10 +311,10 @@ class ManageElement(ParentManage):
             self.element_id = element_id
             self.manage_close(table_object)
             #TODO Reload table tbl_element
-            filter = "node_id = '" + str(feature_id) + "'"
+            filter_ = "node_id = '" + str(feature_id) + "'"
             self.controller.log_info(str(filter))
             table_element = "v_ui_element_x_node"
-            self.set_model_to_table(self.tbl_element, table_element, filter)
+            self.set_model_to_table(self.tbl_element, table_element, filter_)
 
       
     def filter_elementcat_id(self):

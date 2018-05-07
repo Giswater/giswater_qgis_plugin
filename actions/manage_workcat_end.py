@@ -167,7 +167,7 @@ class ManageWorkcatEnd(ParentManage):
             filter_ = filter_[:-3] + ""
             filter_ += " AND arc_state = '1' "
 
-            self.fill_table(self.tbl_arc_x_relations, table_relations, filter)
+            self.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object, self.tbl_arc_x_relations))
             self.manage_close(self.table_object, self.cur_active_layer)
 
