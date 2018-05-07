@@ -11,12 +11,17 @@ DECLARE
     query_result character varying;
     query_result_elements json;
     type_element_arg json;
+    api_version json;
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+            INTO api_version;
 
       -- Get type_element from alias
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT type_element from config_web_layer WHERE alias_id=$1 LIMIT 1)a'
@@ -40,12 +45,12 @@ BEGIN
     query_result_elements := COALESCE(query_result_elements, '{}');
     
 --    Return
-    RETURN ('{"status":"Accepted", "typeElement":' ||type_element_arg||', "elements":' || query_result_elements || '}')::json;
+    RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||', "typeElement":' ||type_element_arg||', "elements":' || query_result_elements || '}')::json;
 	      
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||', "SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

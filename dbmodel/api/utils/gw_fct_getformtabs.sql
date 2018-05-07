@@ -193,8 +193,8 @@ BEGIN
 --    Return
     RETURN ('{"status":"Accepted"' ||
         ', "formTabs":' || form_info ||
-        ', "editData":' || editable_data ||
         ', "linkPath":' || link_path ||
+        ', "editData":' || editable_data ||
         '}')::json;
 
 
@@ -207,9 +207,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_getformtabs(character varying, character varying, character varying, boolean, integer, character varying, character varying)
-  OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getformtabs(character varying, character varying, character varying, boolean, integer, character varying, character varying) TO public;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getformtabs(character varying, character varying, character varying, boolean, integer, character varying, character varying) TO geoadmin;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getformtabs(character varying, character varying, character varying, boolean, integer, character varying, character varying) TO user_dev;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getformtabs(character varying, character varying, character varying, boolean, integer, character varying, character varying) TO rol_dev;
