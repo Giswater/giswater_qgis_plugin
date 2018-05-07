@@ -1,15 +1,29 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoelements"(element_type varchar, id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
+﻿
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(
+    element_type character varying,
+    id character varying,
+    device integer)
+  RETURNS json AS
+$BODY$
 DECLARE
 
 --    Variables
     query_result character varying;
     query_result_elements json;
+    type_element_arg json;
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+
+      -- Get type_element from alias
+        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT type_element from config_web_layer WHERE alias_id=$1 LIMIT 1)a'
+            INTO type_element_arg
+            USING element_type;
+
+	raise notice 'type_element_arg %', type_element_arg;
 
 --    Get query for elements
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat(''v_ui_element_x_'',$1) AND device = $2'
@@ -22,11 +36,12 @@ BEGIN
         USING id;
 
 --    Control NULL's
+    type_element_arg := COALESCE(type_element_arg, '{}');
     query_result_elements := COALESCE(query_result_elements, '{}');
     
 --    Return
-    RETURN ('{"status":"Accepted","elements":' || query_result_elements || '}')::json;
---    RETURN query_result_elements;
+    RETURN ('{"status":"Accepted", "typeElement":' ||type_element_arg||', "elements":' || query_result_elements || '}')::json;
+	      
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
@@ -34,5 +49,11 @@ BEGIN
 
 END;
 $BODY$
-LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer)
+  OWNER TO geoadmin;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer) TO public;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer) TO geoadmin;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer) TO user_dev;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer) TO rol_dev;
