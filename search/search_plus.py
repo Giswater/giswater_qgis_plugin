@@ -37,8 +37,6 @@ class SearchPlus(QObject):
     def init_config(self):
         """ Initial configuration """
 
-        self.expl_updated = False
-
         # Load configuration data from tables
         if not self.load_config_data():
             return False
@@ -84,54 +82,12 @@ class SearchPlus(QObject):
             self.dlg.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydro_id))
             self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
             self.filter_by_list(self.dlg.hydro_id)
-        self.dlg.tab_main.currentChanged.connect(partial(self.tab_activation))
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
         self.dlg.btn_clear_workcat.pressed.connect(self.clear_workcat)
         self.dlg.btn_refresh_workcat.pressed.connect(self.refresh_workcat)
         self.dlg.psector_id_2.activated.connect(partial(self.open_plan_psector))
 
         return True
-
-
-    def tab_activation(self):
-
-        if self.dlg.tab_main.currentWidget().objectName() == 'tab_hydro' and not self.expl_updated:
-            self.update_expl_selector()
-            self.expl_updated = True
-        else:
-            if self.expl_updated:
-                self.restore_expl_selector()
-                self.expl_updated = False
-
-
-    def update_expl_selector(self):
-        """ Force to 0,1,2... the selector_state user values """
-        
-        sql = ("SELECT expl_id, cur_user FROM " +self.schema_name + ".selector_expl "
-               "WHERE cur_user = current_user")
-        self.current_expls = self.controller.get_rows(sql)
-        sql = ("DELETE FROM "+self.schema_name+".selector_expl "
-               "WHERE cur_user = current_user;")
-        self.controller.execute_sql(sql)
- 
-        sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation")
-        rows = self.controller.get_rows(sql)
-        sql = ""
-        for row in rows:
-            sql += ("INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
-                    " VALUES(" + str(row[0]) + ", current_user);\n")
-        self.controller.execute_sql(sql)
-
-
-    def restore_expl_selector(self):
-        """ Restore values to selector_state after update (def update_state_selector(self)) """
-        
-        sql = ("DELETE FROM " + self.schema_name + ".selector_expl "
-               " WHERE cur_user = current_user;\n")
-        for row in self.current_expls:
-            sql += ("INSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
-                    " VALUES(" + str(row[0]) + ", current_user);\n")
-        self.controller.execute_sql(sql)
 
 
     def update_state_selector(self):
@@ -679,7 +635,7 @@ class SearchPlus(QObject):
 
         # Tab 'Hydrometer'
         if self.project_type == 'ws':
-            self.populate_combo('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
+            self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
             self.hydro_create_list()
         else:
             utils_giswater.remove_tab_by_tabName(self.dlg.tab_main, 'tab_hydro')
@@ -706,7 +662,7 @@ class SearchPlus(QObject):
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
             
@@ -786,7 +742,7 @@ class SearchPlus(QObject):
                " WHERE connec_id = '" + connec_id + "'"
                " AND hydrometer_customer_code = '"+hydrometer_customer_code+"'"
                " AND expl_name ILIKE '%" + str(expl_name) + "%'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
             row = rows[0]
         else:
@@ -862,7 +818,7 @@ class SearchPlus(QObject):
                " AND t1.state IN "
                " (SELECT state_id FROM " + self.controller.schema_name + ".selector_state WHERE cur_user = current_user)"               
                " ORDER BY " + str(self.field_to_search))
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
 
@@ -911,7 +867,7 @@ class SearchPlus(QObject):
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
         
@@ -1176,7 +1132,7 @@ class SearchPlus(QObject):
         return expr
                         
             
-    def populate_combo(self, parameter, combo, fieldname):
+    def populate_cmb_expl_name(self, parameter, combo, fieldname):
         """ Populate selected combo from features of selected layer """        
         
         # Check if we have this search option available
@@ -1203,7 +1159,15 @@ class SearchPlus(QObject):
                     elem = [field, field]
                     list_elements.append(field)
                     records.append(elem)
-        
+
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".exploitation AS t1 "
+               " INNER JOIN " + self.schema_name + ".selector_expl AS t2 ON t2.expl_id = t1.expl_id "
+               " WHERE cur_user = current_user")
+        rows = self.controller.get_rows(sql)
+        # Create list with selected exploitations
+        list_expl = []
+        if rows:
+            list_expl = [x[0] for x in rows]
         # Fill combo box
         combo.blockSignals(True)
         combo.clear()
@@ -1211,12 +1175,14 @@ class SearchPlus(QObject):
         expl_list = []
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(record[1], record)
             if record[1] != '':
-                expl_list.append(record[1])
+                if record[1] in list_expl:
+                    expl_list.append(record[1])
+
         self.set_model_by_list(expl_list, combo)
-        combo.blockSignals(False)     
-        
+        combo.blockSignals(False)
+
+        self.expl_name_changed()
         return True
                     
         
@@ -1481,5 +1447,5 @@ class SearchPlus(QObject):
         
         self.network_code_create_lists()            
         if self.project_type == 'ws':
-            self.populate_combo('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
+            self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
 
