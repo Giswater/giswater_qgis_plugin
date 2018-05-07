@@ -651,6 +651,20 @@ class SearchPlus(QObject):
         
         return True
     
+    def state_list(self):
+        """ Get states from state selector and return as string list"""
+        sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state AS t1 "
+               " INNER JOIN " + self.schema_name + ".selector_state AS t2 ON t2.state_id = t1.id "
+               " WHERE cur_user = current_user")
+        rows = self.controller.get_rows(sql)
+        # Create list with selected states
+        list_state = ""
+        if not rows:
+            return False
+        for row in rows:
+            list_state += "'" + str(row[0]) + "', "
+        list_state = list_state[:-2]
+        return list_state
 
     def hydro_create_list(self):
         
@@ -658,9 +672,12 @@ class SearchPlus(QObject):
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
         if expl_name is None:
             expl_name = ""
+
+        list_state = self.state_list()
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
+               " AND state IN ("+str(list_state)+") "
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
         rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
@@ -863,14 +880,16 @@ class SearchPlus(QObject):
         if expl_name == "null" or expl_name is None:
             expl_name = ""
         list_hydro = []
+
+        list_state = self.state_list()
+
         sql = ("SELECT "+self.params['basic_search_hyd_hydro_field_code']+", connec_customer_code, state"
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
+               " AND state IN ("+str(list_state)+") "
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
         rows = self.controller.get_rows(sql, log_sql=False)
-        if not rows:
-            return False
-        
+
         for row in rows:
             append_to_list = True
             for x in range(0, len(row)):
@@ -1448,4 +1467,5 @@ class SearchPlus(QObject):
         self.network_code_create_lists()            
         if self.project_type == 'ws':
             self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
+            self.hydro_create_list()
 
