@@ -573,7 +573,6 @@ class ManageVisit(ParentManage, QObject):
             self.set_table_columns(self.dlg_man.tbl_visit, table_object)            
 
         # manage save and rollback when closing the dialog
-        self.dlg_man.rejected.connect(self.manage_rejected)
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
 
