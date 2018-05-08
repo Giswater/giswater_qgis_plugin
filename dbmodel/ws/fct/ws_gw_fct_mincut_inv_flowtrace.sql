@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace(integer);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace(result_id_arg integer)
-RETURNS integer AS
+  RETURNS integer AS
 $BODY$
 DECLARE
 
@@ -56,6 +56,9 @@ BEGIN
 	ORDER BY 1
 	LOOP
 
+	raise notice 'tank % valve %' , rec_tank, rec_valve;
+	
+
 		query_text:= 'SELECT * FROM pgr_dijkstra( 
 			''SELECT v_edit_arc.arc_id::integer as id, node_1::integer as source, node_2::integer as target, 
 			(case when closed=true then -1 else 1 end) as cost,
@@ -65,16 +68,16 @@ BEGIN
 			LEFT JOIN (
 				  SELECT arc_id, true as closed FROM v_edit_arc JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id
 				  WHERE 
-				   node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE (closed=TRUE AND result_id='||result_id_arg||')) OR
-				   node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE (closed=TRUE AND result_id=1'||result_id_arg||')) OR
 				   (node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE (proposed=TRUE AND result_id='||result_id_arg||'))
 				          AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||')) OR
 				  (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE (proposed=TRUE AND result_id='||result_id_arg||')) 
 					  AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||'))
 				  )a ON a.arc_id=v_edit_arc.arc_id
 			WHERE node_1 is not null or node_2 is not null'','||rec_valve.node_id||'::integer, '||rec_tank.node_id||'::integer)';
-			
-		EXECUTE query_text INTO rec_result;
+
+		IF query_text IS NOT NULL THEN	
+			EXECUTE query_text INTO rec_result;
+		END IF;
 
 		IF rec_result IS NOT NULL THEN
 			--RAISE NOTICE 'inlet true %' ,rec_valve.node_id;
@@ -86,6 +89,7 @@ BEGIN
 		END IF;
 			
 	END LOOP;
+
 
 	IF inlet_path IS FALSE THEN
      
@@ -138,3 +142,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ALTER FUNCTION SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace(integer)
+  OWNER TO amsaadmin;

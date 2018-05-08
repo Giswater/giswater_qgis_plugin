@@ -7,7 +7,11 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2304
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text);
-CREATE OR REPLACE FUNCTION gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
+    element_id_arg character varying,
+    type_element_arg character varying,
+    result_id_arg integer,
+    cur_user_var text)
   RETURNS text AS
 $BODY$
 DECLARE
@@ -37,7 +41,6 @@ BEGIN
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
 
-
     -- Identification of exploitation and macroexploitation
     IF type_element_arg='node' OR type_element_arg='NODE' THEN
 	SELECT expl_id INTO expl_id_arg FROM node WHERE node_id=element_id_arg;
@@ -46,7 +49,6 @@ BEGIN
     END IF;
     
     SELECT macroexpl_id INTO macroexpl_id_arg FROM exploitation WHERE expl_id=expl_id_arg;
-
 
     -- Reset exploitation selector (of user) according the macroexploitation system
     INSERT INTO selector_expl (expl_id, cur_user)
@@ -61,7 +63,7 @@ BEGIN
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg;
 
-     
+
     -- Start process
     INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
     SELECT result_id_arg, node.node_id, false::boolean, closed, broken, node.the_geom
@@ -73,6 +75,7 @@ BEGIN
     -- Identify unaccess valves
     UPDATE anl_mincut_result_valve SET unaccess=true WHERE result_id=result_id_arg AND node_id IN 
     (SELECT node_id FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_arg);
+
 
 
      -- The element to isolate could be an arc or a node
@@ -94,7 +97,7 @@ BEGIN
 
             -- Check extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-            WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND (closed = FALSE) AND result_id=result_id_arg;
+            WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
             IF controlValue = 1 THEN
                 -- Set proposed valve
                 UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
@@ -106,7 +109,7 @@ BEGIN
 
             -- Check other extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-            WHERE node_id = node_2_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND (closed = FALSE) AND result_id=result_id_arg;
+            WHERE node_id = node_2_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
             IF controlValue = 1 THEN
 
                 -- Check if the valve is already computed
@@ -146,15 +149,22 @@ BEGIN
 
     END IF;
 
+
+
+
     -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id 
 	IF (select value::boolean from config_param_system where parameter='om_mincut_use_pgrouting')  IS NOT TRUE THEN 
 		SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
 	ELSE
 		SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
 	END IF;
-	
-    -- Update the rest of the values of not proposed valves to FALSE
-    UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
+
+
+
+    -- Delete valves not proposed, not unaccessible, not closed and not broken
+    DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg 
+						UNION 
+						SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg);
 
     -- Check tempopary overlap control against other planified mincuts 
     SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;
@@ -183,3 +193,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ALTER FUNCTION SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text)
+  OWNER TO bgeoadmin;
