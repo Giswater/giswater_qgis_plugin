@@ -284,16 +284,49 @@ FROM SCHEMA_NAME_V2.connec;
 -- INSERT INTO SCHEMA_NAME_V3.vnode SELECT cast(vnode_id as int), vnode_type, annotation, 2 as sector_id, 2 as dma_id, 1 as state,1 as expl_id, the_geom, null as tstamp FROM SCHEMA_NAME_V2.vnode;
 -- INSERT INTO SCHEMA_NAME_V3.pond SELECT pond_id, connec_id, 2 as dma_id, 1 as state, the_geom, 1 as expl_id, null as tstamp FROM SCHEMA_NAME_V2.pond;
 -- pool
--- samplepoint
+
+/*
+INSERT INTO SCHEMA_NAME_V3.samplepoint
+SELECT
+sample_id,
+sample_id,
+code_lab,
+element_code,
+null as featurecat_id,
+CAST(dma_id2 AS integer),
+null as presszonecat_id,
+1 as state,
+null as builtdate,
+null as enddate,
+null as workcat_id,
+null as workcat_id_end,
+null as rotation,
+1 as muni_id,
+null as postcode,
+street1,
+null as postnumber,
+street2,
+null as streetaxis2_id,
+null as postnumber2,
+null as postcomplement2,
+place,
+cabinet,
+observations,
+null as verified,
+the_geom,
+1 as expl_id,
+null as tstamp
+FROM SCHEMA_NAME_V2.samplepoint;
+*/
 
 
 	-- DOC TABLES
 -----------------------------------------
--- doc
+-- INSERT INTO SCHEMA_NAME_V3.doc SELECT id, doc_type, path, observ, date, user_name, null as tstamp FROM SCHEMA_NAME_V2.doc;
 -- INSERT INTO SCHEMA_NAME_V3.doc_type SELECT id, comment FROM SCHEMA_NAME_V2.doc_type		(already filled)
 -- doc_x_arc
 -- doc_x_connec
--- doc_x_node
+-- INSERT INTO SCHEMA_NAME_V3.doc_x_node SELECT * FROM SCHEMA_NAME_V2.doc_x_node;
 
 
 	-- ELEMENT TABLES
@@ -346,6 +379,7 @@ FROM SCHEMA_NAME_V2.element;
 
 	-- EXT TABLES
 -----------------------------------------
+-- INSERT INTO SCHEMA_NAME_V3.ext_type_street SELECT * FROM SCHEMA_NAME_V2.ext_type_street;
 -- INSERT INTO SCHEMA_NAME_V3.ext_streetaxis SELECT id, type, name, text, the_geom, 1 as expl_id, 1 as muni_id FROM SCHEMA_NAME_V2.ext_streetaxis;
 -- INSERT INTO SCHEMA_NAME_V3.ext_plot SELECT id, code, 1, 08830, streetaxis, postnumber, complement, placement, square, observ, text, the_geom, 1 as expl_id  FROM SCHEMA_NAME_V2.ext_urban_propierties;
 -- INSERT INTO SCHEMA_NAME_V3.ext_cat_hydrometer SELECT * FROM SCHEMA_NAME_V2.ext_cat_hydrometer;
