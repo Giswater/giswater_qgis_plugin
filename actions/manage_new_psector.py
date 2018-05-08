@@ -239,9 +239,9 @@ class ManageNewPsector(ParentManage):
         self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, 
             self.dlg.all_rows, 'v_price_compost', 'v_edit_'+self.plan_om + '_psector_x_other', "id"))
 
-        self.dlg.gexpenses.returnclicked.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'gexpenses'))
-        self.dlg.vat.returnclicked.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'vat'))
-        self.dlg.other.returnclicked.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'other'))
+        self.dlg.gexpenses.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'gexpenses'))
+        self.dlg.vat.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'vat'))
+        self.dlg.other.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'other'))
 
         self.dlg.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg.btn_doc_delete.clicked.connect(self.document_delete)
