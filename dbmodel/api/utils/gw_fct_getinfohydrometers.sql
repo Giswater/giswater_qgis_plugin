@@ -18,7 +18,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --    Get query for elements
-    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat(''v_ui_hydrometer_x_'',$1) AND device = $2'
+    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_hydrometer'') AND device = $2'
         INTO query_result
         USING element_type, device;
 

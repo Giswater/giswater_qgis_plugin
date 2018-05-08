@@ -27,7 +27,7 @@ BEGIN
     IF element_type = 'arc' THEN
 
 --        Get query for connects
-        EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''v_ui_arc_x_relations'' AND device = $1'
+        EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''arc_x_connect'' AND device = $1'
             INTO query_result
             USING device;
 
@@ -58,7 +58,7 @@ BEGIN
 
 --        Get query for connects upstream
     
-        EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''v_ui_node_x_connection_upstream'' AND device = $1'
+        EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''node_x_connect_upstream'' AND device = $1'
             INTO query_result
             USING device;
 
@@ -71,7 +71,7 @@ BEGIN
     END IF;
 
 --        Get query for connects downstream
-        EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''v_ui_node_x_connection_downstream'' AND device = $1'
+        EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''node_x_connect_downstream'' AND device = $1'
             INTO query_result
             USING device;
 
