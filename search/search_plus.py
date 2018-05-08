@@ -1262,8 +1262,8 @@ class SearchPlus(QObject):
             utils_giswater.setWidgetText(self.dlg.workcat_id, "")
             # Get layer by table_name
             layer = self.iface.activeLayer()
-            # Remove selection
-            self.iface.legendInterface().setLayerVisible(layer, False)
+            # Refresh canvas
+            self.refresh_map_canvas()
 
 
     def refresh_workcat(self):
