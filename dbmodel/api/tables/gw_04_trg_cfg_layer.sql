@@ -5,17 +5,17 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ud_sample", public, pg_catalog;
 
 
 -- inserts on config_web_layer
-INSERT INTO config_web_layer VALUES ('v_edit_arc', 'arc', true, 'v_web_parent_arc', false, 'v_edit_arc', 'F13', 'Arc', 2, link);
-INSERT INTO config_web_layer VALUES ('v_edit_connec', 'connec', true, 'v_web_parent_connec', false, 'v_edit_connec', 'F14', 'Connec', 3, link);
-INSERT INTO config_web_layer VALUES ('v_edit_node', 'node', true, 'v_web_parent_node', false, 'v_edit_node', 'F11', 'Node', 1, link);
+INSERT INTO config_web_layer VALUES ('v_edit_arc', 'arc', true, 'v_web_parent_arc', false, 'v_edit_arc', 'F13', 'Arc', 2, 'link');
+INSERT INTO config_web_layer VALUES ('v_edit_connec', 'connec', true, 'v_web_parent_connec', false, 'v_edit_connec', 'F14', 'Connec', 3, 'link');
+INSERT INTO config_web_layer VALUES ('v_edit_node', 'node', true, 'v_web_parent_node', false, 'v_edit_node', 'F11', 'Node', 1, 'link');
 
-INSERT INTO config_web_layer VALUES ('v_edit_man_pipe', 'arc', false, null, true, null, 'F13', 'Pipe', 4, link);
-INSERT INTO config_web_layer VALUES ('v_edit_man_wjoin', 'connec', false, null, true, null, 'F14', 'Wjoin', 5, link);
-INSERT INTO config_web_layer VALUES ('v_edit_man_junction', 'node', false, null, true, null, 'F11', 'junction', 6, link);
+INSERT INTO config_web_layer VALUES ('v_edit_man_pipe', 'arc', false, null, true, null, 'F13', 'Pipe', 4, 'link');
+INSERT INTO config_web_layer VALUES ('v_edit_man_wjoin', 'connec', false, null, true, null, 'F14', 'Wjoin', 5, 'link');
+INSERT INTO config_web_layer VALUES ('v_edit_man_junction', 'node', false, null, true, null, 'F11', 'junction', 6, 'link');
 
 
 
@@ -44,14 +44,14 @@ INSERT INTO config_web_layer_tab VALUES (115, 'v_edit_gully', 'tabDoc');
 
 --inserts on config_web_layer_child (dinamyc insert)
 INSERT INTO config_web_layer_child
-SELECT cat_feature.id, tablename FROM SCHEMA_NAME.cat_feature JOIN SCHEMA_NAME.sys_feature_cat ON system_id=sys_feature_cat.id
+SELECT cat_feature.id, tablename FROM ud_sample.cat_feature JOIN ud_sample.sys_feature_cat ON system_id=sys_feature_cat.id;
 
 
 --inserts on config_web_tableinfo_x_inforole (dinamyc insert)
-insert into SCHEMA_NAME.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
-select tableinfo_id, 1, tableinfo_id  FROM SCHEMA_NAME.config_web_layer 
+insert into ud_sample.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
+select tableinfo_id, 1, tableinfo_id  FROM ud_sample.config_web_layer ;
 
-insert into SCHEMA_NAME.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
-select tableinfo_id, 1, tableinfo_id  FROM SCHEMA_NAME.config_web_layer_child 
+insert into ud_sample.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
+select tableinfo_id, 1, tableinfo_id  FROM ud_sample.config_web_layer_child ;
 
 

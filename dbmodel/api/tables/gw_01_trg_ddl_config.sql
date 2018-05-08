@@ -30,7 +30,7 @@ id text PRIMARY KEY
 );
 
 
-CREATE TABLE config_web_layer(
+CREATE TABLE "config_web_layer"(
   layer_id text NOT NULL,
   alias_id text,
   is_parent boolean,
@@ -47,7 +47,7 @@ CREATE TABLE config_web_layer(
 
 
 
-CREATE TABLE config_web_layer_child(
+CREATE TABLE "config_web_layer_child"(
   featurecat_id character varying(30) NOT NULL,
   tableinfo_id text,
   CONSTRAINT config_web_layer_child_pkey PRIMARY KEY (featurecat_id)
@@ -56,7 +56,7 @@ CREATE TABLE config_web_layer_child(
 
 
 
-CREATE TABLE config_web_layer_tab(
+CREATE TABLE "config_web_layer_tab"(
   id serial NOT NULL,
   layer_id character varying(50),
   formtab text,
@@ -68,7 +68,7 @@ CREATE TABLE config_web_layer_tab(
 
 	  
 	  
-CREATE TABLE config_web_tableinfo_x_inforole(
+CREATE TABLE "config_web_tableinfo_x_inforole"(
   id serial NOT NULL,
   tableinfo_id character varying(50),
   inforole_id integer,

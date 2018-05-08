@@ -1,6 +1,6 @@
 ﻿
-CREATE OR REPLACE FUNCTION .gw_fct_getelement(
-    p_element_type character varying,SCHEMA_NAME
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getelement(
+    p_element_type character varying,
     element_id character varying,
     device integer)
   RETURNS json AS

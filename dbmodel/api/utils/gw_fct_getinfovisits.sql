@@ -1,4 +1,4 @@
-﻿DROP FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint);
+﻿-- DROP FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(
     element_type character varying,
