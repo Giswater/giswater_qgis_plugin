@@ -64,6 +64,20 @@ doc.user_name
 FROM doc_x_visit
 JOIN doc ON doc.id = doc_x_visit.doc_id;
 
+DROP VIEW IF EXISTS v_ui_doc_x_psector CASCADE;
+CREATE OR REPLACE VIEW v_ui_doc_x_psector AS
+SELECT
+doc_x_psector.id,
+doc_x_psector.psector_id,
+doc_x_psector.doc_id,
+doc.doc_type,
+doc.path,
+doc.observ,
+doc.date,
+doc.user_name
+FROM doc_x_psector
+JOIN doc ON doc.id = doc_x_psector.doc_id;
+
 
 
 DROP VIEW IF EXISTS  "v_ui_document" CASCADE;
