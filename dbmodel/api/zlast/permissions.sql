@@ -1,25 +1,15 @@
-﻿/*
+
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:XXXX
 
+GRANT ALL ON DATABASE "db_name" TO "user_name" ;
+GRANT ALL ON SCHEMA "schema_name" TO "user_name";
 
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_refresh_mat_view()
-RETURNS integer SECURITY DEFINER AS $BODY$
-BEGIN
-
---  Search path
-    SET search_path = "SCHEMA_NAME", public;
-
-	REFRESH MATERIALIZED VIEW v_ui_workcat_polygon_aux;
-	
-	RETURN 1;
-	
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+--en función del que queramos:
+GRANT ALL ON ALL TABLES IN SCHEMA "schema_name" TO "user_name";
+GRANT ALL ON ALL SEQUENCES IN SCHEMA "schema_name" TO "user_name";
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA "schema_name" TO "user_name";

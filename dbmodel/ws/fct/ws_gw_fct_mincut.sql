@@ -7,11 +7,15 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2304
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text);
+<<<<<<< HEAD
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
     element_id_arg character varying,
     type_element_arg character varying,
     result_id_arg integer,
     cur_user_var text)
+=======
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
+>>>>>>> 0b5156707942925a67278d9533b9502def790fc9
   RETURNS text AS
 $BODY$
 DECLARE
@@ -159,12 +163,21 @@ BEGIN
 		SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
 	END IF;
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 0b5156707942925a67278d9533b9502def790fc9
     -- Delete valves not proposed, not unaccessible, not closed and not broken
     DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg 
 						UNION 
 						SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg);
+<<<<<<< HEAD
+=======
+	
+	--    DELETE FROM anl_mincut_result_valve WHERE (proposed IS NULL AND unaccess IS FALSE AND closed IS FALSE AND broken IS FALSE) AND result_id=result_id_arg;
+
+>>>>>>> 0b5156707942925a67278d9533b9502def790fc9
 
     -- Check tempopary overlap control against other planified mincuts 
     SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;

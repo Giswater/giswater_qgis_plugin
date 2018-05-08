@@ -1,4 +1,16 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfovisits"(element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp, parameter_type varchar, parameter_id varchar, visit_id int8) RETURNS pg_catalog.json AS $BODY$
+﻿-- DROP FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint);
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(
+    element_type character varying,
+    id character varying,
+    device integer,
+    visit_start timestamp without time zone,
+    visit_end timestamp without time zone,
+    p_parameter_type character varying,
+    p_parameter_id character varying,
+    visit_id bigint)
+  RETURNS json AS
+$BODY$
 DECLARE
 
 --    Variables
@@ -15,8 +27,10 @@ BEGIN
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
+
+
 --    Get query for visits
-    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat(''v_ui_om_visit_x_'',$1) AND device = $2'
+    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_visit'') AND device = $2'
         INTO query_result
         USING element_type, device;
 
@@ -37,13 +51,21 @@ BEGIN
     query_result_dates := query_result;
 
 --    Add parameter_type filter
-    IF parameter_type IS NOT NULL THEN
-        query_result := query_result || ' AND parameter_type = ' || quote_literal(parameter_type);
+    IF p_parameter_type IS NOT NULL THEN
+        query_result := query_result || ' AND parameter_type = ' || quote_literal(p_parameter_type);
     END IF;
 
+
+--    Make consistency against parameter_type and parameter_id
+   IF p_parameter_type IS NOT NULL AND p_parameter_id IS NOT NULL AND 
+   (SELECT om_visit_parameter.id FROM om_visit_parameter WHERE parameter_type=p_parameter_type AND om_visit_parameter.id=p_parameter_id) IS NULL THEN
+	p_parameter_id=null;
+   END IF;
+    
+
 --    Add parameter_id filter
-    IF parameter_id IS NOT NULL THEN
-        query_result := query_result || ' AND parameter_id = ' || quote_literal(parameter_id);
+    IF p_parameter_id IS NOT NULL THEN
+        query_result := query_result || ' AND parameter_id = ' || quote_literal(p_parameter_id);
     END IF;
 
 --    Add visit_id filter
@@ -75,18 +97,21 @@ BEGIN
 --    Get query_result_parameter_id_options
     IF query_result_visits_dates ISNULL THEN
 
-        IF parameter_type ISNULL THEN
-            parameter_type := (SELECT id FROM om_visit_parameter LIMIT 1);
+        IF p_parameter_type ISNULL THEN
+            p_parameter_type := (SELECT parameter_type FROM om_visit_parameter LIMIT 1);
         END IF;
     
         EXECUTE 'SELECT array_to_json(array_agg(json_data)) FROM (SELECT row_to_json(t) AS json_data FROM (SELECT id, descript AS "name" FROM om_visit_parameter 
             WHERE  feature_type = UPPER($1) AND parameter_type = $2) t  ) r'  
             INTO parameter_id_options
-            USING element_type, parameter_type;
+            USING element_type, p_parameter_type;
     ELSE    
-        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT DISTINCT parameter_id AS "id", descript AS "name" FROM (' || query_result_dates || ') b) a'
-            INTO parameter_id_options
-            USING query_result_visits;
+	
+	    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT '' '' as id, '' '' as name FROM om_visit_parameter UNION 
+	    SELECT DISTINCT parameter_id AS "id", descript AS "name" FROM (' || query_result_dates || ')b WHERE parameter_type=$1 order by name asc) a'
+	    INTO parameter_id_options
+		USING p_parameter_type;
+	
     END IF;
 
 
@@ -109,5 +134,5 @@ BEGIN
         
 END;
 $BODY$
-LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

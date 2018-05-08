@@ -48,4 +48,10 @@ doc.id,
 om_visit.id
 FROM doc, om_visit;
 
+update node set link='https://www.giswater.org';
+update arc set link='https://www.giswater.org';
+update connec set link='https://www.giswater.org';
+update gully set link='https://www.giswater.org';
+
+
 refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;

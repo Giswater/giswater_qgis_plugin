@@ -1,4 +1,10 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getelement"(element_id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
+﻿
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getelement(
+    p_element_type character varying,
+    element_id character varying,
+    device integer)
+  RETURNS json AS
+$BODY$
 DECLARE
 
 --    Variables
@@ -12,12 +18,12 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --    Get query for elements
-    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''v_ui_element'' AND device = $1'
+    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = $1 AND device = $2'
         INTO query_result
-        USING device;
+        USING p_element_type, device;
 
 --    Get elements
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE element_id = $1) a'
+    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE id = $1) a'
         INTO query_result_element
         USING element_id;
 
@@ -34,5 +40,7 @@ BEGIN
 
 END;
 $BODY$
-LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION SCHEMA_NAME.gw_fct_getelement(character varying, character varying, integer)
+  OWNER TO geoadmin;
