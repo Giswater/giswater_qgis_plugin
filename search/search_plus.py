@@ -11,6 +11,7 @@ import operator
 import os
 import csv
 import sys
+import webbrowser
 
 import utils_giswater      
 from search.ui.list_items import ListItems
@@ -775,9 +776,18 @@ class SearchPlus(QObject):
             field = widget.objectName()
             if row[field]:
                 widget.setText(row[field])
+        url = str(row['hydrometer_link'])
+        if url is not None or url != '':
+            self.hydro_info_dlg.hydrometer_link.setText(url)
+            self.hydro_info_dlg.hydrometer_link.clicked.connect(partial(self.open_url, url))
+
 
         self.hydro_info_dlg.open()
 
+    def open_url(self, url):
+        """ Open URL """
+        if url:
+            webbrowser.open(url)
 
     def network_code_create_lists(self):
         """ Create one list for each geom type and other one with all geom types """
