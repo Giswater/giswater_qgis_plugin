@@ -154,7 +154,12 @@ BEGIN
 	END IF;
 
     -- Delete valves not proposed, not unaccessible, not closed and not broken
-    DELETE FROM anl_mincut_result_valve WHERE (proposed IS NULL AND unaccess IS FALSE AND closed IS FALSE AND broken IS FALSE) AND result_id=result_id_arg;
+    DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg 
+						UNION 
+						SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg);
+	
+	--    DELETE FROM anl_mincut_result_valve WHERE (proposed IS NULL AND unaccess IS FALSE AND closed IS FALSE AND broken IS FALSE) AND result_id=result_id_arg;
+
 
     -- Check tempopary overlap control against other planified mincuts 
     SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;
