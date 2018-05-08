@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2304
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text);
-CREATE OR REPLACE FUNCTION gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
   RETURNS text AS
 $BODY$
 DECLARE
@@ -94,7 +94,7 @@ BEGIN
 
             -- Check extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-            WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND (closed = FALSE) AND result_id=result_id_arg;
+            WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
             IF controlValue = 1 THEN
                 -- Set proposed valve
                 UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
@@ -106,7 +106,7 @@ BEGIN
 
             -- Check other extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-            WHERE node_id = node_2_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND (closed = FALSE) AND result_id=result_id_arg;
+            WHERE node_id = node_2_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
             IF controlValue = 1 THEN
 
                 -- Check if the valve is already computed
@@ -152,9 +152,14 @@ BEGIN
 	ELSE
 		SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
 	END IF;
+
+    -- Delete valves not proposed, not unaccessible, not closed and not broken
+    DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg 
+						UNION 
+						SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg);
 	
-    -- Update the rest of the values of not proposed valves to FALSE
-    UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id=result_id_arg;
+	--    DELETE FROM anl_mincut_result_valve WHERE (proposed IS NULL AND unaccess IS FALSE AND closed IS FALSE AND broken IS FALSE) AND result_id=result_id_arg;
+
 
     -- Check tempopary overlap control against other planified mincuts 
     SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;

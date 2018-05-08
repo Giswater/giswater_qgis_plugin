@@ -12,7 +12,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 --    Get query for visits
-    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat(''v_ui_om_visit_x_'',$1) AND device = $2'
+    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_visit'') AND device = $2'
         INTO query_result
         USING element_type, device;
 

@@ -1,4 +1,11 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, id varchar, formToDisplay text) RETURNS pg_catalog.json AS $BODY$
+﻿
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoform(
+    table_id character varying,
+    lang character varying,
+    p_id character varying,
+    formtodisplay text)
+  RETURNS json AS
+$BODY$
 DECLARE
 
 --    Variables
@@ -30,32 +37,60 @@ BEGIN
     schemas_array := current_schemas(FALSE);
     
 
-   raise notice 'table_id %, id %, formToDisplay %', table_id, id, formToDisplay;
+   raise notice 'table_id %, id %, formtodisplay %', table_id, p_id, formtodisplay;
         
 --    Get form fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
-    (SELECT column_name as label, column_name as name, ''text'' as type, ''string'' as "dataType", null as placeholder, false as "disabled" 
-    FROM information_schema.columns WHERE columns.table_schema = ''SCHEMA_NAME'' AND table_name= $1) a'
+    (SELECT a.attname as label, a.attname as name, ''text'' as type, ''string'' as "dataType", ''''::TEXT as placeholder, false as "disabled" , pg_catalog.format_type(a.atttypid, a.atttypmod)
+FROM pg_attribute a
+  JOIN pg_class t on a.attrelid = t.oid
+  JOIN pg_namespace s on t.relnamespace = s.oid
+WHERE a.attnum > 0 
+  AND NOT a.attisdropped
+  AND t.relname = $1 
+  AND s.nspname = $2
+  AND a.atttypid != 150381
+ORDER BY a.attnum) a'
         INTO fields_array
-        USING table_id;    
+        USING table_id, schemas_array[1];    
+
+raise notice '1 %', fields_array;
 
 --    Get id column
     EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
         INTO table_pkey
         USING table_id;
+raise notice '2 %', table_pkey;
+
 
 --    For views it suposse pk is the first column
     IF table_pkey ISNULL THEN
-        EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND ordinal_position = 1'
+        EXECUTE '
+ SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+  AND t.relname = $1 
+  AND s.nspname = $2
+ORDER BY a.attnum LIMIT 1'
+
         INTO table_pkey
-        USING schemas_array[1];
+        USING table_id, schemas_array[1];
     END IF;
 
+raise notice '3 %', table_pkey;
 
 --    Get column type
-    EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND column_name = $2'
-        USING schemas_array[1], table_pkey
+    EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+  JOIN pg_class t on a.attrelid = t.oid
+  JOIN pg_namespace s on t.relnamespace = s.oid
+WHERE a.attnum > 0 
+  AND NOT a.attisdropped
+  AND a.attname = $3
+  AND t.relname = $2 
+  AND s.nspname = $1
+ORDER BY a.attnum'
+        USING schemas_array[1], table_id, table_pkey
         INTO column_type;
+        
+raise notice '4 %', column_type;
 
 
 --    Fill every value
@@ -65,14 +100,20 @@ BEGIN
         array_index := array_index + 1;
 
 --        Get field values
-        EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type || ')' 
-        INTO field_value; 
+        EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || (table_id) || ' WHERE ' || (table_pkey) || ' = CAST(' || quote_literal(p_id) || ' AS ' || column_type || ')' 
+        
+       INTO field_value; 
+       	raise notice 'table_pkey % ' , table_pkey;
         field_value := COALESCE(field_value, '');
-
+        
 --        Update array
-        fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
+          fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
+
             
     END LOOP;
+
+
+raise notice '5';
 
     
 --    Convert to json
@@ -83,6 +124,7 @@ BEGIN
     fields := COALESCE(fields, '[]');    
     position := COALESCE(position, '[]');
 
+
 --    Return
     RETURN ('{"status":"Accepted"' ||
         ', "formToDisplay":"' || formToDisplay || '"' ||
@@ -90,11 +132,11 @@ BEGIN
         '}')::json;
 
 --    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
- --       RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+  --  EXCEPTION WHEN OTHERS THEN 
+  --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
 $BODY$
-LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

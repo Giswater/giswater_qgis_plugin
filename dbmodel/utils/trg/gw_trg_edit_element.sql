@@ -28,31 +28,19 @@ BEGIN
 		IF (NEW.elementcat_id IS NULL) THEN
 			NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-		IF (NEW.elementcat_id IS NULL) THEN
-			NEW.elementcat_id:= (SELECT id FROM cat_element LIMIT 1);
-		END IF;
-		IF (NEW.elementcat_id IS NULL) THEN
-			PERFORM audit_function(2010,1114);
-		END IF;
 	
 	
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
 			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT id FROM value_verified limit 1);
-			END IF;
 		END IF;
 		
 	
 		-- State
 		IF (NEW.state IS NULL) THEN
 			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT id FROM value_state limit 1);
-			END IF;
 		END IF;
-				
+	
 
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
@@ -64,12 +52,20 @@ BEGIN
 				END IF;		
 			END IF;
 		END IF;		
-				
-		--Element ID		
+
+		
+		-- Enddate
+		IF (NEW.state > 0 THEN
+			NEW.enddate := NULL;
+		END IF;
+
+		
+		-- Element id 
 		IF (NEW.element_id IS NULL) THEN
 			NEW.element_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 
+		
 
 		-- FEATURE INSERT      
 

@@ -22,7 +22,7 @@ DECLARE
     
 BEGIN 
 
-	set search_path='ws_sample_dev', public;
+	set search_path='SCHEMA_NAME_dev', public;
 	
 	--control same nodetype_id
 

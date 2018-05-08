@@ -36,7 +36,7 @@ CREATE TABLE "ext_streetaxis" (
 "type" varchar(18),
 "name" varchar(100),
 "text" text,
-"the_geom" public.geometry (LINESTRING, SRID_VALUE),
+"the_geom" public.geometry (MULTILINESTRING, SRID_VALUE),
 "expl_id" integer,
 "muni_id" integer
 );
