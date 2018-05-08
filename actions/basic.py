@@ -39,7 +39,7 @@ class Basic(ParentAction):
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
 
-        self.dlg.btn_ok.pressed.connect(self.close_dialog)
+        self.dlg.btn_ok.clicked.connect(self.close_dialog)
         self.dlg.rejected.connect(self.close_dialog)
         self.dlg.setWindowTitle("Explotation selector")
         utils_giswater.setWidgetText(self.dlg.lbl_filter, self.controller.tr('Filter by: Exploitation name', context_name='labels'))
@@ -63,7 +63,7 @@ class Basic(ParentAction):
         self.dlg = Multirow_selector()
         self.load_settings(self.dlg)
         utils_giswater.setDialog(self.dlg)
-        self.dlg.btn_ok.pressed.connect(self.close_dialog)
+        self.dlg.btn_ok.clicked.connect(self.close_dialog)
         self.dlg.rejected.connect(self.close_dialog)
         self.dlg.txt_name.setVisible(False)
         self.dlg.setWindowTitle("State selector")

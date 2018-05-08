@@ -1194,11 +1194,11 @@ class ParentDialog(QDialog):
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
 
-        btn_open_visit.pressed.connect(self.open_visit)
-        btn_new_visit.pressed.connect(self.new_visit)
-        btn_open_gallery.pressed.connect(self.open_gallery)
-        btn_open_visit_doc.pressed.connect(self.open_visit_doc)
-        btn_open_visit_event.pressed.connect(self.open_visit_event)
+        btn_open_visit.clicked.connect(self.open_visit)
+        btn_new_visit.clicked.connect(self.new_visit)
+        btn_open_gallery.clicked.connect(self.open_gallery)
+        btn_open_visit_doc.clicked.connect(self.open_visit_doc)
+        btn_open_visit_event.clicked.connect(self.open_visit_event)
 
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
@@ -1422,8 +1422,8 @@ class ParentDialog(QDialog):
             self.field3 = 'geom1'
         utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
-        self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_cat))
+        self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
+        self.dlg_cat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cat))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))

@@ -253,7 +253,7 @@ class DaoController():
         widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
         button = QPushButton(widget)
         button.setText(self.tr("Show Me"))
-        button.pressed.connect(partial(self.show_details, detail_text, self.tr('Warning details')))
+        button.clicked.connect(partial(self.show_details, detail_text, self.tr('Warning details')))
         widget.layout().addWidget(button)
         self.iface.messageBar().pushWidget(widget, 1)        
         

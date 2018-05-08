@@ -97,15 +97,15 @@ class ManageElement(ParentManage):
         self.set_completer_object(table_object)
         
         # Set signals
-        self.dlg.btn_accept.pressed.connect(self.manage_element_accept)        
-        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
+        self.dlg.btn_accept.clicked.connect(self.manage_element_accept)        
+        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))        
         self.dlg.element_id.textChanged.connect(partial(self.exist_object, table_object)) 
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))              
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))        
-        self.dlg.btn_add_geom.pressed.connect(self.add_point)
+        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, table_object))              
+        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, table_object))
+        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, table_object))        
+        self.dlg.btn_add_geom.clicked.connect(self.add_point)
         
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
@@ -347,7 +347,7 @@ class ManageElement(ParentManage):
         # Set dignals
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        
         self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
+        self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))
                                         

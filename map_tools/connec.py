@@ -112,11 +112,11 @@ class ConnecMapTool(ParentMapTool):
                     exist_gully = self.snapper_manager.check_gully_group(result[0].layer)                    
                     if exist_connec or exist_gully:                       
                         key = QApplication.keyboardModifiers()   
-                        # If Ctrl+Shift is pressed: deselect snapped feature               
+                        # If Ctrl+Shift is clicked: deselect snapped feature               
                         if key == (Qt.ControlModifier | Qt.ShiftModifier):                   
                             result[0].layer.deselect([result[0].snappedAtGeometry])                                                       
                         else:
-                            # If Ctrl is not pressed: remove previous selection                            
+                            # If Ctrl is not clicked: remove previous selection                            
                             if key != Qt.ControlModifier:  
                                 result[0].layer.removeSelection()                                          
                             result[0].layer.select([result[0].snappedAtGeometry])
@@ -273,13 +273,13 @@ class ConnecMapTool(ParentMapTool):
 
         key = QApplication.keyboardModifiers() 
         
-        # If Ctrl+Shift pressed: remove features from selection
+        # If Ctrl+Shift clicked: remove features from selection
         if key == (Qt.ControlModifier | Qt.ShiftModifier):                
             behaviour = QgsVectorLayer.RemoveFromSelection
-        # If Ctrl pressed: add features to selection
+        # If Ctrl clicked: add features to selection
         elif key == Qt.ControlModifier:
             behaviour = QgsVectorLayer.AddToSelection
-        # If Ctrl not pressed: add features to selection
+        # If Ctrl not clicked: add features to selection
         else:
             behaviour = QgsVectorLayer.AddToSelection
 

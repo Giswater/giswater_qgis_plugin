@@ -83,14 +83,14 @@ class ManageDocument(ParentManage):
         # Set signals
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
         self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
-        self.dlg.btn_accept.pressed.connect(self.manage_document_accept)
-        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, table_object, cur_active_layer))
+        self.dlg.btn_accept.clicked.connect(self.manage_document_accept)
+        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.doc_id.textChanged.connect(partial(self.exist_object, table_object)) 
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object))              
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object))
+        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, table_object))              
+        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, table_object))
+        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, table_object))
                 
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
@@ -203,7 +203,7 @@ class ManageDocument(ParentManage):
         # Set dignals
         self.dlg_man.doc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))        
         self.dlg_man.tbl_document.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_man))
+        self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
                                 

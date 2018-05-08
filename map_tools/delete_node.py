@@ -84,8 +84,8 @@ class DeleteNodeMapTool(ParentMapTool):
             utils_giswater.setCalendarDate("enddate", current_date)
 
             # Set signals
-            self.dlg_fusion.btn_accept.pressed.connect(self.exec_fusion)
-            self.dlg_fusion.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_fusion))
+            self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)
+            self.dlg_fusion.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_fusion))
 
             self.dlg_fusion.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_fusion.open()

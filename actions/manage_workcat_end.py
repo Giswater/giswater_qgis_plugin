@@ -65,12 +65,12 @@ class ManageWorkcatEnd(ParentManage):
 
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
-        self.dlg.btn_cancel.pressed.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
+        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
 
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, self.table_object))
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.table_object))
-        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, self.table_object))
+        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.table_object))
+        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, self.table_object))
+        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, self.table_object))
 
         self.dlg.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.table_object))
@@ -151,8 +151,8 @@ class ManageWorkcatEnd(ParentManage):
             utils_giswater.setDialog(self.dlg_work)
             self.load_settings(self.dlg_work)
 
-            self.dlg_work.btn_cancel.pressed.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
-            self.dlg_work.btn_accept.pressed.connect(self.exec_downgrade)
+            self.dlg_work.btn_cancel.clicked.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
+            self.dlg_work.btn_accept.clicked.connect(self.exec_downgrade)
             self.set_completer()
 
             table_relations = "v_ui_arc_x_relations"

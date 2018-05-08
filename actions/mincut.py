@@ -552,11 +552,11 @@ class MincutParent(ParentAction, MultipleSelection):
         self.set_icon(self.dlg_connec.btn_snapping, "129")
 
         # Set signals
-        self.dlg_connec.btn_insert.pressed.connect(partial(self.insert_connec))
-        self.dlg_connec.btn_delete.pressed.connect(partial(self.delete_records_connec))
-        self.dlg_connec.btn_snapping.pressed.connect(self.snapping_init_connec)
-        self.dlg_connec.btn_accept.pressed.connect(partial(self.accept_connec, "connec", self.dlg_connec))
-        self.dlg_connec.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_connec))
+        self.dlg_connec.btn_insert.clicked.connect(partial(self.insert_connec))
+        self.dlg_connec.btn_delete.clicked.connect(partial(self.delete_records_connec))
+        self.dlg_connec.btn_snapping.clicked.connect(self.snapping_init_connec)
+        self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, "connec", self.dlg_connec))
+        self.dlg_connec.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_connec))
         
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_connec.connec_id)
@@ -713,11 +713,11 @@ class MincutParent(ParentAction, MultipleSelection):
         self.set_icon(self.dlg_hydro.btn_snapping, "129")
 
         # Set dignals
-        self.dlg_hydro.btn_insert.pressed.connect(partial(self.insert_hydro))
-        self.dlg_hydro.btn_delete.pressed.connect(partial(self.delete_records_hydro))
-        self.dlg_hydro.btn_snapping.pressed.connect(self.snapping_init_hydro)
-        self.dlg_hydro.btn_accept.pressed.connect(partial(self.accept_hydro, "hydrometer", self.dlg_hydro))
-        self.dlg_hydro.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_hydro))     
+        self.dlg_hydro.btn_insert.clicked.connect(partial(self.insert_hydro))
+        self.dlg_hydro.btn_delete.clicked.connect(partial(self.delete_records_hydro))
+        self.dlg_hydro.btn_snapping.clicked.connect(self.snapping_init_hydro)
+        self.dlg_hydro.btn_accept.clicked.connect(partial(self.accept_hydro, "hydrometer", self.dlg_hydro))
+        self.dlg_hydro.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_hydro))     
 
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_hydro.customer_code_connec, True)
@@ -2136,8 +2136,8 @@ class MincutParent(ParentAction, MultipleSelection):
             self.dlg_comp.cbx_template.addItem(str(template))
 
         # Set signals
-        self.dlg_comp.btn_ok.pressed.connect(self.open_composer)
-        self.dlg_comp.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_comp))
+        self.dlg_comp.btn_ok.clicked.connect(self.open_composer)
+        self.dlg_comp.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_comp))
         self.dlg_comp.rejected.connect(partial(self.close_dialog, self.dlg_comp))
         self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
         

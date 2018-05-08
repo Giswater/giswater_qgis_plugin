@@ -218,9 +218,9 @@ class ManageNewPsector(ParentManage):
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Set signals
-        self.dlg.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, "v_edit_" + self.plan_om + '_psector', True))
+        self.dlg.btn_accept.clicked.connect(partial(self.insert_or_update_new_psector, "v_edit_" + self.plan_om + '_psector', True))
         self.dlg.tabWidget.currentChanged.connect(partial(self.check_tab_position))
-        self.dlg.btn_cancel.pressed.connect(partial(self.close_psector, cur_active_layer))
+        self.dlg.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg.psector_type.currentIndexChanged.connect(partial(self.populate_result_id, self.dlg.result_id, self.plan_om + '_result_cat'))
         self.dlg.rejected.connect(partial(self.close_psector, cur_active_layer))
 
@@ -228,25 +228,25 @@ class ManageNewPsector(ParentManage):
         self.dlg.all_rows.clicked.connect(partial(self.show_description))
         self.dlg.btn_select.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
         self.dlg.btn_unselect.clicked.connect(partial(self.update_total, self.dlg.selected_rows))
-        self.dlg.btn_insert.pressed.connect(partial(self.insert_feature, table_object, True))
-        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, table_object, True))
+        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, table_object, True))
+        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, table_object, True))
         self.dlg.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
-        self.dlg.btn_snapping.pressed.connect(partial(self.selection_init, table_object, True))
+        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, table_object, True))
 
-        self.dlg.btn_rapports.pressed.connect(partial(self.open_dlg_rapports, self.dlg))
+        self.dlg.btn_rapports.clicked.connect(partial(self.open_dlg_rapports, self.dlg))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
         self.dlg.name.textChanged.connect(partial(self.enable_relation_tab, self.plan_om + '_psector'))
         self.dlg.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg.txt_name, 
             self.dlg.all_rows, 'v_price_compost', 'v_edit_'+self.plan_om + '_psector_x_other', "id"))
 
-        self.dlg.gexpenses.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'gexpenses'))
-        self.dlg.vat.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'vat'))
-        self.dlg.other.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'other'))
+        self.dlg.gexpenses.returnclicked.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'gexpenses'))
+        self.dlg.vat.returnclicked.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'vat'))
+        self.dlg.other.returnclicked.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'other'))
 
-        self.dlg.btn_doc_insert.pressed.connect(self.document_insert)
-        self.dlg.btn_doc_delete.pressed.connect(self.document_delete)
-        self.dlg.btn_doc_new.pressed.connect(self.manage_document)
-        self.dlg.btn_open_doc.pressed.connect(self.document_open)
+        self.dlg.btn_doc_insert.clicked.connect(self.document_insert)
+        self.dlg.btn_doc_delete.clicked.connect(self.document_delete)
+        self.dlg.btn_doc_new.clicked.connect(self.manage_document)
+        self.dlg.btn_open_doc.clicked.connect(self.document_open)
 
         self.set_completer()
 
@@ -299,9 +299,9 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setWidgetText('txt_csv_detail_path', default_file_name + " detail.csv")
         utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
 
-        self.dlg_psector_rapport.btn_cancel.pressed.connect(partial(self.set_prev_dialog, self.dlg_psector_rapport, previous_dialog))
-        self.dlg_psector_rapport.btn_ok.pressed.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport))
-        self.dlg_psector_rapport.btn_path.pressed.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
+        self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(self.set_prev_dialog, self.dlg_psector_rapport, previous_dialog))
+        self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports, previous_dialog, self.dlg_psector_rapport))
+        self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, 
             self.controller.plugin_settings_value('psector_rapport_path'))
@@ -847,11 +847,11 @@ class ManageNewPsector(ParentManage):
         self.set_table_columns(tbl_selected_rows, tableright)
 
         # Button select
-        dialog.btn_select.pressed.connect(partial(self.rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
+        dialog.btn_select.clicked.connect(partial(self.rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
         tbl_all_rows.doubleClicked.connect(partial(self.rows_selector, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
 
         # Button unselect
-        dialog.btn_unselect.pressed.connect(partial(self.rows_unselector, tbl_selected_rows, tableright, field_id_right))
+        dialog.btn_unselect.clicked.connect(partial(self.rows_unselector, tbl_selected_rows, tableright, field_id_right))
 
 
     def rows_selector(self, tbl_all_rows, tbl_selected_rows, id_ori, tableright, id_des, field_id):
@@ -1099,7 +1099,7 @@ class ManageNewPsector(ParentManage):
 
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document()
-        dlg_docman.btn_accept.pressed.connect(partial(self.set_completer_object, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, 'doc'))
 
 
     def document_open(self):

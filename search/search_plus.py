@@ -83,8 +83,8 @@ class SearchPlus(QObject):
             self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
             self.filter_by_list(self.dlg.hydro_id)
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
-        self.dlg.btn_clear_workcat.pressed.connect(self.clear_workcat)
-        self.dlg.btn_refresh_workcat.pressed.connect(self.refresh_workcat)
+        self.dlg.btn_clear_workcat.clicked.connect(self.clear_workcat)
+        self.dlg.btn_refresh_workcat.clicked.connect(self.refresh_workcat)
         self.dlg.psector_id_2.activated.connect(partial(self.open_plan_psector))
 
         return True
@@ -211,11 +211,11 @@ class SearchPlus(QObject):
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
-        self.items_dialog.btn_close.pressed.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.btn_close.pressed.connect(partial(self.restore_state_selector))
-        self.items_dialog.export_to_csv.pressed.connect(partial
+        self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.btn_close.clicked.connect(partial(self.restore_state_selector))
+        self.items_dialog.export_to_csv.clicked.connect(partial
             (self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end, self.items_dialog.txt_path))
-        self.items_dialog.btn_path.pressed.connect(partial(self.get_folder_dialog, self.items_dialog.txt_path))
+        self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog.txt_path))
 
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(partial(self.restore_state_selector))

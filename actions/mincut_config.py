@@ -40,14 +40,14 @@ class MincutConfig(ParentAction):
         
         table = "anl_mincut_selector_valve"
         self.menu_valve = QMenu()
-        self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
+        self.dlg_multi.btn_insert.clicked.connect(partial(self.fill_insert_menu, table))
         
         btn_cancel = self.dlg_multi.findChild(QPushButton, "btn_cancel")
-        btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_multi))
+        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_multi))
 
         self.menu_valve.clear()
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
-        self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))
+        self.dlg_multi.btn_delete.clicked.connect(partial(self.delete_records_config, self.tbl_config, table))
 
         self.fill_table_config(self.tbl_config, self.schema_name + "." + table)
         
@@ -163,7 +163,7 @@ class MincutConfig(ParentAction):
         self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "v_ui_anl_mincut_result_cat"))
 
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
-        self.dlg_min_edit.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg_min_edit))
+        self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
 

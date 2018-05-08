@@ -401,12 +401,12 @@ class ParentAction(object):
         self.hide_colums(tbl_selected_rows, [1, 2, 3])
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
-        dialog.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, "id", query_left, query_right, field_id_right))
+        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, "id", query_left, query_right, field_id_right))
 
         # Button unselect
         query_delete = "DELETE FROM " + self.schema_name + "." + tableright
         query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
-        dialog.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
+        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
 

@@ -87,13 +87,13 @@ class MultipleSelection(QgsMapTool):
             if rectangle:
                 if selected_rectangle is None:
                     selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
-                # If Ctrl+Shift pressed: remove features from selection
+                # If Ctrl+Shift clicked: remove features from selection
                 if key == (Qt.ControlModifier | Qt.ShiftModifier):                
                     layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
-                # If Ctrl pressed: add features to selection
+                # If Ctrl clicked: add features to selection
                 elif key == Qt.ControlModifier:
                     layer.selectByRect(selected_rectangle, layer.AddToSelection)
-                # If Ctrl not pressed: add features to selection
+                # If Ctrl not clicked: add features to selection
                 else:
                     layer.selectByRect(selected_rectangle, layer.AddToSelection)
                                         
