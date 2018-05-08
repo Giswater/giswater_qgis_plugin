@@ -1147,20 +1147,17 @@ class MincutParent(ParentAction, MultipleSelection):
 
         sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
                " WHERE result_id = " + str(result_mincut_id) + ";\n")
-        self.controller.execute_sql(sql)
         for element_id in self.connec_list:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
-                   " (result_id, " + str(element) + "_id) "
-                   " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
-            self.controller.execute_sql(sql)
+            sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
+                    " (result_id, " + str(element) + "_id) "
+                    " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
             # Get hydrometer_id of selected connec
-            sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
-                   " WHERE connec_id = '" + str(element_id) + "'")
-            rows = self.controller.get_rows(sql)
-            sql = ""
+            sql2 = ("SELECT hydrometer_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
+                    " WHERE connec_id = '" + str(element_id) + "'")
+            rows = self.controller.get_rows(sql2)
             if rows:
                 for row in rows:
-                    # Hydrometers associated to selected connecs inserted to the table anl_mincut_result_hydrometer
+                    # Hydrometers associated to selected connec inserted to the table anl_mincut_result_hydrometer
                     sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_hydrometer"
                             " (result_id, hydrometer_id) "
                             " VALUES ('" + str(result_mincut_id) + "', '" + str(row[0]) + "');\n")
