@@ -1151,7 +1151,17 @@ class MincutParent(ParentAction, MultipleSelection):
             sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_" + str(element) + ""
                     " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
-        
+            # Get hydrometer_id of selected connec
+            sql2 = ("SELECT hydrometer_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
+                    " WHERE connec_id = '" + str(element_id) + "'")
+            rows = self.controller.get_rows(sql2)
+            if rows:
+                for row in rows:
+                    # Hydrometers associated to selected connec inserted to the table anl_mincut_result_hydrometer
+                    sql += ("INSERT INTO " + self.schema_name + ".anl_mincut_result_hydrometer"
+                            " (result_id, hydrometer_id) "
+                            " VALUES ('" + str(result_mincut_id) + "', '" + str(row[0]) + "');\n")
+
         self.sql_connec = sql
         self.dlg.btn_start.setDisabled(False)
         dlg.close()
