@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2304
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text);
-CREATE OR REPLACE FUNCTION gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(    element_id_arg character varying,    type_element_arg character varying,    result_id_arg integer,    cur_user_var text)
   RETURNS text AS
 $BODY$
 DECLARE
@@ -94,7 +94,7 @@ BEGIN
 
             -- Check extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-            WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND (closed = FALSE) AND result_id=result_id_arg;
+            WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
             IF controlValue = 1 THEN
                 -- Set proposed valve
                 UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
@@ -106,7 +106,7 @@ BEGIN
 
             -- Check other extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
-            WHERE node_id = node_2_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND (closed = FALSE) AND result_id=result_id_arg;
+            WHERE node_id = node_2_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
             IF controlValue = 1 THEN
 
                 -- Check if the valve is already computed
