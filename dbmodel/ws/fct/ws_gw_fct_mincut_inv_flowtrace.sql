@@ -142,5 +142,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_mincut_inverted_flowtrace(integer)
-  OWNER TO amsaadmin;
+

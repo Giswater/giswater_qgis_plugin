@@ -195,5 +195,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text)
-  OWNER TO bgeoadmin;
+
