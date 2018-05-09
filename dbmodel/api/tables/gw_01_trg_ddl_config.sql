@@ -41,7 +41,7 @@ CREATE TABLE "config_web_layer"(
   formname text,
   orderby integer,
   link_id text,
-  type_element,
+  type_element text,
   CONSTRAINT config_web_layer_pkey PRIMARY KEY (layer_id)
 );
 
