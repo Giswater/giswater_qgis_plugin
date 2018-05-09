@@ -202,12 +202,12 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Enable/Disable widget depending state
         self.enable_widgets('0')
-        
+
         self.dlg.show()
 
 
     def mincut_close(self):
-
+        self.dlg.closeMainWin = True
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
             result_mincut_id = self.dlg.result_mincut_id.text()
@@ -1190,7 +1190,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
-
+        
+        self.dlg.closeMainWin = False
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))

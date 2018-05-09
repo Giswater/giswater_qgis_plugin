@@ -211,8 +211,19 @@ class LoadProfiles(QtGui.QDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(QtGui.QMainWindow, FORM_CLASS):
     def __init__(self):
+        self.closeMainWin = True
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
+
+    def closeEvent(self, event):
+        """ Overwrite closeEvent method """
+        if self.closeMainWin:
+            event.accept()
+        else:
+            QtGui.QMessageBox.information(self, "", "Press cancel to exit")
+            event.ignore()
+
+
 
 
 FORM_CLASS = get_ui_class('mincut_add_connec.ui')
