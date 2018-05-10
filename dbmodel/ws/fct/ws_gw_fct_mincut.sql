@@ -13,7 +13,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
     type_element_arg character varying,
     result_id_arg integer,
     cur_user_var text)
-
   RETURNS text AS
 $BODY$
 DECLARE
@@ -33,7 +32,7 @@ DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = SCHEMA_NAME, public;
 
     -- Delete previous data from same result_id
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
@@ -42,6 +41,8 @@ BEGIN
     DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
+
+
 
     -- Identification of exploitation and macroexploitation
     IF type_element_arg='node' OR type_element_arg='NODE' THEN
@@ -52,6 +53,8 @@ BEGIN
     
     SELECT macroexpl_id INTO macroexpl_id_arg FROM exploitation WHERE expl_id=expl_id_arg;
 
+
+
     -- Reset exploitation selector (of user) according the macroexploitation system
     INSERT INTO selector_expl (expl_id, cur_user)
     SELECT expl_id, current_user from exploitation 
@@ -61,11 +64,15 @@ BEGIN
     where macroexpl_id!=macroexpl_id_arg);
 
 
+
+
     -- update values of mincut cat table
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg;
 
 
+
+     
     -- Start process
     INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
     SELECT result_id_arg, node.node_id, false::boolean, closed, broken, node.the_geom
@@ -162,11 +169,14 @@ BEGIN
 	END IF;
 
 
+
     -- Delete valves not proposed, not unaccessible, not closed and not broken
     DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg 
 						UNION 
-						SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg);
-
+						SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg)
+						AND result_id=result_id_arg;
+						
+    UPDATE anl_mincut_result_valve SET proposed = FALSE WHERE closed = TRUE AND result_id=result_id_arg ;
 
     -- Check tempopary overlap control against other planified mincuts 
     SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;
