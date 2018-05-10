@@ -220,8 +220,8 @@ class Mincut(QtGui.QMainWindow, FORM_CLASS):
         if self.closeMainWin:
             event.accept()
         else:
-            QtGui.QMessageBox.information(self, "", "Press cancel to exit")
-            event.ignore()
+            #QtGui.QMessageBox.information(self, "", "Press cancel to exit")
+            event.accept()
 
 
 
