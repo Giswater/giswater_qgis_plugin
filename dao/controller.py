@@ -441,7 +441,7 @@ class DaoController():
             sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                    " SET (" + sql_fields[:-2] + ") = (" + sql_values[:-2] + ")" 
                    " WHERE " + unique_field + " = " + unique_value)         
-            
+        sql = sql.replace("''","'")
         # Execute sql
         self.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit=commit)
