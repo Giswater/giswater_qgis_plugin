@@ -35,7 +35,9 @@ CREATE TABLE hydrometer(
   m3_volume integer,
   start_date date,
   end_date date,
-  update_date date);
+  update_date date
+  expl_id integer,
+);
 
 
 
@@ -49,7 +51,7 @@ CREATE TABLE hydrometer_x_data (
 
 CREATE TABLE hydro_cat_catalog(
 "id" int8 PRIMARY KEY,
-"code" character varying(16),
+"code" character varying(60),
 "hydro_type" character varying(100),
 "madeby" character varying(100),
 "class" character varying(100),
@@ -90,50 +92,3 @@ CREATE TABLE hydro_cat_priority(
 "id" integer PRIMARY KEY,
 "code" character varying(16) NOT NULL,
 "observ" character varying(100));
-
-
--- ----------------------------
--- CRM FUNCTIONS
--- ----------------------------
-
-
--- FUNCTION TO UPDATE VALUES FROM CRM TO GIS
-CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()   RETURNS void AS
-$BODY$DECLARE
-
-
-BEGIN
-
-    -- Search path
-    SET search_path = "ws", public;
-
-    --Delete previous
-
-    RETURN;
-        
-END;$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-
-  
-  -- ----------------------------
--- CRM MANAGEMENT
--- ----------------------------
- 
---ROLE CREATION
-CREATE ROLE role_crm NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-GRANT ALL ON DATABASE "gis" TO "role_crm" ;
-GRANT ALL ON SCHEMA "crm" TO "role_crm";
-
-
--- ROLE PERMISSIONS
-GRANT ALL ON ALL TABLES IN SCHEMA "crm" TO "role_crm";
-GRANT ALL ON ALL SEQUENCES IN SCHEMA "crm" TO "role_crm";
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA "crm" TO "role_crm";
-
-
-  
-
-
-
