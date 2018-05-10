@@ -679,6 +679,10 @@ class SearchPlus(QObject):
             expl_name = ""
 
         list_state = self.state_list()
+        if list_state is False:
+            message = "The state selector is empty"
+            self.controller.show_warning(message)
+            return
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
@@ -897,7 +901,10 @@ class SearchPlus(QObject):
         list_hydro = []
 
         list_state = self.state_list()
-
+        if list_state is False:
+            message = "The state selector is empty"
+            self.controller.show_warning(message)
+            return
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state"
                " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE expl_name LIKE '%" + str(expl_name) + "%'"

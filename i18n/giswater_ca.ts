@@ -948,7 +948,10 @@
         <source>More then one event selected. Select just one</source>
         <translation>More then one event selected. Select just one</translation>
     </message>            
-    
+    <message>
+        <source>The state selector is empty</source>
+        <translation>El selector d'estats esta buit</translation>
+    </message>
     
 </context>
 

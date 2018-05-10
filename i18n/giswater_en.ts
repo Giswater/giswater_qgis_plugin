@@ -253,6 +253,7 @@
         <source>searchplus</source>
         <translation>Searchplus</translation>
     </message>
+
     <message>
         <source>tab_network</source>
         <translation>Network</translation>
@@ -946,8 +947,11 @@
         <source>More then one event selected. Select just one</source>
         <translation>More then one event selected. Select just one</translation>
     </message>            
-    
-    
+    <message>
+        <source>The state selector is empty</source>
+        <translation>The state selector is empty</translation>
+    </message>
+
 </context>
 
 </TS>
