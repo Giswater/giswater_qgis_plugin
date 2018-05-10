@@ -1,4 +1,5 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_dev_getinsertform"(table_id varchar, lang varchar, id varchar, formtodisplay varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_dev_getinsertform"
+(table_id varchar, lang varchar, id varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -22,22 +23,33 @@ DECLARE
     vdefault_var text;
     rownum_aux integer;
     api_version json;
+	formtodisplay text;
+	
 
 BEGIN
 
 
---    Set search path to local schema
+--  Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
     
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
---    Get schema name
+--  Get schema name
     schemas_array := current_schemas(FALSE);
-    
-
---    Get fields
+	
+	--  Take form_id 
+    EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
+        INTO formtodisplay
+        USING table_id; 
+            
+--  Check generic
+    IF formtodisplay ISNULL THEN
+        formtodisplay := 'F16';
+    END IF;
+	
+--  Get fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = $1) a'
         INTO fields_array
         USING table_id;    

@@ -177,9 +177,9 @@ BEGIN
     IF editable AND parent_child_relation IS FALSE THEN
 
         -- call editable form using table information
-        EXECUTE 'SELECT gw_fct_getinsertform($1, $2, $3, $4)'
+        EXECUTE 'SELECT gw_fct_getinsertform($1, $2, $3)'
             INTO editable_data
-            USING table_id_arg, lang, id, formid_arg;
+            USING table_id_arg, lang, id;
 
 --    IF no editable layer
     ELSE
