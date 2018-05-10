@@ -4,12 +4,18 @@ DECLARE
 --    Variables
     query_result character varying;
     query_result_docs json;
+    api_version json;
+
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --    Get query for docs
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_doc'') AND device = $2'
@@ -25,12 +31,12 @@ BEGIN
     query_result_docs := COALESCE(query_result_docs, '{}');
 
 --    Return
-    RETURN ('{"status":"Accepted","docs":' || query_result_docs || '}')::json;
+    RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||',"docs":' || query_result_docs || '}')::json;
     RETURN query_result_docs;
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
         
 END;

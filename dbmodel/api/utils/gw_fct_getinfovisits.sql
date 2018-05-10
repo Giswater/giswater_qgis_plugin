@@ -20,13 +20,18 @@ DECLARE
     query_result_visits_dates json;    
     parameter_type_options json;
     parameter_id_options json;
+    api_version json;
+
     
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
-
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 
 --    Get query for visits
@@ -122,6 +127,7 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
         ', "events":' || query_result_visits || 
         ', "parameter_type_options":' || parameter_type_options ||
         ', "parameter_id_options":' || parameter_id_options ||
@@ -130,7 +136,7 @@ BEGIN
 
 --    Exception handling
   --  EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
         
 END;
 $BODY$

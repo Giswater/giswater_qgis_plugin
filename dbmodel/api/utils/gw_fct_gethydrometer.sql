@@ -8,12 +8,18 @@ DECLARE
 --    Variables
     query_result character varying;
     query_result_hydrometers json;
+    api_version json;
+
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --    Get query for elements
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''hydrometer'' AND device = $1'
@@ -29,12 +35,12 @@ BEGIN
     query_result_hydrometers := COALESCE(query_result_hydrometers, '{}');
     
 --    Return
-    RETURN ('{"status":"Accepted","hydrometers":' || query_result_hydrometers || '}')::json;
+    RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||',"hydrometers":' || query_result_hydrometers || '}')::json;
 --    RETURN query_result_hydrometerss;
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

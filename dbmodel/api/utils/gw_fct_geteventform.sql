@@ -11,6 +11,8 @@ DECLARE
     combo_rows json[];
     aux_json json;    
     combo_json json;
+    api_version json;
+
 
 
 
@@ -19,6 +21,10 @@ BEGIN
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 
 --    Get web form:
@@ -117,13 +123,14 @@ RAISE NOTICE 'Res: %', formToDisplay;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
         ', "formToDisplay":"' || formToDisplay || '"' ||
         ', "fields":' || fields ||
         '}')::json;
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 
-  --      RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+  --      RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

@@ -15,12 +15,18 @@ DECLARE
     query_result_upstream json;
     query_result_downstream json;
     exec_sql text;
+    api_version json;
+
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 
 --    Query depends on element type
@@ -89,16 +95,17 @@ BEGIN
         
 --        Return
         RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
         ', "upstream":' || query_result_upstream || ', "downstream":'|| query_result_downstream || '}')::json;            
     
     END IF;
 
 --    Error
-    RETURN ('{"status":"Failed","error":"error in function gw_fct_getinfoconnects"}')::json;
+    RETURN ('{"status":"Failed","error":"error in function gw_fct_getinfoconnects", "apiVersion":'|| api_version ||'}')::json;
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 
-  --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+  --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

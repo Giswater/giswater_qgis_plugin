@@ -6,12 +6,18 @@ DECLARE
     schemas_array name[];
     sql_query varchar;
     return_event_manager_aux text;
+    api_version json;
+
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -45,11 +51,11 @@ BEGIN
     raise notice '%',return_event_manager_aux;
 
 --    Return
-    RETURN ('{"status":"Accepted", "geometry":"'||return_event_manager_aux||'"}')::json;    
+    RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||', "geometry":"'||return_event_manager_aux||'"}')::json;    
 
 --    Exception handling
  --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
         

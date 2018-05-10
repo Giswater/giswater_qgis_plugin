@@ -28,6 +28,8 @@ DECLARE
     link_path json;
     column_type text;
     schemas_array name[];
+    api_version json;
+
 
     -- future parameter passed by client
     inforole_id_arg integer:=1;
@@ -39,6 +41,10 @@ BEGIN
     schemas_array := current_schemas(FALSE);
 
     parent_child_relation = false;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --    Check if request coherence againts alias_id_arg & table_id_arg (if not exists it means navigation)
     IF (SELECT alias_id FROM config_web_layer WHERE layer_id=table_id_arg)IS NOT NULL 
@@ -192,6 +198,7 @@ BEGIN
     
 --    Return
     RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
         ', "formTabs":' || form_info ||
         ', "linkPath":' || link_path ||
         ', "editData":' || editable_data ||
@@ -200,7 +207,7 @@ BEGIN
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

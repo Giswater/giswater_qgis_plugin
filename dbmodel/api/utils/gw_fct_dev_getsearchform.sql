@@ -27,6 +27,7 @@ DECLARE
 	workcatlayer character varying;
 	psectorlayer character varying;
 	query_text text;
+    api_version json;
 
 
 BEGIN
@@ -34,6 +35,10 @@ BEGIN
 
 --  Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --  Get schema name
     schemas_array := current_schemas(FALSE);
@@ -155,6 +160,7 @@ BEGIN
 
 --    	Return
 	RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
 		', "formToDisplay":"' || formToDisplayId || '"' ||
 		', "fields":' || fields ||
 		'}')::json;

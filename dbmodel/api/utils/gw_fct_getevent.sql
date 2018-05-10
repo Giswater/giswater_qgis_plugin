@@ -5,12 +5,18 @@ DECLARE
     form_data json;
     event_data record;
     event_data_json json;
+    api_version json;
+
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --    Get event data
     SELECT * INTO event_data FROM om_visit_event WHERE id = event_id;
@@ -25,13 +31,14 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
         ', "event_data":' || event_data_json || 
         ', "form_data":' || form_data ||
         '}')::json;
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 

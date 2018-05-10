@@ -5,12 +5,17 @@ DECLARE
     res_delete boolean;
     table_pkey varchar;
     column_type character varying;
+    api_version json;
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;    
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -45,9 +50,9 @@ RAISE NOTICE 'Res: %', column_type;
         EXECUTE 'DELETE FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type || ')'
             USING id;
 
-        RETURN ('{"status":"Accepted"}')::json;
+        RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||'}')::json;
     ELSE
-        RETURN ('{"status":"Failed","message":"' || quote_ident(table_pkey) || ' = ' || id || ' does not exist"}')::json;
+        RETURN ('{"status":"Failed","message":"' || quote_ident(table_pkey) || ' = ' || id || ' does not exist", "apiVersion":'|| api_version ||'}')::json;
     END IF;
 
 --    Exception handling

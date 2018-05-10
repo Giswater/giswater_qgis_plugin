@@ -3,23 +3,30 @@ DECLARE
 
 --    Variables
     event_id integer;
+    api_version json;
+
 
 BEGIN
 
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --    Event insert
     INSERT INTO om_visit_event (visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, text) VALUES (visit_id, position_id, position_value, parameter_id, value_arg, value1, value2, geom1, geom2, geom3, text_arg) RETURNING id INTO event_id;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
         ', "id":"' || event_id || '"}')::json;    
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

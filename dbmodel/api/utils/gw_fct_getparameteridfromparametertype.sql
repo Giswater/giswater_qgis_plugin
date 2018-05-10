@@ -3,6 +3,8 @@ DECLARE
 
 --    Variables
     query_result_parameter_id_options json;
+    api_version json;
+
 
 
 BEGIN
@@ -10,6 +12,10 @@ BEGIN
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;    
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 
 --    COMMON TASKS:
@@ -23,12 +29,13 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
         ', "parameter_id_options":' || query_result_parameter_id_options ||
         '}')::json;
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
         
 
 END;

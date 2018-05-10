@@ -4,6 +4,8 @@ DECLARE
 --    Variables
     query_result character varying;
     query_result_visits json;
+    api_version json;
+
 
 
 BEGIN
@@ -11,6 +13,10 @@ BEGIN
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+    
+--  get api version
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+        INTO api_version;
 
 --    Get query for visits
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_visit_manager'') AND device = $2'
@@ -46,12 +52,13 @@ RAISE NOTICE 'Res: % ', query_result_visits;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
+        ', "apiVersion":'|| api_version ||'"' ||
         ', "visits":' || query_result_visits || 
         '}')::json;    
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
         
 END;
