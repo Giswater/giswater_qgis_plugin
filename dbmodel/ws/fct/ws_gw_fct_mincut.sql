@@ -60,15 +60,15 @@ BEGIN
     SELECT expl_id, current_user from exploitation 
     where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
 
-    DELETE FROM selector_expl WHERE cur_user=current_user AND expl_id IN (select expl_id from exploitation 
-    where macroexpl_id!=macroexpl_id_arg);
+    --DELETE FROM selector_expl WHERE cur_user=current_user AND expl_id IN (select expl_id from exploitation 
+    --where macroexpl_id!=macroexpl_id_arg);
 
 
 
 
     -- update values of mincut cat table
-    UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg;
-    UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg;
+    UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg WHERE id=result_id_arg;
+    UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg WHERE id=result_id_arg;
 
 
 
