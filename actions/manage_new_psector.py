@@ -164,7 +164,9 @@ class ManageNewPsector(ParentManage):
                 return
             
             self.psector_id.setText(str(row['psector_id']))
-            utils_giswater.set_combo_itemData(self.cmb_psector_type, row['psector_type'], 0)
+            sql = ("SELECT name FROM " + self.schema_name + ".plan_psector_cat_type WHERE id = " + str(row['psector_type']))
+            result = self.controller.get_row(sql)
+            utils_giswater.set_combo_itemData(self.cmb_psector_type, str(result['name']), 1)
             sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id = " + str(row['expl_id']))
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_expl_id, str(result['name']), 1)
