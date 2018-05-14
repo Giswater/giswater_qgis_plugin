@@ -1595,7 +1595,8 @@ class MincutParent(ParentAction, MultipleSelection):
             msg = "Class status doesnt exist, check data base!"
             self.controller.show_warning(msg)
             return
-
+        self.set_visible_mincut_layers()
+  
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
         if self.current_state == '0':
