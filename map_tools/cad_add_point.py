@@ -43,12 +43,18 @@ class CadAddPoint(ParentMapTool):
         self.dlg_create_point.dist_x.setFocus()
         self.dlg_create_point.btn_accept.clicked.connect(partial(self.get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
+        rb_left = self.controller.plugin_settings_value(self.dlg_create_point.rb_left.objectName())
+        if rb_left == 'true':
+            self.dlg_create_point.rb_left.setChecked(True)
+        else:
+            self.dlg_create_point.rb_right.setChecked(True)
 
         self.open_dialog(self.dlg_create_point, maximize_button=False)
 
 
     def get_values(self, point_1, point_2):
-        
+        self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
+                                                  self.dlg_create_point.rb_left.isChecked())
         self.dist_x = self.dlg_create_point.dist_x.text()
         if not self.dist_x:
             self.dist_x = 0
@@ -87,6 +93,8 @@ class CadAddPoint(ParentMapTool):
 
 
     def cancel(self):
+        self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
+                                                  self.dlg_create_point.rb_left.isChecked())
 
         self.close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)
