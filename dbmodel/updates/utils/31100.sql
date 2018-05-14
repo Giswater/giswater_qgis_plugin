@@ -19,3 +19,19 @@ ALTER TABLE doc_x_psector DROP CONSTRAINT IF EXISTS doc_x_psector_psector_id_fke
 
 ALTER TABLE doc_x_psector ADD CONSTRAINT doc_x_psector_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc (id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE doc_x_psector ADD CONSTRAINT doc_x_psector_psector_id_fkey FOREIGN KEY (psector_id) REFERENCES plan_psector (psector_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN state int2;
+
+
+
+CREATE TABLE selector_hydrometer
+(
+  id serial NOT NULL,
+  state_id integer NOT NULL,
+  cur_user text NOT NULL,
+  CONSTRAINT selector_hydrometer_pkey PRIMARY KEY (id),
+  CONSTRAINT selector_hydrometer_state_id_cur_user_unique UNIQUE (state_id, cur_user)
+);
