@@ -165,8 +165,12 @@ class ManageNewPsector(ParentManage):
             
             self.psector_id.setText(str(row['psector_id']))
             utils_giswater.set_combo_itemData(self.cmb_psector_type, row['psector_type'], 0)
-            utils_giswater.set_combo_itemData(self.cmb_expl_id, row['expl_id'], 0)
-            utils_giswater.set_combo_itemData(self.cmb_sector_id, row['sector_id'], 0)
+            sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id = " + str(row['expl_id']))
+            result = self.controller.get_row(sql)
+            utils_giswater.set_combo_itemData(self.cmb_expl_id, str(result['name']), 1)
+            sql = ("SELECT name FROM " + self.schema_name + ".sector WHERE sector_id = " + str(row['sector_id']))
+            result = self.controller.get_row(sql)
+            utils_giswater.set_combo_itemData(self.cmb_sector_id, str(result['name']), 1)
 
             utils_giswater.setRow(row)
             utils_giswater.setChecked("active", row['active'])
