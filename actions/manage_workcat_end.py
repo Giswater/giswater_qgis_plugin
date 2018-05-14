@@ -282,25 +282,29 @@ class ManageWorkcatEnd(ParentManage):
         
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
         sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'edit_arc_downgrade_force'")
+               " WHERE parameter = 'edit_arc_downgrade_force'"
+			   " AND cur_user=current_user")
+        
         row = self.controller.get_row(sql, log_info=False)
         if row:
             sql = ("UPDATE " + self.schema_name + ".config_param_user "
                    " SET value = True "
-                   " WHERE parameter = 'edit_arc_downgrade_force'")
+                   " WHERE parameter = 'edit_arc_downgrade_force'"
+				   " AND cur_user=current_user")
             self.controller.execute_sql(sql, log_sql=True)
         else:
-            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (edit_arc_downgrade_force)"
-                   " VALUES (True)")
+            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user)"
+                   " VALUES ('edit_arc_downgrade_force', 'True', current_user)")
             self.controller.execute_sql(sql, commit=self.autocommit)
-
+        
         # Update tablename of every geom_type
         self.update_geom_type("arc")
 
         # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
         sql = ("UPDATE " + self.schema_name + ".config_param_user "
                " SET value = False "
-               " WHERE parameter = 'edit_arc_downgrade_force'")
+               " WHERE parameter = 'edit_arc_downgrade_force'"
+               " AND cur_user=current_user")
         self.controller.execute_sql(sql, log_sql=True)
         self.remove_selection(True)
         self.canvas.refresh()
