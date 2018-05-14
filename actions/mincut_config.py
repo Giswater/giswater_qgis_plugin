@@ -277,5 +277,21 @@ class MincutConfig(ParentAction):
                    " WHERE " + column_id + " IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
-                    
-                
+            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_node')
+            if layer is not None:
+                layer.triggerRepaint()
+            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_connec')
+            if layer is not None:
+                layer.triggerRepaint()
+            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_arc')
+            if layer is not None:
+                layer.triggerRepaint()
+            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_valve')
+            if layer is not None:
+                layer.triggerRepaint()
+            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_cat')
+            if layer is not None:
+                layer.triggerRepaint()
+            layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_hydrometer')
+            if layer is not None:
+                layer.triggerRepaint()
