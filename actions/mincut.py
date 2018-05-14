@@ -207,7 +207,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def mincut_close(self):
-        self.dlg.closeMainWin = True
+        Mincut.closeMainWin = True
+
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
             result_mincut_id = self.dlg.result_mincut_id.text()
@@ -231,7 +232,7 @@ class MincutParent(ParentAction, MultipleSelection):
     
     def disconnect_snapping(self, action_pan=True):
         """ Select 'Pan' as current map tool and disconnect snapping """
-        
+        Mincut.closeMainWin = True
         try:
             self.canvas.xyCoordinates.disconnect()             
             self.emit_point.canvasClicked.disconnect()
@@ -1190,8 +1191,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
-        
-        self.dlg.closeMainWin = False
+
+        Mincut.closeMainWin = True
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
