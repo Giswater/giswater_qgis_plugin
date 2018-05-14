@@ -100,9 +100,7 @@ class ManageVisit(ParentManage, QObject):
         self.set_icon(self.dlg.btn_open_doc, "170")
         self.set_icon(self.dlg.btn_add_geom, "133")    
         
-        if feature_id is None:
-            self.dlg.btn_add_geom.setVisible(False)
-
+ 
         # tab events
         self.tabs = self.dlg.findChild(QTabWidget, 'tab_widget')
         self.button_box = self.dlg.findChild(QDialogButtonBox, 'button_box')
