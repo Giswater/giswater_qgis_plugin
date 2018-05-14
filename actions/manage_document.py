@@ -83,7 +83,7 @@ class ManageDocument(ParentManage):
         # Set signals
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
         self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
-        self.dlg.btn_accept.clicked.connect(self.manage_document_accept)
+        self.dlg.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object))
         self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
@@ -107,7 +107,7 @@ class ManageDocument(ParentManage):
         return self.dlg
                
 
-    def manage_document_accept(self, table_object="doc"):
+    def manage_document_accept(self, table_object):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
@@ -123,8 +123,8 @@ class ManageDocument(ParentManage):
 
         # Check if this document already exists
         sql = ("SELECT DISTINCT(id)"
-               " FROM " + self.schema_name + "." + table_object + ""
-               " WHERE id = '" + doc_id + "'")
+               " FROM " + self.schema_name + "." + str(table_object) + ""
+               " WHERE id = '" + str(doc_id) + "'")
         row = self.controller.get_row(sql, log_info=False)
 
         # If document not exists perform an INSERT
