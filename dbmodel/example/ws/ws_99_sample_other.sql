@@ -55,7 +55,7 @@ update rtc_hydrometer set link='https://www.giswater.org';
 refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
 
-update ext_rtc_hydrometer SET state=1
+update ext_rtc_hydrometer SET state=1;
 
-INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, 'postgres')
+INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, 'postgres');
 
