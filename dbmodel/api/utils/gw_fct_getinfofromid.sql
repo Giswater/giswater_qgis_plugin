@@ -1,11 +1,11 @@
 ﻿
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformtabs(
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfofromid(
     alias_id_arg character varying,
     table_id_arg character varying,
     id character varying,
     editable boolean,
     device integer,
-    user_id character varying,
+    p_info_type integer,
     lang character varying)
   RETURNS json AS
 $BODY$
@@ -31,13 +31,13 @@ DECLARE
     api_version json;
 
 
-    -- future parameter passed by client
-    inforole_id_arg integer:=1;
+    -- fixed info type parameter(to do)
+    p_info_type integer:=1;
 
 BEGIN
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
     schemas_array := current_schemas(FALSE);
 
     parent_child_relation = false;
@@ -135,7 +135,7 @@ BEGIN
         WHERE featurecat_id= (SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1) 
         AND inforole_id=$2'
             INTO table_id_arg
-            USING id, inforole_id_arg;
+            USING id, p_info_type;
 
         raise notice'Parent-Child. Table: %' , table_id_arg;
 
@@ -147,7 +147,7 @@ BEGIN
         JOIN config_web_tableinfo_x_inforole ON config_web_layer.tableinfo_id=config_web_tableinfo_x_inforole.tableinfo_id 
         WHERE layer_id=$1 AND inforole_id=$2'
                 INTO table_id_arg
-            USING table_id_arg, inforole_id_arg;
+            USING table_id_arg, p_info_type;
 
         raise notice'No parent-child and no editable table: %' , table_id_arg;
 
@@ -198,7 +198,7 @@ BEGIN
     
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "formTabs":' || form_info ||
         ', "linkPath":' || link_path ||
         ', "editData":' || editable_data ||

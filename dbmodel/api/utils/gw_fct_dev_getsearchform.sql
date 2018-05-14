@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformsearch(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_dev_getformsearch(
     tab_id_arg integer,
     filterval_arg character varying)
   RETURNS json AS
