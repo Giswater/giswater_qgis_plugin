@@ -5,10 +5,10 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "crm", "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "crm", "ws", public, pg_catalog;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer AS
+CREATE OR REPLACE VIEW ws.v_rtc_hydrometer AS
 SELECT hydrometer.id::text AS hydrometer_id,
    hydrometer.code AS hydrometer_customer_code,
        CASE
@@ -52,9 +52,9 @@ SELECT hydrometer.id::text AS hydrometer_id,
        END AS hydrometer_link
   FROM selector_hydrometer, rtc_hydrometer
     LEFT JOIN crm.hydrometer ON hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
-    LEFT JOIN crm.hydro_val_state ON hydro_val_state.id = hydrometer.state_id*
+    LEFT JOIN crm.hydro_val_state ON hydro_val_state.id = hydrometer.state_id
     LEFT JOIN ext_municipality ON ext_municipality.muni_id = hydrometer.muni_id
     LEFT JOIN exploitation ON exploitation.expl_id = hydrometer.expl_id
     LEFT JOIN connec ON connec.customer_code::text = hydrometer.connec_id::text
-	WHERE selector_hydrometer.state_id=ext_rtc_hydrometer.state AND selector_hydrometer.cur_user=current_user;
+	WHERE selector_hydrometer.state_id=hydrometer.state_id AND selector_hydrometer.cur_user=current_user;
 	
