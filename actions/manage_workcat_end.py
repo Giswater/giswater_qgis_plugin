@@ -28,7 +28,7 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def manage_workcat_end(self):
-
+        self.remove_selection(True)
         # Create the dialog and signals
         self.dlg = WorkcatEnd()
         utils_giswater.setDialog(self.dlg)
@@ -67,6 +67,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
         self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
+        # self.dlg.workcat_id_end.currentIndexChanged.connec(partial(self.get_values_from_form))
 
         self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.table_object))
         self.dlg.btn_delete.clicked.connect(partial(self.delete_records, self.table_object))
@@ -122,14 +123,8 @@ class ManageWorkcatEnd(ParentManage):
             utils_giswater.setText(self.dlg.descript, row['descript'])
             utils_giswater.setCalendarDate(self.dlg.builtdate, row['builtdate'], False)
 
-
-    def manage_workcat_end_accept(self):
-        """ Get elements from all the tables and update his data """
-
-        self.enddate = utils_giswater.getCalendarDate("enddate")
-        self.workcat_id_end = utils_giswater.getWidgetText("workcat_id_end")
-
-        selected_list = self.dlg.tbl_cat_work_x_arc.model()
+    def get_list_selected_id(self, qtable):
+        selected_list = qtable.model()
         self.selected_list = []
         ids_list = ""
         if selected_list is None:
@@ -141,12 +136,18 @@ class ManageWorkcatEnd(ParentManage):
             self.selected_list.append(id_)
             ids_list = ids_list + "'" + id_ + "'" + ","
         ids_list = ids_list[:-1]
+        return ids_list
+    def manage_workcat_end_accept(self):
+        """ Get elements from all the tables and update his data """
+        ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_arc)
+        row = None
+        if ids_list is not None:
+            sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations"
+                   " WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
+            row = self.controller.get_row(sql)
+            ids_list = None
 
-        sql = ("SELECT * FROM " + self.schema_name + ".v_ui_arc_x_relations"
-               " WHERE arc_id IN ( " + str(ids_list) + ") AND arc_state = '1'")
-        row = self.controller.get_row(sql)
-        
-        if row:
+        if row is not None:
             self.dlg_work = WorkcatEndList()
             utils_giswater.setDialog(self.dlg_work)
             self.load_settings(self.dlg_work)
@@ -173,16 +174,24 @@ class ManageWorkcatEnd(ParentManage):
 
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
-            
         else:
             # Update tablename of every geom_type
-            self.update_geom_type("arc")
+            ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_arc)
+            self.update_geom_type("arc", ids_list)
+            ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_node)
+            self.update_geom_type("node", ids_list)
+            ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_connec)
+            self.update_geom_type("connec", ids_list)
+            ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_element)
+            self.update_geom_type("element", ids_list)
+            if str(self.project_type) == 'om':
+                ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_gully)
+                self.update_geom_type("gully", ids_list)
             self.manage_close(self.table_object, self.cur_active_layer)
 
 
-    def update_geom_type(self, geom_type):
+    def update_geom_type(self, geom_type, ids_list):
         """ Get elements from @geom_type and update his corresponding table """
-
         tablename = "v_edit_" + geom_type
         if self.selected_list is None:
             return
@@ -193,10 +202,10 @@ class ManageWorkcatEnd(ParentManage):
                     " SET state = '0', workcat_id_end = '" + str(self.workcat_id_end) + "',"
                     " enddate = '" + str(self.enddate) + "'"
                     " WHERE " + geom_type + "_id = '" + str(id_) + "';\n")
-            
-        status = self.controller.execute_sql(sql, log_sql=True)
-        if status:
-            self.controller.show_info("Geometry updated successfully!")
+        if sql != "":
+            status = self.controller.execute_sql(sql, log_sql=False)
+            if status:
+                self.controller.show_info("Geometry updated successfully!")
 
 
     def fill_table(self, widget, table_name, filter_):
@@ -282,15 +291,15 @@ class ManageWorkcatEnd(ParentManage):
         
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
         sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'edit_arc_downgrade_force'"
-			   " AND cur_user=current_user")
-        
+               " WHERE parameter = 'edit_arc_downgrade_force' "
+               " AND cur_user=current_user")
+
         row = self.controller.get_row(sql, log_info=False)
         if row:
             sql = ("UPDATE " + self.schema_name + ".config_param_user "
                    " SET value = True "
-                   " WHERE parameter = 'edit_arc_downgrade_force'"
-				   " AND cur_user=current_user")
+                   " WHERE parameter = 'edit_arc_downgrade_force' "
+                   " AND cur_user=current_user")
             self.controller.execute_sql(sql, log_sql=True)
         else:
             sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user)"
@@ -298,7 +307,8 @@ class ManageWorkcatEnd(ParentManage):
             self.controller.execute_sql(sql, commit=self.autocommit)
         
         # Update tablename of every geom_type
-        self.update_geom_type("arc")
+        ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_arc)
+        self.update_geom_type("arc", ids_list)
 
         # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
         sql = ("UPDATE " + self.schema_name + ".config_param_user "
@@ -306,10 +316,10 @@ class ManageWorkcatEnd(ParentManage):
                " WHERE parameter = 'edit_arc_downgrade_force'"
                " AND cur_user=current_user")
         self.controller.execute_sql(sql, log_sql=True)
-        self.remove_selection(True)
+
         self.canvas.refresh()
         self.dlg_work.close()
-
+        self.manage_workcat_end_accept()
 
     def set_completer(self):
         """ Set autocompleters of the form """

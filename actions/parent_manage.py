@@ -330,12 +330,16 @@ class ParentManage(ParentAction, object):
         message = "Geometry has been added!"
         self.controller.show_info(message)
         self.emit_point.canvasClicked.disconnect()
-        
+    def get_values_from_form(self):
+        self.enddate = utils_giswater.getCalendarDate("enddate")
+        self.workcat_id_end = utils_giswater.getWidgetText("workcat_id_end")
+        self.description = utils_giswater.getWidgetText("descript")
         
     def tab_feature_changed(self, table_object):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
+        self.get_values_from_form()
         if self.dlg.tab_feature.currentIndex() == 3:
             self.dlg.btn_snapping.setEnabled(False)
         else:
