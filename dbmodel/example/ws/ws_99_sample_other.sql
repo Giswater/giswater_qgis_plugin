@@ -59,3 +59,7 @@ update ext_rtc_hydrometer SET state=1;
 
 INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, 'postgres');
 
+update ext_rtc_hydrometer set connec_id=b.customer_code from rtc_hydrometer_x_connec  a 
+join connec b on a.connec_id = b.connec_id
+where ext_rtc_hydrometer.connec_id = a.connec_id
+
