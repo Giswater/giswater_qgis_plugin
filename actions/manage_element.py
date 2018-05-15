@@ -314,11 +314,9 @@ class ManageElement(ParentManage):
             self.manage_close(table_object)
             #TODO Reload table tbl_element
             filter_ = "node_id = '" + str(feature_id) + "'"
-            self.controller.log_info(str(filter))
             table_element = "v_ui_element_x_node"
-            self.set_model_to_table(self.tbl_element, table_element, filter_)
+            #self.set_model_to_table(self.tbl_element, table_element, filter_)
 
-      
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
         
