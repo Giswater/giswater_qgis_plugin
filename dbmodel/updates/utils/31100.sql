@@ -24,7 +24,8 @@ ALTER TABLE doc_x_psector ADD CONSTRAINT doc_x_psector_psector_id_fkey FOREIGN K
 
 
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN state int2;
-
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN expl_id integer;
+ALTER TABLE ws_sample.ext_rtc_hydrometer ADD COLUMN connec_id varchar (16);
 
 
 CREATE TABLE selector_hydrometer

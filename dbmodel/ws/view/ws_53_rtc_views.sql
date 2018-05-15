@@ -57,11 +57,11 @@ FROM rtc_scada_node
 JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id = rtc_scada_node.scada_id;
 
 	 
-
+	 
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
  SELECT rtc_hydrometer.hydrometer_id,
-    rtc_hydrometer_x_connec.connec_id,
+    ext_rtc_hydrometer.connec_id,
     connec.customer_code AS connec_customer_code,
 	connec.expl_id,
 	value_state.name AS state,
@@ -83,14 +83,14 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
 		WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text) IS NULL THEN rtc_hydrometer.link
 	 else concat(( SELECT config_param_system.value FROM config_param_system
 		WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link) END AS hydrometer_link
-   FROM rtc_hydrometer
-     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
-	 JOIN exploitation ON exploitation.expl_id=connec.expl_id
-	 JOIN value_state ON value_state.id=connec.state;
 
+	   FROM selector_hydrometer, rtc_hydrometer
+    LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
+    LEFT JOIN value_state ON value_state.id = ext_rtc_hydrometer.state
+    LEFT JOIN exploitation ON exploitation.expl_id = ext_rtc_hydrometer.expl_id
+    LEFT JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+	WHERE selector_hydrometer.state_id=ext_rtc_hydrometer.state AND selector_hydrometer.cur_user=current_user;
 
 	 
 CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
