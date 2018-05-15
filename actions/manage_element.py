@@ -97,7 +97,7 @@ class ManageElement(ParentManage):
         self.set_completer_object(table_object)
         
         # Set signals
-        self.dlg.btn_accept.clicked.connect(self.manage_element_accept)        
+        self.dlg.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))        
@@ -128,7 +128,7 @@ class ManageElement(ParentManage):
         return self.dlg
     
  
-    def manage_element_accept(self, table_object="element"):
+    def manage_element_accept(self, table_object):
         """ Insert or update table 'element'. Add element to selected feature """
 
         # Get values from dialog
@@ -183,9 +183,10 @@ class ManageElement(ParentManage):
         
         # Check if this element already exists
         sql = ("SELECT DISTINCT(element_id)"
-               " FROM " + self.schema_name + "." + table_object + ""
-               " WHERE element_id = '" + element_id + "'")
-        row = self.controller.get_row(sql, log_info=False)
+               " FROM " + self.schema_name + "." + str(table_object) + ""
+               " WHERE element_id = '" + str(element_id) + "'")
+        row = self.controller.get_row(sql, log_info=False, log_sql=True)
+
         
         if row is None:
             # If object not exist perform an INSERT
