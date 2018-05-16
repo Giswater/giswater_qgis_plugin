@@ -38,7 +38,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>Parameter_id: </string>
+           <string>Parameter_id:      </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -84,7 +84,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>Value:                </string>
+           <string>Value:                   </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -125,7 +125,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>position_id       </string>
+           <string>Position_id:          </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -166,7 +166,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>position_value</string>
+           <string>Position_value:    </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>

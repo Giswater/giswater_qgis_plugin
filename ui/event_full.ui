@@ -33,7 +33,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>id:</string>
+    <string>Id:</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_close">
@@ -59,7 +59,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>event code:</string>
+    <string>Event code:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="event_code">
@@ -82,7 +82,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>visit_id:</string>
+    <string>Visit_id:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="visit_id">
@@ -115,7 +115,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>position_id:</string>
+    <string>Position_id:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="position_value">
@@ -138,7 +138,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>position_value:</string>
+    <string>Position_value:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="parameter_id">
@@ -161,7 +161,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>parameter_id:</string>
+    <string>Parameter_id:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="value">
@@ -184,7 +184,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>value:</string>
+    <string>Value:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="value1">
@@ -207,7 +207,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>value1:</string>
+    <string>Value1:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="compass">
@@ -240,7 +240,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>value2:</string>
+    <string>Value2:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_xcoord">
@@ -253,7 +253,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>xcoord:</string>
+    <string>Xcoord:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="geom1">
@@ -276,7 +276,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>compass:</string>
+    <string>Compass:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="xcoord">
@@ -309,7 +309,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>ycoord:</string>
+    <string>Ycoord:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_geom2">
@@ -322,7 +322,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>geom2:</string>
+    <string>Geom2:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="geom2">
@@ -345,7 +345,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>geom1:</string>
+    <string>Geom1:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_geom3">
@@ -358,7 +358,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>geom3:</string>
+    <string>Geom3:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="geom3">
@@ -381,7 +381,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>tstamp:</string>
+    <string>Tstamp:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="text">
@@ -414,7 +414,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>index_val:</string>
+    <string>Index_val:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="index_val">
@@ -437,7 +437,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>text:</string>
+    <string>Text:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_is_last">
@@ -450,7 +450,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>is_last:</string>
+    <string>Is_last:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="is_last">

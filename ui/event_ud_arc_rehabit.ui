@@ -38,7 +38,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>Parameter_id   </string>
+           <string>Parameter_id:      </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -82,7 +82,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>position_id       </string>
+           <string>Position_id:          </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -123,7 +123,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>position_value</string>
+           <string>Position_value:    </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -166,7 +166,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>value1                </string>
+           <string>Value1:                 </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -207,7 +207,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>value2                </string>
+           <string>Value2:                 </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -248,7 +248,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>geom1               </string>
+           <string>Geom1:                </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -289,7 +289,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>geom2               </string>
+           <string>Geom2:                </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
@@ -330,7 +330,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text">
-           <string>geom3               </string>
+           <string>Geom3:                </string>
           </property>
           <property name="textFormat">
            <enum>Qt::AutoText</enum>
