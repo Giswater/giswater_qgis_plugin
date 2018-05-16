@@ -695,7 +695,8 @@ class SearchPlus(QObject):
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE expl_name LIKE '%" + str(expl_name) + "%' or expl_name is null"
+               " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " LIKE '%" + str(expl_name) + "%' "
+               " or "+ self.params['basic_search_hyd_hydro_field_expl_name'] + " is null"
                # " AND state IN (" + str(list_state) + ") "
                " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_1'].replace("'", "''")))
         rows = self.controller.get_rows(sql)
