@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
 from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor
@@ -1536,7 +1536,8 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Remove selected features of all layers """
 
         for layer in self.canvas.layers():
-            layer.removeSelection()
+            if type(layer) is QgsVectorLayer:
+                layer.removeSelection()
         self.canvas.refresh()
         
 

@@ -10,7 +10,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition, QgsVectorLayer
 from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from PyQt4.QtGui import QListWidget, QListWidgetItem, QLineEdit
@@ -44,9 +44,7 @@ class DrawProfiles(ParentMapTool):
     def activate(self):
 
         # Remove all selections on canvas
-        for layer in self.canvas.layers():
-            layer.removeSelection()
-        self.canvas.refresh()
+        self.remove_selection()
 
         # Get version of pgRouting
         sql = "SELECT version FROM pgr_version()"
@@ -1235,9 +1233,7 @@ class DrawProfiles(ParentMapTool):
         self.dlg.tbl_list_arc.clear()
         
         # Clear selection 
-        for layer in self.canvas.layers():
-            layer.removeSelection()
-        self.canvas.refresh()
+        self.remove_selection()
         self.deactivate()
 
 
@@ -1543,4 +1539,15 @@ class DrawProfiles(ParentMapTool):
         self.start_end_node.pop(1)
         # Reload path
         self.exec_path()
+        
+        
+    def remove_selection(self):
+        """ Remove selected features of all layers """
+
+        for layer in self.canvas.layers():
+            if type(layer) is QgsVectorLayer:
+                layer.removeSelection()
+        self.canvas.refresh()
+        
+                
         
