@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QGridLayout
+from PyQt4.QtGui import QPushButton
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
+
 from PyQt4 import uic
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QLineEdit, QLabel
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog
+from PyQt4.QtGui import QLineEdit, QLabel
+
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
 
@@ -675,7 +680,7 @@ class SearchPlus(QObject):
         
         self.list_hydro = []
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
-        if expl_name is None:
+        if expl_name is None or expl_name == "None":
             expl_name = ""
 
         list_state = self.state_list()
@@ -683,11 +688,16 @@ class SearchPlus(QObject):
             message = "The state selector is empty"
             self.controller.show_warning(message)
             return
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state "
+        if not self.params['basic_search_hyd_hydro_field_1']:
+            return
+
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''") + ", "
+               + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
+               + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
-               " AND state IN (" + str(list_state) + ") "
-               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
+               " WHERE expl_name LIKE '%" + str(expl_name) + "%' or expl_name is null"
+               # " AND state IN (" + str(list_state) + ") "
+               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_1'].replace("'", "''")))
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
@@ -718,11 +728,11 @@ class SearchPlus(QObject):
         hydro_id = str(row[0])
         connec_customer_code = str(row[1])
         expl_name = utils_giswater.getWidgetText(expl_name, return_string_null=False)
-        sql = ("SELECT connec_id, " + str(self.params['basic_search_hyd_hydro_field_code']) + ""
+        sql = ("SELECT " + str(self.params['basic_search_hyd_hydro_field_cc']) + ", " + str(self.params['basic_search_hyd_hydro_field_1']) + ""
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE connec_customer_code = '"+str(connec_customer_code)+"' "
-               " AND expl_name ILIKE '%" + str(expl_name) + "%' "
-               " AND " + str(self.params['basic_search_hyd_hydro_field_code']) + " = '" + str(hydro_id) + "'")
+               " WHERE " + str(self.params['basic_search_hyd_hydro_field_ccc']) + " = '"+str(connec_customer_code)+"' "
+               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%' "
+               " AND " + str(self.params['basic_search_hyd_hydro_field_1']) + " = '" + str(hydro_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -766,25 +776,47 @@ class SearchPlus(QObject):
         if expl_name == 'null':
             expl_name = ''
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
-               " WHERE connec_id = '" + connec_id + "'"
-               " AND hydrometer_customer_code = '" + hydrometer_customer_code + "'"
-               " AND expl_name ILIKE '%" + str(expl_name) + "%'")
+               " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
+               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
+               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%'")
         rows = self.controller.get_rows(sql)
         if rows:
             row = rows[0]
         else:
             return
 
-        widget_list = self.hydro_info_dlg.findChildren(QLineEdit)
-        for widget in widget_list:
-            field = widget.objectName()
-            if row[field]:
-                widget.setText(row[field])
+        # Get columns name in order of the table
+        sql = ("SELECT column_name FROM information_schema.columns"
+               " WHERE table_name = '" + "v_rtc_hydrometer'"
+               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
+               " ORDER BY ordinal_position")
+        column_name = self.controller.get_rows(sql)
+
+        grid_layout = self.hydro_info_dlg.findChild(QGridLayout, 'gridLayout')
+        for x in range(0, len(row)):
+            label = QLabel()
+            label.setObjectName("lbl_" + column_name[x][0])
+            label.setText(str(column_name[x][0] + ": "))
+            grid_layout.addWidget(label, x, 0, 1, 1)
+            if column_name[x][0] != 'hydrometer_link':
+                lineedit = QLineEdit()
+                lineedit.setObjectName("txt_"+column_name[x][0])
+                lineedit.setText(str(row[x]))
+                lineedit.setDisabled(True)
+                grid_layout.addWidget(lineedit, x, 1, 1, 1)
+            else:
+                button = QPushButton()
+                button.setObjectName("txt_"+column_name[x][0])
+                button.setText(str(row[x]))
+                button.setStyleSheet("Text-align:left")
+                button.setFlat(True)
+                grid_layout.addWidget(button, x, 1, 1, 1)
+                self.button_link = button
+
+
         url = str(row['hydrometer_link'])
         if url is not None or url != '':
-            self.hydro_info_dlg.hydrometer_link.setText(url)
-            self.hydro_info_dlg.hydrometer_link.clicked.connect(partial(self.open_url, url))
-
+            self.button_link.clicked.connect(partial(self.open_url, url))
 
         self.hydro_info_dlg.open()
 
@@ -896,7 +928,8 @@ class SearchPlus(QObject):
         
         self.zoom_to_polygon(self.dlg.expl_name, 'exploitation', 'name')
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
-        if expl_name == "null" or expl_name is None:
+
+        if expl_name == "null" or expl_name is None or expl_name == "None":
             expl_name = ""
         list_hydro = []
 
@@ -905,11 +938,13 @@ class SearchPlus(QObject):
             message = "The state selector is empty"
             self.controller.show_warning(message)
             return
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_code'] + ", connec_customer_code, state"
-               " FROM " + self.schema_name + ".v_rtc_hydrometer"
-               " WHERE expl_name LIKE '%" + str(expl_name) + "%'"
-               " AND state IN (" + str(list_state) + ") "
-               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_code']))
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''") + ", "
+               + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
+               + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
+               " FROM " + self.schema_name + ".v_rtc_hydrometer "
+               " WHERE "+self.params['basic_search_hyd_hydro_field_expl_name']+" LIKE '%" + str(expl_name) + "%' "
+               # " AND state IN (" + str(list_state) + ") "
+               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_1'].replace("'", "''")))
         rows = self.controller.get_rows(sql)
         if not rows:
             return
