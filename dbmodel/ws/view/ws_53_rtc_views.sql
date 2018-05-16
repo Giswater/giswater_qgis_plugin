@@ -62,7 +62,7 @@ DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
  SELECT rtc_hydrometer.hydrometer_id,
-    connec.code,
+    connec.code AS connec_id,
     connec.customer_code AS connec_customer_code,
     connec.expl_id,
     value_state.name  AS state,
