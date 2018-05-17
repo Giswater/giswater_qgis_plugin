@@ -1401,6 +1401,11 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def custom_mincut(self):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
+        # Need this 3 lines here becouse if between one action and another we activate Pan, we cant open another valve
+        # This is a safety measure
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
