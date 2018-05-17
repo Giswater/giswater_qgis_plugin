@@ -55,7 +55,7 @@ BEGIN
 
 		
 		-- Enddate
-		IF (NEW.state > 0 THEN
+		IF (NEW.state > 0) THEN
 			NEW.enddate := NULL;
 		END IF;
 

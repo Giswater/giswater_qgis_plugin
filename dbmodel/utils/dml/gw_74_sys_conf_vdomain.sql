@@ -22,7 +22,7 @@ INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proxim
 
 
 INSERT INTO config_param_system VALUES (29, 'inventory_update_date', '2017-01-01', 'date', 'om', NULL);
-INSERT INTO config_param_system VALUES (30, 'geom_slp_direction', 'TRUE', 'boolean', 'topology', 'Ony for UD');
+INSERT INTO config_param_system VALUES (30, 'geom_slp_direction', 'FALSE', 'boolean', 'topology', 'Ony for UD');
 INSERT INTO config_param_system VALUES (27, 'state_topocontrol', 'TRUE', 'boolean', 'topology', 'Only for WS');
 INSERT INTO config_param_system VALUES (31, 'link_search_button', '0,1', 'float', 'edit', NULL);
 INSERT INTO config_param_system VALUES (34, 'rev_arc_y1_tol', '0', 'float', 'review', 'Only for UD');
@@ -77,7 +77,6 @@ INSERT INTO config_param_system VALUES (3, 'custom_giswater_folder', NULL, 'varc
 INSERT INTO config_param_system VALUES (54, 'edit_arc_divide_automatic_control', 'TRUE', 'boolean', 'edit', NULL);
 INSERT INTO config_param_system VALUES (55, 'edit_enable_arc_nodes_update', 'FALSE', 'boolean', 'edit', NULL);
 INSERT INTO config_param_system VALUES (56, 'hydrometer_link_absolute_path', NULL, 'text', 'rtc', NULL);
-
 INSERT INTO config_param_system VALUES (60, 'basic_search_hyd_hydro_layer_name', 'v_rtc_hydrometer', 'varchar', 'searchplus', 'layer name');
 INSERT INTO config_param_system VALUES (61, 'basic_search_hyd_hydro_field_expl_name', 'expl_name', 'varchar', 'searchplus', 'field exploitation.name');
 INSERT INTO config_param_system VALUES (62, 'basic_search_hyd_hydro_field_cc', 'connec_id', 'text', 'searchplus', 'field connec.code');
