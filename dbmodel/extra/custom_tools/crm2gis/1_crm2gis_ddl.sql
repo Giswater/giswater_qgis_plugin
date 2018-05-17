@@ -35,8 +35,8 @@ CREATE TABLE hydrometer(
   m3_volume integer,
   start_date date,
   end_date date,
-  update_date date
-  expl_id integer,
+  update_date date,
+  expl_id integer
 );
 
 

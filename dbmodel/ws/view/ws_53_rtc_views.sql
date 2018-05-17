@@ -93,7 +93,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
      LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
      LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
      LEFT JOIN value_state ON value_state.id = ext_rtc_hydrometer.state
-    LEFT JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+    LEFT JOIN connec ON connec.connec_customer_code::text = ext_rtc_hydrometer.connec_customer_code::text
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
      
   WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state AND selector_hydrometer.cur_user = "current_user"()::text;
