@@ -691,14 +691,14 @@ class SearchPlus(QObject):
         if not self.params['basic_search_hyd_hydro_field_1']:
             return
 
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''") + ", "
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'] + ", "
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " LIKE '%" + str(expl_name) + "%' "
                " or "+ self.params['basic_search_hyd_hydro_field_expl_name'] + " is null"
                # " AND state IN (" + str(list_state) + ") "
-               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_1'].replace("'", "''")))
+               " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
@@ -729,11 +729,11 @@ class SearchPlus(QObject):
         hydro_id = str(row[0])
         connec_customer_code = str(row[1])
         expl_name = utils_giswater.getWidgetText(expl_name, return_string_null=False)
-        sql = ("SELECT " + str(self.params['basic_search_hyd_hydro_field_cc']) + ", " + str(self.params['basic_search_hyd_hydro_field_1']) + ""
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ", " + self.params['basic_search_hyd_hydro_field_1'] + ""
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE " + str(self.params['basic_search_hyd_hydro_field_ccc']) + " = '"+str(connec_customer_code)+"' "
+               " WHERE " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '"+str(connec_customer_code)+"' "
                " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%' "
-               " AND " + str(self.params['basic_search_hyd_hydro_field_1']) + " = '" + str(hydro_id) + "'")
+               " AND " + self.params['basic_search_hyd_hydro_field_1'] + " = '" + str(hydro_id) + "'")
         row = self.controller.get_row(sql)
         if not row:
             return
@@ -943,9 +943,9 @@ class SearchPlus(QObject):
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE "+self.params['basic_search_hyd_hydro_field_expl_name']+" LIKE '%" + str(expl_name) + "%' "
+               " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name']+" LIKE '%" + str(expl_name) + "%' "
                # " AND state IN (" + str(list_state) + ") "
-               " ORDER BY " + str(self.params['basic_search_hyd_hydro_field_1'].replace("'", "''")))
+               " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
         rows = self.controller.get_rows(sql)
         if not rows:
             return
