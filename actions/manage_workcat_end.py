@@ -16,7 +16,7 @@ from functools import partial
 
 import utils_giswater
 from actions.parent_manage import ParentManage
-from ui_manager import WorkcatEnd
+from ui_manager import WorkcatEnd, NewWorkcat
 from ui_manager import WorkcatEndList
 
 
@@ -69,6 +69,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
         # self.dlg.workcat_id_end.currentIndexChanged.connec(partial(self.get_values_from_form))
 
+        self.dlg.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.table_object))
         self.dlg.btn_delete.clicked.connect(partial(self.delete_records, self.table_object))
         self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, self.table_object))
@@ -395,4 +396,83 @@ class ManageWorkcatEnd(ParentManage):
         self.hide_generic_layers()
         self.disconnect_snapping()
         self.disconnect_signal_selection_changed()
+
+    def new_workcat(self):
+
+        self.new_workcat_dlg = NewWorkcat()
+        utils_giswater.setDialog(self.new_workcat_dlg)
+        self.load_settings(self.new_workcat_dlg)
+
+        utils_giswater.setCalendarDate(self.new_workcat_dlg.builtdate, None, True)
+        
+        table_object = "cat_work"
+        self.set_completer_object(table_object)
+
+        #Set signals
+        self.new_workcat_dlg.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
+
+        self.new_workcat_dlg.btn_cancel.clicked.connect(partial(self.close_dialog, self.new_workcat_dlg))
+
+        # Open dialog
+        self.open_dialog(self.new_workcat_dlg)
+
+    def manage_new_workcat_accept(self, table_object):
+        """ Insert table 'cat_work'. Add cat_work """
+
+        # Get values from dialog
+        values = ""
+        fields = ""
+        cat_work_id = utils_giswater.getWidgetText(self.new_workcat_dlg.cat_work_id)
+        if cat_work_id != "null":
+            fields += 'id, '
+            values += ("'" + str(cat_work_id) + "', ")
+        descript = utils_giswater.getWidgetText("descript")
+        if descript != "null":
+            fields += 'descript, '
+            values += ("'" + str(descript) + "', ")
+        link = utils_giswater.getWidgetText("link")
+        if link != "null":
+            fields += 'link, '
+            values += ("'" + str(link) + "', ")
+        workid_key_1 = utils_giswater.getWidgetText("workid_key_1")
+        if workid_key_1 != "null":
+            fields += 'workid_key1, '
+            values += ("'" + str(workid_key_1) + "', ")
+        workid_key_2 = utils_giswater.getWidgetText("workid_key_2")
+        if workid_key_2 != "null":
+            fields += 'workid_key2, '
+            values += ("'" + str(workid_key_2) + "', ")
+        builtdate = self.new_workcat_dlg.builtdate.dateTime().toString('yyyy-MM-dd')
+        if builtdate != "null":
+            fields += 'builtdate, '
+            values += ("'" + str(builtdate) + "', ")
+
+        if values != "":
+            fields = fields[:-2]
+            values = values[:-2]
+            if cat_work_id == 'null':
+                msg = "El campo Work id esta vacio"
+                self.controller.show_info_box(msg, "Warning")
+            else:
+                # Check if this element already exists
+                sql = ("SELECT DISTINCT(id)"
+                       " FROM " + self.schema_name + "." + str(table_object) + ""
+                       " WHERE id = '" + str(cat_work_id) + "'")
+                row = self.controller.get_row(sql, log_info=False, log_sql=True)
+
+                if row is None :
+                    sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
+                    self.controller.execute_sql(sql, log_sql=True)
+
+                    sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+                    rows = self.controller.get_rows(sql)
+                    if rows:
+                        utils_giswater.fillComboBox(self.dlg.workcat_id_end, rows)
+                        self.dlg.workcat_id_end.setCurrentIndex(self.dlg.workcat_id_end.findText(str(cat_work_id)))
+
+                    self.close_dialog(self.new_workcat_dlg)
+                else:
+                    msg = "Este Workcat ya existe"
+                    self.controller.show_info_box(msg, "Warning")
+
 

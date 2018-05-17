@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>407</width>
-    <height>369</height>
+    <width>408</width>
+    <height>370</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>319</x>
-     <y>324</y>
+     <y>338</y>
      <width>76</width>
      <height>23</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>234</x>
-     <y>324</y>
+     <y>338</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -45,7 +45,7 @@
      <x>12</x>
      <y>21</y>
      <width>379</width>
-     <height>106</height>
+     <height>127</height>
     </rect>
    </property>
    <property name="title">
@@ -55,7 +55,7 @@
     <property name="geometry">
      <rect>
       <x>165</x>
-      <y>63</y>
+      <y>90</y>
       <width>200</width>
       <height>22</height>
      </rect>
@@ -120,7 +120,7 @@
     <property name="geometry">
      <rect>
       <x>25</x>
-      <y>60</y>
+      <y>87</y>
       <width>96</width>
       <height>22</height>
      </rect>
@@ -149,12 +149,25 @@
      <number>3</number>
     </property>
    </widget>
+   <widget class="QPushButton" name="btn_new_workcat">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>58</y>
+      <width>95</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add New Workcat</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>138</y>
+     <y>154</y>
      <width>376</width>
      <height>175</height>
     </rect>

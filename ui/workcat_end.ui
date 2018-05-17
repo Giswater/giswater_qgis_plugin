@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>306</width>
-     <height>446</height>
+     <height>459</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -33,7 +33,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>56</y>
+       <y>38</y>
        <width>103</width>
        <height>22</height>
       </rect>
@@ -66,7 +66,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>24</y>
+       <y>10</y>
        <width>96</width>
        <height>22</height>
       </rect>
@@ -99,7 +99,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>116</y>
+       <y>128</y>
        <width>103</width>
        <height>22</height>
       </rect>
@@ -132,7 +132,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>86</y>
+       <y>98</y>
        <width>97</width>
        <height>22</height>
       </rect>
@@ -165,7 +165,7 @@
      <property name="geometry">
       <rect>
        <x>135</x>
-       <y>55</y>
+       <y>37</y>
        <width>157</width>
        <height>20</height>
       </rect>
@@ -178,7 +178,7 @@
      <property name="geometry">
       <rect>
        <x>135</x>
-       <y>25</y>
+       <y>11</y>
        <width>157</width>
        <height>20</height>
       </rect>
@@ -194,7 +194,7 @@
      <property name="geometry">
       <rect>
        <x>135</x>
-       <y>85</y>
+       <y>97</y>
        <width>157</width>
        <height>20</height>
       </rect>
@@ -207,10 +207,23 @@
      <property name="geometry">
       <rect>
        <x>133</x>
-       <y>120</y>
+       <y>132</y>
        <width>161</width>
        <height>291</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_new_workcat">
+     <property name="geometry">
+      <rect>
+       <x>195</x>
+       <y>64</y>
+       <width>95</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add New Workcat</string>
      </property>
     </widget>
    </widget>
@@ -391,7 +404,7 @@
    <property name="geometry">
     <rect>
      <x>238</x>
-     <y>470</y>
+     <y>474</y>
      <width>76</width>
      <height>23</height>
     </rect>
@@ -404,7 +417,7 @@
    <property name="geometry">
     <rect>
      <x>151</x>
-     <y>470</y>
+     <y>474</y>
      <width>75</width>
      <height>23</height>
     </rect>

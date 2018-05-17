@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QCompleter, QStringListModel
 from qgis.core import QgsPoint, QgsFeatureRequest
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
@@ -18,6 +19,7 @@ from map_tools.parent import ParentMapTool
 from ui_manager import UDcatalog
 from ui_manager import WScatalog
 from ui_manager import NodeReplace
+from ui_manager import NewWorkcat
 
 
 class ReplaceNodeMapTool(ParentMapTool):
@@ -78,6 +80,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("node_node_type_new", rows)
 
+        self.dlg_nodereplace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_nodereplace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_nodereplace))
         self.dlg_nodereplace.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_nodereplace))
 
@@ -85,7 +88,109 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.open_dialog(self.dlg_nodereplace, maximize_button=False)
 
 
-        
+    def new_workcat(self):
+
+        self.new_workcat_dlg = NewWorkcat()
+        utils_giswater.setDialog(self.new_workcat_dlg)
+        self.load_settings(self.new_workcat_dlg)
+
+
+        utils_giswater.setCalendarDate(self.new_workcat_dlg.builtdate, None, True)
+
+        table_object = "cat_work"
+        self.set_completer_object(table_object,self.new_workcat_dlg.cat_work_id,'id')
+
+        #Set signals
+        self.new_workcat_dlg.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
+
+        self.new_workcat_dlg.btn_cancel.clicked.connect(partial(self.close_dialog, self.new_workcat_dlg))
+
+        # Open dialog
+        self.open_dialog(self.new_workcat_dlg)
+
+    def manage_new_workcat_accept(self, table_object):
+        """ Insert table 'cat_work'. Add cat_work """
+
+        # Get values from dialog
+        values = ""
+        fields = ""
+        cat_work_id = utils_giswater.getWidgetText(self.new_workcat_dlg.cat_work_id)
+        if cat_work_id != "null":
+            fields += 'id, '
+            values += ("'" + str(cat_work_id) + "', ")
+        descript = utils_giswater.getWidgetText("descript")
+        if descript != "null":
+            fields += 'descript, '
+            values += ("'" + str(descript) + "', ")
+        link = utils_giswater.getWidgetText("link")
+        if link != "null":
+            fields += 'link, '
+            values += ("'" + str(link) + "', ")
+        workid_key_1 = utils_giswater.getWidgetText("workid_key_1")
+        if workid_key_1 != "null":
+            fields += 'workid_key1, '
+            values += ("'" + str(workid_key_1) + "', ")
+        workid_key_2 = utils_giswater.getWidgetText("workid_key_2")
+        if workid_key_2 != "null":
+            fields += 'workid_key2, '
+            values += ("'" + str(workid_key_2) + "', ")
+        builtdate = self.new_workcat_dlg.builtdate.dateTime().toString('yyyy-MM-dd')
+        if builtdate != "null":
+            fields += 'builtdate, '
+            values += ("'" + str(builtdate) + "', ")
+
+        if values != "":
+            fields = fields[:-2]
+            values = values[:-2]
+            if cat_work_id == 'null':
+                msg = "Work_id field is empty"
+                self.controller.show_info_box(msg, "Warning")
+            else:
+                # Check if this element already exists
+                sql = ("SELECT DISTINCT(id)"
+                       " FROM " + self.schema_name + "." + str(table_object) + ""
+                       " WHERE id = '" + str(cat_work_id) + "'")
+                row = self.controller.get_row(sql, log_info=False, log_sql=True)
+
+                if row is None :
+                    sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
+                    self.controller.execute_sql(sql, log_sql=True)
+
+                    sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+                    rows = self.controller.get_rows(sql)
+                    if rows:
+                        utils_giswater.fillComboBox(self.dlg_nodereplace.workcat_id_end, rows)
+                        self.dlg_nodereplace.workcat_id_end.setCurrentIndex(self.dlg_nodereplace.workcat_id_end.findText(str(cat_work_id)))
+
+                    self.close_dialog(self.new_workcat_dlg)
+                else:
+                    msg = "This Workcat is already exist"
+                    self.controller.show_info_box(msg, "Warning")
+
+    def set_completer_object(self, tablename, widget, field_id):
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object
+        """
+        if not widget:
+            return
+
+        # Set SQL
+        sql = ("SELECT DISTINCT(" + field_id + ")"
+               " FROM " + self.schema_name + "." + tablename +""
+               " ORDER BY "+ field_id + "")
+        row = self.controller.get_rows(sql)
+        for i in range(0, len(row)):
+            aux = row[i]
+            row[i] = str(aux[0])
+
+        # Set completer and model: add autocomplete in the widget
+        self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        widget.setCompleter(self.completer)
+        model = QStringListModel()
+        model.setStringList(row)
+        self.completer.setModel(model)
+
     def get_values(self, dialog):
 
         self.workcat_id_end_aux = utils_giswater.getWidgetText(dialog.workcat_id_end)
