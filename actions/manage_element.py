@@ -66,7 +66,7 @@ class ManageElement(ParentManage):
         self.dlg.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
 
         # Fill combo boxes
-        sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".v_edit_element ORDER BY elementtype_id"
+        sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".cat_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("element_type", rows, False)
         self.populate_combo("state", "value_state", "name")
@@ -320,7 +320,7 @@ class ManageElement(ParentManage):
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
         
-        sql = ("SELECT DISTINCT(elementcat_id) FROM " + self.schema_name + ".v_edit_element"
+        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_element"
                " WHERE elementtype_id = '" + utils_giswater.getWidgetText("element_type") + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("elementcat_id", rows, False)
