@@ -81,18 +81,18 @@ INSERT INTO ext_hydrometer_state VALUES (1, 'postgres');
 
 
 
-
 -----------------------
 --system variables
 -----------------------
+INSERT INTO config_param_system VALUES (60, 'basic_search_hyd_hydro_layer_name', 'v_rtc_hydrometer', 'varchar', 'searchplus', 'layer name');
+INSERT INTO config_param_system VALUES (61, 'basic_search_hyd_hydro_field_expl_name', 'expl_name', 'varchar', 'searchplus', 'field exploitation.name');
+INSERT INTO config_param_system VALUES (62, 'basic_search_hyd_hydro_field_cc', 'connec_id', 'text', 'searchplus', 'field connec.code');
+INSERT INTO config_param_system VALUES (63, 'basic_search_hyd_hydro_field_erhc', 'hydrometer_customer_code', 'text', 'searchplus', 'field ext_rtc_hydrometer.code');
+INSERT INTO config_param_system VALUES (64, 'basic_search_hyd_hydro_field_ccc', 'connec_customer_code', 'text', 'searchplus', 'field connec.customer_code');
+INSERT INTO config_param_system VALUES (66, 'basic_search_hyd_hydro_field_1', 'hydrometer_customer_code', 'text', 'searchplus', 'field ext_rtc_hydrometer.code');
+INSERT INTO config_param_system VALUES (67, 'basic_search_hyd_hydro_field_2', 'connec_customer_code', 'text', 'searchplus', 'field connec.customer_code');
+INSERT INTO config_param_system VALUES (68, 'basic_search_hyd_hydro_field_3', 'state', 'text', 'searchplus', 'field value_state.name');
+INSERT INTO config_param_system VALUES (69, 'basic_search_workcat_filter', 'code', 'text', 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (70, 'om_mincut_use_pgrouting', NULL, 'boolean', 'mincut', NULL);
 
--- search
-
-
-
-
-
-
-
--- profile
 
