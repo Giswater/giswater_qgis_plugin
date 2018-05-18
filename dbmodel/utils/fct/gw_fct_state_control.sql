@@ -6,8 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2130
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_state_control(feature_type_aux character varying,feature_id_aux character varying,state_aux integer,tg_op_aux character varying)  
-RETURNS integer AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_state_control(
+    feature_type_aux character varying,
+    feature_id_aux character varying,
+    state_aux integer,
+    tg_op_aux character varying)
+  RETURNS integer AS
 $BODY$
 
 DECLARE 
@@ -32,7 +36,7 @@ BEGIN
     IF tg_op_aux = 'UPDATE' THEN
 		IF feature_type_aux='NODE' and state_aux=0 THEN
 			SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
-			IF state_aux!=old_state_aux THEN
+			IF state_aux!=old_state_aux AND (arc_downgrade_force_aux IS NOT TRUE) THEN
 
 				-- arcs control
 				SELECT count(arc.arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
@@ -45,6 +49,19 @@ BEGIN
 				IF num_feature > 0 THEN 
 					PERFORM audit_function(1072,2130,feature_id_aux);
 				END IF;
+			ELSIF state_aux!=old_state_aux AND (arc_downgrade_force_aux IS TRUE) THEN
+				-- arcs control
+				SELECT count(arc.arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
+				IF num_feature > 0 THEN 
+					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, old_state_aux);
+				END IF;
+
+				--link feature control
+				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux AND link.state > 0;
+				IF num_feature > 0 THEN 
+					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, old_state_aux);
+				END IF;
+				
 				
 			END IF;
 
