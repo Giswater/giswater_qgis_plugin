@@ -1,6 +1,6 @@
-﻿--SELECT ws_sample.gw_fct_apicheck();
+﻿--SELECT SCHEMA_NAME.gw_fct_apicheck();
 
-CREATE OR REPLACE FUNCTION "ws_sample"."gw_fct_apicheck"() RETURNS json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_apicheck"() RETURNS json AS $BODY$
 DECLARE
 
     api_version json;
@@ -12,7 +12,7 @@ DECLARE
 BEGIN
 
 --  Set search path to local schema
-    SET search_path = "ws_sample", public;  
+    SET search_path = "SCHEMA_NAME", public;  
       
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -20,8 +20,8 @@ BEGIN
 
 
 RAISE NOTICE 'count: % gw_fct_deleteevent', v_count;	v_count=v_count+1;
-	SELECT id FROM ws_sample.om_visit_event LIMIT 1 into v_gid;
-	PERFORM ws_sample.gw_fct_deleteevent (v_gid);
+	SELECT id FROM SCHEMA_NAME.om_visit_event LIMIT 1 into v_gid;
+	PERFORM SCHEMA_NAME.gw_fct_deleteevent (v_gid);
 		
 
 RAISE NOTICE 'count: % gw_fct_getinfofromcoordinates', v_count;	v_count=v_count+1;

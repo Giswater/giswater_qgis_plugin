@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfofromid(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfofromid(
     alias_id_arg character varying,
     table_id_arg character varying,
     id character varying,
@@ -37,7 +37,7 @@ DECLARE
 BEGIN
 
 --    Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
 
     parent_child_relation = false;

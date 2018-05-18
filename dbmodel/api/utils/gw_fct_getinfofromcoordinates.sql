@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinfofromcoordinates(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfofromcoordinates(
     p_x double precision,
     p_y double precision,
     p_epsg integer,
@@ -32,7 +32,7 @@ BEGIN
 
 
 --  Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
 
 --  get api version
