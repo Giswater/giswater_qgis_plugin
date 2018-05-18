@@ -33,7 +33,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>38</y>
+       <y>17</y>
        <width>103</width>
        <height>22</height>
       </rect>
@@ -66,7 +66,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>57</y>
        <width>96</width>
        <height>22</height>
       </rect>
@@ -99,7 +99,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>128</y>
+       <y>137</y>
        <width>103</width>
        <height>22</height>
       </rect>
@@ -132,7 +132,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>98</y>
+       <y>97</y>
        <width>97</width>
        <height>22</height>
       </rect>
@@ -165,8 +165,8 @@
      <property name="geometry">
       <rect>
        <x>135</x>
-       <y>37</y>
-       <width>157</width>
+       <y>16</y>
+       <width>131</width>
        <height>20</height>
       </rect>
      </property>
@@ -178,7 +178,7 @@
      <property name="geometry">
       <rect>
        <x>135</x>
-       <y>11</y>
+       <y>58</y>
        <width>157</width>
        <height>20</height>
       </rect>
@@ -207,23 +207,23 @@
      <property name="geometry">
       <rect>
        <x>133</x>
-       <y>132</y>
+       <y>137</y>
        <width>161</width>
-       <height>291</height>
+       <height>286</height>
       </rect>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_new_workcat">
      <property name="geometry">
       <rect>
-       <x>195</x>
-       <y>64</y>
-       <width>95</width>
-       <height>23</height>
+       <x>271</x>
+       <y>15</y>
+       <width>22</width>
+       <height>22</height>
       </rect>
      </property>
      <property name="text">
-      <string>Add New Workcat</string>
+      <string>...</string>
      </property>
     </widget>
    </widget>

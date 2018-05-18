@@ -952,7 +952,10 @@
         <source>The state selector is empty</source>
         <translation>El selector d'estats esta buit</translation>
     </message>
-    
+    <message>
+        <source>Select a workcat id end</source>
+        <translation>Seleccioni un expedient</translation>
+    </message>
 </context>
 
 </TS>

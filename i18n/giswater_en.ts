@@ -951,6 +951,10 @@
         <source>The state selector is empty</source>
         <translation>The state selector is empty</translation>
     </message>
+    <message>
+        <source>Select a workcat id end</source>
+        <translation>Please select a workcat id end</translation>
+    </message>
 
 </context>
 
