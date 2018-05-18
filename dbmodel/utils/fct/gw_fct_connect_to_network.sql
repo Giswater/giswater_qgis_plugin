@@ -36,7 +36,10 @@ DECLARE
 	dma_aux integer;
 	expl_aux integer;
 	state_connec integer;
-	v_link_geom public.geometry;	
+	v_link_geom public.geometry;
+	v_exit_type text;
+	v_vnode_type text;	
+	v_exit_id text;
 
 	
 BEGIN
@@ -52,8 +55,17 @@ BEGIN
     FOREACH connect_id_aux IN ARRAY connec_array
     LOOP
 
-        -- Control user defined geometry (in case of existing link)
-	SELECT userdefined_geom, the_geom INTO userDefined, v_link_geom FROM link WHERE feature_id = connect_id_aux AND feature_type=feature_type_aux;
+        -- Get data from link (in case of exists)
+	SELECT userdefined_geom, the_geom, exit_type, exit_id INTO userDefined, v_link_geom, v_exit_type, v_exit_id FROM link WHERE feature_id = connect_id_aux AND feature_type=feature_type_aux;
+
+	IF v_exit_type='VNODE' THEN
+		SELECT vnode_type INTO v_vnode_type FROM vnode WHERE vnode_id::text=v_exit_id;
+	END IF;
+
+	IF (v_exit_type!='VNODE') THEN
+		RETURN;
+	END IF;
+
 
         -- Get connec or gully geometry and arc_id  (if it has)
 	IF feature_type_aux ='CONNEC' THEN          
@@ -66,13 +78,14 @@ BEGIN
 
 	END IF;
 
-	IF (arc_id_aux is null) or (arc_id_aux IS NOT NULL AND v_link_geom IS NOT NULL) THEN
+	IF (arc_id_aux is null) OR (v_link_geom IS NOT NULL AND v_exit_type='VNODE' AND v_vnode_type!='CUSTOM') THEN
 		-- Improved version for curved lines (not perfect!)
 		WITH index_query AS
 		(
 			SELECT ST_Distance(the_geom, connect_geom) as d, arc_id FROM v_edit_arc ORDER BY the_geom <-> connect_geom LIMIT 10
 		)
 		SELECT arc_id INTO arc_id_aux FROM index_query ORDER BY d limit 1;
+
 	END IF;
 
 	-- Get v_edit_arc geometry
@@ -91,10 +104,6 @@ BEGIN
 				link_geom = ST_SetPoint(v_link_geom, ST_NumPoints(v_link_geom) - 1, St_closestpoint(arcrec.the_geom, St_pointn(v_link_geom, (ST_NumPoints(v_link_geom) - 2)))); 
 				
 			END IF;
-
-			--v_link_geom:= ST_AddPoint(v_link_geom, ST_closestpoint (arcrec.the_geom, ST_EndPoint(v_link_geom)));
-			INSERT INTO anl_arc_x_node (arc_id, node_id, fprocesscat_id, the_geom, the_geom_p) VALUES 
-			(arcrec.arc_id, null, 4, v_link_geom, ST_EndPoint(v_link_geom));
 
 		ELSE	
 		-- make the whole link
@@ -136,9 +145,9 @@ BEGIN
 
 		-- Update connec or gully arc_id
 		IF feature_type_aux ='CONNEC' THEN          
-			UPDATE connec SET arc_id=arc_id_aux WHERE connec_id = connect_id_aux;
+			UPDATE connec SET arc_id=arcrec.arc_id WHERE connec_id = connect_id_aux;
 		ELSIF feature_type_aux ='GULLY' THEN 
-			UPDATE connec SET arc_id=arc_id_aux WHERE connec_id = connect_id_aux;
+			UPDATE gully SET arc_id=arcrec.arc_id WHERE gully_id = connect_id_aux;
 		END IF;
 			               
         END IF;

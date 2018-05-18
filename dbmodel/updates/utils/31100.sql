@@ -46,7 +46,7 @@ ALTER TABLE ext_rtc_hydrometer ADD COLUMN connec_customer_code varchar (30);
 CREATE TABLE ext_rtc_hydrometer_state
 (
   id serial PRIMARY KEY,
-  name integer NOT NULL,
+  name text NOT NULL,
   observ text
 );
 
@@ -75,9 +75,6 @@ CREATE TABLE selector_hydrometer
 );
 
 INSERT INTO audit_cat_table VALUES ('selector_hydrometer', 'System', 'Selector of hydrometers', 'role_basic', 0, NULL, NULL, 0, NULL,'selector_hydrometer_id_seq', 'id');
-
-
-INSERT INTO ext_hydrometer_state VALUES (1, 'postgres');
 
 
 

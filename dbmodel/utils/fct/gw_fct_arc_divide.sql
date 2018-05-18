@@ -113,16 +113,14 @@ BEGIN
 			value_param
 			FROM man_addfields_value WHERE feature_id=arc_id_aux;
 			
-		
 			-- Redraw the link and vnode (only userdefined_geom false and directly connected to arc
-			UPDATE arc SET state=0 WHERE arc_id=arc_id_aux;	
-	
 			FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=arc_id_aux
 			LOOP
 				array_agg:= array_append(array_agg, connec_id_aux);
 			END LOOP;
 
 			UPDATE connec SET arc_id=NULL WHERE arc_id=arc_id_aux;	
+	
 			PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
 
 			
@@ -135,10 +133,15 @@ BEGIN
 					array_agg:= array_append(array_agg, gully_id_aux);
 				END LOOP;
 
-				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;	j
+				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;
 				PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
 			
 			END IF;
+
+			DELETE FROM config_param_user where parameter='edit_arc_downgrade_force' AND cur_user=current_user;
+			INSERT INTO config_param_user (value, parameter, cur_user) VALUES ('TRUE', 'edit_arc_downgrade_force', current_user);
+			UPDATE arc SET state=0 WHERE arc_id=arc_id_aux;	
+			UPDATE config_param_user SET value='FALSE' where parameter='edit_arc_downgrade_force' AND cur_user=current_user;
 		
 			--INSERT DATA INTO OM_TRACEABILITY
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
