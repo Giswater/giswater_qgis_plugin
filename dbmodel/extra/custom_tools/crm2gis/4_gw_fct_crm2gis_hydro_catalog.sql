@@ -4,17 +4,12 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
-SET search_path = "crm", public, pg_catalog;
-
-
-
 -- ----------------------------
 -- CRM FUNCTIONS
 -- ----------------------------
 
 
-CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()
+CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis_hydro_catalog()
   RETURNS void AS
 $BODY$DECLARE
 
@@ -22,12 +17,11 @@ $BODY$DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "crm", public;
-	
+    SET search_path = "crm", SCHEMA_NAME, public;
 
-	PERFORM gw_fct_crm2gis_hydro_catalog();
-	PERFORM gw_fct_crm2gis_hydro_data();
-	PERFORM gw_fct_crm2gis_hydro_flow();
+	-- state values
+	INSERT INTO ext_rtc_hydrometer_state (name, observ)
+	SELECT id, code FROM hydro_val_state WHERE id NOT IN (SELECT id FROM ext_rtc_hydrometer_state);
 
 
     RETURN;
