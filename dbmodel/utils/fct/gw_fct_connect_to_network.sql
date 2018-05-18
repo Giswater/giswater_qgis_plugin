@@ -96,8 +96,6 @@ BEGIN
 			INSERT INTO anl_arc_x_node (arc_id, node_id, fprocesscat_id, the_geom, the_geom_p) VALUES 
 			(arcrec.arc_id, null, 4, v_link_geom, ST_EndPoint(v_link_geom));
 
-			raise notice '7';
-
 		ELSE	
 		-- make the whole link
 			link_geom := ST_ShortestLine(connect_geom, arcrec.the_geom);
