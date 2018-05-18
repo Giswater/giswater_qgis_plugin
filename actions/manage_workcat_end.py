@@ -124,6 +124,7 @@ class ManageWorkcatEnd(ParentManage):
             utils_giswater.setText(self.dlg.descript, row['descript'])
             utils_giswater.setCalendarDate(self.dlg.builtdate, row['builtdate'], False)
 
+
     def get_list_selected_id(self, qtable):
         selected_list = qtable.model()
         self.selected_list = []
@@ -138,6 +139,8 @@ class ManageWorkcatEnd(ParentManage):
             ids_list = ids_list + "'" + id_ + "'" + ","
         ids_list = ids_list[:-1]
         return ids_list
+
+
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
         ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_arc)
@@ -283,7 +286,6 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def exec_downgrade(self):
-
         message = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
         answer = self.controller.ask_question(message, title)

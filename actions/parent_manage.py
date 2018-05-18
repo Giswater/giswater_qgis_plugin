@@ -33,7 +33,8 @@ class ParentManage(ParentAction, object):
         self.plan_om = None
         self.previous_map_tool = None
         self.autocommit = True
-        self.lazy_widget = None        
+        self.lazy_widget = None
+        self.workcat_id_end = None
 
 
     def reset_lists(self):
