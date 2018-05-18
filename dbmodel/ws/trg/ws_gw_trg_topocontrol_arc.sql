@@ -15,6 +15,8 @@ DECLARE
     newPoint public.geometry;    
     connecPoint public.geometry;
     state_topocontrol_bool boolean;
+    connec_id_aux varchar;
+    array_agg varchar [];
 	
 BEGIN 
 
@@ -148,16 +150,18 @@ BEGIN
 				-- Update vnode/link
 				IF TG_OP = 'UPDATE' THEN
 	
-					-- Select arcs with start-end on the updated node
-					FOR vnoderec IN SELECT * FROM vnode JOIN link ON vnode_id::text=exit_id WHERE exit_type='VNODE' 
-					AND ST_DWithin(OLD.the_geom, vnode.the_geom, rec.vnode_update_tolerance) AND (userdefined_geom=false OR userdefined_geom is null)
+					-- Redraw the link and vnode
+					FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=NEW.arc_id
 					LOOP
-							-- Update vnode geometry
-						newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
-						UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
+						array_agg:= array_append(array_agg, connec_id_aux);
+						UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
+						
+					END LOOP;
 
-					END LOOP; 
+					PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
+
 				END IF;
+				
 				RETURN NEW;
 			END IF;
 

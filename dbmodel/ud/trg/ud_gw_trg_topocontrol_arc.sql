@@ -29,6 +29,9 @@ DECLARE
 	sys_length_aux double precision;
 	is_reversed boolean;
 	geom_slp_direction_bool boolean;
+	connec_id_aux varchar;
+    gully_id_aux varchar;
+    array_agg varchar [];
 	
 
 BEGIN 
@@ -222,18 +225,25 @@ BEGIN
 
 		END IF;
 
-		-- Update vnode/link
-		IF TG_OP = 'UPDATE' AND is_reversed IS FALSE THEN
-			-- Select arcs with start-end on the updated node
-			FOR vnoderec IN SELECT * FROM vnode JOIN link ON vnode_id::text=exit_id WHERE exit_type='VNODE' 
-			AND ST_DWithin(OLD.the_geom, vnode.the_geom, rec.vnode_update_tolerance)
-			LOOP
-				-- Update vnode geometry
-				NewPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
-				UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
-			END LOOP; 
-		END IF;
+		-- Redraw the link and vnode
+		FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=NEW.arc_id
+		LOOP
+			array_agg:= array_append(array_agg, connec_id_aux);
+			UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
+					
+		END LOOP;
+		PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
 
+		IF project_type_aux='UD' THEN
+
+			array_agg:=NULL;
+			FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=NEW.arc_id
+			LOOP	
+				array_agg:= array_append(array_agg, gully_id_aux);
+				UPDATE gully SET arc_id=NULL WHERE gully_id=gully_id_aux;
+			END LOOP;
+			PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
+		END IF;
 		
 
 	-- Check auto insert end nodes

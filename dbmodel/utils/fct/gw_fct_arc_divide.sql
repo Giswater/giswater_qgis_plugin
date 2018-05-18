@@ -115,33 +115,28 @@ BEGIN
 			
 		
 			-- Redraw the link and vnode (only userdefined_geom false and directly connected to arc
+			UPDATE arc SET state=0 WHERE arc_id=arc_id_aux;	
+	
 			FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=arc_id_aux
 			LOOP
 				array_agg:= array_append(array_agg, connec_id_aux);
 			END LOOP;
-		
-			PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
-		
-			-- Identifying how many connec not have been updated the field arc_id
-			SELECT count(connec_id) INTO count_aux1 FROM connec WHERE arc_id=arc_id_aux;
-			SELECT count(link_id) INTO count_aux2 FROM link JOIN connec ON link.feature_id=connec_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
-			return_aux:=count_aux1-count_aux2;
-			
+
 			UPDATE connec SET arc_id=NULL WHERE arc_id=arc_id_aux;	
+			PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
+
+			
 			IF project_type_aux='UD' THEN
+
+				array_agg:=NULL;
+
 				FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=arc_id_aux
 				LOOP
 					array_agg:= array_append(array_agg, gully_id_aux);
 				END LOOP;
-				
-				array_agg:=NULL;
+
+				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;	j
 				PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
-			
-				-- Identifying how many gully not have been updated the field arc_id
-				SELECT count(gully_id) INTO count_aux1 FROM gully WHERE arc_id=arc_id_aux;
-				SELECT count(link_id) INTO count_aux2 FROM link JOIN gully ON link.feature_id=gully_id WHERE arc_id=arc_id_aux AND userdefined_geom IS FALSE;
-				return_aux:= return_aux + count_aux1-count_aux2;
-				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;
 			
 			END IF;
 		
