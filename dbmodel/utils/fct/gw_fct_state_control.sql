@@ -20,7 +20,7 @@ DECLARE
 	old_state_aux integer;
 	psector_vdefault_var integer;
 	num_feature integer;
-	arc_downgrade_force_aux boolean;
+	downgrade_force_aux boolean;
 	rec_feature record;
 	
 
@@ -29,14 +29,14 @@ BEGIN
     SET search_path=SCHEMA_NAME, public;
 	
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
-	arc_downgrade_force_aux:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_downgrade_force' AND cur_user=current_user)::boolean;
+	downgrade_force_aux:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_downgrade_force' AND cur_user=current_user)::boolean;
 	
 
      -- control for downgrade features to state(0)
     IF tg_op_aux = 'UPDATE' THEN
 		IF feature_type_aux='NODE' and state_aux=0 THEN
 			SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
-			IF state_aux!=old_state_aux AND (arc_downgrade_force_aux IS NOT TRUE) THEN
+			IF state_aux!=old_state_aux AND (downgrade_force_aux IS NOT TRUE) THEN
 
 				-- arcs control
 				SELECT count(arc.arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
@@ -49,7 +49,9 @@ BEGIN
 				IF num_feature > 0 THEN 
 					PERFORM audit_function(1072,2130,feature_id_aux);
 				END IF;
-			ELSIF state_aux!=old_state_aux AND (arc_downgrade_force_aux IS TRUE) THEN
+				
+			ELSIF state_aux!=old_state_aux AND (downgrade_force_aux IS TRUE) THEN
+			
 				-- arcs control
 				SELECT count(arc.arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
 				IF num_feature > 0 THEN 
@@ -68,7 +70,7 @@ BEGIN
 		ELSIF feature_type_aux='ARC' and state_aux=0 THEN
 			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
 			
-			IF state_aux!=old_state_aux AND (arc_downgrade_force_aux IS TRUE) THEN
+			IF state_aux!=old_state_aux AND (downgrade_force_aux IS TRUE) THEN
 
 				--connec's control
 				FOR rec_feature IN SELECT * FROM connec WHERE arc_id=feature_id_aux AND connec.state>0
@@ -120,35 +122,51 @@ BEGIN
 
 
 		ELSIF feature_type_aux='CONNEC' and state_aux=0 THEN
-			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
-			IF state_aux!=old_state_aux THEN
+			SELECT state INTO old_state_aux FROM connec WHERE connec_id=feature_id_aux;
+			
+			IF state_aux!=old_state_aux AND (downgrade_force_aux IS NOT TRUE) THEN
 
 				--link feature control
 				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
 				IF num_feature > 0 THEN 
-					PERFORM audit_function(1076,2130,feature_id_aux);
+					PERFORM audit_function(1072,2130,feature_id_aux);
+				END IF;
+				
+			ELSIF state_aux!=old_state_aux AND (downgrade_force_aux IS TRUE) THEN
+			
+				--link feature control
+				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
+				IF num_feature > 0 THEN 
+					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'CONNEC', feature_id_aux, old_state_aux);
 				END IF;
 				
 			END IF;	
 
 
 		ELSIF feature_type_aux='GULLY' and state_aux=0 THEN
-			SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
-			IF state_aux!=old_state_aux THEN
+			SELECT state INTO old_state_aux FROM gully WHERE gully_id=feature_id_aux;
+
+			IF state_aux!=old_state_aux AND (downgrade_force_aux IS NOT TRUE) THEN
 
 				--link feature control
 				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
 				IF num_feature > 0 THEN 
-					PERFORM audit_function(1078,2130,feature_id_aux);
+					PERFORM audit_function(1072,2130,feature_id_aux);
+				END IF;
+				
+			ELSIF state_aux!=old_state_aux AND (downgrade_force_aux IS TRUE) THEN
+			
+				--link feature control
+				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
+				IF num_feature > 0 THEN 
+					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'GULLY', feature_id_aux, old_state_aux);
 				END IF;
 				
 			END IF;	
-		
+					
 		END IF;
 	  
     END IF;
-
-
 
 
    -- control of insert/update nodes with state(2)

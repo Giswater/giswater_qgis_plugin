@@ -82,7 +82,7 @@ INSERT INTO ext_hydrometer_state VALUES (1, 'postgres');
 
 
 -----------------------
---system variables
+--system tables
 -----------------------
 INSERT INTO config_param_system VALUES (60, 'basic_search_hyd_hydro_layer_name', 'v_rtc_hydrometer', 'varchar', 'searchplus', 'layer name');
 INSERT INTO config_param_system VALUES (61, 'basic_search_hyd_hydro_field_expl_name', 'expl_name', 'varchar', 'searchplus', 'field exploitation.name');
@@ -96,3 +96,5 @@ INSERT INTO config_param_system VALUES (69, 'basic_search_workcat_filter', 'code
 INSERT INTO config_param_system VALUES (70, 'om_mincut_use_pgrouting', NULL, 'boolean', 'mincut', NULL);
 
 
+
+INSERT INTO sys_fprocess_cat VALUES (28, 'Massive downgrade features', 'Edit', 'Massive downgrade features', 'utils');
