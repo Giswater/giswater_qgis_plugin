@@ -121,6 +121,7 @@ class ManageElement(ParentManage):
         if self.new_element_id is True:
             # Set calendars date from config_param_user
             self.set_calendars('builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
+            utils_giswater.setWidgetText('num_elements', '1')
             self.dlg.enddate.setEnabled(False)
 
         # Open the dialog    
@@ -134,7 +135,6 @@ class ManageElement(ParentManage):
         # Get values from dialog
         element_id = utils_giswater.getWidgetText("element_id", return_string_null=False)
         elementcat_id = utils_giswater.getWidgetText("elementcat_id", return_string_null=False)
-        num_elements = utils_giswater.getWidgetText("num_elements", return_string_null=False)
         ownercat_id = utils_giswater.getWidgetText("ownercat_id", return_string_null=False)
         location_type = utils_giswater.getWidgetText("location_type", return_string_null=False)
         buildercat_id = utils_giswater.getWidgetText("buildercat_id", return_string_null=False)
@@ -155,6 +155,10 @@ class ManageElement(ParentManage):
         message = "You need to insert value for field"
         if elementcat_id == '':
             self.controller.show_warning(message, parameter="elementcat_id")
+            return
+        num_elements = utils_giswater.getWidgetText("num_elements", return_string_null=False)
+        if num_elements == '':
+            self.controller.show_warning(message, parameter="num_elements")
             return
         state_value = utils_giswater.getWidgetText('state', return_string_null=False)
         if state_value == '':
