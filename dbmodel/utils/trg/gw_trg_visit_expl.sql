@@ -32,9 +32,5 @@ $BODY$
   COST 100;
 
 
-
-CREATE TRIGGER gw_trg_visit_expl
-  BEFORE INSERT OR UPDATE OF the_geom
-  ON SCHEMA_NAME.om_visit
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_expl();
+DROP TRIGGER IF EXISTS gw_trg_visit_expl ON SCHEMA_NAME.om_visit;
+CREATE TRIGGER gw_trg_visit_expl BEFORE INSERT OR UPDATE OF the_geom ON SCHEMA_NAME.om_visit FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_expl();
