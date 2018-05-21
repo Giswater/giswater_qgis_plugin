@@ -331,7 +331,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elev:*</string>
+         <string>Elev:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -405,7 +405,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id:*</string>
+         <string>Workcat id:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -441,7 +441,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate:*</string>
+         <string>Builtdate:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1195,8 +1195,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1999,8 +1999,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2693,8 +2693,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4359,7 +4359,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:</string>
+     <string>State type:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>

@@ -719,7 +719,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate:*</string>
+         <string>Builtdate:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -785,7 +785,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id:*</string>
+         <string>Workcat id:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -3245,7 +3245,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:</string>
+     <string>State type:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>

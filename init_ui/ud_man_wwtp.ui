@@ -275,7 +275,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id:*</string>
+         <string>Workcat id:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -573,7 +573,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate:*</string>
+         <string>Builtdate:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -794,7 +794,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Y max:*</string>
+         <string>Y max:</string>
         </property>
         <property name="margin">
          <number>3</number>
@@ -984,7 +984,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Top elev:*</string>
+         <string>Top elev:</string>
         </property>
         <property name="margin">
          <number>3</number>
@@ -1813,8 +1813,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3595,7 +3595,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:</string>
+     <string>State type:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>

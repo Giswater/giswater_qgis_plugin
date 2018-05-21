@@ -439,7 +439,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Builtdate:*</string>
+         <string>Builtdate:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -579,7 +579,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Workcat id:*</string>
+         <string>Workcat id:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -763,7 +763,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elev:*</string>
+         <string>Elev:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1169,29 +1169,13 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>581</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Specific information</string>
        </attribute>
-       <widget class="QLineEdit" name="valve">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>30</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_communication">
         <property name="geometry">
          <rect>
@@ -1332,14 +1316,24 @@
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="QComboBox" name="valve">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>30</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="Additionalinformation_11">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>581</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3711,7 +3705,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State type:</string>
+     <string>State type:*</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -4235,7 +4229,6 @@
   <tabstop>workcat_id_end</tabstop>
   <tabstop>enddate</tabstop>
   <tabstop>fire_code</tabstop>
-  <tabstop>valve</tabstop>
   <tabstop>communication</tabstop>
   <tabstop>muni_id</tabstop>
   <tabstop>postcode</tabstop>
