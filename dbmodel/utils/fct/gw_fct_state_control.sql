@@ -56,13 +56,21 @@ BEGIN
 				-- arcs control
 				SELECT count(arc.arc_id) INTO num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
 				IF num_feature > 0 THEN 
-					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, old_state_aux);
+					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
+						INTO state_type_aux
+						USING feature_id_aux;						
+					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, concat(old_state_aux,',',state_type_aux));
+				
 				END IF;
 
 				--link feature control
 				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='NODE' AND exit_id=feature_id_aux AND link.state > 0;
 				IF num_feature > 0 THEN 
-					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, old_state_aux);
+					EXECUTE 'SELECT state_type FROM node WHERE node_id=$1'
+						INTO state_type_aux
+						USING feature_id_aux;						
+					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'NODE', feature_id_aux, concat(old_state_aux,',',state_type_aux));
+
 				END IF;
 				
 				
@@ -138,9 +146,9 @@ BEGIN
 				--link feature control
 				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='CONNEC' AND exit_id=feature_id_aux AND link.state > 0;
 				IF num_feature > 0 THEN 
-					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1
+					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1'
 						INTO state_type_aux
-						USING feature_id_aux;'	
+						USING feature_id_aux;						
 					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'CONNEC', feature_id_aux, concat(old_state_aux,',',state_type_aux));
 				END IF;
 				
@@ -163,9 +171,9 @@ BEGIN
 				--link feature control
 				SELECT count(link_id) INTO num_feature FROM link WHERE exit_type='GULLY' AND exit_id=feature_id_aux AND link.state > 0;
 				IF num_feature > 0 THEN 
-					EXECUTE 'SELECT state_type FROM gully WHERE gully_id=$1
+					EXECUTE 'SELECT state_type FROM gully WHERE gully_id=$1'
 						INTO state_type_aux
-						USING feature_id_aux;'
+						USING feature_id_aux;
 					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'GULLY', feature_id_aux, concat(old_state_aux,',',state_type_aux));
 				END IF;
 				
