@@ -267,7 +267,7 @@ INSERT INTO audit_cat_table VALUES ('inp_value_status_pipe', 'Hydraulic input da
 INSERT INTO audit_cat_table VALUES ('inp_value_yesno', 'Hydraulic input data', 'Domain data with values yes/no', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_reactions_gl', 'Hydraulic input data', 'Domain data used to determine the general coefficiency of reaction', 'role_admin', 3, '=3', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_noneall', 'Hydraulic input data', 'Domain data with values none/all', 'role_admin', 3, '=2', 'role_admin', 1, 'Forms values', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('config', 'System', 'Table to define diferent configuration parameters related to the GIS USER interface', 'role_admin', 3, '=1', NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config', 'System', 'Table to define diferent configuration parameters related to the GIS USER interface', 'role_edit', 3, '=1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('arc_type', 'System', 'Contains the types of arcs', 'role_admin', 2, '>2', 'role_edit', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_mixing', 'Hydraulic input data', 'Domain data with mixing type', 'role_admin', 3, '=4', 'role_admin', 1, 'Forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_value_param_energy', 'Hydraulic input data', 'Domain data with parameters type used to calculate energy', 'role_admin', 3, '=3', 'role_admin', 1, 'Forms values', NULL, NULL);
