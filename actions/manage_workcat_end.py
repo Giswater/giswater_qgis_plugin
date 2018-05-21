@@ -33,7 +33,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg = WorkcatEnd()
         utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
-
+        self.set_edit_arc_downgrade_force('True')
         # Capture the current layer to return it at the end of the operation
         self.cur_active_layer = self.iface.activeLayer()
 
@@ -65,9 +65,9 @@ class ManageWorkcatEnd(ParentManage):
 
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
-        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
-        self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer))
-        # self.dlg.workcat_id_end.currentIndexChanged.connec(partial(self.get_values_from_form))
+        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, self.table_object, self.cur_active_layer,  force_downgrade=True))
+        self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer,  force_downgrade=True, show_warning=True))
+        self.dlg.workcat_id_end.currentIndexChanged.connect(partial(self.get_values_from_form))
 
         self.dlg.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.table_object))
@@ -75,6 +75,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, self.table_object))
 
         self.dlg.workcat_id_end.activated.connect(partial(self.fill_workids))
+
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.table_object))
 
         # Set values
@@ -94,6 +95,25 @@ class ManageWorkcatEnd(ParentManage):
         self.open_dialog(self.dlg, maximize_button=False)     
 
 
+    def set_edit_arc_downgrade_force(self, value):
+        # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
+        sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
+               " WHERE parameter = 'edit_arc_downgrade_force' "
+               " AND cur_user=current_user")
+
+        row = self.controller.get_row(sql, log_info=False)
+        if row:
+            sql = ("UPDATE " + self.schema_name + ".config_param_user "
+                   " SET value = '" + str(value) + "'"
+                   " WHERE parameter = 'edit_arc_downgrade_force' "
+                   " AND cur_user=current_user")
+            self.controller.execute_sql(sql, log_sql=True)
+        else:
+            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user)"
+                   " VALUES ('edit_arc_downgrade_force', '"+str(value)+"', current_user)")
+            self.controller.execute_sql(sql, commit=self.autocommit)
+
+
     def fill_fields(self):
         """ Fill dates and combo cat_work """
         
@@ -106,10 +126,18 @@ class ManageWorkcatEnd(ParentManage):
             enddate = QDate.currentDate()
         utils_giswater.setCalendarDate("enddate", enddate)
 
+
         sql = ("SELECT id FROM " + self.controller.schema_name + ".cat_work")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg.workcat_id_end, rows)
+        utils_giswater.fillComboBox(self.dlg.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg.workcat_id_end)
+        sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
+               " WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
+        row = self.controller.get_row(sql, log_info=False)
+        self.controller.log_info(str(row))
+        if row:
+            utils_giswater.setWidgetText(self.dlg.workcat_id_end, row[0])
+
 
 
     def fill_workids(self):
@@ -130,7 +158,7 @@ class ManageWorkcatEnd(ParentManage):
         self.selected_list = []
         ids_list = ""
         if selected_list is None:
-            self.manage_close(self.table_object, self.cur_active_layer)
+            self.manage_close(self.table_object, self.cur_active_layer,  force_downgrade=False)
             return
         for x in range(0, selected_list.rowCount()):
             index = selected_list.index(x, 0)
@@ -143,6 +171,10 @@ class ManageWorkcatEnd(ParentManage):
 
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
+        if self.workcat_id_end == 'null' or self.workcat_id_end is None:
+            message = "Please select a workcat id end"
+            self.controller.show_warning(message)
+            return
         ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_arc)
         row = None
         if ids_list is not None:
@@ -174,8 +206,6 @@ class ManageWorkcatEnd(ParentManage):
 
             self.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(partial(self.open_selected_object, self.tbl_arc_x_relations))
-            self.manage_close(self.table_object, self.cur_active_layer)
-
             self.dlg_work.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlg_work.show()
         else:
@@ -188,10 +218,10 @@ class ManageWorkcatEnd(ParentManage):
             self.update_geom_type("connec", ids_list)
             ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_element)
             self.update_geom_type("element", ids_list)
-            if str(self.project_type) == 'om':
+            if str(self.project_type) == 'ud':
                 ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_gully)
                 self.update_geom_type("gully", ids_list)
-            self.manage_close(self.table_object, self.cur_active_layer)
+            self.manage_close(self.table_object, self.cur_active_layer, force_downgrade=True)
 
 
     def update_geom_type(self, geom_type, ids_list):
@@ -209,7 +239,7 @@ class ManageWorkcatEnd(ParentManage):
         if sql != "":
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
-                self.controller.show_info("Geometry updated successfully!")
+                self.controller.show_info("Features updated successfully!")
 
 
     def fill_table(self, widget, table_name, filter_):
@@ -292,33 +322,11 @@ class ManageWorkcatEnd(ParentManage):
         if not answer:
             return
         
-        # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
-               " WHERE parameter = 'edit_arc_downgrade_force' "
-               " AND cur_user=current_user")
-
-        row = self.controller.get_row(sql, log_info=False)
-        if row:
-            sql = ("UPDATE " + self.schema_name + ".config_param_user "
-                   " SET value = True "
-                   " WHERE parameter = 'edit_arc_downgrade_force' "
-                   " AND cur_user=current_user")
-            self.controller.execute_sql(sql, log_sql=True)
-        else:
-            sql = ("INSERT INTO " + self.schema_name + ".config_param_user (parameter, value, cur_user)"
-                   " VALUES ('edit_arc_downgrade_force', 'True', current_user)")
-            self.controller.execute_sql(sql, commit=self.autocommit)
-        
         # Update tablename of every geom_type
         ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_arc)
         self.update_geom_type("arc", ids_list)
 
-        # Restore on config_param_user the user's value of edit_arc_downgrade_force to false
-        sql = ("UPDATE " + self.schema_name + ".config_param_user "
-               " SET value = False "
-               " WHERE parameter = 'edit_arc_downgrade_force'"
-               " AND cur_user=current_user")
-        self.controller.execute_sql(sql, log_sql=True)
+
 
         self.canvas.refresh()
         self.dlg_work.close()
@@ -391,13 +399,35 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg.open()
 
 
-    def manage_close(self, table_object, cur_active_layer=None):
+    def manage_close(self, table_object, cur_active_layer=None, force_downgrade=False, show_warning=False):
         """ Close dialog and disconnect snapping """
 
         self.close_dialog()
         self.hide_generic_layers()
         self.disconnect_snapping()
         self.disconnect_signal_selection_changed()
+        if force_downgrade:
+            sql = ("SELECT feature_type, feature_id, log_message  FROM " + self.schema_name + ".audit_log_data "
+                   " WHERE  fprocesscat_id = '28' "
+                   " AND user_name = current_user")
+            rows = self.controller.get_rows(sql, log_sql=False)
+            ids_ = ""
+            for row in rows:
+                ids_ += str(row[1]) + ", "
+                state_statetype = str(row['log_message']).split(',')
+                sql = ("UPDATE " + self.schema_name + "." + str(row[0].lower()) + ""
+                       " SET state='"+str(state_statetype[0])+"', state_type='"+str(state_statetype[1])+"' "
+                       " WHERE "+str(row[0])+"_id='"+str(row[1])+"'")
+                self.controller.execute_sql(sql)
+            self.set_edit_arc_downgrade_force('False')
+            ids_ = ids_[:-2]
+            if show_warning:
+                msg = 'These items could not be downgrade to state 0'
+                self.controller.show_info_box(msg, title="Warning", inf_text=str(ids_), context_name=None, parameter=None)
+            sql = ("DELETE FROM " + self.schema_name + ".audit_log_data "
+                   " WHERE fprocesscat_id ='28' AND user_name = current_user")
+            self.controller.execute_sql(sql)
+
 
     def new_workcat(self):
 
@@ -410,7 +440,7 @@ class ManageWorkcatEnd(ParentManage):
         table_object = "cat_work"
         self.set_completer_object(table_object)
 
-        #Set signals
+        # Set signals
         self.new_workcat_dlg.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
 
         self.new_workcat_dlg.btn_cancel.clicked.connect(partial(self.close_dialog, self.new_workcat_dlg))
