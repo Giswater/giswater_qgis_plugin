@@ -120,7 +120,7 @@ INSERT INTO audit_cat_table VALUES ('audit_cat_function', 'System', 'Catalog of 
 INSERT INTO audit_cat_table VALUES ('audit_cat_table_x_column', 'System', 'Table with the information of columns of the project', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_arc_type', 'Hydraulic input data', 'Domain data with arc''s geometry', 'role_admin', 3, '=6', 'role_admin', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_element_x_arc', 'User interface view', 'Contains the elements related to arc. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_node', 'User interface view', 'Shows the visits related to node elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_node', 'User interface view', 'Shows the visits related to node elements. User Interface view.', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_connec', 'User interface view', 'Shows the visits related to management of connec elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_flow_node', 'Analysis', 'View with the result of flow trace and flow exit results (node)', NULL, 0, NULL, 'role_om', 2, 'Flow trace tool', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_om_psector', 'O&M', 'Shows the om psector information', 'role_om', 0, NULL, 'role_om', 2, NULL, NULL, NULL);
@@ -530,8 +530,8 @@ INSERT INTO audit_cat_table VALUES ('cat_arc_class_cat', 'Catalog', 'Categorys o
 INSERT INTO audit_cat_table VALUES ('cat_arc_class_type', 'Catalog', 'Types of classification', 'role_admin', 3, '2', NULL, NULL, NULL, 'cat_arc_class_type_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('cat_hydrology', 'Catalog', 'Catalog of hydrology.', 'role_epa', 2, '>1', 'role_edit', 1, 'Custom forms values & basic data', 'cat_hydrology_hydrology_id_seq', 'hydrology_id');
 INSERT INTO audit_cat_table VALUES ('config_client_forms', 'System', 'Configuration qgis table view forms table', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('config_param_system', 'System', 'Configuration table of system parameters', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_param_system_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('config_param_user', 'System', 'Configuration table of user parameters', 'role_admin', 2, '>0', NULL, 0, NULL, 'config_param_user_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('config_param_system', 'System', 'Configuration table of system parameters', 'role_edit', 2, '=9999', NULL, 0, NULL, 'config_param_system_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('config_param_user', 'System', 'Configuration table of user parameters', 'role_basic', 2, '>0', NULL, 0, NULL, 'config_param_user_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('dimensions', 'GIS feature', 'Table to store dimension entities (CAD utils)', 'role_edit', 0, NULL, NULL, 0, NULL, 'dimensions_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('dma', 'GIS feature', 'Table of spatial objects representing District Meter Area.', 'role_edit', 2, '>exploitation', NULL, 0, NULL, 'dma_dma_id_seq', 'dma_id');
 INSERT INTO audit_cat_table VALUES ('doc_x_arc', 'Document management', 'Contains the information of document related to arcs.', 'role_edit', 0, NULL, NULL, 0, NULL, 'doc_x_arc_id_seq', 'id');
@@ -606,8 +606,8 @@ INSERT INTO audit_cat_table VALUES ('v_plan_aux_arc_gully', 'masterplan', 'Auxil
 INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_connec', 'User interface view', 'Shows the information of document related to connects. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_gully', 'User interface view', 'Shows the visits related to management of gully elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_arc', 'User interface view', 'Shows the visits related to management of arc elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_gully', 'User interface view', 'Shows the visits related to gully elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_connec', 'User interface view', 'Shows the visits related to connec elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_gully', 'User interface view', 'Shows the visits related to gully elements. User Interface view.', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_connec', 'User interface view', 'Shows the visits related to connec elements. User Interface view.', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('ext_cat_scada', 'external catalog', 'Catalog of scada receivers', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_rtc_scada', 'Real time control', 'Shows the scada receivers', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('ext_rtc_scada_x_data', 'external table', 'Agregated data obtained from scada receivers', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);

@@ -127,9 +127,9 @@ INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_connec', 'User interface view', 
 INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_node', 'User interface view', 'Shows the information of document related to nodes. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_mincut_connec', 'User interface view', 'Shows the mincut results related to connecs', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_mincut_hydrometer', 'User interface view', 'Shows the mincut results related to hydrometers', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_arc', 'User interface view', 'Shows the visits related to arc elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_connec', 'User interface view', 'Shows the visits related to connec elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_node', 'User interface view', 'Shows the visits related to node elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_arc', 'User interface view', 'Shows the visits related to arc elements. User Interface view.', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_connec', 'User interface view', 'Shows the visits related to connec elements. User Interface view.', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_node', 'User interface view', 'Shows the visits related to node elements. User Interface view.', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_arc', 'User interface view', 'Shows the visits related to management of arc elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_connec', 'User interface view', 'Shows the visits related to management of connec elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_inp_backdrop', 'Hydraulic input data', 'Shows information about backdrop images and dimensions for the network EPANET map.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -380,8 +380,8 @@ INSERT INTO audit_cat_table VALUES ('audit_log_feature', 'System', 'Result of tr
 INSERT INTO audit_cat_table VALUES ('audit_log_project', 'System', 'Result of fct_aydut_schema_repair. Compare and update different schemas', 'role_admin', 0, NULL, NULL, 0, NULL, 'audit_log_project_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('cat_dscenario', 'Hydraulic catalog', 'Catalog of demand scenarios', 'role_epa', 2, '>1', 'role_epa', 1, 'Custom forms values & basic data', 'cat_dscenario_dscenario_id_seq', 'dscenario_id');
 INSERT INTO audit_cat_table VALUES ('config_client_forms', 'System', 'Table to define diferent configuration parameters related to the custom forms', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_client_forms_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('config_param_system', 'System', 'Table to define diferent configuration parameters related to the system', 'role_admin', 2, '=9999', NULL, 0, NULL, 'config_param_system_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('config_param_user', 'System', 'Table to define diferent configuration parameters of default values', 'role_admin', 2, '>0', NULL, 0, NULL, 'config_param_user_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('config_param_system', 'System', 'Table to define diferent configuration parameters related to the system', 'role_edit', 2, '=9999', NULL, 0, NULL, 'config_param_system_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('config_param_user', 'System', 'Table to define diferent configuration parameters of default values', 'role_basic', 2, '>0', NULL, 0, NULL, 'config_param_user_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_connec', 'Analysis', 'Table with the results of the topology process of connecs', 'role_edit', 0, NULL, NULL, 0, NULL, 'anl_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_connec', 'Mincut', 'Table of minimum cut analysis related to connecs.', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_mincut_result_connec_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('anl_mincut_result_hydrometer', 'Mincut', 'Table of minimum cut analysis related to hydrometers.', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_mincut_result_hydrometer_id_seq', 'id');
