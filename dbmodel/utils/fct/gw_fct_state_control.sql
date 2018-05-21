@@ -140,7 +140,7 @@ BEGIN
 				IF num_feature > 0 THEN 
 					EXECUTE 'SELECT state_type FROM connec WHERE connec_id=$1
 						INTO state_type_aux
-						USING feature_id_aux;		
+						USING feature_id_aux;'	
 					INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) VALUES (28,'CONNEC', feature_id_aux, concat(old_state_aux,',',state_type_aux));
 				END IF;
 				
