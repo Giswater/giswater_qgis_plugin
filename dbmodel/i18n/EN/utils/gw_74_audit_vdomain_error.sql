@@ -11,9 +11,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Message errors already translated (i18n)
 --
 
-
--- Uncatched errors (audit_cat_error.id = -1)
-
 INSERT INTO audit_cat_error VALUES (-1, 'Uncatched error', 'Open PotgreSQL log file to get more details', 2, true, 'generic');
 INSERT INTO audit_cat_error VALUES (0, 'OK', NULL, 3, false, 'generic');
 INSERT INTO audit_cat_error VALUES (1, 'Trigger INSERT', 'Inserted', 3, false, NULL);
@@ -132,3 +129,6 @@ INSERT INTO audit_cat_error VALUES (2110, 'Define at least one value of state_ty
 INSERT INTO audit_cat_error VALUES (2120, 'There is an inconsistency between node and arc state', NULL, 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (2122, 'Arc not found on insertion process', NULL, 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (1110, 'There are no exploitations defined in the model', 'Define at least one', 2, true, NULL);
+INSERT INTO audit_cat_error VALUES (3002, 'The selected arc has state=0 (num. node,feature_id)=', 'Please, select another one In order to use mincut, we recommend to disable network state=0.', 2, true, NULL);
+INSERT INTO audit_cat_error VALUES (3004, 'The selected arc has state=0 (num. node,feature_id)=', 'Please, select another one In order to use mincut, we recommend to disable network state=0.', 2, true, NULL);
+
