@@ -77,8 +77,8 @@ BEGIN
      -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' OR type_element_arg='ARC' THEN
 	
-		IF (SELECT state FROM arc WHERE WHERE (arc_id = element_id_arg) IS NULL THEN
-            PERFORM audit_function(3002,2304,element_id_arg);
+		IF (SELECT state FROM arc WHERE (arc_id = element_id_arg))=0 THEN
+			PERFORM audit_function(3002,2304,element_id_arg);
 		END IF;
 		
         -- Check an existing arc
@@ -103,8 +103,14 @@ BEGIN
                 UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
                 
             ELSE
-                -- Compute the tributary area using DFS
-                PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
+		-- Check if extreme if being a inlet
+		SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_1_aux;
+		IF controlValue = 0 THEN
+		        -- Compute the tributary area using DFS
+			PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
+		ELSE 
+			INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_1_aux, result_id_arg);	
+		END IF;
             END IF;
 
             -- Check other extreme being a valve
@@ -124,8 +130,14 @@ BEGIN
                 END IF;
                 
             ELSE
-                -- Compute the tributary area using DFS
-                PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);
+		-- Check if extreme if being a inlet
+		SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_2_aux;
+		IF controlValue = 0 THEN
+		        -- Compute the tributary area using DFS
+			PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
+		ELSE 
+			INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_2_aux, result_id_arg);	
+		END IF;
 
             END IF;
 
@@ -136,7 +148,7 @@ BEGIN
 
     ELSE
 
-		IF (SELECT state FROM node WHERE WHERE (node_id = element_id_arg) IS NULL THEN
+		IF (SELECT state FROM node WHERE (node_id = element_id_arg))=0 THEN
             PERFORM audit_function(3004,2304,element_id_arg);
 		END IF;
 	
