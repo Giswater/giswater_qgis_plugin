@@ -92,9 +92,11 @@ CREATE OR REPLACE VIEW v_ui_workcat_x_feature AS
     arc.arccat_id AS featurecat_id,
     arc.arc_id AS feature_id,
     arc.code,
-    arc.state,
-    arc.workcat_id
+    exploitation.name AS expl_name,
+    arc.workcat_id,
+	exploitation.expl_id
    FROM arc
+   JOIN exploitation ON exploitation.expl_id=arc.expl_id
    where state=1
 UNION
  SELECT row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
@@ -102,9 +104,11 @@ UNION
     node.nodecat_id AS featurecat_id,
     node.node_id AS feature_id,
     node.code,
-    node.state,
-    node.workcat_id
-   FROM node
+    exploitation.name AS expl_name,
+    node.workcat_id,
+	exploitation.expl_id
+	FROM node
+   JOIN exploitation ON exploitation.expl_id=node.expl_id
    where state=1
 UNION
  SELECT row_number() OVER (ORDER BY connec.connec_id) + 3000000 AS rid,
@@ -112,9 +116,11 @@ UNION
     connec.connecat_id AS featurecat_id,
     connec.connec_id AS feature_id,
     connec.code,
-    connec.state,
-    connec.workcat_id
+    exploitation.name AS expl_name,
+    connec.workcat_id,
+	exploitation.expl_id
    FROM connec
+   JOIN exploitation ON exploitation.expl_id=connec.expl_id
    where state=1
 UNION
  SELECT row_number() OVER (ORDER BY element.element_id) + 4000000 AS rid,
@@ -122,9 +128,11 @@ UNION
     element.elementcat_id AS featurecat_id,
     element.element_id AS feature_id,
     element.code,
-    element.state,
-    element.workcat_id
+    exploitation.name AS expl_name,
+    element.workcat_id,
+	exploitation.expl_id
    FROM element
+   JOIN exploitation ON exploitation.expl_id=element.expl_id
    where state=1;
 
 
@@ -137,9 +145,11 @@ CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS
     arc.arccat_id AS featurecat_id,
     arc.arc_id AS feature_id,
     arc.code,
-    arc.state,
-    arc.workcat_id_end
+    exploitation.name AS expl_name,
+    workcat_id_end AS workcat_id,
+	exploitation.expl_id
    FROM arc
+   JOIN exploitation ON exploitation.expl_id=arc.expl_id
    where state=0
 
 UNION
@@ -148,9 +158,11 @@ UNION
     node.nodecat_id AS featurecat_id,
     node.node_id AS feature_id,
     node.code,
-    node.state,
-    node.workcat_id_end
+    exploitation.name AS expl_name,
+    workcat_id_end AS workcat_id,
+	exploitation.expl_id
    FROM node
+   JOIN exploitation ON exploitation.expl_id=node.expl_id
    where state=0
 
 UNION
@@ -159,9 +171,11 @@ UNION
     connec.connecat_id AS featurecat_id,
     connec.connec_id AS feature_id,
     connec.code,
-    connec.state,
-    connec.workcat_id_end
+    exploitation.name AS expl_name,
+    workcat_id_end AS workcat_id,
+	exploitation.expl_id
    FROM connec
+   JOIN exploitation ON exploitation.expl_id=connec.expl_id
    where state=0
 
 UNION
@@ -170,9 +184,11 @@ UNION
     element.elementcat_id AS featurecat_id,
     element.element_id AS feature_id,
     element.code,
-    element.state,
-    element.workcat_id_end
+    exploitation.name AS expl_name,
+    workcat_id_end AS workcat_id,
+	exploitation.expl_id
    FROM element
+   JOIN exploitation ON exploitation.expl_id=element.expl_id
    where state=0;
 	
 	
