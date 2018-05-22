@@ -91,7 +91,7 @@ class SearchPlus(QObject):
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
         self.dlg.btn_clear_workcat.clicked.connect(self.clear_workcat)
         self.dlg.btn_refresh_workcat.clicked.connect(self.refresh_workcat)
-        self.dlg.psector_id_2.activated.connect(partial(self.open_plan_psector))
+        self.dlg.psector_id.activated.connect(partial(self.open_plan_psector))
 
         return True
 
@@ -152,7 +152,8 @@ class SearchPlus(QObject):
     def psector_populate(self, combo):
         """ Fill @combo """
 
-        sql = ("SELECT name FROM " + self.controller.schema_name + ".plan_psector ")
+        sql = ("SELECT name FROM " + self.controller.schema_name + ".plan_psector "
+               " WHERE expl_id IN(SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user=current_user)")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(combo, rows)
         return rows
@@ -651,8 +652,8 @@ class SearchPlus(QObject):
         if not status:
             self.dlg.tab_main.removeTab(0)
 
-        # Tab 'Document'
-        status = self.psector_populate(self.dlg.psector_id_2)
+        # Tab 'Psector'
+        status = self.psector_populate(self.dlg.psector_id)
         
         return True
     
@@ -1321,7 +1322,7 @@ class SearchPlus(QObject):
 
     def open_plan_psector(self):
 
-        psector_name = self.dlg.psector_id_2.currentText()
+        psector_name = self.dlg.psector_id.currentText()
         sql = ("SELECT psector_id"
                " FROM " + self.schema_name + ".plan_psector"
                " WHERE name = '" + str(psector_name)+"'")
@@ -1329,7 +1330,7 @@ class SearchPlus(QObject):
         psector_id = row[0]
         self.manage_new_psector.new_psector(psector_id, 'plan')
 
-        self.zoom_to_psector(self.dlg.psector_id_2, 'v_edit_plan_psector', 'name')
+        self.zoom_to_psector(self.dlg.psector_id, 'v_edit_plan_psector', 'name')
 
 
     def zoom_to_psector(self, widget, layer_name, field_id):
