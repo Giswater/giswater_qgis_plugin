@@ -57,9 +57,16 @@ class ReplaceNodeMapTool(ParentMapTool):
         if row:
             self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
         else:
-            self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
+            work_id = utils_giswater.getWidgetText(self.dlg_nodereplace.workcat_id_end)
+            sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work"
+                   " WHERE id ='"+str(work_id)+"'")
+            row = self.controller.get_row(sql)
+            if row:
+                self.enddate_aux = datetime.strptime(str(row[0]), '%Y-%m-%d').date()
+            else:
+                self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
 
-            self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
+        self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
         # Get nodetype_id from current node
         project_type = self.controller.get_project_type()
@@ -74,6 +81,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.dlg_nodereplace.node_node_type.setText(node_type)
         self.dlg_nodereplace.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
         self.dlg_nodereplace.btn_catalog.clicked.connect(partial(self.open_catalog_form, project_type, 'node'))
+        self.dlg_nodereplace.workcat_id_end.currentIndexChanged.connect(self.update_date)
 
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
@@ -86,6 +94,25 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Open dialog
         self.open_dialog(self.dlg_nodereplace, maximize_button=False)
+
+
+    def update_date(self):
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
+               " WHERE cur_user = current_user AND parameter = 'enddate_vdefault'")
+        row = self.controller.get_row(sql)
+        if row:
+            self.enddate_aux = datetime.strptime(row[0], '%Y-%m-%d').date()
+        else:
+            work_id = utils_giswater.getWidgetText(self.dlg_nodereplace.workcat_id_end)
+            sql = ("SELECT builtdate FROM " + self.schema_name + ".cat_work"
+                   " WHERE id ='"+str(work_id)+"'")
+            row = self.controller.get_row(sql)
+            if row:
+                self.enddate_aux = datetime.strptime(str(row[0]), '%Y-%m-%d').date()
+            else:
+                self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
+
+        self.dlg_nodereplace.enddate.setDate(self.enddate_aux)
 
 
     def new_workcat(self):
@@ -414,7 +441,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         sql = ("SELECT DISTINCT(matcat_id) as matcat_id "
                " FROM " + self.schema_name + ".cat_" + geom_type)
         if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
+            sql += " WHERE " + str(geom_type) + "type_id = '" + str(self.node_type_text) + "'"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
@@ -422,8 +449,8 @@ class ReplaceNodeMapTool(ParentMapTool):
         sql = ("SELECT DISTINCT(" + self.field2 + ")"
                " FROM " + self.schema_name + ".cat_" + geom_type)
         if wsoftware == 'ws' and geom_type == 'node':
-            sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
-        sql += " ORDER BY " + self.field2
+            sql += " WHERE " + str(geom_type) + "type_id = '" + str(self.node_type_text) + "'"
+        sql += " ORDER BY " + str(self.field2)
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
 
@@ -490,35 +517,35 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Set SQL query
         sql_where = ""
         if wsoftware == 'ws' and geom_type != 'connec':
-            sql = "SELECT " + self.field3
-            sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + self.field3 + "),'-','', 'g')) as x, " + self.field3
+            sql = "SELECT " + str(self.field3)
+            sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM " + str(self.field3) + "),'-','', 'g')) as x, " + str(self.field3)
         elif wsoftware == 'ws' and geom_type == 'connec':
-            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + self.field3 + ")) as " + self.field3
+            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from " + str(self.field3str) + ")) as " + str(self.field3str)
         else:
             sql = "SELECT DISTINCT(" + self.field3 + ")"
-        sql += " FROM " + self.schema_name + ".cat_" + geom_type
+        sql += " FROM " + self.schema_name + ".cat_" + str(geom_type)
 
         # Build SQL filter
         if wsoftware == 'ws' and self.node_type_text is not None:
-            sql_where = " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
+            sql_where = " WHERE " + str(geom_type) + "type_id = '" + str(self.node_type_text) + "'"
 
         if mats != "null":
             if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
-            sql_where += " matcat_id = '" + mats + "'"
+            sql_where += " matcat_id = '" + str(mats) + "'"
 
         if filter2 != "null":
             if sql_where == "":
                 sql_where = " WHERE"
             else:
                 sql_where += " AND"
-            sql_where += " " + self.field2 + " = '" + filter2 + "'"
+            sql_where += " " + str(self.field2) + " = '" + str(filter2) + "'"
         if wsoftware == 'ws' and geom_type != 'connec':
-            sql += sql_where + " ORDER BY x) AS " + self.field3
+            sql += sql_where + " ORDER BY x) AS " + str(self.field3)
         else:
-            sql += sql_where + " ORDER BY " + self.field3
+            sql += sql_where + " ORDER BY " + str(self.field3)
 
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
