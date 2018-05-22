@@ -569,18 +569,24 @@ class DrawProfiles(ParentMapTool):
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
 
+            columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id']
+
             if row:
-                # Check if we have all data for drawing
-                if None in row:
-                    message = "Some parameters are missing for node"
+                if row[0] is None or row[1] is None or row[2] is None or row[3] is None:
+                    message = "Some parameters are missing for node (Values Defaults used for)"
                     self.controller.show_info_box(message, "Info", node_id)
-                    parameters = []
-                    return
-                else:
-                    parameters[1] = row[0]
-                    parameters[2] = row[1]
-                    parameters[13] = row[2]
-                    nodecat_id = row[3]
+                # Check if we have all data for drawing
+                for x in range(0, len(columns)):
+                    if row[x] is None:
+                        sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        result = self.controller.get_row(sql)
+                        row[x] = result[0]
+
+
+                parameters[1] = row[0]
+                parameters[2] = row[1]
+                parameters[13] = row[2]
+                nodecat_id = row[3]
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
@@ -589,15 +595,21 @@ class DrawProfiles(ParentMapTool):
                    " FROM " + self.schema_name + ".cat_node"
                    " WHERE id = '" + str(nodecat_id) + "'")
             row = self.controller.get_row(sql)
+
+            columns = ['geom1']
+
             if row:
-                # Check if we have all data for drawing
-                if None in row:
-                    message = "Some parameters are missing for node"
+                if row[0] is None:
+                    message = "Some parameters are missing for node catalog (Values Defaults used for)"
                     self.controller.show_info_box(message, "Info", node_id)
-                    parameters = []
-                    return
-                else:
-                    parameters[6] = row[0]
+                # Check if we have all data for drawing
+                for x in range(0, len(columns)):
+                    if row[x] is None:
+                        sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        result = self.controller.get_row(sql)
+                        row[x] = result[0]
+
+                parameters[6] = row[0]
 
             # Set node_id in memory
             parameters[12] = node_id
@@ -611,23 +623,33 @@ class DrawProfiles(ParentMapTool):
                    " FROM " + self.schema_name + ".v_edit_arc"
                    " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
+
+
+            columns = ['z1','z2','cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
+
             if row:
                 # Check if we have all data for drawing
-                if None in row:
-                    message = "Some parameters are missing for node"
+                if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
+                   row[5] is None or row[6] is None or row[7] is None:
+                    message = "Some parameters are missing for arc (Values Defaults used for)"
                     self.controller.show_info_box(message, "Info", node_id)
-                    parameters = []
-                    return
-                else:
-                    self.memory[n][3] = row[0]
-                    self.memory[n][4] = row[1]
-                    self.memory[n][5] = row[2]
-                    self.memory[n][8] = row[3]
-                    self.memory[n][9] = row[4]
-                    self.memory[n][10] = row[5]
-                    self.memory[n][11] = row[6]
-                    self.memory[n][7] = row[7]
-                    n = n + 1
+                for x in range(0, len(columns)):
+                    if row[x] is None:
+                        sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
+                        result = self.controller.get_row(sql)
+                        row[x] = result[0]
+
+
+
+                self.memory[n][3] = row[0]
+                self.memory[n][4] = row[1]
+                self.memory[n][5] = row[2]
+                self.memory[n][8] = row[3]
+                self.memory[n][9] = row[4]
+                self.memory[n][10] = row[5]
+                self.memory[n][11] = row[6]
+                self.memory[n][7] = row[7]
+                n = n + 1
 
 
     def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx): #@UnusedVariable
