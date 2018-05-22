@@ -27,6 +27,7 @@ GRANT ALL ON ALL FUNCTIONS IN SCHEMA "crm" TO "role_crm";
 
 -- ROLE PERMISSIONS
 GRANT SELECT ON TABLE ws.v_rtc_hydrometer TO role_basic;
+GRANT SELECT ON ALL TABLES IN SCHEMA crm TO role_basic;
 
   
 

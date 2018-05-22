@@ -25,6 +25,8 @@ BEGIN
 	-- Looking for project type
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
+	
+	
 	-- Starting process
 	-- Grant access on database
 	FOR table_record IN SELECT * FROM sys_role
@@ -50,6 +52,9 @@ BEGIN
 		query_text:= 'GRANT ALL ON TABLE '||table_record.id||' TO '||table_record.sys_role_id||';';
 		EXECUTE query_text;
 	END LOOP;
+	
+	query_text:= 'GRANT ALL ON ALL FUNCTIONS IN SCHEMA '||schema_name_aux||' TO role_basic'; 
+		EXECUTE query_text;
 	
 	-- Grant specificic permissions for functions
 	FOR table_record IN SELECT * FROM audit_cat_function WHERE project_type=project_type_aux
