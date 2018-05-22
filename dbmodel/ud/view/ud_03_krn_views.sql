@@ -264,9 +264,9 @@ CREATE MATERIALIZED VIEW v_ui_workcat_polygon_aux AS
         )
  SELECT workcat_polygon.workcat_id,
         CASE
-            WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text THEN st_buffer(st_concavehull(workcat_polygon.locations, 0.99::double precision), 10::double precision)
-            WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_LineString'::text THEN st_envelope(workcat_polygon.locations)
-            ELSE NULL::geometry
+            WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text 
+            THEN st_buffer(st_concavehull(workcat_polygon.locations, 0.99::double precision), 10::double precision)::geometry(polygon, SRID_VALUE)
+            ELSE NULL::geometry(polygon, SRID_VALUE)
         END AS the_geom
    FROM workcat_polygon;
    
