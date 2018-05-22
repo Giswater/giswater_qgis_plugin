@@ -5,6 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+--FUNCTION CODE: XXXX
+
+
 DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(p_audit_cat_function_id integer, p_audit_cat_error_id integer) RETURNS "pg_catalog"."int2" AS $BODY$
 BEGIN

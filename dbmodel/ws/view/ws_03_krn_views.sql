@@ -29,8 +29,8 @@ JOIN exploitation ON v_arc.expl_id=exploitation.expl_id;
 */
 
 
-DROP MATERIALIZED VIEW IF EXISTS v_ui_workcat_polygon_aux CASCADE;
-CREATE MATERIALIZED VIEW v_ui_workcat_polygon_aux AS 
+DROP VIEW IF EXISTS v_ui_workcat_polygon_aux CASCADE;
+CREATE VIEW v_ui_workcat_polygon_aux AS 
  WITH workcat_polygon AS (
          SELECT st_collect(a.the_geom) AS locations,
             a.workcat_id
@@ -79,12 +79,13 @@ CREATE MATERIALIZED VIEW v_ui_workcat_polygon_aux AS
         CASE
             WHEN st_geometrytype(st_concavehull(workcat_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text 
             THEN st_buffer(st_concavehull(workcat_polygon.locations, 0.99::double precision), 10::double precision)::geometry(polygon, SRID_VALUE)
-            ELSE NULL::geometry(polygon, SRID_VALUE)
+            ELSE st_buffer(workcat_polygon.locations,10)::geometry(polygon, SRID_VALUE)
         END AS the_geom
-   FROM workcat_polygon;
+   FROM workcat_polygon
+   WHERE workcat_id IS NOT NULL;
 
 
-
+DROP MATERIALIZED VIEW IF EXISTS v_ui_workcat_x_feature;
 DROP VIEW IF EXISTS v_ui_workcat_x_feature;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature AS 
  SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,
@@ -138,6 +139,7 @@ UNION
 
    
 
+DROP MATERIALIZED VIEW IF EXISTS v_ui_workcat_x_feature_end;
 DROP VIEW IF EXISTS v_ui_workcat_x_feature_end;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS 
  SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,

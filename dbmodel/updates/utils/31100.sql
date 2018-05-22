@@ -95,3 +95,24 @@ INSERT INTO config_param_system VALUES (70, 'om_mincut_use_pgrouting', NULL, 'bo
 
 
 INSERT INTO sys_fprocess_cat VALUES (28, 'Massive downgrade features', 'Edit', 'Massive downgrade features', 'utils');
+
+
+
+
+
+----------------------
+--22/05/2018
+-----------------------
+
+INSERT INTO config_param_system VALUES (100, 'enable_update_workcat_geom', TRUE, 'boolean', 'mincut', NULL);
+
+ALTER TABLE cat_work ADD COLUMN the_geom geometry(POLYGON, SRID_VALUE);
+
+/* Inserted on i18n flle: gw_74_audit_vdomain_error
+INSERT INTO audit_cat_error VALUES (3002, 'The selected arc has state=0 (num. node,feature_id)=', 'Please, select another one In order to use mincut, we recommend to disable network state=0.', 2, true, NULL);
+INSERT INTO audit_cat_error VALUES (3004, 'The selected arc has state=0 (num. node,feature_id)=', 'Please, select another one In order to use mincut, we recommend to disable network state=0.', 2, true, NULL);
+*/
+
+
+
+

@@ -54,4 +54,4 @@ update connec set link='https://www.giswater.org';
 update gully set link='https://www.giswater.org';
 
 
-refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
+--refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
