@@ -171,9 +171,18 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
+        sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
+               " WHERE "+str(field_id)+"='"+str(polygon_name) + "'")
+        row = self.controller.get_row(sql)
+        if row[0] is None:
+            msg = "Cant zoom to selection becouse has no geometry: "
+            self.controller.show_warning(msg, parameter=polygon_name)
+            self.iface.legendInterface().setLayerVisible(layer, False)
+            return
+
         # Select features of @layer applying @expr
         self.select_features_by_expr(layer, expr)
-
+        
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
@@ -686,7 +695,7 @@ class SearchPlus(QObject):
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " LIKE '%" + str(expl_name) + "%' "
-               " or "+ self.params['basic_search_hyd_hydro_field_expl_name'] + " is null"
+               " or " + self.params['basic_search_hyd_hydro_field_expl_name'] + " is null"
                # " AND state IN (" + str(list_state) + ") "
                " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
         rows = self.controller.get_rows(sql)
