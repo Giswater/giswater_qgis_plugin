@@ -131,19 +131,8 @@ class SearchPlus(QObject):
 
     def workcat_populate(self, combo):
         """ Fill @combo """
-        
-        sql = ("SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".arc"
-               " WHERE workcat_id LIKE '%%' or workcat_id is NULL"
-               " UNION"
-               " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".connec"
-               " WHERE workcat_id LIKE '%%' or workcat_id is NULL"
-               " UNION"
-               " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".node"
-               " WHERE workcat_id LIKE '%%' or workcat_id is NULL")
-        if self.project_type == 'ud':
-            sql += (" UNION"
-                    " SELECT DISTINCT(workcat_id) FROM " + self.controller.schema_name + ".gully"
-                    " WHERE workcat_id LIKE '%%' or workcat_id is NULL")
+
+        sql = ("SELECT id FROM " + self.schema_name + ".cat_work")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(combo, rows)
         return rows
