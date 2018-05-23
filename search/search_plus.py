@@ -205,7 +205,7 @@ class SearchPlus(QObject):
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
         self.set_table_columns(self.items_dialog.tbl_psm, table_name)
-        expr = "workcat_id_end ILIKE '%" + str(workcat_id) + "%'"
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
 
@@ -231,6 +231,7 @@ class SearchPlus(QObject):
                " VALUES('" + str(state) + "', current_user)")
         self.controller.execute_sql(sql, log_sql=True)
         qtable.setEnabled(True)
+        self.refresh_map_canvas()
 
 
     def disable_qatable(self, qtable, _id):
@@ -242,18 +243,18 @@ class SearchPlus(QObject):
             qtable.setEnabled(False)
 
 
-    def fill_label_data(self, table_name, extension = None):
+    def fill_label_data(self, table_name, extension=None):
 
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
         if workcat_id == "null":
             return
 
-        features = ['NODE','CONNEC','GULLY','ELEMENT','ARC']
+        features = ['NODE', 'CONNEC', 'GULLY', 'ELEMENT', 'ARC']
         for feature in features:
             sql = ("SELECT feature_id "
                    " FROM " + self.schema_name + "." + str(table_name) + "")
             if extension is not None:
-                sql += (" WHERE workcat_id_end = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+                sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
             else:
                 sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
             rows = self.controller.get_rows(sql)
@@ -1363,6 +1364,7 @@ class SearchPlus(QObject):
             self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, 
                 self.params['basic_search_hyd_hydro_field_expl_name'])
             self.hydro_create_list()
+        self.psector_populate(self.dlg.psector_id)
                     
 
     def unload(self):
