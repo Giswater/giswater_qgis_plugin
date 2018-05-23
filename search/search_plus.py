@@ -89,45 +89,12 @@ class SearchPlus(QObject):
             self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
             self.filter_by_list(self.dlg.hydro_id)
         self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
+
         self.dlg.btn_clear_workcat.clicked.connect(self.clear_workcat)
         self.dlg.btn_refresh_workcat.clicked.connect(self.refresh_workcat)
         self.dlg.psector_id.activated.connect(partial(self.open_plan_psector))
 
         return True
-
-
-    def update_state_selector(self):
-        """ Force to 0,1,2... the selector_state user values """
-        
-        sql = ("SELECT state_id, cur_user FROM " +self.schema_name + ".selector_state "
-               " WHERE cur_user = current_user")
-        self.current_selector = self.controller.get_rows(sql)
-        sql = ("DELETE FROM " + self.schema_name + ".selector_state "
-               " WHERE cur_user = current_user")
-        self.controller.execute_sql(sql)
-
-        sql = ("SELECT id FROM " + self.schema_name + ".value_state")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-        
-        sql = ""
-        for row in rows:
-            sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
-                    " VALUES(" + str(row[0]) + ", current_user);\n")
-        self.controller.execute_sql(sql)
-
-
-    def restore_state_selector(self):
-        """ Restore values to selector_state after update (def update_state_selector(self)) """
-        
-        sql = ("DELETE FROM " + self.schema_name + ".selector_state "
-               " WHERE cur_user = current_user;\n")
-        for row in self.current_selector:
-            sql += ("INSERT INTO " + self.schema_name + ".selector_state (state_id, cur_user)"
-                    " VALUES(" + str(row[0]) + ", current_user);\n")
-        self.controller.execute_sql(sql)
-
 
     def workcat_populate(self, combo):
         """ Fill @combo """
@@ -182,7 +149,7 @@ class SearchPlus(QObject):
 
         # Select features of @layer applying @expr
         self.select_features_by_expr(layer, expr)
-        
+
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
@@ -193,8 +160,7 @@ class SearchPlus(QObject):
 
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
-        
-        self.update_state_selector()
+
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
         if workcat_id == "null":
             return False
@@ -213,16 +179,20 @@ class SearchPlus(QObject):
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.disable_qatable(self.items_dialog.tbl_psm, 1)
+        self.disable_qatable(self.items_dialog.tbl_psm_end, 0)
+
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.btn_close.clicked.connect(partial(self.restore_state_selector))
+
         self.items_dialog.export_to_csv.clicked.connect(partial
             (self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end, self.items_dialog.txt_path))
         self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog.txt_path))
-
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.rejected.connect(partial(self.restore_state_selector))
+        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, 1, self.items_dialog.tbl_psm))
+        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, 0, self.items_dialog.tbl_psm_end))
+
 
         self.items_dialog.txt_name.textChanged.connect(partial
             (self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
@@ -248,6 +218,28 @@ class SearchPlus(QObject):
 
         self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
         self.items_dialog.open()
+
+
+    def force_state(self, state, qtable):
+        """ Force selected state and set qtable enabled = True """
+        sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
+               " WHERE cur_user=current_user")
+        row = self.controller.get_row(sql, log_sql=True)
+        if row is not None:
+            return
+        sql = ("INSERT INTO " + self.schema_name + ".selector_state(state_id, cur_user) "
+               " VALUES('" + str(state) + "', current_user)")
+        self.controller.execute_sql(sql, log_sql=True)
+        qtable.setEnabled(True)
+
+
+    def disable_qatable(self, qtable, _id):
+
+        sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
+               " WHERE cur_user = current_user AND state_id ='" + str(_id) + "'")
+        row = self.controller.get_row(sql)
+        if row is None:
+            qtable.setEnabled(False)
 
 
     def fill_label_data(self, table_name, extension = None):
@@ -282,27 +274,27 @@ class SearchPlus(QObject):
             # Add data to workcat search form
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
 
-            length = 0
-            if feature == 'ARC':
-                for row in rows:
-                    arc_id = str(row[0])
-                    sql = ("SELECT gis_length "
-                           " FROM " + self.schema_name + ".v_arc"
-                           " WHERE arc_id = '" + arc_id + "'")
-                    row = self.controller.get_row(sql)
-                    if row:
-                        length = length + row[0]
-                    else:
-                        message = "Some data is missing. Check gis_length for arc"
-                        self.controller.show_warning(message, parameter = arc_id)
-                        return
-                if extension != None:
-                    widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
-                else:
-                    widget = self.items_dialog.findChild(QLabel, "lbl_length")
-
-                # Add data to workcat search form
-                widget.setText("Total arcs length: " + str(length))
+            # length = 0
+            # if feature == 'ARC':
+            #     for row in rows:
+            #         arc_id = str(row[0])
+            #         sql = ("SELECT gis_length "
+            #                " FROM " + self.schema_name + ".v_arc"
+            #                " WHERE arc_id = '" + arc_id + "'")
+            #         row = self.controller.get_row(sql)
+            #         if row:
+            #             length = length + row[0]
+            #         else:
+            #             message = "Some data is missing. Check gis_length for arc"
+            #             self.controller.show_warning(message, parameter = arc_id)
+            #             return
+            #     if extension != None:
+            #         widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
+            #     else:
+            #         widget = self.items_dialog.findChild(QLabel, "lbl_length")
+            #
+            #     # Add data to workcat search form
+            #     widget.setText("Total arcs length: " + str(length))
 
 
     def export_to_csv(self, qtable_1=None, qtable_2=None, path=None):

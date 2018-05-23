@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>538</width>
+    <width>547</width>
     <height>728</height>
    </rect>
   </property>
@@ -53,7 +53,23 @@
      <property name="topMargin">
       <number>0</number>
      </property>
-     <item row="6" column="0">
+     <item row="4" column="2">
+      <widget class="QTableView" name="tbl_psm_end"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Features initiated with the selected workcat</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
       <layout class="QGridLayout" name="gridLayout_7">
        <item row="0" column="0">
         <widget class="QLabel" name="label_2">
@@ -106,66 +122,10 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="2">
-      <widget class="QTableView" name="tbl_psm_end"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Features initiated with the selected workcat</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QLineEdit" name="txt_name"/>
      </item>
-     <item row="3" column="0">
-      <widget class="QTableView" name="tbl_psm"/>
-     </item>
-     <item row="1" column="2">
-      <widget class="QLineEdit" name="txt_name_end"/>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_end">
-       <property name="text">
-        <string>End - Feature_id</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_init">
-       <property name="text">
-        <string>Init - Feature_id</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QLabel" name="label_5">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Features ended with the selected workcat</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="2">
+     <item row="7" column="2">
       <layout class="QGridLayout" name="gridLayout_8">
        <item row="1" column="1">
         <widget class="QLabel" name="lbl_total_connec_end">
@@ -215,6 +175,120 @@
           <string/>
          </property>
         </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_init">
+       <property name="text">
+        <string>Init - Feature_id</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QLabel" name="label_5">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Features ended with the selected workcat</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLineEdit" name="txt_name_end"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QTableView" name="tbl_psm"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_end">
+       <property name="text">
+        <string>End - Feature_id</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Set state 1 = True</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="btn_state1">
+         <property name="maximumSize">
+          <size>
+           <width>25</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="2">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Set state 0 = True</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="btn_state0">
+         <property name="maximumSize">
+          <size>
+           <width>25</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
