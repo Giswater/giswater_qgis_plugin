@@ -59,7 +59,7 @@ class SearchPlus(QObject):
         if not 'portal_field_postal' in self.params:
             self.controller.show_warning(message, parameter='portal_field_postal')
             return False
-                    
+
         self.street_field_expl = self.params['street_field_expl']
         portal_field_postal = self.params['portal_field_postal']
 
@@ -126,26 +126,26 @@ class SearchPlus(QObject):
 
 
     def zoom_to_polygon(self, widget, layer_name, field_id):
-        
-        polygon_name = utils_giswater.getWidgetText(widget)
+
         layer = self.controller.get_layer_by_tablename(layer_name)
         if not layer:
             return
-
+        polygon_name = utils_giswater.getWidgetText(widget)
         # Check if the expression is valid
-        expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
+        expr_filter = str(field_id) + " LIKE '%" + str(polygon_name) + "%'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
-
-        sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
-               " WHERE "+str(field_id)+"='"+str(polygon_name) + "'")
-        row = self.controller.get_row(sql)
-        if row[0] is None:
-            msg = "Cant zoom to selection becouse has no geometry: "
-            self.controller.show_warning(msg, parameter=polygon_name)
-            self.iface.legendInterface().setLayerVisible(layer, False)
-            return
+        if polygon_name is not None:
+            sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
+                   " WHERE "+str(field_id)+"='"+str(polygon_name) + "'")
+            row = self.controller.get_row(sql, log_sql=True)
+            self.controller.log_info(str(row[0]))
+            if row[0] is None or row[0] == 'null':
+                msg = "Cant zoom to selection because has no geometry: "
+                self.controller.show_warning(msg, parameter=polygon_name)
+                self.iface.legendInterface().setLayerVisible(layer, False)
+                return
 
         # Select features of @layer applying @expr
         self.select_features_by_expr(layer, expr)
@@ -274,7 +274,7 @@ class SearchPlus(QObject):
             total = len(rows)
             # Add data to workcat search form
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
-
+            # TODO 1 DESCOMENTAR ESTO Y COMPROBAR, FALLA EL gis_length de la capa arc
             # length = 0
             # if feature == 'ARC':
             #     for row in rows:
@@ -296,7 +296,7 @@ class SearchPlus(QObject):
             #
             #     # Add data to workcat search form
             #     widget.setText("Total arcs length: " + str(length))
-
+            # TODO END
 
     def export_to_csv(self, qtable_1=None, qtable_2=None, path=None):
 
@@ -675,11 +675,11 @@ class SearchPlus(QObject):
         if expl_name is None or expl_name == "None":
             expl_name = ""
 
-        list_state = self.state_list()
-        if list_state is False:
-            message = "The state selector is empty"
-            self.controller.show_warning(message)
-            return
+        # list_state = self.state_list()
+        # if list_state is False:
+        #     message = "The state selector is empty"
+        #     self.controller.show_warning(message)
+        #     return
         if not self.params['basic_search_hyd_hydro_field_1']:
             return
 
@@ -926,11 +926,11 @@ class SearchPlus(QObject):
             expl_name = ""
         list_hydro = []
 
-        list_state = self.state_list()
-        if list_state is False:
-            message = "The state selector is empty"
-            self.controller.show_warning(message)
-            return
+        # list_state = self.state_list()
+        # if list_state is False:
+        #     message = "The state selector is empty"
+        #     self.controller.show_warning(message)
+        #     return
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
@@ -1320,7 +1320,6 @@ class SearchPlus(QObject):
         row = self.controller.get_row(sql)
         psector_id = row[0]
         self.manage_new_psector.new_psector(psector_id, 'plan')
-
         self.zoom_to_psector(self.dlg.psector_id, 'v_edit_plan_psector', 'name')
 
 
