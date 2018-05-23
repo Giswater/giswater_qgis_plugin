@@ -134,7 +134,7 @@ BEGIN
 		SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_2_aux;
 		IF controlValue = 0 THEN
 		        -- Compute the tributary area using DFS
-			PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
+			PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);
 		ELSE 
 			INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_2_aux, result_id_arg);	
 		END IF;
