@@ -166,6 +166,8 @@ class SearchPlus(QObject):
             return False
 
         self.update_selector_workcat(workcat_id)
+        self.force_expl(workcat_id)
+
         self.zoom_to_polygon(self.dlg.workcat_id, 'v_ui_workcat_polygon', 'workcat_id')
 
         self.items_dialog = ListItems()
@@ -179,20 +181,19 @@ class SearchPlus(QObject):
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.disable_qatable(self.items_dialog.tbl_psm, 1)
-        self.disable_qatable(self.items_dialog.tbl_psm_end, 0)
+        self.disable_qatable_by_state(self.items_dialog.tbl_psm, 1)
+        self.disable_qatable_by_state(self.items_dialog.tbl_psm_end, 0)
 
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
-
-        self.items_dialog.export_to_csv.clicked.connect(partial
-            (self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end, self.items_dialog.txt_path))
         self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, 0, self.items_dialog.tbl_psm_end))
-
+        self.items_dialog.export_to_csv.clicked.connect(
+            partial(self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
+                    self.items_dialog.txt_path))
 
         self.items_dialog.txt_name.textChanged.connect(partial
             (self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
@@ -224,23 +225,47 @@ class SearchPlus(QObject):
         """ Force selected state and set qtable enabled = True """
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
                " WHERE cur_user=current_user AND state_id ='" + str(state) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row is not None:
             return
         sql = ("INSERT INTO " + self.schema_name + ".selector_state(state_id, cur_user) "
                " VALUES('" + str(state) + "', current_user)")
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
         qtable.setEnabled(True)
         self.refresh_map_canvas()
 
 
-    def disable_qatable(self, qtable, _id):
+    def disable_qatable_by_state(self, qtable, _id):
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
                " WHERE cur_user = current_user AND state_id ='" + str(_id) + "'")
         row = self.controller.get_row(sql)
         if row is None:
             qtable.setEnabled(False)
+
+
+    def force_expl(self,  workcat_id):
+        """ Active exploitations are compared with workcat farms.
+            If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
+
+        sql = ("SELECT a.expl_id, a.expl_name FROM "
+               "  (SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature "
+               "   WHERE workcat_id='" + str(workcat_id) + "' "
+               "   UNION SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature_end "
+               "   WHERE workcat_id='" + str(workcat_id) + "'"
+               "   ) AS a "
+               " WHERE expl_id NOT IN "
+               "  (SELECT expl_id FROM " + self.schema_name + ".selector_expl "
+               "   WHERE cur_user=current_user)")
+        rows = self.controller.get_rows(sql)
+
+        if len(rows) > 0:
+            for row in rows:
+                sql = ("INSERT INTO " + self.schema_name + ".selector_expl(expl_id, cur_user) "
+                       " VALUES('" + str(row[0]) + "', current_user)")
+                self.controller.execute_sql(sql, log_sql=True)
+            msg = "Your exploitation selector has been updated"
+            self.controller.show_warning(msg)
 
 
     def fill_label_data(self, table_name, extension=None):
@@ -253,10 +278,7 @@ class SearchPlus(QObject):
         for feature in features:
             sql = ("SELECT feature_id "
                    " FROM " + self.schema_name + "." + str(table_name) + "")
-            if extension is not None:
-                sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
-            else:
-                sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
             rows = self.controller.get_rows(sql)
             if not rows:
                 pass
@@ -270,32 +292,31 @@ class SearchPlus(QObject):
 
             if self.project_type == 'ws' and feature == 'GULLY':
                 widget.hide()
-
             total = len(rows)
             # Add data to workcat search form
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
             # TODO 1 DESCOMENTAR ESTO Y COMPROBAR, FALLA EL gis_length de la capa arc
-            # length = 0
-            # if feature == 'ARC':
-            #     for row in rows:
-            #         arc_id = str(row[0])
-            #         sql = ("SELECT gis_length "
-            #                " FROM " + self.schema_name + ".v_arc"
-            #                " WHERE arc_id = '" + arc_id + "'")
-            #         row = self.controller.get_row(sql)
-            #         if row:
-            #             length = length + row[0]
-            #         else:
-            #             message = "Some data is missing. Check gis_length for arc"
-            #             self.controller.show_warning(message, parameter = arc_id)
-            #             return
-            #     if extension != None:
-            #         widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
-            #     else:
-            #         widget = self.items_dialog.findChild(QLabel, "lbl_length")
-            #
-            #     # Add data to workcat search form
-            #     widget.setText("Total arcs length: " + str(length))
+            length = 0
+            if feature == 'ARC':
+                for row in rows:
+                    arc_id = str(row[0])
+                    sql = ("SELECT st_length2d(the_geom)::numeric(12,2) "
+                           " FROM " + self.schema_name + ".arc"
+                           " WHERE arc_id = '" + arc_id + "'")
+                    row = self.controller.get_row(sql)
+                    if row:
+                        length = length + row[0]
+                    else:
+                        message = "Some data is missing. Check gis_length for arc"
+                        self.controller.show_warning(message, parameter = arc_id)
+                        return
+                if extension != None:
+                    widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
+                else:
+                    widget = self.items_dialog.findChild(QLabel, "lbl_length")
+
+                # Add data to workcat search form
+                widget.setText("Total arcs length: " + str(length))
             # TODO END
 
     def export_to_csv(self, qtable_1=None, qtable_2=None, path=None):
