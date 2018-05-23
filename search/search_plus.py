@@ -223,7 +223,7 @@ class SearchPlus(QObject):
     def force_state(self, state, qtable):
         """ Force selected state and set qtable enabled = True """
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
-               " WHERE cur_user=current_user")
+               " WHERE cur_user=current_user AND state_id ='" + str(state) + "'")
         row = self.controller.get_row(sql, log_sql=True)
         if row is not None:
             return
