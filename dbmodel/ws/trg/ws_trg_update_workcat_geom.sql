@@ -37,7 +37,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 		IF OLD.workcat_id!= NEW.workcat_id THEN
-			PEFORM gw_fct_update_workcat_geom('NEW.workcat_id');
+			PERFORM gw_fct_update_workcat_geom('NEW.workcat_id');
 			--UPDATE cat_work SET the_geom=v_the_geom WHERE cat_work=NEW.workcat_id;	
 
 			PERFORM gw_fct_update_workcat_geom('OLD.workcat_id');
