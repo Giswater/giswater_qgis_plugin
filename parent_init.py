@@ -249,7 +249,11 @@ class ParentDialog(QDialog):
         # Close dialog
         if close_dialog:
             self.close_dialog()
-
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               "WHERE parameter='cf_keep_opened_edition' AND cur_user = current_user")
+        row = self.controller.get_row(sql)
+        if row:
+            self.iface.activeLayer().startEditing()
 
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
