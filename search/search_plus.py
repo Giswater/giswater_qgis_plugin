@@ -1415,7 +1415,8 @@ class SearchPlus(QObject):
 
 
     def filter_by_list(self, widget):
-        self.proxy_model.setFilterFixedString(widget.currentText())
+        if len(utils_giswater.getWidgetText(widget)) >= 3:
+            self.proxy_model.setFilterFixedString(widget.currentText())
 
 
     def set_table_columns(self, widget, table_name):
