@@ -52,7 +52,7 @@ RAISE NOTICE 'Res: % ', query_result_visits;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "visits":' || query_result_visits || 
         '}')::json;    
 

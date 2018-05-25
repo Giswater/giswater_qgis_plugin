@@ -92,3 +92,10 @@ CREATE TABLE hydro_cat_priority(
 "id" integer PRIMARY KEY,
 "code" character varying(16) NOT NULL,
 "observ" character varying(100));
+
+
+CREATE INDEX hydrometer_code ON crm.hydrometer USING btree (code);
+CREATE INDEX hydro_val_state_code ON crm.hydro_val_state USING btree (code);
+CREATE INDEX hydro_cat_catalog_code ON crm.hydro_cat_catalog USING btree (code);
+CREATE INDEX hydro_cat_period_code ON crm.hydro_cat_period USING btree (code);
+CREATE INDEX hydro_cat_type_code ON crm.hydro_cat_type USING btree (code);

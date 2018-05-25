@@ -29,7 +29,7 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "parameter_id_options":' || query_result_parameter_id_options ||
         '}')::json;
 

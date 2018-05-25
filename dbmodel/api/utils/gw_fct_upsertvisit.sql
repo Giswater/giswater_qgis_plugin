@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_upsertvisit"(x float8, y float8, srid_arg int4, element_type varchar, id varchar, device int4, visitcat_id_aux int4, cur_user varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_upsertvisit"(x float8, y float8, srid_arg int4, element_type varchar, id varchar, device int4, cur_user varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -9,7 +9,7 @@ DECLARE
     query_result_def_parameter_type json;
     query_result_parameter_id_options json;
     query_result_parameter_id varchar;
-    point_geom geometry;
+    point_geom public.geometry;
     SRID_var int;
     id_visit int;
     schemas_array name[];
@@ -36,22 +36,32 @@ BEGIN
 --    Get user default
     EXECUTE 'SELECT value FROM config_param_user WHERE parameter=''visicat_vdefault'' AND cur_user=$1 LIMIT 1' USING cur_user INTO query_result_def_visit;
 
+    IF query_result_def_visit IS NULL THEN
+     EXECUTE 'SELECT id FROM om_visit_cat LIMIT 1' INTO query_result_def_visit;
+    END IF;
+    
 --    Get parameter type
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT DISTINCT parameter_type AS "id", parameter_type AS "name" FROM om_visit_parameter) a' INTO query_result_parameter_type;
 
 --    Get default parameter type
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT value AS parameter_type FROM config_param_user 
-        WHERE parameter = ''om_param_type_vdefault'' AND cur_user=$1) a' USING cur_user 
+        WHERE parameter = ''om_param_type_vdefault'' AND cur_user=$1) a' 
+        INTO query_result_def_parameter_type
+        USING cur_user ;
+        
+    IF query_result_def_parameter_type IS NULL THEN
+     EXECUTE 'SELECT array_to_json(array_agg(id)) FROM om_visit_parameter LIMIT 1' 
         INTO query_result_def_parameter_type;
-
+    END IF;
+        
 --    Get parameter id
     EXECUTE 'SELECT array_to_json(array_agg(json_data)) FROM (SELECT row_to_json(t) AS json_data FROM (SELECT id, descript AS "name" FROM om_visit_parameter 
-    WHERE parameter_type = (SELECT value FROM config_param_user WHERE parameter = ''om_param_type_vdefault'' AND cur_user=$1) 
+    WHERE parameter_type = cast($3 as text)
         AND LOWER(feature_type) = $2) t  ) r'  
-    USING cur_user, element_type
-    INTO query_result_parameter_id_options;
+        INTO query_result_parameter_id_options
+    USING cur_user, element_type, query_result_def_parameter_type;
 
-RAISE NOTICE 'Res: % ', query_result_parameter_id_options;
+    RAISE NOTICE 'Res: % ', query_result_parameter_id_options;
 
 --    INSERT VISIT:
 
@@ -70,8 +80,7 @@ RAISE NOTICE 'Res: % ', query_result_parameter_id_options;
         WHERE ' || quote_ident(element_type || '_id') || ' = ' || quote_literal(id) || ' AND startdate::date=now()::date ORDER BY startdate DESC LIMIT 1'
         INTO id_visit, is_done, query_result_def_code;
 
-
-        
+     
 
 --    Perform INSERT in case of new visit
     IF id_visit ISNULL THEN
@@ -112,10 +121,9 @@ RAISE NOTICE 'Res: % ', query_result_parameter_id_options;
     query_result_parameter_id_options := COALESCE(query_result_parameter_id_options, '[]');
 
 
-
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "visicat_id_options":' || query_result_cat_visits || 
         ', "visicat_id":"' || query_result_def_visit || '"' ||
         ', "parameter_type_options":' || query_result_parameter_type ||
@@ -127,8 +135,8 @@ RAISE NOTICE 'Res: % ', query_result_parameter_id_options;
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+ --   EXCEPTION WHEN OTHERS THEN 
+   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

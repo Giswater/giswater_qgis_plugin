@@ -36,7 +36,7 @@ BEGIN
     sql_query := 'UPDATE om_visit SET ' || quote_ident(column_name) || ' = CAST(' || quote_literal(value_new) || ' AS ' || column_type || ') WHERE id = ' || visit_id::INT;
     EXECUTE sql_query;
 
-/* only applied for arbrat viari (nodes).
+/* only applied for tm projects (nodes).
     IF column_name='is_done' THEN
         IF value_new::boolean IS TRUE THEN
             SELECT gw_fct_om_visit_event_manager(visit_id::integer) INTO return_event_manager_aux;

@@ -21,7 +21,7 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "id":"' || event_photo_id || '"}')::json;    
 
 --    Exception handling

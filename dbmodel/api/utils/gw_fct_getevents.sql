@@ -38,7 +38,7 @@ raise notice '1 %', query_result;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "events":' || query_result_visits || 
         '}')::json;
 

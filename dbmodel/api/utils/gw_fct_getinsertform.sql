@@ -1,5 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinsertform"(table_id varchar, lang varchar, id varchar, formtodisplay text) 
-RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinsertform"(table_id varchar, lang varchar, id varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -18,8 +17,8 @@ DECLARE
     schemas_array name[];
     array_index integer DEFAULT 0;
     field_value character varying;
+    formtodisplay text;
     api_version json;
-
 
 
 BEGIN
@@ -27,13 +26,25 @@ BEGIN
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
-    
+
+--    Get schema name
+    schemas_array := current_schemas(FALSE);
+
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
---    Get schema name
-    schemas_array := current_schemas(FALSE);
+    --  Take form_id 
+    EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
+        INTO formtodisplay
+        USING table_id; 
+            
+--    Check generic
+    IF formtodisplay ISNULL THEN
+        formtodisplay := 'F16';
+    END IF;
+
+
     
 
 --    Get fields
@@ -54,8 +65,8 @@ BEGIN
     LOOP
 
 --      Get combo id's
-	    EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
-		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
+        || quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
         INTO combo_json; 
      
 
@@ -69,10 +80,10 @@ BEGIN
 
 --        Get combo values
         EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM '
-		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
+        || quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
         INTO combo_json; 
         combo_json := COALESCE(combo_json, '[]');
-	
+    
 --      Update array
         fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
 
@@ -136,7 +147,7 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "formToDisplay":"' || formtodisplay || '"' ||
         ', "fields":' || fields ||
         '}')::json;
