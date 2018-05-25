@@ -40,6 +40,7 @@ DECLARE
 	v_exit_type text;
 	v_vnode_type text;	
 	v_exit_id text;
+	point_aux public.geometry;
 
 	
 BEGIN
@@ -98,11 +99,12 @@ BEGIN
 	        -- update only last point
 
 			-- Reverse (if it's need) the existing link geometry
-			IF (SELECT link.link_id FROM link WHERE st_dwithin (st_startpoint(link.the_geom), connect_geom, 0.01)) IS NULL THEN
-				link_geom = ST_SetPoint(v_link_geom, 0, St_closestpoint(arcrec.the_geom, St_pointn(v_link_geom, 1))) ; 
+			IF (SELECT link.link_id FROM link WHERE st_dwithin (st_startpoint(link.the_geom), connect_geom, 0.01) LIMIT 1) IS NULL THEN
+				point_aux := St_closestpoint(arcrec.the_geom, St_startpoint(v_link_geom));
+				link_geom = ST_SetPoint(v_link_geom, 0, point_aux) ; 
 			ELSE
-				link_geom = ST_SetPoint(v_link_geom, ST_NumPoints(v_link_geom) - 1, St_closestpoint(arcrec.the_geom, St_pointn(v_link_geom, (ST_NumPoints(v_link_geom) - 2)))); 
-				
+				point_aux := St_closestpoint(arcrec.the_geom, St_endpoint(v_link_geom));
+				link_geom = ST_SetPoint(v_link_geom, (ST_NumPoints(v_link_geom) - 1),point_aux); 
 			END IF;
 
 		ELSE	
