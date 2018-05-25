@@ -1015,7 +1015,7 @@ class SearchPlus(QObject):
 
         # Check if the expression is valid
         expr_filter = self.field_to_search + " = '" + feature_id + "'"
-        expr_filter += "AND " + geom_type+"_id = " + geom_id
+        expr_filter += " AND " + geom_type+"_id = '" + geom_id + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
