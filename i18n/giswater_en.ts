@@ -36,7 +36,11 @@
 	<message>
         <source>48_text</source>
         <translation>State selector</translation>
-    </message> 
+    </message>
+    <message>
+        <source>51_text</source>
+        <translation>Hydrometer selector</translation>
+    </message>
 	<message>
         <source>32_text</source>
         <translation>Search plus</translation>

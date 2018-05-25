@@ -37,7 +37,11 @@
 	<message>
         <source>48_text</source>
         <translation>Selector d'estat</translation>
-    </message> 
+    </message>
+    <message>
+        <source>51_text</source>
+        <translation>Selector d'hydrometres</translation>
+    </message>
 	<message>
         <source>32_text</source>
         <translation>Cercador</translation>
