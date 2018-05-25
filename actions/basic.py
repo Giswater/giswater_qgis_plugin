@@ -77,7 +77,29 @@ class Basic(ParentAction):
         
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)
-        
+
+
+    def basic_hydrometer_state_selector(self):
+        """ Button 51: Hydrometer selector """
+        # Create the dialog and signals
+        self.dlg = Multirow_selector()
+        self.load_settings(self.dlg)
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_ok.clicked.connect(self.close_dialog)
+        self.dlg.rejected.connect(self.close_dialog)
+        self.dlg.txt_name.setVisible(False)
+        self.dlg.setWindowTitle("Hydrometer selector")
+        utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Unselected hydrometers', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg.lbl_selected, self.controller.tr('Selected hydrometers', context_name='labels'))
+        tableleft = "ext_rtc_hydrometer_state"
+        tableright = "selector_hydrometer"
+        field_id_left = "id"
+        field_id_right = "state_id"
+        self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
+
+        # Open dialog
+        self.open_dialog(self.dlg, maximize_button=False)
+
 
     def basic_search_plus(self):   
         """ Button 32: Open search plus dialog """
