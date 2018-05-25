@@ -401,7 +401,7 @@ class ParentAction(object):
         self.hide_colums(tbl_selected_rows, [1, 2, 3])
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
-        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, "id", query_left, query_right, field_id_right))
+        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
         query_delete = "DELETE FROM " + self.schema_name + "." + tableright

@@ -173,7 +173,8 @@ class SearchPlus(QObject):
         self.items_dialog = ListItems()
         utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
-
+        self.items_dialog.btn_state1.setEnabled(False)
+        self.items_dialog.btn_state0.setEnabled(False)
         utils_giswater.setWidgetText(self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
         text_lbl = self.params['basic_search_workcat_filter']
         utils_giswater.setWidgetText(self.items_dialog.label_init, "Filter by: "+str(text_lbl))
@@ -181,16 +182,16 @@ class SearchPlus(QObject):
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.disable_qatable_by_state(self.items_dialog.tbl_psm, 1)
-        self.disable_qatable_by_state(self.items_dialog.tbl_psm_end, 0)
+        self.disable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
+        self.disable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
 
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, 1, self.items_dialog.tbl_psm))
-        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, 0, self.items_dialog.tbl_psm_end))
+        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
+        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
         self.items_dialog.export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
@@ -221,7 +222,7 @@ class SearchPlus(QObject):
         self.items_dialog.open()
 
 
-    def force_state(self, state, qtable):
+    def force_state(self, qbutton, state, qtable):
         """ Force selected state and set qtable enabled = True """
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
                " WHERE cur_user=current_user AND state_id ='" + str(state) + "'")
@@ -232,17 +233,18 @@ class SearchPlus(QObject):
                " VALUES('" + str(state) + "', current_user)")
         self.controller.execute_sql(sql)
         qtable.setEnabled(True)
+        qbutton.setEnabled(False)
         self.refresh_map_canvas()
 
 
-    def disable_qatable_by_state(self, qtable, _id):
+    def disable_qatable_by_state(self, qtable, _id, qbutton):
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
                " WHERE cur_user = current_user AND state_id ='" + str(_id) + "'")
         row = self.controller.get_row(sql)
         if row is None:
             qtable.setEnabled(False)
-
+            qbutton.setEnabled(True)
 
     def force_expl(self,  workcat_id):
         """ Active exploitations are compared with workcat farms.
