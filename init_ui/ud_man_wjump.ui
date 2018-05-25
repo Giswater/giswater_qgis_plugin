@@ -999,32 +999,13 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Specific information</string>
        </attribute>
-       <widget class="QLineEdit" name="accessibility">
-        <property name="geometry">
-         <rect>
-          <x>400</x>
-          <y>0</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="name">
         <property name="geometry">
          <rect>
@@ -1339,14 +1320,24 @@
          <string/>
         </property>
        </widget>
+       <widget class="QComboBox" name="accessibility">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>0</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_54">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2039,8 +2030,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4363,7 +4354,6 @@
   <tabstop>name</tabstop>
   <tabstop>length</tabstop>
   <tabstop>width</tabstop>
-  <tabstop>accessibility</tabstop>
   <tabstop>sander_depth</tabstop>
   <tabstop>prot_surface</tabstop>
   <tabstop>muni_id</tabstop>
