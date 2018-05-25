@@ -206,8 +206,8 @@ UNION
 
 
 
-DROP VIEW IF EXISTS v_ui_workcat_polygon_aux CASCADE;
-CREATE VIEW v_ui_workcat_polygon_aux AS 
+DROP MATERIALIZED VIEW IF EXISTS v_ui_workcat_polygon_aux CASCADE;
+CREATE MATERIALIZED VIEW v_ui_workcat_polygon_aux AS 
  WITH workcat_polygon AS (
          SELECT st_collect(a.the_geom) AS locations,
             a.workcat_id

@@ -58,23 +58,36 @@ BEGIN
 			LEFT JOIN (
 				  SELECT arc_id, true as closed FROM v_edit_arc JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id
 				  WHERE 
-				   (node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE (proposed=TRUE AND result_id='||result_id_arg||'))
-				          AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||')) OR
-				  (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE (proposed=TRUE AND result_id='||result_id_arg||')) 
-					  AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||'))
-				  )a ON a.arc_id=v_edit_arc.arc_id
+					(node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE proposed=TRUE AND result_id='||result_id_arg||')
+   					AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||'))
+   					
+					OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE proposed=TRUE AND result_id='||result_id_arg||')
+					AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||')) 
+
+					OR (node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND result_id='||result_id_arg||'))
+					
+					OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND result_id='||result_id_arg||'))
+
+				   )a ON a.arc_id=v_edit_arc.arc_id
 			WHERE node_1 is not null or node_2 is not null'','||rec_valve.node_id||'::integer, '||rec_tank.node_id||'::integer)';
 
 		IF query_text IS NOT NULL THEN	
 			EXECUTE query_text INTO rec_result;
 		END IF;
 
+		RAISE NOTICE 'query_text %',query_text;
+
 		IF rec_result IS NOT NULL THEN
 			inlet_path=true;
+			RAISE NOTICE 'valve % tank % inlet_path % ', rec_valve.node_id, rec_tank.node_id, inlet_path;
+
 			EXIT;
 		ELSE 
 			inlet_path=false;
+			RAISE NOTICE 'valve % tank % inlet_path % ', rec_valve.node_id, rec_tank.node_id, inlet_path;
+
 		END IF;
+
 			
 	END LOOP;
 
@@ -130,4 +143,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
 
