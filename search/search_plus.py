@@ -139,7 +139,7 @@ class SearchPlus(QObject):
         if polygon_name is not None:
             sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
                    " WHERE "+str(field_id)+"='"+str(polygon_name) + "'")
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql)
             self.controller.log_info(str(row[0]))
             if row[0] is None or row[0] == 'null':
                 msg = "Cant zoom to selection because has no geometry: "
@@ -265,7 +265,7 @@ class SearchPlus(QObject):
             for row in rows:
                 sql = ("INSERT INTO " + self.schema_name + ".selector_expl(expl_id, cur_user) "
                        " VALUES('" + str(row[0]) + "', current_user)")
-                self.controller.execute_sql(sql, log_sql=True)
+                self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
             self.controller.show_warning(msg)
 
@@ -696,13 +696,9 @@ class SearchPlus(QObject):
         self.list_hydro = []
         expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
         if expl_name is None or expl_name == "None":
-            expl_name = ""
+            self.set_model_by_list([], self.dlg.hydro_id)
+            return
 
-        # list_state = self.state_list()
-        # if list_state is False:
-        #     message = "The state selector is empty"
-        #     self.controller.show_warning(message)
-        #     return
         if not self.params['basic_search_hyd_hydro_field_1']:
             return
 
@@ -710,7 +706,7 @@ class SearchPlus(QObject):
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " LIKE '%" + str(expl_name) + "%' "
+               " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " = '" + str(expl_name) + "' "
                " or " + self.params['basic_search_hyd_hydro_field_expl_name'] + " is null"
                # " AND state IN (" + str(list_state) + ") "
                " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
@@ -949,16 +945,11 @@ class SearchPlus(QObject):
             expl_name = ""
         list_hydro = []
 
-        # list_state = self.state_list()
-        # if list_state is False:
-        #     message = "The state selector is empty"
-        #     self.controller.show_warning(message)
-        #     return
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name']+" LIKE '%" + str(expl_name) + "%' "
+               " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name']+" = '" + str(expl_name) + "' "
                # " AND state IN (" + str(list_state) + ") "
                " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
         rows = self.controller.get_rows(sql)
@@ -1417,8 +1408,7 @@ class SearchPlus(QObject):
 
 
     def filter_by_list(self, widget):
-        if len(utils_giswater.getWidgetText(widget)) >= 3:
-            self.proxy_model.setFilterFixedString(widget.currentText())
+        self.proxy_model.setFilterFixedString(widget.currentText())
 
 
     def set_table_columns(self, widget, table_name):
