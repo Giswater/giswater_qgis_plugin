@@ -50,9 +50,14 @@ JOIN exploitation ON v_edit_connec.expl_id=exploitation.expl_id;
 
 CREATE OR REPLACE VIEW v_ui_workcat_polygon AS 
 SELECT v_ui_workcat_polygon_aux.workcat_id,
-v_ui_workcat_polygon_aux.the_geom
-FROM v_ui_workcat_polygon_aux, selector_workcat
-WHERE selector_workcat.workcat_id = v_ui_workcat_polygon_aux.workcat_id::text AND selector_workcat.cur_user = "current_user"()::text;
+	descript, 
+	link, 
+	workid_key1, 
+	workid_key2, 
+	builtdate,
+    v_ui_workcat_polygon_aux.the_geom
+   FROM selector_workcat, v_ui_workcat_polygon_aux JOIN cat_work ON workcat_id=id
+   WHERE selector_workcat.workcat_id = v_ui_workcat_polygon_aux.workcat_id::text AND selector_workcat.cur_user = "current_user"()::text;
 
 
 
