@@ -95,6 +95,7 @@ INSERT INTO config_param_system VALUES (70, 'om_mincut_use_pgrouting', NULL, 'bo
 
 
 INSERT INTO sys_fprocess_cat VALUES (28, 'Massive downgrade features', 'Edit', 'Massive downgrade features', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (29, 'Audit mincut data', 'OM', 'Audit mincut data', 'ws');
 
 
 

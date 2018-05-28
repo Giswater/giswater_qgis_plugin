@@ -42,6 +42,7 @@ BEGIN
     DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
+	DELETE FROM "audit_log_data" where user_name=current_user AND fprocesscat_id=29;
 
 
     -- Identification of exploitation and macroexploitation
