@@ -275,10 +275,13 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Cost' """
         
         # Get values from database        
-        sql = ("SELECT *"
+        sql = ("SELECT arc_id, y1, y2, mean_y, z1, z2,thickness,width,b,bulk,geom1,area,y_param,total_y, rec_y, geom1_ext,"
+               "calculed_y, m3mlexc,m2mltrenchl,m2mlbottom, m2mlpav,m3mlprotec,m3mlfill,m3mlexcess,m3exc_cost,m2trenchl_cost,"
+               "m2bottom_cost, m2pav_cost, m3protec_cost, m3fill_cost, m3excess_cost, cost_unit, pav_cost, exc_cost,trenchl_cost,"
+               "base_cost,protec_cost,fill_cost,excess_cost,arc_cost,cost,length,budget,other_budget, total_budget"
                " FROM " + self.schema_name + ".v_plan_arc"
                " WHERE arc_id = '" + self.id + "'")    
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row is None: 
             return
         
