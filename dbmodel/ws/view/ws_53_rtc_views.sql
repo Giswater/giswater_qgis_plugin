@@ -65,7 +65,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
     connec.code AS connec_id,
     connec.customer_code AS connec_customer_code,
     connec.expl_id,
-    value_state.name  AS state,
+    ext_rtc_hydrometer_state.name  AS state,
     exploitation.name AS expl_name,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
     ext_rtc_hydrometer.hydrometer_category,
@@ -92,7 +92,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
     rtc_hydrometer
      LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
      LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
-     LEFT JOIN value_state ON value_state.id = ext_rtc_hydrometer.state
+     LEFT JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state
     LEFT JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_customer_code::text
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
      
