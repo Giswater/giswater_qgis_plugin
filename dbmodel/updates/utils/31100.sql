@@ -113,5 +113,21 @@ INSERT INTO audit_cat_error VALUES (3004, 'The selected arc has state=0 (num. no
 */
 
 
+----------------------
+--28/05/2018
+-----------------------
 
+
+INSERT INTO config_param_system VALUES (84, 'ymax_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (83, 'top_elev_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (85, 'sys_elev_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (86, 'geom1_vd', '0.4', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (87, 'z1_vd', '0.1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (88, 'z2_vd', '0.1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (89, 'cat_geom1_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (90, 'sys_elev1_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (91, 'sys_elev2_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (92, 'y1_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (93, 'y2_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
+INSERT INTO config_param_system VALUES (94, 'slope_vd', '1', 'decimal', 'draw_profile', 'Only for UD');
 
