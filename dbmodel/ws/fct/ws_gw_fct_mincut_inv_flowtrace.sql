@@ -56,7 +56,7 @@ BEGIN
 			FROM SCHEMA_NAME.v_edit_arc 
 			JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id 
 			LEFT JOIN (
-				  SELECT arc_id, true as closed FROM v_edit_arc JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id
+				  SELECT arc_id, true as closed FROM SCHEMA_NAME.v_edit_arc JOIN SCHEMA_NAME.exploitation ON v_edit_arc.expl_id=exploitation.expl_id
 				  WHERE 
 					(node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
    					AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||'))
@@ -64,9 +64,9 @@ BEGIN
 					OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
 					AND arc_id IN(SELECT arc_id FROM SCHEMA_NAME.anl_mincut_result_arc WHERE result_id='||result_id_arg||')) 
 
-					OR (node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed=FALSE AND result_id='||result_id_arg||'))
+					OR (node_1 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
 					
-					OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed=FALSE AND result_id='||result_id_arg||'))
+					OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
 
 				   )a ON a.arc_id=v_edit_arc.arc_id
 			WHERE node_1 is not null or node_2 is not null'','||rec_valve.node_id||'::integer, '||rec_tank.node_id||'::integer)';
@@ -76,9 +76,16 @@ BEGIN
 		END IF;
 
 		RAISE NOTICE 'query_text %',query_text;
+		RAISE NOTICE 'rec_result %',rec_result;
+
+
 
 		IF rec_result IS NOT NULL THEN
 			inlet_path=true;
+			FOR rec_result IN EXECUTE query_text
+			LOOP 
+			INSERT INTO audit_log_data(fprocesscat_id, feature_id, log_message, user_name) VALUES (29, rec_result.edge, concat(result_id_arg, ':', rec_valve.node_id,'-',rec_tank.node_id), current_user);
+		END LOOP;
 			RAISE NOTICE 'valve % tank % inlet_path % ', rec_valve.node_id, rec_tank.node_id, inlet_path;
 
 			EXIT;

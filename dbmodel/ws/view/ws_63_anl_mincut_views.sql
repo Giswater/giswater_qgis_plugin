@@ -309,3 +309,18 @@ FROM anl_mincut_result_cat
 LEFT JOIN anl_mincut_cat_class ON anl_mincut_cat_class.id = mincut_class
 LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state;
 
+-- ----------------------------
+-- MINCUT RESULT AUDIT VIEW
+-- ----------------------------
+
+DROP VIEW IF EXISTS "v_anl_mincut_result_audit";
+CREATE OR REPLACE VIEW "v_anl_mincut_result_audit" AS 
+ SELECT audit_log_data.id,
+    audit_log_data.feature_id,
+    audit_log_data.log_message,
+    arc.the_geom
+   FROM audit_log_data
+     JOIN arc ON arc.arc_id::text = audit_log_data.feature_id::text
+  WHERE audit_log_data.fprocesscat_id = 29 AND audit_log_data.user_name = "current_user"()::text
+  ORDER BY audit_log_data.log_message;
+
