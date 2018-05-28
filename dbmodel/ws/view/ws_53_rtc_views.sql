@@ -61,7 +61,8 @@ JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id = rtc_scada_node.sc
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
- SELECT rtc_hydrometer.hydrometer_id,
+ SELECT row_number() OVER (ORDER BY rtc_hydrometer.hydrometer_id) AS rid,
+    rtc_hydrometer.hydrometer_id,
     connec.code AS connec_id,
     connec.customer_code AS connec_customer_code,
     connec.expl_id,
