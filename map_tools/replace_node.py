@@ -15,6 +15,7 @@ from functools import partial
 from datetime import datetime
 
 import utils_giswater
+from utils.widget_manager import WidgetManager
 from map_tools.parent import ParentMapTool
 from ui_manager import UDcatalog
 from ui_manager import WScatalog
@@ -117,23 +118,24 @@ class ReplaceNodeMapTool(ParentMapTool):
 
     def new_workcat(self):
 
-        self.new_workcat_dlg = NewWorkcat()
-        utils_giswater.setDialog(self.new_workcat_dlg)
+        # self.new_workcat_dlg = NewWorkcat()
+        # utils_giswater.setDialog(self.new_workcat_dlg)
+        # self.load_settings(self.new_workcat_dlg)
+        self.new_workcat_dlg = WidgetManager(NewWorkcat())
         self.load_settings(self.new_workcat_dlg)
 
-
-        utils_giswater.setCalendarDate(self.new_workcat_dlg.builtdate, None, True)
+        self.new_workcat_dlg.setCalendarDate(self.new_workcat_dlg.dialog.builtdate, None, True)
 
         table_object = "cat_work"
-        self.set_completer_object(table_object,self.new_workcat_dlg.cat_work_id,'id')
+        self.set_completer_object(table_object,self.new_workcat_dlg.dialog.cat_work_id,'id')
 
         #Set signals
-        self.new_workcat_dlg.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
+        self.new_workcat_dlg.dialog.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
 
-        self.new_workcat_dlg.btn_cancel.clicked.connect(partial(self.close_dialog, self.new_workcat_dlg))
+        self.new_workcat_dlg.dialog.btn_cancel.clicked.connect(partial(self.close_dialog, self.new_workcat_dlg.dialog))
 
         # Open dialog
-        self.open_dialog(self.new_workcat_dlg)
+        self.open_dialog(self.new_workcat_dlg.dialog)
 
     def manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
@@ -141,27 +143,27 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = utils_giswater.getWidgetText(self.new_workcat_dlg.cat_work_id)
+        cat_work_id = self.new_workcat_dlg.getWidgetText(self.new_workcat_dlg.dialog.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += ("'" + str(cat_work_id) + "', ")
-        descript = utils_giswater.getWidgetText("descript")
+        descript = self.new_workcat_dlg.getWidgetText("descript")
         if descript != "null":
             fields += 'descript, '
             values += ("'" + str(descript) + "', ")
-        link = utils_giswater.getWidgetText("link")
+        link = self.new_workcat_dlg.getWidgetText("link")
         if link != "null":
             fields += 'link, '
             values += ("'" + str(link) + "', ")
-        workid_key_1 = utils_giswater.getWidgetText("workid_key_1")
+        workid_key_1 = self.new_workcat_dlg.getWidgetText("workid_key_1")
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += ("'" + str(workid_key_1) + "', ")
-        workid_key_2 = utils_giswater.getWidgetText("workid_key_2")
+        workid_key_2 = self.new_workcat_dlg.getWidgetText("workid_key_2")
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += ("'" + str(workid_key_2) + "', ")
-        builtdate = self.new_workcat_dlg.builtdate.dateTime().toString('yyyy-MM-dd')
+        builtdate = self.new_workcat_dlg.dialog.builtdate.dateTime().toString('yyyy-MM-dd')
         if builtdate != "null":
             fields += 'builtdate, '
             values += ("'" + str(builtdate) + "', ")
@@ -186,10 +188,10 @@ class ReplaceNodeMapTool(ParentMapTool):
                     sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        utils_giswater.fillComboBox(self.dlg_nodereplace.workcat_id_end, rows)
+                        self.new_workcat_dlg.fillComboBox(self.dlg_nodereplace.workcat_id_end, rows)
                         self.dlg_nodereplace.workcat_id_end.setCurrentIndex(self.dlg_nodereplace.workcat_id_end.findText(str(cat_work_id)))
 
-                    self.close_dialog(self.new_workcat_dlg)
+                    self.close_dialog(self.new_workcat_dlg.dialog)
                 else:
                     msg = "This Workcat is already exist"
                     self.controller.show_info_box(msg, "Warning")
