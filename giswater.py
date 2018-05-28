@@ -281,7 +281,10 @@ class Giswater(QObject):
         """ Manage actions of the different plugin toolbars """           
                         
         toolbar_id = "basic"
-        list_actions = ['41', '48', '51', '32']
+        if self.controller.get_project_type() == 'ws':
+            list_actions = ['41', '48', '51', '32']
+        if self.controller.get_project_type() == 'ud':
+            list_actions = ['41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)
 
         toolbar_id = "om_ws"
