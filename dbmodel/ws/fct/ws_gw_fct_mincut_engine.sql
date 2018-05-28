@@ -40,12 +40,20 @@ BEGIN
         -- Check node_id being a valve
         SELECT node_id INTO exists_id FROM anl_mincut_result_valve WHERE node_id = node_id_arg 
         AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
+        
         IF FOUND THEN
             UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_id_arg AND result_id=result_id_arg;
             --Remove element form array
             stack := stack[1:(array_length(stack,1) - 1)];
 
         ELSE
+
+            -- Check if extreme is being a inlet
+	    SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_id_arg;
+	    IF controlValue = 1 THEN
+                  INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_aux, result_id_arg);	
+	    END IF;
+		
             -- Check if the anl_mincut_result_valve is already computed
             SELECT node_id INTO exists_id FROM anl_mincut_result_node WHERE node_id = node_id_arg AND result_id=result_id_arg;
 

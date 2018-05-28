@@ -100,47 +100,20 @@ BEGIN
 				newRecord.arc_id := (SELECT nextval('urn_id_seq'));
 
 				INSERT INTO v_edit_arc SELECT newRecord.*;
-		
-			-- Redraw the link and vnode (only userdefined_geom false and directly connected to arc)
-			FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=newRecord.arc_id
-			LOOP
-				array_agg:= array_append(array_agg, connec_id_aux);
-			END LOOP;
-		
-			PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
-	
-			-- For those that are not redrawed
-			UPDATE connec SET arc_id=arc_id_new WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
-	
-			IF project_type_aux='UD' THEN
-				array_agg:=null;
-				FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=newRecord.arc_id
-				LOOP
-					array_agg:= array_append(array_agg, gully_id_aux);
-				END LOOP;
-				IF array_agg IS NOT NULL THEN
-					PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
-				END IF;
-				
-				-- For those that are not redrawed		
-				UPDATE gully SET arc_id=arc_id_new WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;    
-	
-					END IF;
 					
 			--Insert data on audit_log_arc_traceability table
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 			VALUES ('ARC FUSION', newRecord.arc_id, myRecord2.arc_id,myRecord1.arc_id,exists_id, CURRENT_TIMESTAMP, CURRENT_USER);
 				
 			-- Update complementary information from old arcs to new one
-			UPDATE element_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id;
-			UPDATE element_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord2.arc_id;
-
-			UPDATE doc_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id;
-			UPDATE doc_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord2.arc_id;
-		
-			UPDATE om_visit_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id;
-			UPDATE om_visit_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord2.arc_id;
-
+			UPDATE element_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+			UPDATE doc_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+			UPDATE om_visit_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+			UPDATE connec SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+	
+			IF project_type_aux='UD' THEN
+				UPDATE gully SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;    
+			END IF;
 
 			-- Delete information of arc deleted
 			DELETE FROM arc WHERE arc_id = myRecord1.arc_id;

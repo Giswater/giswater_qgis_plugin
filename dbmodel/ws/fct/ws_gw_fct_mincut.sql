@@ -33,6 +33,7 @@ DECLARE
 BEGIN
     -- Search path
     SET search_path = SCHEMA_NAME, public;
+	
 
     -- Delete previous data from same result_id
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
@@ -41,7 +42,7 @@ BEGIN
     DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
-
+	DELETE FROM "audit_log_data" where user_name=current_user AND fprocesscat_id=29;
 
 
     -- Identification of exploitation and macroexploitation
@@ -53,25 +54,14 @@ BEGIN
     
     SELECT macroexpl_id INTO macroexpl_id_arg FROM exploitation WHERE expl_id=expl_id_arg;
 
-
-
     -- Reset exploitation selector (of user) according the macroexploitation system
     INSERT INTO selector_expl (expl_id, cur_user)
     SELECT expl_id, current_user from exploitation 
     where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
 
-    --DELETE FROM selector_expl WHERE cur_user=current_user AND expl_id IN (select expl_id from exploitation 
-    --where macroexpl_id!=macroexpl_id_arg);
-
-
-
-
     -- update values of mincut cat table
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg WHERE id=result_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg WHERE id=result_id_arg;
-
-
-
      
     -- Start process
     INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
@@ -85,11 +75,13 @@ BEGIN
     UPDATE anl_mincut_result_valve SET unaccess=true WHERE result_id=result_id_arg AND node_id IN 
     (SELECT node_id FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_arg);
 
-
-
      -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' OR type_element_arg='ARC' THEN
-
+	
+		IF (SELECT state FROM arc WHERE (arc_id = element_id_arg))=0 THEN
+			PERFORM audit_function(3002,2304,element_id_arg);
+		END IF;
+		
         -- Check an existing arc
         SELECT COUNT(*) INTO controlValue FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
         WHERE (arc_id = element_id_arg) AND (is_operative IS TRUE);
@@ -112,8 +104,14 @@ BEGIN
                 UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
                 
             ELSE
-                -- Compute the tributary area using DFS
-                PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
+		-- Check if extreme if being a inlet
+		SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_1_aux;
+		IF controlValue = 0 THEN
+		        -- Compute the tributary area using DFS
+			PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
+		ELSE 
+			INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_1_aux, result_id_arg);	
+		END IF;
             END IF;
 
             -- Check other extreme being a valve
@@ -133,8 +131,14 @@ BEGIN
                 END IF;
                 
             ELSE
-                -- Compute the tributary area using DFS
-                PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);
+		-- Check if extreme if being a inlet
+		SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_2_aux;
+		IF controlValue = 0 THEN
+		        -- Compute the tributary area using DFS
+			PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);
+		ELSE 
+			INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_2_aux, result_id_arg);	
+		END IF;
 
             END IF;
 
@@ -145,7 +149,11 @@ BEGIN
 
     ELSE
 
-        -- Check an existing node
+		IF (SELECT state FROM node WHERE (node_id = element_id_arg))=0 THEN
+            PERFORM audit_function(3004,2304,element_id_arg);
+		END IF;
+	
+		-- Check an existing node
         SELECT COUNT(*) INTO controlValue FROM v_edit_node JOIN value_state_type ON state_type=value_state_type.id  
         WHERE node_id = element_id_arg AND (is_operative IS TRUE);
         IF controlValue = 1 THEN
@@ -159,15 +167,12 @@ BEGIN
     END IF;
 
 
-
-
     -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id 
 	IF (select value::boolean from config_param_system where parameter='om_mincut_use_pgrouting')  IS NOT TRUE THEN 
 		SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
 	ELSE
 		SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
 	END IF;
-
 
 
     -- Delete valves not proposed, not unaccessible, not closed and not broken

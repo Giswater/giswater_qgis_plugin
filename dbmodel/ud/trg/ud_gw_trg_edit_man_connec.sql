@@ -29,6 +29,14 @@ BEGIN
             NEW.connec_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
+        -- connec type
+        IF (NEW.connec_type IS NULL) THEN
+			   NEW.connec_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='connectype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			IF (NEW.connec_type IS NULL) THEN
+				NEW.connec_type:=(SELECT id FROM connec_type LIMIT 1);
+			END IF;
+        END IF;
+        
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
                RETURN audit_function(1022,1214); 

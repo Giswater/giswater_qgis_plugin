@@ -1,10 +1,4 @@
-﻿
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getelement(
-    p_element_type character varying,
-    element_id character varying,
-    device integer)
-  RETURNS json AS
-$BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getelement"(p_element_type varchar, element_id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -45,7 +39,5 @@ BEGIN
 
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_getelement(character varying, character varying, integer)
-  OWNER TO geoadmin;
+LANGUAGE 'plpgsql' VOLATILE COST 100;
+

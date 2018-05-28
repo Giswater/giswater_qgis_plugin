@@ -28,7 +28,6 @@ DECLARE
     project_type_aux text;
     state_aux integer;
     state_node_arg integer;
-    array_agg varchar [];
     gully_id_aux varchar;
     connec_id_aux varchar;
     count_aux1 smallint;
@@ -36,6 +35,9 @@ DECLARE
     return_aux smallint;
 	arc_divide_tolerance_aux float =0.01;
 	plan_arc_vdivision_dsbl_aux boolean;
+	array_agg_connec varchar [];
+	array_agg_gully varchar [];
+
 
 	
 BEGIN
@@ -116,32 +118,24 @@ BEGIN
 			-- Redraw the link and vnode (only userdefined_geom false and directly connected to arc
 			FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=arc_id_aux
 			LOOP
-				array_agg:= array_append(array_agg, connec_id_aux);
+				array_agg_connec:= array_append(array_agg_connec, connec_id_aux);
 			END LOOP;
 
 			UPDATE connec SET arc_id=NULL WHERE arc_id=arc_id_aux;	
 	
-			PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
-
 			
 			IF project_type_aux='UD' THEN
 
-				array_agg:=NULL;
 
 				FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=arc_id_aux
 				LOOP
-					array_agg:= array_append(array_agg, gully_id_aux);
+					array_agg_gully:= array_append(array_agg_gully, gully_id_aux);
 				END LOOP;
 
 				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;
-				PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
 			
 			END IF;
-
-			DELETE FROM config_param_user where parameter='edit_arc_downgrade_force' AND cur_user=current_user;
-			INSERT INTO config_param_user (value, parameter, cur_user) VALUES ('TRUE', 'edit_arc_downgrade_force', current_user);
-			UPDATE arc SET state=0 WHERE arc_id=arc_id_aux;	
-			UPDATE config_param_user SET value='FALSE' where parameter='edit_arc_downgrade_force' AND cur_user=current_user;
+			
 		
 			--INSERT DATA INTO OM_TRACEABILITY
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
@@ -172,6 +166,10 @@ BEGIN
 	
 			-- delete old arc
 			DELETE FROM arc WHERE arc_id=arc_id_aux;
+
+			PERFORM gw_fct_connect_to_network(array_agg_connec, 'CONNEC');
+			PERFORM gw_fct_connect_to_network(array_agg_gully, 'GULLY');
+
 			
 			
 		ELSIF (state_aux=1 AND state_node_arg=2) AND plan_arc_vdivision_dsbl_aux IS NOT TRUE THEN 
@@ -219,5 +217,3 @@ RETURN return_aux;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_arc_divide(character varying)
-  OWNER TO postgres;

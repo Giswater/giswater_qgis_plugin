@@ -1,8 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_gethydrometer(
-    element_id character varying,
-    device integer)
-  RETURNS json AS
-$BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_gethydrometer"(element_id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -44,6 +40,5 @@ BEGIN
 
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+LANGUAGE 'plpgsql' VOLATILE COST 100;
 

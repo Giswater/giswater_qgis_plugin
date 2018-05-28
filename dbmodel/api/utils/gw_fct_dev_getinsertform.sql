@@ -1,5 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_dev_getinsertform"
-(table_id varchar, lang varchar, id varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_dev_getinsertform"(table_id varchar, lang varchar, id varchar, formtodisplay varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -23,33 +22,22 @@ DECLARE
     vdefault_var text;
     rownum_aux integer;
     api_version json;
-	formtodisplay text;
-	
 
 BEGIN
 
 
---  Set search path to local schema
+--    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
-    
+
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
---  Get schema name
+--    Get schema name
     schemas_array := current_schemas(FALSE);
-	
-	--  Take form_id 
-    EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
-        INTO formtodisplay
-        USING table_id; 
-            
---  Check generic
-    IF formtodisplay ISNULL THEN
-        formtodisplay := 'F16';
-    END IF;
-	
---  Get fields
+    
+
+--    Get fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = $1) a'
         INTO fields_array
         USING table_id;    
@@ -66,91 +54,91 @@ BEGIN
     FOREACH aux_json IN ARRAY combo_rows
     LOOP
 
-	-- For filtered combos
-	IF (aux_json->>'filterby') IS NOT NULL THEN 
+    -- For filtered combos
+    IF (aux_json->>'filterby') IS NOT NULL THEN 
 
-		-- Get vdefault values of parent filter
-		EXECUTE 'SELECT config_param_vdefault FROM config_web_fields WHERE table_id=$1 AND name='|| quote_ident(aux_json->>'filterby')
-		INTO config_param_vdefault_var
-		USING table_id, filterby;
+        -- Get vdefault values of parent filter
+        EXECUTE 'SELECT config_param_vdefault FROM config_web_fields WHERE table_id=$1 AND name='|| quote_ident(aux_json->>'filterby')
+        INTO config_param_vdefault_var
+        USING table_id, filterby;
 
-		-- Get filter
-		IF config_param_vdefault_var IS NOT NULL THEN 
-			EXECUTE 'SELECT value FROM config_param_user WHERE parameter=$1 cur_user=$2'
-			INTO filter_val
-			USING config_param_vdefault_var, current_user;
-		END IF;
+        -- Get filter
+        IF config_param_vdefault_var IS NOT NULL THEN 
+            EXECUTE 'SELECT value FROM config_param_user WHERE parameter=$1 cur_user=$2'
+            INTO filter_val
+            USING config_param_vdefault_var, current_user;
+        END IF;
 
-		-- Get combo id's using filtered values
-		IF filter_val IS NOT NULL THEN
-			EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'id') || ')) FROM ('|| quote_ident(aux_json->>'query_text')||' AND '
-			||quote_ident(aux_json->>'onfilter')||' = '||filter_val||') a'
-			INTO combo_json;
-		END IF;
+        -- Get combo id's using filtered values
+        IF filter_val IS NOT NULL THEN
+            EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'id') || ')) FROM ('|| quote_ident(aux_json->>'query_text')||' AND '
+            ||quote_ident(aux_json->>'onfilter')||' = '||filter_val||') a'
+            INTO combo_json;
+        END IF;
 
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'id') || ')) FROM ('|| quote_ident(aux_json->>'query_text')') a'
-		INTO combo_json;
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'id') || ')) FROM ('|| quote_ident(aux_json->>'query_text')') a'
+        INTO combo_json;
 
-		-- Update array
-		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+        -- Update array
+        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 
-		-- Set selected id
-		IF combo_json IS NOT NULL THEN
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->0);
-		ELSE
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
-		END IF;
+        -- Set selected id
+        IF combo_json IS NOT NULL THEN
+            fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->0);
+        ELSE
+            fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
+        END IF;
 
-		-- Get combo values using filtered values
-		IF filter_val IS NOT NULL THEN
-			EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'name') || ')) FROM ('|| quote_ident(aux_json->>'query_text')||' AND '
-			||quote_ident(aux_json->>'onfilter')||' = '||filter_val||') a'
-			INTO combo_json;
-		END IF;
+        -- Get combo values using filtered values
+        IF filter_val IS NOT NULL THEN
+            EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'name') || ')) FROM ('|| quote_ident(aux_json->>'query_text')||' AND '
+            ||quote_ident(aux_json->>'onfilter')||' = '||filter_val||') a'
+            INTO combo_json;
+        END IF;
 
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'name') || ')) FROM ('|| quote_ident(aux_json->>'query_text')') a'
-		INTO combo_json; 
-		
-		combo_json := COALESCE(combo_json, '[]');
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'name') || ')) FROM ('|| quote_ident(aux_json->>'query_text')') a'
+        INTO combo_json; 
+        
+        combo_json := COALESCE(combo_json, '[]');
 
---        	Update array
-		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
+--            Update array
+        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
 
-	ELSE
+    ELSE
 
-		-- Get combo id's values
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'id') || ')) FROM ('|| quote_ident(aux_json->>'query_text')') a'
-		INTO combo_json;
+        -- Get combo id's values
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'id') || ')) FROM ('|| quote_ident(aux_json->>'query_text')') a'
+        INTO combo_json;
 
-		-- Update array
-		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+        -- Update array
+        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 
-		-- Set selected id
-		IF combo_json IS NOT NULL AND (aux_json->>'vdefault') IS NOT NULL THEN
+        -- Set selected id
+        IF combo_json IS NOT NULL AND (aux_json->>'vdefault') IS NOT NULL THEN
 
-			-- Get vdefault values
-			EXECUTE 'SELECT value FROM config_param_user WHERE parameter=$1 cur_user=$2'
-			INTO vdefault_var
-			USING (aux_json->>'vdefault'), current_user;
-		
-			EXECUTE 'SELECT '|| quote_ident(aux_json->>'rownum')||'WHERE '||quote_ident(aux_json->>'id')' = '|| vdefault_var
-			INTO rownum_aux;
-			
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->rownum_aux);
-		ELSE
-			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
-		END IF;
+            -- Get vdefault values
+            EXECUTE 'SELECT value FROM config_param_user WHERE parameter=$1 cur_user=$2'
+            INTO vdefault_var
+            USING (aux_json->>'vdefault'), current_user;
+        
+            EXECUTE 'SELECT '|| quote_ident(aux_json->>'rownum')||'WHERE '||quote_ident(aux_json->>'id')' = '|| vdefault_var
+            INTO rownum_aux;
+            
+            fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->rownum_aux);
+        ELSE
+            fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
+        END IF;
 
-		-- Get combo name values
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'name') || ')) FROM ('|| quote_ident(aux_json->>'query_text')') a'
-		INTO combo_json; 
-		
-		combo_json := COALESCE(combo_json, '[]');
+        -- Get combo name values
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'name') || ')) FROM ('|| quote_ident(aux_json->>'query_text')') a'
+        INTO combo_json; 
+        
+        combo_json := COALESCE(combo_json, '[]');
 
-		-- Update array
-		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
-		
-	END IF;
+        -- Update array
+        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
+        
+    END IF;
 
     END LOOP;
 
@@ -212,14 +200,14 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+    ', "apiVersion":'|| api_version ||'"' ||
         ', "formToDisplay":"' || formToDisplay || '"' ||
         ', "fields":' || fields ||
         '}')::json;
 
 --    Exception handling
    EXCEPTION WHEN OTHERS THEN 
-       RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+       RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

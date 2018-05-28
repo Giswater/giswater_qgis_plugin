@@ -31,7 +31,7 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "event_data":' || event_data_json || 
         ', "form_data":' || form_data ||
         '}')::json;

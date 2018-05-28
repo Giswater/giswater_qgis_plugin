@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatefeature"(table_id varchar, id int8, column_name varchar, value_new varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatefeature"(p_table_id varchar, p_id varchar, p_column_name varchar, p_value_new varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -22,42 +22,43 @@ BEGIN
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
-       raise notice '%' ,table_id;
+       raise notice '%' ,p_table_id;
 
 --    Get column type
-    EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND column_name = $2'
-        USING schemas_array[1], column_name
+    EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2'
+        USING schemas_array[1], p_column_name
         INTO column_type;
-       raise notice '%' ,table_id;
+       raise notice '%' ,p_table_id;
 
 --    Error control
     IF column_type ISNULL THEN
-        RETURN ('{"status":"Failed","SQLERR":"Column ' || column_name || ' does not exist in table om_visit_event"}')::json;
+        RETURN ('{"status":"Failed","SQLERR":"Column ' || p_column_name || ' does not exist in table om_visit_event"}')::json;
     END IF;
-           raise notice '%' ,table_id;
+           raise notice '%' ,p_table_id;
 
 --    Get id column, for tables is the key column
     EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
         INTO table_pkey
-        USING table_id;
-       raise notice '%' ,table_id;
+        USING p_table_id;
+       raise notice '%' ,p_table_id;
 
 --    For views is the first column
     IF table_pkey ISNULL THEN
-        EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND ordinal_position = 1'
+        EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND ordinal_position = 1'
         INTO table_pkey
         USING schemas_array[1];
     END IF;
 
 --    Get column type
-    EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND column_name = $2'
+    EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2'
         USING schemas_array[1], table_pkey
         INTO column_type_id;
 
-       raise notice '%' ,table_id;
+       raise notice '%' ,p_table_id;
 
 --    Value update
-    sql_query := 'UPDATE ' || quote_ident(table_id) || ' SET ' || quote_ident(column_name) || ' = CAST(' || quote_literal(value_new) || ' AS ' || column_type || ') WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type_id || ')';
+    sql_query := 'UPDATE ' || quote_ident(p_table_id) || ' SET ' || quote_ident(p_column_name) || ' = CAST(' || quote_literal(p_value_new) || ' AS ' 
+    || column_type || ') WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(p_id) || ' AS ' || column_type_id || ')';
 
 RAISE NOTICE 'Res: %', sql_query;
     

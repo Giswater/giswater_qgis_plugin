@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_dev_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -36,14 +36,11 @@ BEGIN
 -------------------------------------
     SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
-
-raise notice '1';
-  
+    
 --      Get api version
 ------------------------
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
-raise notice '2';
 
 --    Check if request coherence againts alias_id_arg & table_id_arg (if not exists it means navigation)
 --------------------------------------------------------------------------------------------------------
@@ -57,8 +54,6 @@ raise notice '2';
 
     END IF;
 
-raise notice '3';
-
 --      Get form (if exists) for the layer 
 ------------------------------------------
         -- to build json
@@ -66,8 +61,6 @@ raise notice '3';
             FROM config_web_layer WHERE layer_id = $1 LIMIT 1) row'
             INTO form_info
             USING table_id_arg; 
-            
-raise notice '4';
 
 
 --    Get id column
@@ -100,25 +93,19 @@ raise notice '4';
         USING schemas_array[1], table_id_arg, v_idname
         INTO column_type;
 
-
-raise notice '5';
-
-
 --     Get geometry_column
 ------------------------------------------
-        EXECUTE 'SELECT attname FROM pg_attribute a        
-            JOIN pg_class t on a.attrelid = t.oid
-            JOIN pg_namespace s on t.relnamespace = s.oid
-            WHERE a.attnum > 0 
-            AND NOT a.attisdropped
-            AND t.relname = $1
-            AND s.nspname = $2
-            AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-            ORDER BY a.attnum' 
-            INTO v_the_geom
-            USING table_id_arg, schemas_array[1];
-
-            
+    EXECUTE 'SELECT attname FROM pg_attribute a        
+        JOIN pg_class t on a.attrelid = t.oid
+        JOIN pg_namespace s on t.relnamespace = s.oid
+        WHERE a.attnum > 0 
+        AND NOT a.attisdropped
+        AND t.relname = ''v_edit_node''
+        AND s.nspname = ''SCHEMA_NAME''
+        AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+        ORDER BY a.attnum' 
+        INTO v_the_geom;
+    
 --     Get geometry (to feature response)
 ------------------------------------------
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||v_the_geom||') FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
@@ -142,7 +129,6 @@ raise notice '5';
             INTO form_tabs
             USING table_id_arg;
 
-raise notice '6';
 
 --        Check if it is parent table 
 -------------------------------------
@@ -205,33 +191,30 @@ raise notice '6';
      form_info := gw_fct_json_object_set_key(form_info, 'formTabs', form_tabs_json);
 
 
+--    Check editability
+-----------------------
+
     -- If editable layer
-    IF editable THEN
+    IF editable AND parent_child_relation IS FALSE THEN
 
         -- call editable form using table information
         EXECUTE 'SELECT gw_fct_getinsertform($1, $2, $3)'
             INTO editable_data
             USING table_id_arg, lang, id;
-
-    ELSIF table_id_arg is not null THEN
+    
+    -- If no editable layer
+    ELSE
 
         -- call getinfoform using table information
         EXECUTE 'SELECT gw_fct_getinfoform($1, $2, $3, $4)'
             INTO editable_data
             USING table_id_arg, lang, id, formid_arg;
-    
-
     END IF;
 
-    table_id_arg:= (to_json(table_id_arg));
-
-    raise notice 'table_id_arg %', table_id_arg;
-
 --    Control NULL's
-----------------------
+-----------------------
     api_version := COALESCE(api_version, '{}');
     form_info := COALESCE(form_info, '{}');
-    table_id_arg := COALESCE(table_id_arg, '{}');
     v_idname := COALESCE(v_idname, '{}');
     v_geometry := COALESCE(v_geometry, '{}');
     link_path := COALESCE(link_path, '{}');
@@ -243,7 +226,6 @@ raise notice '6';
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
         ', "formTabs":' || form_info ||
-        ', "tableName":'|| table_id_arg ||
         ', "idName": "' || v_idname ||'"'||
         ', "geometry":' || v_geometry ||
         ', "linkPath":' || link_path ||
@@ -252,8 +234,8 @@ raise notice '6';
 
 
 --    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

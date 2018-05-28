@@ -123,7 +123,7 @@ RAISE NOTICE 'Res: %', formToDisplay;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "formToDisplay":"' || formToDisplay || '"' ||
         ', "fields":' || fields ||
         '}')::json;

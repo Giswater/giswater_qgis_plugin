@@ -1,10 +1,4 @@
-﻿
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(
-    element_type character varying,
-    id character varying,
-    device integer)
-  RETURNS json AS
-$BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoelements"(element_type varchar, id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -28,17 +22,22 @@ BEGIN
             INTO type_element_arg
             USING element_type;
 
-	raise notice 'type_element_arg %', type_element_arg;
+    raise notice 'type_element_arg %', type_element_arg;
 
 --    Get query for elements
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_element'') AND device = $2'
         INTO query_result
         USING element_type, device;
 
+    raise notice 'query_result %', query_result;
+
 --    Get elements
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE ' || quote_ident( element_type || '_id') || '::text = $1) a'
         INTO query_result_elements
         USING id;
+
+    raise notice 'query_result_elements %', query_result_elements;
+
 
 --    Control NULL's
     type_element_arg := COALESCE(type_element_arg, '{}');
@@ -46,7 +45,7 @@ BEGIN
     
 --    Return
     RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||', "typeElement":' ||type_element_arg||', "elements":' || query_result_elements || '}')::json;
-	      
+          
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
@@ -54,11 +53,5 @@ BEGIN
 
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer)
-  OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer) TO public;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer) TO geoadmin;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer) TO user_dev;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getinfoelements(character varying, character varying, integer) TO rol_dev;
+LANGUAGE 'plpgsql' VOLATILE COST 100;
+

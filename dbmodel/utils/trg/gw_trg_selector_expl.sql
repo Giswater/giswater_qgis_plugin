@@ -59,3 +59,5 @@ $BODY$
 
 DROP TRIGGER IF EXISTS gw_trg_selector_expl ON "SCHEMA_NAME".selector_expl;
 CREATE TRIGGER gw_trg_selector_expl AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".selector_expl FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_selector_expl();
+
+ALTER TABLE selector_expl DISABLE TRIGGER gw_trg_selector_expl;

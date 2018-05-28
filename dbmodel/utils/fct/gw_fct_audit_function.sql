@@ -5,6 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+--FUNCTION CODE: XXXX
+
+
 DROP FUNCTION IF EXISTS SCHEMA_NAME.audit_function (integer, integer);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(p_audit_cat_function_id integer, p_audit_cat_error_id integer) RETURNS "pg_catalog"."int2" AS $BODY$
 BEGIN
@@ -28,10 +31,12 @@ DECLARE
 BEGIN
     
     SET search_path = "SCHEMA_NAME", public; 
-    SELECT * INTO cat_error_rec FROM audit_cat_error WHERE audit_cat_error.id=p_audit_cat_error_id;  
-
-    
-        
+    SELECT * INTO cat_error_rec FROM audit_cat_error WHERE audit_cat_error.id=p_audit_cat_error_id; 
+	
+		IF cat_error_rec IS NULL THEN
+			RAISE EXCEPTION 'The process has returned and error code, but this error code is not present on the audit_cat_error table. Please contact with your system administrator in order to update your audit_cat_error table';
+		END IF;
+            
         -- log_level of type 'INFO' or 'SUCCESS'
         IF cat_error_rec.log_level = 0 OR cat_error_rec.log_level = 3 THEN 
             RETURN p_audit_cat_error_id;

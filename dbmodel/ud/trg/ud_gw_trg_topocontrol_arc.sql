@@ -32,7 +32,8 @@ DECLARE
 	connec_id_aux varchar;
     gully_id_aux varchar;
     array_agg varchar [];
-	
+	project_type_aux text;
+		
 
 BEGIN 
 
@@ -42,6 +43,7 @@ BEGIN
  -- Get data from config tables
     SELECT * INTO rec FROM config; 
     SELECT * INTO optionsRecord FROM inp_options LIMIT 1;  
+	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol' ;
 	SELECT value::boolean INTO geom_slp_direction_bool FROM config_param_system WHERE parameter='geom_slp_direction' ;
 		

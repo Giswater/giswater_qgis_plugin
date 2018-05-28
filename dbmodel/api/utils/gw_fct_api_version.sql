@@ -12,4 +12,4 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 DELETE FROM config_param_system WHERE parameter='ApiVersion';
 INSERT INTO config_param_system (parameter, value, data_type, context) 
-VALUES ('ApiVersion', '0.9.101', 'varchar', 'api');
+VALUES ('ApiVersion', '0.9.102', 'varchar', 'api');

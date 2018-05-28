@@ -1,11 +1,4 @@
-﻿
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoform(
-    table_id character varying,
-    lang character varying,
-    p_id character varying,
-    formtodisplay text)
-  RETURNS json AS
-$BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, p_id varchar, formtodisplay text) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -109,7 +102,7 @@ raise notice '4 %', column_type;
         EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || (table_id) || ' WHERE ' || (table_pkey) || ' = CAST(' || quote_literal(p_id) || ' AS ' || column_type || ')' 
         
        INTO field_value; 
-       	raise notice 'table_pkey % ' , table_pkey;
+           raise notice 'table_pkey % ' , table_pkey;
         field_value := COALESCE(field_value, '');
         
 --        Update array
@@ -133,7 +126,7 @@ raise notice '5';
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "formToDisplay":"' || formToDisplay || '"' ||
         ', "fields":' || fields ||
         '}')::json;
@@ -145,5 +138,5 @@ raise notice '5';
 
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+LANGUAGE 'plpgsql' VOLATILE COST 100;
+

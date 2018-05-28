@@ -1,16 +1,4 @@
-﻿-- DROP FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(character varying, character varying, integer, timestamp without time zone, timestamp without time zone, character varying, character varying, bigint);
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfovisits(
-    element_type character varying,
-    id character varying,
-    device integer,
-    visit_start timestamp without time zone,
-    visit_end timestamp without time zone,
-    p_parameter_type character varying,
-    p_parameter_id character varying,
-    visit_id bigint)
-  RETURNS json AS
-$BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfovisits"(element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp, p_parameter_type varchar, p_parameter_id varchar, visit_id int8) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -64,7 +52,7 @@ BEGIN
 --    Make consistency against parameter_type and parameter_id
    IF p_parameter_type IS NOT NULL AND p_parameter_id IS NOT NULL AND 
    (SELECT om_visit_parameter.id FROM om_visit_parameter WHERE parameter_type=p_parameter_type AND om_visit_parameter.id=p_parameter_id) IS NULL THEN
-	p_parameter_id=null;
+    p_parameter_id=null;
    END IF;
     
 
@@ -111,12 +99,12 @@ BEGIN
             INTO parameter_id_options
             USING element_type, p_parameter_type;
     ELSE    
-	
-	    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT '' '' as id, '' '' as name FROM om_visit_parameter UNION 
-	    SELECT DISTINCT parameter_id AS "id", descript AS "name" FROM (' || query_result_dates || ')b WHERE parameter_type=$1 order by name asc) a'
-	    INTO parameter_id_options
-		USING p_parameter_type;
-	
+    
+        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT '' '' as id, '' '' as name FROM om_visit_parameter UNION 
+        SELECT DISTINCT parameter_id AS "id", descript AS "name" FROM (' || query_result_dates || ')b WHERE parameter_type=$1 order by name asc) a'
+        INTO parameter_id_options
+        USING p_parameter_type;
+    
     END IF;
 
 
@@ -127,7 +115,7 @@ BEGIN
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
-        ', "apiVersion":'|| api_version ||'"' ||
+        ', "apiVersion":'|| api_version ||
         ', "events":' || query_result_visits || 
         ', "parameter_type_options":' || parameter_type_options ||
         ', "parameter_id_options":' || parameter_id_options ||
@@ -140,5 +128,5 @@ BEGIN
         
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+LANGUAGE 'plpgsql' VOLATILE COST 100;
+
