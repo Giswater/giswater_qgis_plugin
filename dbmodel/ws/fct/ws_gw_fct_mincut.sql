@@ -29,41 +29,46 @@ DECLARE
     macroexpl_id_arg	integer;
     conflict_text	text;
     cont1 		integer default 0;
+    v_om_mincut_areas	boolean;
 
 BEGIN
     -- Search path
     SET search_path = SCHEMA_NAME, public;
-	
+    	
+    -- get values
+    select value::boolean INTO v_om_mincut_areas from config_param_user where parameter='om_mincut_areas' AND cur_user=current_user;
 
-    -- Delete previous data from same result_id
+    INSERT INTO anl_mincut_result_cat (work_order) VALUES('test') ON CONFLICT (id) DO NOTHING;
+
+    RAISE NOTICE '1-Delete previous data from same result_id';
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_arc" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_polygon" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
-	DELETE FROM "audit_log_data" where user_name=current_user AND fprocesscat_id=29;
+    DELETE FROM "audit_log_data" where user_name=current_user AND fprocesscat_id=29;
 
 
-    -- Identification of exploitation and macroexploitation
+    RAISE NOTICE '2-Identification of exploitation and macroexploitation';
     IF type_element_arg='node' OR type_element_arg='NODE' THEN
-	SELECT expl_id INTO expl_id_arg FROM node WHERE node_id=element_id_arg;
+		SELECT expl_id INTO expl_id_arg FROM node WHERE node_id=element_id_arg;
     ELSE
-	SELECT expl_id INTO expl_id_arg FROM arc WHERE arc_id=element_id_arg;
+		SELECT expl_id INTO expl_id_arg FROM arc WHERE arc_id=element_id_arg;
     END IF;
     
     SELECT macroexpl_id INTO macroexpl_id_arg FROM exploitation WHERE expl_id=expl_id_arg;
 
-    -- Reset exploitation selector (of user) according the macroexploitation system
+    RAISE NOTICE '3-Update exploitation selector (of user) according the macroexploitation system';
     INSERT INTO selector_expl (expl_id, cur_user)
     SELECT expl_id, current_user from exploitation 
     where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
 
-    -- update values of mincut cat table
+    RAISE NOTICE '4-update values of mincut cat table';
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg WHERE id=result_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg WHERE id=result_id_arg;
      
-    -- Start process
+    RAISE NOTICE '5-Start mincut process';
     INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
     SELECT result_id_arg, node.node_id, false::boolean, closed, broken, node.the_geom
     FROM v_anl_mincut_selected_valve
@@ -71,7 +76,7 @@ BEGIN
     JOIN exploitation ON node.expl_id=exploitation.expl_id
     WHERE macroexpl_id=macroexpl_id_arg;
 
-    -- Identify unaccess valves
+    RAISE NOTICE '6-Identify unaccess valves';
     UPDATE anl_mincut_result_valve SET unaccess=true WHERE result_id=result_id_arg AND node_id IN 
     (SELECT node_id FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_arg);
 
@@ -99,53 +104,67 @@ BEGIN
             -- Check extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
             WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
+
             IF controlValue = 1 THEN
                 -- Set proposed valve
                 UPDATE anl_mincut_result_valve SET proposed = TRUE WHERE node_id=node_1_aux AND result_id=result_id_arg;
                 
             ELSE
-		-- Check if extreme if being a inlet
-		SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_1_aux;
-		IF controlValue = 0 THEN
-		        -- Compute the tributary area using DFS
-			PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);
-		ELSE 
-			INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_1_aux, result_id_arg);	
-		END IF;
-            END IF;
+				-- Check if extreme if being a inlet
+				SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_1_aux;
+			
+				IF controlValue = 0 THEN
+					-- Compute the tributary area using DFS
+					IF v_om_mincut_areas IS NOT TRUE THEN
+						PERFORM gw_fct_mincut_engine(node_1_aux, result_id_arg);	
+					ELSE
+						PERFORM gw_fct_mincut_analytics_engine(element_id_arg, node_1_aux, result_id_arg);	
+					END IF;
+				ELSE
+					SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_1_aux;
+					INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_1_aux, node_aux, result_id_arg);	
+				END IF;
+			END IF;
 
-            -- Check other extreme being a valve
+			-- Check other extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
             WHERE node_id = node_2_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;
             IF controlValue = 1 THEN
 
-                -- Check if the valve is already computed
-               SELECT node_id INTO exists_id FROM anl_mincut_result_valve 
-               WHERE node_id = node_2_aux AND (proposed = TRUE) AND result_id=result_id_arg;
-
-                -- Compute proceed
-                IF NOT FOUND THEN
-			-- Set proposed valve
-			UPDATE anl_mincut_result_valve SET proposed = TRUE 
-			WHERE node_id=node_2_aux AND result_id=result_id_arg;
-                END IF;
-                
+				-- Check if the valve is already computed
+				SELECT node_id INTO exists_id FROM anl_mincut_result_valve 
+				WHERE node_id = node_2_aux AND (proposed = TRUE) AND result_id=result_id_arg;
+	
+				-- Compute proceed
+				IF NOT FOUND THEN
+					-- Set proposed valve
+					UPDATE anl_mincut_result_valve SET proposed = TRUE 
+					WHERE node_id=node_2_aux AND result_id=result_id_arg;
+				END IF;
             ELSE
-		-- Check if extreme if being a inlet
-		SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_2_aux;
-		IF controlValue = 0 THEN
-		        -- Compute the tributary area using DFS
-			PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);
+		
+				-- Check if extreme if being a inlet
+				SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_2_aux;
+				IF controlValue = 0 THEN
+
+					-- Compute the tributary area using DFS
+					IF v_om_mincut_areas IS NOT TRUE THEN
+						PERFORM gw_fct_mincut_engine(node_2_aux, result_id_arg);	
+					ELSE
+						PERFORM gw_fct_mincut_analytics_engine(element_id_arg, node_2_aux, result_id_arg);	
+					END IF;
+					
+				ELSE 
+					SELECT the_geom INTO node_aux FROM v_edit_node WHERE node_id = node_2_aux;
+					INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_2_aux, node_aux, result_id_arg);		
+				END IF;	
+	
+			END IF;
+			
+		-- The arc_id was not found
 		ELSE 
-			INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_2_aux, result_id_arg);	
+				PERFORM audit_function(1082,2304,element_id_arg);
 		END IF;
-
-            END IF;
-
-        -- The arc_id was not found
-        ELSE 
-            PERFORM audit_function(1082,2304,element_id_arg);
-        END IF;
 
     ELSE
 
@@ -166,46 +185,53 @@ BEGIN
 
     END IF;
 
+	
+	IF v_om_mincut_areas IS NOT TRUE THEN 
+		RAISE NOTICE '7-Compute flow trace on network using the tanks and sources that belong on the macroexpl_id using inlet function or inverted flowtrace function';
 
-    -- Compute flow trace on network using the tanks and sources that belong on the macroexpl_id 
-	IF (select value::boolean from config_param_system where parameter='om_mincut_use_pgrouting')  IS NOT TRUE THEN 
-		SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
-	ELSE
-		SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
-	END IF;
+		IF (select value::boolean from config_param_system where parameter='om_mincut_use_pgrouting')  IS NOT TRUE THEN 
+			SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
+		ELSE
+			SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
+		END IF;
 
-
-    -- Delete valves not proposed, not unaccessible, not closed and not broken
-    DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg 
-						UNION 
+		RAISE NOTICE '8-Delete valves not proposed, not unaccessible, not closed and not broken';
+		DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
+						WHERE result_id=result_id_arg UNION 
 						SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg)
 						AND result_id=result_id_arg;
 						
-    UPDATE anl_mincut_result_valve SET proposed = FALSE WHERE closed = TRUE AND result_id=result_id_arg ;
+		UPDATE anl_mincut_result_valve SET proposed = FALSE WHERE closed = TRUE AND result_id=result_id_arg ;
 
-    -- Check tempopary overlap control against other planified mincuts 
-    SELECT gw_fct_mincut_result_overlap(result_id_arg, cur_user_var) INTO conflict_text;
-
-    IF conflict_text IS NULL THEN 
-
-	-- Update mincut selector
-	DELETE FROM "anl_mincut_result_selector" where cur_user=cur_user_var;
-	INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (result_id_arg, cur_user_var);
-
-	INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
-	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
+		IF (select value::boolean from config_param_system where parameter='om_mincut_disable_check_temporary_overlap')  IS NOT TRUE THEN 
+			RAISE NOTICE '9-Check temporary overlap control against other planified mincuts';
+			SELECT gw_fct_mincut_result_overlap(result_id_arg, current_user) INTO conflict_text;
 	
-	INSERT INTO anl_mincut_result_hydrometer (result_id, hydrometer_id)
-	SELECT result_id_arg,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
-	JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
-	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-	WHERE result_id=result_id_arg;
-
-   END IF;
-
+			IF conflict_text IS NOT NULL THEN 
+				RAISE NOTICE 'Mincut conflict - End of process ';
+				RETURN conflict_text;
+			END IF;	
+		END IF;
 		
--- End of process
-RETURN conflict_text;
+		RAISE NOTICE '10-Update mincut selector';
+		DELETE FROM anl_mincut_result_selector WHERE cur_user=current_user;
+		INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (result_id_arg, current_user);
+
+		RAISE NOTICE '11-Insert into anl_mincut_result_connec table ';
+		INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
+		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
+	
+		RAISE NOTICE '12-Insert into anl_mincut_result_hydrometer table ';
+		INSERT INTO anl_mincut_result_hydrometer (result_id, hydrometer_id)
+		SELECT result_id_arg,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
+		JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
+		JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
+		WHERE result_id=result_id_arg;
+
+	END IF;
+
+	RAISE NOTICE 'End of process ';
+	RETURN 'Ok';
 
 
 END;

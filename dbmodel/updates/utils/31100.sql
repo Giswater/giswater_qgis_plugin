@@ -90,7 +90,7 @@ INSERT INTO config_param_system VALUES (66, 'basic_search_hyd_hydro_field_1', 'h
 INSERT INTO config_param_system VALUES (67, 'basic_search_hyd_hydro_field_2', 'connec_customer_code', 'text', 'searchplus', 'field connec.customer_code');
 INSERT INTO config_param_system VALUES (68, 'basic_search_hyd_hydro_field_3', 'state', 'text', 'searchplus', 'field value_state.name');
 INSERT INTO config_param_system VALUES (69, 'basic_search_workcat_filter', 'code', 'text', 'searchplus', NULL);
-INSERT INTO config_param_system VALUES (70, 'om_mincut_use_pgrouting', NULL, 'boolean', 'mincut', NULL);
+INSERT INTO config_param_system VALUES (70, 'om_mincut_use_pgrouting', 'TRUE', 'boolean', 'mincut', NULL);
 
 
 
@@ -130,4 +130,15 @@ INSERT INTO config_param_system VALUES (91, 'sys_elev2_vd', '1', 'decimal', 'dra
 INSERT INTO config_param_system VALUES (92, 'y1_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
 INSERT INTO config_param_system VALUES (93, 'y2_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
 INSERT INTO config_param_system VALUES (94, 'slope_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
+
+
+----------------------
+--29/05/2018
+-----------------------
+
+INSERT INTO config_param_system VALUES (95, 'om_mincut_disable_check_temporary_overlap', 'FALSE', 'Boolean', 'Mincut', 'Only for WS');
+INSERT INTO config_param_system VALUES (96, 'om_mincut_valve2tank_traceability', 'FALSE', 'Boolean', 'Mincut', 'Only for WS');
+
+INSERT INTO sys_fprocess_cat VALUES (30, 'Analysis mincut areas', 'OM', 'Analysis mincut areas', 'ws');
+
 
