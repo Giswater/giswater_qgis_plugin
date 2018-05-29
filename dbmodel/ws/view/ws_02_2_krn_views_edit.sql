@@ -18,7 +18,7 @@ node_id,
 code,
 elevation, 
 depth, 
-nodetype_id AS nodetype_id,
+v_node.nodetype_id,
 sys_type,
 nodecat_id,
 cat_matcat_id,
@@ -34,6 +34,7 @@ state_type,
 annotation, 
 observ, 
 comment,
+cat_node.label,
 dma_id,
 presszonecat_id,
 soilcat_id,
@@ -56,9 +57,9 @@ postcomplement2,
 streetaxis2_id,
 postnumber2,
 v_node.descript,
-svg,
+v_node.svg,
 rotation,
-link,
+v_node.link,
 verified,
 v_node.the_geom,
 v_node.undelete,
@@ -72,7 +73,8 @@ expl_id,
 hemisphere,
 num_value
 FROM v_node
-	LEFT JOIN sector ON v_node.sector_id = sector.sector_id;
+	LEFT JOIN sector ON v_node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON v_node.nodecat_id = cat_node.id;
 
 
 DROP VIEW IF EXISTS v_edit_arc CASCADE;
@@ -83,11 +85,11 @@ code,
 node_1,
 node_2,
 arccat_id, 
-arctype_id AS "cat_arctype_id",
+v_arc.arctype_id AS "cat_arctype_id",
 sys_type,
-matcat_id AS "cat_matcat_id",
-pnom AS "cat_pnom",
-dnom AS "cat_dnom",
+v_arc.matcat_id AS "cat_matcat_id",
+v_arc.pnom AS "cat_pnom",
+v_arc.dnom AS "cat_dnom",
 epa_type,
 v_arc.sector_id, 
 sector.macrosector_id,
@@ -96,6 +98,7 @@ state_type,
 annotation, 
 observ, 
 comment,
+cat_arc.label,
 gis_length,
 custom_length,
 dma_id,
@@ -120,7 +123,7 @@ postcomplement2,
 streetaxis2_id,
 postnumber2,
 v_arc.descript,
-link,
+v_arc.link,
 verified,
 v_arc.the_geom,
 v_arc.undelete,
@@ -133,7 +136,8 @@ macrodma_id,
 expl_id,
 num_value
 FROM v_arc
-	LEFT JOIN sector ON v_arc.sector_id = sector.sector_id;
+	LEFT JOIN sector ON v_arc.sector_id = sector.sector_id
+	JOIN cat_arc ON v_arc.arccat_id = cat_arc.id;
 
 DROP VIEW IF EXISTS v_edit_man_pipe CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_pipe AS
