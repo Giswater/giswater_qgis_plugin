@@ -18,6 +18,8 @@ DECLARE
     count int2;
     azm_aux float;
     rec_config record;
+    connec_id_aux text;
+    array_agg text[];
 
         
 BEGIN 
@@ -125,6 +127,19 @@ BEGIN
 		ELSE
 			UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
 		END IF;
+
+		-- Update vnode/link
+			
+		-- Redraw the link and vnode
+		FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=NEW.arc_id
+		LOOP
+			array_agg:= array_append(array_agg, connec_id_aux);
+			UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
+						
+		END LOOP;
+
+		--RAISE EXCEPTION 'array_agg %', array_agg;
+		PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
 	
 	END LOOP;
 

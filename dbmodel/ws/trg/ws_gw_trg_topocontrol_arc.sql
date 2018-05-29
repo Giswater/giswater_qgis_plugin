@@ -147,20 +147,6 @@ BEGIN
 				NEW.node_1:= nodeRecord1.node_id; 
 				NEW.node_2:= nodeRecord2.node_id;
 
-				-- Update vnode/link
-				IF TG_OP = 'UPDATE' THEN
-	
-					-- Redraw the link and vnode
-					FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=NEW.arc_id
-					LOOP
-						array_agg:= array_append(array_agg, connec_id_aux);
-						UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
-						
-					END LOOP;
-
-					PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
-
-				END IF;
 				
 				RETURN NEW;
 			END IF;
