@@ -66,34 +66,12 @@
          <x>0</x>
          <y>0</y>
          <width>566</width>
-         <height>327</height>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Basic information</string>
        </attribute>
-       <widget class="QComboBox" name="workcat_id_end">
-        <property name="geometry">
-         <rect>
-          <x>402</x>
-          <y>183</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_buildercat_id">
         <property name="geometry">
          <rect>
@@ -200,28 +178,6 @@
         </property>
         <property name="margin">
          <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="workcat_id">
-        <property name="geometry">
-         <rect>
-          <x>102</x>
-          <y>210</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_workcat_id">
@@ -1095,14 +1051,53 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLineEdit" name="workcat_id">
+        <property name="geometry">
+         <rect>
+          <x>102</x>
+          <y>210</y>
+          <width>130</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_new_workcat">
+        <property name="geometry">
+         <rect>
+          <x>237</x>
+          <y>210</y>
+          <width>26</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="workcat_id_end">
+        <property name="geometry">
+         <rect>
+          <x>402</x>
+          <y>182</y>
+          <width>161</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_15">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1971,15 +1966,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_6">
@@ -2132,15 +2127,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_new">
@@ -2271,15 +2266,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter">
@@ -2324,15 +2319,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_9">
@@ -6126,7 +6121,6 @@
   <tabstop>cat_pnom</tabstop>
   <tabstop>ownercat_id</tabstop>
   <tabstop>buildercat_id</tabstop>
-  <tabstop>workcat_id_end</tabstop>
   <tabstop>builtdate</tabstop>
   <tabstop>gis_length</tabstop>
   <tabstop>custom_length</tabstop>
@@ -6135,7 +6129,6 @@
   <tabstop>function_type</tabstop>
   <tabstop>fluid_type</tabstop>
   <tabstop>location_type</tabstop>
-  <tabstop>workcat_id</tabstop>
   <tabstop>enddate</tabstop>
   <tabstop>muni_id</tabstop>
   <tabstop>postcode</tabstop>
