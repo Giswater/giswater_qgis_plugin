@@ -510,7 +510,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;	
 	
 		ELSIF man_table ='man_netsamplepoint' THEN
-			UPDATE man_netsamplepoint SET node_id=NEW.node_id
+			UPDATE man_netsamplepoint SET node_id=NEW.node_id, lab_code=NEW.lab_code
 			WHERE node_id=OLD.node_id;		
 		
 		ELSIF man_table ='man_wtp' THEN		

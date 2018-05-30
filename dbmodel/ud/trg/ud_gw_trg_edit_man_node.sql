@@ -264,8 +264,8 @@ BEGIN
 		
 		ELSIF man_table='man_netinit' THEN
 			
-			INSERT INTO man_netinit (node_id,length, width, inlet, bottom_channel, accessibility, name) 
-			VALUES (NEW.node_id, NEW.length,NEW.width,NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.name);
+			INSERT INTO man_netinit (node_id,length, width, inlet, bottom_channel, accessibility, name, sander_depth) 
+			VALUES (NEW.node_id, NEW.length,NEW.width,NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.name, NEW.sander_depth);
 			
 		ELSIF man_table='man_wjump' THEN
 	
@@ -430,7 +430,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_netinit' THEN
-			UPDATE man_netinit SET length=NEW.length, width=NEW.width, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
+			UPDATE man_netinit SET length=NEW.length, width=NEW.width, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name, sander_depth=NEW.sander_depth
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_wjump' THEN

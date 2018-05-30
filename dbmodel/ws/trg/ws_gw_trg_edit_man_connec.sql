@@ -276,7 +276,7 @@ BEGIN
 			
 		ELSIF man_table ='man_tap' THEN
 			UPDATE man_tap SET linked_connec=NEW.linked_connec, drain_diam=NEW.drain_diam,drain_exit=NEW.drain_exit,drain_gully=NEW.drain_gully,
-			drain_distance=NEW.drain_distance, arq_patrimony=NEW.arq_patrimony, com_state=NEW.com_state
+			drain_distance=NEW.drain_distance, arq_patrimony=NEW.arq_patrimony, com_state=NEW.com_state, cat_valve=NEW.cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
         ELSIF man_table ='man_fountain' THEN 			
