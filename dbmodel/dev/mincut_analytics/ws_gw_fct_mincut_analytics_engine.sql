@@ -52,25 +52,36 @@ BEGIN
 	    SELECT COUNT(*) INTO controlValue FROM anl_mincut_inlet_x_exploitation WHERE node_id = node_id_arg;
 	    IF controlValue = 1 THEN
 	    END IF;
+
+		  RAISE NOTICE ' Inserting into anl_mincut_result_node; %', node_id_arg;
+                  INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_aux, result_id_arg);
 		
             -- Check if the anl_mincut_result_valve is already computed
             SELECT node_id INTO exists_id FROM anl_mincut_result_node WHERE node_id = node_id_arg AND result_id=result_id_arg;
 
             -- Compute proceed
             IF NOT FOUND THEN
+            
+                -- Update value
+		RAISE NOTICE ' Inserting into anl_mincut_result_node; %', node_id_arg;
+                INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_aux, result_id_arg);         
                                        
                 -- Loop for all the upstream nodes
                 FOR rec_table IN SELECT arc_id, node_1 FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
                 WHERE (node_2 = node_id_arg) AND (is_operative IS TRUE)
                 LOOP
 
-					SELECT arc_id INTO exists_id FROM anl_mincut_result_arc WHERE arc_id = rec_table.arc_id AND result_id=result_id_arg;
+			SELECT arc_id INTO exists_id FROM anl_mincut_result_arc WHERE arc_id = rec_table.arc_id AND result_id=result_id_arg;
 
                     -- Compute proceed
                     IF NOT FOUND THEN
 					
 			RAISE NOTICE ' Inserting into anl_arc; %', rec_table.arc_id;
                       	INSERT INTO "anl_arc" (arc_id, arc_id_aux, the_geom, fprocesscat_id) VALUES(rec_table.arc_id, arc_id_arg, arc_aux, 30);
+
+                   	RAISE NOTICE ' Inserting into anl_mincut_result_arc; %', rec_table.arc_id;
+			INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES(rec_table.arc_id, rec_table.the_geom, result_id_arg);
+
                     END IF;
 
                     --Push element into the array
@@ -88,7 +99,11 @@ BEGIN
 					-- Compute proceed
                     IF NOT FOUND THEN
 			RAISE NOTICE ' Inserting into anl_arc; %', rec_table.arc_id;
-                      	INSERT INTO "anl_arc" (arc_id, arc_id_aux, the_geom, fprocesscat_id) VALUES(rec_table.arc_id, arc_id_arg, arc_aux, 30);                
+                      	INSERT INTO "anl_arc" (arc_id, arc_id_aux, the_geom, fprocesscat_id) VALUES(rec_table.arc_id, arc_id_arg, arc_aux, 30);  
+
+			RAISE NOTICE ' Inserting into anl_mincut_result_arc; %', rec_table.arc_id;
+			INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES(rec_table.arc_id, rec_table.the_geom, result_id_arg);   
+                      	              
                     END IF;
 
                     --Push element into the array
