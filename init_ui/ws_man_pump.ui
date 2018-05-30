@@ -207,7 +207,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1188,8 +1188,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1234,7 +1234,7 @@
        <widget class="QLineEdit" name="elev_height">
         <property name="geometry">
          <rect>
-          <x>110</x>
+          <x>115</x>
           <y>130</y>
           <width>160</width>
           <height>18</height>
@@ -1289,7 +1289,7 @@
        <widget class="QLineEdit" name="max_flow">
         <property name="geometry">
          <rect>
-          <x>110</x>
+          <x>115</x>
           <y>5</y>
           <width>160</width>
           <height>18</height>
@@ -1344,7 +1344,7 @@
        <widget class="QLineEdit" name="power">
         <property name="geometry">
          <rect>
-          <x>110</x>
+          <x>115</x>
           <y>80</y>
           <width>160</width>
           <height>18</height>
@@ -1363,7 +1363,7 @@
        <widget class="QLineEdit" name="min_flow">
         <property name="geometry">
          <rect>
-          <x>110</x>
+          <x>115</x>
           <y>30</y>
           <width>160</width>
           <height>18</height>
@@ -1418,7 +1418,7 @@
        <widget class="QLineEdit" name="nom_flow">
         <property name="geometry">
          <rect>
-          <x>110</x>
+          <x>115</x>
           <y>55</y>
           <width>160</width>
           <height>18</height>
@@ -1509,7 +1509,7 @@
        <widget class="QLineEdit" name="pressure">
         <property name="geometry">
          <rect>
-          <x>110</x>
+          <x>115</x>
           <y>105</y>
           <width>160</width>
           <height>18</height>
@@ -1525,11 +1525,11 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="elev_height_2">
+       <widget class="QLineEdit" name="pump_number">
         <property name="geometry">
          <rect>
-          <x>111</x>
-          <y>156</y>
+          <x>115</x>
+          <y>180</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -1544,11 +1544,11 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_elev_height_2">
+       <widget class="QLabel" name="label_pump_number">
         <property name="geometry">
          <rect>
           <x>11</x>
-          <y>156</y>
+          <y>180</y>
           <width>99</width>
           <height>22</height>
          </rect>
@@ -1578,6 +1578,61 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="labe_name">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>155</y>
+          <width>99</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Name:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="name">
+        <property name="geometry">
+         <rect>
+          <x>115</x>
+          <y>155</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -2825,15 +2880,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -2845,15 +2900,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -3188,15 +3243,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_gallery">
@@ -3270,15 +3325,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QTableView" name="tbl_event_node">
@@ -3546,15 +3601,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_el_to">
@@ -3566,15 +3621,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QTabWidget" name="tbl_scada_3">

@@ -89,7 +89,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1012,8 +1012,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1038,7 +1038,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="mlength">
+       <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1057,7 +1057,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_mlength">
+       <widget class="QLabel" name="label_length">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1132,7 +1132,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="mwidth">
+       <widget class="QLineEdit" name="width">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1151,7 +1151,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_mwidth">
+       <widget class="QLabel" name="label_width">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1330,7 +1330,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_mh_sander_depth_2">
+       <widget class="QLabel" name="label_sander_depth">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1366,7 +1366,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="mh_sander_depth_2">
+       <widget class="QLineEdit" name="sander_depth">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2677,15 +2677,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QComboBox" name="doc_type">
@@ -2743,15 +2743,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -2915,15 +2915,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter_type">
@@ -2971,15 +2971,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QComboBox" name="event_type">
@@ -3274,15 +3274,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_scada_to">
@@ -3327,15 +3327,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_scada_from">
@@ -4420,9 +4420,9 @@
   <tabstop>workcat_id_end</tabstop>
   <tabstop>enddate</tabstop>
   <tabstop>name</tabstop>
-  <tabstop>mlength</tabstop>
-  <tabstop>mwidth</tabstop>
-  <tabstop>mh_sander_depth_2</tabstop>
+  <tabstop>length</tabstop>
+  <tabstop>width</tabstop>
+  <tabstop>sander_depth</tabstop>
   <tabstop>inlet</tabstop>
   <tabstop>bottom_channel</tabstop>
   <tabstop>muni_id</tabstop>

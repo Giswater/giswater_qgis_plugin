@@ -89,7 +89,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1013,7 +1013,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1113,7 +1113,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_total_volume">
+       <widget class="QLabel" name="label_max_volume">
         <property name="geometry">
          <rect>
           <x>300</x>
@@ -1149,7 +1149,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="total_volume">
+       <widget class="QLineEdit" name="max_volume">
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -1168,7 +1168,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_total_length">
+       <widget class="QLabel" name="label_length">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1207,7 +1207,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="total_length">
+       <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1281,7 +1281,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_total_width">
+       <widget class="QLabel" name="label_width">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1320,7 +1320,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="total_width">
+       <widget class="QLineEdit" name="width">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2796,15 +2796,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QComboBox" name="doc_type">
@@ -2862,15 +2862,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -3034,15 +3034,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter_type">
@@ -3090,15 +3090,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QComboBox" name="event_type">
@@ -3393,15 +3393,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_scada_to">
@@ -3446,15 +3446,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_scada_from">
@@ -4540,11 +4540,11 @@
   <tabstop>enddate</tabstop>
   <tabstop>pol_id</tabstop>
   <tabstop>name</tabstop>
-  <tabstop>total_length</tabstop>
-  <tabstop>total_width</tabstop>
+  <tabstop>length</tabstop>
+  <tabstop>width</tabstop>
   <tabstop>min_height</tabstop>
   <tabstop>custom_area</tabstop>
-  <tabstop>total_volume</tabstop>
+  <tabstop>max_volume</tabstop>
   <tabstop>util_volume</tabstop>
   <tabstop>muni_id</tabstop>
   <tabstop>postcode</tabstop>

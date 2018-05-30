@@ -86,7 +86,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1009,8 +1009,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1172,7 +1172,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="sander_length">
+       <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1227,7 +1227,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="sander_width">
+       <widget class="QLineEdit" name="width">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2665,15 +2665,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QComboBox" name="doc_type">
@@ -2731,15 +2731,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -2906,15 +2906,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter_type">
@@ -2962,15 +2962,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QComboBox" name="event_type">
@@ -3265,15 +3265,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_scada_to">
@@ -3318,15 +3318,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_scada_from">
@@ -4410,8 +4410,8 @@
   <tabstop>xyz_date</tabstop>
   <tabstop>workcat_id_end</tabstop>
   <tabstop>enddate</tabstop>
-  <tabstop>sander_length</tabstop>
-  <tabstop>sander_width</tabstop>
+  <tabstop>length</tabstop>
+  <tabstop>width</tabstop>
   <tabstop>sander_depth</tabstop>
   <tabstop>prot_surface</tabstop>
   <tabstop>inlet</tabstop>

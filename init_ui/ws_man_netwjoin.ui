@@ -204,7 +204,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1186,13 +1186,13 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Specific information</string>
        </attribute>
-       <widget class="QLineEdit" name="demand">
+       <widget class="QLineEdit" name="customer_code">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1205,7 +1205,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_demand">
+       <widget class="QLabel" name="label_customer_code">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1226,7 +1226,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Demand:</string>
+         <string>Customer code:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1342,8 +1342,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2036,8 +2036,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2581,15 +2581,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -2601,15 +2601,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -2938,15 +2938,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_gallery">
@@ -3020,15 +3020,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QTableView" name="tbl_event_node">
@@ -3296,15 +3296,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_el_to">
@@ -3316,15 +3316,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QTabWidget" name="tbl_scada_3">
@@ -4231,7 +4231,7 @@
   <tabstop>location_type</tabstop>
   <tabstop>workcat_id_end</tabstop>
   <tabstop>enddate</tabstop>
-  <tabstop>demand</tabstop>
+  <tabstop>customer_code</tabstop>
   <tabstop>top_floor</tabstop>
   <tabstop>muni_id</tabstop>
   <tabstop>postcode</tabstop>
