@@ -37,6 +37,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -------------
 -- ALTER TABLES
 -------------
+ALTER TABLE cat_node ADD COLUMN label varchar(255);
+ALTER TABLE cat_arc ADD COLUMN label varchar(255);
+ALTER TABLE cat_connec ADD COLUMN label varchar(255);
 
 
 
