@@ -960,6 +960,10 @@
         <source>Select a workcat id end</source>
         <translation>Seleccioni un expedient</translation>
     </message>
+    <message>
+        <source>Mincut done, but has conflict and overlaps with</source>
+        <translation>Poligon de tall fet, pero te conflictes d' interseccions amb </translation>
+    </message>
 </context>
 
 </TS>

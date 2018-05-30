@@ -959,6 +959,10 @@
         <source>Select a workcat id end</source>
         <translation>Seleccione un expediente</translation>
     </message>
+    <message>
+        <source>Mincut done, but has conflict and overlaps with</source>
+        <translation>Poligono de corte hecho, pero tiene conflictos de interseccion con </translation>
+    </message>
 </context>
 
 </TS>

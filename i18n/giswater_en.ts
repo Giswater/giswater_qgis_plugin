@@ -959,6 +959,11 @@
         <source>Select a workcat id end</source>
         <translation>Please select a workcat id end</translation>
     </message>
+    <message>
+        <source>Mincut done, but has conflict and overlaps with</source>
+        <translation>Mincut done, but has conflict and overlaps with </translation>
+    </message>
+
 
 </context>
 
