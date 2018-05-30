@@ -1185,8 +1185,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>247</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1290,19 +1290,6 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cat_valve">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>55</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_top_floor">
         <property name="geometry">
          <rect>
@@ -1339,14 +1326,24 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QComboBox" name="cat_valve">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>55</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="Additionalinformation_14">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2039,8 +2036,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4236,7 +4233,6 @@
   <tabstop>enddate</tabstop>
   <tabstop>demand</tabstop>
   <tabstop>top_floor</tabstop>
-  <tabstop>cat_valve</tabstop>
   <tabstop>muni_id</tabstop>
   <tabstop>postcode</tabstop>
   <tabstop>streetaxis_id</tabstop>

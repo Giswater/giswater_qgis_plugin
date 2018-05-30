@@ -1146,8 +1146,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>247</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1297,9 +1297,9 @@
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>75</y>
+          <y>70</y>
           <width>97</width>
-          <height>31</height>
+          <height>41</height>
          </rect>
         </property>
         <property name="font">
@@ -1549,25 +1549,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="cat_valve">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>25</y>
-          <width>160</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QCheckBox" name="arq_patrimony">
         <property name="geometry">
          <rect>
@@ -1581,14 +1562,24 @@
          <string/>
         </property>
        </widget>
+       <widget class="QComboBox" name="cat_valve">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>25</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_15">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2281,8 +2272,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4241,7 +4232,6 @@
   <tabstop>workcat_id_end</tabstop>
   <tabstop>enddate</tabstop>
   <tabstop>linked_connec</tabstop>
-  <tabstop>cat_valve</tabstop>
   <tabstop>drain_diameter</tabstop>
   <tabstop>drain_exit</tabstop>
   <tabstop>drain_gully</tabstop>
