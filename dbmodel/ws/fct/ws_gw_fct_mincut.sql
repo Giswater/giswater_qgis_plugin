@@ -38,8 +38,6 @@ BEGIN
     -- get values
     select value::boolean INTO v_om_mincut_areas from config_param_user where parameter='om_mincut_areas' AND cur_user=current_user;
 
-    INSERT INTO anl_mincut_result_cat (work_order) VALUES('test') ON CONFLICT (id) DO NOTHING;
-
     RAISE NOTICE '1-Delete previous data from same result_id';
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_arc" where result_id=result_id_arg;
@@ -207,10 +205,6 @@ BEGIN
 			RAISE NOTICE '9-Check temporary overlap control against other planified mincuts';
 			SELECT gw_fct_mincut_result_overlap(result_id_arg, current_user) INTO conflict_text;
 	
-			IF conflict_text IS NOT NULL THEN 
-				RAISE NOTICE 'Mincut conflict - End of process ';
-				RETURN conflict_text;
-			END IF;	
 		END IF;
 		
 		RAISE NOTICE '10-Update mincut selector';
@@ -227,11 +221,11 @@ BEGIN
 		JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
 		JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 		WHERE result_id=result_id_arg;
-
+		
 	END IF;
 
 	RAISE NOTICE 'End of process ';
-	RETURN 'Ok';
+	RETURN conflict_text;
 
 
 END;
