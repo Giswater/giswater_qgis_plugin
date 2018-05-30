@@ -197,7 +197,7 @@ class ManArcDialog(ParentDialog):
         # column_name = cur_layer.name().lower() + "_cat_shape"
         # Get cat_shape value from database
         sql = ("SELECT image FROM " + self.schema_name + ".cat_arc_shape WHERE id = "
-               "(SELECT shape FROM " + self.schema_name + ".v_edit_man_" + self.layer.name().lower() + ""
+               "(SELECT cat_shape FROM " + self.schema_name + ".v_edit_arc"
                " WHERE arc_id = '" + arc_id + "')")
         row = self.controller.get_row(sql)
 
