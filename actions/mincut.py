@@ -469,9 +469,27 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.show_warning(message)           
         
         # Close dialog and disconnect snapping
-        self.dlg.close()
         self.disconnect_snapping()
-                
+
+        sql = ("SELECT mincut_state, mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat "
+               " WHERE id = '" + str(result_mincut_id) + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            if str(row[0]) == '0' and str(row[1]) == '1':
+                cur_user = self.controller.get_project_user()
+                result_mincut_id_text = self.dlg.result_mincut_id.text()
+                sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_result_overlap('"+str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
+                row = self.controller.get_row(sql, log_sql=False, commit=True)
+                if row[0] is not None:
+                        message = "Mincut done, but has conflict and overlaps with "
+                        answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
+                        if not answer:
+                            self.dlg.close()
+                else:
+                    self.dlg.close()
+        else:
+            self.dlg.close()
+
 
     def update_result_selector(self, result_mincut_id, commit=True):    
         """ Update table 'anl_mincut_result_selector' """    
@@ -1358,39 +1376,40 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
                " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
+
         if row:
-            if row[0]: 
-                message = "This mincut has conflict, and overlaps with"
+            if row[0]:
+                message = "Mincut done, but has conflict and overlaps with"
                 self.controller.show_info_box(message, parameter=row[0])
             else:
                 message = "Mincut done successfully"
                 self.controller.show_info(message)
-    
-                # Update table 'anl_mincut_result_cat'
-                sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-                       " SET mincut_class = 1, "
-                       " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", " 
-                       + str(snapping_position.y()) + "), " + str(srid) + "),"
-                       " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "',"
-                       " anl_feature_id = '" + str(elem_id) + "'"
-                       " WHERE id = '" + result_mincut_id_text + "'")
-                status = self.controller.execute_sql(sql)
-                if not status:
-                    message = "Error updating element in table, you need to review data"
-                    self.controller.show_warning(message)
-                    self.set_cursor_restore()                  
-                    return
 
-                # Enable button CustomMincut and button Start
-                self.dlg.btn_start.setDisabled(False)
-                self.action_custom_mincut.setDisabled(False)
-                self.action_mincut.setDisabled(True)
-                self.action_add_connec.setDisabled(True)
-                self.action_add_hydrometer.setDisabled(True)
-                self.action_mincut_composer.setDisabled(False)
-    
-                # Refresh map canvas
-                self.refresh_map_canvas()
+            # Update table 'anl_mincut_result_cat'
+            sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
+                   " SET mincut_class = 1, "
+                   " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", "
+                   + str(snapping_position.y()) + "), " + str(srid) + "),"
+                   " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "',"
+                   " anl_feature_id = '" + str(elem_id) + "'"
+                   " WHERE id = '" + result_mincut_id_text + "'")
+            status = self.controller.execute_sql(sql, log_sql=True)
+            if not status:
+                message = "Error updating element in table, you need to review data"
+                self.controller.show_warning(message)
+                self.set_cursor_restore()
+                return
+
+            # Enable button CustomMincut and button Start
+            self.dlg.btn_start.setDisabled(False)
+            self.action_custom_mincut.setDisabled(False)
+            self.action_mincut.setDisabled(True)
+            self.action_add_connec.setDisabled(True)
+            self.action_add_hydrometer.setDisabled(True)
+            self.action_mincut_composer.setDisabled(False)
+
+            # Refresh map canvas
+            self.refresh_map_canvas()
 
         # Restore default cursor
         self.set_cursor_restore()
