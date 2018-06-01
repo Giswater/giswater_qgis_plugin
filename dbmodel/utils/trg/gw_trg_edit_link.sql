@@ -85,7 +85,7 @@ BEGIN
         -- link ID
 			IF (NEW.link_id IS NULL) THEN
 				--PERFORM setval('urn_id_seq', gw_fct_urn()+1,true);
-				NEW.link_id:= (SELECT nextval('urn_id_seq'));
+				NEW.link_id:= (SELECT nextval('link_link_id_seq'));
 			END IF;			
 		
         -- Sector ID
