@@ -87,6 +87,7 @@ def getText(widget, return_string_null=True):
     
     if widget is None:
         return
+    text = None
     if widget:
         if type(widget) is QLineEdit:
             text = widget.text()
