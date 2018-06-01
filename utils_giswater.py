@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QTableView
+
 """ Module with utility functions to interact with dialog and its widgets """
 from qgis.gui import QgsDateTimeEdit
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
@@ -122,43 +124,38 @@ def setText(widget, text):
 def getCalendarDate(widget, date_format = "yyyy/MM/dd", datetime_format = "yyyy/MM/dd hh:mm:ss"):
     
     date = None
-    # TODO esto es or o es and?
-    if type(widget) is not QDateEdit or type(widget) is not QDateTimeEdit:
-        return
     if not widget:
         return
-    if type(widget) is QDateEdit:
-        date = widget.date().toString(date_format)
-    elif type(widget) is QDateTimeEdit:
-        date = widget.dateTime().toString(datetime_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy':
-        date = widget.dateTime().toString(date_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss':
-        date = widget.dateTime().toString(datetime_format)
-                
-    return date
+    if type(widget) is QDateEdit or type(widget) is QDateTimeEdit:
+        if type(widget) is QDateEdit:
+            date = widget.date().toString(date_format)
+        elif type(widget) is QDateTimeEdit:
+            date = widget.dateTime().toString(datetime_format)
+        elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy':
+            date = widget.dateTime().toString(date_format)
+        elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss':
+            date = widget.dateTime().toString(datetime_format)
+        return date
         
 
 def setCalendarDate(widget, date, default_current_date=True):
 
-    # TODO esto es or o es and?
-    if type(widget) is not QDateEdit or type(widget) is not QDateTimeEdit:
-        return
+
     if not widget:
         return
-    if type(widget) is QDateEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy'):
-        if date is None:
-            if default_current_date:
-                date = QDate.currentDate()
-            else:
-                date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
-        widget.setDate(date)
-    elif type(widget) is QDateTimeEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss'):
-        if date is None:
-            date = QDateTime.currentDateTime()
-        widget.setDateTime(date)
+    if type(widget) is QDateEdit or type(widget) is QDateTimeEdit:
+        if type(widget) is QDateEdit or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy'):
+            if date is None:
+                if default_current_date:
+                    date = QDate.currentDate()
+                else:
+                    date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
+            widget.setDate(date)
+        elif type(widget) is QDateTimeEdit \
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss'):
+            if date is None:
+                date = QDateTime.currentDateTime()
+            widget.setDateTime(date)
 
 
 def setTimeEdit(widget, time):
@@ -281,13 +278,13 @@ def setImage(widget, cat_shape):
         widget.show()  
 
 
-def setRow(p_row):
-    #TODO parametrizamos esta row en la funcion fillWidget?
-    global _row
-    _row = p_row
-    
+# def setRow(p_row):
+#     #TODO parametrizamos esta row en la funcion fillWidget?
+#     global _row
+#     _row = p_row
+#
                         
-def fillWidget(widget):
+def fillWidget(widget, row):
     
     key = widget
     if type(widget) is str or type(widget) is unicode:
@@ -295,9 +292,9 @@ def fillWidget(widget):
     if not widget:
         return
     
-    if key in _row: 
-        if _row[key] is not None:
-            value = unicode(_row[key])
+    if key in row:
+        if row[key] is not None:
+            value = unicode(row[key])
             if type(widget) is QLineEdit or type(widget) is QTextEdit: 
                 if value == 'None':    
                     value = ""        
@@ -347,8 +344,10 @@ def get_settings_value(settings, parameter):
 
 def set_table_selection_behavior(widget):
     """ Set selection behavior of @widget """
-    #TODO esta funcion es un poco inutil, no?
-    widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+    if type(widget) is QTableView:
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+    else:
+        return None
 
 
 def set_autocompleter(combobox, list_items=None):
