@@ -99,6 +99,11 @@ BEGIN
             -- Run for extremes node
             SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 
+            IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
+		PERFORM audit_function(3006,2304);
+            END IF;
+            
+
             -- Check extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM anl_mincut_result_valve 
             WHERE node_id = node_1_aux AND (unaccess = FALSE) AND (broken  = FALSE) AND result_id=result_id_arg;

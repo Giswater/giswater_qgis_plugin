@@ -142,3 +142,6 @@ INSERT INTO config_param_system VALUES (96, 'om_mincut_valve2tank_traceability',
 INSERT INTO sys_fprocess_cat VALUES (30, 'Analysis mincut areas', 'OM', 'Analysis mincut areas', 'ws');
 
 
+
+
+

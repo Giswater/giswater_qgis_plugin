@@ -32,6 +32,11 @@ BEGIN
 
         --Get next element
         node_id_arg = stack[array_length(stack, 1)];
+        
+        --Control nulls
+        IF node_id_arg IS NULL THEN
+		PERFORM audit_function(3006,2306);
+        END IF;
 
         -- Get node public.geometry
         SELECT the_geom INTO node_aux FROM v_edit_node  JOIN value_state_type ON state_type=value_state_type.id WHERE (node_id = node_id_arg) AND (is_operative IS TRUE);
@@ -68,7 +73,7 @@ BEGIN
                 FOR rec_table IN SELECT * FROM v_edit_arc JOIN value_state_type ON state_type=value_state_type.id 
                 WHERE (node_2 = node_id_arg) AND (is_operative IS TRUE)
                 LOOP
-
+	
 					SELECT arc_id INTO exists_id FROM anl_mincut_result_arc WHERE arc_id = rec_table.arc_id AND result_id=result_id_arg;
 
                     -- Compute proceed
