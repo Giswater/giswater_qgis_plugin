@@ -30,7 +30,7 @@ class Info(ParentAction):
         
         # Create form
         self.dlg_info = InfoShowInfo()
-        utils_giswater.setDialog(self.dlg_info)
+        # utils_giswater.setDialog(self.dlg_info)
         self.load_settings(self.dlg_info)
         
         # Get Plugin, Giswater, PostgreSQL and Postgis version
