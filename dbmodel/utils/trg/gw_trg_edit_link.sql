@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1116
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_link()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_link()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -98,7 +98,7 @@ BEGIN
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"());
 			END IF;
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1116,NEW.link_id); 
+                RETURN audit_function(1010,1116,NEW.link_id::text); 
             END IF;
         END IF;
         
@@ -112,7 +112,7 @@ BEGIN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1116,NEW.link_id); 
+                RETURN audit_function(1014,1116,NEW.link_id::text); 
             END IF;
         END IF;
 
@@ -131,7 +131,7 @@ BEGIN
 			IF (NEW.expl_id IS NULL) THEN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
-					PERFORM audit_function(2012,1116,NEW.link_id);
+					PERFORM audit_function(2012,1116,NEW.link_id::text);
 				END IF;		
 			END IF;
 		END IF;		
@@ -279,10 +279,10 @@ BEGIN
 			PERFORM audit_function(2016,1116);
 		END IF;
 
-		UPDATE link SET userdefined_geom=NEW.userdefined_geom, state=NEW.state  WHERE link_id=OLD.link_id;
+		UPDATE link SET userdefined_geom=NEW.userdefined_geom, the_geom = NEW.the_geom, state=NEW.state  WHERE link_id=OLD.link_id;
 
-		IF OLD.the_geom IS DISTINCT FROM NEW.the_geom THEN
-			UPDATE link SET userdefined_geom=NEW.userdefined_geom, the_geom = NEW.the_geom WHERE link_id=OLD.link_id;	
+		IF st_equals (link_geom_old, link_geom) IS FALSE THEN
+			UPDATE link SET userdefined_geom=true WHERE link_id=OLD.link_id;	
 		END IF;
                 
 		RETURN NEW;
