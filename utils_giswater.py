@@ -173,8 +173,6 @@ def setTimeEdit(widget, time):
 
 def getWidget(widget):
     # TODO le pasamos el dialogo donde queremos buscar el widget(string)?
-    if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)  
     if not widget:
         return None           
     return widget    
@@ -182,8 +180,6 @@ def getWidget(widget):
 
 def getWidgetType(widget):
     # TODO le pasamos el dialogo donde queremos buscar el widget(string)?
-    if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)
     if not widget:
         return None
     return type(widget)
@@ -286,13 +282,9 @@ def setImage(widget, cat_shape):
 #
                         
 def fillWidget(widget, row):
-    
-    key = widget
-    if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)
     if not widget:
         return
-    
+    key = widget.objectName()
     if key in row:
         if row[key] is not None:
             value = unicode(row[key])
