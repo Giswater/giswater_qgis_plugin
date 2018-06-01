@@ -77,7 +77,7 @@ BEGIN
 						OR (node_2 IN (SELECT node_id FROM SCHEMA_NAME.anl_mincut_result_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
 
 					)a ON a.arc_id=v_edit_arc.arc_id
-				WHERE node_1 is not null or node_2 is not null'','||rec_valve.node_id||'::integer, '||rec_tank.node_id||'::integer)';
+				WHERE node_1 is not null and node_2 is not null'','||rec_valve.node_id||'::integer, '||rec_tank.node_id||'::integer)';
 
 			IF query_text IS NOT NULL THEN	
 				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 
