@@ -217,8 +217,13 @@ BEGIN
 		 	INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
 			VALUES (NEW.connec_id, NEW.top_floor, NEW.cat_valve);
 			
-		END IF;		 
-		
+		END IF;	
+
+		-- Control of automatic insert of link and vnode
+		IF (SELECT value::boolean FROM config_param_system WHERE parameter='insert_connect_automatic_connect2network') IS TRUE THEN
+			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+		END IF;
+			 
 		RETURN NEW;
 
 	
@@ -238,20 +243,26 @@ BEGIN
 
          -- Looking for state control
         IF (NEW.state != OLD.state) THEN   
-			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
-		
+			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);
+			
 		END IF;
 		
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN
 			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
-			NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.state_type=(SELECT "value" FROM config_param_user WHERE parameter='statetype_end_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 				IF NEW.state_type IS NULL THEN
-				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
+					NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
-					RETURN audit_function(2110,1318);
+						RETURN audit_function(2110,1318);
 					END IF;
 				END IF;
+			END IF;
+			
+			-- Control of automatic downgrade of associated link/vnode
+			IF (SELECT value::boolean FROM config_param_system WHERE parameter='downgrade_connect_automatic_state_connect2network') IS TRUE THEN
+				UPDATE link SET state=0 WHERE feature_id=OLD.connec_id;
+				UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.connec_id LIMIT 1)::integer;
 			END IF;
 		END IF;
 
@@ -292,16 +303,16 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' THEN
 	
-			PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
+		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
 		
-			IF man_table ='man_fountain'  THEN
-				DELETE FROM connec WHERE connec_id=OLD.connec_id;
-				DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_fountain WHERE connec_id=OLD.connec_id );
-			ELSE
-				DELETE FROM connec WHERE connec_id = OLD.connec_id;
-			END IF;		
+		IF man_table ='man_fountain'  THEN
+			DELETE FROM connec WHERE connec_id=OLD.connec_id;
+			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_fountain WHERE connec_id=OLD.connec_id );
+		ELSE
+			DELETE FROM connec WHERE connec_id = OLD.connec_id;
+		END IF;		
 
-				RETURN NULL;
+		RETURN NULL;
 
 	END IF;
 	

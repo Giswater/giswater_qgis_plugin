@@ -94,6 +94,7 @@ INSERT INTO config_param_system VALUES (70, 'om_mincut_use_pgrouting', 'TRUE', '
 
 
 
+
 INSERT INTO sys_fprocess_cat VALUES (28, 'Massive downgrade features', 'Edit', 'Massive downgrade features', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (29, 'Audit mincut data', 'OM', 'Audit mincut data', 'ws');
 
@@ -142,6 +143,11 @@ INSERT INTO config_param_system VALUES (96, 'om_mincut_valve2tank_traceability',
 INSERT INTO sys_fprocess_cat VALUES (30, 'Analysis mincut areas', 'OM', 'Analysis mincut areas', 'ws');
 
 
+----------------------
+--1/06/2018
+-----------------------
 
+INSERT INTO config_param_system VALUES (97, 'downgrade_connect_automatic_state_connect2network', 'FALSE', 'Boolean', 'Edit', 'Utils');
+INSERT INTO config_param_system VALUES (98, 'insert_connect_automatic_connect2network', 'FALSE', 'Boolean', 'Edit', 'Utils');
 
 

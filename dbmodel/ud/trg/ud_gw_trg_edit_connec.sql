@@ -152,6 +152,11 @@ BEGIN
 								NEW.postnumber, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, 
 								NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,NEW.feature_id, NEW.label_x, NEW.label_y, NEW.label_rotation,
 								NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_connecat_id);
+		
+		-- Control of automatic insert of link and vnode
+		IF (SELECT value::boolean FROM config_param_system WHERE parameter='insert_connect_automatic_connect2network') IS TRUE THEN
+			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+		END IF;
 
         RETURN NEW;
 
@@ -176,6 +181,11 @@ BEGIN
 					RETURN audit_function(2110,1318);
 					END IF;
 				END IF;
+			END IF;
+			-- Control of automatic downgrade of associated link/vnode
+			IF (SELECT value::boolean FROM config_param_system WHERE parameter='downgrade_connect_automatic_state_connect2network') IS TRUE THEN
+				UPDATE link SET state=0 WHERE feature_id=OLD.connec_id;
+				UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.connec_id LIMIT 1)::integer;
 			END IF;
 		END IF;
 
