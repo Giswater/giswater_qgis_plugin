@@ -314,22 +314,21 @@ def setImage(dialog, widget,cat_shape):
         widget.show()
 
 
-def setRow(p_row):
-    global _row
-    _row = p_row
+# def setRow(p_row):
+#     global _row
+#     _row = p_row
 
 
-def fillWidget(dialog, widget):
+def fillWidget(dialog, widget, row):
 
-    key = widget
     if type(widget) is str or type(widget) is unicode:
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
-
-    if key in _row:
-        if _row[key] is not None:
-            value = unicode(_row[key])
+    key = widget.objectName()
+    if key in row:
+        if row[key] is not None:
+            value = unicode(row[key])
             if type(widget) is QLineEdit or type(widget) is QTextEdit:
                 if value == 'None':
                     value = ""

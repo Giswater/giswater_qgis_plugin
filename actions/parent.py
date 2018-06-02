@@ -290,11 +290,11 @@ class ParentAction(object):
             utils_giswater.setWidgetText(widget, str(folder_path))            
                 
                 
-    def get_folder_dialog(self, widget):
+    def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
         
         # Check if selected folder exists. Set default value if necessary
-        folder_path = utils_giswater.getWidgetText(widget)
+        folder_path = utils_giswater.getWidgetText(dialog, widget)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
             folder_path = os.path.expanduser("~")
 
@@ -305,7 +305,7 @@ class ParentAction(object):
         message = "Select folder"
         folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path))
+            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
 
     def load_settings(self, dialog=None):
@@ -608,10 +608,10 @@ class ParentAction(object):
         return cursor        
                     
                 
-    def set_table_columns(self, widget, table_name):
+    def set_table_columns(self, dialog, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """
 
-        widget = utils_giswater.getWidget(widget)
+        widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
             return
 
@@ -665,7 +665,7 @@ class ParentAction(object):
             pass
 
 
-    def set_label_current_psector(self):
+    def set_label_current_psector(self, dialog):
 
         sql = ("SELECT t1.name FROM " + self.schema_name + ".plan_psector AS t1 "
                " INNER JOIN " + self.schema_name + ".config_param_user AS t2 ON t1.psector_id::text = t2.value "
@@ -673,5 +673,5 @@ class ParentAction(object):
         row = self.controller.get_row(sql)
         if not row:
             return
-        utils_giswater.setWidgetText('lbl_vdefault_psector', row[0])
+        utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
 

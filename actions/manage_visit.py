@@ -7,7 +7,8 @@ or (at your option) any later version.
 """
 
 from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
-from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget, QDialogButtonBox
+from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox
+from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -149,9 +150,9 @@ class ManageVisit(ParentManage, QObject):
         self.dlg.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg.btn_event_delete.clicked.connect(self.event_delete)
         self.dlg.btn_event_update.clicked.connect(self.event_update)
-        self.dlg.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.tbl_relation))
-        self.dlg.btn_feature_delete.clicked.connect(partial(self.delete_records, self.tbl_relation))
-        self.dlg.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.tbl_relation))
+        self.dlg.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.dlg, self.tbl_relation))
+        self.dlg.btn_feature_delete.clicked.connect(partial(self.delete_records, self.dlg, self.tbl_relation))
+        self.dlg.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg, self.tbl_relation))
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed))
         self.visit_id.textChanged.connect(self.manage_visit_id_change)
         self.dlg.btn_doc_insert.clicked.connect(self.document_insert)
@@ -162,7 +163,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg.btn_add_geom.clicked.connect(self.add_point)        
 
         # Fill combo boxes of the form and related events
-        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected))
+        self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg))
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo))
         self.fill_combos()
 
@@ -212,7 +213,7 @@ class ManageVisit(ParentManage, QObject):
 
         # do selection allowing the tbl_relation to be linked to canvas selectionChanged
         self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(self.tbl_relation)
+        self.connect_signal_selection_changed(self.dlg, self.tbl_relation)
         self.select_features_by_ids(self.geom_type, expr)
         self.disconnect_signal_selection_changed()
 
@@ -495,7 +496,7 @@ class ManageVisit(ParentManage, QObject):
         self.set_configuration(self.tbl_relation, table_name)
 
 
-    def event_feature_type_selected(self):
+    def event_feature_type_selected(self, dialog):
         """Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table."""
@@ -505,12 +506,12 @@ class ManageVisit(ParentManage, QObject):
         # 3) if so, select them => would appear in the table associated to the model
         self.geom_type = self.feature_type.currentText().lower()
         viewname = "v_edit_" + self.geom_type
-        self.set_completer_feature_id(self.geom_type, viewname)
+        self.set_completer_feature_id(self.dlg.feature_id, self.geom_type, viewname)
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
         fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
-        self.set_table_model(self.tbl_relation, self.geom_type, fake_filter)
+        self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
 
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
@@ -540,7 +541,7 @@ class ManageVisit(ParentManage, QObject):
 
         # do selection allowing the tbl_relation to be linked to canvas selectionChanged
         self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(self.tbl_relation)
+        self.connect_signal_selection_changed(dialog, self.tbl_relation)
         self.select_features_by_ids(self.geom_type, expr)
         self.disconnect_signal_selection_changed()
 
@@ -555,7 +556,7 @@ class ManageVisit(ParentManage, QObject):
         # previous dialog will be set exiting the current one
         self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg_man)
-        utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_visit)
+        self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if geom_type is None:
             # Set a model with selected filter. Attach that model to selected table
@@ -572,13 +573,13 @@ class ManageVisit(ParentManage, QObject):
 
         # manage save and rollback when closing the dialog
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.accepted.connect(partial(self.open_selected_object,self.dlg_man, self.dlg_man.tbl_visit, table_object))
 
         # Set dignals
         self.dlg_man.tbl_visit.doubleClicked.connect(
-            partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
+            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_open.clicked.connect(
-            partial(self.open_selected_object, self.dlg_man.tbl_visit, table_object))
+            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
 
@@ -725,7 +726,7 @@ class ManageVisit(ParentManage, QObject):
         manage_document = ManageDocument(
             self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document()
-        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(dlg_docman, self.set_completer_object, 'doc'))
 
 
     def fill_table_visit(self, widget, table_name, filter_):

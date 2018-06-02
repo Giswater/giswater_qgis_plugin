@@ -73,8 +73,8 @@ class Om(ParentAction):
         self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, table_name))
         self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
-        self.set_table_columns(qtbl_psm, table_name)
-        self.set_label_current_psector()
+        self.set_table_columns(self.dlg, qtbl_psm, table_name)
+        self.set_label_current_psector(self.dlg)
 
         # Open form
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -154,7 +154,7 @@ class Om(ParentAction):
         self.controller.show_info(message)
 
         self.fill_table(qtbl_psm, "v_ui_plan_psector")
-        self.set_table_columns(qtbl_psm, "v_ui_plan_psector")
+        self.set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
 
         self.dlg.exec_()
 

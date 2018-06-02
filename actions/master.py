@@ -46,7 +46,7 @@ class Master(ParentAction):
 
         # Create the dialog and signals
         self.dlg = Psector_management()
-        utils_giswater.setDialog(self.dlg)
+
         self.load_settings(self.dlg)
         table_name = "plan_psector"
         column_id = "psector_id"
@@ -59,12 +59,12 @@ class Master(ParentAction):
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         self.dlg.rejected.connect(self.close_dialog)
         self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
-        self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
+        self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg, qtbl_psm))
         self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "plan_psector"))
         self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
-        self.set_table_columns(qtbl_psm, table_name)
-        self.set_label_current_psector()
+        self.set_table_columns(self.dlg, qtbl_psm, table_name)
+        self.set_label_current_psector(self.dlg)
 
         # Open form
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -72,7 +72,7 @@ class Master(ParentAction):
 
 
 
-    def update_current_psector(self, qtbl_psm):
+    def update_current_psector(self, dialog, qtbl_psm):
       
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -89,9 +89,9 @@ class Master(ParentAction):
         self.controller.show_info(message)
 
         self.fill_table(qtbl_psm, "plan_psector")
-        self.set_table_columns(qtbl_psm, "plan_psector")
-        self.set_label_current_psector()
-        self.open_dialog(self.dlg)
+        self.set_table_columns(dialog, qtbl_psm, "plan_psector")
+        self.set_label_current_psector(dialog)
+        self.open_dialog(dialog)
 
 
     def upsert_config_param_user(self, widget, parameter):

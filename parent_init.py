@@ -2287,7 +2287,7 @@ class ParentDialog(QDialog):
             self.tabs_removed += 1                    
         else:
             # Manage signal 'doubleClicked'
-            utils_giswater.set_table_selection_behavior(self.tbl_relations)
+            self.tbl_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))         
      
      

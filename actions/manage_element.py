@@ -8,6 +8,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-    
 from functools import partial
 
+from PyQt4.QtGui import QAbstractItemView
+
 import utils_giswater
 from ui_manager import AddElement                
 from ui_manager import ElementManagement
@@ -94,28 +96,28 @@ class ManageElement(ParentManage):
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
-        self.set_completer_object(table_object)
+        self.set_completer_object(self.dlg, table_object)
         
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
-        self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))        
-        self.dlg.element_id.textChanged.connect(partial(self.exist_object, table_object)) 
-        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, table_object))              
-        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, table_object))        
+        self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg, table_object))
+        self.dlg.element_id.textChanged.connect(partial(self.exist_object, self.dlg, table_object))
+        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg, table_object))
+        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, self.dlg, table_object))
+        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg, table_object))
         self.dlg.btn_add_geom.clicked.connect(self.add_point)
         
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
         viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(geom_type, viewname)
+        self.set_completer_feature_id(self.dlg.feature_id, geom_type, viewname)
         
         # Set default tab 'arc'
         self.dlg.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(table_object)        
+        self.tab_feature_changed(self.dlg, table_object)
 
         # If is a new element dont need set enddate
         if self.new_element_id is True:
@@ -335,21 +337,21 @@ class ManageElement(ParentManage):
         
         # Create the dialog
         self.dlg_man = ElementManagement()
-        utils_giswater.setDialog(self.dlg_man)
+        #utils_giswater.setDialog(self.dlg_man)
         self.load_settings(self.dlg_man)
-        utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_element)                 
+        self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
                 
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
-        self.set_completer_object(table_object)  
+        self.set_completer_object(self.dlg_man, table_object)
                 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
         self.set_table_columns(self.dlg_man.tbl_element, table_object)        
         
         # Set dignals
-        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))        
-        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_element, table_object))
+        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id,  self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
+        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element, table_object))

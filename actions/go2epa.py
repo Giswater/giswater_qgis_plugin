@@ -7,8 +7,9 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QTime, QDate, Qt
-from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit, QTimeEdit, QSpinBox, \
-    QTableWidget, QWidget
+from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox
+from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
+
 
 import os
 import csv
@@ -769,7 +770,7 @@ class Go2Epa(ParentAction):
 
         # Fill combo box and table view
         self.fill_combo_result_id()        
-        utils_giswater.set_table_selection_behavior(self.dlg_manager.tbl_rpt_cat_result)
+        self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
         self.set_table_columns(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 

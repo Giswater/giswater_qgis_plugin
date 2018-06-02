@@ -8,6 +8,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-    
 from functools import partial
 
+from PyQt4.QtGui import QAbstractItemView
+
 import utils_giswater
 from ui_manager import AddDoc                           
 from ui_manager import DocManagement
@@ -34,17 +36,17 @@ class ManageDocument(ParentManage):
         """ Button 34: Add document """
 
         # Create the dialog and signals
-        self.dlg = AddDoc()
-        if not self.single_tool_mode:
-            self.previous_dialog = utils_giswater.dialog()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
+        self.dlg_add_doc = AddDoc()
+        # if not self.single_tool_mode:
+        #     self.previous_dialog = utils_giswater.dialog()
+        # utils_giswater.setDialog(self.dlg_add_doc)
+        self.load_settings(self.dlg_add_doc)
         self.doc_id = None           
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
 
-        self.set_selectionbehavior(self.dlg)
+        self.set_selectionbehavior(self.dlg_add_doc)
         
         # Get layers of every geom_type
         self.reset_lists()
@@ -57,7 +59,7 @@ class ManageDocument(ParentManage):
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
-            self.dlg.tab_feature.removeTab(3)        
+            self.dlg_add_doc.tab_feature.removeTab(3)
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')                  
         
@@ -66,9 +68,9 @@ class ManageDocument(ParentManage):
             self.remove_selection(True)
         
         # Set icons
-        self.set_icon(self.dlg.btn_insert, "111")
-        self.set_icon(self.dlg.btn_delete, "112")
-        self.set_icon(self.dlg.btn_snapping, "137")
+        self.set_icon(self.dlg_add_doc.btn_insert, "111")
+        self.set_icon(self.dlg_add_doc.btn_delete, "112")
+        self.set_icon(self.dlg_add_doc.btn_snapping, "137")
 
         # Manage i18n of the form
         #self.controller.translate_form(self.dlg, 'file')
@@ -78,43 +80,43 @@ class ManageDocument(ParentManage):
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"        
-        self.set_completer_object(table_object)
+        self.set_completer_object(self.dlg_add_doc, table_object)
 
         # Set signals
-        self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
-        self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
-        self.dlg.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object))
-        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
-        self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
-        self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
-        self.dlg.doc_id.textChanged.connect(partial(self.exist_object, table_object)) 
-        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, table_object))              
-        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, table_object))
-        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, table_object))
+        self.dlg_add_doc.path_url.clicked.connect(partial(self.open_web_browser, "path"))
+        self.dlg_add_doc.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
+        self.dlg_add_doc.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object))
+        self.dlg_add_doc.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
+        self.dlg_add_doc.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))
+        self.dlg_add_doc.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_doc,  table_object))
+        self.dlg_add_doc.doc_id.textChanged.connect(partial(self.exist_object, self.dlg_add_doc, table_object))
+        self.dlg_add_doc.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_doc, table_object))
+        self.dlg_add_doc.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_doc,  table_object))
+        self.dlg_add_doc.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_doc, table_object))
                 
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
         viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(geom_type, viewname)
+        self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
 
         # Set default tab 'arc'
-        self.dlg.tab_feature.setCurrentIndex(0)
+        self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(table_object)        
+        self.tab_feature_changed(self.dlg_add_doc, table_object)
 
         # Open the dialog
-        self.open_dialog(self.dlg, maximize_button=False)
-        return self.dlg
+        self.open_dialog(self.dlg_add_doc, maximize_button=False)
+        return self.dlg_add_doc
                
 
     def manage_document_accept(self, table_object):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        doc_id = utils_giswater.getWidgetText("doc_id")
-        doc_type = utils_giswater.getWidgetText("doc_type")
-        observ = utils_giswater.getWidgetText("observ")
-        path = utils_giswater.getWidgetText("path")
+        doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id")
+        doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type")
+        observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ")
+        path = utils_giswater.getWidgetText(self.dlg_add_doc, "path")
 
         if doc_type == 'null':
             message = "You need to insert doc_type"
@@ -188,21 +190,22 @@ class ManageDocument(ParentManage):
         
         # Create the dialog
         self.dlg_man = DocManagement()
-        utils_giswater.setDialog(self.dlg_man)
+        # utils_giswater.setDialog(self.dlg_man)
         self.load_settings(self.dlg_man)
-        utils_giswater.set_table_selection_behavior(self.dlg_man.tbl_document)         
+        self.dlg_man.tbl_document
+        self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
                 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"        
-        self.set_completer_object(table_object)
+        self.set_completer_object(self.dlg_man, table_object)
                 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)                
-        self.set_table_columns(self.dlg_man.tbl_document, table_object)        
+        self.set_table_columns(self.dlg_man, self.dlg_man.tbl_document, table_object)
         
         # Set dignals
-        self.dlg_man.doc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))        
-        self.dlg_man.tbl_document.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man.tbl_document, table_object))
+        self.dlg_man.doc_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
+        self.dlg_man.tbl_document.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_document, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))

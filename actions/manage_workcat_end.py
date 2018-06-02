@@ -61,22 +61,22 @@ class ManageWorkcatEnd(ParentManage):
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "cat_work"
-        self.set_completer_object(self.table_object)
+        self.set_completer_object(self.dlg, self.table_object)
 
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
         self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, self.table_object, self.cur_active_layer,  force_downgrade=True))
         self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer,  force_downgrade=True, show_warning=True))
-        self.dlg.workcat_id_end.currentIndexChanged.connect(partial(self.get_values_from_form))
+        self.dlg.workcat_id_end.currentIndexChanged.connect(partial(self.get_values_from_form, self.dlg))
 
         self.dlg.btn_new_workcat.clicked.connect(partial(self.new_workcat))
-        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.table_object))
-        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, self.table_object))
-        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, self.table_object))
+        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg, self.table_object))
+        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, self.dlg, self.table_object))
+        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg, self.table_object))
 
         self.dlg.workcat_id_end.activated.connect(partial(self.fill_workids))
 
-        self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.table_object))
+        self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg, self.table_object))
 
         # Set values
         self.fill_fields()
@@ -84,12 +84,12 @@ class ManageWorkcatEnd(ParentManage):
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "arc"
         viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(geom_type, viewname)
+        self.set_completer_feature_id(self.dlg.feature_id, geom_type, viewname)
         
         # Set default tab 'arc'
         self.dlg.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.table_object)
+        self.tab_feature_changed(self.dlg, self.table_object)
 
         # Open dialog
         self.open_dialog(self.dlg, maximize_button=False)     
@@ -431,22 +431,22 @@ class ManageWorkcatEnd(ParentManage):
 
     def new_workcat(self):
 
-        self.new_workcat_dlg = NewWorkcat()
-        utils_giswater.setDialog(self.new_workcat_dlg)
-        self.load_settings(self.new_workcat_dlg)
+        self.dlg_new_workcat = NewWorkcat()
+        # utils_giswater.setDialog(self.dlg_new_workcat)
+        self.load_settings(self.dlg_new_workcat)
 
-        utils_giswater.setCalendarDate(self.new_workcat_dlg.builtdate, None, True)
+        utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         
         table_object = "cat_work"
-        self.set_completer_object(table_object)
+        self.set_completer_object(self.dlg_new_workcat, table_object)
 
         # Set signals
-        self.new_workcat_dlg.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
+        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
 
-        self.new_workcat_dlg.btn_cancel.clicked.connect(partial(self.close_dialog, self.new_workcat_dlg))
+        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        self.open_dialog(self.new_workcat_dlg)
+        self.open_dialog(self.dlg_new_workcat)
 
     def manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
@@ -454,7 +454,7 @@ class ManageWorkcatEnd(ParentManage):
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = utils_giswater.getWidgetText(self.new_workcat_dlg.cat_work_id)
+        cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += ("'" + str(cat_work_id) + "', ")
@@ -474,7 +474,7 @@ class ManageWorkcatEnd(ParentManage):
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += ("'" + str(workid_key_2) + "', ")
-        builtdate = self.new_workcat_dlg.builtdate.dateTime().toString('yyyy-MM-dd')
+        builtdate = self.dlg_new_workcat.builtdate.dateTime().toString('yyyy-MM-dd')
         if builtdate != "null":
             fields += 'builtdate, '
             values += ("'" + str(builtdate) + "', ")
@@ -502,7 +502,7 @@ class ManageWorkcatEnd(ParentManage):
                         utils_giswater.fillComboBox(self.dlg.workcat_id_end, rows)
                         self.dlg.workcat_id_end.setCurrentIndex(self.dlg.workcat_id_end.findText(str(cat_work_id)))
 
-                    self.close_dialog(self.new_workcat_dlg)
+                    self.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "Este Workcat ya existe"
                     self.controller.show_info_box(msg, "Warning")
