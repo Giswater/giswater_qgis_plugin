@@ -106,10 +106,10 @@ class Basic(ParentAction):
         """ Button 32: Open search plus dialog """
                 
         try:
-            if self.search_plus is not None:  
-                if self.search_plus.dlg.tab_main.count() > 0:
+            if self.search_plus is not None:
+                if self.search_plus.dlg_search.tab_main.count() > 0:
                     # Manage 'i18n' of the form and make it visible
-                    self.controller.translate_form(self.search_plus.dlg, 'search_plus')                            
+                    self.controller.translate_form(self.search_plus.dlg_search, 'search_plus')
                     self.search_plus.dock_dialog()
                 else:
                     message = "Search Plus: Any layer has been found. Check parameters in table 'config_param_system'"
