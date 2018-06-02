@@ -202,11 +202,12 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return None
+
     text = None
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-        text = getText(widget, return_string_null)
+        text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
-        text = getSelectedItem(widget, return_string_null)
+        text = getSelectedItem(dialog, widget, return_string_null)
     if add_quote and text <> "null":
         text = "'"+text+"'"
     return text
@@ -219,11 +220,11 @@ def setWidgetText(dialog, widget, text):
     if not widget:
         return
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit or type(widget) is QLabel:
-        setText(widget, text)
+        setText(dialog, widget, text)
     elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-        setText(widget, text)
+        setText(dialog, widget, text)
     elif type(widget) is QComboBox:
-        setSelectedItem(widget, text)
+        setSelectedItem(dialog, widget, text)
 
 
 def isChecked(dialog, widget):
@@ -268,7 +269,7 @@ def setSelectedItem(dialog, widget, text):
         index = widget.findText(str(text))
         if index == -1:
             index = 0
-        widget.setCurrentIndex(index);
+        widget.setCurrentIndex(index)
 
 
 def setCurrentIndex(dialog, widget, index):
