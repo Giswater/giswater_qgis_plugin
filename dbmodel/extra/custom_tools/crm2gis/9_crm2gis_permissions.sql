@@ -17,6 +17,7 @@ SET search_path = "crm", public, pg_catalog;
 CREATE ROLE role_crm NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 GRANT ALL ON DATABASE "gis" TO "role_crm" ;
 GRANT ALL ON SCHEMA "crm" TO "role_crm";
+GRANT ALL ON SCHEMA "crm" TO "role_basic";
 
 
 -- ROLE PERMISSIONS
