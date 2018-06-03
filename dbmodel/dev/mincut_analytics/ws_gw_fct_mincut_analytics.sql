@@ -33,7 +33,9 @@ BEGIN
 			v_query_text:= 'SELECT arc_id, the_geom FROM v_edit_arc WHERE state=1 AND expl_id='|| p_expl_id;
 				
 	        ELSE 
-       			v_query_text:= 'SELECT arc_id, the_geom FROM v_edit_arc WHERE state=1 AND expl_id='|| p_expl_id||'AND sector_id='||p_sector_id;
+       			v_query_text:= 'SELECT arc_id, the_geom FROM v_edit_arc 
+				JOIN value_state_type ON state_type=id 
+				WHERE state=1 AND is_operative=TRUE AND expl_id='|| p_expl_id||'AND sector_id='||p_sector_id;
 		END IF;	
 		
 		EXECUTE 'SELECT COUNT(*) FROM ('||v_query_text||')a'
