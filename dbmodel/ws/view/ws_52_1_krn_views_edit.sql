@@ -6,85 +6,58 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+
+DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
+CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
+ SELECT row_number() OVER (ORDER BY rtc_hydrometer.hydrometer_id) AS rid,
+    rtc_hydrometer.hydrometer_id,
+    v_edit_connec.code AS connec_id,
+    v_edit_connec.customer_code AS connec_customer_code,
+    v_edit_connec.expl_id,
+    ext_rtc_hydrometer_state.name  AS state,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    ext_rtc_hydrometer.hydrometer_category,
+    ext_rtc_hydrometer.house_number,
+    ext_rtc_hydrometer.id_number,
+    ext_rtc_hydrometer.cat_hydrometer_id,
+    ext_rtc_hydrometer.hydrometer_number,
+    ext_rtc_hydrometer.identif,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class AS hydrometer_class,
+    ext_cat_hydrometer.ulmc,
+    ext_cat_hydrometer.voltman_flow,
+    ext_cat_hydrometer.multi_jet_flow,
+    ext_cat_hydrometer.dnom,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link
+   FROM selector_hydrometer,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state
+     JOIN v_edit_connec ON v_edit_connec.customer_code::text = ext_rtc_hydrometer.connec_customer_code::text
+     LEFT JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id  
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state AND selector_hydrometer.cur_user = "current_user"()::text;
+
+  
+ 
+
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec AS
 SELECT 
-connec_id,
-count(hydrometer_id)::integer as n_hydrometer
+rtc_hydrometer_x_connec.connec_id,
+count(v_rtc_hydrometer.hydrometer_id)::integer as n_hydrometer
 FROM rtc_hydrometer_x_connec
-group by connec_id;
+JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
+group by rtc_hydrometer_x_connec.connec_id;
 
-
-
-DROP VIEW IF EXISTS v_edit_connec CASCADE;
-CREATE OR REPLACE VIEW v_edit_connec AS 
-SELECT 
-connec.connec_id,
-connec.code,
-connec.elevation,
-connec.depth,
-cat_connec.connectype_id,
-connec_type.type as sys_type,
-connec.connecat_id,
-connec.sector_id,
-sector.macrosector_id,
-connec.customer_code,
-cat_connec.matcat_id AS cat_matcat_id,
-cat_connec.pnom AS cat_pnom,
-cat_connec.dnom AS cat_dnom,
-connec_length,
-v_rtc_hydrometer_x_connec.n_hydrometer,
-connec.state,
-connec.state_type,
-connec.annotation,
-connec.observ,
-connec.comment,
-cat_connec.label,
-connec.dma_id,
-connec.presszonecat_id,
-connec.soilcat_id,
-connec.function_type,
-connec.category_type,
-connec.fluid_type,
-connec.location_type,
-connec.workcat_id,
-connec.workcat_id_end,
-connec.buildercat_id,
-connec.builtdate,
-connec.enddate,
-connec.ownercat_id,
-connec.muni_id ,
-connec.postcode,
-connec.streetaxis_id,
-connec.postnumber,
-connec.postcomplement,
-connec.streetaxis2_id,
-connec.postnumber2,
-connec.postcomplement2,
-connec.descript,
-connec.arc_id,
-cat_connec.svg AS svg,
-connec.rotation,
-concat(connec_type.link_path,connec.link) as link,
-connec.verified,
-connec.the_geom,
-connec.undelete,
-connec.label_x,
-connec.label_y,
-connec.label_rotation,
-connec.publish,
-connec.inventory,
-dma.macrodma_id,
-connec.expl_id,
-connec.num_value
-FROM  connec
-	JOIN cat_connec ON connec.connecat_id = cat_connec.id
-	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
-	JOIN v_state_connec ON v_state_connec.connec_id=connec.connec_id
-	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
-	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
-	LEFT JOIN dma ON connec.dma_id = dma.dma_id
-	LEFT JOIN sector ON connec.sector_id=sector.sector_id;
 	
 
 DROP VIEW IF EXISTS v_edit_man_wjoin CASCADE;

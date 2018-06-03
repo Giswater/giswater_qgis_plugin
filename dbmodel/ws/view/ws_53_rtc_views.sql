@@ -58,51 +58,6 @@ JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id = rtc_scada_node.sc
 
 	 
 	 
-DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
-
-CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
- SELECT row_number() OVER (ORDER BY rtc_hydrometer.hydrometer_id) AS rid,
-    rtc_hydrometer.hydrometer_id,
-    connec.code AS connec_id,
-    connec.customer_code AS connec_customer_code,
-    connec.expl_id,
-    ext_rtc_hydrometer_state.name  AS state,
-    exploitation.name AS expl_name,
-    ext_rtc_hydrometer.code AS hydrometer_customer_code,
-    ext_rtc_hydrometer.hydrometer_category,
-    ext_rtc_hydrometer.house_number,
-    ext_rtc_hydrometer.id_number,
-    ext_rtc_hydrometer.cat_hydrometer_id,
-    ext_rtc_hydrometer.hydrometer_number,
-    ext_rtc_hydrometer.identif,
-    ext_cat_hydrometer.madeby,
-    ext_cat_hydrometer.class AS hydrometer_class,
-    ext_cat_hydrometer.ulmc,
-    ext_cat_hydrometer.voltman_flow,
-    ext_cat_hydrometer.multi_jet_flow,
-    ext_cat_hydrometer.dnom,
-        CASE
-            WHEN (( SELECT config_param_system.value
-               FROM config_param_system
-              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
-            ELSE concat(( SELECT config_param_system.value
-               FROM config_param_system
-              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link)
-        END AS hydrometer_link
-   FROM selector_hydrometer,
-    rtc_hydrometer
-     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
-     LEFT JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state
-    LEFT JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_customer_code::text
-     LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
-     
-  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state AND selector_hydrometer.cur_user = "current_user"()::text;
-
-ALTER TABLE v_rtc_hydrometer
-  OWNER TO postgres;
-
-
 	 
 CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
  SELECT ext_rtc_hydrometer.hydrometer_id,

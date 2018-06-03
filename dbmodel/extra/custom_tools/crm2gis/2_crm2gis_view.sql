@@ -54,10 +54,10 @@ CREATE OR REPLACE VIEW ws.v_rtc_hydrometer AS
         END AS hydrometer_link
   FROM ws.selector_hydrometer, ws.rtc_hydrometer
      LEFT JOIN crm.hydrometer ON hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
-     LEFT JOIN crm.hydro_val_state ON hydro_val_state.id = hydrometer.state_id
+     JOIN crm.hydro_val_state ON hydro_val_state.id = hydrometer.state_id
      LEFT JOIN ws.ext_municipality ON ext_municipality.muni_id = hydrometer.muni_id
      LEFT JOIN ws.exploitation ON exploitation.expl_id = hydrometer.expl_id
-     LEFT JOIN ws.connec ON connec.customer_code::text = hydrometer.connec_id::text
+     JOIN ws.v_edit_connec ON v_edit_connec.customer_code::text = hydrometer.connec_id::text
      	WHERE selector_hydrometer.state_id=hydrometer.state_id AND selector_hydrometer.cur_user=current_user;
 
 
