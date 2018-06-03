@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -146,8 +146,11 @@ INSERT INTO sys_fprocess_cat VALUES (30, 'Analysis mincut areas', 'OM', 'Analysi
 ----------------------
 --1/06/2018
 -----------------------
+INSERT INTO audit_cat_param_user VALUES ('edit_connect_force_downgrade_linkvnode', null, null, 'role_edit');
+INSERT INTO audit_cat_param_user VALUES ('edit_connect_force_automatic_connect2network', null, null, 'role_edit');
 
-INSERT INTO config_param_system VALUES (97, 'downgrade_connect_automatic_state_connect2network', 'FALSE', 'Boolean', 'Edit', 'Utils');
-INSERT INTO config_param_system VALUES (98, 'insert_connect_automatic_connect2network', 'FALSE', 'Boolean', 'Edit', 'Utils');
+
+INSERT INTO config_param_user VALUES (110, 'edit_connect_force_downgrade_linkvnode', 'TRUE', 'postgres');
+INSERT INTO config_param_user VALUES (111, 'edit_connect_force_automatic_connect2network', 'TRUE', 'postgres');
 
 

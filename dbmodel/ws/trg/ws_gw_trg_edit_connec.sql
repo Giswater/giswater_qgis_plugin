@@ -108,10 +108,10 @@ BEGIN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 		
-		-- State_type
-		--IF (NEW.state_type IS NULL) THEN
-			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        --END IF;
+	-- State_type
+	IF (NEW.state_type IS NULL) THEN
+	   NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        END IF;
 
 		--Inventory
 		IF (NEW.inventory IS NULL) THEN
@@ -158,7 +158,8 @@ BEGIN
         RETURN NEW;
 		
 		-- Control of automatic insert of link and vnode
-		IF (SELECT value::boolean FROM config_param_system WHERE parameter='insert_connect_automatic_connect2network') IS TRUE THEN
+		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
+		AND cur_user=current_user LIMIT 1) IS TRUE THEN
 			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
 		END IF;
 			 
@@ -200,7 +201,8 @@ BEGIN
 			END IF;
 			
 			-- Control of automatic downgrade of associated link/vnode
-			IF (SELECT value::boolean FROM config_param_system WHERE parameter='downgrade_connect_automatic_state_connect2network') IS TRUE THEN
+			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_downgrade_linkvnode' 
+			AND cur_user=current_user LIMIT 1) IS TRUE THEN	
 				UPDATE link SET state=0 WHERE feature_id=OLD.connec_id;
 				UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.connec_id LIMIT 1)::integer;
 			END IF;
