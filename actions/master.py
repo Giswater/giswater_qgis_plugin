@@ -45,30 +45,30 @@ class Master(ParentAction):
         """ Button 46: Psector management """
 
         # Create the dialog and signals
-        self.dlg = Psector_management()
+        self.dlg_psector_mng = Psector_management()
 
-        self.load_settings(self.dlg)
+        self.load_settings(self.dlg_psector_mng)
         table_name = "plan_psector"
         column_id = "psector_id"
 
         # Tables
-        qtbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
+        qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
-        self.dlg.rejected.connect(self.close_dialog)
-        self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
-        self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg, qtbl_psm))
-        self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "plan_psector"))
-        self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
+        self.dlg_psector_mng.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, qtbl_psm))
+        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, qtbl_psm, self.dlg_psector_mng.txt_name, "plan_psector"))
+        self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
-        self.set_table_columns(self.dlg, qtbl_psm, table_name)
-        self.set_label_current_psector(self.dlg)
+        self.set_table_columns(self.dlg_psector_mng, qtbl_psm, table_name)
+        self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg, dlg_name="psector_management")
+        self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
 
 
 
@@ -83,7 +83,7 @@ class Master(ParentAction):
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
-        self.upsert_config_param_user(aux_widget, "psector_vdefault")
+        self.upsert_config_param_user(dialog, aux_widget, "psector_vdefault")
 
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -94,7 +94,8 @@ class Master(ParentAction):
         self.open_dialog(dialog)
 
 
-    def upsert_config_param_user(self, widget, parameter):
+
+    def upsert_config_param_user(self, dialog,  widget, parameter):
         """ Insert or update values in tables with current_user control """
 
         tablename = "config_param_user"
@@ -103,27 +104,27 @@ class Master(ParentAction):
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
-            if utils_giswater.getWidgetText(widget) != "":
+            if utils_giswater.getWidgetText(dialog, widget) != "":
                 for row in rows:
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() != 'state_vdefault':
-                        sql += ("'" + utils_giswater.getWidgetText(widget) + "'"
+                        sql += ("'" + utils_giswater.getWidgetText( widget) + "'"
                                 " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
                     else:
                         sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "')"
+                                " WHERE name = '" + utils_giswater.getWidgetText( widget) + "')"
                                 " WHERE cur_user = current_user AND parameter = 'state_vdefault'")
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() != 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
+                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText( widget) + "', current_user)"
                     else:
                         sql += (" VALUES ('" + parameter + "',"
                                 " (SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'), current_user)")
+                                " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "'), current_user)")
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -139,9 +140,9 @@ class Master(ParentAction):
         self.controller.execute_sql(sql)
 
 
-    def filter_by_text(self, table, widget_txt, tablename):
+    def filter_by_text(self, dialog, table, widget_txt, tablename):
 
-        result_select = utils_giswater.getWidgetText(widget_txt)
+        result_select = utils_giswater.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
             expr = " name ILIKE '%" + result_select + "%'"
             # Refresh model with selected filter
@@ -160,7 +161,7 @@ class Master(ParentAction):
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        self.close_dialog()
+        self.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
 
 
@@ -486,5 +487,5 @@ class Master(ParentAction):
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
         
-        self.filter_by_text(dialog.tbl_om_result_cat, dialog.txt_name, tablename)
+        self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
             

@@ -17,7 +17,7 @@ class MultipleSelection(QgsMapTool):
     canvasClicked = pyqtSignal()
 
     def __init__(self, iface, controller, layers, 
-                 mincut=None, parent_manage=None, table_object=None):
+                 mincut=None, parent_manage=None, manage_new_psector=None, table_object=None):
         """ Class constructor """
 
         self.layers = layers
@@ -25,6 +25,7 @@ class MultipleSelection(QgsMapTool):
         self.canvas = self.iface.mapCanvas()
         self.mincut = mincut
         self.parent_manage = parent_manage
+        self.manage_new_psector = manage_new_psector
         self.table_object = table_object
         
         # Call superclass constructor and set current action
@@ -72,7 +73,9 @@ class MultipleSelection(QgsMapTool):
         if self.mincut:                            
             self.mincut.disconnect_signal_selection_changed()           
         if self.parent_manage: 
-            self.parent_manage.disconnect_signal_selection_changed()           
+            self.parent_manage.disconnect_signal_selection_changed()
+        if self.manage_new_psector:
+            self.manage_new_psector.disconnect_signal_selection_changed()
         
         for i in range(len(self.layers)):
             
@@ -81,8 +84,9 @@ class MultipleSelection(QgsMapTool):
                 if self.mincut:                              
                     self.mincut.connect_signal_selection_changed("mincut_connec")
                 if self.parent_manage:                          
-                    self.parent_manage.connect_signal_selection_changed(self.table_object)                          
-            
+                    self.parent_manage.connect_signal_selection_changed(self.table_object)
+                if self.manage_new_psector:
+                    self.manage_new_psector.connect_signal_selection_changed(self.manage_new_psector.dlg_plan_psector, self.table_object)
             # Selection by rectangle
             if rectangle:
                 if selected_rectangle is None:

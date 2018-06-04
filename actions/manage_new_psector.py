@@ -240,7 +240,7 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_plan_psector, table_object, True))
         self.dlg_plan_psector.btn_delete.clicked.connect(partial(self.delete_records,self.dlg_plan_psector, table_object, True))
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
-        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(self.selection_init, table_object, True))
+        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_plan_psector, table_object, True))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_plan_psector, table_object))
@@ -561,20 +561,20 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_snapping.setEnabled(enabled)
 
 
-    def selection_init(self, table_object, query=True):
+    def selection_init(self, dialog, table_object, query=True):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
-                                               parent_manage=self, table_object=table_object)
+                                               manage_new_psector=self, table_object=table_object)
         self.canvas.setMapTool(multiple_selection)
         self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(table_object, query)
+        self.connect_signal_selection_changed(dialog, table_object, query)
 
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
 
-    def connect_signal_selection_changed(self, table_object, query=True):
+    def connect_signal_selection_changed(self, dialog, table_object, query=True):
         """ Connect signal selectionChanged """
 
         try:
@@ -836,7 +836,7 @@ class ManageNewPsector(ParentManage):
 
         if close_dlg:
             self.reload_states_selector()
-            self.close_dialog()
+            self.close_dialog(self.dlg_plan_psector)
 
 
     def price_selector(self, dialog, tableleft, tableright,  field_id_right):
