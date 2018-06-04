@@ -2369,25 +2369,22 @@ class ParentDialog(QDialog):
                    " WHERE " + geom_type + "_id = '" + feature_id + "'")
             self.controller.execute_sql(sql)
 
-    def cf_new_workcat(self):
-        self.controller.log_info(str("test1111"))
+    def cf_new_workcat(self, dialog):
+        self.dlg_previous_cf = dialog
         self.wm_new_workcat = WidgetManager(NewWorkcat())
         self.dlg_new_workcat = self.wm_new_workcat.getDialog()
         self.load_settings(self.dlg_new_workcat)
 
         self.wm_new_workcat.setCalendarDate(self.dlg_new_workcat.builtdate, None, True)
-
         table_object = "cat_work"
-        self.new_workcat_set_completer_object(table_object, self.dlg_new_workcat.cat_work_id)
-
+        self.new_workcat_set_completer_object(table_object, self.dlg_new_workcat.cat_work_id, 'id')
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, table_object))
-
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
-        self.controller.log_info(str("test2222"))
+
         # Open dialog
         self.cf_open_dialog(self.dlg_new_workcat)
-        self.controller.log_info(str("test3333"))
+
 
     def cf_manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
@@ -2431,40 +2428,36 @@ class ParentDialog(QDialog):
                 sql = ("SELECT DISTINCT(id)"
                        " FROM " + self.schema_name + "." + str(table_object) + ""
                        " WHERE id = '" + str(cat_work_id) + "'")
-                row = self.controller.get_row(sql, log_info=False, log_sql=True)
+                row = self.controller.get_row(sql, log_info=False)
 
                 if row is None :
                     sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
-                    self.controller.execute_sql(sql, log_sql=True)
+                    self.controller.execute_sql(sql)
 
                     sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        self.wm_new_workcat.fillComboBox(self.dlg.workcat_id_end, rows)
-                        self.dlg.workcat_id_end.setCurrentIndex(self.dlg.workcat_id_end.findText(str(cat_work_id)))
-
+                        self.controller.log_info(str(self.dlg_previous_cf))
+                        cmb_workcat_id = self.dlg_previous_cf.findChild(QComboBox, "workcat_id")
+                        self.wm_new_workcat.fillComboBox(cmb_workcat_id, rows)
+                        cmb_workcat_id.setCurrentIndex(cmb_workcat_id.findText(str(cat_work_id)))
                     self.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "Este Workcat ya existe"
                     self.controller.show_info_box(msg, "Warning")
 
-    def new_workcat_set_completer_object(self, table_object, widget=False):
+    def new_workcat_set_completer_object(self, tablename, widget, field_id):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
         """
-
-        if widget == False:
-            widget = utils_giswater.getWidget(table_object + "_id")
         if not widget:
             return
 
         # Set SQL
-        field_object_id = "id"
-        if table_object == "element":
-            field_object_id = table_object + "_id"
-        sql = ("SELECT DISTINCT(" + field_object_id + ")"
-                                                      " FROM " + self.schema_name + "." + table_object)
-        row = self.controller.get_rows(sql, commit=self.autocommit)
+        sql = ("SELECT DISTINCT(" + field_id + ")"
+               " FROM " + self.schema_name + "." + tablename +""
+               " ORDER BY "+ field_id + "")
+        row = self.controller.get_rows(sql)
         for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])

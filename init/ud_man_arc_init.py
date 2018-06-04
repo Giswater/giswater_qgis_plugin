@@ -66,7 +66,7 @@ class ManArcDialog(ParentDialog):
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, self.dialog, 'ud', 'arc'))
-        self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat))
+        self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
         
         # Manage buttons node forms
         self.set_button_node_form()

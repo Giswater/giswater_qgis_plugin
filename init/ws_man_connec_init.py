@@ -79,7 +79,7 @@ class ManConnecDialog(ParentDialog):
         self.check_link()
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, self.dialog, 'ws', 'connec'))
-        self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat))
+        self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
 
         open_link = self.dialog.findChild(QPushButton, "open_link")
         utils_giswater.setWidgetEnabled("open_link", False)
