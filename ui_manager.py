@@ -349,6 +349,11 @@ class UDcatalog(QtGui.QDialog, FORM_CLASS):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
 
+FORM_CLASS = get_ui_class('cf_ud_catalog.ui')
+class CFUDcatalog(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
 
 FORM_CLASS = get_ui_class('ud_options.ui')
 class UDoptions(QtGui.QDialog, FORM_CLASS):
@@ -384,6 +389,11 @@ class WScatalog(QtGui.QDialog, FORM_CLASS):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
 
+FORM_CLASS = get_ui_class('cf_ws_catalog.ui')
+class CFWScatalog(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
 
 FORM_CLASS = get_ui_class('ws_options.ui')
 class WSoptions(QtGui.QDialog, FORM_CLASS):

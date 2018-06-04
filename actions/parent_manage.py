@@ -370,12 +370,13 @@ class ParentManage(ParentAction, object):
         self.iface.actionPan().trigger()    
         
 
-    def set_completer_object(self, table_object):
-        """ Set autocomplete of widget @table_object + "_id" 
-            getting id's from selected @table_object 
+    def set_completer_object(self, table_object, widget = False):
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object
         """
-                     
-        widget = utils_giswater.getWidget(table_object + "_id")
+
+        if widget == False:
+            widget = utils_giswater.getWidget(table_object + "_id")
         if not widget:
             return
         

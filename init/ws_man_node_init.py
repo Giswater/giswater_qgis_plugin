@@ -100,8 +100,8 @@ class ManNodeDialog(ParentDialog):
               
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
-
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, self.dialog, 'ws', 'node', nodetype_id.text()))
+        self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat))
         feature = self.feature
         layer = self.iface.activeLayer()
 

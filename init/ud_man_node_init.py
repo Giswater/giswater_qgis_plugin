@@ -82,7 +82,8 @@ class ManNodeDialog(ParentDialog):
         self.tbl_downstream = self.dialog.findChild(QTableView, "tbl_downstream")
         self.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, self.dialog, 'ud', 'node'))
+        self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat))
 
         self.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
         self.tbl_downstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))

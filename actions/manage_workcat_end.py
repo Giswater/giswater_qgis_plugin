@@ -18,10 +18,11 @@ import utils_giswater
 from actions.parent_manage import ParentManage
 from ui_manager import WorkcatEnd, NewWorkcat
 from ui_manager import WorkcatEndList
+from utils_.widget_manager import WidgetManager
 
 
 class ManageWorkcatEnd(ParentManage):
-    
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Workcat end' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
@@ -41,12 +42,12 @@ class ManageWorkcatEnd(ParentManage):
 
         # Get layers of every geom_type
         self.reset_lists()
-        self.reset_layers()    
+        self.reset_layers()
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = self.controller.get_group_layers('element')
-            
+
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
@@ -85,14 +86,14 @@ class ManageWorkcatEnd(ParentManage):
         geom_type = "arc"
         viewname = "v_edit_" + geom_type
         self.set_completer_feature_id(geom_type, viewname)
-        
+
         # Set default tab 'arc'
         self.dlg.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
         self.tab_feature_changed(self.table_object)
 
         # Open dialog
-        self.open_dialog(self.dlg, maximize_button=False)     
+        self.open_dialog(self.dlg, maximize_button=False)
 
 
     def set_edit_arc_downgrade_force(self, value):
@@ -116,7 +117,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def fill_fields(self):
         """ Fill dates and combo cat_work """
-        
+
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
                " WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
@@ -142,7 +143,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def fill_workids(self):
         """ Auto fill descriptions and workid's """
-        
+
         workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id_end)
         sql = ("SELECT descript, builtdate"
                " FROM " + self.controller.schema_name + ".cat_work"
@@ -229,7 +230,7 @@ class ManageWorkcatEnd(ParentManage):
         tablename = "v_edit_" + geom_type
         if self.selected_list is None:
             return
-        
+
         sql = ""
         for id_ in self.selected_list:
             sql += ("UPDATE " + self.schema_name + "." + tablename + ""
@@ -258,7 +259,7 @@ class ManageWorkcatEnd(ParentManage):
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
-            
+
         # Attach model to table view
         widget.setModel(self.model)
 
@@ -321,7 +322,7 @@ class ManageWorkcatEnd(ParentManage):
         answer = self.controller.ask_question(message, title)
         if not answer:
             return
-        
+
         # Update tablename of every geom_type
         ids_list = self.get_list_selected_id(self.dlg.tbl_cat_work_x_arc)
         self.update_geom_type("arc", ids_list)
@@ -431,22 +432,22 @@ class ManageWorkcatEnd(ParentManage):
 
     def new_workcat(self):
 
-        self.new_workcat_dlg = NewWorkcat()
-        utils_giswater.setDialog(self.new_workcat_dlg)
-        self.load_settings(self.new_workcat_dlg)
+        self.wm_new_workcat = WidgetManager(NewWorkcat())
+        self.dlg_new_workcat = self.wm_new_workcat.getDialog()
+        self.load_settings(self.dlg_new_workcat)
 
-        utils_giswater.setCalendarDate(self.new_workcat_dlg.builtdate, None, True)
-        
+        self.wm_new_workcat.setCalendarDate(self.dlg_new_workcat.builtdate, None, True)
+
         table_object = "cat_work"
-        self.set_completer_object(table_object)
+        self.set_completer_object(table_object, self.dlg_new_workcat.cat_work_id)
 
         # Set signals
-        self.new_workcat_dlg.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
+        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
 
-        self.new_workcat_dlg.btn_cancel.clicked.connect(partial(self.close_dialog, self.new_workcat_dlg))
+        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        self.open_dialog(self.new_workcat_dlg)
+        self.open_dialog(self.dlg_new_workcat)
 
     def manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
@@ -454,27 +455,27 @@ class ManageWorkcatEnd(ParentManage):
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = utils_giswater.getWidgetText(self.new_workcat_dlg.cat_work_id)
+        cat_work_id = self.wm_new_workcat.getWidgetText(self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += ("'" + str(cat_work_id) + "', ")
-        descript = utils_giswater.getWidgetText("descript")
+        descript = self.wm_new_workcat.getWidgetText("descript")
         if descript != "null":
             fields += 'descript, '
             values += ("'" + str(descript) + "', ")
-        link = utils_giswater.getWidgetText("link")
+        link = self.wm_new_workcat.getWidgetText("link")
         if link != "null":
             fields += 'link, '
             values += ("'" + str(link) + "', ")
-        workid_key_1 = utils_giswater.getWidgetText("workid_key_1")
+        workid_key_1 = self.wm_new_workcat.getWidgetText("workid_key_1")
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += ("'" + str(workid_key_1) + "', ")
-        workid_key_2 = utils_giswater.getWidgetText("workid_key_2")
+        workid_key_2 = self.wm_new_workcat.getWidgetText("workid_key_2")
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += ("'" + str(workid_key_2) + "', ")
-        builtdate = self.new_workcat_dlg.builtdate.dateTime().toString('yyyy-MM-dd')
+        builtdate = self.wm_new_workcat.dialog.builtdate.dateTime().toString('yyyy-MM-dd')
         if builtdate != "null":
             fields += 'builtdate, '
             values += ("'" + str(builtdate) + "', ")
@@ -499,10 +500,10 @@ class ManageWorkcatEnd(ParentManage):
                     sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        utils_giswater.fillComboBox(self.dlg.workcat_id_end, rows)
+                        self.wm_new_workcat.fillComboBox(self.dlg.workcat_id_end, rows)
                         self.dlg.workcat_id_end.setCurrentIndex(self.dlg.workcat_id_end.findText(str(cat_work_id)))
 
-                    self.close_dialog(self.new_workcat_dlg)
+                    self.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "Este Workcat ya existe"
                     self.controller.show_info_box(msg, "Warning")

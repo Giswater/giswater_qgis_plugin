@@ -24,9 +24,9 @@ import webbrowser
 
 import utils_giswater
 from dao.controller import DaoController
-from ui_manager import AddSum
-from ui_manager import WScatalog
-from ui_manager import UDcatalog
+from ui_manager import AddSum, NewWorkcat
+from ui_manager import CFWScatalog
+from ui_manager import CFUDcatalog
 from ui_manager import LoadDocuments
 from ui_manager import EventFull
 from ui_manager import AddPicture
@@ -37,6 +37,7 @@ from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
 from map_tools.snapping_utils import SnappingConfigManager
 from actions.manage_visit import ManageVisit
+from utils_.widget_manager import WidgetManager
 
 
 class ParentDialog(QDialog):   
@@ -739,8 +740,8 @@ class ParentDialog(QDialog):
         model = QStringListModel()
         model.setStringList(row)
         self.completer.setModel(model)        
-    
-    
+
+
     def add_object(self, widget, table_object, view_object):
         """ Add object (doc or element) to selected feature """
         
@@ -1405,7 +1406,7 @@ class ParentDialog(QDialog):
             layer.rollBack()
             
 
-    def catalog(self, wsoftware, geom_type, node_type=None):
+    def catalog(self, prev_dialog, wsoftware, geom_type, node_type=None):
 
         # Get key
         layer = self.iface.activeLayer()
@@ -1417,17 +1418,19 @@ class ParentDialog(QDialog):
 
         # Set dialog depending water software
         if wsoftware == 'ws':
-            self.dlg_cat = WScatalog()
+            self.dlg_cat = CFWScatalog()
             self.field2 = 'pnom'
             self.field3 = 'dnom'
         elif wsoftware == 'ud':
-            self.dlg_cat = UDcatalog()
+            self.dlg_cat = CFUDcatalog()
             self.field2 = 'shape'
             self.field3 = 'geom1'
+        self.cf_prev_dialog = prev_dialog
         utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
         self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cat))
+        self.dlg_cat.btn_cancel.clicked.connect(partial(self.cancel))
+        self.dlg_cat.rejected.connect(partial(self.cancel))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -1484,6 +1487,9 @@ class ParentDialog(QDialog):
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
         self.fill_catalog_id(wsoftware, geom_type)
 
+    def cancel(self):
+        utils_giswater.setDialog(self.cf_prev_dialog)
+        self.close_dialog(self.dlg_cat)
 
     def fill_filter2(self, wsoftware, geom_type):
 
@@ -1606,7 +1612,7 @@ class ParentDialog(QDialog):
             utils_giswater.setWidgetText(self.arccat_id, catalog_id)
         else:
             utils_giswater.setWidgetText(self.connecat_id, catalog_id)
-
+        utils_giswater.setDialog(self.cf_prev_dialog)
 
     def manage_feature_cat(self):
 
@@ -2363,3 +2369,135 @@ class ParentDialog(QDialog):
                    " WHERE " + geom_type + "_id = '" + feature_id + "'")
             self.controller.execute_sql(sql)
 
+    def cf_new_workcat(self):
+        self.controller.log_info(str("test1111"))
+        self.wm_new_workcat = WidgetManager(NewWorkcat())
+        self.dlg_new_workcat = self.wm_new_workcat.getDialog()
+        self.load_settings(self.dlg_new_workcat)
+
+        self.wm_new_workcat.setCalendarDate(self.dlg_new_workcat.builtdate, None, True)
+
+        table_object = "cat_work"
+        self.new_workcat_set_completer_object(table_object, self.dlg_new_workcat.cat_work_id)
+
+        # Set signals
+        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, table_object))
+
+        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
+        self.controller.log_info(str("test2222"))
+        # Open dialog
+        self.cf_open_dialog(self.dlg_new_workcat)
+        self.controller.log_info(str("test3333"))
+
+    def cf_manage_new_workcat_accept(self, table_object):
+        """ Insert table 'cat_work'. Add cat_work """
+
+        # Get values from dialog
+        values = ""
+        fields = ""
+        cat_work_id = self.wm_new_workcat.getWidgetText(self.dlg_new_workcat.cat_work_id)
+        if cat_work_id != "null":
+            fields += 'id, '
+            values += ("'" + str(cat_work_id) + "', ")
+        descript = self.wm_new_workcat.getWidgetText("descript")
+        if descript != "null":
+            fields += 'descript, '
+            values += ("'" + str(descript) + "', ")
+        link = self.wm_new_workcat.getWidgetText("link")
+        if link != "null":
+            fields += 'link, '
+            values += ("'" + str(link) + "', ")
+        workid_key_1 = self.wm_new_workcat.getWidgetText("workid_key_1")
+        if workid_key_1 != "null":
+            fields += 'workid_key1, '
+            values += ("'" + str(workid_key_1) + "', ")
+        workid_key_2 = self.wm_new_workcat.getWidgetText("workid_key_2")
+        if workid_key_2 != "null":
+            fields += 'workid_key2, '
+            values += ("'" + str(workid_key_2) + "', ")
+        builtdate = self.wm_new_workcat.dialog.builtdate.dateTime().toString('yyyy-MM-dd')
+        if builtdate != "null":
+            fields += 'builtdate, '
+            values += ("'" + str(builtdate) + "', ")
+
+        if values != "":
+            fields = fields[:-2]
+            values = values[:-2]
+            if cat_work_id == 'null':
+                msg = "El campo Work id esta vacio"
+                self.controller.show_info_box(msg, "Warning")
+            else:
+                # Check if this element already exists
+                sql = ("SELECT DISTINCT(id)"
+                       " FROM " + self.schema_name + "." + str(table_object) + ""
+                       " WHERE id = '" + str(cat_work_id) + "'")
+                row = self.controller.get_row(sql, log_info=False, log_sql=True)
+
+                if row is None :
+                    sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
+                    self.controller.execute_sql(sql, log_sql=True)
+
+                    sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
+                    rows = self.controller.get_rows(sql)
+                    if rows:
+                        self.wm_new_workcat.fillComboBox(self.dlg.workcat_id_end, rows)
+                        self.dlg.workcat_id_end.setCurrentIndex(self.dlg.workcat_id_end.findText(str(cat_work_id)))
+
+                    self.close_dialog(self.dlg_new_workcat)
+                else:
+                    msg = "Este Workcat ya existe"
+                    self.controller.show_info_box(msg, "Warning")
+
+    def new_workcat_set_completer_object(self, table_object, widget=False):
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object
+        """
+
+        if widget == False:
+            widget = utils_giswater.getWidget(table_object + "_id")
+        if not widget:
+            return
+
+        # Set SQL
+        field_object_id = "id"
+        if table_object == "element":
+            field_object_id = table_object + "_id"
+        sql = ("SELECT DISTINCT(" + field_object_id + ")"
+                                                      " FROM " + self.schema_name + "." + table_object)
+        row = self.controller.get_rows(sql, commit=self.autocommit)
+        for i in range(0, len(row)):
+            aux = row[i]
+            row[i] = str(aux[0])
+
+        # Set completer and model: add autocomplete in the widget
+        self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        widget.setCompleter(self.completer)
+        model = QStringListModel()
+        model.setStringList(row)
+        self.completer.setModel(model)
+
+    def cancel(self):
+        utils_giswater.setDialog(self.dlg_nodereplace)
+        self.close_dialog(self.dlg_cat)
+
+    def cf_open_dialog(self, dlg=None, dlg_name=None, maximize_button=True, stay_on_top=True):
+        """ Open dialog """
+
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+
+        # Manage i18n of the dialog
+        if dlg_name:
+            self.controller.manage_translation(dlg_name, dlg)
+
+            # Manage stay on top and maximize button
+        if maximize_button and stay_on_top:
+            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
+        elif not maximize_button and stay_on_top:
+            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowStaysOnTopHint)
+        elif maximize_button and not stay_on_top:
+            dlg.setWindowFlags(Qt.WindowMaximizeButtonHint)
+
+            # Open dialog
+        dlg.open()
