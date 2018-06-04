@@ -35,7 +35,6 @@ class CadAddCircle(ParentMapTool):
         
         # Create the dialog and signals
         self.dlg_create_circle = Cad_add_circle()
-        utils_giswater.setDialog(self.dlg_create_circle)
         self.load_settings(self.dlg_create_circle)
 
         validator = QDoubleValidator(0.00, 999.00, 3)
@@ -54,7 +53,7 @@ class CadAddCircle(ParentMapTool):
         self.radius = self.dlg_create_circle.radius.text()
         if not self.radius:
             self.radius = 0.1
-        self.delete_prev = utils_giswater.isChecked(self.dlg_create_circle.chk_delete_prev)
+        self.delete_prev = utils_giswater.isChecked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
 
         if self.layer_circle:
             self.layer_circle.startEditing()
