@@ -392,7 +392,7 @@ class ParentDialog(QDialog):
         if doc.doc_id is None:
             return
 
-        utils_giswater.setWidgetText("doc_id", doc.doc_id) 
+        utils_giswater.setWidgetText("doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_document")
 
 
@@ -623,7 +623,7 @@ class ParentDialog(QDialog):
         expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
         
         # Get selected values in Comboboxes        
-        doc_type_value = utils_giswater.getWidgetText("doc_type")
+        doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type")
         if doc_type_value != 'null': 
             expr+= " AND doc_type = '"+doc_type_value+"'"
   
@@ -1910,13 +1910,13 @@ class ParentDialog(QDialog):
                     utils_giswater.setWidgetText(parameter.widget, value_param)
                  
 
-    def check_link(self, open_link=False):
+    def check_link(self, dialog, open_link=False):
         """ Check if exist URL from field 'link' in main tab """
         
         field_link = "link"
         widget = self.tab_main.findChild(QTextEdit, field_link)
         if widget:
-            url = utils_giswater.getWidgetText(widget)
+            url = utils_giswater.getWidgetText(dialog, widget)
             if url == 'null':
                 self.dialog.findChild(QAction, "actionLink").setEnabled(False)
             else:
@@ -2267,8 +2267,8 @@ class ParentDialog(QDialog):
 
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
-               " WHERE node_id = '" + self.id + "';")
-        row = self.controller.get_row(sql, log_info=False)
+               " WHERE node_id = '" + str(self.id) + "';")
+        row = self.controller.get_row(sql, log_info=False, log_sql=True)
         if not row:
             self.tab_main.removeTab(6) 
             self.tab_scada_removed = 1
@@ -2279,7 +2279,7 @@ class ParentDialog(QDialog):
         
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + "." + viewname + ""
-               " WHERE " + field_id + " = '" + self.id + "';")
+               " WHERE " + str(field_id) + " = '" + str(self.id) + "';")
         row = self.controller.get_row(sql, log_info=False)
         if not row:  
             # Hide tab 'relations'
@@ -2354,12 +2354,12 @@ class ParentDialog(QDialog):
     def update_filters(self, table_name, field_id, geom_type, widget, feature_id):
         """ @widget is the field to SET """
         
-        sql = ("SELECT " + field_id + " FROM " + self.schema_name + "." + table_name + " "
+        sql = ("SELECT " + str(field_id) + " FROM " + self.schema_name + "." + str(table_name) + " "
                " WHERE name = '" + str(utils_giswater.getWidgetText(widget)) + "'")
         row = self.controller.get_row(sql)
         if row:
-            sql = ("UPDATE " + self.schema_name + "." + geom_type + " "
+            sql = ("UPDATE " + self.schema_name + "." + str(geom_type) + " "
                    " SET " + widget + " = '" + str(row[0]) + "'"
-                   " WHERE " + geom_type + "_id = '" + feature_id + "'")
+                   " WHERE " + str(geom_type) + "_id = '" + str(feature_id) + "'")
             self.controller.execute_sql(sql)
 

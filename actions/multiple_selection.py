@@ -17,7 +17,7 @@ class MultipleSelection(QgsMapTool):
     canvasClicked = pyqtSignal()
 
     def __init__(self, iface, controller, layers, 
-                 mincut=None, parent_manage=None, manage_new_psector=None, table_object=None):
+                 mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None):
         """ Class constructor """
 
         self.layers = layers
@@ -27,6 +27,7 @@ class MultipleSelection(QgsMapTool):
         self.parent_manage = parent_manage
         self.manage_new_psector = manage_new_psector
         self.table_object = table_object
+        self.dialog = dialog
         
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
@@ -84,9 +85,10 @@ class MultipleSelection(QgsMapTool):
                 if self.mincut:                              
                     self.mincut.connect_signal_selection_changed("mincut_connec")
                 if self.parent_manage:                          
-                    self.parent_manage.connect_signal_selection_changed(self.table_object)
+                    self.parent_manage.connect_signal_selection_changed(self.dialog, self.table_object)
                 if self.manage_new_psector:
                     self.manage_new_psector.connect_signal_selection_changed(self.manage_new_psector.dlg_plan_psector, self.table_object)
+
             # Selection by rectangle
             if rectangle:
                 if selected_rectangle is None:

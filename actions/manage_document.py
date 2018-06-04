@@ -76,18 +76,18 @@ class ManageDocument(ParentManage):
         #self.controller.translate_form(self.dlg, 'file')
                 
         # Fill combo boxes
-        self.populate_combo("doc_type", "doc_type")
+        self.populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"        
         self.set_completer_object(self.dlg_add_doc, table_object)
 
         # Set signals
-        self.dlg_add_doc.path_url.clicked.connect(partial(self.open_web_browser, "path"))
-        self.dlg_add_doc.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
+        self.dlg_add_doc.path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object))
-        self.dlg_add_doc.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
-        self.dlg_add_doc.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))
+        self.dlg_add_doc.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer))
+        self.dlg_add_doc.rejected.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer))
         self.dlg_add_doc.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_doc,  table_object))
         self.dlg_add_doc.doc_id.textChanged.connect(partial(self.exist_object, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_doc, table_object))
@@ -182,7 +182,7 @@ class ManageDocument(ParentManage):
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id            
-            self.manage_close(table_object)     
+            self.manage_close(self.dlg_add_doc, table_object)
             
             
     def edit_document(self):

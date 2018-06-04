@@ -101,14 +101,14 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)        
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         
         # Manage tab 'Scada'
         self.manage_tab_scada()        
         
         # Check if exist URL from field 'link' in main tab
-        self.check_link()
+        self.check_link(self.dialog)
 
         # Check topology for new features
         continue_insert = True        

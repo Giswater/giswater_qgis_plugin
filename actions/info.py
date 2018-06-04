@@ -49,7 +49,7 @@ class Info(ParentAction):
         
         # Set signals
         self.dlg_info.btn_open_giswater.clicked.connect(self.open_giswater)
-        self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, None))
+        self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, self.dlg_info, None))
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         
         # Open dialog

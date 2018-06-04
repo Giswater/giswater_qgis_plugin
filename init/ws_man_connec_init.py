@@ -76,7 +76,7 @@ class ManConnecDialog(ParentDialog):
         self.tbl_hydrometer.clicked.connect(self.check_url)
         
         # Check if exist URL from field 'link' in main tab
-        self.check_link()
+        self.check_link(self.dialog)
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
 
@@ -94,7 +94,7 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, self.dialog, True))
         
         # Manage tab signal
         self.tab_hydrometer_loaded = False        

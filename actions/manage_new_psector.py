@@ -298,34 +298,34 @@ class ManageNewPsector(ParentManage):
 
     def open_dlg_rapports(self, previous_dialog):#, self.dlg_plan_psector
 
-        default_file_name = utils_giswater.getWidgetText(previous_dialog.name)
+        default_file_name = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
         self.dlg_psector_rapport = Psector_rapport()
-        utils_giswater.setDialog(self.dlg_psector_rapport)
+        # utils_giswater.setDialog(self.dlg_psector_rapport)
         self.load_settings(self.dlg_psector_rapport)
 
-        utils_giswater.setWidgetText('txt_composer_path', default_file_name + " comp.pdf")
-        utils_giswater.setWidgetText('txt_csv_detail_path', default_file_name + " detail.csv")
-        utils_giswater.setWidgetText('txt_csv_path', default_file_name + ".csv")
+        utils_giswater.setWidgetText(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
+        utils_giswater.setWidgetText(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " detail.csv")
+        utils_giswater.setWidgetText(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + ".csv")
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_rapport))
-        self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports, self.dlg_psector_rapport))
+        self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
         self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
 
-        utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path,
+        utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path,
             self.controller.plugin_settings_value('psector_rapport_path'))
-        utils_giswater.setChecked(self.dlg_psector_rapport.chk_composer,
+        utils_giswater.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer,
             bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
-        utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv_detail,
+        utils_giswater.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail,
             self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
-        utils_giswater.setChecked(self.dlg_psector_rapport.chk_csv,
+        utils_giswater.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv,
             self.controller.plugin_settings_value('psector_rapport_chk_csv'))
-        if utils_giswater.getWidgetText(self.dlg_psector_rapport.txt_path) == 'null':
+        if utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
             if 'nt' in sys.builtin_module_names:
                 plugin_dir = os.path.expanduser("~\Documents")
             else:
                 plugin_dir = os.path.expanduser("~")
-            utils_giswater.setWidgetText(self.dlg_psector_rapport.txt_path, plugin_dir)
+            utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, plugin_dir)
         self.populate_cmb_templates()
         # Open dialog
         self.open_dialog(self.dlg_psector_rapport, maximize_button=False)     
@@ -346,7 +346,7 @@ class ManageNewPsector(ParentManage):
         row = self.controller.get_row(sql)
         if not row:
             return
-        utils_giswater.setWidgetText(self.dlg_psector_rapport.cmb_templates, row[0])
+        utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, row[0])
 
 
     # def set_prev_dialog(self, current_dialog, previous_dialog):
@@ -395,7 +395,8 @@ class ManageNewPsector(ParentManage):
 
         # Generate csv
         if utils_giswater.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
-            file_name = utils_giswater.getWidgetText('txt_csv_detail_path')
+            file_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_csv_detail_path')
+            self.controller.log_info(str(file_name))
             viewname = "v_" + self.plan_om + "_current_psector_budget"
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
@@ -407,9 +408,9 @@ class ManageNewPsector(ParentManage):
         self.close_dialog(self.dlg_psector_rapport)
 
 
-    def generate_composer(self, path, dialog=None):
+    def generate_composer(self, path):
 
-        index = utils_giswater.get_item_data(dialog.cmb_templates, 0)
+        index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
         comp_view = self.iface.activeComposers()[index]
         my_comp = comp_view.composition()
         if my_comp is not None:
@@ -442,7 +443,7 @@ class ManageNewPsector(ParentManage):
             columns.append(str(column_name[0]))
 
         sql = ("SELECT * FROM " + self.schema_name + "." + viewname + ""
-               " WHERE psector_id = '" + str(utils_giswater.getWidgetText(self.dlg_plan_psector.psector_id)) + "'")
+               " WHERE psector_id = '" + str(utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)) + "'")
         rows = self.controller.get_rows(sql)
         all_rows = []
         all_rows.append(columns)
@@ -990,7 +991,7 @@ class ManageNewPsector(ParentManage):
 
 
 
-    def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None ):
+    def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Set a model with selected filter.
         Attach that model to selected table
         @setEditStrategy:
@@ -1007,7 +1008,7 @@ class ManageNewPsector(ParentManage):
         model.select()
 
         # When change some field we need to refresh Qtableview and filter by psector_id
-        model.dataChanged.connect(partial(self.refresh_table, widget))
+        model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
         model.dataChanged.connect(partial(self.update_total, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
         # Check for errors
@@ -1108,7 +1109,7 @@ class ManageNewPsector(ParentManage):
 
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document()
-        dlg_docman.btn_accept.clicked.connect(partial(dlg_docman, self.set_completer_object, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
 
 
     def document_open(self):

@@ -70,29 +70,29 @@ class ManageElement(ParentManage):
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".cat_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("element_type", rows, False)
-        self.populate_combo("state", "value_state", "name")
-        self.populate_combo("expl_id", "exploitation", "name")
+        utils_giswater.fillComboBox(self.dlg, "element_type", rows, False)
+        self.populate_combo(self.dlg, "state", "value_state", "name")
+        self.populate_combo(self.dlg, "expl_id", "exploitation", "name")
         sql = ("SELECT location_type"
                " FROM " + self.schema_name + ".man_type_location"
                " WHERE feature_type = 'ELEMENT' " 
                " ORDER BY location_type")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
-        utils_giswater.fillComboBox("location_type", rows)
+        utils_giswater.fillComboBox(self.dlg, "location_type", rows)
         if rows:
             utils_giswater.setCurrentIndex("location_type", 0)
-        self.populate_combo("workcat_id", "cat_work")
-        self.populate_combo("buildercat_id", "cat_builder")
-        self.populate_combo("ownercat_id", "cat_owner")
-        self.populate_combo("verified", "value_verified")
-        self.populate_combo("workcat_id_end", "cat_work")
+        self.populate_combo(self.dlg, "workcat_id", "cat_work")
+        self.populate_combo(self.dlg, "buildercat_id", "cat_builder")
+        self.populate_combo(self.dlg, "ownercat_id", "cat_owner")
+        self.populate_combo(self.dlg, "verified", "value_verified")
+        self.populate_combo(self.dlg, "workcat_id_end", "cat_work")
 
         # Set combo boxes
-        self.set_combo('elementcat_id', 'cat_element', 'elementcat_vdefault', field_id='id', field_name='id')
-        self.set_combo('state', 'value_state', 'state_vdefault', field_name='name')
-        self.set_combo('expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')
-        self.set_combo('workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
-        self.set_combo('verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
+        self.set_combo(self.dlg, 'elementcat_id', 'cat_element', 'elementcat_vdefault', field_id='id', field_name='id')
+        self.set_combo(self.dlg, 'state', 'value_state', 'state_vdefault', field_name='name')
+        self.set_combo(self.dlg, 'expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')
+        self.set_combo(self.dlg, 'workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
+        self.set_combo(self.dlg, 'verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
@@ -100,8 +100,8 @@ class ManageElement(ParentManage):
         
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
-        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
-        self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
+        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg, table_object, cur_active_layer))
+        self.dlg.rejected.connect(partial(self.manage_close, self.dlg, table_object, cur_active_layer))
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg, table_object))
         self.dlg.element_id.textChanged.connect(partial(self.exist_object, self.dlg, table_object))
         self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg, table_object))
@@ -317,7 +317,7 @@ class ManageElement(ParentManage):
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.element_id = element_id
-            self.manage_close(table_object)
+            self.manage_close(self.dlg, table_object)
             #TODO Reload table tbl_element
             filter_ = "node_id = '" + str(feature_id) + "'"
             table_element = "v_ui_element_x_node"

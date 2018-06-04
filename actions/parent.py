@@ -257,11 +257,11 @@ class ParentAction(object):
         self.gsw_settings.setValue('POSTGIS_USESSL', 'false')               
         
         
-    def open_web_browser(self, widget=None):
+    def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
         
         if widget is not None:           
-            url = utils_giswater.getWidgetText(widget)            
+            url = utils_giswater.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'www.giswater.org'
         else:
@@ -270,11 +270,11 @@ class ParentAction(object):
         webbrowser.open(url)    
         
 
-    def get_file_dialog(self, widget):
+    def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
         
         # Check if selected file exists. Set default value if necessary
-        file_path = utils_giswater.getWidgetText(widget)
+        file_path = utils_giswater.getWidgetText(dialog, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
             folder_path = self.plugin_dir   
         else:     
@@ -287,7 +287,7 @@ class ParentAction(object):
         message = "Select file"
         folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path))            
+            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
                 
                 
     def get_folder_dialog(self, dialog, widget):
