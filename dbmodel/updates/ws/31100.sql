@@ -47,6 +47,14 @@ INSERT INTO audit_cat_error VALUES (3006, 'There are one or more arc(s) with nul
 */
 
 
+----------------------
+--04/06/2018
+-----------------------
+INSERT INTO audit_cat_table VALUES ('anl_mincut_result_cat', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_mincut_result_cat_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('v_edit_cad_auxcircle', 'CAD layer', 'Layer to store circle geometry when CAD tool is used', 'role_edit', 0, NULL, 'role_edit', 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_edit_cad_auxpoint', 'CAD layer', 'Layer to store point geometry when CAD tool is used', 'role_edit', 0, NULL, 'role_edit', 0, NULL, NULL, NULL); 
+ 
+
 
 
 
