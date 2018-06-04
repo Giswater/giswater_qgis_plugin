@@ -408,7 +408,7 @@ class ParentAction(object):
         query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
 
 
     def hide_colums(self, widget, comuns_to_hide):
@@ -537,10 +537,10 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())  
             
 
-    def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
         
-        query = utils_giswater.getWidgetText(text_line, return_string_null=False).lower()
+        query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
         sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
                "(SELECT name FROM " + self.schema_name + "." + tableleft + ""
                " RIGHT JOIN " + self.schema_name + "." + tableright + ""
