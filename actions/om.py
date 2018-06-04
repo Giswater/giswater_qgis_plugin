@@ -219,7 +219,7 @@ class Om(ParentAction):
         """ Button 84: Selector dates """
 
         self.dlg_selector_date = SelectorDate()
-        utils_giswater.setDialog(self.dlg_selector_date)
+        #utils_giswater.setDialog(self.dlg_selector_date)
         self.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")
@@ -230,9 +230,9 @@ class Om(ParentAction):
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 
         self.get_default_dates()
-        utils_giswater.setCalendarDate(self.widget_date_from, self.from_date)
-        utils_giswater.setCalendarDate(self.widget_date_to, self.to_date)
-        self.open_dialog(self.dlg_selector_date,dlg_name="selector_date")
+        utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
+        utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
+        self.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
 
     def update_dates_into_db(self):
@@ -264,7 +264,7 @@ class Om(ParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if from_date >= to_date:
             to_date = self.widget_date_from.date().addDays(1).toString('yyyy-MM-dd')
-            utils_giswater.setCalendarDate(self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
+            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
 
 
     def update_date_from(self):
@@ -273,7 +273,7 @@ class Om(ParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if to_date <= from_date:
             from_date = self.widget_date_to.date().addDays(-1).toString('yyyy-MM-dd')
-            utils_giswater.setCalendarDate(self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
+            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
 
 
     def get_default_dates(self):
