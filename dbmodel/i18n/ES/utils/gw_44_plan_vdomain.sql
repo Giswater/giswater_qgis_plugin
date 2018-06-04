@@ -20,11 +20,36 @@ INSERT INTO price_value_unit VALUES ('t');
 
 
 -- ----------------------------
--- Records of plan_value_ps_priority
+-- Records of value_priority
 -- ----------------------------
-INSERT INTO plan_value_ps_priority VALUES ('PRIORIDAD_ALTA');
-INSERT INTO plan_value_ps_priority VALUES ('PRIORIDAD_NORMAL');
-INSERT INTO plan_value_ps_priority VALUES ('PRIORIDAD_BAJA');
+INSERT INTO value_priority VALUES ('PRIORIDAD ALTA');
+INSERT INTO value_priority VALUES ('PRIORIDAD MEDIA');
+INSERT INTO value_priority VALUES ('PRIORIDAD BAJA');
+
+INSERT INTO plan_result_type VALUES (1,'Reconstrucción');
+INSERT INTO plan_result_type VALUES (2,'Rehabilitación');
+
+
+INSERT INTO plan_psector_cat_type VALUES (1,'Planificado');
+
+
+INSERT INTO om_psector_cat_type VALUES (1,'Reconstrucción');
+INSERT INTO om_psector_cat_type VALUES (2,'Rehabilitación');
+
+
+
+-- ----------------------------
+-- Records of review
+-- ----------------------------
+INSERT INTO value_review_validation VALUES (0, 'Rechazado');
+INSERT INTO value_review_validation VALUES (1, 'Aceptado');
+INSERT INTO value_review_validation VALUES (2, 'A revisar');
+
+INSERT INTO value_review_status VALUES (0, 'No hay cambios por encima o debajo de los valores de tolerancia', 'Sin cambios');
+INSERT INTO value_review_status VALUES (1, 'Nuevo elemento introducido para revisar', 'Nuevo elemento');
+INSERT INTO value_review_status VALUES (2, 'Geometría modificada en la revisión. Otros datos pueden ser modificados', 'Geometría modificada');
+INSERT INTO value_review_status VALUES (3, 'Cambios en los datos, no en la geometría', 'Datos modificados');
+
 
 
 

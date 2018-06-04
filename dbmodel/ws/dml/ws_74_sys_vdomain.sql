@@ -50,6 +50,7 @@ INSERT INTO sys_feature_cat VALUES ('ELEMENT', 'ELEMENT', NULL, 'v_edit_element'
 -- ----------------------------
 -- Records of audit_cat_table
 -- ----------------------------
+INSERT INTO audit_cat_table VALUES ('anl_mincut_result_cat', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, 'anl_mincut_result_cat_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('cat_arc_class', 'Catalog', 'Arc classification', 'role_edit', 0, NULL, NULL, NULL, NULL, 'cat_arc_class_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('cat_arc_class_cat', 'Catalog', 'Categorys of classification', 'role_admin', 1, '>2', NULL, NULL, NULL, 'cat_arc_class_cat_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('cat_arc_class_type', 'Catalog', 'Types of classification', 'role_admin', 3, '2', NULL, NULL, NULL, 'cat_arc_class_type_id_seq', 'id');
