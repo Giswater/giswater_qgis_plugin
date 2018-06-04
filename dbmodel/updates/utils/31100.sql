@@ -155,3 +155,8 @@ INSERT INTO audit_cat_param_user VALUES ('edit_connect_force_automatic_connect2n
 INSERT INTO config_param_user VALUES (110, 'edit_connect_force_downgrade_linkvnode', 'TRUE', 'postgres');
 INSERT INTO config_param_user VALUES (111, 'edit_connect_force_automatic_connect2network', 'TRUE', 'postgres');
 
+----------------------
+--04/06/2018
+-----------------------
+INSERT INTO audit_cat_param_user VALUES ('cf_keep_opened_edition', null, null, 'role_edit');
+
