@@ -39,8 +39,8 @@ ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m3fill_cost_fkey";
 ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m3excess_cost_fkey";
 ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m2trenchl_cost_fkey";
 
-ALTER TABLE "cat_work" DROP CONSTRAINT IF EXISTS "cat_work_workid_key1_fkey";
-ALTER TABLE "cat_work" DROP CONSTRAINT IF EXISTS "cat_work_workid_key2_fkey";
+--ALTER TABLE "cat_work" DROP CONSTRAINT IF EXISTS "cat_work_workid_key1_fkey";
+--ALTER TABLE "cat_work" DROP CONSTRAINT IF EXISTS "cat_work_workid_key2_fkey";
 
 ALTER TABLE "cat_pavement" DROP CONSTRAINT IF EXISTS "cat_pavement_m2_cost_fkey";
 
@@ -83,7 +83,7 @@ ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_username_fkey";
 ALTER TABLE "exploitation_x_user" DROP CONSTRAINT IF EXISTS "exploitation_x_user_expl_username_unique";
 
-ALTER TABLE "selector_expl" DROP CONSTRAINT IF EXISTS "selector_expl_username_id_fkey" ;
+--ALTER TABLE "selector_expl" DROP CONSTRAINT IF EXISTS "selector_expl_username_id_fkey" ;
 
 
 --ELEMENT
@@ -96,10 +96,10 @@ ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_ownercat_id_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_verified_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_feature_type_fkey";
 ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_state_type_fkey";
-ALTER TABLE "element" DROP CONSTRAINT IF EXISTS  element_function_type_feature_type_fkey;
-ALTER TABLE "element" DROP CONSTRAINT IF EXISTS  element_category_type_feature_type_fkey;
-ALTER TABLE "element" DROP CONSTRAINT IF EXISTS  element_fluid_type_feature_type_fkey;
-ALTER TABLE "element" DROP CONSTRAINT IF EXISTS  element_location_type_feature_type_fkey;
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_function_type_feature_type_fkey";
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_category_type_feature_type_fkey";
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_fluid_type_feature_type_fkey";
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS "element_location_type_feature_type_fkey";
 
 ALTER TABLE "element_x_arc" DROP CONSTRAINT IF EXISTS "element_x_arc_element_id_fkey";
 ALTER TABLE "element_x_arc" DROP CONSTRAINT IF EXISTS "element_x_arc_arc_id_fkey";

@@ -43,11 +43,9 @@ ALTER TABLE "om_psector_selector" DROP CONSTRAINT IF EXISTS "om_psector_selector
 
 ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_arc_id_fkey";
 ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_psector_id_fkey";
-ALTER TABLE "om_psector_x_arc" DROP CONSTRAINT IF EXISTS "om_psector_x_arc_state_fkey";
 
 ALTER TABLE "om_psector_x_node" DROP CONSTRAINT IF EXISTS "om_psector_x_node_node_id_fkey";
 ALTER TABLE "om_psector_x_node" DROP CONSTRAINT IF EXISTS "om_psector_x_node_psector_id_fkey";
-ALTER TABLE "om_psector_x_node" DROP CONSTRAINT IF EXISTS "om_psector_x_node_state_fkey";
 
 ALTER TABLE "om_psector_x_other" DROP CONSTRAINT IF EXISTS "om_psector_x_other_price_id_fkey";
 ALTER TABLE "om_psector_x_other" DROP CONSTRAINT IF EXISTS "om_psector_x_other_psector_id_fkey";
