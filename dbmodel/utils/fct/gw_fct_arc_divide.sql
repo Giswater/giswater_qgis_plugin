@@ -104,6 +104,9 @@ BEGIN
 			UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
 			INSERT INTO v_edit_arc SELECT rec_aux1.*;
 			INSERT INTO v_edit_arc SELECT rec_aux2.*;
+			-- force trg topocontrol to prevent conflicts
+			update arc set the_geom=the_geom where arc_id=rec_aux1.arc_id;
+			update arc set the_geom=the_geom where arc_id=rec_aux2.arc_id;
 			-- restore the state_topocontrol variable
 			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
 	
@@ -184,6 +187,9 @@ BEGIN
 			UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
 			INSERT INTO v_edit_arc SELECT rec_aux1.*;
 			INSERT INTO v_edit_arc SELECT rec_aux2.*;
+			-- force trg topocontrol to prevent conflicts
+			update arc set the_geom=the_geom where arc_id=rec_aux1.arc_id;
+			update arc set the_geom=the_geom where arc_id=rec_aux2.arc_id;
 			-- restore the state_topocontrol variable
 			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
 	
