@@ -42,7 +42,7 @@ class ManGullyDialog(ParentDialog):
 
         self.geom_type = "gully"      
         self.field_id = "gully_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ud_man_gully', dialog) 
@@ -55,7 +55,7 @@ class ManGullyDialog(ParentDialog):
               
         # Define class variables
         self.filter = self.field_id + " = '" + str(self.id) + "'"
-        self.gratecat_id = utils_giswater.getWidgetText("gratecat_id", False) 
+        self.gratecat_id = utils_giswater.getWidgetText(self.dialog, "gratecat_id", False)
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -89,11 +89,11 @@ class ManGullyDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'gully_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
             self.load_default()
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
 
 
     def tab_activation(self):

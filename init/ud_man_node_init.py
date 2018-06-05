@@ -49,7 +49,7 @@ class ManNodeDialog(ParentDialog):
         self.feature = feature
         self.geom_type = "node"
         self.field_id = "node_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ud_man_node', dialog) 
@@ -153,12 +153,12 @@ class ManNodeDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'node_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("nodecat_id", "nodecat_vdefault")
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
 
 
     def open_up_down_stream(self, qtable):

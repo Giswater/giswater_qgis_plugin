@@ -36,7 +36,7 @@ class ManArcDialog(ParentDialog):
         
         self.geom_type = "arc"        
         self.field_id = "arc_id"
-        self.id = utils_giswater.getWidgetText(self.field_id, False)        
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ws_man_arc', dialog)
@@ -49,8 +49,8 @@ class ManArcDialog(ParentDialog):
 
         # Define class variables
         self.filter = self.field_id+" = '"+str(self.id)+"'"
-        self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)
-        self.connecat_id = utils_giswater.getWidgetText("arccat_id", False)
+        self.connec_type = utils_giswater.getWidgetText(self.dialog, "cat_arctype_id", False)
+        self.connecat_id = utils_giswater.getWidgetText(self.dialog, "arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
         
         # Get widget controls
@@ -89,7 +89,7 @@ class ManArcDialog(ParentDialog):
         self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")   
 
         # Manage 'image'
-        self.set_image("label_image_ws_shape")
+        self.set_image(self.dialog, "label_image_ws_shape")
         
         # Check if exist URL from field 'link' in main tab
         self.check_link(self.dialog)
@@ -111,16 +111,16 @@ class ManArcDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'arc_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
             self.load_default()
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("arccat_id", cat_id)
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
-        self.load_pressure_zone(presszonecat_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
+        self.load_pressure_zone(self.dialog, presszonecat_id, self.geom_type)
 
 
     def get_nodes(self):
@@ -255,8 +255,8 @@ class ManArcDialog(ParentDialog):
         self.set_configuration(self.tbl_event, table_event_arc)
 
 
-    def set_image(self, widget):
-        utils_giswater.setImage(widget, "ws_shape.png")
+    def set_image(self, dialog, widget):
+        utils_giswater.setImage(dialog, widget, "ws_shape.png")
     
 
     def fill_tab_cost(self):

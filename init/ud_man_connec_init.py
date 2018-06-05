@@ -44,7 +44,7 @@ class ManConnecDialog(ParentDialog):
         self.feature = feature
         self.geom_type = "connec"         
         self.field_id = "connec_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManConnecDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ud_man_connec', dialog) 
@@ -97,12 +97,12 @@ class ManConnecDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'connec_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
             self.load_default()
             self.load_type_default("connecat_id", "connecat_vdefault")
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
 
 
     def tab_activation(self):

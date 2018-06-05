@@ -46,7 +46,7 @@ class ManConnecDialog(ParentDialog):
         self.feature = feature
         self.geom_type = "connec"
         self.field_id = "connec_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
         self.controller.manage_translation('ws_man_connec', dialog)
@@ -81,7 +81,7 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
 
         open_link = self.dialog.findChild(QPushButton, "open_link")
-        utils_giswater.setWidgetEnabled("open_link", False)
+        utils_giswater.setWidgetEnabled(self.dialog, "open_link", False)
         open_link.clicked.connect(self.open_url)
         
         feature = self.feature
@@ -106,16 +106,16 @@ class ManConnecDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'connec_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
             self.load_default()
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
             self.load_type_default("connecat_id", cat_id)
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
-        self.load_pressure_zone(presszonecat_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
+        self.load_pressure_zone(self.dialog ,presszonecat_id, self.geom_type)
 
 
     def check_url(self):
