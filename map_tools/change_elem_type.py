@@ -35,7 +35,7 @@ class ChangeElemType(ParentMapTool):
     def open_catalog_form(self, wsoftware, geom_type):
         """ Set dialog depending water software """
 
-        node_type = utils_giswater.getWidgetText("node_node_type_new")
+        node_type = utils_giswater.getWidgetText(self.dlg_chg_node_type, "node_node_type_new")
         if node_type == 'null':
             message = "Select a Custom node Type"
             self.controller.show_warning(message)
@@ -49,7 +49,7 @@ class ChangeElemType(ParentMapTool):
             self.dlg_cat = UDcatalog()
             self.field2 = 'shape'
             self.field3 = 'geom1'
-        utils_giswater.setDialog(self.dlg_cat)
+        #utils_giswater.setDialog(self.dlg_cat)
         self.load_settings(self.dlg_cat)
 
         self.node_type_text = None
@@ -62,7 +62,7 @@ class ChangeElemType(ParentMapTool):
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.matcat_id, rows)
 
         sql = ("SELECT DISTINCT(" + self.field2 + ")"
                " FROM " + self.schema_name + ".cat_" + geom_type)
@@ -70,7 +70,7 @@ class ChangeElemType(ParentMapTool):
             sql += " WHERE " + geom_type + "type_id = '" + self.node_type_text + "'"
         sql += " ORDER BY " + self.field2
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)                     
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter2, rows)
 
         self.fill_filter3(wsoftware, geom_type)
 
@@ -90,7 +90,7 @@ class ChangeElemType(ParentMapTool):
     def fill_filter2(self, wsoftware, geom_type):
 
         # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+        mats = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.matcat_id)
 
         # Set SQL query
         sql_where = ""
@@ -111,15 +111,15 @@ class ChangeElemType(ParentMapTool):
         sql += sql_where + " ORDER BY " + self.field2
 
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter2, rows)
         self.fill_filter3(wsoftware, geom_type)
 
 
     def fill_filter3(self, wsoftware, geom_type):
 
         # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
+        mats = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.matcat_id)
+        filter2 = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.filter2)
 
         # Set SQL query
         sql_where = ""
@@ -155,7 +155,7 @@ class ChangeElemType(ParentMapTool):
             sql += sql_where + " ORDER BY " + self.field3
 
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter3, rows)
         
         self.fill_catalog_id(wsoftware, geom_type)        
 
@@ -163,9 +163,9 @@ class ChangeElemType(ParentMapTool):
     def fill_catalog_id(self, wsoftware, geom_type):
 
         # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
-        filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)
-        filter3 = utils_giswater.getWidgetText(self.dlg_cat.filter3)
+        mats = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.matcat_id)
+        filter2 = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.filter2)
+        filter3 = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.filter3)
 
         # Set SQL query
         sql_where = ""
@@ -195,16 +195,16 @@ class ChangeElemType(ParentMapTool):
         sql += sql_where + " ORDER BY id"
 
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.id, rows)
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.id, rows)
 
 
     def fill_geomcat_id(self):
         
-        catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
+        catalog_id = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.id)
         self.close_dialog(self.dlg_cat)
-        utils_giswater.setDialog(self.dlg)
-        utils_giswater.setWidgetEnabled(self.dlg.node_nodecat_id, True)
-        utils_giswater.setWidgetText(self.dlg.node_nodecat_id, catalog_id)        
+        #utils_giswater.setDialog(self.dlg_chg_node_type)
+        utils_giswater.setWidgetEnabled(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id, True)
+        utils_giswater.setWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id, catalog_id)
           
      
     def edit_change_elem_type_get_value(self, index):
@@ -214,28 +214,28 @@ class ChangeElemType(ParentMapTool):
             return
         
         # Get selected value from 2nd combobox
-        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
+        node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, "node_node_type_new")
         
         # When value is selected, enabled 3rd combo box
         if node_node_type_new != 'null':
             project_type = self.controller.get_project_type()             
             if project_type == 'ws':
                 # Fill 3rd combo_box-catalog_id
-                utils_giswater.setWidgetEnabled(self.dlg.node_nodecat_id, True)
+                utils_giswater.setWidgetEnabled(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id, True)
                 sql = ("SELECT DISTINCT(id)"
                        " FROM " + self.schema_name + ".cat_node"
                        " WHERE nodetype_id = '" + str(node_node_type_new) + "'")
                 rows = self.controller.get_rows(sql)
-                utils_giswater.fillComboBox(self.dlg.node_nodecat_id, rows)
+                utils_giswater.fillComboBox(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id, rows)
 
 
     def edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
         
         project_type = self.controller.get_project_type() 
-        old_node_type = utils_giswater.getWidgetText(self.dlg.node_node_type)
-        node_node_type_new = utils_giswater.getWidgetText(self.dlg.node_node_type_new)
-        node_nodecat_id = utils_giswater.getWidgetText(self.dlg.node_nodecat_id)
+        old_node_type = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type)
+        node_node_type_new = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        node_nodecat_id = utils_giswater.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
 
         if node_node_type_new != "null":
                     
@@ -290,7 +290,7 @@ class ChangeElemType(ParentMapTool):
 
 
         # Close form
-        self.close_dialog(self.dlg)
+        self.close_dialog(self.dlg_chg_node_type)
 
         # Refresh map canvas
         self.refresh_map_canvas()
@@ -314,9 +314,9 @@ class ChangeElemType(ParentMapTool):
     def change_elem_type(self, feature):
                         
         # Create the dialog, fill node_type and define its signals
-        self.dlg = ChangeNodeType()      
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)        
+        self.dlg_chg_node_type = ChangeNodeType()
+        #utils_giswater.setDialog(self.dlg_chg_node_type)
+        self.load_settings(self.dlg_chg_node_type)
 
         # Get nodetype_id from current node         
         project_type = self.controller.get_project_type()         
@@ -328,19 +328,19 @@ class ChangeElemType(ParentMapTool):
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox("node_nodecat_id", rows, allow_nulls=False)
  
-        self.dlg.node_node_type.setText(node_type)
-        self.dlg.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)        
-        self.dlg.btn_catalog.clicked.connect(partial(self.open_catalog_form, project_type, 'node'))
-        self.dlg.btn_accept.clicked.connect(self.edit_change_elem_type_accept)         
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+        self.dlg_chg_node_type.node_node_type.setText(node_type)
+        self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
+        self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog_form, project_type, 'node'))
+        self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
+        self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_chg_node_type))
         
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("node_node_type_new", rows)
+        utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
-        self.open_dialog(self.dlg, dlg_name='change_node_type', maximize_button=False)             
+        self.open_dialog(self.dlg_chg_node_type, dlg_name='change_node_type', maximize_button=False)
 
 
     def close_dialog(self, dlg=None):
@@ -357,7 +357,7 @@ class ChangeElemType(ParentMapTool):
                 self.set_action_pan()
         except AttributeError:
             pass
-        utils_giswater.setDialog(self.dlg)
+        #utils_giswater.setDialog(self.dlg)
                
             
     """ QgsMapTools inherited event functions """
