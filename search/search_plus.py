@@ -658,7 +658,7 @@ class SearchPlus(QObject):
             self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg_search.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
             self.hydro_create_list()
         else:
-            utils_giswater.remove_tab_by_tabName(self.dlg_search, self.dlg_search.tab_main, 'tab_hydro')
+            utils_giswater.remove_tab_by_tabName(self.dlg_search.tab_main, 'tab_hydro')
 
         # Tab 'Network'
         self.network_code_create_lists()

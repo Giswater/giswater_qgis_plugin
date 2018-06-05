@@ -21,18 +21,18 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManGullyDialog(dialog, layer, feature)
-    init_config()
+    init_config(dialog)
 
     
-def init_config():
+def init_config(dialog):
      
     # Manage 'gratecat_id'
-    gratecat_id = utils_giswater.getWidgetText("gratecat_id") 
-    utils_giswater.setSelectedItem("gratecat_id", gratecat_id) 
+    gratecat_id = utils_giswater.getWidgetText(dialog, "gratecat_id")
+    utils_giswater.setSelectedItem(dialog, "gratecat_id", gratecat_id)
 
     # Manage 'arccat_id'
-    arccat_id = utils_giswater.getWidgetText("arccat_id") 
-    utils_giswater.setSelectedItem("arccat_id", arccat_id)    
+    arccat_id = utils_giswater.getWidgetText(dialog, "arccat_id")
+    utils_giswater.setSelectedItem(dialog, "arccat_id", arccat_id)
     
      
 class ManGullyDialog(ParentDialog):
@@ -151,7 +151,7 @@ class ManGullyDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         gully_type = self.dialog.findChild(QComboBox, "gully_type")
-        cat_feature_id = utils_giswater.getWidgetText(gully_type)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, gully_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter='gully_type', duration=10)

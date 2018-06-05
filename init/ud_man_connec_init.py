@@ -21,18 +21,18 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManConnecDialog(dialog, layer, feature)
-    init_config()
+    init_config(dialog)
 
     
-def init_config():
+def init_config(dialog):
 
     # Manage 'connec_type'
-    connec_type = utils_giswater.getWidgetText("connec_type") 
-    utils_giswater.setSelectedItem("connec_type", connec_type)
+    connec_type = utils_giswater.getWidgetText(dialog, "connec_type")
+    utils_giswater.setSelectedItem(dialog, "connec_type", connec_type)
      
     # Manage 'connecat_id'
-    connecat_id = utils_giswater.getWidgetText("connecat_id") 
-    utils_giswater.setSelectedItem("connecat_id", connecat_id)   
+    connecat_id = utils_giswater.getWidgetText(dialog, "connecat_id")
+    utils_giswater.setSelectedItem(dialog, "connecat_id", connecat_id)
 
      
 class ManConnecDialog(ParentDialog):
@@ -178,7 +178,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         connec_type = self.dialog.findChild(QComboBox, "connec_type")
-        cat_feature_id = utils_giswater.getWidgetText(connec_type)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, connec_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter="'connec_type'", duration=10)

@@ -26,18 +26,18 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManNodeDialog(dialog, layer, feature)
-    init_config()
+    init_config(dialog)
 
     
-def init_config():
+def init_config(dialog):
 
     # Manage 'node_type'
-    node_type = utils_giswater.getWidgetText("node_type") 
-    utils_giswater.setSelectedItem("node_type", node_type)
+    node_type = utils_giswater.getWidgetText(dialog, "node_type")
+    utils_giswater.setSelectedItem(dialog, "node_type", node_type)
      
     # Manage 'nodecat_id'
-    nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
-    utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
+    nodecat_id = utils_giswater.getWidgetText(dialog, "nodecat_id")
+    utils_giswater.setSelectedItem(dialog, "nodecat_id", nodecat_id)
     
      
 class ManNodeDialog(ParentDialog):
@@ -364,7 +364,7 @@ class ManNodeDialog(ParentDialog):
                " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("hemisphere" , str(row[0]))
+            utils_giswater.setWidgetText(self.dialog, "hemisphere" , str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             self.controller.show_info(message, parameter=str(row[0]))
    
@@ -478,7 +478,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         node_type = self.dialog.findChild(QComboBox, "node_type")
-        cat_feature_id = utils_giswater.getWidgetText(node_type)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, node_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter='node_type', duration=10)

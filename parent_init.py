@@ -635,7 +635,7 @@ class ParentDialog(QDialog):
     def set_configuration(self, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """
         
-        widget = utils_giswater.getWidget(widget)
+        widget = utils_giswater.getWidget(self.dialog, widget)
         if not widget:
             return
 
