@@ -625,7 +625,7 @@ class ParentDialog(QDialog):
         
         # Get selected values in Comboboxes        
         doc_type_value = utils_giswater.getWidgetText("doc_type")
-        if doc_type_value != 'null': 
+        if doc_type_value != 'null':
             expr+= " AND doc_type = '"+doc_type_value+"'"
   
         # Refresh model with selected filter
@@ -1418,25 +1418,25 @@ class ParentDialog(QDialog):
 
         # Set dialog depending water software
         if wsoftware == 'ws':
-            self.dlg_cat = CFWScatalog()
+            self.dlg_cf_cat = CFWScatalog()
             self.field2 = 'pnom'
             self.field3 = 'dnom'
         elif wsoftware == 'ud':
-            self.dlg_cat = CFUDcatalog()
+            self.dlg_cf_cat = CFUDcatalog()
             self.field2 = 'shape'
             self.field3 = 'geom1'
         self.cf_prev_dialog = prev_dialog
-        utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()
-        self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.clicked.connect(partial(self.cancel))
-        self.dlg_cat.rejected.connect(partial(self.cancel))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
-        self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+        utils_giswater.setDialog(self.dlg_cf_cat)
+        self.dlg_cf_cat.open()
+        self.dlg_cf_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
+        self.dlg_cf_cat.btn_cancel.clicked.connect(partial(self.cancel))
+        self.dlg_cf_cat.rejected.connect(partial(self.cancel))
+        self.dlg_cf_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+        self.dlg_cf_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
+        self.dlg_cf_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
+        self.dlg_cf_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+        self.dlg_cf_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
+        self.dlg_cf_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
 
         self.node_type_text = None
         if wsoftware == 'ws' and geom_type == 'node':
@@ -1449,7 +1449,7 @@ class ParentDialog(QDialog):
             sql += " WHERE type = '" + str(self.sys_type) + "')"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
+        utils_giswater.fillComboBox(self.dlg_cf_cat.matcat_id, rows)
 
         sql = "SELECT DISTINCT(" + self.field2 + ")"
         sql += " FROM " + self.schema_name + ".cat_" + geom_type
@@ -1459,14 +1459,14 @@ class ParentDialog(QDialog):
             sql += " WHERE type = '" + str(self.sys_type) + "')"
         sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
+        utils_giswater.fillComboBox(self.dlg_cf_cat.filter2, rows)
 
         if wsoftware == 'ws':
             if geom_type == 'node':
                 sql = "SELECT "+self.field3
                 sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
-                sql += " FROM "+self.schema_name+".cat_"+geom_type+" WHERE "+self.field2 + " LIKE '%"+self.dlg_cat.filter2.currentText()+"%' "
-                sql += " AND matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' AND "+geom_type+"type_id IN "
+                sql += " FROM "+self.schema_name+".cat_"+geom_type+" WHERE "+self.field2 + " LIKE '%"+self.dlg_cf_cat.filter2.currentText()+"%' "
+                sql += " AND matcat_id LIKE '%"+self.dlg_cf_cat.matcat_id.currentText()+"%' AND "+geom_type+"type_id IN "
                 sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
                 sql += " ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
@@ -1484,17 +1484,17 @@ class ParentDialog(QDialog):
                 sql = "SELECT DISTINCT("+self.field3+") "
                 sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY " + self.field3
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        utils_giswater.fillComboBox(self.dlg_cf_cat.filter3, rows)
         self.fill_catalog_id(wsoftware, geom_type)
 
     def cancel(self):
         utils_giswater.setDialog(self.cf_prev_dialog)
-        self.close_dialog(self.dlg_cat)
+        self.close_dialog(self.dlg_cf_cat)
 
     def fill_filter2(self, wsoftware, geom_type):
 
         # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+        mats = utils_giswater.getWidgetText(self.dlg_cf_cat.matcat_id)
 
         # Set SQL query
         sql_where = None
@@ -1519,7 +1519,7 @@ class ParentDialog(QDialog):
             sql += " ORDER BY " + str(self.field2)
 
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
+        utils_giswater.fillComboBox(self.dlg_cf_cat.filter2, rows)
         self.fill_filter3(wsoftware, geom_type)
 
 
@@ -1530,8 +1530,8 @@ class ParentDialog(QDialog):
                 sql = "SELECT "+self.field3
                 sql += " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
                 sql += " FROM "+self.schema_name+".cat_"+geom_type
-                sql += " WHERE ("+self.field2 + " LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
-                sql += " AND (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' OR matcat_id is null)"
+                sql += " WHERE ("+self.field2 + " LIKE '%"+self.dlg_cf_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
+                sql += " AND (matcat_id LIKE '%"+self.dlg_cf_cat.matcat_id.currentText()+"%' OR matcat_id is null)"
                 sql += " AND "+geom_type+"type_id IN "
                 sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
                 sql += " ORDER BY x) AS "+self.field3
@@ -1541,8 +1541,8 @@ class ParentDialog(QDialog):
                 sql += " FROM "+self.schema_name+".cat_"+geom_type
                 sql += " WHERE "+geom_type+"type_id IN "
                 sql += "(SELECT id FROM "+self.schema_name+"."+geom_type+"_type WHERE type LIKE '%" + str(self.sys_type) + "%')"
-                sql += " AND (" + self.field2 + " LIKE '%" + self.dlg_cat.filter2.currentText() + "%' OR " + self.field2 + " is null) "
-                sql += " AND (matcat_id LIKE '%" + self.dlg_cat.matcat_id.currentText() + "%' OR matcat_id is null)"
+                sql += " AND (" + self.field2 + " LIKE '%" + self.dlg_cf_cat.filter2.currentText() + "%' OR " + self.field2 + " is null) "
+                sql += " AND (matcat_id LIKE '%" + self.dlg_cf_cat.matcat_id.currentText() + "%' OR matcat_id is null)"
                 sql += " ORDER BY x) AS "+self.field3
             elif geom_type == 'connec':
                 sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) AS "+self.field3
@@ -1550,12 +1550,12 @@ class ParentDialog(QDialog):
         else:
             if geom_type == 'node' or geom_type == 'arc':
                 sql = "SELECT DISTINCT("+self.field3+") FROM "+self.schema_name+".cat_"+geom_type
-                sql += " WHERE (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' OR matcat_id is null) "
-                sql += " AND ("+self.field2+" LIKE '%"+self.dlg_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
+                sql += " WHERE (matcat_id LIKE '%"+self.dlg_cf_cat.matcat_id.currentText()+"%' OR matcat_id is null) "
+                sql += " AND ("+self.field2+" LIKE '%"+self.dlg_cf_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
                 sql += " ORDER BY "+self.field3
 
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        utils_giswater.fillComboBox(self.dlg_cf_cat.filter3, rows)
         self.fill_catalog_id(wsoftware, geom_type)
 
 
@@ -1570,27 +1570,27 @@ class ParentDialog(QDialog):
                          " (SELECT DISTINCT (id) FROM " + self.schema_name + "." + geom_type + "_type"
                          " WHERE type = '" + str(self.sys_type) + "')")
 
-        if self.dlg_cat.matcat_id.currentText() != 'null':
+        if self.dlg_cf_cat.matcat_id.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
-            sql_where += " (matcat_id LIKE '%"+self.dlg_cat.matcat_id.currentText()+"%' or matcat_id is null)"
+            sql_where += " (matcat_id LIKE '%"+self.dlg_cf_cat.matcat_id.currentText()+"%' or matcat_id is null)"
             
-        if self.dlg_cat.filter2.currentText() != 'null':
+        if self.dlg_cf_cat.filter2.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
-            sql_where += ("(" + self.field2 + " LIKE '%" + self.dlg_cat.filter2.currentText() + ""
+            sql_where += ("(" + self.field2 + " LIKE '%" + self.dlg_cf_cat.filter2.currentText() + ""
                           "%' OR " + self.field2 + " is null)")
             
-        if self.dlg_cat.filter3.currentText() != 'null':
+        if self.dlg_cf_cat.filter3.currentText() != 'null':
             if sql_where is None:
                 sql_where = " WHERE "
             else:
                 sql_where += " AND "
-            sql_where += ("(" + self.field3 + "::text LIKE '%" + self.dlg_cat.filter3.currentText() + ""
+            sql_where += ("(" + self.field3 + "::text LIKE '%" + self.dlg_cf_cat.filter3.currentText() + ""
                           "%' OR " + self.field3 + " is null)")
             
         if sql_where is not None:
@@ -1599,13 +1599,13 @@ class ParentDialog(QDialog):
             sql += " ORDER BY id"
             
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.id, rows)
+        utils_giswater.fillComboBox(self.dlg_cf_cat.id, rows)
 
 
     def fill_geomcat_id(self, geom_type):
         
-        catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
-        self.close_dialog(self.dlg_cat)
+        catalog_id = utils_giswater.getWidgetText(self.dlg_cf_cat.id)
+        self.close_dialog(self.dlg_cf_cat)
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)
         elif geom_type == 'arc':
@@ -2437,7 +2437,6 @@ class ParentDialog(QDialog):
                     sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        self.controller.log_info(str(self.dlg_previous_cf))
                         cmb_workcat_id = self.dlg_previous_cf.findChild(QComboBox, "workcat_id")
                         self.wm_new_workcat.fillComboBox(cmb_workcat_id, rows)
                         cmb_workcat_id.setCurrentIndex(cmb_workcat_id.findText(str(cat_work_id)))
@@ -2471,8 +2470,8 @@ class ParentDialog(QDialog):
         self.completer.setModel(model)
 
     def cancel(self):
-        utils_giswater.setDialog(self.dlg_nodereplace)
-        self.close_dialog(self.dlg_cat)
+        utils_giswater.setDialog(self.cf_prev_dialog)
+        self.close_dialog(self.dlg_cf_cat)
 
     def cf_open_dialog(self, dlg=None, dlg_name=None, maximize_button=True, stay_on_top=True):
         """ Open dialog """
