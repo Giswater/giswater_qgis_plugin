@@ -135,13 +135,13 @@ class Go2Epa(ParentAction):
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
         dlg_psector_sel.setWindowTitle("Selector")
         if tableleft == 'sector':
-            utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Sector name', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected sectors', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel.lbl_selected, self.controller.tr('Selected sectors', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Sector name', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected sectors', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected, self.controller.tr('Selected sectors', context_name='labels'))
         if tableleft == 'cat_dscenario':
-            utils_giswater.setWidgetText(dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Dscenario name', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected dscenarios', context_name='labels'))
-            utils_giswater.setWidgetText(dlg_psector_sel.lbl_selected, self.controller.tr('Selected dscenarios', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Dscenario name', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected dscenarios', context_name='labels'))
+            utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected, self.controller.tr('Selected dscenarios', context_name='labels'))
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
         dlg_psector_sel.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_psector_sel.exec_()
@@ -175,42 +175,42 @@ class Go2Epa(ParentAction):
         # Set values from widgets of type QComboBox
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.units, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.units, rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.headloss, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.headloss, rows, False)
         sql = "SELECT pattern_id FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.pattern, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.pattern, rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.unbalanced, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.unbalanced, rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.hydraulics, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.hydraulics, rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.quality, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.quality, rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_valvemode ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.valve_mode, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".anl_mincut_result_cat ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.valve_mode_mincut_result, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.valve_mode_mincut_result, rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".ext_cat_period ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.rtc_period_id, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.rtc_period_id, rows, False)
 
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions.rtc_coefficient, rows, False)
+        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.rtc_coefficient, rows, False)
 
         # TODO
         if self.dlg_wsoptions.valve_mode.currentText() == "MINCUT RESULTS":
@@ -227,18 +227,18 @@ class Go2Epa(ParentAction):
         else:
             self.dlg_wsoptions.node_id.setEnabled(True)
 
-        if utils_giswater.isChecked(self.dlg_wsoptions.chk_enabled):
+        if utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.chk_enabled):
             self.dlg_wsoptions.rtc_period_id.setEnabled(True)
             self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
             
         self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions.unbalanced, self.dlg_wsoptions.unbalanced_n, "STOP"))
+            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.unbalanced, self.dlg_wsoptions.unbalanced_n, "STOP"))
         self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions.hydraulics, self.dlg_wsoptions.hydraulics_fname, ""))
+            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.hydraulics, self.dlg_wsoptions.hydraulics_fname, ""))
         self.dlg_wsoptions.quality.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions.quality, self.dlg_wsoptions.node_id, "TRACE"))
+            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.quality, self.dlg_wsoptions.node_id, "TRACE"))
         self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, "MINCUT RESULTS"))
+            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, "MINCUT RESULTS"))
         self.dlg_wsoptions.chk_enabled.stateChanged.connect(self.enable_per_coef)
 
         self.dlg_wsoptions.btn_accept.clicked.connect(
@@ -268,16 +268,16 @@ class Go2Epa(ParentAction):
 
     def enable_per_coef(self):
         """ Enable or dissable cbx """
-        self.dlg_wsoptions.rtc_period_id.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions.chk_enabled))
-        self.dlg_wsoptions.rtc_coefficient.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions.chk_enabled))
+        self.dlg_wsoptions.rtc_period_id.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.chk_enabled))
+        self.dlg_wsoptions.rtc_coefficient.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.chk_enabled))
 
 
-    def enable_linetext(self, widget1, widget2, text):
+    def enable_linetext(self, dialog, widget1, widget2, text):
         """ Enable or disable txt """
-        if utils_giswater.getWidgetText(widget1) == text:
-            utils_giswater.setWidgetEnabled(widget2, False)
+        if utils_giswater.getWidgetText(dialog, widget1) == text:
+            utils_giswater.setWidgetEnabled(dialog, widget2, False)
         else:
-            utils_giswater.setWidgetEnabled(widget2, True)
+            utils_giswater.setWidgetEnabled(dialog, widget2, True)
 
 
     def ud_options(self):
@@ -285,7 +285,6 @@ class Go2Epa(ParentAction):
         
         # Create dialog
         dlg_udoptions = UDoptions()
-        # utils_giswater.setDialog(dlg_udoptions)
         self.load_settings(dlg_udoptions)
 
         dlg_udoptions.min_slope.setValidator(QDoubleValidator())
@@ -300,31 +299,31 @@ class Go2Epa(ParentAction):
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fu ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions.flow_units, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.flow_units, rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fr ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions.flow_routing, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.flow_routing, rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_lo ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions.link_offsets, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.link_offsets, rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fme ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions.force_main_equation, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.force_main_equation, rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_nfl ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions.normal_flow_limited, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.normal_flow_limited, rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_id ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions.inertial_damping, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.inertial_damping, rows, False)
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_yesno ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions.allow_ponding, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions.skip_steady_state, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions.ignore_rainfall, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions.ignore_snowmelt, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions.ignore_groundwater, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions.ignore_routing, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions.ignore_quality, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.allow_ponding, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.skip_steady_state, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_rainfall, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_snowmelt, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_groundwater, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_routing, rows, False)
+        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_quality, rows, False)
         dlg_udoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', dlg_udoptions))
         dlg_udoptions.btn_cancel.clicked.connect(dlg_udoptions.close)
         self.go2epa_options_get_data('inp_options', dlg_udoptions)
@@ -336,7 +335,6 @@ class Go2Epa(ParentAction):
         """ Dialog ud_times.ui """
 
         dlg_udtimes = UDtimes()
-        # utils_giswater.setDialog(dlg_udtimes)
         self.load_settings(dlg_udtimes)
         dlg_udtimes.dry_days.setValidator(QIntValidator())
         dlg_udtimes.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', dlg_udtimes))
@@ -385,13 +383,11 @@ class Go2Epa(ParentAction):
         row = self.controller.get_row(sql)
         if row:
             sql = ("UPDATE " + self.schema_name + ".inp_selector_hydrology "
-                   " SET hydrology_id = "+str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+""
+                   " SET hydrology_id = "+str(utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1))+""
                    " WHERE cur_user = current_user")
-            self.controller.log_info(str("test111"))
-            self.controller.log_info(str(sql))
         else:
             sql = ("INSERT INTO " + self.schema_name + ".inp_selector_hydrology (hydrology_id, cur_user)"
-                   " VALUES('" +str(utils_giswater.get_item_data(self.dlg_hydrology_selector.hydrology, 1))+"', current_user)")
+                   " VALUES('" +str(utils_giswater.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1))+"', current_user)")
         self.controller.execute_sql(sql)
         message = "Values has been update"
         self.controller.show_info(message)
@@ -439,16 +435,16 @@ class Go2Epa(ParentAction):
             for column_name in columns:
                 if column_name != 'id':
                     widget = dialog.findChild(QWidget, column_name)
-                    widget_type = utils_giswater.getWidgetType(widget)
+                    widget_type = utils_giswater.getWidgetType(dialog, widget)
                     if widget_type is QCheckBox:
-                        value = utils_giswater.isChecked(widget)
+                        value = utils_giswater.isChecked(dialog, widget)
                     elif widget_type is QDateEdit:
                         date = dialog.findChild(QDateEdit, str(column_name))
                         value = date.dateTime().toString('dd/MM/yyyy')
                     elif widget_type is QTimeEdit:
                         aux = 0
                         widget_day = str(column_name) + "_day"
-                        day = utils_giswater.getText(widget)
+                        day = utils_giswater.getText(dialog, widget)
                         if day != "null":
                             aux = int(day) * 24
                         time = dialog.findChild(QTimeEdit, str(column_name))
@@ -460,8 +456,7 @@ class Go2Epa(ParentAction):
                         x = dialog.findChild(QSpinBox, str(column_name))
                         value = x.value()
                     else:
-                        value = utils_giswater.getWidgetText(widget)
-                        self.controller.log_info(str(value))
+                        value = utils_giswater.getWidgetText(dialog, widget)
                     if value == 'null':
                         sql += column_name + " = null, "
                     elif value is None:
@@ -471,9 +466,6 @@ class Go2Epa(ParentAction):
                             value = value.replace(",", ".")
                         sql += column_name + " = '" + str(value) + "', "
             sql = sql[:len(sql) - 2]
-            self.controller.log_info(str("test222"))
-            self.controller.log_info(str(sql))
-                
         self.controller.execute_sql(sql)
         dialog.close()
 
@@ -732,14 +724,14 @@ class Go2Epa(ParentAction):
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
             widget = dialog.findChild(QWidget, column_name)
-            widget_type = utils_giswater.getWidgetType(widget)
+            widget_type = utils_giswater.getWidgetType(dialog, widget)
             if row[column_name] is not None:
                 if widget_type is QCheckBox:
-                    utils_giswater.setChecked(widget, row[column_name])
+                    utils_giswater.setChecked(dialog, widget, row[column_name])
                 elif widget_type is QDateEdit:
                     dateaux = row[column_name].replace('/', '-')
                     date = QDate.fromString(dateaux, 'dd-MM-yyyy')
-                    utils_giswater.setCalendarDate(widget, date)
+                    utils_giswater.setCalendarDate(dialog, widget, date)
 
                 elif widget_type is QTimeEdit:
                     timeparts = str(row[column_name]).split(':')
@@ -750,10 +742,10 @@ class Go2Epa(ParentAction):
                     minuts = int(timeparts[1])
                     seconds = int(timeparts[2])
                     time = QTime(hours, minuts, seconds)
-                    utils_giswater.setTimeEdit(widget, time)
-                    utils_giswater.setText(column_name + "_day", days)
+                    utils_giswater.setTimeEdit(dialog, widget, time)
+                    utils_giswater.setText(dialog, column_name + "_day", days)
                 else:
-                    utils_giswater.setWidgetText(widget, row[column_name])
+                    utils_giswater.setWidgetText(dialog, widget, row[column_name])
 
             columns.append(column_name)
             
