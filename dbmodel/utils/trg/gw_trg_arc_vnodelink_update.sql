@@ -34,24 +34,21 @@ BEGIN
 						
 		END LOOP;
 
-		--RAISE EXCEPTION 'array_agg %', array_connec_agg;
 		PERFORM gw_fct_connect_to_network(array_connec_agg, 'CONNEC');
 		
+		IF (select wsoftware FROM version LIMIT 1)='ud' THEN 
 
-		FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=NEW.arc_id
-		LOOP
-			array_gully_agg:= array_append(array_gully_agg, gully_id_aux);
-			UPDATE gully SET arc_id=NULL WHERE gully_id=gully_id_aux;
-						
-		END LOOP;
+			FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=NEW.arc_id
+			LOOP
+				array_gully_agg:= array_append(array_gully_agg, gully_id_aux);
+				UPDATE gully SET arc_id=NULL WHERE gully_id=gully_id_aux;
+			END LOOP;
 
-		--RAISE EXCEPTION 'array_agg %', array_gully_agg;
-		PERFORM gw_fct_connect_to_network(array_gully_agg, 'GULLY');
-	
+			PERFORM gw_fct_connect_to_network(array_gully_agg, 'GULLY');
+		
+		END IF;
 
-
-	RETURN NEW;
-
+		RETURN NEW;
 
     END IF;
     
@@ -59,5 +56,8 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_trg_arc_vnodelink_update()
-  OWNER TO postgres;
+
+  
+DROP TRIGGER IF EXISTS gw_trg_arc_vnodelink_update ON "SCHEMA_NAME".arc;
+CREATE TRIGGER gw_trg_arc_vnodelink_update AFTER UPDATE OF the_geom ON "SCHEMA_NAME".arc
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_vnodelink_update();

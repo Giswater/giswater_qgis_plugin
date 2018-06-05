@@ -11,17 +11,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
   
    
 -------------
--- ALTER TABLES
+--01/06/2018
 -------------
-ALTER TABLE cat_node ADD COLUMN label varchar(255);
-ALTER TABLE cat_arc ADD COLUMN label varchar(255);
-ALTER TABLE cat_connec ADD COLUMN label varchar(255);
 ALTER TABLE cat_grate ADD COLUMN label varchar(255);
 
-
-----------------------
---04/06/2018
------------------------
-INSERT INTO audit_cat_table VALUES ('v_edit_cad_auxcircle', 'CAD layer', 'Layer to store circle geometry when CAD tool is used', 'role_edit', 0, NULL, 'role_edit', 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_edit_cad_auxpoint', 'CAD layer', 'Layer to store point geometry when CAD tool is used', 'role_edit', 0, NULL, 'role_edit', 0, NULL, NULL, NULL); 
 
