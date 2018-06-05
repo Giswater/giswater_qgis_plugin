@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
+/*
 --DROP
 ALTER TABLE "anl_node" DROP CONSTRAINT IF EXISTS "anl_node_node_id_fkey";
 ALTER TABLE "anl_node" DROP CONSTRAINT IF EXISTS "anl_node_state_fkey";
@@ -49,3 +49,5 @@ ALTER TABLE "anl_arc_x_node" ADD CONSTRAINT "anl_arc_x_node_node_id_fkey" FOREIG
 ALTER TABLE "anl_arc_x_node" ADD CONSTRAINT "anl_arc_x_node_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_arc_x_node" ADD CONSTRAINT "anl_arc_x_node_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_arc_x_node" ADD CONSTRAINT "anl_arc_x_node_fprocesscat_id_fkey" FOREIGN KEY ("fprocesscat_id")  REFERENCES "sys_fprocess_cat" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+*/
