@@ -323,4 +323,31 @@ CREATE OR REPLACE VIEW "v_anl_mincut_result_audit" AS
      JOIN arc ON arc.arc_id::text = audit_log_data.feature_id::text
   WHERE audit_log_data.fprocesscat_id = 29 AND audit_log_data.user_name = "current_user"()::text
   ORDER BY audit_log_data.log_message;
+  
+  
+  
+-- ----------------------------
+-- MINCUT CONFLICT
+-- ----------------------------
+   
+CREATE VIEW v_anl_mincut_result_conflict_arc AS
+SELECT * FROM anl_arc WHERE fprocesscat_id=31 AND cur_user=current_user;
+
+CREATE VIEW v_anl_mincut_result_conflict_valve AS
+SELECT * FROM anl_node WHERE fprocesscat_id=31 AND cur_user=current_user;
+
+
+
+-- ----------------------------
+-- MINCUT FORECAST
+-- ----------------------------
+
+CREATE VIEW v_anl_mincut_planified_arc AS
+SELECT anl_mincut_result_arc.id, result_id, arc_id, forecast_start, forecast_end, the_geom FROM anl_mincut_result_arc
+JOIN anl_mincut_result_cat ON anl_mincut_result_cat.id=result_id WHERE mincut_state<2;
+
+CREATE VIEW v_anl_mincut_planified_valve AS
+SELECT anl_mincut_result_valve.id, result_id, node_id, closed, unaccess, proposed, forecast_start, forecast_end, the_geom FROM anl_mincut_result_valve
+JOIN anl_mincut_result_cat ON anl_mincut_result_cat.id=result_id WHERE mincut_state<2 and proposed=true
+
 

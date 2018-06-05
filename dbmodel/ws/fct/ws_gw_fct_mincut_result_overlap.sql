@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_result_overlap(integer, text);
 
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_overlap(
     result_id_arg integer,
     cur_user_var text)
@@ -122,14 +123,15 @@ BEGIN
 				JOIN anl_mincut_result_valve ON node_id=node_2 WHERE anl_mincut_result_arc.result_id=id_last AND proposed IS TRUE
 			);
 
+			-- Insert the conflict results on the anl tables to enable the posibility to analyze it
+			DELETE FROM anl_arc WHERE fprocesscat_id=31 and cur_user=current_user;
+			DELETE FROM anl_node WHERE fprocesscat_id=31 and cur_user=current_user;
 			
-			DELETE FROM anl_mincut_result_arc WHERE result_id=result_id_arg;
-			DELETE FROM anl_mincut_result_valve WHERE result_id=result_id_arg;
-			DELETE FROM anl_mincut_result_node WHERE result_id=result_id_arg;
-
-			UPDATE anl_mincut_result_arc SET result_id=result_id_arg WHERE result_id=id_last;
-			UPDATE anl_mincut_result_valve SET result_id=result_id_arg WHERE result_id=id_last;
-			UPDATE anl_mincut_result_node SET result_id=result_id_arg WHERE result_id=id_last;
+			INSERT INTO anl_arc (arc_id, arc_type, arc_id_aux, fprocesscat_id, cur_user, the_geom) SELECT arc_id, concat ('result_id:', result_id_arg), 
+						 concat ('{', conflict_id_text, '}'), 31, current_user, the_geom FROM anl_mincut_result_arc WHERE result_id=id_last;
+			INSERT INTO anl_node (node_id, nodecat_id, node_id_aux, nodecat_id_aux, fprocesscat_id, cur_user, the_geom) SELECT node_id, 
+						concat ('result_id:', result_id_arg), concat ('{', conflict_id_text, '}'), (CASE WHEN proposed=false THEN 'OPEN' ELSE 'CLOSED' END),
+						31, current_user, the_geom FROM anl_mincut_result_valve WHERE result_id=id_last;
 
 			conflict_text:=conflict_id_text;
 		ELSE 
@@ -147,3 +149,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+

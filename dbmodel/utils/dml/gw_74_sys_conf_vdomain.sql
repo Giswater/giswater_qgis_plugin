@@ -69,7 +69,6 @@ INSERT INTO config_param_system VALUES (7, 'scale_zoom', '500', 'integer', 'sear
 INSERT INTO config_param_system VALUES (24, 'portal_field_postal', 'postcode', 'varchar', 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (25, 'street_field_expl', 'muni_id', 'varchar', 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (5, 'expl_field_code', 'muni_id', 'varchar', 'searchplus', NULL);
-INSERT INTO config_param_system VALUES (28, 'mincut_conflict_map', 'FALSE', 'boolean', 'mincut', NULL);
 INSERT INTO config_param_system VALUES (26, 'module_om_rehabit', 'TRUE', 'boolean', 'om', NULL);
 INSERT INTO config_param_system VALUES (2, 'om_visit_absolute_path', 'c:/', 'varchar', 'path', NULL);
 INSERT INTO config_param_system VALUES (1, 'doc_absolute_path', NULL, 'varchar', 'path', NULL);

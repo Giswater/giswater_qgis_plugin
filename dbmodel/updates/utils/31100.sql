@@ -159,4 +159,12 @@ INSERT INTO config_param_user VALUES (111, 'edit_connect_force_automatic_connect
 --04/06/2018
 -----------------------
 INSERT INTO audit_cat_param_user VALUES ('cf_keep_opened_edition', null, null, 'role_edit');
+INSERT INTO config_param_user VALUES (112, 'cf_keep_opened_edition', 'TRUE', 'postgres');
+
+
+----------------------
+--05/06/2018
+-----------------------
+INSERT INTO sys_fprocess_cat VALUES (31, 'Mincut conlfict scenario result', 'OM', 'Mincut conlfict scenario result', 'ws');
+
 
