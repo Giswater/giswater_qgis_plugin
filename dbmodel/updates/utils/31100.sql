@@ -178,11 +178,6 @@ INSERT INTO sys_fprocess_cat VALUES (31, 'Mincut conlfict scenario result', 'OM'
 INSERT INTO audit_cat_param_user VALUES ('edit_noderotation_update_dissbl', null, null, 'role_edit');
 INSERT INTO config_param_user VALUES (113, 'edit_noderotation_update_dissbl', 'FALSE', 'postgres');
 
-INSERT INTO audit_cat_table VALUES ('doc_x_psector', 'doc', 'Doc psector', 'role_basic', 0, NULL, NULL, 0, NULL,'doc_x_psector_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('doc_x_psector', 'doc', 'Doc psector', 'role_basic', 0, NULL, NULL, 0, NULL,'doc_x_psector_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('doc_x_psector', 'doc', 'Doc psector', 'role_basic', 0, NULL, NULL, 0, NULL,'doc_x_psector_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('doc_x_psector', 'doc', 'Doc psector', 'role_basic', 0, NULL, NULL, 0, NULL,'doc_x_psector_id_seq', 'id');
-
 
 
 
