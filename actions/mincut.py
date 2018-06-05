@@ -1337,6 +1337,10 @@ class MincutParent(ParentAction, MultipleSelection):
                 node_exist = '0'
 
             if node_exist == '0':
+                layers_arc = self.controller.get_group_layers('arc')
+                self.layernames_arc = []
+                for layer in layers_arc:
+                    self.layernames_arc.append(layer.name())
                 for snap_point in result:
                     element_type = snap_point.layer.name()
                     if element_type in self.layernames_arc:
