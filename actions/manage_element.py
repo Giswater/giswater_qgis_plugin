@@ -27,15 +27,14 @@ class ManageElement(ParentManage):
         
         self.new_element_id = new_element_id
         # Create the dialog and signals
-        self.dlg = AddElement()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
+        self.dlg_add_element = AddElement()
+        self.load_settings(self.dlg_add_element)
         self.element_id = None        
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
         
-        self.set_selectionbehavior(self.dlg)
+        self.set_selectionbehavior(self.dlg_add_element)
         
         # Get layers of every geom_type
         self.reset_lists()
@@ -48,15 +47,15 @@ class ManageElement(ParentManage):
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
-            self.dlg.tab_feature.removeTab(3)   
+            self.dlg_add_element.tab_feature.removeTab(3)
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')            
                             
         # Set icons
-        self.set_icon(self.dlg.btn_add_geom, "133")
-        self.set_icon(self.dlg.btn_insert, "111")
-        self.set_icon(self.dlg.btn_delete, "112")
-        self.set_icon(self.dlg.btn_snapping, "137")
+        self.set_icon(self.dlg_add_element.btn_add_geom, "133")
+        self.set_icon(self.dlg_add_element.btn_insert, "111")
+        self.set_icon(self.dlg_add_element.btn_delete, "112")
+        self.set_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections
         self.remove_selection(True)        
@@ -65,108 +64,108 @@ class ManageElement(ParentManage):
         #self.controller.translate_form(self.dlg, 'element')
 
         # Fill combo boxes of the form and related events
-        self.dlg.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
+        self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
 
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".cat_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg, "element_type", rows, False)
-        self.populate_combo(self.dlg, "state", "value_state", "name")
-        self.populate_combo(self.dlg, "expl_id", "exploitation", "name")
+        utils_giswater.fillComboBox(self.dlg_add_element, "element_type", rows, False)
+        self.populate_combo(self.dlg_add_element, "state", "value_state", "name")
+        self.populate_combo(self.dlg_add_element, "expl_id", "exploitation", "name")
         sql = ("SELECT location_type"
                " FROM " + self.schema_name + ".man_type_location"
                " WHERE feature_type = 'ELEMENT' " 
                " ORDER BY location_type")
         rows = self.controller.get_rows(sql, commit=self.autocommit)
-        utils_giswater.fillComboBox(self.dlg, "location_type", rows)
+        utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)
         if rows:
-            utils_giswater.setCurrentIndex("location_type", 0)
-        self.populate_combo(self.dlg, "workcat_id", "cat_work")
-        self.populate_combo(self.dlg, "buildercat_id", "cat_builder")
-        self.populate_combo(self.dlg, "ownercat_id", "cat_owner")
-        self.populate_combo(self.dlg, "verified", "value_verified")
-        self.populate_combo(self.dlg, "workcat_id_end", "cat_work")
+            utils_giswater.setCurrentIndex(self.dlg_add_element, "location_type", 0)
+        self.populate_combo(self.dlg_add_element, "workcat_id", "cat_work")
+        self.populate_combo(self.dlg_add_element, "buildercat_id", "cat_builder")
+        self.populate_combo(self.dlg_add_element, "ownercat_id", "cat_owner")
+        self.populate_combo(self.dlg_add_element, "verified", "value_verified")
+        self.populate_combo(self.dlg_add_element, "workcat_id_end", "cat_work")
 
         # Set combo boxes
-        self.set_combo(self.dlg, 'elementcat_id', 'cat_element', 'elementcat_vdefault', field_id='id', field_name='id')
-        self.set_combo(self.dlg, 'state', 'value_state', 'state_vdefault', field_name='name')
-        self.set_combo(self.dlg, 'expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')
-        self.set_combo(self.dlg, 'workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
-        self.set_combo(self.dlg, 'verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
+        self.set_combo(self.dlg_add_element, 'elementcat_id', 'cat_element', 'elementcat_vdefault', field_id='id', field_name='id')
+        self.set_combo(self.dlg_add_element, 'state', 'value_state', 'state_vdefault', field_name='name')
+        self.set_combo(self.dlg_add_element, 'expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')
+        self.set_combo(self.dlg_add_element, 'workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
+        self.set_combo(self.dlg_add_element, 'verified', 'value_verified', 'verified_vdefault', field_id='id', field_name='id')
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
-        self.set_completer_object(self.dlg, table_object)
+        self.set_completer_object(self.dlg_add_element, table_object)
         
         # Set signals
-        self.dlg.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
-        self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg, table_object, cur_active_layer))
-        self.dlg.rejected.connect(partial(self.manage_close, self.dlg, table_object, cur_active_layer))
-        self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg, table_object))
-        self.dlg.element_id.textChanged.connect(partial(self.exist_object, self.dlg, table_object))
-        self.dlg.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg, table_object))
-        self.dlg.btn_delete.clicked.connect(partial(self.delete_records, self.dlg, table_object))
-        self.dlg.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg, table_object))
-        self.dlg.btn_add_geom.clicked.connect(self.add_point)
+        self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
+        self.dlg_add_element.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
+        self.dlg_add_element.rejected.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
+        self.dlg_add_element.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_element, table_object))
+        self.dlg_add_element.element_id.textChanged.connect(partial(self.exist_object, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_element, table_object))
+        self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
         
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "node"
         viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(self.dlg.feature_id, geom_type, viewname)
+        self.set_completer_feature_id(self.dlg_add_element.feature_id, geom_type, viewname)
         
         # Set default tab 'arc'
-        self.dlg.tab_feature.setCurrentIndex(0)
+        self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg, table_object)
+        self.tab_feature_changed(self.dlg_add_element, table_object)
 
         # If is a new element dont need set enddate
         if self.new_element_id is True:
             # Set calendars date from config_param_user
-            self.set_calendars('builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
-            utils_giswater.setWidgetText('num_elements', '1')
-            self.dlg.enddate.setEnabled(False)
+            self.set_calendars(self.dlg_add_element, 'builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
+            utils_giswater.setWidgetText(self.dlg_add_element, 'num_elements', '1')
+            self.dlg_add_element.enddate.setEnabled(False)
 
         # Open the dialog    
-        self.open_dialog(self.dlg, maximize_button=False) 
-        return self.dlg
+        self.open_dialog(self.dlg_add_element, maximize_button=False)
+        return self.dlg_add_element
     
  
     def manage_element_accept(self, table_object):
         """ Insert or update table 'element'. Add element to selected feature """
 
         # Get values from dialog
-        element_id = utils_giswater.getWidgetText("element_id", return_string_null=False)
-        elementcat_id = utils_giswater.getWidgetText("elementcat_id", return_string_null=False)
-        ownercat_id = utils_giswater.getWidgetText("ownercat_id", return_string_null=False)
-        location_type = utils_giswater.getWidgetText("location_type", return_string_null=False)
-        buildercat_id = utils_giswater.getWidgetText("buildercat_id", return_string_null=False)
-        workcat_id = utils_giswater.getWidgetText("workcat_id", return_string_null=False)
-        workcat_id_end = utils_giswater.getWidgetText("workcat_id_end", return_string_null=False)
-        comment = utils_giswater.getWidgetText("comment", return_string_null=False)
-        observ = utils_giswater.getWidgetText("observ", return_string_null=False)
-        link = utils_giswater.getWidgetText("link", return_string_null=False)
-        verified = utils_giswater.getWidgetText("verified", return_string_null=False)
-        rotation = utils_giswater.getWidgetText("rotation")
+        element_id = utils_giswater.getWidgetText(self.dlg_add_element, "element_id", return_string_null=False)
+        elementcat_id = utils_giswater.getWidgetText(self.dlg_add_element, "elementcat_id", return_string_null=False)
+        ownercat_id = utils_giswater.getWidgetText(self.dlg_add_element, "ownercat_id", return_string_null=False)
+        location_type = utils_giswater.getWidgetText(self.dlg_add_element, "location_type", return_string_null=False)
+        buildercat_id = utils_giswater.getWidgetText(self.dlg_add_element, "buildercat_id", return_string_null=False)
+        workcat_id = utils_giswater.getWidgetText(self.dlg_add_element, "workcat_id", return_string_null=False)
+        workcat_id_end = utils_giswater.getWidgetText(self.dlg_add_element, "workcat_id_end", return_string_null=False)
+        comment = utils_giswater.getWidgetText(self.dlg_add_element, "comment", return_string_null=False)
+        observ = utils_giswater.getWidgetText(self.dlg_add_element, "observ", return_string_null=False)
+        link = utils_giswater.getWidgetText(self.dlg_add_element, "link", return_string_null=False)
+        verified = utils_giswater.getWidgetText(self.dlg_add_element, "verified", return_string_null=False)
+        rotation = utils_giswater.getWidgetText(self.dlg_add_element, "rotation")
         if rotation == 0 or rotation is None or rotation == 'null':
             rotation = '0'
-        builtdate = self.dlg.builtdate.dateTime().toString('yyyy-MM-dd')
-        enddate = self.dlg.enddate.dateTime().toString('yyyy-MM-dd')
-        undelete = self.dlg.undelete.isChecked()
+        builtdate = self.dlg_add_element.builtdate.dateTime().toString('yyyy-MM-dd')
+        enddate = self.dlg_add_element.enddate.dateTime().toString('yyyy-MM-dd')
+        undelete = self.dlg_add_element.undelete.isChecked()
 
         # Check mandatory fields
         message = "You need to insert value for field"
         if elementcat_id == '':
             self.controller.show_warning(message, parameter="elementcat_id")
             return
-        num_elements = utils_giswater.getWidgetText("num_elements", return_string_null=False)
+        num_elements = utils_giswater.getWidgetText(self.dlg_add_element, "num_elements", return_string_null=False)
         if num_elements == '':
             self.controller.show_warning(message, parameter="num_elements")
             return
-        state_value = utils_giswater.getWidgetText('state', return_string_null=False)
+        state_value = utils_giswater.getWidgetText(self.dlg_add_element, 'state', return_string_null=False)
         if state_value == '':
             self.controller.show_warning(message, parameter="state_id")
             return            
-        expl_value = utils_giswater.getWidgetText('expl_id', return_string_null=False) 
+        expl_value = utils_giswater.getWidgetText(self.dlg_add_element, 'expl_id', return_string_null=False)
         if expl_value == '':
             self.controller.show_warning(message, parameter="expl_id")
             return  
@@ -317,7 +316,7 @@ class ManageElement(ParentManage):
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.element_id = element_id
-            self.manage_close(self.dlg, table_object)
+            self.manage_close(self.dlg_add_element, table_object)
             #TODO Reload table tbl_element
             filter_ = "node_id = '" + str(feature_id) + "'"
             table_element = "v_ui_element_x_node"
@@ -327,9 +326,9 @@ class ManageElement(ParentManage):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
         
         sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_element"
-               " WHERE elementtype_id = '" + utils_giswater.getWidgetText("element_type") + "'")
+               " WHERE elementtype_id = '" + utils_giswater.getWidgetText(self.dlg_add_element, "element_type") + "'")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("elementcat_id", rows, False)
+        utils_giswater.fillComboBox(self.dlg_add_element, "elementcat_id", rows, False)
 
 
     def edit_element(self):
@@ -337,7 +336,6 @@ class ManageElement(ParentManage):
         
         # Create the dialog
         self.dlg_man = ElementManagement()
-        #utils_giswater.setDialog(self.dlg_man)
         self.load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
                 

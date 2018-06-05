@@ -179,12 +179,12 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "verified", row['verified'])
             utils_giswater.setWidgetText(dialog, "rotation", row['rotation'])
             if str(row['undelete'])== 'True':
-                self.dlg.undelete.setChecked(True)
+                dialog.undelete.setChecked(True)
             builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
             enddate = QDate.fromString(str(row['enddate']), 'yyyy-MM-dd')
 
-            self.dlg.builtdate.setDate(builtdate)
-            self.dlg.enddate.setDate(enddate)
+            dialog.builtdate.setDate(builtdate)
+            dialog.enddate.setDate(enddate)
             
               
     def get_records_geom_type(self, dialog, table_object, geom_type):
@@ -301,7 +301,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, widget, row[0])
 
 
-    def set_calendars(self, widget, table_name, value, parameter):
+    def set_calendars(self, dialog, widget, table_name, value, parameter):
         """ Executes query and set QDateEdit """
         
         sql = ("SELECT " + value + " FROM " + self.schema_name + "." + table_name + ""
@@ -311,7 +311,7 @@ class ParentManage(ParentAction, object):
             date = QDate.fromString(row[0], 'yyyy-MM-dd')
         else:
             date = QDate.currentDate()
-        utils_giswater.setCalendarDate(widget, date)
+        utils_giswater.setCalendarDate(dialog, widget, date)
 
 
     def add_point(self):
