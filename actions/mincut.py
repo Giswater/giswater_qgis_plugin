@@ -79,7 +79,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.remove_selection()      
 
         self.dlg_mincut = Mincut()
-        utils_giswater.setDialog(self.dlg_mincut)
+        #utils_giswater.setDialog(self.dlg_mincut)
         self.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -345,11 +345,11 @@ class MincutParent(ParentAction, MultipleSelection):
         anl_cause = self.dlg_mincut.cause.currentText()
         work_order = self.work_order.text()
 
-        anl_descript = utils_giswater.getWidgetText("pred_description", return_string_null=False)
+        anl_descript = utils_giswater.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
         exec_from_plot = str(self.distance.text())
         exec_depth = str(self.depth.text())
-        exec_descript = utils_giswater.getWidgetText("real_description", return_string_null=False)
-        exec_user = utils_giswater.getWidgetText("exec_user", return_string_null=False)
+        exec_descript = utils_giswater.getWidgetText(self.dlg_mincut, "real_description", return_string_null=False)
+        exec_user = utils_giswater.getWidgetText(self.dlg_mincut, "exec_user", return_string_null=False)
         
         # Get prediction date - start
         date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
@@ -376,9 +376,9 @@ class MincutParent(ParentAction, MultipleSelection):
         received_time = self.dlg_mincut.cbx_recieved_time.time()
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
-        assigned_to = utils_giswater.get_item_data(self.dlg_mincut.assigned_to, 0)
+        assigned_to = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
         cur_user = self.controller.get_project_user()
-        appropiate_status = utils_giswater.isChecked("appropiate")
+        appropiate_status = utils_giswater.isChecked(self.dlg_mincut, "appropiate")
 
         check_data = [str(mincut_result_state), str(anl_cause), str(received_date), 
                       str(forecast_start_predict), str(forecast_end_predict)]
@@ -516,18 +516,17 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_mincut.cbx_hours_start.setTime(exec_start_time)
         self.dlg_mincut.cbx_date_end.setDate(exec_end_day)
         self.dlg_mincut.cbx_hours_end.setTime(exec_end_time)
-        utils_giswater.setWidgetText(self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))  
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
         municipality = self.dlg_fin.address_exploitation.currentText()
-        utils_giswater.setWidgetText(self.dlg_mincut.address_exploitation, municipality)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_exploitation, municipality)
         street = self.dlg_fin.address_street.currentText()
-        utils_giswater.setWidgetText(self.dlg_mincut.address_street, street)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_street, street)
         number = self.dlg_fin.address_number.currentText()
-        utils_giswater.setWidgetText(self.dlg_mincut.address_number, number)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_number, number)
         postal_code = self.dlg_fin.address_postal_code.currentText()
-        utils_giswater.setWidgetText(self.dlg_mincut.address_postal_code, postal_code)
-        exec_user = utils_giswater.getWidgetText(self.dlg_fin.exec_user)
-        self.controller.log_info(exec_user)
-        utils_giswater.setWidgetText(self.dlg_mincut.exec_user, exec_user)        
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code, postal_code)
+        exec_user = utils_giswater.getWidgetText(self.dlg_fin, self.dlg_fin.exec_user)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.exec_user, exec_user)
 
         self.dlg_fin.close()
 
@@ -535,7 +534,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def real_end_cancel(self):
 
         # Return to state 'In Progress'
-        utils_giswater.setWidgetText(self.dlg_mincut.state, str(self.states[1]))           
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
         self.enable_widgets('1')
         
         self.dlg_fin.close()
@@ -562,7 +561,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog add_connec
         self.dlg_connec = Mincut_add_connec()
-        utils_giswater.setDialog(self.dlg_connec)
+        # utils_giswater.setDialog(self.dlg_connec)
         self.load_settings(self.dlg_connec)
 
         # Set icons
@@ -722,7 +721,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog Mincut_add_hydrometer
         self.dlg_hydro = Mincut_add_hydrometer()
-        utils_giswater.setDialog(self.dlg_hydro)
+        # utils_giswater.setDialog(self.dlg_hydro)
         self.load_settings(self.dlg_hydro)
         self.dlg_hydro.btn_snapping.setEnabled(False)
         
@@ -782,7 +781,7 @@ class MincutParent(ParentAction, MultipleSelection):
         """
               
         # Check if user entered hydrometer_id
-        hydrometer_id = utils_giswater.getWidgetText(self.dlg_hydro.hydrometer_id)
+        hydrometer_id = utils_giswater.getWidgetText(self.dlg_hydro, self.dlg_hydro.hydrometer_id)
         if hydrometer_id == "null":
             message = "You need to enter hydrometer_id"
             self.controller.show_info_box(message)
@@ -1337,10 +1336,12 @@ class MincutParent(ParentAction, MultipleSelection):
                 node_exist = '0'
 
             if node_exist == '0':
+                layers_arc = self.controller.get_group_layers('arc')
+                self.layernames_arc = []
+                for layer in layers_arc:
+                    self.layernames_arc.append(layer.name())
                 for snap_point in result:
                     element_type = snap_point.layer.name()
-                    self.controller.log_info(str(element_type))
-                    self.controller.log_info(str(self.layernames_arc))
                     if element_type in self.layernames_arc:
                         # Get the point
                         point = QgsPoint(snap_point.snappedVertex)
