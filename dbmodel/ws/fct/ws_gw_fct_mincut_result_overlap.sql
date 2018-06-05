@@ -7,7 +7,10 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2244
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_result_overlap(integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_overlap(result_id_arg integer, cur_user_var text)
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_overlap(
+    result_id_arg integer,
+    cur_user_var text)
   RETURNS text AS
 $BODY$
 DECLARE
@@ -52,7 +55,7 @@ BEGIN
 		-- if exists macroexpl overlap		
 		IF overlap_macexpl_aux=mincut_rec.macroexpl_id THEN
 
-			-- if it's first time
+			-- if it's first time - Inserting mincut values
 			IF overlap_exists_bool IS FALSE THEN
 
 				-- create temp result for joined analysis
@@ -68,7 +71,7 @@ BEGIN
 				query_text:='INSERT INTO anl_mincut_result_arc ( result_id, arc_id, the_geom)
 				             SELECT '||id_last||', arc_id, the_geom 
 				             FROM anl_mincut_result_arc WHERE result_id='||result_id_arg;
-				EXECUTE query_text;
+				EXECUTE query_text;	
 
 				--identifing overlaping
 				overlap_exists_bool:= TRUE;
@@ -106,44 +109,37 @@ BEGIN
 		PERFORM gw_fct_mincut_inverted_flowtrace (id_last);
 
 		count_result_int:=(SELECT count(*) FROM anl_mincut_result_arc WHERE result_id=id_last) ;
-
-		raise notice 'v1 %, v2 %', count_int, count_result_int;
-
-		-- Update result valves with two dry sides to proposed=false
-		UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id IN
-		(
-			SELECT node_1 FROM anl_mincut_result_arc JOIN arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
-			JOIN anl_mincut_result_valve ON node_id=node_1 WHERE anl_mincut_result_arc.result_id=id_last AND proposed IS TRUE
-				INTERSECT
-			SELECT node_2 FROM anl_mincut_result_arc JOIN arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
-			JOIN anl_mincut_result_valve ON node_id=node_2 WHERE anl_mincut_result_arc.result_id=id_last AND proposed IS TRUE
-		);
 	
-		-- compare results from original againts overlaped result
-		
 		IF count_int != count_result_int THEN
 
-			conflict_text:=conflict_id_text;
-			IF (SELECT value FROM config_param_system WHERE parameter='mincut_conflict_map')='TRUE' THEN
+			-- Update result valves with two dry sides to proposed=false
+			UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id IN
+			(
+				SELECT node_1 FROM anl_mincut_result_arc JOIN arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
+				JOIN anl_mincut_result_valve ON node_id=node_1 WHERE anl_mincut_result_arc.result_id=id_last AND proposed IS TRUE
+					INTERSECT
+				SELECT node_2 FROM anl_mincut_result_arc JOIN arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
+				JOIN anl_mincut_result_valve ON node_id=node_2 WHERE anl_mincut_result_arc.result_id=id_last AND proposed IS TRUE
+			);
 
-				-- update workcat on cat table
-				UPDATE anl_mincut_result_cat SET work_order=concat('Conflict: ',result_id_arg,' vs',conflict_id_text) WHERE id=id_last;	
-
-				--update selector
-				DELETE FROM "anl_mincut_result_selector" where cur_user=cur_user_var;
-				INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (id_last, cur_user_var);
-			ELSE
-				DELETE FROM  anl_mincut_result_cat WHERE id=id_last;
-			END IF;
-
-		ELSE 
-			DELETE FROM  anl_mincut_result_cat WHERE id=id_last;
-			conflict_text:=null;
 			
+			DELETE FROM anl_mincut_result_arc WHERE result_id=result_id_arg;
+			DELETE FROM anl_mincut_result_valve WHERE result_id=result_id_arg;
+			DELETE FROM anl_mincut_result_node WHERE result_id=result_id_arg;
+
+			UPDATE anl_mincut_result_arc SET result_id=result_id_arg WHERE result_id=id_last;
+			UPDATE anl_mincut_result_valve SET result_id=result_id_arg WHERE result_id=id_last;
+			UPDATE anl_mincut_result_node SET result_id=result_id_arg WHERE result_id=id_last;
+
+			conflict_text:=conflict_id_text;
+		ELSE 
+			conflict_text:=null;
 		END IF;
 
-   END IF;
+	END IF;
 
+	DELETE FROM  anl_mincut_result_cat WHERE id=id_last;
+	PERFORM setval('SCHEMA_NAME.anl_mincut_result_cat_seq', (select max(id) from anl_mincut_result_cat) , true);
 
 RETURN conflict_text;
 
