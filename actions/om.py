@@ -54,31 +54,31 @@ class Om(ParentAction):
     def om_psector_management(self):
         """ Button 82: Psector management """
 
-        self.dlg = Psector_management()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
+        self.dlg_psector_mng = Psector_management()
+        #utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg_psector_mng)
         table_name = "om_psector"
         column_id = "psector_id"
-        self.dlg.lbl_vdefault_psector.setVisible(False)
-        self.dlg.btn_update_psector.setVisible(False)
+        self.dlg_psector_mng.lbl_vdefault_psector.setVisible(False)
+        self.dlg_psector_mng.btn_update_psector.setVisible(False)
         # Tables
-        qtbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
+        qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
         # Set signals
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
-        self.dlg.rejected.connect(self.close_dialog)
-        self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
-        self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
-        self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, table_name))
-        self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
+        self.dlg_psector_mng.btn_cancel.clicked.connect(self.close_dialog)
+        self.dlg_psector_mng.rejected.connect(self.close_dialog)
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, qtbl_psm))
+        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
+        self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
-        self.set_table_columns(self.dlg, qtbl_psm, table_name)
-        self.set_label_current_psector(self.dlg)
+        self.set_table_columns(self.dlg_psector_mng, qtbl_psm, table_name)
+        self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg, dlg_name="psector_management")
+        self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
 
 
     def charge_psector(self, qtbl_psm):
@@ -127,7 +127,7 @@ class Om(ParentAction):
             widget.model().select()
 
 
-    def update_current_psector(self, qtbl_psm):
+    def update_current_psector(self, dialog, qtbl_psm):
 
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -156,7 +156,7 @@ class Om(ParentAction):
         self.fill_table(qtbl_psm, "v_ui_plan_psector")
         self.set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
 
-        self.dlg.exec_()
+        dialog.exec_()
 
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
