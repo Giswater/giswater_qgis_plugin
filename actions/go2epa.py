@@ -369,9 +369,9 @@ class Go2Epa(ParentAction):
                " WHERE t2.cur_user = current_user")
         row = self.controller.get_rows(sql)
         if row:
-            utils_giswater.setWidgetText(self.dlg_hydrology_selector.hydrology, row[0])
+            utils_giswater.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
         else:
-            utils_giswater.setWidgetText(self.dlg_hydrology_selector.hydrology, 0)
+            utils_giswater.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
         self.update_labels()
         self.dlg_hydrology_selector.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_hydrology_selector.exec_()
@@ -401,8 +401,8 @@ class Go2Epa(ParentAction):
                " WHERE name = '" + str(self.dlg_hydrology_selector.hydrology.currentText()) + "'")
         row = self.controller.get_row(sql)
         if row is not None:
-            utils_giswater.setText(self.dlg_hydrology_selector.infiltration, row[0])
-            utils_giswater.setText(self.dlg_hydrology_selector.descript, row[1])
+            utils_giswater.setText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
+            utils_giswater.setText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
 
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
