@@ -656,8 +656,8 @@ class Go2Epa(ParentAction):
 
         # Create the dialog and signals
         self.dlg_go2epa_result = EpaResultCompareSelector()
-        # utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg_go2epa_result)
+
         self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
         self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa_result))
         self.dlg_go2epa_result.rejected.connect(partial(self.close_dialog, self.dlg_go2epa_result))
@@ -665,18 +665,18 @@ class Go2Epa(ParentAction):
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_go2epa_result.rpt_selector_result_id, rows)
-        utils_giswater.fillComboBox(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
+        utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, rows)
+        utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id, rows)
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_result"
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"])
+            utils_giswater.setWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"])
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_compare"
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"])
+            utils_giswater.setWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"])
 
         # Open the dialog
         self.dlg_go2epa_result.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -687,8 +687,8 @@ class Go2Epa(ParentAction):
         """ Update current values to the table """
 
         # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = utils_giswater.getWidgetText(self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = utils_giswater.getWidgetText(self.dlg_go2epa_result.rpt_selector_compare_id)
+        rpt_selector_result_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
+        rpt_selector_compare_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
 
         # Set project user
         user = self.controller.get_project_user()
