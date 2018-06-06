@@ -766,6 +766,8 @@ class Go2Epa(ParentAction):
         self.set_table_columns(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
+        self.dlg_manager.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
+                                                            'rpt_cat_result', 'result_id'))
         self.dlg_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)
