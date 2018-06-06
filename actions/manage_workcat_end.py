@@ -67,7 +67,7 @@ class ManageWorkcatEnd(ParentManage):
         # Set signals
         self.dlg.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
         self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, self.table_object, self.cur_active_layer,  force_downgrade=True))
-        self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer,  force_downgrade=True, show_warning=True))
+        self.dlg.rejected.connect(partial(self.manage_close, self.table_object, self.cur_active_layer,  force_downgrade=True, show_warning=False))
         self.dlg.workcat_id_end.currentIndexChanged.connect(partial(self.get_values_from_form))
 
         self.dlg.btn_new_workcat.clicked.connect(partial(self.new_workcat))
