@@ -7,10 +7,10 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: XXXX
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getinsertform_vdef(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinsertform_vdef(
 p_x float,
 p_y float)
-  RETURNS json AS
+  RETURNS text AS
 $BODY$
 DECLARE
 
@@ -35,11 +35,12 @@ DECLARE
 	v_expl_id text;
 	v_muni_id text;
 	api_version text;
+	v_return text;
 
 BEGIN
 
 	--    Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -49,7 +50,7 @@ BEGIN
         v_arc_id:= (SELECT nextval('urn_id_seq')::text);
       			
 	-- Make geometry column
-	v_the_geom:= ST_SetSRID(ST_MakePoint(p_x, p_y),(SELECT ST_srid (the_geom) FROM ws_sample.sector limit 1));
+	v_the_geom:= ST_SetSRID(ST_MakePoint(p_x, p_y),(SELECT ST_srid (the_geom) FROM SCHEMA_NAME.sector limit 1));
 
 	-- Sector ID
 	SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(v_the_geom, sector.the_geom,0.001);
@@ -88,35 +89,16 @@ BEGIN
 	END IF;
 
 
-	v_sector_id:= (SELECT row_to_json(a) FROM (SELECT name FROM sector WHERE sector_id=v_sector_id::integer)a);
-	v_dma_id:= (SELECT row_to_json(a) FROM (SELECT name FROM dma WHERE dma_id=v_dma_id::integer)a);
-	v_expl_id:= (SELECT row_to_json(a) FROM (SELECT name FROM exploitation WHERE expl_id=v_expl_id::integer)a);
-	v_muni_id:= (SELECT row_to_json(a) FROM (SELECT name FROM ext_municipality WHERE muni_id=v_muni_id::integer)a);
- 
+	v_sector_id:= (SELECT name FROM sector WHERE sector_id=v_sector_id::integer);
+	v_dma_id:= (SELECT name FROM dma WHERE dma_id=v_dma_id::integer);
+	v_expl_id:= (SELECT name FROM exploitation WHERE expl_id=v_expl_id::integer);
+	v_muni_id:= (SELECT name FROM ext_municipality WHERE muni_id=v_muni_id::integer);
 
---    Control NULL's
-    v_arc_id := COALESCE(v_arc_id, '{}');
-    v_expl_id := COALESCE(v_expl_id, '{}');
-    v_dma_id := COALESCE(v_dma_id, '{}');
-    v_expl_id := COALESCE(v_expl_id, '{}');
-    v_muni_id := COALESCE(v_muni_id, '{}');
-    
+	v_return:= '''arc_id'':'''|| v_arc_id ||''';''expl_id'':''' || v_expl_id ||''';''dma_id'':''' || v_dma_id ||''';''expl_id'':''' || v_expl_id ||''';''muni_id'':''' || v_muni_id ||'''';
 
 --    Return
-    RETURN ('{"status":"Accepted"' ||
-	', "arc_id":"' || v_arc_id || '"' ||
-        ', "expl_id":' || v_expl_id || 
-        ', "dma_id":' || v_dma_id ||
-        ', "expl_id":' || v_expl_id ||
-        ', "muni_id":' || v_muni_id ||
-        '}')::json;
-
---   Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
-
-
+    RETURN v_return;
+    
 
 END;
 $BODY$
