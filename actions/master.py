@@ -237,7 +237,6 @@ class Master(ParentAction):
         self.load_settings(self.dlg)
 
         # Set signals
-        self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.dlg.prices_coefficient.setValidator(QDoubleValidator())
 
@@ -261,6 +260,12 @@ class Master(ParentAction):
             self.dlg.cmb_result_type.setEnabled(False)
             self.dlg.prices_coefficient.setEnabled(False)
             self.dlg.observ.setEnabled(False)
+            self.dlg.btn_calculate.setText("Close")
+            self.dlg.btn_calculate.clicked.connect(
+            partial(self.close_dialog))
+        else:
+            self.dlg.btn_calculate.clicked.connect(
+            partial(self.master_estimate_result_new_calculate))
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
