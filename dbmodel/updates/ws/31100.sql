@@ -25,8 +25,8 @@ INSERT INTO audit_cat_table VALUES ('anl_mincut_result_cat', 'Mincut', 'Catalog 
 -----------------------
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_conflict_arc', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_conflict_valve', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_anl_mincut_planified_arc', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_anl_mincut_planified_valve', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_anl_mincut_planified_arc', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_anl_mincut_planified_valve', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
  
 
 
