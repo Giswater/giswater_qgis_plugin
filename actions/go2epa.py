@@ -757,29 +757,33 @@ class Go2Epa(ParentAction):
 
         # Create the dialog
         self.dlg_manager = EpaResultManager()
-        # utils_giswater.setDialog(self.dlg_manager)
         self.load_settings(self.dlg_manager)
 
         # Fill combo box and table view
         self.fill_combo_result_id()        
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-        self.set_table_columns(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        self.set_table_columns(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
+        self.dlg_manager.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
+                                                            'rpt_cat_result', 'result_id'))
         self.dlg_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)
 
+
         # Open form
         self.open_dialog(self.dlg_manager) 
             
-        
+
+
+
     def fill_combo_result_id(self):
         
         sql = "SELECT result_id FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_manager.txt_result_id, rows)
+        utils_giswater.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
 
 
     def filter_by_result_id(self):
@@ -787,7 +791,7 @@ class Go2Epa(ParentAction):
         table = self.dlg_manager.tbl_rpt_cat_result
         widget_txt = self.dlg_manager.txt_result_id  
         tablename = 'v_ui_rpt_cat_result'
-        result_id = utils_giswater.getWidgetText(widget_txt)
+        result_id = utils_giswater.getWidgetText(self.dlg_manager, widget_txt)
         if result_id != 'null':
             expr = " result_id ILIKE '%" + result_id + "%'"
             # Refresh model with selected filter
