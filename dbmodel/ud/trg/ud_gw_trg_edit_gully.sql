@@ -207,7 +207,7 @@ BEGIN
 
         -- Looking for state control
         IF (NEW.state != OLD.state) THEN   
-		PERFORM gw_fct_state_control('GULLY', NEW.connec_id, NEW.state, TG_OP);	
+		PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);	
 		END IF;
 	
 
