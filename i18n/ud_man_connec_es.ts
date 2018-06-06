@@ -59,13 +59,13 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_connec.ui" line="332"/>
-        <source>Builtdate:*</source>
-        <translation>Fecha de alta:*</translation>
+        <source>Builtdate:</source>
+        <translation>Fecha de alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_connec.ui" line="365"/>
-        <source>Workcat id:*</source>
-        <translation>Exp. trabajo:*</translation>
+        <source>Workcat id:</source>
+        <translation>Exp. trabajo:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_connec.ui" line="416"/>
@@ -156,7 +156,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_connec.ui" line="1118"/>
         <source>Priv. catalog</source>
-        <translation>Catálego priv</translation>
+        <translation>Catálogo privado:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_connec.ui" line="1177"/>

@@ -33,7 +33,6 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="208"/>
         <source>Basic information</source>
         <translation>Informació bàsica</translation>
     </message>
@@ -55,8 +54,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="442"/>
-        <source>Builtdate:*</source>
-        <translation>Data d&apos;alta:*</translation>
+        <source>Builtdate:</source>
+        <translation>Data d&apos;alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="478"/>
@@ -70,8 +69,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="582"/>
-        <source>Workcat id:*</source>
-        <translation>Exp. treball:*</translation>
+        <source>Workcat id:</source>
+        <translation>Exp. treball:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="620"/>
@@ -159,7 +158,6 @@
         <translation>Codi bombers:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1355"/>
         <source>Additional information</source>
         <translation>Informació adicional</translation>
     </message>
@@ -224,7 +222,6 @@
         <translation>Descripció:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2049"/>
         <source>Feature graphic design</source>
         <translation>Disseny gràfic de l&apos;element</translation>
     </message>
@@ -524,7 +521,7 @@
     </message>
     <message>
         <source>Util volume:</source>
-        <translation>Volum d'utilitats:</translation>
+        <translation>Volum útil:</translation>
     </message>
     <message>
         <source>Max volume:</source>
@@ -544,35 +541,35 @@
     </message>
     <message>
         <source>Irrigation indicator:</source>
-        <translation>Indicador de risc:</translation>
+        <translation>Indicador reg:</translation>
     </message>
     <message>
         <source>Entry pression:</source>
-        <translation>Pressió d'entrada:</translation>
+        <translation>Pressió entrada:</translation>
     </message>
     <message>
         <source>Exit pression:</source>
-        <translation>Pressió de sortida:</translation>
+        <translation>Pressió sortida:</translation>
     </message>
     <message>
         <source>Valveshaft depth:</source>
-        <translation>Prefunditat del pou de vàlvules:</translation>
+        <translation>Prefunditat pou:</translation>
     </message>
     <message>
         <source>Regulator situation:</source>
-        <translation>Situació del regulador:</translation>
+        <translation>Situació regulador:</translation>
     </message>
     <message>
         <source>Regulator location:</source>
-        <translation>Ubicació del regulador:</translation>
+        <translation>Ubic. regulador:</translation>
     </message>
     <message>
         <source>Regulator observation:</source>
-        <translation>Observació del regulador:</translation>
+        <translation>Obs. regulador:</translation>
     </message>
     <message>
         <source>Linear meters:</source>
-        <translation>metres lineals:</translation>
+        <translation>Metres lineals:</translation>
     </message>
     <message>
         <source>Exit type:</source>
@@ -584,11 +581,11 @@
     </message>
     <message>
         <source>Drive type:</source>
-        <translation>Tipus d'unitat:</translation>
+        <translation>Tipus d''unitat:</translation>
     </message>
     <message>
         <source>Second valve catalog:</source>
-        <translation>Segon catàleg de vàlvules:</translation>
+        <translation>Cat. vàlvula 2:</translation>
     </message>
     <message>
         <source>Arc id:</source>
@@ -612,7 +609,7 @@
     </message>
     <message>
         <source>Nominal flow:</source>
-        <translation>Flux Nominal:</translation>
+        <translation>Flux nominal:</translation>
     </message>
     <message>
         <source>Power:</source>
@@ -624,7 +621,7 @@
     </message>
     <message>
         <source>Elevation height:</source>
-        <translation>Altura d'elevació:</translation>
+        <translation>Altura d''elevació:</translation>
     </message>
     <message>
         <source>Pump number:</source>
@@ -632,7 +629,7 @@
     </message>
     <message>
         <source>Laboratory code:</source>
-        <translation>Codi de laboratori:</translation>
+        <translation>Codi laboratori:</translation>
     </message>
     <message>
         <source>Serial number:</source>

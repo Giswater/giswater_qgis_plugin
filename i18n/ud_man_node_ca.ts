@@ -23,7 +23,6 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="93"/>
         <source>Basic information</source>
         <translation>Informació bàsica</translation>
     </message>
@@ -80,13 +79,13 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="533"/>
-        <source>Workcat id:*</source>
-        <translation>Exp. treball:*</translation>
+        <source>Workcat id:</source>
+        <translation>Exp. treball:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="598"/>
-        <source>Builtdate:*</source>
-        <translation>Data d&apos;alta:*</translation>
+        <source>Builtdate:</source>
+        <translation>Data d&apos;alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="655"/>
@@ -95,8 +94,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="697"/>
-        <source>Top elev:*</source>
-        <translation>Elevació max:*</translation>
+        <source>Top elev:</source>
+        <translation>Elevació max:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="746"/>
@@ -105,8 +104,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="776"/>
-        <source>XYZ date:</source>
-        <translation>XYZ:</translation>
+        <source>Topographic date:</source>
+        <translation>Aixec. topogràfic:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="811"/>
@@ -193,7 +192,6 @@
         <translation>Entrada:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="1561"/>
         <source>Additional information</source>
         <translation>Informació adicional</translation>
     </message>
@@ -258,7 +256,6 @@
         <translation>Descripció:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_chamber.ui" line="2255"/>
         <source>Feature graphic design</source>
         <translation>Disseny gràfic de l&apos;element</translation>
     </message>
@@ -602,7 +599,7 @@
     </message>
     <message>
         <source>Length:</source>
-        <translation>longitud:</translation>
+        <translation>Longitud:</translation>
     </message>
     <message>
         <source>Width:</source>
@@ -610,15 +607,15 @@
     </message>
     <message>
         <source>Accessibility:</source>
-        <translation>accessibilitat:</translation>
+        <translation>Accessibilitat:</translation>
     </message>
     <message>
         <source>Sander depth:</source>
-        <translation>Profunditat de la polidora:</translation>
+        <translation>Profunditat sorrer:</translation>
     </message>
     <message>
         <source>Protection surface:</source>
-        <translation>Superfície de protecció:</translation>
+        <translation>Sup. de protecció:</translation>
     </message>
 </context>
 </TS>

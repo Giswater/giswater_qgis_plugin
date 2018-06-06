@@ -33,7 +33,6 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="208"/>
         <source>Basic information</source>
         <translation>Información básica</translation>
     </message>
@@ -55,8 +54,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="442"/>
-        <source>Builtdate:*</source>
-        <translation>Fecha de alta:*</translation>
+        <source>Builtdate:</source>
+        <translation>Fecha de alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="478"/>
@@ -70,8 +69,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="582"/>
-        <source>Workcat id:*</source>
-        <translation>Exp. trabajo:*</translation>
+        <source>Workcat id:</source>
+        <translation>Exp. trabajo:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="620"/>
@@ -139,7 +138,6 @@
         <translation>Exp. trabajo baja:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1186"/>
         <source>Specific information</source>
         <translation>Información específica</translation>
     </message>
@@ -159,7 +157,6 @@
         <translation>Código bombers:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="1355"/>
         <source>Additional information</source>
         <translation>Información adicional</translation>
     </message>
@@ -224,7 +221,6 @@
         <translation>Descripción:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_hydrant.ui" line="2049"/>
         <source>Feature graphic design</source>
         <translation>Diseño gráfico del elemento</translation>
     </message>
@@ -524,11 +520,11 @@
     </message>
     <message>
         <source>Util volume:</source>
-        <translation>Volumen de utilidades:</translation>
+        <translation>Vol. útil:</translation>
     </message>
     <message>
         <source>Max volume:</source>
-        <translation>Volumen maximo:</translation>
+        <translation>Vol. máximo:</translation>
     </message>
     <message>
         <source>Area:</source>
@@ -544,31 +540,31 @@
     </message>
     <message>
         <source>Irrigation indicator:</source>
-        <translation>Indicador de riesgo:</translation>
+        <translation>Indicador riego:</translation>
     </message>
     <message>
         <source>Entry pression:</source>
-        <translation>Presión de entrada:</translation>
+        <translation>Presión entrada:</translation>
     </message>
     <message>
         <source>Exit pression:</source>
-        <translation>Presión de salida:</translation>
+        <translation>Presión salida:</translation>
     </message>
     <message>
         <source>Valveshaft depth:</source>
-        <translation>Profundidad del pozo de válvulas:</translation>
+        <translation>Profundidad pozo:</translation>
     </message>
     <message>
         <source>Regulator situation:</source>
-        <translation>Situación del regulador:</translation>
+        <translation>Situ. regulador:</translation>
     </message>
     <message>
         <source>Regulator location:</source>
-        <translation>Ubicación del regulador:</translation>
+        <translation>Ubic. regulador:</translation>
     </message>
     <message>
         <source>Regulator observation:</source>
-        <translation>Observación del regulador:</translation>
+        <translation>Observ. regulador:</translation>
     </message>
     <message>
         <source>Linear meters:</source>
@@ -580,7 +576,7 @@
     </message>
     <message>
         <source>Exit code:</source>
-        <translation>Codigo de salida:</translation>
+        <translation>Código de salida:</translation>
     </message>
     <message>
         <source>Drive type:</source>
@@ -588,7 +584,7 @@
     </message>
     <message>
         <source>Second valve catalog:</source>
-        <translation>Segundo catálogo de válvulas:</translation>
+        <translation>Cat. válvula 2:</translation>
     </message>
     <message>
         <source>Arc id:</source>
@@ -612,7 +608,7 @@
     </message>
     <message>
         <source>Nominal flow:</source>
-        <translation>Flujo Nominal:</translation>
+        <translation>Flujo nominal:</translation>
     </message>
     <message>
         <source>Power:</source>
@@ -632,7 +628,7 @@
     </message>
     <message>
         <source>Laboratory code:</source>
-        <translation>Código de laboratorio:</translation>
+        <translation>Código laboratorio:</translation>
     </message>
     <message>
         <source>Serial number:</source>
