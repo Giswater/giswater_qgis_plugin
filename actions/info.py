@@ -45,7 +45,7 @@ class Info(ParentAction):
                    "Giswater version:   " + str(giswater_build_version) + "\n" 
                    "PostgreSQL version: " + str(postgresql_version) + "\n" 
                    "Postgis version:    " + str(postgis_version))
-        utils_giswater.setWidgetText(self.dlg_info.txt_info, message)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, message)
         
         # Set signals
         self.dlg_info.btn_open_giswater.clicked.connect(self.open_giswater)
