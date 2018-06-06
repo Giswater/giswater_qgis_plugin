@@ -23,9 +23,9 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
-   <widget class="QWidget" name="tab">
+   <widget class="QWidget" name="tab_doc">
     <attribute name="title">
      <string>Document</string>
     </attribute>
@@ -236,7 +236,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_2">
+   <widget class="QWidget" name="tab_rel">
     <attribute name="title">
      <string>Relations</string>
     </attribute>

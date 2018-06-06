@@ -146,6 +146,11 @@ class ManageNewPsector(ParentManage):
         if isinstance(psector_id, bool):
             psector_id = 0
         self.delete_psector_selector(self.plan_om + '_psector_selector')
+        # tab 'Document'
+        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+        self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+        filter_ = None
+        self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
 
         if psector_id != 0:
             self.enable_tabs(True)
@@ -209,13 +214,13 @@ class ManageNewPsector(ParentManage):
                        " WHERE cur_user = current_user AND psector_id='" +utils_giswater.getWidgetText(self.dlg.psector_id) + "'")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
-
-            # tab 'Document'
-            self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
-            self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
             filter_ = "psector_id = '" + str(psector_id) + "'"
-            self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
-            self.tbl_document.doubleClicked.connect(partial(self.document_open))
+
+        # tab 'Document'
+        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
+        self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+        self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
+        self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
@@ -251,7 +256,7 @@ class ManageNewPsector(ParentManage):
 
         self.dlg.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg.btn_doc_delete.clicked.connect(self.document_delete)
-        self.dlg.btn_doc_new.clicked.connect(self.manage_document)
+        self.dlg.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg.btn_open_doc.clicked.connect(self.document_open)
 
         self.set_completer()
@@ -1100,13 +1105,19 @@ class ManageNewPsector(ParentManage):
                 self.dlg.tbl_document.model().select()
 
 
-    def manage_document(self):
+    def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
+        psector_id = utils_giswater.getText(self.dlg.psector_id)
 
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
-        dlg_docman = manage_document.manage_document()
-        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, 'doc'))
+        dlg_docman = manage_document.manage_document(refresh_table=True, qtable=qtable, psector_id=psector_id)
+        # dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, 'doc'))
 
+        # Remove tab relations for new document in psector
+        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
+        # Refres QTableView
+        # self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
+        # self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
     def document_open(self):
         """Open selected document."""
@@ -1157,15 +1168,15 @@ class ManageNewPsector(ParentManage):
         self.completer.setModel(model)
 
 
-    def fill_table_doc(self, widget, table_name, filter_):
-    #def fill_table_doc(self, widget, table_name):
+    def fill_table_doc(self, widget, table_name, filter_=None):
         """ Set a model with selected filter. Attach that model to selected table """
 
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.setFilter(filter_)
+        if filter_ is not None:
+            model.setFilter(filter_)
         model.select()
 
         # Check for errors

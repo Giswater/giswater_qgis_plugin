@@ -8,6 +8,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-    
 from functools import partial
 
+from PyQt4.QtSql import QSqlTableModel
+
 import utils_giswater
 from ui_manager import AddDoc                           
 from ui_manager import DocManagement
@@ -30,7 +32,7 @@ class ManageDocument(ParentManage):
         self.manage_document()
                 
 
-    def manage_document(self):
+    def manage_document(self, refresh_table=False, qtable=None, psector_id=None):
         """ Button 34: Add document """
 
         # Create the dialog and signals
@@ -83,7 +85,7 @@ class ManageDocument(ParentManage):
         # Set signals
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
         self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
-        self.dlg.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object))
+        self.dlg.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object, refresh_table, qtable, psector_id))
         self.dlg.btn_cancel.clicked.connect(partial(self.manage_close, table_object, cur_active_layer))
         self.dlg.rejected.connect(partial(self.manage_close, table_object, cur_active_layer))        
         self.dlg.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, table_object))
@@ -105,11 +107,10 @@ class ManageDocument(ParentManage):
         # Open the dialog
         self.open_dialog(self.dlg, maximize_button=False)
         return self.dlg
-               
 
-    def manage_document_accept(self, table_object):
+
+    def manage_document_accept(self, table_object, refresh_table=False, qtable=None, psector_id=None):
         """ Insert or update table 'document'. Add document to selected feature """
-
         # Get values from dialog
         doc_id = utils_giswater.getWidgetText("doc_id")
         doc_type = utils_giswater.getWidgetText("doc_type")
@@ -181,8 +182,35 @@ class ManageDocument(ParentManage):
         if status:
             self.doc_id = doc_id            
             self.manage_close(table_object)     
-            
-            
+
+        if refresh_table:
+            sql = ("INSERT INTO " + self.schema_name +".doc_x_psector(doc_id, psector_id) "
+                   " VALUES('"+str(doc_id)+"', '"+str(psector_id)+"')")
+            self.controller.execute_sql(sql)
+            filter_ = "psector_id = '" + str(psector_id) + "'"
+            self.fill_table_doc(qtable, self.schema_name + ".v_ui_doc_x_psector", filter_=filter_)
+
+
+    def fill_table_doc(self, widget, table_name, filter_=None):
+        """ Set a model with selected filter. Attach that model to selected table """
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        if filter_ is not None:
+            model.setFilter(filter_)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+        widget.show()
+
+
     def edit_document(self):
         """ Button 66: Edit document """ 
         
