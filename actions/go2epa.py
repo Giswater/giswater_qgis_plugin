@@ -258,7 +258,7 @@ class Go2Epa(ParentAction):
         dlg_wstimes.duration.setValidator(QIntValidator())
         sql = "SELECT id FROM "+self.schema_name+".inp_value_times ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_wstimes.statistic, rows, False)
+        utils_giswater.fillComboBox(dlg_wstimes, dlg_wstimes.statistic, rows, False)
         dlg_wstimes.btn_accept.clicked.connect(partial(self.update_table, 'inp_times', dlg_wstimes))
         dlg_wstimes.btn_cancel.clicked.connect(dlg_wstimes.close)
         self.go2epa_options_get_data('inp_times', dlg_wstimes)
@@ -444,7 +444,7 @@ class Go2Epa(ParentAction):
                     elif widget_type is QTimeEdit:
                         aux = 0
                         widget_day = str(column_name) + "_day"
-                        day = utils_giswater.getText(dialog, widget)
+                        day = utils_giswater.getText(dialog, widget_day)
                         if day != "null":
                             aux = int(day) * 24
                         time = dialog.findChild(QTimeEdit, str(column_name))
@@ -510,9 +510,9 @@ class Go2Epa(ParentAction):
         """ Save INP, RPT and result name into GSW file """
 
         # Get widgets values
-        self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa.txt_file_inp)
-        self.file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa.txt_file_rpt)
-        self.project_name = utils_giswater.getWidgetText(self.dlg_go2epa.txt_result_name)
+        self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        self.file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+        self.project_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         
         # Check that all parameters has been set
         if self.file_inp == "null":
@@ -536,7 +536,7 @@ class Go2Epa(ParentAction):
             if not answer:
                 return
         
-        only_check = utils_giswater.isChecked(self.dlg_go2epa.chk_only_check)
+        only_check = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
         if only_check:
             self.check_data()
             return
