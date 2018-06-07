@@ -285,6 +285,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
         mincut = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
         utils_giswater.setWidgetText(self.dlg_fin.mincut, mincut)
+        work_order = utils_giswater.getWidgetText(self.dlg.work_order)
+        utils_giswater.setWidgetText(self.dlg_fin.work_order, work_order)
 
         # Manage address
         self.adress_init_config(self.dlg_fin)
