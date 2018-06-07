@@ -281,6 +281,9 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.setDialog(self.dlg_fin)
         self.load_settings(self.dlg_fin)
 
+        mincut = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
+        utils_giswater.setWidgetText(self.dlg_fin.mincut, mincut)
+
         # Manage address
         self.adress_init_config(self.dlg_fin)
         municipality_current = str(self.dlg.address_exploitation.currentText())
@@ -469,6 +472,7 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("SELECT mincut_state, mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat "
                " WHERE id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
+        answer = False
         if row:
             if str(row[0]) == '0' and str(row[1]) == '1':
                 cur_user = self.controller.get_project_user()
@@ -477,13 +481,12 @@ class MincutParent(ParentAction, MultipleSelection):
                 row = self.controller.get_row(sql, log_sql=False, commit=True)
                 if row[0] is not None:
                         message = "Mincut done, but has conflict and overlaps with "
+                        self.controller.log_info(str(answer))
                         answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
-                        if not answer:
+                        if answer:
                             self.dlg.close()
-                else:
-                    self.dlg.close()
-        else:
-            self.dlg.close()
+        if answer is False:
+             self.dlg.close()
 
 
     def update_result_selector(self, result_mincut_id, commit=True):    
