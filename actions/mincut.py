@@ -428,18 +428,11 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # If state 'In Progress' or 'Finished'
         if mincut_result_state == 1 or mincut_result_state == 2:
-            
-            if exec_from_plot == '':
-                message = "This mandatory field is missing. Please, review your data"
-                self.controller.show_warning(message, parameter='Distance from plot')
-                return
-            if exec_depth == '':
-                message = "This mandatory field is missing. Please, review your data"
-                self.controller.show_warning(message, parameter='Depth')
-                return
-            
-            sql += (", exec_from_plot = '" + str(exec_from_plot) + "', exec_depth = '" + str(exec_depth) + "'"             
-                    ", exec_start = '" + str(forecast_start_real) + "', exec_end = '" + str(forecast_end_real) + "'")       
+            sql += ", exec_start = '" + str(forecast_start_real) + "', exec_end = '" + str(forecast_end_real) + "'"
+            if exec_from_plot != '':
+                sql += ", exec_from_plot = '" + str(exec_from_plot) + "'"
+            if exec_depth != '':
+                sql += ",  exec_depth = '" + str(exec_depth) + "'"
             if exec_descript != '':
                 sql += ", exec_descript = '" + str(exec_descript) + "'"     
             if exec_user != '':
