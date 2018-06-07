@@ -208,7 +208,7 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
         text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)
-    if add_quote and text <> "null":
+    if add_quote and text != "null":
         text = "'"+text+"'"
     return text
 

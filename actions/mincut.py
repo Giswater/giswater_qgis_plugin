@@ -336,10 +336,10 @@ class MincutParent(ParentAction, MultipleSelection):
         mincut_result_state = self.current_state
 
         # Manage 'address'
-        address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut.address_exploitation)
-        address_postal_code = utils_giswater.getWidgetText(self.dlg_mincut.address_postal_code)
-        address_street = utils_giswater.get_item_data(self.dlg_mincut.address_street)
-        address_number = utils_giswater.getWidgetText(self.dlg_mincut.address_number)
+        address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_exploitation)
+        address_postal_code = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code)
+        address_street = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_street)
+        address_number = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_number)
 
         mincut_result_type = self.dlg_mincut.type.currentText()
         anl_cause = self.dlg_mincut.cause.currentText()
@@ -573,7 +573,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_connec.btn_insert.clicked.connect(partial(self.insert_connec))
         self.dlg_connec.btn_delete.clicked.connect(partial(self.delete_records_connec))
         self.dlg_connec.btn_snapping.clicked.connect(self.snapping_init_connec)
-        self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, "connec", self.dlg_connec))
+        self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, self.dlg_connec, "connec"))
         self.dlg_connec.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_connec))
         
         # Set autocompleter for 'customer_code'
@@ -734,7 +734,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_hydro.btn_insert.clicked.connect(partial(self.insert_hydro))
         self.dlg_hydro.btn_delete.clicked.connect(partial(self.delete_records_hydro))
         self.dlg_hydro.btn_snapping.clicked.connect(self.snapping_init_hydro)
-        self.dlg_hydro.btn_accept.clicked.connect(partial(self.accept_hydro, "hydrometer", self.dlg_hydro))
+        self.dlg_hydro.btn_accept.clicked.connect(partial(self.accept_hydro, self.dlg_hydro, "hydrometer"))
         self.dlg_hydro.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_hydro))     
 
         # Set autocompleter for 'customer_code'
@@ -840,7 +840,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connec_list = []
 
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_connec, self.result_mincut_id)
         sql = ("SELECT connec_id FROM " + self.schema_name + ".anl_mincut_result_connec"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
@@ -867,7 +867,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connec_list = []
 
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = ("SELECT DISTINCT(connec_id) FROM " + self.schema_name + ".rtc_hydrometer_x_connec AS rtc"
                " INNER JOIN " + self.schema_name + ".anl_mincut_result_hydrometer AS anl"
                " ON anl.hydrometer_id = rtc.hydrometer_id"
@@ -890,7 +890,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.hydro_list = []
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".anl_mincut_result_hydrometer"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
@@ -916,7 +916,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connec_list = []
 
         # Get 'connec_id' from selected 'customer_code'
-        customer_code = utils_giswater.getWidgetText(self.dlg_connec.connec_id)
+        customer_code = utils_giswater.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
             message = "You need to enter a customer code"
             self.controller.show_info_box(message) 
@@ -1154,12 +1154,12 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connect_signal_selection_changed("mincut_hydro")           
         
 
-    def accept_connec(self, element, dlg):
+    def accept_connec(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'connec' dialog 
             Insert into table 'anl_mincut_result_connec' values of current mincut 
         """
         
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
@@ -1185,12 +1185,12 @@ class MincutParent(ParentAction, MultipleSelection):
         dlg.close()
         
 
-    def accept_hydro(self, element, dlg):
+    def accept_hydro(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
             Insert into table 'anl_mincut_result_hydrometer' values of current mincut 
         """
         
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
@@ -1543,7 +1543,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.set_cursor_wait()                
         
         cur_user = self.controller.get_project_user()               
-        result_mincut_id = utils_giswater.getWidgetText("result_mincut_id")
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
             sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
                    "('" + str(elem_id) + "', '" + str(result_mincut_id) + "', '" + str(cur_user) + "');")
@@ -1593,10 +1593,10 @@ class MincutParent(ParentAction, MultipleSelection):
         if not row:
             return
               
-        utils_giswater.setWidgetText(self.dlg_mincut.work_order, row['work_order'])        
-        utils_giswater.setWidgetText(self.dlg_mincut.type, row['mincut_type'])
-        utils_giswater.setWidgetText(self.dlg_mincut.cause, row['anl_cause'])
-        utils_giswater.setWidgetText(self.dlg_mincut.state, row['state_name'])        
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.type, row['mincut_type'])
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.cause, row['anl_cause'])
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, row['state_name'])
         
         # Manage location
         self.open_mincut_manage_location(row)
@@ -1604,11 +1604,11 @@ class MincutParent(ParentAction, MultipleSelection):
         # Manage dates
         self.open_mincut_manage_dates(row)
 
-        utils_giswater.setWidgetText("pred_description", row['anl_descript'])
-        utils_giswater.setWidgetText("real_description", row['exec_descript'])
-        utils_giswater.setWidgetText("distance", row['exec_from_plot'])
-        utils_giswater.setWidgetText("depth", row['exec_depth'])
-        utils_giswater.setWidgetText("assigned_to", row['assigned_to_name'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "pred_description", row['anl_descript'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "real_description", row['exec_descript'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "distance", row['exec_from_plot'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
         # Update table 'anl_mincut_result_selector'
         self.update_result_selector(result_mincut_id)
@@ -1761,9 +1761,9 @@ class MincutParent(ParentAction, MultipleSelection):
                    " WHERE muni_id = '" + str(row['muni_id']) + "'")
             row_aux = self.controller.get_row(sql)
             if row_aux:                
-                utils_giswater.setWidgetText(self.dlg_mincut.address_exploitation, row_aux['name'])
+                utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_exploitation, row_aux['name'])
                     
-        utils_giswater.setWidgetText(self.dlg_mincut.address_postal_code, str(row['postcode']))
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code, str(row['postcode']))
         
         # Get 'street_name' from 'streetaxis_id'  
         if row['streetaxis_id'] and row['streetaxis_id'] != -1:
@@ -1771,9 +1771,9 @@ class MincutParent(ParentAction, MultipleSelection):
                    " WHERE id = '" + str(row['streetaxis_id']) + "'")
             row_aux = self.controller.get_row(sql)
             if row_aux:
-                utils_giswater.setWidgetText(self.dlg_mincut.address_street, row_aux['name'])
+                utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_street, row_aux['name'])
                          
-        utils_giswater.setWidgetText(self.dlg_mincut.address_number, str(row['postnumber']))     
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_number, str(row['postnumber']))
         
         
     def open_mincut_manage_dates(self, row):
@@ -1795,8 +1795,8 @@ class MincutParent(ParentAction, MultipleSelection):
             time = str(datetime.split()[1])
             qt_date = QDate.fromString(date, 'yyyy-MM-dd')
             qt_time = QTime.fromString(time, 'h:mm:ss')
-            utils_giswater.setCalendarDate(widget_date, qt_date) 
-            utils_giswater.setTimeEdit(widget_time, qt_time)
+            utils_giswater.setCalendarDate(self.dlg_mincut, widget_date, qt_date)
+            utils_giswater.setTimeEdit(self.dlg_mincut, widget_time, qt_time)
 
 
     def searchplus_get_parameters(self):
@@ -2092,7 +2092,7 @@ class MincutParent(ParentAction, MultipleSelection):
                    " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
             row = self.controller.get_row(sql, log_sql=True)
             if row:
-                utils_giswater.setSelectedItem(dialog.address_exploitation, row[0])
+                utils_giswater.setSelectedItem(dialog, dialog.address_exploitation, row[0])
 
         # Set signals
         dialog.address_exploitation.currentIndexChanged.connect(
@@ -2153,7 +2153,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog add_connec
         self.dlg_comp = MincutComposer()
-        utils_giswater.setDialog(self.dlg_comp)
+        # utils_giswater.setDialog(self.dlg_comp)
         self.load_settings(self.dlg_comp)
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates

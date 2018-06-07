@@ -112,11 +112,11 @@ class ManArcDialog(ParentDialog):
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'arc_id')
         if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
-            self.load_default()
+            self.load_default(self.dialog)
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
-            self.load_type_default("arccat_id", cat_id)
+            self.load_type_default(self.dialog, "arccat_id", cat_id)
 
         self.load_state_type(self.dialog, state_type, self.geom_type)
         self.load_dma(self.dialog, dma_id, self.geom_type)
@@ -143,8 +143,8 @@ class ManArcDialog(ParentDialog):
         node_2 = self.get_node_from_point(end_point, arc_searchnodes)
 
         # Fill fields node_1 and node_2
-        utils_giswater.setText("node_1", node_1)
-        utils_giswater.setText("node_2", node_2)
+        utils_giswater.setText(self.dialog, "node_1", node_1)
+        utils_giswater.setText(self.dialog, "node_2", node_2)
                     
 
     def open_node_form(self, idx):

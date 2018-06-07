@@ -127,7 +127,7 @@ class ParentDialog(QDialog):
             self.filter_state_type(self.dialog, state, state_type)
 
        
-    def load_default(self):
+    def load_default(self, dialog):
         """ Load default user values from table 'config_param_user' """
         
         # Builddate
@@ -138,7 +138,7 @@ class ParentDialog(QDialog):
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
         else:
             date_value = QDateTime.currentDateTime()
-        utils_giswater.setCalendarDate("builtdate", date_value)
+        utils_giswater.setCalendarDate(dialog, "builtdate", date_value)
 
         # Exploitation
         sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text ="
@@ -146,7 +146,7 @@ class ParentDialog(QDialog):
                " WHERE cur_user = current_user AND parameter = 'exploitation_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("expl_id", row[0])
+            utils_giswater.setWidgetText(dialog, "expl_id", row[0])
             
         # DMA
         sql = ("SELECT name FROM " + self.schema_name + ".dma WHERE dma_id::text ="
@@ -154,7 +154,7 @@ class ParentDialog(QDialog):
                " WHERE cur_user = current_user AND parameter = 'dma_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("dma_id", row[0])            
+            utils_giswater.setWidgetText(dialog, "dma_id", row[0])
 
         # State
         sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
@@ -162,7 +162,7 @@ class ParentDialog(QDialog):
                " WHERE cur_user = current_user AND  parameter = 'state_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("state", row[0])
+            utils_giswater.setWidgetText(dialog, "state", row[0])
             
         # State type
         sql = ("SELECT name FROM " + self.schema_name + ".value_state_type WHERE id::text ="
@@ -170,33 +170,33 @@ class ParentDialog(QDialog):
                " WHERE cur_user = current_user AND  parameter = 'statetype_vdefault')::text")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("state_type", row[0])            
+            utils_giswater.setWidgetText(dialog, "state_type", row[0])
 
-        self.set_vdefault('presszone_vdefault', 'presszonecat_id')
-        self.set_vdefault('verified_vdefault', 'verified')
-        self.set_vdefault('workcat_vdefault', 'workcat_id')
-        self.set_vdefault('sector_vdefault', 'sector_id')
-        self.set_vdefault('municipality_vdefault', 'muni_id')
-        self.set_vdefault('soilcat_vdefault', 'soilcat_id')
+        self.set_vdefault(dialog, 'presszone_vdefault', 'presszonecat_id')
+        self.set_vdefault(dialog, 'verified_vdefault', 'verified')
+        self.set_vdefault(dialog, 'workcat_vdefault', 'workcat_id')
+        self.set_vdefault(dialog, 'sector_vdefault', 'sector_id')
+        self.set_vdefault(dialog, 'municipality_vdefault', 'muni_id')
+        self.set_vdefault(dialog, 'soilcat_vdefault', 'soilcat_id')
 
 
-    def set_vdefault(self, parameter, widget):
+    def set_vdefault(self, dialog, parameter, widget):
         """ Set default values from default values when insert new feature """
         
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(widget, str(row[0]))
+            utils_giswater.setWidgetText(dialog, widget, str(row[0]))
 
 
-    def load_type_default(self, widget, cat_id):
+    def load_type_default(self, dialog, widget, cat_id):
 
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = '" + str(cat_id) + "'")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(widget, row[0])
+            utils_giswater.setWidgetText(dialog, widget, row[0])
 
 
     def set_signals(self):
@@ -507,7 +507,7 @@ class ParentDialog(QDialog):
         
         # Create the dialog and signals
         self.dlg_sum = AddSum()   
-        utils_giswater.setDialog(self.dlg_sum)     
+        # utils_giswater.setDialog(self.dlg_sum)
               
         # Set signals
         self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept)
@@ -786,7 +786,7 @@ class ParentDialog(QDialog):
     def fill_tbl_element_man(self, widget, table_name, expr_filter):
         """ Fill the table control to show elements """
         
-        # Get widgets  
+        # Get widgets
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)        
         self.element_id = self.dialog.findChild(QLineEdit, "element_id")             
         open_element = self.dialog.findChild(QPushButton, "open_element")
@@ -963,7 +963,7 @@ class ParentDialog(QDialog):
         else:
             # If more then one document is attached open dialog with list of documents
             self.dlg_load_doc = LoadDocuments()
-            utils_giswater.setDialog(self.dlg_load_doc)
+            # utils_giswater.setDialog(self.dlg_load_doc)
 
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
             btn_open_doc.clicked.connect(self.open_selected_doc)
@@ -1017,7 +1017,7 @@ class ParentDialog(QDialog):
 
         # Open dialog event_standard
         self.dlg_event_full = EventFull()
-        utils_giswater.setDialog(self.dlg_event_full)
+        # utils_giswater.setDialog(self.dlg_event_full)
 
         # Get all data for one visit
         sql = ("SELECT *"
@@ -1027,25 +1027,25 @@ class ParentDialog(QDialog):
         if not row:
             return
 
-        utils_giswater.setWidgetText(self.dlg_event_full.id, row['id'])
-        utils_giswater.setWidgetText(self.dlg_event_full.event_code, row['event_code'])
-        utils_giswater.setWidgetText(self.dlg_event_full.visit_id, row['visit_id'])
-        utils_giswater.setWidgetText(self.dlg_event_full.position_id, row['position_id'])
-        utils_giswater.setWidgetText(self.dlg_event_full.position_value, row['position_value'])
-        utils_giswater.setWidgetText(self.dlg_event_full.parameter_id, row['parameter_id'])
-        utils_giswater.setWidgetText(self.dlg_event_full.value, row['value'])
-        utils_giswater.setWidgetText(self.dlg_event_full.value1, row['value1'])
-        utils_giswater.setWidgetText(self.dlg_event_full.value2, row['value2'])
-        utils_giswater.setWidgetText(self.dlg_event_full.geom1, row['geom1'])
-        utils_giswater.setWidgetText(self.dlg_event_full.geom2, row['geom2'])
-        utils_giswater.setWidgetText(self.dlg_event_full.geom3, row['geom3'])
-        utils_giswater.setWidgetText(self.dlg_event_full.xcoord, row['xcoord'])
-        utils_giswater.setWidgetText(self.dlg_event_full.ycoord, row['ycoord'])
-        utils_giswater.setWidgetText(self.dlg_event_full.compass, row['compass'])
-        utils_giswater.setWidgetText(self.dlg_event_full.tstamp, row['tstamp'])
-        utils_giswater.setWidgetText(self.dlg_event_full.text, row['text'])
-        utils_giswater.setWidgetText(self.dlg_event_full.index_val, row['index_val'])
-        utils_giswater.setWidgetText(self.dlg_event_full.is_last, row['is_last'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.id, row['id'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value, row['value'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.text, row['text'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
 
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
 
@@ -1108,7 +1108,7 @@ class ParentDialog(QDialog):
     def add_picture(self):
 
         self.dlg_add_img = AddPicture()
-        utils_giswater.setDialog(self.dlg_add_img)
+        # utils_giswater.setDialog(self.dlg_add_img)
 
         self.lbl_path = self.dlg_add_img.findChild(QLineEdit, "path")
 
@@ -1127,7 +1127,7 @@ class ParentDialog(QDialog):
         """ Get file dialog """
 
         # Check if selected file exists. Set default value if necessary
-        file_path = utils_giswater.getWidgetText(widget)
+        file_path = utils_giswater.getWidgetText(self.dlg_add_img, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
             folder_path = self.plugin_dir
         else:
@@ -1141,13 +1141,13 @@ class ParentDialog(QDialog):
         file_dialog.setFileMode(QFileDialog.AnyFile)
         folder_path = file_dialog.getOpenFileName(self, 'Open picture', 'c:\\', "Images (*.png *.jpg)")
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path))
+            utils_giswater.setWidgetText(self.dlg_add_img, widget, str(folder_path))
 
 
     def save_picture(self):
         """ Insert picture selected from form dialog to om_visit_event_photo """
 
-        picture_path = utils_giswater.getWidgetText(self.lbl_path)
+        picture_path = utils_giswater.getWidgetText(self.dlg_add_img, self.lbl_path)
         if picture_path == "null":
             message = "Please choose a file"
             self.controller.show_info_box(message)
@@ -1424,7 +1424,7 @@ class ParentDialog(QDialog):
             self.dlg_cat = UDcatalog()
             self.field2 = 'shape'
             self.field3 = 'geom1'
-        utils_giswater.setDialog(self.dlg_cat)
+        # utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
         self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
         self.dlg_cat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cat))
@@ -1446,7 +1446,7 @@ class ParentDialog(QDialog):
             sql += " WHERE type = '" + str(self.sys_type) + "')"
         sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.matcat_id, rows)
 
         sql = "SELECT DISTINCT(" + self.field2 + ")"
         sql += " FROM " + self.schema_name + ".cat_" + geom_type
@@ -1488,7 +1488,7 @@ class ParentDialog(QDialog):
     def fill_filter2(self, wsoftware, geom_type):
 
         # Get values from filters
-        mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)
+        mats = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.matcat_id)
 
         # Set SQL query
         sql_where = None
@@ -1513,7 +1513,7 @@ class ParentDialog(QDialog):
             sql += " ORDER BY " + str(self.field2)
 
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter2, rows)
         self.fill_filter3(wsoftware, geom_type)
 
 
@@ -1549,7 +1549,7 @@ class ParentDialog(QDialog):
                 sql += " ORDER BY "+self.field3
 
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.filter3, rows)
         self.fill_catalog_id(wsoftware, geom_type)
 
 
@@ -1593,19 +1593,19 @@ class ParentDialog(QDialog):
             sql += " ORDER BY id"
             
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.id, rows)
+        utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.id, rows)
 
 
     def fill_geomcat_id(self, geom_type):
         
-        catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
+        catalog_id = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.id)
         self.close_dialog(self.dlg_cat)
         if geom_type == 'node':
-            utils_giswater.setWidgetText(self.nodecat_id, catalog_id)
+            utils_giswater.setWidgetText(self.dlg_cat, self.nodecat_id, catalog_id)
         elif geom_type == 'arc':
-            utils_giswater.setWidgetText(self.arccat_id, catalog_id)
+            utils_giswater.setWidgetText(self.dlg_cat, self.arccat_id, catalog_id)
         else:
-            utils_giswater.setWidgetText(self.connecat_id, catalog_id)
+            utils_giswater.setWidgetText(self.dlg_cat, self.connecat_id, catalog_id)
 
 
     def manage_feature_cat(self):
@@ -1887,7 +1887,7 @@ class ParentDialog(QDialog):
         return True
                   
     
-    def manage_combo_parameter(self, parameter):     
+    def manage_combo_parameter(self, parameter):
         """ Manage parameter of widgettype_id = 'QComboBox' """
         
         sql = None
