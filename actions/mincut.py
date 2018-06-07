@@ -99,6 +99,8 @@ class MincutParent(ParentAction, MultipleSelection):
         self.real_description = self.dlg.findChild(QTextEdit, "real_description")
         self.distance = self.dlg.findChild(QLineEdit, "distance")
         self.depth = self.dlg.findChild(QLineEdit, "depth")
+        utils_giswater.double_validator(self.distance, 0, 9999999, 3)
+        utils_giswater.double_validator(self.depth, 0, 9999999, 3)
 
         # Manage adress
         self.adress_init_config(self.dlg)

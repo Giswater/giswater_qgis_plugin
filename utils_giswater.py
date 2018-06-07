@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QDoubleValidator
+
 """ Module with utility functions to interact with dialog and its widgets """
 from qgis.gui import QgsDateTimeEdit
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
@@ -474,5 +476,9 @@ def remove_tab_by_tabName(tab_widget, tab_name):
         if tab_widget.widget(x).objectName() == tab_name:
             tab_widget.removeTab(x)
             break
-        
-        
+
+
+def double_validator(widget, min=0, max=999999, decimals=3, notation=QDoubleValidator().StandardNotation):
+    validator = QDoubleValidator(min, max, decimals)
+    validator.setNotation(notation)
+    widget.setValidator(validator)
