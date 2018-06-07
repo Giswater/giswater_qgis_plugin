@@ -37,7 +37,7 @@ class CadAddCircle(ParentMapTool):
         self.dlg_create_circle = Cad_add_circle()
         utils_giswater.setDialog(self.dlg_create_circle)
         self.load_settings(self.dlg_create_circle)
-
+        self.cancel_circle = False
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
         self.dlg_create_circle.radius.setValidator(validator)
@@ -153,12 +153,10 @@ class CadAddCircle(ParentMapTool):
 
         elif event.button() == Qt.RightButton:
             self.iface.actionPan().trigger()
-            self.cancel_circle = False
-            return
-
-        elif event.button() == Qt.RightButton:
+            self.cancel_circle = True
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
+            return
 
         if self.layer_circle:
             self.layer_circle.commitChanges()
