@@ -7,8 +7,8 @@ or (at your option) any later version.
 """
 
 from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
-from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget, QDialogButtonBox
-from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QDialogButtonBox
+from PyQt4.QtGui import QAbstractItemView, QTabWidget
 
 import os
 import sys
@@ -74,7 +74,7 @@ class ManageVisit(ParentManage, QObject):
         # save previous dialog and set new one. Previous dialog will be set exiting the current one
         self.previous_dialog = utils_giswater.dialog()
         utils_giswater.setDialog(self.dlg)
-        
+
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -128,7 +128,9 @@ class ManageVisit(ParentManage, QObject):
         self.btn_doc_new = self.dlg.findChild(QPushButton, "btn_doc_new")
         self.btn_open_doc = self.dlg.findChild(QPushButton, "btn_open_doc")
         self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
+        self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
+        self.set_selectionbehavior(self.dlg)
         # Set current date and time
         current_date = QDate.currentDate()
         self.dlg.startdate.setDate(current_date)
@@ -299,13 +301,13 @@ class ManageVisit(ParentManage, QObject):
         # C) load all related events in the relative table
         self.filter = "visit_id = '" + str(text) + "'"
         table_name = self.schema_name + ".om_visit_event"
-        self.fill_table_visit(self.tbl_event, table_name, self.filter)
+        self.fill_table_object(self.tbl_event, table_name, expr_filter=self.filter)
         self.set_configuration(self.tbl_event, table_name)
         self.manage_events_changed()
 
         # D) load all related documents in the relative table
         table_name = self.schema_name + ".v_ui_doc_x_visit"
-        self.fill_table_visit(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
+        self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", expr_filter=self.filter)
         self.set_configuration(self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table
@@ -719,32 +721,13 @@ class ManageVisit(ParentManage, QObject):
         self.completer.setModel(model)
 
 
-    def manage_document(self):
+    def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
-        
-        manage_document = ManageDocument(
-            self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
-        dlg_docman = manage_document.manage_document()
+        visit_id = utils_giswater.getText(self.dlg.visit_id)
+        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        dlg_docman = manage_document.manage_document(tablename='visit', qtable=self.dlg.tbl_document, item_id=visit_id)
+        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, 'doc'))
-
-
-    def fill_table_visit(self, widget, table_name, filter_):
-        """ Set a model with selected filter. Attach that model to selected table """
-
-        # Set model
-        model = QSqlTableModel()
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.setFilter(filter_)
-        model.select()
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
-
-        # Attach model to table view
-        widget.setModel(model)
-        widget.show()
 
 
     def event_insert(self):

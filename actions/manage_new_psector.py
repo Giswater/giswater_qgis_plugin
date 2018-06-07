@@ -146,11 +146,6 @@ class ManageNewPsector(ParentManage):
         if isinstance(psector_id, bool):
             psector_id = 0
         self.delete_psector_selector(self.plan_om + '_psector_selector')
-        # tab 'Document'
-        self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
-        self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
-        filter_ = None
-        self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
 
         if psector_id != 0:
             self.enable_tabs(True)
@@ -214,12 +209,11 @@ class ManageNewPsector(ParentManage):
                        " WHERE cur_user = current_user AND psector_id='" +utils_giswater.getWidgetText(self.dlg.psector_id) + "'")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg.psector_id))
-            filter_ = "psector_id = '" + str(psector_id) + "'"
+
 
         # tab 'Document'
         self.doc_id = self.dlg.findChild(QLineEdit, "doc_id")
         self.tbl_document = self.dlg.findChild(QTableView, "tbl_document")
-        self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
         self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
@@ -552,9 +546,8 @@ class ManageNewPsector(ParentManage):
 
 
     def enable_tabs(self, enabled):
-        self.dlg.tabWidget.setTabEnabled(1, enabled)
-        self.dlg.tabWidget.setTabEnabled(2, enabled)
-        self.dlg.tabWidget.setTabEnabled(3, enabled)
+        for x in range(1, self.dlg.tabWidget.count()):
+            self.dlg.tabWidget.setTabEnabled(x, enabled)
 
 
     def enable_buttons(self, enabled):
@@ -624,7 +617,10 @@ class ManageNewPsector(ParentManage):
             self.update_total(self.dlg.selected_rows)
         elif self.dlg.tabWidget.currentIndex() == 3:
             self.populate_budget(utils_giswater.getWidgetText('psector_id'))
-
+        elif self.dlg.tabWidget.currentIndex() == 4:
+            psector_id = utils_giswater.getWidgetText('psector_id')
+            expr = "psector_id = '" + str(psector_id) + "'"
+            self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
         sql = ("SELECT other, gexpenses, vat"
                " FROM " + self.schema_name + "." + self.plan_om + "_psector "
                " WHERE psector_id = '" + str(utils_giswater.getWidgetText('psector_id')) + "'")
@@ -1110,14 +1106,10 @@ class ManageNewPsector(ParentManage):
         psector_id = utils_giswater.getText(self.dlg.psector_id)
 
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
-        dlg_docman = manage_document.manage_document(refresh_table=True, qtable=qtable, psector_id=psector_id)
-        # dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, 'doc'))
-
-        # Remove tab relations for new document in psector
+        dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
         utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
-        # Refres QTableView
-        # self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
-        # self.tbl_document.doubleClicked.connect(partial(self.document_open))
+        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, 'doc'))
+
 
     def document_open(self):
         """Open selected document."""
@@ -1167,23 +1159,4 @@ class ManageNewPsector(ParentManage):
         model.setStringList(values)
         self.completer.setModel(model)
 
-
-    def fill_table_doc(self, widget, table_name, filter_=None):
-        """ Set a model with selected filter. Attach that model to selected table """
-
-        # Set model
-        model = QSqlTableModel()
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        if filter_ is not None:
-            model.setFilter(filter_)
-        model.select()
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
-
-        # Attach model to table view
-        widget.setModel(model)
-        widget.show()
 
