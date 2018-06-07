@@ -126,7 +126,11 @@ class ParentDialog(QDialog):
             state_type = self.dialog.findChild(QComboBox, 'state_type')
             self.filter_dma(expl_id, dma_id)
             self.filter_state_type(state, state_type)
-
+        else:
+            sql = ("SELECT max(" + self.geom_type + "_id::integer) FROM " + self.schema_name + "." + self.geom_type)
+            row = self.controller.get_row(sql)
+            feature_id = int(row[0])+1
+            utils_giswater.setWidgetText(self.geom_type + "_id", str(feature_id))
        
     def load_default(self):
         """ Load default user values from table 'config_param_user' """
