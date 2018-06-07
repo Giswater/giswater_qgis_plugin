@@ -964,6 +964,10 @@
         <source>Mincut done, but has conflict and overlaps with</source>
         <translation>Poligon de tall fet, pero te conflictes d' interseccions amb </translation>
     </message>
+    <message>
+        <source>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</source>
+        <translation>Poligon de tall fet, pero te conflictes. Revisi anl_arc y anl_node per veure els detalls</translation>
+    </message>
 </context>
 
 </TS>

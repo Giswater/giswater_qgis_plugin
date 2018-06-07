@@ -166,14 +166,16 @@ class MincutParent(ParentAction, MultipleSelection):
         self.action_mincut_composer = action
 
         # Show future id of mincut
-        result_mincut_id = 1        
-        sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
-        row = self.controller.get_row(sql)
-        if row:                
-            result_mincut_id = row[0]
-                    
+        result_mincut_id = 1
+        sql = ("SELECT setval('" +self.schema_name+".urn_id_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
+
+        #sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            result_mincut_id = str(int(row[0])+1)
+
         self.result_mincut_id.setText(str(result_mincut_id))
-        
+
         # Set state name
         utils_giswater.setWidgetText(self.dlg.state, str(self.states[0]))
         self.current_state = 0        
@@ -481,8 +483,9 @@ class MincutParent(ParentAction, MultipleSelection):
                 row = self.controller.get_row(sql, log_sql=False, commit=True)
                 if row[0] is not None:
                         message = "Mincut done, but has conflict and overlaps with "
+                        message = "Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict"
                         self.controller.log_info(str(answer))
-                        answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
+                        answer = self.controller.ask_question(message, "Change dates")
                         if answer:
                             self.dlg.close()
         if answer is False:
