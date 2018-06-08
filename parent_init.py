@@ -406,8 +406,9 @@ class ParentDialog(QDialog):
 
         # Set completer
         self.set_completer_object(dialog, self.table_object)
+
         if element_id:
-            utils_giswater.setWidgetText(dialog, "element_id", element_id)
+            utils_giswater.setWidgetText(elem.dlg_add_element, "element_id", element_id)
 
         # Open dialog
         elem.open_dialog(elem.dlg_add_element)
@@ -812,8 +813,8 @@ class ParentDialog(QDialog):
                     
 
     def open_selected_element(self, dialog, widget):
-        """ Open form of selected element of the @widget?? """  
-            
+        """ Open form of selected element of the @widget?? """
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
@@ -827,6 +828,7 @@ class ParentDialog(QDialog):
             break
         
         # Open selected element
+
         self.manage_element(dialog, element_id)
         
             
