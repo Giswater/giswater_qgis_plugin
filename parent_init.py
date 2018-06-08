@@ -406,7 +406,6 @@ class ParentDialog(QDialog):
 
         # Set completer
         self.set_completer_object(dialog, self.table_object)
-        self.controller.log_info(str(element_id))
         if element_id:
             utils_giswater.setWidgetText(dialog, "element_id", element_id)
 
@@ -625,8 +624,7 @@ class ParentDialog(QDialog):
         
         # Get selected values in Comboboxes        
         doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type")
-        self.controller.log_info(str("test111111111111111"))
-        self.controller.log_info(str(doc_type_value))
+
         if doc_type_value != 'null' or doc_type_value is not None:
             expr+= " AND doc_type = '"+doc_type_value+"'"
   

@@ -345,7 +345,7 @@ class ManageElement(ParentManage):
                 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)                
-        self.set_table_columns(self.dlg_man.tbl_element, table_object)        
+        self.set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
         
         # Set dignals
         self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id,  self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
