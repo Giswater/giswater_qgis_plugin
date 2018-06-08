@@ -440,7 +440,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_node" 
-        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
+        self.fill_tbl_element_man(self.dialog, self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
                         
 
@@ -448,7 +448,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_node"       
-        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.fill_tbl_document_man(self.dialog, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
                 
             

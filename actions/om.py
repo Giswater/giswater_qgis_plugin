@@ -66,8 +66,8 @@ class Om(ParentAction):
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
         # Set signals
-        self.dlg_psector_mng.btn_cancel.clicked.connect(self.close_dialog)
-        self.dlg_psector_mng.rejected.connect(self.close_dialog)
+        self.dlg_psector_mng.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
         self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, qtbl_psm))
         self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
@@ -90,7 +90,7 @@ class Om(ParentAction):
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        self.close_dialog()
+        self.close_dialog(self.dlg_psector_mng)
         self.om_psector(psector_id)
 
 
