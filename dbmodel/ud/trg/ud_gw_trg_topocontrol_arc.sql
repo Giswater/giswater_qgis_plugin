@@ -16,6 +16,8 @@ DECLARE
     rec Record;
     sys_elev1_aux double precision;
     sys_elev2_aux double precision;
+	custom_elev1_aux double precision;
+    custom_elev2_aux double precision;
     y_aux double precision;
     vnoderec Record;
     newPoint public.geometry;    
@@ -159,11 +161,11 @@ BEGIN
 			is_reversed= FALSE;
 			sys_y1_aux:= (CASE WHEN (NEW.custom_y1 IS NOT NULL) THEN NEW.custom_y1::numeric (12,3) ELSE NEW.y1::numeric (12,3) END);
 			sys_y2_aux:= (CASE WHEN (NEW.custom_y2 IS NOT NULL) THEN NEW.custom_y2::numeric (12,3) ELSE NEW.y2::numeric (12,3) END);
-			sys_elev1_aux:= (CASE WHEN (NEW.custom_elev1 IS NOT NULL) THEN NEW.custom_elev1 ELSE NEW.elev1 END);
-			sys_elev2_aux:= (CASE WHEN (NEW.custom_elev2 IS NOT NULL) THEN NEW.custom_elev2 ELSE NEW.elev2 END);
+			custom_elev1_aux:= (CASE WHEN (NEW.custom_elev1 IS NOT NULL) THEN NEW.custom_elev1 ELSE NEW.elev1 END);
+			custom_elev2_aux:= (CASE WHEN (NEW.custom_elev2 IS NOT NULL) THEN NEW.custom_elev2 ELSE NEW.elev2 END);
 			sys_elev1_aux:= (CASE WHEN sys_elev1_aux IS NOT NULL THEN sys_elev1_aux ELSE (SELECT sys_top_elev FROM v_node WHERE node_id=nodeRecord1.node_id) - (CASE WHEN sys_y1_aux IS NOT NULL THEN sys_y1_aux ELSE 0 END) END);
 			sys_elev2_aux:= (CASE WHEN sys_elev2_aux IS NOT NULL THEN sys_elev2_aux ELSE (SELECT sys_top_elev FROM v_node WHERE node_id=nodeRecord2.node_id) - (CASE WHEN sys_y2_aux IS NOT NULL THEN sys_y2_aux ELSE 0 END) END);
-		
+			
 			-- Update coordinates
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
@@ -200,6 +202,9 @@ BEGIN
 				y_aux := NEW.custom_elev1;
 				NEW.custom_elev1 := NEW.custom_elev2;
 				NEW.custom_elev2 := y_aux;
+				
+				NEW.sys_y1 := sys_y2_aux;
+				NEW.sys_y2 := sys_y1_aux;
 
 				NEW.sys_elev1 := sys_elev2_aux;
 				NEW.sys_elev2 := sys_elev1_aux;
