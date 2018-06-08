@@ -184,7 +184,12 @@ class DrawProfiles(ParentMapTool):
 
     def open_profile(self):
         """ Open selected profile from dialog load_profiles.ui """
-    
+
+        selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
         # Selected item from list 
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
@@ -1526,6 +1531,11 @@ class DrawProfiles(ParentMapTool):
     def delete_profile(self):
         """ Delete profile """
 
+        selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
         # Selected item from list
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
