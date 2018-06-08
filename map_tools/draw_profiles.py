@@ -1513,7 +1513,7 @@ class DrawProfiles(ParentMapTool):
             self.dlg.btn_export_pdf.setDisabled(False)
             self.dlg.cbx_template.setDisabled(False)
 
-        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None and self.start_end_node[2] != None:
+        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
             self.dlg.btn_delete_additional_point.setDisabled(False)
 
         # Manual path - if additional point exist
