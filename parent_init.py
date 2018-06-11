@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from PyQt4.Qt import QDate, QDateTime
@@ -40,7 +40,7 @@ from actions.manage_visit import ManageVisit
 from utils_.widget_manager import WidgetManager
 
 
-class ParentDialog(QDialog):   
+class ParentDialog(QDialog):
     
     def __init__(self, dialog, layer, feature):
         """ Constructor class """  
@@ -127,10 +127,22 @@ class ParentDialog(QDialog):
             self.filter_dma(expl_id, dma_id)
             self.filter_state_type(state, state_type)
         else:
-            sql = ("SELECT max(" + self.geom_type + "_id::integer) FROM " + self.schema_name + "." + self.geom_type)
+            point = self.canvas.mouseLastXY()
+            point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), point.x(), point.y())
+
+            sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('"+str(point[0])+"', '"+str(point[1])+"')")
             row = self.controller.get_row(sql)
-            feature_id = int(row[0])+1
-            utils_giswater.setWidgetText(self.geom_type + "_id", str(feature_id))
+            values = row[0]
+            self.controller.log_info(str(values))
+            #utils_giswater.setWidgetText(self.geom_type + "_id", str(values['feature_id']))
+            if 'name' in values['muni_id']:
+                utils_giswater.setWidgetText('muni_id', values['muni_id']['name'])
+            if 'name' in values['sector_id']:
+                utils_giswater.setWidgetText('sector_id', values['sector_id']['name'])
+            if 'name' in values['expl_id']:
+                utils_giswater.setWidgetText('expl_id', values['expl_id']['name'])
+            if 'name' in values['dma_id']:
+                utils_giswater.setWidgetText('dma_id', values['dma_id']['name'])
        
     def load_default(self):
         """ Load default user values from table 'config_param_user' """
@@ -248,8 +260,8 @@ class ParentDialog(QDialog):
             self.parse_commit_error_message()
         else:
             feature_id = self.feature.attribute(self.geom_type + '_id')
-            self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
-            self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)
+            # self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
+            # self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)
 
         # Close dialog
         if close_dialog:
@@ -2497,3 +2509,7 @@ class ParentDialog(QDialog):
 
             # Open dialog
         dlg.open()
+
+
+
+
