@@ -958,10 +958,10 @@ class ParentManage(ParentAction, object):
 
         if table_object == "doc":
             self.manage_document()
-            utils_giswater.setWidgetText(dialog, widget_id, selected_object_id)
+            utils_giswater.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
         elif table_object == "element":
             self.manage_element(new_element_id=False)
-            utils_giswater.setWidgetText(dialog, widget_id, selected_object_id)
+            utils_giswater.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
         elif table_object == "om_visit":
             self.manage_visit(visit_id=selected_object_id)
 
