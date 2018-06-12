@@ -151,8 +151,8 @@ class ManArcDialog(ParentDialog):
         """ Open form corresponding to start or end node of the current arc """
 
         field_node = "node_" + str(idx)
-        widget = self.dialog.findChild(QLineEdit, field_node)        
-        node_id = utils_giswater.getWidgetText(widget)           
+        widget = self.dialog.findChild(QLineEdit, field_node)
+        node_id = utils_giswater.getWidgetText(self.dialog, widget)
         if not widget:    
             self.controller.log_info("widget not found", parameter=field_node)                 
             return
