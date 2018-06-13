@@ -326,7 +326,7 @@ class ChangeElemType(ParentMapTool):
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_node ORDER BY id"
             rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox("node_nodecat_id", rows, allow_nulls=False)
+            utils_giswater.fillComboBox(self.dlg_chg_node_type, "node_nodecat_id", rows, allow_nulls=False)
  
         self.dlg_chg_node_type.node_node_type.setText(node_type)
         self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
