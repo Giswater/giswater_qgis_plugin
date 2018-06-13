@@ -28,7 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QPushButton" name="btn_cancel">
+  <widget class="QPushButton" name="btn_close">
    <property name="geometry">
     <rect>
      <x>155</x>
@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Cancel</string>
+    <string>Close</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_delete">
@@ -82,7 +82,7 @@
   <tabstop>btn_insert</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>tbl</tabstop>
-  <tabstop>btn_cancel</tabstop>
+  <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
  <connections/>

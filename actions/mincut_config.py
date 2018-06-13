@@ -42,8 +42,8 @@ class MincutConfig(ParentAction):
         self.menu_valve = QMenu()
         self.dlg_multi.btn_insert.clicked.connect(partial(self.fill_insert_menu, table))
         
-        btn_cancel = self.dlg_multi.findChild(QPushButton, "btn_cancel")
-        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_multi))
+        btn_close = self.dlg_multi.findChild(QPushButton, "btn_close")
+        btn_close.clicked.connect(partial(self.close_dialog, self.dlg_multi))
 
         self.menu_valve.clear()
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
