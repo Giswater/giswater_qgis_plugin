@@ -119,7 +119,6 @@ class Basic(ParentAction):
      
      
     def close_dialog(self, dlg):
-        self.controller.log_info(str("close?"))
         ParentAction.close_dialog(self, dlg)
         try:
             self.search_plus.refresh_data()

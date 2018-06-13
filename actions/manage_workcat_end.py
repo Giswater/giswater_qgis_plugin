@@ -31,7 +31,6 @@ class ManageWorkcatEnd(ParentManage):
         self.remove_selection(True)
         # Create the dialog and signals
         self.dlg_work_end = WorkcatEnd()
-        # utils_giswater.setDialog(self.dlg_work_end)
         self.load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
         # Capture the current layer to return it at the end of the operation
@@ -326,8 +325,6 @@ class ManageWorkcatEnd(ParentManage):
         ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
         self.update_geom_type("arc", ids_list)
 
-
-
         self.canvas.refresh()
         self.dlg_work.close()
         self.manage_workcat_end_accept()
@@ -421,13 +418,14 @@ class ManageWorkcatEnd(ParentManage):
                 self.controller.execute_sql(sql)
             self.set_edit_arc_downgrade_force('False')
             ids_ = ids_[:-2]
-            if show_warning:
+            if show_warning and len(ids_) != 0:
                 msg = 'These items could not be downgrade to state 0'
                 self.controller.show_info_box(msg, title="Warning", inf_text=str(ids_), context_name=None, parameter=None)
             sql = ("DELETE FROM " + self.schema_name + ".audit_log_data "
                    " WHERE fprocesscat_id ='28' AND user_name = current_user")
             self.controller.execute_sql(sql)
 
+        self.canvas.refresh()
 
     def new_workcat(self):
 
