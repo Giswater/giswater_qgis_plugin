@@ -14,8 +14,8 @@ CREATE OR REPLACE VIEW ws.v_rtc_hydrometer AS
  SELECT hydrometer.id::text AS hydrometer_id,
     hydrometer.code AS hydrometer_customer_code,
         CASE
-            WHEN connec.connec_id IS NULL THEN 'XXXX'::character varying
-            ELSE connec.connec_id
+            WHEN v_edit_connec.connec_id IS NULL THEN 'XXXX'::character varying
+            ELSE v_edit_connec.connec_id
         END AS connec_id,
         CASE
             WHEN hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
@@ -60,17 +60,12 @@ CREATE OR REPLACE VIEW ws.v_rtc_hydrometer AS
      JOIN ws.v_edit_connec ON v_edit_connec.customer_code::text = hydrometer.connec_id::text
      	WHERE selector_hydrometer.state_id=hydrometer.state_id AND selector_hydrometer.cur_user=current_user;
 
-
-GRANT ALL ON TABLE ws.v_rtc_hydrometer TO postgres;
 GRANT SELECT ON TABLE ws.v_rtc_hydrometer TO role_basic;
 GRANT SELECT ON TABLE ws.v_rtc_hydrometer TO role_edit;
 GRANT SELECT ON TABLE ws.v_rtc_hydrometer TO role_om;
 GRANT SELECT ON TABLE ws.v_rtc_hydrometer TO role_epa;
 GRANT SELECT ON TABLE ws.v_rtc_hydrometer TO role_master;
-GRANT SELECT ON TABLE ws.v_rtc_hydrometer TO role_admin
-
-
-
+GRANT SELECT ON TABLE ws.v_rtc_hydrometer TO role_admin;
 
 
 
@@ -90,7 +85,7 @@ SELECT anl_mincut_result_hydrometer.id,
 
 GRANT SELECT ON TABLE ws.v_anl_mincut_result_hydrometer TO role_basic;
 GRANT SELECT ON TABLE ws.v_anl_mincut_result_hydrometer TO role_edit;
-GRANT ALL ON TABLE ws.v_anl_mincut_result_hydrometer TO role_om;
+GRANT SELECT ON TABLE ws.v_anl_mincut_result_hydrometer TO role_om;
 GRANT SELECT ON TABLE ws.v_anl_mincut_result_hydrometer TO role_epa;
-GRANT ALL ON TABLE ws.v_anl_mincut_result_hydrometer TO role_master;
+GRANT SELECT ON TABLE ws.v_anl_mincut_result_hydrometer TO role_master;
 GRANT SELECT ON TABLE ws.v_anl_mincut_result_hydrometer TO role_admin;
