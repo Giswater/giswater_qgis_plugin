@@ -63,7 +63,10 @@ class ReplaceNodeMapTool(ParentMapTool):
                    " WHERE id ='"+str(work_id)+"'")
             row = self.controller.get_row(sql)
             if row:
-                self.enddate_aux = datetime.strptime(str(row[0]), '%Y-%m-%d').date()
+                if row[0] != 'null' and row[0] is not None:
+                    self.enddate_aux = datetime.strptime(str(row[0]), '%Y-%m-%d').date()
+                else:
+                    self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
             else:
                 self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
 
