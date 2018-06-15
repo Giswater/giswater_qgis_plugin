@@ -22,8 +22,8 @@ BEGIN
     -- Computing process
     FOR rec_node IN SELECT DISTINCT * FROM node AS a WHERE (SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id) = 0
     LOOP
-        INSERT INTO anl_node (node_id, state, expl_id, fprocesscat_id, the_geom) 
-		VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom);
+        INSERT INTO anl_node (node_id, state, expl_id, fprocesscat_id, the_geom, nodecat_id) 
+		VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id);
     END LOOP;
 
     RETURN;
