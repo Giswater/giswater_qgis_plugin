@@ -48,8 +48,8 @@ class SearchPlus(QObject):
             return False
 
         # Create dialog
-        self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-        utils_giswater.remove_tab_by_tabName(self.dlg.tab_main, 'tab')
+        self.dlg_search = SearchPlusDockWidget(self.iface.mainWindow())
+        utils_giswater.remove_tab_by_tabName(self.dlg_search.tab_main, 'tab')
         
         # Check address parameters
         message = "Parameter not found"
@@ -64,54 +64,54 @@ class SearchPlus(QObject):
         portal_field_postal = self.params['portal_field_postal']
 
         # Set signals
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial
-            (self.address_fill_postal_code, self.dlg.address_postal_code))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial
-            (self.address_populate, self.dlg.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg.address_exploitation.currentIndexChanged.connect(partial
-            (self.address_get_numbers, self.dlg.address_exploitation, self.street_field_expl, False, False))
+        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_fill_postal_code, self.dlg_search.address_postal_code))
+        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
+        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
+            (self.address_get_numbers, self.dlg_search.address_exploitation, self.street_field_expl, False, False))
         
-        self.dlg.address_postal_code.currentIndexChanged.connect(partial
-            (self.address_get_numbers, self.dlg.address_postal_code, portal_field_postal, False))
-        self.dlg.address_street.activated.connect(partial
-            (self.address_get_numbers, self.dlg.address_street, self.params['portal_field_code'], True))
-        self.dlg.address_number.activated.connect(partial(self.address_zoom_portal))
+        self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
+            (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False))
+        self.dlg_search.address_street.activated.connect(partial
+            (self.address_get_numbers, self.dlg_search.address_street, self.params['portal_field_code'], True))
+        self.dlg_search.address_number.activated.connect(partial(self.address_zoom_portal))
 
-        self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
-        self.dlg.network_code.activated.connect(partial
-            (self.network_zoom, self.dlg.network_code, self.dlg.network_geom_type))
-        self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
+        self.dlg_search.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
+        self.dlg_search.network_code.activated.connect(partial
+            (self.network_zoom, self.dlg_search.network_code, self.dlg_search.network_geom_type))
+        self.dlg_search.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg_search.network_code))
         if self.project_type == 'ws':
             self.hydro_create_list()
-            self.dlg.expl_name.activated.connect(partial(self.expl_name_changed))
-            self.dlg.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg.hydro_id, self.dlg.expl_name))
-            self.dlg.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydro_id))
-            self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
-            self.filter_by_list(self.dlg.hydro_id)
-        self.dlg.workcat_id.activated.connect(partial(self.workcat_open_table_items))
+            self.dlg_search.expl_name.activated.connect(partial(self.expl_name_changed))
+            self.dlg_search.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg_search.hydro_id, self.dlg_search.expl_name))
+            self.dlg_search.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg_search.hydro_id))
+            self.set_model_by_list(self.list_hydro, self.dlg_search.hydro_id)
+            self.filter_by_list(self.dlg_search.hydro_id)
+        self.dlg_search.workcat_id.activated.connect(partial(self.workcat_open_table_items))
 
-        self.dlg.btn_clear_workcat.clicked.connect(self.clear_workcat)
-        self.dlg.btn_refresh_workcat.clicked.connect(self.refresh_workcat)
-        self.dlg.psector_id.activated.connect(partial(self.open_plan_psector))
+        self.dlg_search.btn_clear_workcat.clicked.connect(self.clear_workcat)
+        self.dlg_search.btn_refresh_workcat.clicked.connect(self.refresh_workcat)
+        self.dlg_search.psector_id.activated.connect(partial(self.open_plan_psector))
 
         return True
 
-    def workcat_populate(self, combo):
+    def workcat_populate(self, dialog, combo):
         """ Fill @combo """
 
         sql = ("SELECT id FROM " + self.schema_name + ".cat_work")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(combo, rows)
+        utils_giswater.fillComboBox(dialog, combo, rows)
         return rows
 
 
-    def psector_populate(self, combo):
+    def psector_populate(self, dialog, combo):
         """ Fill @combo """
 
         sql = ("SELECT name FROM " + self.controller.schema_name + ".plan_psector "
                " WHERE expl_id IN(SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user=current_user)")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(combo, rows)
+        utils_giswater.fillComboBox(dialog, combo, rows)
         return rows
 
 
@@ -130,7 +130,8 @@ class SearchPlus(QObject):
         layer = self.controller.get_layer_by_tablename(layer_name)
         if not layer:
             return
-        polygon_name = utils_giswater.getWidgetText(widget)
+
+        polygon_name = utils_giswater.getWidgetText(self.dlg_search, widget)
         # Check if the expression is valid
         expr_filter = str(field_id) + " LIKE '%" + str(polygon_name) + "%'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
@@ -140,7 +141,6 @@ class SearchPlus(QObject):
             sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
                    " WHERE "+str(field_id)+"='"+str(polygon_name) + "'")
             row = self.controller.get_row(sql)
-            self.controller.log_info(str(row[0]))
             if row[0] is None or row[0] == 'null':
                 msg = "Cant zoom to selection because has no geometry: "
                 self.controller.show_warning(msg, parameter=polygon_name)
@@ -161,24 +161,24 @@ class SearchPlus(QObject):
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
 
-        workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
+        workcat_id = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.workcat_id)
         if workcat_id == "null":
             return False
 
         self.update_selector_workcat(workcat_id)
         self.force_expl(workcat_id)
 
-        self.zoom_to_polygon(self.dlg.workcat_id, 'v_ui_workcat_polygon', 'workcat_id')
+        self.zoom_to_polygon(self.dlg_search.workcat_id, 'v_ui_workcat_polygon', 'workcat_id')
 
         self.items_dialog = ListItems()
-        utils_giswater.setDialog(self.items_dialog)
+        #utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
-        utils_giswater.setWidgetText(self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
         text_lbl = self.params['basic_search_workcat_filter']
-        utils_giswater.setWidgetText(self.items_dialog.label_init, "Filter by: "+str(text_lbl))
-        utils_giswater.setWidgetText(self.items_dialog.label_end, "Filter by: "+str(text_lbl))
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_init, "Filter by: "+str(text_lbl))
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_end, "Filter by: "+str(text_lbl))
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -188,28 +188,28 @@ class SearchPlus(QObject):
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog.txt_path))
+        self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
         self.items_dialog.export_to_csv.clicked.connect(
-            partial(self.export_to_csv, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
+            partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
 
         self.items_dialog.txt_name.textChanged.connect(partial
-            (self.workcat_filter_by_text, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
+            (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial
-            (self.workcat_filter_by_text, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
+            (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id))
         self.items_dialog.tbl_psm.doubleClicked.connect(partial
             (self.workcat_zoom, self.items_dialog.tbl_psm))
         self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
-        self.set_table_columns(self.items_dialog.tbl_psm, table_name)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm, table_name)
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
-        self.set_table_columns(self.items_dialog.tbl_psm_end, table_name_end)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
 
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
@@ -272,7 +272,7 @@ class SearchPlus(QObject):
 
     def fill_label_data(self, table_name, extension=None):
 
-        workcat_id = utils_giswater.getWidgetText(self.dlg.workcat_id)
+        workcat_id = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.workcat_id)
         if workcat_id == "null":
             return
 
@@ -321,9 +321,9 @@ class SearchPlus(QObject):
                 widget.setText("Total arcs length: " + str(length))
             # TODO END
 
-    def export_to_csv(self, qtable_1=None, qtable_2=None, path=None):
+    def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
-        folder_path = utils_giswater.getWidgetText(path)
+        folder_path = utils_giswater.getWidgetText(dialog, path)
         if folder_path is None or folder_path == 'null':
             return
         if folder_path.find('.csv') == -1:
@@ -362,26 +362,26 @@ class SearchPlus(QObject):
                 msg = "Are you sure you want to overwrite this file?"
                 answer = self.controller.ask_question(msg, "Overwrite")
                 if answer:
-                    self.write_csv(folder_path, all_rows)
+                    self.write_csv(dialog, folder_path, all_rows)
             else:
-                self.write_csv(folder_path, all_rows)
+                self.write_csv(dialog, folder_path, all_rows)
         except:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             self.controller.show_warning(msg)
             pass
         
 
-    def write_csv(self, folder_path=None, all_rows=None):
+    def write_csv(self, dialog, folder_path=None, all_rows=None):
         
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText('txt_path'))
+        self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText(dialog, 'txt_path'))
         message = "Values has been updated"
         self.controller.show_info(message)
 
 
-    def get_folder_dialog(self, widget):
+    def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
         if 'nt' in sys.builtin_module_names:
             folder_path = os.path.expanduser("~\Documents")
@@ -396,7 +396,7 @@ class SearchPlus(QObject):
         msg = "Save as"
         folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path))
+            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
 
     def workcat_zoom(self, qtable):
@@ -482,23 +482,23 @@ class SearchPlus(QObject):
             self.refresh_table(widget)
 
 
-    def workcat_filter_by_text(self, qtable, widget_txt, table_name, workcat_id):
+    def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id):
 
-        result_select = utils_giswater.getWidgetText(widget_txt)
+        result_select = utils_giswater.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
             expr = ("workcat_id = '" + str(workcat_id) + "'"
                     " and "+self.params['basic_search_workcat_filter'] +" ILIKE '%" + str(result_select) + "%'")
         else:
             expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
-        self.set_table_columns(qtable, table_name)
+        self.set_table_columns(dialog, qtable, table_name)
 
 
     def address_fill_postal_code(self, combo):
         """ Fill @combo """
 
         # Get exploitation code: 'expl_id'
-        elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
+        elem = self.dlg_search.address_exploitation.itemData(self.dlg_search.address_exploitation.currentIndex())
         code = elem[0]
 
         # Select features of @layer applying @expr
@@ -579,14 +579,14 @@ class SearchPlus(QObject):
         
         # Make it dockable in left dock widget area
         self.dock = uic.loadUi(ui_path)
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg)
-        self.dlg.setFixedHeight(162)
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
+        self.dlg_search.setFixedHeight(162)
         
         # Set his backgroundcolor
-        p = self.dlg.palette()
-        self.dlg.setAutoFillBackground(True)
-        p.setColor(self.dlg.backgroundRole(), Qt.white)
-        self.dlg.setPalette(p)   
+        p = self.dlg_search.palette()
+        self.dlg_search.setAutoFillBackground(True)
+        p.setColor(self.dlg_search.backgroundRole(), Qt.white)
+        self.dlg_search.setPalette(p)
         
         return True
     
@@ -633,14 +633,14 @@ class SearchPlus(QObject):
         self.get_layers()
 
         # Tab 'WorkCat'
-        status = self.workcat_populate(self.dlg.workcat_id)
+        status = self.workcat_populate(self.dlg_search, self.dlg_search.workcat_id)
         if not status:
-            self.dlg.tab_main.removeTab(3)
+            self.dlg_search.tab_main.removeTab(3)
 
         # Tab 'Address'
-        status = self.address_populate(self.dlg.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
+        status = self.address_populate(self.dlg_search.address_exploitation, 'expl_layer', 'expl_field_code', 'expl_field_name')
         if not status:
-            self.dlg.tab_main.removeTab(2)
+            self.dlg_search.tab_main.removeTab(2)
         else:
             # Get project variable 'expl_id'
             expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl))
@@ -651,23 +651,23 @@ class SearchPlus(QObject):
                        " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
                 row = self.controller.get_row(sql)
                 if row:
-                    utils_giswater.setSelectedItem(self.dlg.address_exploitation, row[0])
+                    utils_giswater.setSelectedItem(self.dlg_search, self.dlg_search.address_exploitation, row[0])
 
         # Tab 'Hydrometer'
         if self.project_type == 'ws':
-            self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
+            self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg_search.expl_name, self.params['basic_search_hyd_hydro_field_expl_name'])
             self.hydro_create_list()
         else:
-            utils_giswater.remove_tab_by_tabName(self.dlg.tab_main, 'tab_hydro')
+            utils_giswater.remove_tab_by_tabName(self.dlg_search.tab_main, 'tab_hydro')
 
         # Tab 'Network'
         self.network_code_create_lists()
         status = self.network_geom_type_populate()
         if not status:
-            self.dlg.tab_main.removeTab(0)
+            self.dlg_search.tab_main.removeTab(0)
 
         # Tab 'Psector'
-        status = self.psector_populate(self.dlg.psector_id)
+        status = self.psector_populate(self.dlg_search, self.dlg_search.psector_id)
         
         return True
     
@@ -694,9 +694,9 @@ class SearchPlus(QObject):
     def hydro_create_list(self):
         
         self.list_hydro = []
-        expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
+        expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
         if expl_name is None or expl_name == "None":
-            self.set_model_by_list([], self.dlg.hydro_id)
+            self.set_model_by_list([], self.dlg_search.hydro_id)
             return
 
         if not self.params['basic_search_hyd_hydro_field_1']:
@@ -724,14 +724,14 @@ class SearchPlus(QObject):
                 self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
                 
         self.list_hydro = sorted(set(self.list_hydro))
-        self.set_model_by_list(self.list_hydro, self.dlg.hydro_id)
+        self.set_model_by_list(self.list_hydro, self.dlg_search.hydro_id)
 
 
     def hydro_zoom(self, hydro, expl_name):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
         
         # Get selected code from combo
-        element = utils_giswater.getWidgetText(hydro)
+        element = utils_giswater.getWidgetText(self.dlg_search, hydro)
         if element == 'null':
             return
 
@@ -739,7 +739,7 @@ class SearchPlus(QObject):
         row = element.split(' . ', 2)
         hydro_id = str(row[0])
         connec_customer_code = str(row[1])
-        expl_name = utils_giswater.getWidgetText(expl_name, return_string_null=False)
+        expl_name = utils_giswater.getWidgetText(self.dlg_search, expl_name, return_string_null=False)
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ", " + self.params['basic_search_hyd_hydro_field_1'] + ""
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '"+str(connec_customer_code)+"' "
@@ -778,13 +778,13 @@ class SearchPlus(QObject):
     def open_hydrometer_dialog(self, connec_id, hydrometer_customer_code):
         
         self.hydro_info_dlg = HydroInfo()
-        utils_giswater.setDialog(self.hydro_info_dlg)
+        #utils_giswater.setDialog(self.hydro_info_dlg)
         self.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
 
-        expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
+        expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
         if expl_name == 'null':
             expl_name = ''
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
@@ -862,7 +862,7 @@ class SearchPlus(QObject):
         try: 
             self.list_all = self.list_arc + self.list_connec + self.list_element + self.list_gully + self.list_node
             self.list_all = sorted(set(self.list_all))
-            self.set_model_by_list(self.list_all, self.dlg.network_code)
+            self.set_model_by_list(self.list_all, self.dlg_search.network_code)
         except:
             pass
         
@@ -918,28 +918,27 @@ class SearchPlus(QObject):
         """ Populate combo 'network_geom_type' """
         
         # Add null value
-        self.dlg.network_geom_type.clear() 
-        self.dlg.network_geom_type.addItem('')   
+        self.dlg_search.network_geom_type.clear()
+        self.dlg_search.network_geom_type.addItem('')
                    
         # Check which layers are available
         if 'network_layer_arc' in self.layers:  
-            self.dlg.network_geom_type.addItem(self.controller.tr('Arc'))
+            self.dlg_search.network_geom_type.addItem(self.controller.tr('Arc'))
         if 'network_layer_connec' in self.layers:  
-            self.dlg.network_geom_type.addItem(self.controller.tr('Connec'))
+            self.dlg_search.network_geom_type.addItem(self.controller.tr('Connec'))
         if 'network_layer_element' in self.layers:  
-            self.dlg.network_geom_type.addItem(self.controller.tr('Element'))
+            self.dlg_search.network_geom_type.addItem(self.controller.tr('Element'))
         if 'network_layer_gully' in self.layers:  
-            self.dlg.network_geom_type.addItem(self.controller.tr('Gully'))
+            self.dlg_search.network_geom_type.addItem(self.controller.tr('Gully'))
         if 'network_layer_node' in self.layers:  
-            self.dlg.network_geom_type.addItem(self.controller.tr('Node'))
+            self.dlg_search.network_geom_type.addItem(self.controller.tr('Node'))
 
-        return self.dlg.network_geom_type > 0
+        return self.dlg_search.network_geom_type > 0
 
 
     def expl_name_changed(self):
-        
-        self.zoom_to_polygon(self.dlg.expl_name, 'exploitation', 'name')
-        expl_name = utils_giswater.getWidgetText(self.dlg.expl_name)
+        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'name')
+        expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
 
         if expl_name == "null" or expl_name is None or expl_name == "None":
             expl_name = ""
@@ -964,13 +963,13 @@ class SearchPlus(QObject):
             if append_to_list:
                 list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
         list_hydro = sorted(set(list_hydro))
-        self.set_model_by_list(list_hydro, self.dlg.hydro_id)
+        self.set_model_by_list(list_hydro, self.dlg_search.hydro_id)
 
 
     def network_geom_type_changed(self):
         """ Get 'geom_type' to filter 'code' values """        
             
-        geom_type = utils_giswater.getWidgetText(self.dlg.network_geom_type)
+        geom_type = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.network_geom_type)
         list_codes = []
         if geom_type == self.controller.tr('Arc'):
             list_codes = self.list_arc
@@ -984,7 +983,7 @@ class SearchPlus(QObject):
             list_codes = self.list_node
         else:
             list_codes = self.list_all
-        self.set_model_by_list(list_codes, self.dlg.network_code)
+        self.set_model_by_list(list_codes, self.dlg_search.network_code)
         
         return True
 
@@ -993,7 +992,7 @@ class SearchPlus(QObject):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
         
         # Get selected code from combo
-        element = utils_giswater.getWidgetText(network_code)
+        element = utils_giswater.getWidgetText(self.dlg_search, network_code)
         if element == 'null':
             return
 
@@ -1004,7 +1003,7 @@ class SearchPlus(QObject):
         cat_feature_id = str(row[2])
 
         # Get selected layer
-        geom_type = utils_giswater.getWidgetText(network_geom_type).lower()
+        geom_type = utils_giswater.getWidgetText(self.dlg_search, network_geom_type).lower()
         if geom_type == "null":
             sql = ("SELECT feature_type FROM " + self.controller.schema_name + ".cat_feature"
                    " WHERE id = '" + cat_feature_id + "'")
@@ -1054,7 +1053,7 @@ class SearchPlus(QObject):
             
             # Get 'expl_id'
             field_expl_id = self.street_field_expl
-            elem = self.dlg.address_exploitation.itemData(self.dlg.address_exploitation.currentIndex())
+            elem = self.dlg_search.address_exploitation.itemData(self.dlg_search.address_exploitation.currentIndex())
             expl_id = elem[0]
             records = [[-1, '']]
             
@@ -1094,7 +1093,7 @@ class SearchPlus(QObject):
         Build an expression with @field_code """
 
         # Get selected street
-        selected = utils_giswater.getWidgetText(combo)
+        selected = utils_giswater.getWidgetText(self.dlg_search, combo)
         if selected == 'null':
             return
 
@@ -1129,8 +1128,8 @@ class SearchPlus(QObject):
             self.controller.show_warning(message)
             return
 
-        self.dlg.address_number.blockSignals(True)
-        self.dlg.address_number.clear()
+        self.dlg_search.address_number.blockSignals(True)
+        self.dlg_search.address_number.clear()
 
         if fill_combo:
             it = layer.getFeatures(QgsFeatureRequest(expr))
@@ -1145,8 +1144,8 @@ class SearchPlus(QObject):
             records_sorted = sorted(records, key=operator.itemgetter(1))
 
             for record in records_sorted:
-                self.dlg.address_number.addItem(record[1], record)
-            self.dlg.address_number.blockSignals(False)
+                self.dlg_search.address_number.addItem(record[1], record)
+            self.dlg_search.address_number.blockSignals(False)
 
         if zoom:
             # Select features of @layer applying @expr
@@ -1160,13 +1159,13 @@ class SearchPlus(QObject):
         """ Show street data on the canvas when selected street and number in street tab """  
                 
         # Get selected street
-        street = utils_giswater.getWidgetText(self.dlg.address_street)                 
-        civic = utils_giswater.getWidgetText(self.dlg.address_number)                 
+        street = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.address_street)
+        civic = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.address_number)
         if street == 'null' or civic == 'null':
             return  
                 
         # Get selected portal
-        elem = self.dlg.address_number.itemData(self.dlg.address_number.currentIndex())
+        elem = self.dlg_search.address_number.itemData(self.dlg_search.address_number.currentIndex())
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
@@ -1308,7 +1307,7 @@ class SearchPlus(QObject):
             message = "Workcat cleared successfully"
             self.controller.show_info(message)
             # Clear combo workcat_id
-            utils_giswater.setWidgetText(self.dlg.workcat_id, "")
+            utils_giswater.setWidgetText(self.dlg_search, self.dlg_search.workcat_id, "")
             # Get layer by table_name
             layer = self.iface.activeLayer()
             # Refresh canvas
@@ -1327,19 +1326,19 @@ class SearchPlus(QObject):
 
     def open_plan_psector(self):
 
-        psector_name = self.dlg.psector_id.currentText()
+        psector_name = self.dlg_search.psector_id.currentText()
         sql = ("SELECT psector_id"
                " FROM " + self.schema_name + ".plan_psector"
                " WHERE name = '" + str(psector_name)+"'")
         row = self.controller.get_row(sql)
         psector_id = row[0]
         self.manage_new_psector.new_psector(psector_id, 'plan')
-        self.zoom_to_psector(self.dlg.psector_id, 'v_edit_plan_psector', 'name')
+        self.zoom_to_psector(self.dlg_search, self.dlg_search.psector_id, 'v_edit_plan_psector', 'name')
 
 
-    def zoom_to_psector(self, widget, layer_name, field_id):
+    def zoom_to_psector(self, dialog, widget, layer_name, field_id):
 
-        polygon_name = utils_giswater.getWidgetText(widget)
+        polygon_name = utils_giswater.getWidgetText(dialog, widget)
         layer = self.controller.get_layer_by_tablename(layer_name)
         if not layer:
             return
@@ -1374,17 +1373,17 @@ class SearchPlus(QObject):
         
         self.network_code_create_lists()            
         if self.project_type == 'ws':
-            self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg.expl_name, 
+            self.populate_cmb_expl_name('basic_search_hyd_hydro_layer_name', self.dlg_search.expl_name,
                 self.params['basic_search_hyd_hydro_field_expl_name'])
             self.hydro_create_list()
-        self.psector_populate(self.dlg.psector_id)
+        self.psector_populate(self.dlg_search, self.dlg_search.psector_id)
                     
 
     def unload(self):
         """ Removes dialog """       
-        if self.dlg:
-            self.dlg.deleteLater()
-            del self.dlg
+        if self.dlg_search:
+            self.dlg_search.deleteLater()
+            del self.dlg_search
 
 
     #TODO: Move to a common class
@@ -1411,10 +1410,10 @@ class SearchPlus(QObject):
         self.proxy_model.setFilterFixedString(widget.currentText())
 
 
-    def set_table_columns(self, widget, table_name):
+    def set_table_columns(self, dialog, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """
 
-        widget = utils_giswater.getWidget(widget)
+        widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
             return
 
@@ -1451,7 +1450,7 @@ class SearchPlus(QObject):
         """ Load QGIS settings related with dialog position and size """
 
         if dialog is None:
-            dialog = self.dlg
+            dialog = self.dlg_search
 
         try:
             width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
@@ -1470,7 +1469,7 @@ class SearchPlus(QObject):
         """ Save QGIS settings related with dialog position and size """
 
         if dialog is None:
-            dialog = self.dlg
+            dialog = self.dlg_search
 
         self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
         self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
@@ -1482,7 +1481,7 @@ class SearchPlus(QObject):
         """ Close dialog """
 
         if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
+            dlg = self.dlg_search
         try:
             self.save_settings(dlg)
             dlg.close()

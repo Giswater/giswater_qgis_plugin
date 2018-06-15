@@ -23,18 +23,18 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManConnecDialog(dialog, layer, feature)
-    init_config()
+    init_config(dialog)
 
     
-def init_config():
+def init_config(dialog):
 
     # Manage 'connec_type'
-    connec_type = utils_giswater.getWidgetText("connec_type") 
-    utils_giswater.setSelectedItem("connec_type", connec_type)
+    connec_type = utils_giswater.getWidgetText(dialog, "connec_type")
+    utils_giswater.setSelectedItem(dialog, "connec_type", connec_type)
      
     # Manage 'connecat_id'
-    connecat_id = utils_giswater.getWidgetText("connecat_id") 
-    utils_giswater.setSelectedItem("connecat_id", connecat_id)   
+    connecat_id = utils_giswater.getWidgetText(dialog, "connecat_id")
+    utils_giswater.setSelectedItem(dialog, "connecat_id", connecat_id)
         
      
 class ManConnecDialog(ParentDialog):
@@ -46,7 +46,7 @@ class ManConnecDialog(ParentDialog):
         self.feature = feature
         self.geom_type = "connec"
         self.field_id = "connec_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
         self.controller.manage_translation('ws_man_connec', dialog)
@@ -76,13 +76,13 @@ class ManConnecDialog(ParentDialog):
         self.tbl_hydrometer.clicked.connect(self.check_url)
         
         # Check if exist URL from field 'link' in main tab
-        self.check_link()
+        self.check_link(self.dialog)
 
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, self.dialog, 'ws', 'connec'))
         self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
 
         open_link = self.dialog.findChild(QPushButton, "open_link")
-        utils_giswater.setWidgetEnabled("open_link", False)
+        utils_giswater.setWidgetEnabled(self.dialog, "open_link", False)
         open_link.clicked.connect(self.open_url)
         
         feature = self.feature
@@ -95,7 +95,7 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, self.dialog, True))
         
         # Manage tab signal
         self.tab_hydrometer_loaded = False        
@@ -107,16 +107,16 @@ class ManConnecDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'connec_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
-            self.load_default()
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
+            self.load_default(self.dialog)
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
-            self.load_type_default("connecat_id", cat_id)
+            self.load_type_default(self.dialog, "connecat_id", cat_id)
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
-        self.load_pressure_zone(presszonecat_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
+        self.load_pressure_zone(self.dialog ,presszonecat_id, self.geom_type)
 
 
     def check_url(self):
@@ -132,9 +132,9 @@ class ManConnecDialog(ParentDialog):
         url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
         if url != '':
             self.url = url
-            utils_giswater.setWidgetEnabled("open_link")
+            utils_giswater.setWidgetEnabled(self.dialog, "open_link")
         else:
-            utils_giswater.setWidgetEnabled("open_link", False)
+            utils_giswater.setWidgetEnabled(self.dialog, "open_link", False)
 
 
     def open_url(self):
@@ -190,7 +190,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_connec" 
-        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
+        self.fill_tbl_element_man(self.dialog, self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
 
 
@@ -198,7 +198,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_connec"  
-        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.fill_tbl_document_man(self.dialog, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
         
             
@@ -215,7 +215,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         connectype_id = self.dialog.findChild(QLineEdit, "connectype_id")
-        cat_feature_id = utils_giswater.getWidgetText(connectype_id)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, connectype_id)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter="'connec_type'", duration=10)

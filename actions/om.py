@@ -54,31 +54,31 @@ class Om(ParentAction):
     def om_psector_management(self):
         """ Button 82: Psector management """
 
-        self.dlg = Psector_management()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
+        self.dlg_psector_mng = Psector_management()
+        #utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg_psector_mng)
         table_name = "om_psector"
         column_id = "psector_id"
-        self.dlg.lbl_vdefault_psector.setVisible(False)
-        self.dlg.btn_update_psector.setVisible(False)
+        self.dlg_psector_mng.lbl_vdefault_psector.setVisible(False)
+        self.dlg_psector_mng.btn_update_psector.setVisible(False)
         # Tables
-        qtbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
+        qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
         # Set signals
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
-        self.dlg.rejected.connect(self.close_dialog)
-        self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
-        self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
-        self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, table_name))
-        self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
+        self.dlg_psector_mng.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, qtbl_psm))
+        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
+        self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
-        self.set_table_columns(qtbl_psm, table_name)
-        self.set_label_current_psector()
+        self.set_table_columns(self.dlg_psector_mng, qtbl_psm, table_name)
+        self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg, dlg_name="psector_management")
+        self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
 
 
     def charge_psector(self, qtbl_psm):
@@ -90,7 +90,7 @@ class Om(ParentAction):
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        self.close_dialog()
+        self.close_dialog(self.dlg_psector_mng)
         self.om_psector(psector_id)
 
 
@@ -127,7 +127,7 @@ class Om(ParentAction):
             widget.model().select()
 
 
-    def update_current_psector(self, qtbl_psm):
+    def update_current_psector(self, dialog, qtbl_psm):
 
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -154,9 +154,9 @@ class Om(ParentAction):
         self.controller.show_info(message)
 
         self.fill_table(qtbl_psm, "v_ui_plan_psector")
-        self.set_table_columns(qtbl_psm, "v_ui_plan_psector")
+        self.set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
 
-        self.dlg.exec_()
+        dialog.exec_()
 
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
@@ -219,7 +219,7 @@ class Om(ParentAction):
         """ Button 84: Selector dates """
 
         self.dlg_selector_date = SelectorDate()
-        utils_giswater.setDialog(self.dlg_selector_date)
+        #utils_giswater.setDialog(self.dlg_selector_date)
         self.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")
@@ -230,9 +230,9 @@ class Om(ParentAction):
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 
         self.get_default_dates()
-        utils_giswater.setCalendarDate(self.widget_date_from, self.from_date)
-        utils_giswater.setCalendarDate(self.widget_date_to, self.to_date)
-        self.open_dialog(self.dlg_selector_date,dlg_name="selector_date")
+        utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
+        utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
+        self.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
 
     def update_dates_into_db(self):
@@ -264,7 +264,7 @@ class Om(ParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if from_date >= to_date:
             to_date = self.widget_date_from.date().addDays(1).toString('yyyy-MM-dd')
-            utils_giswater.setCalendarDate(self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
+            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
 
 
     def update_date_from(self):
@@ -273,7 +273,7 @@ class Om(ParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if to_date <= from_date:
             from_date = self.widget_date_to.date().addDays(-1).toString('yyyy-MM-dd')
-            utils_giswater.setCalendarDate(self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
+            utils_giswater.setCalendarDate(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
 
 
     def get_default_dates(self):

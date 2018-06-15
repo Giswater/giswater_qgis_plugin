@@ -36,7 +36,7 @@ class ManArcDialog(ParentDialog):
         
         self.geom_type = "arc"        
         self.field_id = "arc_id"
-        self.id = utils_giswater.getWidgetText(self.field_id, False)        
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ws_man_arc', dialog)
@@ -49,8 +49,8 @@ class ManArcDialog(ParentDialog):
 
         # Define class variables
         self.filter = self.field_id+" = '"+str(self.id)+"'"
-        self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)
-        self.connecat_id = utils_giswater.getWidgetText("arccat_id", False)
+        self.connec_type = utils_giswater.getWidgetText(self.dialog, "cat_arctype_id", False)
+        self.connecat_id = utils_giswater.getWidgetText(self.dialog, "arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
         
         # Get widget controls
@@ -83,17 +83,17 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         
         # Manage tab 'Relations'
         self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")   
 
         # Manage 'image'
-        self.set_image("label_image_ws_shape")
+        self.set_image(self.dialog, "label_image_ws_shape")
         
         # Check if exist URL from field 'link' in main tab
-        self.check_link()
+        self.check_link(self.dialog)
 
         # Check if feature has geometry object and we are creating a new arc
         geometry = self.feature.geometry()    
@@ -112,16 +112,16 @@ class ManArcDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'arc_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
-            self.load_default()
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
+            self.load_default(self.dialog)
             cat_id = self.controller.get_layer_source_table_name(layer)
             cat_id = cat_id.replace('v_edit_man_', '')
             cat_id += 'cat_vdefault'
-            self.load_type_default("arccat_id", cat_id)
+            self.load_type_default(self.dialog, "arccat_id", cat_id)
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
-        self.load_pressure_zone(presszonecat_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
+        self.load_pressure_zone(self.dialog, presszonecat_id, self.geom_type)
 
 
     def get_nodes(self):
@@ -144,16 +144,16 @@ class ManArcDialog(ParentDialog):
         node_2 = self.get_node_from_point(end_point, arc_searchnodes)
 
         # Fill fields node_1 and node_2
-        utils_giswater.setText("node_1", node_1)
-        utils_giswater.setText("node_2", node_2)
+        utils_giswater.setText(self.dialog, "node_1", node_1)
+        utils_giswater.setText(self.dialog, "node_2", node_2)
                     
 
     def open_node_form(self, idx):
         """ Open form corresponding to start or end node of the current arc """
 
         field_node = "node_" + str(idx)
-        widget = self.dialog.findChild(QLineEdit, field_node)        
-        node_id = utils_giswater.getWidgetText(widget)           
+        widget = self.dialog.findChild(QLineEdit, field_node)
+        node_id = utils_giswater.getWidgetText(self.dialog, widget)
         if not widget:    
             self.controller.log_info("widget not found", parameter=field_node)                 
             return
@@ -235,7 +235,7 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_arc" 
-        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
+        self.fill_tbl_element_man(self.dialog, self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
                         
 
@@ -243,7 +243,7 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_arc"          
-        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.fill_tbl_document_man(self.dialog, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
         
             
@@ -256,8 +256,8 @@ class ManArcDialog(ParentDialog):
         self.set_configuration(self.tbl_event, table_event_arc)
 
 
-    def set_image(self, widget):
-        utils_giswater.setImage(widget, "ws_shape.png")
+    def set_image(self, dialog, widget):
+        utils_giswater.setImage(dialog, widget, "ws_shape.png")
     
 
     def fill_tab_cost(self):

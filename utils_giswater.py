@@ -20,8 +20,8 @@ import inspect
 import os
 import sys
 import operator
-if 'nt' in sys.builtin_module_names: 
-    import _winreg 
+if 'nt' in sys.builtin_module_names:
+    import _winreg
 
 
 def setDialog(p_dialog):
@@ -36,12 +36,12 @@ def dialog():
         return None
 
 
-def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
+def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
 
     if rows is None:
         return
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QComboBox, widget)        
+        widget = dialog.findChild(QComboBox, widget)
     if clear_combo:
         widget.clear()
     if allow_nulls:
@@ -61,34 +61,34 @@ def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
                     widget.addItem(elem, user_data)
             except:
                 widget.addItem(str(elem), user_data)
-        
-        
-def fillComboBoxList(widget, list_object, allow_nulls=True, clear_combo=True):
+
+
+def fillComboBoxList(dialog, widget, list_object, allow_nulls=True, clear_combo=True):
 
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QComboBox, widget)    
+        widget = dialog.findChild(QComboBox, widget)
     if widget is None:
         return None
 
     if clear_combo:
         widget.clear()
     if allow_nulls:
-        widget.addItem('') 
-    for elem in list_object: 
-        widget.addItem(str(elem))          
+        widget.addItem('')
+    for elem in list_object:
+        widget.addItem(str(elem))
 
 
 def fillWidgets(rows, index_widget=0, index_text=1):
-    
+
     if rows:
         for row in rows:
             setWidgetText(str(row[index_widget]), str(row[index_text]))
-            
 
-def getText(widget, return_string_null=True):
-    
+
+def getText(dialog, widget, return_string_null=True):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)          
+        widget = dialog.findChild(QWidget, widget)
     if widget:
         if type(widget) is QLineEdit:
             text = widget.text()
@@ -107,32 +107,32 @@ def getText(widget, return_string_null=True):
             elem_text = "null"
         else:
             elem_text = ""
-    return elem_text      
+    return elem_text
 
 
-def setText(widget, text):
-    
+def setText(dialog, widget, text):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)      
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
-        return    
-    
+        return
+
     value = unicode(text)
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel:
-        if value == 'None':    
-            value = ""        
-        widget.setText(value)       
+        if value == 'None':
+            value = ""
+        widget.setText(value)
     elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-        if value == 'None' or value == 'null':    
-            value = 0        
+        if value == 'None' or value == 'null':
+            value = 0
         widget.setValue(float(value))
 
 
-def getCalendarDate(widget, date_format = "yyyy/MM/dd", datetime_format = "yyyy/MM/dd hh:mm:ss"):
-    
+def getCalendarDate(dialog, widget, date_format = "yyyy/MM/dd", datetime_format = "yyyy/MM/dd hh:mm:ss"):
+
     date = None
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
     if type(widget) is QDateEdit:
@@ -143,16 +143,16 @@ def getCalendarDate(widget, date_format = "yyyy/MM/dd", datetime_format = "yyyy/
         date = widget.dateTime().toString(date_format)
     elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss':
         date = widget.dateTime().toString(datetime_format)
-                
-    return date
-        
 
-def setCalendarDate(widget, date, default_current_date=True):
-    
+    return date
+
+
+def setCalendarDate(dialog, widget, date, default_current_date=True):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
-        return           
+        return
     if type(widget) is QDateEdit \
         or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy'):
         if date is None:
@@ -168,10 +168,10 @@ def setCalendarDate(widget, date, default_current_date=True):
         widget.setDateTime(date)
 
 
-def setTimeEdit(widget, time):
-    
+def setTimeEdit(dialog, widget, time):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
     if type(widget) is QTimeEdit:
@@ -180,176 +180,176 @@ def setTimeEdit(widget, time):
         widget.setTime(time)
 
 
-def getWidget(widget):
-    
+def getWidget(dialog, widget):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)  
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
-        return None           
-    return widget    
+        return None
+    return widget
 
 
-def getWidgetType(widget):
-    
+def getWidgetType(dialog, widget):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
-        return None   
+        return None
     return type(widget)
 
 
-def getWidgetText(widget, add_quote=False, return_string_null=True):
-    
+def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)      
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
-        return None   
+        return None
+
     text = None
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-        text = getText(widget, return_string_null)    
+        text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
-        text = getSelectedItem(widget, return_string_null)
-    if add_quote and text <> "null":
-        text = "'"+text+"'"  
+        text = getSelectedItem(dialog, widget, return_string_null)
+    if add_quote and text != "null":
+        text = "'"+text+"'"
     return text
 
 
-def setWidgetText(widget, text):
-    
+def setWidgetText(dialog, widget, text):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)       
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
     if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit or type(widget) is QLabel:
-        setText(widget, text)
+        setText(dialog, widget, text)
     elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-        setText(widget, text)
+        setText(dialog, widget, text)
     elif type(widget) is QComboBox:
-        setSelectedItem(widget, text)
+        setSelectedItem(dialog, widget, text)
 
 
-def isChecked(widget):
-    
+def isChecked(dialog, widget):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QCheckBox, widget)        
-    checked = False    
+        widget = dialog.findChild(QCheckBox, widget)
+    checked = False
     if widget:
-        checked = widget.isChecked()       
-    return checked    
+        checked = widget.isChecked()
+    return checked
 
 
-def setChecked(widget, checked=True):
-    
+def setChecked(dialog, widget, checked=True):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)       
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
     if type(widget) is QCheckBox:
         widget.setChecked(bool(checked))
 
 
-def getSelectedItem(widget, return_string_null=True):
-    
+def getSelectedItem(dialog, widget, return_string_null=True):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QComboBox, widget)        
+        widget = dialog.findChild(QComboBox, widget)
     if return_string_null:
-        widget_text = "null"   
+        widget_text = "null"
     else:
-        widget_text = "" 
+        widget_text = ""
     if widget:
         if widget.currentText():
-            widget_text = widget.currentText()       
-    return widget_text    
+            widget_text = widget.currentText()
+    return widget_text
 
 
-def setSelectedItem(widget, text):
+def setSelectedItem(dialog, widget, text):
 
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QComboBox, widget)    
+        widget = dialog.findChild(QComboBox, widget)
     if widget:
         index = widget.findText(str(text))
         if index == -1:
             index = 0
-        widget.setCurrentIndex(index);        
+        widget.setCurrentIndex(index)
 
 
-def setCurrentIndex(widget, index):
+def setCurrentIndex(dialog, widget, index):
 
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QComboBox, widget)    
+        widget = dialog.findChild(QComboBox, widget)
     if widget:
         if index == -1:
-            index = 0        
-        widget.setCurrentIndex(index);        
+            index = 0
+        widget.setCurrentIndex(index);
 
 
-def setWidgetVisible(widget, visible=True):
+def setWidgetVisible(dialog, widget, visible=True):
 
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)    
+        widget = dialog.findChild(QWidget, widget)
     if widget:
         widget.setVisible(visible)
-        
-        
-def setWidgetEnabled(widget, enabled=True):
+
+
+def setWidgetEnabled(dialog, widget, enabled=True):
 
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)    
+        widget = dialog.findChild(QWidget, widget)
     if widget:
         widget.setEnabled(enabled)
-                
 
-def setImage(widget,cat_shape):
+
+def setImage(dialog, widget,cat_shape):
     """ Set pictures for UD"""
-    
+
     element = cat_shape.lower()
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)  
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
     if type(widget) is QLabel:
-        plugin_dir = os.path.dirname(__file__)    
+        plugin_dir = os.path.dirname(__file__)
         pic_file = os.path.join(plugin_dir, 'png', ''+element+'')
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
-        widget.show()  
-        
-        
-def setRow(p_row):
-    global _row
-    _row = p_row
-    
-                        
-def fillWidget(widget):
-    
-    key = widget
+        widget.show()
+
+
+# def setRow(p_row):
+#     global _row
+#     _row = p_row
+
+
+def fillWidget(dialog, widget, row):
+
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)      
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
-        return    
-    
-    if key in _row: 
-        if _row[key] is not None:
-            value = unicode(_row[key])
-            if type(widget) is QLineEdit or type(widget) is QTextEdit: 
-                if value == 'None':    
-                    value = ""        
+        return
+    key = widget.objectName()
+    if key in row:
+        if row[key] is not None:
+            value = unicode(row[key])
+            if type(widget) is QLineEdit or type(widget) is QTextEdit:
+                if value == 'None':
+                    value = ""
                 widget.setText(value)
         else:
-            widget.setText("")       
+            widget.setText("")
     else:
         widget.setText("")
 
 
 def get_reg(reg_hkey, reg_path, reg_name):
-    
-    if 'nt' in sys.builtin_module_names:     
+
+    if 'nt' in sys.builtin_module_names:
         reg_root = None
         if reg_hkey == "HKEY_LOCAL_MACHINE":
             reg_root = _winreg.HKEY_LOCAL_MACHINE
         elif reg_hkey == "HKEY_CURRENT_USER":
             reg_root = _winreg.HKEY_CURRENT_USER
-        
+
         if reg_root is not None:
             try:
                 registry_key = _winreg.OpenKey(reg_root, reg_path)
@@ -360,11 +360,11 @@ def get_reg(reg_hkey, reg_path, reg_name):
                 return None
     else:
         return None
-        
-        
+
+
 def get_settings_value(settings, parameter):
     """ Function that fix problem with network units in Windows """
-    
+
     file_aux = ""
     try:
         file_aux = settings.value(parameter)
@@ -374,16 +374,16 @@ def get_settings_value(settings, parameter):
                 path = file_aux[1:]
                 file_aux = unit+":"+path
     except IndexError:
-        pass   
+        pass
     return file_aux
 
 
-def set_table_selection_behavior(widget):
+def set_table_selection_behavior(dialog, widget):
     """ Set selection behavior of @widget """
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)      
+        widget = dialog.findChild(QWidget, widget)
     if not widget:
-        return    
+        return
     widget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 
@@ -406,7 +406,7 @@ def filter_by_list(widget, proxy_model):
 
 def set_model_by_list(string_list, widget, proxy_model):
     """ Set the model according to the list """
-    
+
     model = QStringListModel()
     model.setStringList(string_list)
     proxy_model.setSourceModel(model)
@@ -423,12 +423,12 @@ def set_model_by_list(string_list, widget, proxy_model):
     widget.setCompleter(completer)
 
 
-def get_item_data(widget, index=0):
+def get_item_data(dialog, widget, index=0):
     """ Get item data of current index of the @widget """
-    
+
     code = -1
     if type(widget) is str or type(widget) is unicode:
-        widget = _dialog.findChild(QWidget, widget)          
+        widget = dialog.findChild(QWidget, widget)
     if widget:
         if type(widget) is QComboBox:
             current_index = widget.currentIndex()     

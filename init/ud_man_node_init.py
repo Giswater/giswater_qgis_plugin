@@ -26,18 +26,18 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManNodeDialog(dialog, layer, feature)
-    init_config()
+    init_config(dialog)
 
     
-def init_config():
+def init_config(dialog):
 
     # Manage 'node_type'
-    node_type = utils_giswater.getWidgetText("node_type") 
-    utils_giswater.setSelectedItem("node_type", node_type)
+    node_type = utils_giswater.getWidgetText(dialog, "node_type")
+    utils_giswater.setSelectedItem(dialog, "node_type", node_type)
      
     # Manage 'nodecat_id'
-    nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
-    utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
+    nodecat_id = utils_giswater.getWidgetText(dialog, "nodecat_id")
+    utils_giswater.setSelectedItem(dialog, "nodecat_id", nodecat_id)
     
      
 class ManNodeDialog(ParentDialog):
@@ -49,7 +49,7 @@ class ManNodeDialog(ParentDialog):
         self.feature = feature
         self.geom_type = "node"
         self.field_id = "node_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ud_man_node', dialog) 
@@ -102,14 +102,14 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)        
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         
         # Manage tab 'Scada'
         self.manage_tab_scada()        
         
         # Check if exist URL from field 'link' in main tab
-        self.check_link()
+        self.check_link(self.dialog)
 
         # Check topology for new features
         continue_insert = True        
@@ -154,12 +154,12 @@ class ManNodeDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'node_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
-            self.load_default()
-            self.load_type_default("nodecat_id", "nodecat_vdefault")
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
+            self.load_default(self.dialog)
+            self.load_type_default(self.dialog, "nodecat_id", "nodecat_vdefault")
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
 
 
     def open_up_down_stream(self, qtable):
@@ -365,7 +365,7 @@ class ManNodeDialog(ParentDialog):
                " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText("hemisphere" , str(row[0]))
+            utils_giswater.setWidgetText(self.dialog, "hemisphere" , str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             self.controller.show_info(message, parameter=str(row[0]))
    
@@ -441,7 +441,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_node" 
-        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
+        self.fill_tbl_element_man(self.dialog, self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
                         
 
@@ -449,7 +449,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_node"       
-        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.fill_tbl_document_man(self.dialog, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
                 
             
@@ -479,7 +479,7 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         node_type = self.dialog.findChild(QComboBox, "node_type")
-        cat_feature_id = utils_giswater.getWidgetText(node_type)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, node_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter='node_type', duration=10)

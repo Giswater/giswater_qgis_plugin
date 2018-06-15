@@ -78,10 +78,10 @@ class MincutParent(ParentAction, MultipleSelection):
         # Refresh canvas, remove all old selections
         self.remove_selection()      
 
-        self.dlg = Mincut()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_mincut = Mincut()
+        #utils_giswater.setDialog(self.dlg_mincut)
+        self.load_settings(self.dlg_mincut)
+        self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Parametrize list of layers
         self.layers_connec = self.controller.get_group_layers('connec')                        
@@ -92,75 +92,76 @@ class MincutParent(ParentAction, MultipleSelection):
         if self.canvas.currentLayer() is None:
             self.iface.setActiveLayer(self.layer_node)
 
-        self.result_mincut_id = self.dlg.findChild(QLineEdit, "result_mincut_id")
-        self.customer_state = self.dlg.findChild(QLineEdit, "customer_state")
-        self.work_order = self.dlg.findChild(QLineEdit, "work_order")
-        self.pred_description = self.dlg.findChild(QTextEdit, "pred_description")
-        self.real_description = self.dlg.findChild(QTextEdit, "real_description")
-        self.distance = self.dlg.findChild(QLineEdit, "distance")
-        self.depth = self.dlg.findChild(QLineEdit, "depth")
+        self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
+        self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
+        self.work_order = self.dlg_mincut.findChild(QLineEdit, "work_order")
+        self.pred_description = self.dlg_mincut.findChild(QTextEdit, "pred_description")
+        self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
+        self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
+        self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
+        
         utils_giswater.double_validator(self.distance, 0, 9999999, 3)
         utils_giswater.double_validator(self.depth, 0, 9999999, 3)
 
         # Manage adress
-        self.adress_init_config(self.dlg)
+        self.adress_init_config(self.dlg_mincut)
 
         # Set signals
-        self.dlg.btn_accept.clicked.connect(self.accept_save_data)        
-        self.dlg.btn_cancel.clicked.connect(self.mincut_close)
-        self.dlg.btn_start.clicked.connect(self.real_start)
-        self.dlg.btn_end.clicked.connect(self.real_end)
+        self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)        
+        self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
+        self.dlg_mincut.btn_start.clicked.connect(self.real_start)
+        self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
         # Fill ComboBox type
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".anl_mincut_cat_type"
                " ORDER BY id;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("type", rows, False)
+        utils_giswater.fillComboBox(self.dlg_mincut, "type", rows, False)
 
         # Fill ComboBox cause
         sql = ("SELECT id"
                " FROM " + self.schema_name + ".anl_mincut_cat_cause"
                " ORDER BY id;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("cause", rows, False)
+        utils_giswater.fillComboBox(self.dlg_mincut, "cause", rows, False)
 
         # Fill ComboBox assigned_to and exec_user
         sql = ("SELECT id, name"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY name;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg.assigned_to, rows, 1)
-        utils_giswater.fillComboBox("exec_user", rows, False)
-        self.dlg.exec_user.setVisible(False)
+        utils_giswater.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
+        utils_giswater.fillComboBox(self.dlg_mincut, "exec_user", rows, False)
+        self.dlg_mincut.exec_user.setVisible(False)
 
         # Toolbar actions
-        action = self.dlg.findChild(QAction, "actionConfig")
+        action = self.dlg_mincut.findChild(QAction, "actionConfig")
         action.triggered.connect(self.mincut_config.config)
         self.set_icon(action, "99")
         self.action_config = action
 
-        action = self.dlg.findChild(QAction, "actionMincut")
+        action = self.dlg_mincut.findChild(QAction, "actionMincut")
         action.triggered.connect(self.auto_mincut)
         self.set_icon(action, "126")
         self.action_mincut = action
 
-        action = self.dlg.findChild(QAction, "actionCustomMincut")
+        action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
         action.triggered.connect(self.custom_mincut)
         self.set_icon(action, "123")
         self.action_custom_mincut = action
 
-        action = self.dlg.findChild(QAction, "actionAddConnec")
+        action = self.dlg_mincut.findChild(QAction, "actionAddConnec")
         action.triggered.connect(self.add_connec)
         self.set_icon(action, "121")
         self.action_add_connec = action
 
-        action = self.dlg.findChild(QAction, "actionAddHydrometer")
+        action = self.dlg_mincut.findChild(QAction, "actionAddHydrometer")
         action.triggered.connect(self.add_hydrometer)
         self.set_icon(action, "122")
         self.action_add_hydrometer = action
 
-        action = self.dlg.findChild(QAction, "actionComposer")
+        action = self.dlg_mincut.findChild(QAction, "actionComposer")
         action.triggered.connect(self.mincut_composer)
         self.set_icon(action, "181")
         self.action_mincut_composer = action
@@ -177,13 +178,13 @@ class MincutParent(ParentAction, MultipleSelection):
         self.result_mincut_id.setText(str(result_mincut_id))
 
         # Set state name
-        utils_giswater.setWidgetText(self.dlg.state, str(self.states[0]))
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
         self.current_state = 0        
         
         self.sql_connec = ""
         self.sql_hydro = ""
         
-        self.dlg.show()
+        self.dlg_mincut.show()
 
 
     def mg_mincut(self):
@@ -194,28 +195,29 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Get current date. Set all QDateEdit to current date
         date_start = QDate.currentDate()
-        utils_giswater.setCalendarDate("cbx_date_start", date_start)
-        utils_giswater.setCalendarDate("cbx_date_end", date_start)
-        utils_giswater.setCalendarDate("cbx_recieved_day", date_start)
-        utils_giswater.setCalendarDate("cbx_date_start_predict", date_start)
-        utils_giswater.setCalendarDate("cbx_date_end_predict", date_start)
+        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_start", date_start)
+        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_end", date_start)
+        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_recieved_day", date_start)
+        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_start_predict", date_start)
+        utils_giswater.setCalendarDate(self.dlg_mincut, "cbx_date_end_predict", date_start)
         
         # Get current time
         current_time = QTime.currentTime()
-        self.dlg.cbx_recieved_time.setTime(current_time)     
+        self.dlg_mincut.cbx_recieved_time.setTime(current_time)     
 
         # Enable/Disable widget depending state
         self.enable_widgets('0')
 
-        self.dlg.show()
+        self.dlg_mincut.show()
 
 
     def mincut_close(self):
+        
         Mincut.closeMainWin = True
 
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
-            result_mincut_id = self.dlg.result_mincut_id.text()
+            result_mincut_id = self.dlg_mincut.result_mincut_id.text()
             sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
                    " WHERE id = " + str(result_mincut_id))
             row = self.controller.get_row(sql)
@@ -230,12 +232,13 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.dao.rollback()
             
         # Close dialog, save dialog position, and disconnect snapping
-        self.close_dialog(self.dlg)
+        self.close_dialog(self.dlg_mincut)
         self.disconnect_snapping()
         
     
     def disconnect_snapping(self, action_pan=True):
         """ Select 'Pan' as current map tool and disconnect snapping """
+        
         Mincut.closeMainWin = True
         try:
             self.canvas.xyCoordinates.disconnect()             
@@ -251,19 +254,17 @@ class MincutParent(ParentAction, MultipleSelection):
 
         date_start = QDate.currentDate()
         time_start = QTime.currentTime()
-        self.dlg.cbx_date_start.setDate(date_start)
-        self.dlg.cbx_hours_start.setTime(time_start)
-        self.dlg.cbx_date_end.setDate(date_start)
-        self.dlg.cbx_hours_end.setTime(time_start)
-
-        self.dlg.btn_end.setEnabled(True)
-
-        self.dlg.distance.setEnabled(True)
-        self.dlg.depth.setEnabled(True)
-        self.dlg.real_description.setEnabled(True)
+        self.dlg_mincut.cbx_date_start.setDate(date_start)
+        self.dlg_mincut.cbx_hours_start.setTime(time_start)
+        self.dlg_mincut.cbx_date_end.setDate(date_start)
+        self.dlg_mincut.cbx_hours_end.setTime(time_start)
+        self.dlg_mincut.btn_end.setEnabled(True)
+        self.dlg_mincut.distance.setEnabled(True)
+        self.dlg_mincut.depth.setEnabled(True)
+        self.dlg_mincut.real_description.setEnabled(True)
 
         # Set state to 'In Progress'
-        utils_giswater.setWidgetText(self.dlg.state, str(self.states[1]))   
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
         self.current_state = 1
 
         # Enable/Disable widget depending state
@@ -275,12 +276,12 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set current date and time
         date_end = QDate.currentDate()
         time_end = QTime.currentTime()
-        self.dlg.cbx_date_end.setDate(date_end)
-        self.dlg.cbx_hours_end.setTime(time_end)
+        self.dlg_mincut.cbx_date_end.setDate(date_end)
+        self.dlg_mincut.cbx_hours_end.setTime(time_end)
 
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
-        utils_giswater.setDialog(self.dlg_fin)
+        # utils_giswater.setDialog(self.dlg_fin)
         self.load_settings(self.dlg_fin)
 
         mincut = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
@@ -290,33 +291,33 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Manage address
         self.adress_init_config(self.dlg_fin)
-        municipality_current = str(self.dlg.address_exploitation.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin.address_exploitation, str(municipality_current))
-        address_postal_code_current = str(self.dlg.address_postal_code.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin.address_postal_code, str(address_postal_code_current))
-        address_street_current = str(self.dlg.address_street.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin.address_street, str(address_street_current))
-        address_number_current = str(self.dlg.address_number.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin.address_number, str(address_number_current))
+        municipality_current = str(self.dlg_mincut.address_exploitation.currentText())
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_exploitation, str(municipality_current))
+        address_postal_code_current = str(self.dlg_mincut.address_postal_code.currentText())
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_postal_code, str(address_postal_code_current))
+        address_street_current = str(self.dlg_mincut.address_street.currentText())
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_street, str(address_street_current))
+        address_number_current = str(self.dlg_mincut.address_number.currentText())
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_number, str(address_number_current))
 
         # Fill ComboBox exec_user
         sql = ("SELECT name"
                " FROM " + self.schema_name + ".cat_users"
                " ORDER BY name;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("exec_user", rows, False)
-        assigned_to = utils_giswater.get_item_data(self.dlg.assigned_to, 1)
-        utils_giswater.setWidgetText("exec_user", str(assigned_to))
+        utils_giswater.fillComboBox(self.dlg_fin, "exec_user", rows, False)
+        assigned_to = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
+        utils_giswater.setWidgetText(self.dlg_fin, "exec_user", str(assigned_to))
 
-        date_start = self.dlg.cbx_date_start.date()
-        time_start = self.dlg.cbx_hours_start.time()
+        date_start = self.dlg_mincut.cbx_date_start.date()
+        time_start = self.dlg_mincut.cbx_hours_start.time()
         self.dlg_fin.cbx_date_start_fin.setDate(date_start)
         self.dlg_fin.cbx_hours_start_fin.setTime(time_start)
         self.dlg_fin.cbx_date_end_fin.setDate(date_end)
         self.dlg_fin.cbx_hours_end_fin.setTime(time_end) 
 
         # Set state to 'Finished'
-        utils_giswater.setWidgetText(self.dlg.state, str(self.states[2]))   
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[2]))
         self.current_state = 2                 
 
         # Enable/Disable widget depending state
@@ -345,49 +346,49 @@ class MincutParent(ParentAction, MultipleSelection):
         mincut_result_state = self.current_state
 
         # Manage 'address'
-        address_exploitation_id = utils_giswater.get_item_data(self.dlg.address_exploitation)
-        address_postal_code = utils_giswater.getWidgetText(self.dlg.address_postal_code)
-        address_street = utils_giswater.get_item_data(self.dlg.address_street)
-        address_number = utils_giswater.getWidgetText(self.dlg.address_number)
+        address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_exploitation)
+        address_postal_code = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code)
+        address_street = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_street)
+        address_number = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_number)
 
-        mincut_result_type = self.dlg.type.currentText()
-        anl_cause = self.dlg.cause.currentText()
+        mincut_result_type = self.dlg_mincut.type.currentText()
+        anl_cause = self.dlg_mincut.cause.currentText()
         work_order = self.work_order.text()
 
-        anl_descript = utils_giswater.getWidgetText("pred_description", return_string_null=False)
+        anl_descript = utils_giswater.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
         exec_from_plot = str(self.distance.text())
         exec_depth = str(self.depth.text())
-        exec_descript = utils_giswater.getWidgetText("real_description", return_string_null=False)
-        exec_user = utils_giswater.getWidgetText("exec_user", return_string_null=False)
+        exec_descript = utils_giswater.getWidgetText(self.dlg_mincut, "real_description", return_string_null=False)
+        exec_user = utils_giswater.getWidgetText(self.dlg_mincut, "exec_user", return_string_null=False)
         
         # Get prediction date - start
-        date_start_predict = self.dlg.cbx_date_start_predict.date()
-        time_start_predict = self.dlg.cbx_hours_start_predict.time()
+        date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
+        time_start_predict = self.dlg_mincut.cbx_hours_start_predict.time()
         forecast_start_predict = date_start_predict.toString('yyyy-MM-dd') + " " + time_start_predict.toString('HH:mm:ss')
 
         # Get prediction date - end
-        date_end_predict = self.dlg.cbx_date_end_predict.date()
-        time_end_predict = self.dlg.cbx_hours_end_predict.time()
+        date_end_predict = self.dlg_mincut.cbx_date_end_predict.date()
+        time_end_predict = self.dlg_mincut.cbx_hours_end_predict.time()
         forecast_end_predict = date_end_predict.toString('yyyy-MM-dd') + " " + time_end_predict.toString('HH:mm:ss')
 
         # Get real date - start
-        date_start_real = self.dlg.cbx_date_start.date()
-        time_start_real = self.dlg.cbx_hours_start.time()
+        date_start_real = self.dlg_mincut.cbx_date_start.date()
+        time_start_real = self.dlg_mincut.cbx_hours_start.time()
         forecast_start_real = date_start_real.toString('yyyy-MM-dd') + " " + time_start_real.toString('HH:mm:ss')
 
         # Get real date - end
-        date_end_real = self.dlg.cbx_date_end.date()
-        time_end_real = self.dlg.cbx_hours_end.time()
+        date_end_real = self.dlg_mincut.cbx_date_end.date()
+        time_end_real = self.dlg_mincut.cbx_hours_end.time()
         forecast_end_real = date_end_real.toString('yyyy-MM-dd') + " " + time_end_real.toString('HH:mm:ss')
 
         # Check data
-        received_day = self.dlg.cbx_recieved_day.date()
-        received_time = self.dlg.cbx_recieved_time.time()
+        received_day = self.dlg_mincut.cbx_recieved_day.date()
+        received_time = self.dlg_mincut.cbx_recieved_time.time()
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
-        assigned_to = utils_giswater.get_item_data(self.dlg.assigned_to, 0)
+        assigned_to = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
         cur_user = self.controller.get_project_user()
-        appropiate_status = utils_giswater.isChecked("appropiate")
+        appropiate_status = utils_giswater.isChecked(self.dlg_mincut, "appropiate")
 
         check_data = [str(mincut_result_state), str(anl_cause), str(received_date), 
                       str(forecast_start_predict), str(forecast_end_predict)]
@@ -480,18 +481,18 @@ class MincutParent(ParentAction, MultipleSelection):
         if row:
             if str(row[0]) == '0' and str(row[1]) == '1':
                 cur_user = self.controller.get_project_user()
-                result_mincut_id_text = self.dlg.result_mincut_id.text()
+                result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
                 sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_result_overlap('"+str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
                 row = self.controller.get_row(sql, log_sql=False, commit=True)
                 if row[0] is not None:
                         message = "Mincut done, but has conflict and overlaps with "
-                        message = "Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict"
-                        self.controller.log_info(str(answer))
-                        answer = self.controller.ask_question(message, "Change dates")
-                        if answer:
-                            self.dlg.close()
-        if answer is False:
-             self.dlg.close()
+                        answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
+                        if not answer:
+                            self.dlg_mincut.close()
+                else:
+                    self.dlg_mincut.close()
+        else:
+            self.dlg_mincut.close()
 
 
     def update_result_selector(self, result_mincut_id, commit=True):    
@@ -515,22 +516,21 @@ class MincutParent(ParentAction, MultipleSelection):
         exec_end_time = self.dlg_fin.cbx_hours_end_fin.time()
  
         # Set new values in mincut dialog also
-        self.dlg.cbx_date_start.setDate(exec_start_day)
-        self.dlg.cbx_hours_start.setTime(exec_start_time)
-        self.dlg.cbx_date_end.setDate(exec_end_day)
-        self.dlg.cbx_hours_end.setTime(exec_end_time)
-        utils_giswater.setWidgetText(self.dlg.work_order, str(self.dlg_fin.work_order.text()))  
+        self.dlg_mincut.cbx_date_start.setDate(exec_start_day)
+        self.dlg_mincut.cbx_hours_start.setTime(exec_start_time)
+        self.dlg_mincut.cbx_date_end.setDate(exec_end_day)
+        self.dlg_mincut.cbx_hours_end.setTime(exec_end_time)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
         municipality = self.dlg_fin.address_exploitation.currentText()
-        utils_giswater.setWidgetText(self.dlg.address_exploitation, municipality)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_exploitation, municipality)
         street = self.dlg_fin.address_street.currentText()
-        utils_giswater.setWidgetText(self.dlg.address_street, street)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_street, street)
         number = self.dlg_fin.address_number.currentText()
-        utils_giswater.setWidgetText(self.dlg.address_number, number)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_number, number)
         postal_code = self.dlg_fin.address_postal_code.currentText()
-        utils_giswater.setWidgetText(self.dlg.address_postal_code, postal_code)
-        exec_user = utils_giswater.getWidgetText(self.dlg_fin.exec_user)
-        self.controller.log_info(exec_user)
-        utils_giswater.setWidgetText(self.dlg.exec_user, exec_user)        
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code, postal_code)
+        exec_user = utils_giswater.getWidgetText(self.dlg_fin, self.dlg_fin.exec_user)
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.exec_user, exec_user)
 
         self.dlg_fin.close()
 
@@ -538,7 +538,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def real_end_cancel(self):
 
         # Return to state 'In Progress'
-        utils_giswater.setWidgetText(self.dlg.state, str(self.states[1]))           
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
         self.enable_widgets('1')
         
         self.dlg_fin.close()
@@ -547,7 +547,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def add_connec(self):
         """ B3-121: Connec selector """
 
-        result_mincut_id_text = self.dlg.result_mincut_id.text()
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in anl_mincut_result_cat
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
@@ -565,7 +565,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog add_connec
         self.dlg_connec = Mincut_add_connec()
-        utils_giswater.setDialog(self.dlg_connec)
+        # utils_giswater.setDialog(self.dlg_connec)
         self.load_settings(self.dlg_connec)
 
         # Set icons
@@ -577,7 +577,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_connec.btn_insert.clicked.connect(partial(self.insert_connec))
         self.dlg_connec.btn_delete.clicked.connect(partial(self.delete_records_connec))
         self.dlg_connec.btn_snapping.clicked.connect(self.snapping_init_connec)
-        self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, "connec", self.dlg_connec))
+        self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, self.dlg_connec, "connec"))
         self.dlg_connec.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_connec))
         
         # Set autocompleter for 'customer_code'
@@ -707,7 +707,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         self.connec_list = []
 
-        result_mincut_id_text = self.dlg.result_mincut_id.text()
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in table 'anl_mincut_result_cat'
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
@@ -725,7 +725,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog Mincut_add_hydrometer
         self.dlg_hydro = Mincut_add_hydrometer()
-        utils_giswater.setDialog(self.dlg_hydro)
+        # utils_giswater.setDialog(self.dlg_hydro)
         self.load_settings(self.dlg_hydro)
         self.dlg_hydro.btn_snapping.setEnabled(False)
         
@@ -738,7 +738,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_hydro.btn_insert.clicked.connect(partial(self.insert_hydro))
         self.dlg_hydro.btn_delete.clicked.connect(partial(self.delete_records_hydro))
         self.dlg_hydro.btn_snapping.clicked.connect(self.snapping_init_hydro)
-        self.dlg_hydro.btn_accept.clicked.connect(partial(self.accept_hydro, "hydrometer", self.dlg_hydro))
+        self.dlg_hydro.btn_accept.clicked.connect(partial(self.accept_hydro, self.dlg_hydro, "hydrometer"))
         self.dlg_hydro.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_hydro))     
 
         # Set autocompleter for 'customer_code'
@@ -785,7 +785,7 @@ class MincutParent(ParentAction, MultipleSelection):
         """
               
         # Check if user entered hydrometer_id
-        hydrometer_id = utils_giswater.getWidgetText(self.dlg_hydro.hydrometer_id)
+        hydrometer_id = utils_giswater.getWidgetText(self.dlg_hydro, self.dlg_hydro.hydrometer_id)
         if hydrometer_id == "null":
             message = "You need to enter hydrometer_id"
             self.controller.show_info_box(message)
@@ -844,7 +844,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connec_list = []
 
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_connec, self.result_mincut_id)
         sql = ("SELECT connec_id FROM " + self.schema_name + ".anl_mincut_result_connec"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
@@ -871,7 +871,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connec_list = []
 
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = ("SELECT DISTINCT(connec_id) FROM " + self.schema_name + ".rtc_hydrometer_x_connec AS rtc"
                " INNER JOIN " + self.schema_name + ".anl_mincut_result_hydrometer AS anl"
                " ON anl.hydrometer_id = rtc.hydrometer_id"
@@ -894,7 +894,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.hydro_list = []
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
-        result_mincut_id = utils_giswater.getWidgetText(self.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".anl_mincut_result_hydrometer"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
@@ -920,7 +920,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connec_list = []
 
         # Get 'connec_id' from selected 'customer_code'
-        customer_code = utils_giswater.getWidgetText(self.dlg_connec.connec_id)
+        customer_code = utils_giswater.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
             message = "You need to enter a customer code"
             self.controller.show_info_box(message) 
@@ -1158,12 +1158,12 @@ class MincutParent(ParentAction, MultipleSelection):
         self.connect_signal_selection_changed("mincut_hydro")           
         
 
-    def accept_connec(self, element, dlg):
+    def accept_connec(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'connec' dialog 
             Insert into table 'anl_mincut_result_connec' values of current mincut 
         """
         
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
@@ -1185,16 +1185,16 @@ class MincutParent(ParentAction, MultipleSelection):
                             " VALUES ('" + str(result_mincut_id) + "', '" + str(row[0]) + "');\n")
 
         self.sql_connec = sql
-        self.dlg.btn_start.setDisabled(False)
+        self.dlg_mincut.btn_start.setDisabled(False)
         dlg.close()
         
 
-    def accept_hydro(self, element, dlg):
+    def accept_hydro(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
             Insert into table 'anl_mincut_result_hydrometer' values of current mincut 
         """
         
-        result_mincut_id = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
+        result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
@@ -1206,7 +1206,7 @@ class MincutParent(ParentAction, MultipleSelection):
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
         
         self.sql_hydro = sql
-        self.dlg.btn_start.setDisabled(False)
+        self.dlg_mincut.btn_start.setDisabled(False)
         dlg.close()
 
 
@@ -1300,7 +1300,7 @@ class MincutParent(ParentAction, MultipleSelection):
         event_point = QPoint(x, y)
         
         real_snapping_position = QgsPoint(point.x(), point.y())
-        result_mincut_id_text = self.dlg.result_mincut_id.text()
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
 
         sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
@@ -1359,7 +1359,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
-        result_mincut_id_text = self.dlg.result_mincut_id.text()
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
 
         # Check if id exist in 'anl_mincut_result_cat'
@@ -1408,7 +1408,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 return
 
             # Enable button CustomMincut and button Start
-            self.dlg.btn_start.setDisabled(False)
+            self.dlg_mincut.btn_start.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
             self.action_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
@@ -1547,7 +1547,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.set_cursor_wait()                
         
         cur_user = self.controller.get_project_user()               
-        result_mincut_id = utils_giswater.getWidgetText("result_mincut_id")
+        result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
             sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
                    "('" + str(elem_id) + "', '" + str(result_mincut_id) + "', '" + str(cur_user) + "');")
@@ -1597,10 +1597,10 @@ class MincutParent(ParentAction, MultipleSelection):
         if not row:
             return
               
-        utils_giswater.setWidgetText(self.dlg.work_order, row['work_order'])        
-        utils_giswater.setWidgetText(self.dlg.type, row['mincut_type'])
-        utils_giswater.setWidgetText(self.dlg.cause, row['anl_cause'])
-        utils_giswater.setWidgetText(self.dlg.state, row['state_name'])        
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.type, row['mincut_type'])
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.cause, row['anl_cause'])
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, row['state_name'])
         
         # Manage location
         self.open_mincut_manage_location(row)
@@ -1608,11 +1608,11 @@ class MincutParent(ParentAction, MultipleSelection):
         # Manage dates
         self.open_mincut_manage_dates(row)
 
-        utils_giswater.setWidgetText("pred_description", row['anl_descript'])
-        utils_giswater.setWidgetText("real_description", row['exec_descript'])
-        utils_giswater.setWidgetText("distance", row['exec_from_plot'])
-        utils_giswater.setWidgetText("depth", row['exec_depth'])
-        utils_giswater.setWidgetText("assigned_to", row['assigned_to_name'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "pred_description", row['anl_descript'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "real_description", row['exec_descript'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "distance", row['exec_from_plot'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
+        utils_giswater.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
         # Update table 'anl_mincut_result_selector'
         self.update_result_selector(result_mincut_id)
@@ -1633,35 +1633,35 @@ class MincutParent(ParentAction, MultipleSelection):
         # Current_state == '0': Planified
         if self.current_state == '0':
             
-            self.dlg.work_order.setDisabled(False)
+            self.dlg_mincut.work_order.setDisabled(False)
             # Group Location
-            self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
-            self.dlg.address_postal_code.setDisabled(self.search_plus_disabled)
-            self.dlg.address_street.setDisabled(self.search_plus_disabled)
-            self.dlg.address_number.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_exploitation.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_postal_code.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_street.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_number.setDisabled(self.search_plus_disabled)
             # Group Details
-            self.dlg.type.setDisabled(False)
-            self.dlg.cause.setDisabled(False)
-            self.dlg.cbx_recieved_day.setDisabled(False)
-            self.dlg.cbx_recieved_time.setDisabled(False)
+            self.dlg_mincut.type.setDisabled(False)
+            self.dlg_mincut.cause.setDisabled(False)
+            self.dlg_mincut.cbx_recieved_day.setDisabled(False)
+            self.dlg_mincut.cbx_recieved_time.setDisabled(False)
             # Group Prediction
-            self.dlg.cbx_date_start_predict.setDisabled(False)
-            self.dlg.cbx_hours_start_predict.setDisabled(False)
-            self.dlg.cbx_date_end_predict.setDisabled(False)
-            self.dlg.cbx_hours_end_predict.setDisabled(False)
-            self.dlg.assigned_to.setDisabled(False)
-            self.dlg.pred_description.setDisabled(False)
+            self.dlg_mincut.cbx_date_start_predict.setDisabled(False)
+            self.dlg_mincut.cbx_hours_start_predict.setDisabled(False)
+            self.dlg_mincut.cbx_date_end_predict.setDisabled(False)
+            self.dlg_mincut.cbx_hours_end_predict.setDisabled(False)
+            self.dlg_mincut.assigned_to.setDisabled(False)
+            self.dlg_mincut.pred_description.setDisabled(False)
             # Group Real Details
-            self.dlg.cbx_date_start.setDisabled(True)
-            self.dlg.cbx_hours_start.setDisabled(True)
-            self.dlg.cbx_date_end.setDisabled(True)
-            self.dlg.cbx_hours_end.setDisabled(True)
-            self.dlg.distance.setDisabled(True)
-            self.dlg.depth.setDisabled(True)
-            self.dlg.appropiate.setDisabled(True)
-            self.dlg.real_description.setDisabled(True)
-            self.dlg.btn_start.setDisabled(False)
-            self.dlg.btn_end.setDisabled(True)
+            self.dlg_mincut.cbx_date_start.setDisabled(True)
+            self.dlg_mincut.cbx_hours_start.setDisabled(True)
+            self.dlg_mincut.cbx_date_end.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end.setDisabled(True)
+            self.dlg_mincut.distance.setDisabled(True)
+            self.dlg_mincut.depth.setDisabled(True)
+            self.dlg_mincut.appropiate.setDisabled(True)
+            self.dlg_mincut.real_description.setDisabled(True)
+            self.dlg_mincut.btn_start.setDisabled(False)
+            self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             if mincut_class_status == '1':
                 self.action_mincut.setDisabled(False)
@@ -1682,35 +1682,35 @@ class MincutParent(ParentAction, MultipleSelection):
         # Current_state == '1': In progress
         elif self.current_state == '1':
 
-            self.dlg.work_order.setDisabled(True)
+            self.dlg_mincut.work_order.setDisabled(True)
             # Group Location
-            self.dlg.address_exploitation.setDisabled(True)
-            self.dlg.address_postal_code.setDisabled(True)
-            self.dlg.address_street.setDisabled(True)
-            self.dlg.address_number.setDisabled(True)
+            self.dlg_mincut.address_exploitation.setDisabled(True)
+            self.dlg_mincut.address_postal_code.setDisabled(True)
+            self.dlg_mincut.address_street.setDisabled(True)
+            self.dlg_mincut.address_number.setDisabled(True)
             # Group Details
-            self.dlg.type.setDisabled(True)
-            self.dlg.cause.setDisabled(True)
-            self.dlg.cbx_recieved_day.setDisabled(True)
-            self.dlg.cbx_recieved_time.setDisabled(True)
+            self.dlg_mincut.type.setDisabled(True)
+            self.dlg_mincut.cause.setDisabled(True)
+            self.dlg_mincut.cbx_recieved_day.setDisabled(True)
+            self.dlg_mincut.cbx_recieved_time.setDisabled(True)
             # Group Prediction dates
-            self.dlg.cbx_date_start_predict.setDisabled(True)
-            self.dlg.cbx_hours_start_predict.setDisabled(True)
-            self.dlg.cbx_date_end_predict.setDisabled(True)
-            self.dlg.cbx_hours_end_predict.setDisabled(True)
-            self.dlg.assigned_to.setDisabled(True)
-            self.dlg.pred_description.setDisabled(True)
+            self.dlg_mincut.cbx_date_start_predict.setDisabled(True)
+            self.dlg_mincut.cbx_hours_start_predict.setDisabled(True)
+            self.dlg_mincut.cbx_date_end_predict.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end_predict.setDisabled(True)
+            self.dlg_mincut.assigned_to.setDisabled(True)
+            self.dlg_mincut.pred_description.setDisabled(True)
             # Group Real dates
-            self.dlg.cbx_date_start.setDisabled(False)
-            self.dlg.cbx_hours_start.setDisabled(False)
-            self.dlg.cbx_date_end.setDisabled(True)
-            self.dlg.cbx_hours_end.setDisabled(True)
-            self.dlg.distance.setDisabled(False)
-            self.dlg.depth.setDisabled(False)
-            self.dlg.appropiate.setDisabled(False)
-            self.dlg.real_description.setDisabled(False)
-            self.dlg.btn_start.setDisabled(True)
-            self.dlg.btn_end.setDisabled(False)
+            self.dlg_mincut.cbx_date_start.setDisabled(False)
+            self.dlg_mincut.cbx_hours_start.setDisabled(False)
+            self.dlg_mincut.cbx_date_end.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end.setDisabled(True)
+            self.dlg_mincut.distance.setDisabled(False)
+            self.dlg_mincut.depth.setDisabled(False)
+            self.dlg_mincut.appropiate.setDisabled(False)
+            self.dlg_mincut.real_description.setDisabled(False)
+            self.dlg_mincut.btn_start.setDisabled(True)
+            self.dlg_mincut.btn_end.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
@@ -1720,35 +1720,35 @@ class MincutParent(ParentAction, MultipleSelection):
         # Current_state == '2': Finished
         elif self.current_state == '2':
             
-            self.dlg.work_order.setDisabled(True)
+            self.dlg_mincut.work_order.setDisabled(True)
             # Group Location
-            self.dlg.address_exploitation.setDisabled(True)
-            self.dlg.address_postal_code.setDisabled(True)
-            self.dlg.address_street.setDisabled(True)
-            self.dlg.address_number.setDisabled(True)
+            self.dlg_mincut.address_exploitation.setDisabled(True)
+            self.dlg_mincut.address_postal_code.setDisabled(True)
+            self.dlg_mincut.address_street.setDisabled(True)
+            self.dlg_mincut.address_number.setDisabled(True)
             # Group Details
-            self.dlg.type.setDisabled(True)
-            self.dlg.cause.setDisabled(True)
-            self.dlg.cbx_recieved_day.setDisabled(True)
-            self.dlg.cbx_recieved_time.setDisabled(True)
+            self.dlg_mincut.type.setDisabled(True)
+            self.dlg_mincut.cause.setDisabled(True)
+            self.dlg_mincut.cbx_recieved_day.setDisabled(True)
+            self.dlg_mincut.cbx_recieved_time.setDisabled(True)
             # Group Prediction dates
-            self.dlg.cbx_date_start_predict.setDisabled(True)
-            self.dlg.cbx_hours_start_predict.setDisabled(True)
-            self.dlg.cbx_date_end_predict.setDisabled(True)
-            self.dlg.cbx_hours_end_predict.setDisabled(True)
-            self.dlg.assigned_to.setDisabled(True)
-            self.dlg.pred_description.setDisabled(True)
+            self.dlg_mincut.cbx_date_start_predict.setDisabled(True)
+            self.dlg_mincut.cbx_hours_start_predict.setDisabled(True)
+            self.dlg_mincut.cbx_date_end_predict.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end_predict.setDisabled(True)
+            self.dlg_mincut.assigned_to.setDisabled(True)
+            self.dlg_mincut.pred_description.setDisabled(True)
             # Group Real dates
-            self.dlg.cbx_date_start.setDisabled(True)
-            self.dlg.cbx_hours_start.setDisabled(True)
-            self.dlg.cbx_date_end.setDisabled(True)
-            self.dlg.cbx_hours_end.setDisabled(True)
-            self.dlg.distance.setDisabled(True)
-            self.dlg.depth.setDisabled(True)
-            self.dlg.appropiate.setDisabled(True)
-            self.dlg.real_description.setDisabled(True)
-            self.dlg.btn_start.setDisabled(True)
-            self.dlg.btn_end.setDisabled(True)
+            self.dlg_mincut.cbx_date_start.setDisabled(True)
+            self.dlg_mincut.cbx_hours_start.setDisabled(True)
+            self.dlg_mincut.cbx_date_end.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end.setDisabled(True)
+            self.dlg_mincut.distance.setDisabled(True)
+            self.dlg_mincut.depth.setDisabled(True)
+            self.dlg_mincut.appropiate.setDisabled(True)
+            self.dlg_mincut.real_description.setDisabled(True)
+            self.dlg_mincut.btn_start.setDisabled(True)
+            self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
@@ -1765,9 +1765,9 @@ class MincutParent(ParentAction, MultipleSelection):
                    " WHERE muni_id = '" + str(row['muni_id']) + "'")
             row_aux = self.controller.get_row(sql)
             if row_aux:                
-                utils_giswater.setWidgetText(self.dlg.address_exploitation, row_aux['name'])
+                utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_exploitation, row_aux['name'])
                     
-        utils_giswater.setWidgetText(self.dlg.address_postal_code, str(row['postcode']))
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code, str(row['postcode']))
         
         # Get 'street_name' from 'streetaxis_id'  
         if row['streetaxis_id'] and row['streetaxis_id'] != -1:
@@ -1775,9 +1775,9 @@ class MincutParent(ParentAction, MultipleSelection):
                    " WHERE id = '" + str(row['streetaxis_id']) + "'")
             row_aux = self.controller.get_row(sql)
             if row_aux:
-                utils_giswater.setWidgetText(self.dlg.address_street, row_aux['name'])
+                utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_street, row_aux['name'])
                          
-        utils_giswater.setWidgetText(self.dlg.address_number, str(row['postnumber']))     
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_number, str(row['postnumber']))
         
         
     def open_mincut_manage_dates(self, row):
@@ -1799,8 +1799,8 @@ class MincutParent(ParentAction, MultipleSelection):
             time = str(datetime.split()[1])
             qt_date = QDate.fromString(date, 'yyyy-MM-dd')
             qt_time = QTime.fromString(time, 'h:mm:ss')
-            utils_giswater.setCalendarDate(widget_date, qt_date) 
-            utils_giswater.setTimeEdit(widget_time, qt_time)
+            utils_giswater.setCalendarDate(self.dlg_mincut, widget_date, qt_date)
+            utils_giswater.setTimeEdit(self.dlg_mincut, widget_time, qt_time)
 
 
     def searchplus_get_parameters(self):
@@ -1833,7 +1833,7 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Fill @combo """
 
         # Get exploitation code: 'expl_id'
-        expl_id = utils_giswater.get_item_data(dialog.address_exploitation)
+        expl_id = utils_giswater.get_item_data(dialog, dialog.address_exploitation)
         
         # Select features of @layer applying @expr
         layer = self.layers['expl_layer']
@@ -1946,7 +1946,7 @@ class MincutParent(ParentAction, MultipleSelection):
         """      
 
         # Get selected street
-        selected = utils_giswater.getWidgetText(combo)
+        selected = utils_giswater.getWidgetText(dialog, combo)
         if selected == 'null':
             return
 
@@ -2096,7 +2096,7 @@ class MincutParent(ParentAction, MultipleSelection):
                    " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
             row = self.controller.get_row(sql, log_sql=True)
             if row:
-                utils_giswater.setSelectedItem(dialog.address_exploitation, row[0])
+                utils_giswater.setSelectedItem(dialog, dialog.address_exploitation, row[0])
 
         # Set signals
         dialog.address_exploitation.currentIndexChanged.connect(
@@ -2117,8 +2117,8 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Show street data on the canvas when selected street and number in street tab """
 
         # Get selected street
-        street = utils_giswater.getWidgetText(dialog.address_street)
-        civic = utils_giswater.getWidgetText(dialog.address_number)
+        street = utils_giswater.getWidgetText(dialog, dialog.address_street)
+        civic = utils_giswater.getWidgetText(dialog, dialog.address_number)
         if street == 'null' or civic == 'null':
             return
 
@@ -2157,7 +2157,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog add_connec
         self.dlg_comp = MincutComposer()
-        utils_giswater.setDialog(self.dlg_comp)
+        # utils_giswater.setDialog(self.dlg_comp)
         self.load_settings(self.dlg_comp)
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
@@ -2250,35 +2250,35 @@ class MincutParent(ParentAction, MultipleSelection):
         # Planified
         if state == '0':
             
-            self.dlg.work_order.setDisabled(False)
+            self.dlg_mincut.work_order.setDisabled(False)
             # Group Location
-            self.dlg.address_exploitation.setDisabled(self.search_plus_disabled)
-            self.dlg.address_postal_code.setDisabled(self.search_plus_disabled)
-            self.dlg.address_street.setDisabled(self.search_plus_disabled)
-            self.dlg.address_number.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_exploitation.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_postal_code.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_street.setDisabled(self.search_plus_disabled)
+            self.dlg_mincut.address_number.setDisabled(self.search_plus_disabled)
             # Group Details
-            self.dlg.type.setDisabled(False)
-            self.dlg.cause.setDisabled(False)
-            self.dlg.cbx_recieved_day.setDisabled(False)
-            self.dlg.cbx_recieved_time.setDisabled(False)
+            self.dlg_mincut.type.setDisabled(False)
+            self.dlg_mincut.cause.setDisabled(False)
+            self.dlg_mincut.cbx_recieved_day.setDisabled(False)
+            self.dlg_mincut.cbx_recieved_time.setDisabled(False)
             # Group Prediction
-            self.dlg.cbx_date_start_predict.setDisabled(False)
-            self.dlg.cbx_hours_start_predict.setDisabled(False)
-            self.dlg.cbx_date_end_predict.setDisabled(False)
-            self.dlg.cbx_hours_end_predict.setDisabled(False)
-            self.dlg.assigned_to.setDisabled(False)
-            self.dlg.pred_description.setDisabled(False)
+            self.dlg_mincut.cbx_date_start_predict.setDisabled(False)
+            self.dlg_mincut.cbx_hours_start_predict.setDisabled(False)
+            self.dlg_mincut.cbx_date_end_predict.setDisabled(False)
+            self.dlg_mincut.cbx_hours_end_predict.setDisabled(False)
+            self.dlg_mincut.assigned_to.setDisabled(False)
+            self.dlg_mincut.pred_description.setDisabled(False)
             # Group Real Details
-            self.dlg.cbx_date_start.setDisabled(True)
-            self.dlg.cbx_hours_start.setDisabled(True)
-            self.dlg.cbx_date_end.setDisabled(True)
-            self.dlg.cbx_hours_end.setDisabled(True)
-            self.dlg.distance.setDisabled(True)
-            self.dlg.depth.setDisabled(True)
-            self.dlg.appropiate.setDisabled(True)
-            self.dlg.real_description.setDisabled(True)
-            self.dlg.btn_start.setDisabled(False)
-            self.dlg.btn_end.setDisabled(True)        
+            self.dlg_mincut.cbx_date_start.setDisabled(True)
+            self.dlg_mincut.cbx_hours_start.setDisabled(True)
+            self.dlg_mincut.cbx_date_end.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end.setDisabled(True)
+            self.dlg_mincut.distance.setDisabled(True)
+            self.dlg_mincut.depth.setDisabled(True)
+            self.dlg_mincut.appropiate.setDisabled(True)
+            self.dlg_mincut.real_description.setDisabled(True)
+            self.dlg_mincut.btn_start.setDisabled(False)
+            self.dlg_mincut.btn_end.setDisabled(True)        
             # Actions
             self.action_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(True)
@@ -2288,35 +2288,35 @@ class MincutParent(ParentAction, MultipleSelection):
         # In Progess    
         elif state == '1':
             
-            self.dlg.work_order.setDisabled(True)
+            self.dlg_mincut.work_order.setDisabled(True)
             # Group Location            
-            self.dlg.address_exploitation.setDisabled(True)
-            self.dlg.address_postal_code.setDisabled(True)
-            self.dlg.address_street.setDisabled(True)
-            self.dlg.address_number.setDisabled(True)
+            self.dlg_mincut.address_exploitation.setDisabled(True)
+            self.dlg_mincut.address_postal_code.setDisabled(True)
+            self.dlg_mincut.address_street.setDisabled(True)
+            self.dlg_mincut.address_number.setDisabled(True)
             # Group Details
-            self.dlg.type.setDisabled(True)
-            self.dlg.cause.setDisabled(True)
-            self.dlg.cbx_recieved_day.setDisabled(True)
-            self.dlg.cbx_recieved_time.setDisabled(True)
+            self.dlg_mincut.type.setDisabled(True)
+            self.dlg_mincut.cause.setDisabled(True)
+            self.dlg_mincut.cbx_recieved_day.setDisabled(True)
+            self.dlg_mincut.cbx_recieved_time.setDisabled(True)
             # Group Prediction dates
-            self.dlg.cbx_date_start_predict.setDisabled(True)
-            self.dlg.cbx_hours_start_predict.setDisabled(True)
-            self.dlg.cbx_date_end_predict.setDisabled(True)
-            self.dlg.cbx_hours_end_predict.setDisabled(True)
-            self.dlg.assigned_to.setDisabled(True)
-            self.dlg.pred_description.setDisabled(True)
+            self.dlg_mincut.cbx_date_start_predict.setDisabled(True)
+            self.dlg_mincut.cbx_hours_start_predict.setDisabled(True)
+            self.dlg_mincut.cbx_date_end_predict.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end_predict.setDisabled(True)
+            self.dlg_mincut.assigned_to.setDisabled(True)
+            self.dlg_mincut.pred_description.setDisabled(True)
             # Group Real dates
-            self.dlg.cbx_date_start.setDisabled(False)
-            self.dlg.cbx_hours_start.setDisabled(False)
-            self.dlg.cbx_date_end.setDisabled(True)
-            self.dlg.cbx_hours_end.setDisabled(True)
-            self.dlg.distance.setDisabled(False)
-            self.dlg.depth.setDisabled(False)
-            self.dlg.appropiate.setDisabled(False)
-            self.dlg.real_description.setDisabled(False)
-            self.dlg.btn_start.setDisabled(True)
-            self.dlg.btn_end.setDisabled(False)        
+            self.dlg_mincut.cbx_date_start.setDisabled(False)
+            self.dlg_mincut.cbx_hours_start.setDisabled(False)
+            self.dlg_mincut.cbx_date_end.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end.setDisabled(True)
+            self.dlg_mincut.distance.setDisabled(False)
+            self.dlg_mincut.depth.setDisabled(False)
+            self.dlg_mincut.appropiate.setDisabled(False)
+            self.dlg_mincut.real_description.setDisabled(False)
+            self.dlg_mincut.btn_start.setDisabled(True)
+            self.dlg_mincut.btn_end.setDisabled(False)        
             # Actions
             self.action_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(True)
@@ -2326,35 +2326,35 @@ class MincutParent(ParentAction, MultipleSelection):
         # Finished
         elif state == '2':
             
-            self.dlg.work_order.setDisabled(True)
+            self.dlg_mincut.work_order.setDisabled(True)
             # Group Location  
-            self.dlg.address_exploitation.setDisabled(True)
-            self.dlg.address_postal_code.setDisabled(True)
-            self.dlg.address_street.setDisabled(True)
-            self.dlg.address_number.setDisabled(True)
+            self.dlg_mincut.address_exploitation.setDisabled(True)
+            self.dlg_mincut.address_postal_code.setDisabled(True)
+            self.dlg_mincut.address_street.setDisabled(True)
+            self.dlg_mincut.address_number.setDisabled(True)
             # Group Details
-            self.dlg.type.setDisabled(True)
-            self.dlg.cause.setDisabled(True)
-            self.dlg.cbx_recieved_day.setDisabled(True)
-            self.dlg.cbx_recieved_time.setDisabled(True)
+            self.dlg_mincut.type.setDisabled(True)
+            self.dlg_mincut.cause.setDisabled(True)
+            self.dlg_mincut.cbx_recieved_day.setDisabled(True)
+            self.dlg_mincut.cbx_recieved_time.setDisabled(True)
             # Group Prediction dates
-            self.dlg.cbx_date_start_predict.setDisabled(True)
-            self.dlg.cbx_hours_start_predict.setDisabled(True)
-            self.dlg.cbx_date_end_predict.setDisabled(True)
-            self.dlg.cbx_hours_end_predict.setDisabled(True)
-            self.dlg.assigned_to.setDisabled(True)
-            self.dlg.pred_description.setDisabled(True)
+            self.dlg_mincut.cbx_date_start_predict.setDisabled(True)
+            self.dlg_mincut.cbx_hours_start_predict.setDisabled(True)
+            self.dlg_mincut.cbx_date_end_predict.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end_predict.setDisabled(True)
+            self.dlg_mincut.assigned_to.setDisabled(True)
+            self.dlg_mincut.pred_description.setDisabled(True)
             # Group Real dates
-            self.dlg.cbx_date_start.setDisabled(True)
-            self.dlg.cbx_hours_start.setDisabled(True)
-            self.dlg.cbx_date_end.setDisabled(True)
-            self.dlg.cbx_hours_end.setDisabled(True)
-            self.dlg.distance.setDisabled(True)
-            self.dlg.depth.setDisabled(True)
-            self.dlg.appropiate.setDisabled(True)
-            self.dlg.real_description.setDisabled(True)
-            self.dlg.btn_start.setDisabled(True)
-            self.dlg.btn_end.setDisabled(True) 
+            self.dlg_mincut.cbx_date_start.setDisabled(True)
+            self.dlg_mincut.cbx_hours_start.setDisabled(True)
+            self.dlg_mincut.cbx_date_end.setDisabled(True)
+            self.dlg_mincut.cbx_hours_end.setDisabled(True)
+            self.dlg_mincut.distance.setDisabled(True)
+            self.dlg_mincut.depth.setDisabled(True)
+            self.dlg_mincut.appropiate.setDisabled(True)
+            self.dlg_mincut.real_description.setDisabled(True)
+            self.dlg_mincut.btn_start.setDisabled(True)
+            self.dlg_mincut.btn_end.setDisabled(True) 
             # Actions        
             self.action_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)

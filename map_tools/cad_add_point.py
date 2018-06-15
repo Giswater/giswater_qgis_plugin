@@ -31,7 +31,6 @@ class CadAddPoint(ParentMapTool):
 
         # Create the dialog and signals
         self.dlg_create_point = Cad_add_point()
-        utils_giswater.setDialog(self.dlg_create_point)
         self.load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
@@ -61,7 +60,7 @@ class CadAddPoint(ParentMapTool):
         self.dist_y = self.dlg_create_point.dist_y.text()
         if not self.dist_y:
             self.dist_y = 0
-        self.delete_prev = utils_giswater.isChecked(self.dlg_create_point.chk_delete_prev)
+        self.delete_prev = utils_giswater.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
         
         if self.layer_points:
             self.layer_points.startEditing()

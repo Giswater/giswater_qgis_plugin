@@ -144,7 +144,7 @@ class MincutConfig(ParentAction):
 
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
-        utils_giswater.setDialog(self.dlg_min_edit)
+        #utils_giswater.setDialog(self.dlg_min_edit)
         self.load_settings(self.dlg_min_edit)
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
@@ -176,13 +176,12 @@ class MincutConfig(ParentAction):
                " FROM " + self.schema_name + ".anl_mincut_cat_state"
                " ORDER BY name")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("state_edit", rows)
+        utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
         self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit, self.dlg_min_edit.state_edit, "v_ui_anl_mincut_result_cat"))
 
-        self.controller.log_info("test 1")
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
-        self.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
+        self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
         self.controller.log_info("test set table columns for mincut management ")
         #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
@@ -213,7 +212,7 @@ class MincutConfig(ParentAction):
 
     def filter_by_id(self, table, widget_txt, tablename):
 
-        id_ = utils_giswater.getWidgetText(widget_txt)
+        id_ = utils_giswater.getWidgetText(self.dlg_min_edit, widget_txt)
         if id_ != 'null':
             expr = " id = '" + id_ + "'"
             # Refresh model with selected filter
@@ -225,7 +224,7 @@ class MincutConfig(ParentAction):
 
     def filter_by_state(self, table, widget, tablename):
         
-        state = utils_giswater.getWidgetText(widget)
+        state = utils_giswater.getWidgetText(self.dlg_min_edit, widget)
         if state != 'null':
             expr_filter = " state = '" + str(state) + "'"
             self.controller.log_info(str(expr_filter))

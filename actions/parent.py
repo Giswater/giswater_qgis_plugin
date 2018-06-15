@@ -257,11 +257,11 @@ class ParentAction(object):
         self.gsw_settings.setValue('POSTGIS_USESSL', 'false')               
         
         
-    def open_web_browser(self, widget=None):
+    def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
         
         if widget is not None:           
-            url = utils_giswater.getWidgetText(widget)            
+            url = utils_giswater.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'www.giswater.org'
         else:
@@ -270,11 +270,11 @@ class ParentAction(object):
         webbrowser.open(url)    
         
 
-    def get_file_dialog(self, widget):
+    def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
         
         # Check if selected file exists. Set default value if necessary
-        file_path = utils_giswater.getWidgetText(widget)
+        file_path = utils_giswater.getWidgetText(dialog, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
             folder_path = self.plugin_dir   
         else:     
@@ -287,14 +287,14 @@ class ParentAction(object):
         message = "Select file"
         folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path))            
+            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
                 
                 
-    def get_folder_dialog(self, widget):
+    def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
         
         # Check if selected folder exists. Set default value if necessary
-        folder_path = utils_giswater.getWidgetText(widget)
+        folder_path = utils_giswater.getWidgetText(dialog, widget)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
             folder_path = os.path.expanduser("~")
 
@@ -305,7 +305,7 @@ class ParentAction(object):
         message = "Select folder"
         folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
-            utils_giswater.setWidgetText(widget, str(folder_path))
+            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
 
     def load_settings(self, dialog=None):
@@ -408,7 +408,7 @@ class ParentAction(object):
         query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
 
 
     def hide_colums(self, widget, comuns_to_hide):
@@ -537,10 +537,10 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())  
             
 
-    def query_like_widget_text(self, text_line, qtable, tableleft, tableright, field_id):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Fill the QTableView by filtering through the QLineEdit"""
         
-        query = utils_giswater.getWidgetText(text_line, return_string_null=False).lower()
+        query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
         sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
                "(SELECT name FROM " + self.schema_name + "." + tableleft + ""
                " RIGHT JOIN " + self.schema_name + "." + tableright + ""
@@ -608,10 +608,10 @@ class ParentAction(object):
         return cursor        
                     
                 
-    def set_table_columns(self, widget, table_name):
+    def set_table_columns(self, dialog, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """
 
-        widget = utils_giswater.getWidget(widget)
+        widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
             return
 
@@ -665,7 +665,7 @@ class ParentAction(object):
             pass
 
 
-    def set_label_current_psector(self):
+    def set_label_current_psector(self, dialog):
 
         sql = ("SELECT t1.name FROM " + self.schema_name + ".plan_psector AS t1 "
                " INNER JOIN " + self.schema_name + ".config_param_user AS t2 ON t1.psector_id::text = t2.value "
@@ -673,7 +673,9 @@ class ParentAction(object):
         row = self.controller.get_row(sql)
         if not row:
             return
-        utils_giswater.setWidgetText('lbl_vdefault_psector', row[0])
+        utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
+
+
 
 
     def multi_rows_delete(self, widget, table_name, column_id):

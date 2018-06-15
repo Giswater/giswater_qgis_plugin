@@ -60,12 +60,12 @@ class ParentManage(ParentAction, object):
         self.layers['element'] = []
 
 
-    def reset_model(self, table_object, geom_type):
+    def reset_model(self, dialog, table_object, geom_type):
         """ Reset model of the widget """ 
 
         table_relation = table_object + "_x_" + geom_type
         widget_name = "tbl_" + table_relation
-        widget = utils_giswater.getWidget(widget_name)
+        widget = utils_giswater.getWidget(dialog, widget_name)
         if widget:              
             widget.setModel(None)
 
@@ -109,38 +109,38 @@ class ParentManage(ParentAction, object):
         self.canvas.refresh()
     
     
-    def reset_widgets(self, table_object):    
+    def reset_widgets(self, dialog, table_object):
         """ Clear contents of input widgets """
         
         if table_object == "doc":
-            utils_giswater.setWidgetText("doc_type", "")
-            utils_giswater.setWidgetText("observ", "")
-            utils_giswater.setWidgetText("path", "")   
+            utils_giswater.setWidgetText(dialog, "doc_type", "")
+            utils_giswater.setWidgetText(dialog, "observ", "")
+            utils_giswater.setWidgetText(dialog, "path", "")
         elif table_object == "element":
-            utils_giswater.setWidgetText("elementcat_id", "")
-            utils_giswater.setWidgetText("state", "")
-            utils_giswater.setWidgetText("expl_id","")
-            utils_giswater.setWidgetText("ownercat_id", "")
-            utils_giswater.setWidgetText("location_type", "")
-            utils_giswater.setWidgetText("buildercat_id", "")
-            utils_giswater.setWidgetText("workcat_id", "")
-            utils_giswater.setWidgetText("workcat_id_end", "")
-            utils_giswater.setWidgetText("comment", "")
-            utils_giswater.setWidgetText("observ", "")
-            utils_giswater.setWidgetText("path", "")
-            utils_giswater.setWidgetText("rotation", "")                                    
-            utils_giswater.setWidgetText("verified", "")
-            utils_giswater.setWidgetText(self.dlg.num_elements, "")
+            utils_giswater.setWidgetText(dialog, "elementcat_id", "")
+            utils_giswater.setWidgetText(dialog, "state", "")
+            utils_giswater.setWidgetText(dialog, "expl_id","")
+            utils_giswater.setWidgetText(dialog, "ownercat_id", "")
+            utils_giswater.setWidgetText(dialog, "location_type", "")
+            utils_giswater.setWidgetText(dialog, "buildercat_id", "")
+            utils_giswater.setWidgetText(dialog, "workcat_id", "")
+            utils_giswater.setWidgetText(dialog, "workcat_id_end", "")
+            utils_giswater.setWidgetText(dialog, "comment", "")
+            utils_giswater.setWidgetText(dialog, "observ", "")
+            utils_giswater.setWidgetText(dialog, "path", "")
+            utils_giswater.setWidgetText(dialog, "rotation", "")
+            utils_giswater.setWidgetText(dialog, "verified", "")
+            utils_giswater.setWidgetText(dialog, dialog.num_elements, "")
                     
     
-    def fill_widgets(self, table_object, row):    
+    def fill_widgets(self, dialog, table_object, row):
         """ Fill input widgets with data int he @row """
         
         if table_object == "doc":
             
-            utils_giswater.setWidgetText("doc_type", row["doc_type"])
-            utils_giswater.setWidgetText("observ",  row["observ"])
-            utils_giswater.setWidgetText("path",  row["path"])  
+            utils_giswater.setWidgetText(dialog, "doc_type", row["doc_type"])
+            utils_giswater.setWidgetText(dialog, "observ",  row["observ"])
+            utils_giswater.setWidgetText(dialog, "path",  row["path"])
              
         elif table_object == "element":
                     
@@ -160,37 +160,37 @@ class ParentManage(ParentAction, object):
                 if row_aux:
                     expl_id = row_aux[0]
 
-            utils_giswater.setWidgetText("num_elements", row['num_elements'])
-            utils_giswater.setWidgetText("state", state)
-            utils_giswater.setWidgetText("expl_id", expl_id)
+            utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
+            utils_giswater.setWidgetText(dialog, "state", state)
+            utils_giswater.setWidgetText(dialog, "expl_id", expl_id)
             sql = ("SELECT elementtype_id FROM " + self.schema_name + ".cat_element"
                    " WHERE id = '" + str(row['elementcat_id']) + "'")
             row_type = self.controller.get_row(sql)
             if row_type:
-                utils_giswater.setWidgetText("element_type", row_type[0])
-            utils_giswater.setWidgetText("ownercat_id", row['ownercat_id'])
-            utils_giswater.setWidgetText("location_type", row['location_type'])
-            utils_giswater.setWidgetText("buildercat_id", row['buildercat_id'])
-            utils_giswater.setWidgetText("workcat_id", row['workcat_id'])
-            utils_giswater.setWidgetText("workcat_id_end", row['workcat_id_end'])
-            utils_giswater.setWidgetText("comment", row['comment'])
-            utils_giswater.setWidgetText("observ", row['observ'])
-            utils_giswater.setWidgetText("link", row['link'])
-            utils_giswater.setWidgetText("verified", row['verified'])
-            utils_giswater.setWidgetText("rotation", row['rotation'])
+                utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
+            utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
+            utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
+            utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
+            utils_giswater.setWidgetText(dialog, "workcat_id", row['workcat_id'])
+            utils_giswater.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
+            utils_giswater.setWidgetText(dialog, "comment", row['comment'])
+            utils_giswater.setWidgetText(dialog, "observ", row['observ'])
+            utils_giswater.setWidgetText(dialog, "link", row['link'])
+            utils_giswater.setWidgetText(dialog, "verified", row['verified'])
+            utils_giswater.setWidgetText(dialog, "rotation", row['rotation'])
             if str(row['undelete'])== 'True':
-                self.dlg.undelete.setChecked(True)
+                dialog.undelete.setChecked(True)
             builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
             enddate = QDate.fromString(str(row['enddate']), 'yyyy-MM-dd')
 
-            self.dlg.builtdate.setDate(builtdate)
-            self.dlg.enddate.setDate(enddate)
+            dialog.builtdate.setDate(builtdate)
+            dialog.enddate.setDate(enddate)
             
               
-    def get_records_geom_type(self, table_object, geom_type):
+    def get_records_geom_type(self, dialog, table_object, geom_type):
         """ Get records of @geom_type associated to selected @table_object """
         
-        object_id = utils_giswater.getWidgetText(table_object + "_id")        
+        object_id = utils_giswater.getWidgetText(dialog, table_object + "_id")
         table_relation = table_object + "_x_" + geom_type
         widget_name = "tbl_" + table_relation           
         
@@ -209,10 +209,10 @@ class ParentManage(ParentAction, object):
                 self.ids.append(str(row[0]))
 
             expr_filter = self.get_expr_filter(geom_type)
-            self.set_table_model(widget_name, geom_type, expr_filter)   
+            self.set_table_model(dialog, widget_name, geom_type, expr_filter)
             
                                 
-    def exist_object(self, table_object):
+    def exist_object(self, dialog, table_object):
         """ Check if selected object (document or element) already exists """
         
         # Reset list of selected records
@@ -221,7 +221,7 @@ class ParentManage(ParentAction, object):
         field_object_id = "id"
         if table_object == "element":
             field_object_id = table_object + "_id"           
-        object_id = utils_giswater.getWidgetText(table_object + "_id")
+        object_id = utils_giswater.getWidgetText(dialog, table_object + "_id")
 
         # Check if we already have data with selected object_id
         sql = ("SELECT * " 
@@ -231,12 +231,12 @@ class ParentManage(ParentAction, object):
 
         # If object_id not found: Clear data
         if not row:    
-            self.reset_widgets(table_object)
+            self.reset_widgets(dialog, table_object)
             if table_object == 'element':
-                self.set_combo('state', 'value_state', 'state_vdefault', field_name='name')
-                self.set_combo('expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id',field_name='name')
-                self.set_calendars('builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
-                self.set_combo('workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
+                self.set_combo(dialog, 'state', 'value_state', 'state_vdefault', field_name='name')
+                self.set_combo(dialog, 'expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id',field_name='name')
+                self.set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
+                self.set_combo(dialog, 'workcat_id', 'cat_work', 'workcat_vdefault', field_id='id', field_name='id')
             if hasattr(self, 'single_tool_mode'):
                 # some tools can work differently if standalone or integrated in
                 # another tool
@@ -244,53 +244,53 @@ class ParentManage(ParentAction, object):
                     self.remove_selection(True)
             else:
                 self.remove_selection(True)
-            self.reset_model(table_object, "arc")      
-            self.reset_model(table_object, "node")      
-            self.reset_model(table_object, "connec")
-            self.reset_model(table_object, "element")
+            self.reset_model(dialog, table_object, "arc")
+            self.reset_model(dialog, table_object, "node")
+            self.reset_model(dialog, table_object, "connec")
+            self.reset_model(dialog, table_object, "element")
             if self.project_type == 'ud':
-                self.reset_model(table_object, "gully")
+                self.reset_model(dialog, table_object, "gully")
             if table_object != 'doc':
-                self.dlg.enddate.setEnabled(False)
+                dialog.enddate.setEnabled(False)
             return
 
         if table_object != 'doc':
-            self.dlg.enddate.setEnabled(True)
+            dialog.enddate.setEnabled(True)
 
 
         # Fill input widgets with data of the @row
-        self.fill_widgets(table_object, row)
+        self.fill_widgets(dialog, table_object, row)
 
         # Check related 'arcs'
-        self.get_records_geom_type(table_object, "arc")
+        self.get_records_geom_type(dialog, table_object, "arc")
         
         # Check related 'nodes'
-        self.get_records_geom_type(table_object, "node")
+        self.get_records_geom_type(dialog, table_object, "node")
         
         # Check related 'connecs'
-        self.get_records_geom_type(table_object, "connec")
+        self.get_records_geom_type(dialog, table_object, "connec")
 
         # Check related 'elements'
-        self.get_records_geom_type(table_object, "element")
+        self.get_records_geom_type(dialog, table_object, "element")
 
         # Check related 'gullys'
         if self.project_type == 'ud':        
-            self.get_records_geom_type(table_object, "gully")
+            self.get_records_geom_type(dialog, table_object, "gully")
 
 
-    def populate_combo(self, widget, table_name, field_name="id"):
+    def populate_combo(self, dialog, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
         sql = ("SELECT " + field_name + ""
                " FROM " + self.schema_name + "." + table_name + ""
                " ORDER BY " + field_name)
         rows = self.controller.get_rows(sql, commit=self.autocommit)
-        utils_giswater.fillComboBox(widget, rows)
+        utils_giswater.fillComboBox(dialog, widget, rows)
         if rows:
-            utils_giswater.setCurrentIndex(widget, 0)           
+            utils_giswater.setCurrentIndex(dialog, widget, 0)
 
 
-    def set_combo(self, widget, table_name, parameter, field_id='id', field_name='id'):
+    def set_combo(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
         """ Executes query and set combo box """
         
         sql = ("SELECT t1." + field_name + " FROM " + self.schema_name + "." + table_name + " as t1"
@@ -298,10 +298,10 @@ class ParentManage(ParentAction, object):
                " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(widget, row[0])
+            utils_giswater.setWidgetText(dialog, widget, row[0])
 
 
-    def set_calendars(self, widget, table_name, value, parameter):
+    def set_calendars(self, dialog, widget, table_name, value, parameter):
         """ Executes query and set QDateEdit """
         
         sql = ("SELECT " + value + " FROM " + self.schema_name + "." + table_name + ""
@@ -311,7 +311,7 @@ class ParentManage(ParentAction, object):
             date = QDate.fromString(row[0], 'yyyy-MM-dd')
         else:
             date = QDate.currentDate()
-        utils_giswater.setCalendarDate(widget, date)
+        utils_giswater.setCalendarDate(dialog, widget, date)
 
 
     def add_point(self):
@@ -332,22 +332,22 @@ class ParentManage(ParentAction, object):
         self.controller.show_info(message)
         self.emit_point.canvasClicked.disconnect()
 
-    def get_values_from_form(self):
-        self.enddate = utils_giswater.getCalendarDate("enddate")
-        self.workcat_id_end = utils_giswater.getWidgetText("workcat_id_end")
-        self.description = utils_giswater.getWidgetText("descript")
+    def get_values_from_form(self, dialog):
+        self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
+        self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
+        self.description = utils_giswater.getWidgetText(dialog, "descript")
         
-    def tab_feature_changed(self, table_object):
+    def tab_feature_changed(self, dialog, table_object):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
-        self.get_values_from_form()
-        if self.dlg.tab_feature.currentIndex() == 3:
-            self.dlg.btn_snapping.setEnabled(False)
+        self.get_values_from_form(dialog)
+        if dialog.tab_feature.currentIndex() == 3:
+            dialog.btn_snapping.setEnabled(False)
         else:
-            self.dlg.btn_snapping.setEnabled(True)
+            dialog.btn_snapping.setEnabled(True)
 
-        tab_position = self.dlg.tab_feature.currentIndex()
+        tab_position = dialog.tab_feature.currentIndex()
         if tab_position == 0:
             self.geom_type = "arc"   
         elif tab_position == 1:
@@ -362,21 +362,20 @@ class ParentManage(ParentAction, object):
         self.hide_generic_layers()                  
         widget_name = "tbl_" + table_object + "_x_" + str(self.geom_type)
         viewname = "v_edit_" + str(self.geom_type)
-        self.widget = utils_giswater.getWidget(widget_name)
+        self.widget = utils_giswater.getWidget(dialog, widget_name)
             
         # Adding auto-completion to a QLineEdit
-        self.set_completer_feature_id(self.geom_type, viewname)
+        self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
         
         self.iface.actionPan().trigger()    
         
 
-    def set_completer_object(self, table_object, widget = False):
-        """ Set autocomplete of widget @table_object + "_id"
-            getting id's from selected @table_object
+    def set_completer_object(self, dialog, table_object):
+        """ Set autocomplete of widget @table_object + "_id" 
+            getting id's from selected @table_object 
         """
-
-        if widget == False:
-            widget = utils_giswater.getWidget(table_object + "_id")
+                     
+        widget = utils_giswater.getWidget(dialog, table_object + "_id")
         if not widget:
             return
         
@@ -399,8 +398,33 @@ class ParentManage(ParentAction, object):
         model.setStringList(row)
         self.completer.setModel(model)
         
+        
+    def set_completer_widget(self, tablename, widget, field_id):
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object
+        """
+        if not widget:
+            return
 
-    def set_completer_feature_id(self, geom_type, viewname):
+        # Set SQL
+        sql = ("SELECT DISTINCT(" + field_id + ")"
+               " FROM " + self.schema_name + "." + tablename +""
+               " ORDER BY "+ field_id + "")
+        row = self.controller.get_rows(sql)
+        for i in range(0, len(row)):
+            aux = row[i]
+            row[i] = str(aux[0])
+
+        # Set completer and model: add autocomplete in the widget
+        self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        widget.setCompleter(self.completer)
+        model = QStringListModel()
+        model.setStringList(row)
+        self.completer.setModel(model)
+                
+
+    def set_completer_feature_id(self, widget, geom_type, viewname):
         """ Set autocomplete of widget 'feature_id' 
             getting id's from selected @viewname 
         """
@@ -408,7 +432,7 @@ class ParentManage(ParentAction, object):
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-        self.dlg.feature_id.setCompleter(self.completer)
+        widget.setCompleter(self.completer)
         model = QStringListModel()
 
         sql = ("SELECT " + geom_type + "_id"
@@ -450,12 +474,12 @@ class ParentManage(ParentAction, object):
         return expr_filter
 
 
-    def reload_table(self, table_object, geom_type, expr_filter):
+    def reload_table(self, dialog, table_object, geom_type, expr_filter):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
         if type(table_object) is str:
             widget_name = "tbl_" + table_object + "_x_" + geom_type
-            widget = utils_giswater.getWidget(widget_name)
+            widget = utils_giswater.getWidget(dialog, widget_name)
 
             if not widget:
                 message = "Widget not found"
@@ -469,11 +493,11 @@ class ParentManage(ParentAction, object):
             self.controller.log_info(message)
             return None
 
-        expr = self.set_table_model(widget, geom_type, expr_filter)
+        expr = self.set_table_model(dialog, widget, geom_type, expr_filter)
         return expr
 
 
-    def set_table_model(self, table_object, geom_type, expr_filter):
+    def set_table_model(self, dialog, table_object, geom_type, expr_filter):
         """ Sets a TableModel to @widget_name attached to
             @table_name and filter @expr_filter 
         """
@@ -491,7 +515,7 @@ class ParentManage(ParentAction, object):
             table_name = self.schema_name + "." + table_name
 
         # Set the model
-        model = QSqlTableModel();
+        model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.select()
@@ -501,7 +525,7 @@ class ParentManage(ParentAction, object):
 
         # Attach model to selected widget
         if type(table_object) is str:
-            widget = utils_giswater.getWidget(table_object)
+            widget = utils_giswater.getWidget(dialog, table_object)
             if not widget:
                 message = "Widget not found"
                 self.controller.log_info(message, parameter=table_object)
@@ -559,14 +583,14 @@ class ParentManage(ParentAction, object):
                     layer.removeSelection()             
         
              
-    def delete_records(self, table_object, query=False):
+    def delete_records(self, dialog, table_object, query=False):
         """ Delete selected elements of the table """
 
         self.disconnect_signal_selection_changed()
 
         if type(table_object) is str:
             widget_name = "tbl_" + table_object + "_x_" + self.geom_type
-            widget = utils_giswater.getWidget(widget_name)
+            widget = utils_giswater.getWidget(dialog, widget_name)
             if not widget:
                 message = "Widget not found"
                 self.controller.show_warning(message, parameter=widget_name)
@@ -631,10 +655,10 @@ class ParentManage(ParentAction, object):
 
         # Update model of the widget with selected expr_filter
         if query:
-            self.delete_feature_at_plan(self.geom_type, list_id)
-            self.reload_qtable(self.geom_type, self.plan_om)
+            self.delete_feature_at_plan(dialog, self.geom_type, list_id)
+            self.reload_qtable(dialog, self.geom_type, self.plan_om)
         else:
-            self.reload_table(table_object, self.geom_type, expr_filter)               
+            self.reload_table(dialog, table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)
 
         # Select features with previous filter
@@ -646,10 +670,10 @@ class ParentManage(ParentAction, object):
         # Update list
         self.list_ids[self.geom_type] = self.ids                        
         
-        self.connect_signal_selection_changed(table_object)                              
+        self.connect_signal_selection_changed(dialog, table_object)
 
 
-    def manage_close(self, table_object, cur_active_layer=None):
+    def manage_close(self, dialog, table_object, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
 
         if cur_active_layer:
@@ -661,36 +685,36 @@ class ParentManage(ParentAction, object):
                 self.remove_selection(True)
         else:
             self.remove_selection(True)
-        self.reset_model(table_object, "arc")
-        self.reset_model(table_object, "node")
-        self.reset_model(table_object, "connec")
-        self.reset_model(table_object, "element")
+        self.reset_model(dialog, table_object, "arc")
+        self.reset_model(dialog, table_object, "node")
+        self.reset_model(dialog, table_object, "connec")
+        self.reset_model(dialog, table_object, "element")
         if self.project_type == 'ud':
-            self.reset_model(table_object, "gully")
-        self.close_dialog()   
+            self.reset_model(dialog, table_object, "gully")
+        self.close_dialog(dialog)
         self.hide_generic_layers()
         self.disconnect_snapping()   
         self.disconnect_signal_selection_changed()
         # reset previous dialog in not in single_tool_mode
-        if hasattr(self, 'single_tool_mode') and not self.single_tool_mode:
-            if hasattr(self, 'previous_dialog'):
-                utils_giswater.setDialog(self.previous_dialog)
+        # if hasattr(self, 'single_tool_mode') and not self.single_tool_mode:
+        #     if hasattr(self, 'previous_dialog'):
+        #         utils_giswater.setDialog(self.previous_dialog)
 
 
-    def selection_init(self, table_object, query=False):
+    def selection_init(self, dialog, table_object, query=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
-                                             parent_manage=self, table_object=table_object)  
+                                             parent_manage=self, table_object=table_object, dialog=dialog)
         self.previous_map_tool = self.canvas.mapTool()        
         self.canvas.setMapTool(multiple_selection)              
         self.disconnect_signal_selection_changed()        
-        self.connect_signal_selection_changed(table_object, query)
+        self.connect_signal_selection_changed(dialog, table_object, query)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
 
-    def selection_changed(self, table_object, geom_type, query=False):
+    def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
 
         self.disconnect_signal_selection_changed()
@@ -737,29 +761,29 @@ class ParentManage(ParentAction, object):
                         
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if query:
-            self.insert_feature_to_plan(self.geom_type)
+            self.insert_feature_to_plan(dialog, self.geom_type)
             self.remove_selection()
-            self.reload_qtable(geom_type, self.plan_om)
+            self.reload_qtable(dialog, geom_type, self.plan_om)
         else:
-            self.reload_table(table_object, self.geom_type, expr_filter)
+            self.reload_table(dialog, table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)            
         # Remove selection in generic 'v_edit' layers
         self.remove_selection(False)
                     
-        self.connect_signal_selection_changed(table_object)
+        self.connect_signal_selection_changed(dialog, table_object)
 
 
-    def delete_feature_at_plan(self, geom_type, list_id):
+    def delete_feature_at_plan(self, dialog, geom_type, list_id):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         sql = ("DELETE FROM " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
                " WHERE " + geom_type + "_id IN (" + list_id + ") AND psector_id = '" + str(value) + "'")
         self.controller.execute_sql(sql)
 
 
 
-    def insert_feature(self, table_object, query=False):
+    def insert_feature(self, dialog, table_object, query=False):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
@@ -770,7 +794,7 @@ class ParentManage(ParentAction, object):
         self.ids = []
         field_id = self.geom_type + "_id"
 
-        feature_id = utils_giswater.getWidgetText("feature_id")
+        feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
         if feature_id == 'null':
             message = "You need to enter a feature id"
             self.controller.show_info_box(message)
@@ -810,22 +834,22 @@ class ParentManage(ParentAction, object):
 
         # Reload contents of table 'tbl_???_x_@geom_type'
         if query:
-            self.insert_feature_to_plan(self.geom_type)
+            self.insert_feature_to_plan(dialog, self.geom_type)
             self.remove_selection()
         else:
-            self.reload_table(table_object, self.geom_type, expr_filter)
+            self.reload_table(dialog, table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)            
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
 
-        self.connect_signal_selection_changed(table_object)
+        self.connect_signal_selection_changed(dialog, table_object)
 
 
-    def insert_feature_to_plan(self, geom_type):
+    def insert_feature_to_plan(self, dialog, geom_type):
         """ Insert features_id to table plan_@geom_type_x_psector"""
 
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         for i in range(len(self.ids)):
             sql = ("SELECT " + geom_type + "_id"
                    " FROM " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
@@ -836,18 +860,18 @@ class ParentManage(ParentAction, object):
                 sql = ("INSERT INTO " + self.schema_name + "." + self.plan_om + "_psector_x_" + geom_type + ""
                        "(" + geom_type + "_id, psector_id) VALUES('" + str(self.ids[i]) + "', '" + str(value) + "')")
                 self.controller.execute_sql(sql)
-            self.reload_qtable(geom_type, self.plan_om)
+            self.reload_qtable(dialog, geom_type, self.plan_om)
 
 
-    def reload_qtable(self, geom_type, plan_om):
+    def reload_qtable(self, dialog, geom_type, plan_om):
         """ Reload QtableView """
         
-        value = utils_giswater.getWidgetText(self.dlg.psector_id)
+        value = utils_giswater.getWidgetText(dialog, dialog.psector_id)
         sql = ("SELECT * FROM " + self.schema_name + "." + plan_om + "_psector_x_" + geom_type + ""
                " WHERE psector_id = '" + str(value) + "'")
-        qtable = utils_giswater.getWidget('tbl_psector_x_' + geom_type)
+        qtable = utils_giswater.getWidget(dialog, 'tbl_psector_x_' + geom_type)
         self.fill_table_by_query(qtable, sql)
-        self.set_table_columns(qtable, plan_om + "_psector_x_"+geom_type)
+        self.set_table_columns(dialog, qtable, plan_om + "_psector_x_"+geom_type)
         self.refresh_map_canvas()
 
 
@@ -883,12 +907,12 @@ class ParentManage(ParentAction, object):
         widget.setModel(model)
 
 
-    def filter_by_id(self, widget_table, widget_txt, table_object):
+    def filter_by_id(self, dialog, widget_table, widget_txt, table_object):
 
         field_object_id = "id"
         if table_object == "element":
             field_object_id = table_object + "_id"
-        object_id = utils_giswater.getWidgetText(widget_txt)
+        object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         if object_id != 'null':
             expr = field_object_id + " ILIKE '%" + str(object_id) + "%'"
             # Refresh model with selected filter
@@ -930,7 +954,7 @@ class ParentManage(ParentAction, object):
             widget.model().select()
 
     
-    def open_selected_object(self, widget, table_object):
+    def open_selected_object(self, dialog, widget, table_object):
         """ Open object form with selected record of the table """
 
         selected_list = widget.selectionModel().selectedRows()
@@ -951,18 +975,18 @@ class ParentManage(ParentAction, object):
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
-        self.dlg_man.close()
+        dialog.close()
 
         # set previous dialog
-        if hasattr(self, 'previous_dialog'):
-            utils_giswater.setDialog(self.previous_dialog)
+        # if hasattr(self, 'previous_dialog'):
+        #     utils_giswater.setDialog(self.previous_dialog)
 
         if table_object == "doc":
             self.manage_document()
-            utils_giswater.setWidgetText(widget_id, selected_object_id)
+            utils_giswater.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
         elif table_object == "element":
             self.manage_element(new_element_id=False)
-            utils_giswater.setWidgetText(widget_id, selected_object_id)
+            utils_giswater.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
         elif table_object == "om_visit":
             self.manage_visit(visit_id=selected_object_id)
 
@@ -997,11 +1021,11 @@ class ParentManage(ParentAction, object):
                 self.iface.legendInterface().setLayerVisible(layer, visible)            
         
     
-    def connect_signal_selection_changed(self, table_object, query=False):
+    def connect_signal_selection_changed(self, dialog, table_object, query=False):
         """ Connect signal selectionChanged """
         
         try:
-            self.canvas.selectionChanged.connect(partial(self.selection_changed, table_object, self.geom_type,query))
+            self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog,  table_object, self.geom_type, query))
         except Exception:    
             pass
     
@@ -1068,3 +1092,4 @@ class ParentManage(ParentAction, object):
             widget.setModel(model)
         else:
             self.controller.log_info("set_model_to_table: widget not found")
+            
