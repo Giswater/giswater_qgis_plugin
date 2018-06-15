@@ -398,6 +398,31 @@ class ParentManage(ParentAction, object):
         model.setStringList(row)
         self.completer.setModel(model)
         
+        
+    def set_completer_widget(self, tablename, widget, field_id):
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object
+        """
+        if not widget:
+            return
+
+        # Set SQL
+        sql = ("SELECT DISTINCT(" + field_id + ")"
+               " FROM " + self.schema_name + "." + tablename +""
+               " ORDER BY "+ field_id + "")
+        row = self.controller.get_rows(sql)
+        for i in range(0, len(row)):
+            aux = row[i]
+            row[i] = str(aux[0])
+
+        # Set completer and model: add autocomplete in the widget
+        self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        widget.setCompleter(self.completer)
+        model = QStringListModel()
+        model.setStringList(row)
+        self.completer.setModel(model)
+                
 
     def set_completer_feature_id(self, widget, geom_type, viewname):
         """ Set autocomplete of widget 'feature_id' 

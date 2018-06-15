@@ -82,7 +82,7 @@ class ManageDocument(ParentManage):
         # Set signals
         self.dlg_add_doc.path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object))
+        self.dlg_add_doc.btn_accept.clicked.connect(partial(self.manage_document_accept, table_object, tablename, qtable, item_id))        
         self.dlg_add_doc.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer))
         self.dlg_add_doc.rejected.connect(partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer))
         self.dlg_add_doc.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_doc,  table_object))
