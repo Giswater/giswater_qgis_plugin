@@ -113,7 +113,7 @@ class Giswater(QObject):
             action = self.actions[index_action]                
 
             # Basic toolbar actions
-            if int(index_action) in (41, 48, 51, 32):
+            if int(index_action) in (41, 48, 86, 32):
                 callback_function = getattr(self.basic, function_name)  
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
@@ -231,7 +231,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 24, 25, 26, 27, 29, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 51, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
+                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -282,7 +282,7 @@ class Giswater(QObject):
                         
         toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
-            list_actions = ['41', '48', '51', '32']
+            list_actions = ['41', '48', '86', '32']
         if self.controller.get_project_type() == 'ud':
             list_actions = ['41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)

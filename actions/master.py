@@ -71,7 +71,6 @@ class Master(ParentAction):
         self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
 
 
-
     def update_current_psector(self, dialog, qtbl_psm):
       
         selected_list = qtbl_psm.selectionModel().selectedRows()
@@ -212,13 +211,15 @@ class Master(ParentAction):
 
         # Create the dialog and signals
         self.dlg_psector_selector = Multirow_selector()
-        #utils_giswater.setDialog(self.dlg_psector_selector)
         self.load_settings(self.dlg_psector_selector)
         self.dlg_psector_selector.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_psector_selector))
         self.dlg_psector_selector.setWindowTitle("Psector")
-        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_filter, self.controller.tr('Filter by: Psector name', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_unselected, self.controller.tr('Unselected psectors', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_selected, self.controller.tr('Selected psectors', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_filter, 
+            self.controller.tr('Filter by: Psector name', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_unselected, 
+            self.controller.tr('Unselected psectors', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_selected, 
+            self.controller.tr('Selected psectors', context_name='labels'))
 
         tableleft = "plan_psector"
         tableright = "selector_psector"
@@ -233,11 +234,9 @@ class Master(ParentAction):
 
         # Create dialog 
         dlg_estimate_result_new = EstimateResultNew()
-        # utils_giswater.setDialog(dlg_estimate_result_new)
         self.load_settings(dlg_estimate_result_new)
 
         # Set signals
-        dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.master_estimate_result_new_calculate, dlg_estimate_result_new))
         dlg_estimate_result_new.btn_close.clicked.connect(partial(self.close_dialog, dlg_estimate_result_new))
         dlg_estimate_result_new.prices_coefficient.setValidator(QDoubleValidator())
 
@@ -256,11 +255,14 @@ class Master(ParentAction):
             dlg_estimate_result_new.cmb_result_type.setCurrentIndex(index)
             utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.prices_coefficient, row['network_price_coeff'])
             utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.observ, row['descript'])
-
             dlg_estimate_result_new.result_name.setEnabled(False)
             dlg_estimate_result_new.cmb_result_type.setEnabled(False)
             dlg_estimate_result_new.prices_coefficient.setEnabled(False)
             dlg_estimate_result_new.observ.setEnabled(False)
+            dlg_estimate_result_new.btn_calculate.setText("Close")
+            dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.close_dialog))
+        else:
+            dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.master_estimate_result_new_calculate, dlg_estimate_result_new))            
 
         # Manage i18n of the form and open it
         self.controller.translate_form(dlg_estimate_result_new, 'estimate_result_new')
@@ -435,9 +437,7 @@ class Master(ParentAction):
 
         # Create the dialog and signals
         self.dlg_merm = EstimateResultManager()
-        # utils_giswater.setDialog(self.dlg_merm)
         self.load_settings(self.dlg_merm)
-
 
         #TODO activar este boton cuando sea necesario
         self.dlg_merm.btn_delete.setVisible(False)

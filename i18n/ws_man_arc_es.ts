@@ -18,7 +18,6 @@
         <translation>Cañería</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_pipe.ui" line="73"/>
         <source>Basic information</source>
         <translation>Información básica</translation>
     </message>
@@ -34,13 +33,13 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_pipe.ui" line="190"/>
-        <source>Builtdate:*</source>
-        <translation>Fecha de alta:*</translation>
+        <source>Builtdate:</source>
+        <translation>Fecha de alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_pipe.ui" line="248"/>
-        <source>Workcat id:*</source>
-        <translation>Exp. trabajo:*</translation>
+        <source>Workcat id:</source>
+        <translation>Exp. trabajo:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_pipe.ui" line="304"/>
@@ -124,7 +123,6 @@
         <translation>Longitud Gis:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_pipe.ui" line="1109"/>
         <source>Additional information</source>
         <translation>Información adicional</translation>
     </message>

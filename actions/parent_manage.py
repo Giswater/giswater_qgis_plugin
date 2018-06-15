@@ -1067,3 +1067,4 @@ class ParentManage(ParentAction, object):
             widget.setModel(model)
         else:
             self.controller.log_info("set_model_to_table: widget not found")
+            

@@ -99,6 +99,9 @@ class MincutParent(ParentAction, MultipleSelection):
         self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
         self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
         self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
+        
+        utils_giswater.double_validator(self.distance, 0, 9999999, 3)
+        utils_giswater.double_validator(self.depth, 0, 9999999, 3)
 
         # Manage adress
         self.adress_init_config(self.dlg_mincut)
@@ -164,14 +167,16 @@ class MincutParent(ParentAction, MultipleSelection):
         self.action_mincut_composer = action
 
         # Show future id of mincut
-        result_mincut_id = 1        
-        sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
-        row = self.controller.get_row(sql)
-        if row:                
-            result_mincut_id = row[0]
-                    
+        result_mincut_id = 1
+        sql = ("SELECT setval('" +self.schema_name+".urn_id_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
+
+        #sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            result_mincut_id = str(int(row[0])+1)
+
         self.result_mincut_id.setText(str(result_mincut_id))
-        
+
         # Set state name
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
         self.current_state = 0        
@@ -207,6 +212,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def mincut_close(self):
+        
         Mincut.closeMainWin = True
 
         # If id exists in data base on btn_cancel delete
@@ -232,6 +238,7 @@ class MincutParent(ParentAction, MultipleSelection):
     
     def disconnect_snapping(self, action_pan=True):
         """ Select 'Pan' as current map tool and disconnect snapping """
+        
         Mincut.closeMainWin = True
         try:
             self.canvas.xyCoordinates.disconnect()             
@@ -251,9 +258,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_mincut.cbx_hours_start.setTime(time_start)
         self.dlg_mincut.cbx_date_end.setDate(date_start)
         self.dlg_mincut.cbx_hours_end.setTime(time_start)
-
         self.dlg_mincut.btn_end.setEnabled(True)
-
         self.dlg_mincut.distance.setEnabled(True)
         self.dlg_mincut.depth.setEnabled(True)
         self.dlg_mincut.real_description.setEnabled(True)
@@ -278,6 +283,11 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_fin = Mincut_fin()
         # utils_giswater.setDialog(self.dlg_fin)
         self.load_settings(self.dlg_fin)
+
+        mincut = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
+        utils_giswater.setWidgetText(self.dlg_fin.mincut, mincut)
+        work_order = utils_giswater.getWidgetText(self.dlg.work_order)
+        utils_giswater.setWidgetText(self.dlg_fin.work_order, work_order)
 
         # Manage address
         self.adress_init_config(self.dlg_fin)
@@ -426,18 +436,11 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # If state 'In Progress' or 'Finished'
         if mincut_result_state == 1 or mincut_result_state == 2:
-            
-            if exec_from_plot == '':
-                message = "This mandatory field is missing. Please, review your data"
-                self.controller.show_warning(message, parameter='Distance from plot')
-                return
-            if exec_depth == '':
-                message = "This mandatory field is missing. Please, review your data"
-                self.controller.show_warning(message, parameter='Depth')
-                return
-            
-            sql += (", exec_from_plot = '" + str(exec_from_plot) + "', exec_depth = '" + str(exec_depth) + "'"             
-                    ", exec_start = '" + str(forecast_start_real) + "', exec_end = '" + str(forecast_end_real) + "'")       
+            sql += ", exec_start = '" + str(forecast_start_real) + "', exec_end = '" + str(forecast_end_real) + "'"
+            if exec_from_plot != '':
+                sql += ", exec_from_plot = '" + str(exec_from_plot) + "'"
+            if exec_depth != '':
+                sql += ",  exec_depth = '" + str(exec_depth) + "'"
             if exec_descript != '':
                 sql += ", exec_descript = '" + str(exec_descript) + "'"     
             if exec_user != '':
@@ -474,6 +477,7 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("SELECT mincut_state, mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat "
                " WHERE id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
+        answer = False
         if row:
             if str(row[0]) == '0' and str(row[1]) == '1':
                 cur_user = self.controller.get_project_user()

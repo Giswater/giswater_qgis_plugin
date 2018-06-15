@@ -95,8 +95,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_gully.ui" line="722"/>
-        <source>Builtdate:*</source>
-        <translation>Fecha de alta:*</translation>
+        <source>Builtdate:</source>
+        <translation>Fecha de alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_gully.ui" line="755"/>
@@ -105,8 +105,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_gully.ui" line="788"/>
-        <source>Workcat id:*</source>
-        <translation>Exp. trabajo:*</translation>
+        <source>Workcat id:</source>
+        <translation>Exp. trabajo:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_gully.ui" line="840"/>

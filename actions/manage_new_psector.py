@@ -149,6 +149,7 @@ class ManageNewPsector(ParentManage):
         self.delete_psector_selector(self.plan_om + '_psector_selector')
 
         if psector_id != 0:
+            
             self.enable_tabs(True)
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(False)
@@ -301,7 +302,6 @@ class ManageNewPsector(ParentManage):
         default_file_name = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
         self.dlg_psector_rapport = Psector_rapport()
-        # utils_giswater.setDialog(self.dlg_psector_rapport)
         self.load_settings(self.dlg_psector_rapport)
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
@@ -327,6 +327,7 @@ class ManageNewPsector(ParentManage):
                 plugin_dir = os.path.expanduser("~")
             utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, plugin_dir)
         self.populate_cmb_templates()
+        
         # Open dialog
         self.open_dialog(self.dlg_psector_rapport, maximize_button=False)     
 
@@ -349,18 +350,17 @@ class ManageNewPsector(ParentManage):
         utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, row[0])
 
 
-    # def set_prev_dialog(self, current_dialog, previous_dialog):
-    #     """ Close current dialog and set previous dialog as current dialog"""
-    #     self.close_dialog(current_dialog)
-    #     utils_giswater.setDialog(previous_dialog)
-
-
     def generate_rapports(self):
         
-        self.controller.plugin_settings_set_value("psector_rapport_path", utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_path'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_composer", utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_composer'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail", utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_csv_detail'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_csv", utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_csv'))
+        self.controller.plugin_settings_set_value("psector_rapport_path", 
+            utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_path'))
+        self.controller.plugin_settings_set_value("psector_rapport_chk_composer", 
+            utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_composer'))
+        self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail", 
+            utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_csv_detail'))
+        self.controller.plugin_settings_set_value("psector_rapport_chk_csv", 
+            utils_giswater.isChecked(self.dlg_psector_rapport, 'chk_csv'))
+        
         folder_path = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
             self.get_folder_dialog(self.dlg_psector_rapport.txt_path)
@@ -623,6 +623,10 @@ class ManageNewPsector(ParentManage):
             self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 3:
             self.populate_budget(self.dlg_plan_psector, utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id'))
+        elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
+            psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id')
+            expr = "psector_id = '" + str(psector_id) + "'"
+            self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
 
         sql = ("SELECT other, gexpenses, vat"
                " FROM " + self.schema_name + "." + self.plan_om + "_psector "
@@ -1011,6 +1015,7 @@ class ManageNewPsector(ParentManage):
         model.dataChanged.connect(partial(self.refresh_table, dialog, widget))
         model.dataChanged.connect(partial(self.update_total, dialog, widget))
         widget.setEditTriggers(set_edit_triggers)
+        
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
@@ -1023,7 +1028,6 @@ class ManageNewPsector(ParentManage):
 
         if hidde:
             self.refresh_table(dialog, widget)
-        #self.set_table_columns(widget, table_name)
 
 
     def refresh_table(self, dialog, widget):
@@ -1104,12 +1108,15 @@ class ManageNewPsector(ParentManage):
                 self.dlg_plan_psector.tbl_document.model().select()
 
 
-    def manage_document(self):
+    def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
+        
+        psector_id = utils_giswater.getText(self.dlg.psector_id)
 
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
-        dlg_docman = manage_document.manage_document()
+        dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
+        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 
     def document_open(self):
@@ -1159,24 +1166,4 @@ class ManageNewPsector(ParentManage):
 
         model.setStringList(values)
         self.completer.setModel(model)
-
-
-    def fill_table_doc(self, widget, table_name, filter_):
-    #def fill_table_doc(self, widget, table_name):
-        """ Set a model with selected filter. Attach that model to selected table """
-
-        # Set model
-        model = QSqlTableModel()
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.setFilter(filter_)
-        model.select()
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
-
-        # Attach model to table view
-        widget.setModel(model)
-        widget.show()
 

@@ -59,13 +59,13 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_connec.ui" line="332"/>
-        <source>Builtdate:*</source>
-        <translation>Data d&apos;alta:*</translation>
+        <source>Builtdate:</source>
+        <translation>Data d&apos;alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_connec.ui" line="365"/>
-        <source>Workcat id:*</source>
-        <translation>Exp. treball:*</translation>
+        <source>Workcat id:</source>
+        <translation>Exp. treball:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_connec.ui" line="416"/>

@@ -47,8 +47,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="442"/>
-        <source>Builtdate:*</source>
-        <translation type="unfinished"></translation>
+        <source>Builtdate:</source>
+        <translation>Fecha de alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="478"/>
@@ -62,8 +62,8 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="582"/>
-        <source>Workcat id:*</source>
-        <translation type="unfinished"></translation>
+        <source>Workcat id:</source>
+        <translation>Exp. trabajo:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="620"/>
@@ -87,7 +87,7 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_junction.ui" line="788"/>
-        <source>Elev:*</source>
+        <source>Elev:</source>
         <translation>Elevación:</translation>
     </message>
     <message>

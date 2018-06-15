@@ -6,9 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-    
-from functools import partial
-
 from PyQt4.QtGui import QAbstractItemView
+
+from functools import partial
 
 import utils_giswater
 from ui_manager import AddDoc                           
@@ -32,14 +32,11 @@ class ManageDocument(ParentManage):
         self.manage_document()
                 
 
-    def manage_document(self):
+    def manage_document(self, tablename=None, qtable=None, item_id=None):
         """ Button 34: Add document """
 
         # Create the dialog and signals
         self.dlg_add_doc = AddDoc()
-        # if not self.single_tool_mode:
-        #     self.previous_dialog = utils_giswater.dialog()
-        # utils_giswater.setDialog(self.dlg_add_doc)
         self.load_settings(self.dlg_add_doc)
         self.doc_id = None           
 
@@ -50,7 +47,7 @@ class ManageDocument(ParentManage):
         
         # Get layers of every geom_type
         self.reset_lists()
-        self.reset_layers ()       
+        self.reset_layers()
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
@@ -107,11 +104,11 @@ class ManageDocument(ParentManage):
         # Open the dialog
         self.open_dialog(self.dlg_add_doc, maximize_button=False)
         return self.dlg_add_doc
-               
 
-    def manage_document_accept(self, table_object):
+
+    def manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None):
         """ Insert or update table 'document'. Add document to selected feature """
-
+        
         # Get values from dialog
         doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id")
         doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type")
@@ -182,15 +179,23 @@ class ManageDocument(ParentManage):
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id            
-            self.manage_close(self.dlg_add_doc, table_object)
-            
-            
+            self.manage_close(self.dlg_add_doc, table_object)  
+
+        if tablename is None:
+            return
+        else:
+            sql = ("INSERT INTO " + self.schema_name +".doc_x_"+str(tablename)+"(doc_id, "+str(tablename)+"_id) "
+                   " VALUES('"+str(doc_id)+"', '"+str(item_id)+"')")
+            self.controller.execute_sql(sql)
+            expr = "" + str(tablename) + "_id = '" + str(item_id) + "'"
+            self.fill_table_object(qtable, self.schema_name + ".v_ui_doc_x_"+str(tablename)+"", expr_filter=expr)
+
+
     def edit_document(self):
         """ Button 66: Edit document """ 
         
         # Create the dialog
         self.dlg_man = DocManagement()
-        # utils_giswater.setDialog(self.dlg_man)
         self.load_settings(self.dlg_man)
         self.dlg_man.tbl_document
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)

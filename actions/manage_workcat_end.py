@@ -21,18 +21,21 @@ from ui_manager import WorkcatEndList
 
 
 class ManageWorkcatEnd(ParentManage):
-    
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Workcat end' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
     def manage_workcat_end(self):
+        
         self.remove_selection(True)
+        
         # Create the dialog and signals
         self.dlg_work_end = WorkcatEnd()
         self.load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
+        
         # Capture the current layer to return it at the end of the operation
         self.cur_active_layer = self.iface.activeLayer()
 
@@ -40,12 +43,12 @@ class ManageWorkcatEnd(ParentManage):
 
         # Get layers of every geom_type
         self.reset_lists()
-        self.reset_layers()    
+        self.reset_layers()
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = self.controller.get_group_layers('element')
-            
+
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
@@ -67,14 +70,11 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer,  force_downgrade=True))
         self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer,  force_downgrade=True, show_warning=True))
         self.dlg_work_end.workcat_id_end.currentIndexChanged.connect(partial(self.get_values_from_form, self.dlg_work_end))
-
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_work_end.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_work_end, self.table_object))
         self.dlg_work_end.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_work_end, self.table_object))
         self.dlg_work_end.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_work_end, self.table_object))
-
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
-
         self.dlg_work_end.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_work_end, self.table_object))
 
         # Set values
@@ -84,7 +84,7 @@ class ManageWorkcatEnd(ParentManage):
         geom_type = "arc"
         viewname = "v_edit_" + geom_type
         self.set_completer_feature_id(self.dlg_work_end.feature_id, geom_type, viewname)
-        
+
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
@@ -95,6 +95,7 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def set_edit_arc_downgrade_force(self, value):
+        
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
         sql = ("SELECT * FROM " + self.controller.schema_name + ".config_param_user "
                " WHERE parameter = 'edit_arc_downgrade_force' "
@@ -115,7 +116,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def fill_fields(self):
         """ Fill dates and combo cat_work """
-        
+
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
                " WHERE parameter = 'enddate_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
@@ -138,11 +139,11 @@ class ManageWorkcatEnd(ParentManage):
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
 
-
     def fill_workids(self):
         """ Auto fill descriptions and workid's """
         
         workcat_id = utils_giswater.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
+
         sql = ("SELECT descript, builtdate"
                " FROM " + self.controller.schema_name + ".cat_work"
                " WHERE id = '" + workcat_id + "'")
@@ -153,6 +154,7 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def get_list_selected_id(self, qtable):
+        
         selected_list = qtable.model()
         self.selected_list = []
         ids_list = ""
@@ -170,6 +172,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
+        
         if self.workcat_id_end == 'null' or self.workcat_id_end is None:
             message = "Please select a workcat id end"
             self.controller.show_warning(message)
@@ -228,7 +231,7 @@ class ManageWorkcatEnd(ParentManage):
         tablename = "v_edit_" + geom_type
         if self.selected_list is None:
             return
-        
+
         sql = ""
         for id_ in self.selected_list:
             sql += ("UPDATE " + self.schema_name + "." + tablename + ""
@@ -257,7 +260,7 @@ class ManageWorkcatEnd(ParentManage):
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
-            
+
         # Attach model to table view
         widget.setModel(self.model)
 
@@ -315,12 +318,13 @@ class ManageWorkcatEnd(ParentManage):
 
 
     def exec_downgrade(self):
+        
         message = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
         answer = self.controller.ask_question(message, title)
         if not answer:
             return
-        
+
         # Update tablename of every geom_type
         ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
         self.update_geom_type("arc", ids_list)
@@ -328,6 +332,7 @@ class ManageWorkcatEnd(ParentManage):
         self.canvas.refresh()
         self.dlg_work.close()
         self.manage_workcat_end_accept()
+
 
     def set_completer(self):
         """ Set autocompleters of the form """
@@ -427,24 +432,23 @@ class ManageWorkcatEnd(ParentManage):
 
         self.canvas.refresh()
 
+
     def new_workcat(self):
 
         self.dlg_new_workcat = NewWorkcat()
-        # utils_giswater.setDialog(self.dlg_new_workcat)
         self.load_settings(self.dlg_new_workcat)
 
         utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
-
         table_object = "cat_work"
-        self.set_completer_widget(table_object,self.dlg_new_workcat.cat_work_id,'id')
+        self.set_completer_widget(table_object,self.dlg_new_workcat.cat_work_id, 'id')
 
-        #Set signals
+        # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
-
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
         self.open_dialog(self.dlg_new_workcat)
+
 
     def manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
@@ -452,6 +456,7 @@ class ManageWorkcatEnd(ParentManage):
         # Get values from dialog
         values = ""
         fields = ""
+        
         cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
@@ -473,6 +478,7 @@ class ManageWorkcatEnd(ParentManage):
             fields += 'workid_key2, '
             values += ("'" + str(workid_key_2) + "', ")
         builtdate = self.dlg_new_workcat.builtdate.dateTime().toString('yyyy-MM-dd')
+
         if builtdate != "null":
             fields += 'builtdate, '
             values += ("'" + str(builtdate) + "', ")
@@ -489,8 +495,7 @@ class ManageWorkcatEnd(ParentManage):
                        " FROM " + self.schema_name + "." + str(table_object) + ""
                        " WHERE id = '" + str(cat_work_id) + "'")
                 row = self.controller.get_row(sql, log_info=False, log_sql=True)
-
-                if row is None :
+                if row is None:
                     sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
                     self.controller.execute_sql(sql, log_sql=True)
 
@@ -501,31 +506,8 @@ class ManageWorkcatEnd(ParentManage):
                         self.dlg_work_end.workcat_id_end.setCurrentIndex(self.dlg_work_end.workcat_id_end.findText(str(cat_work_id)))
 
                     self.close_dialog(self.dlg_new_workcat)
+                    
                 else:
                     msg = "This Workcat is already exist"
-                    self.controller.show_info_box(msg, "Warning")
-
-
-    def set_completer_widget(self, tablename, widget, field_id):
-        """ Set autocomplete of widget @table_object + "_id"
-            getting id's from selected @table_object
-        """
-        if not widget:
-            return
-
-        # Set SQL
-        sql = ("SELECT DISTINCT(" + field_id + ")"
-               " FROM " + self.schema_name + "." + tablename +""
-               " ORDER BY "+ field_id + "")
-        row = self.controller.get_rows(sql)
-        for i in range(0, len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
-
-        # Set completer and model: add autocomplete in the widget
-        self.completer = QCompleter()
-        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-        widget.setCompleter(self.completer)
-        model = QStringListModel()
-        model.setStringList(row)
-        self.completer.setModel(model)
+                    self.controller.show_info_box(msg, "Warning")        
+        

@@ -184,7 +184,12 @@ class DrawProfiles(ParentMapTool):
 
     def open_profile(self):
         """ Open selected profile from dialog load_profiles.ui """
-    
+
+        selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
         # Selected item from list 
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
@@ -1513,7 +1518,7 @@ class DrawProfiles(ParentMapTool):
             self.dlg.btn_export_pdf.setDisabled(False)
             self.dlg.cbx_template.setDisabled(False)
 
-        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None and self.start_end_node[2] != None:
+        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
             self.dlg.btn_delete_additional_point.setDisabled(False)
 
         # Manual path - if additional point exist
@@ -1526,6 +1531,11 @@ class DrawProfiles(ParentMapTool):
     def delete_profile(self):
         """ Delete profile """
 
+        selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
         # Selected item from list
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 

@@ -48,7 +48,6 @@
         <translation>Incert</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_siphon.ui" line="268"/>
         <source>Numeric information</source>
         <translation>Informació numèrica</translation>
     </message>
@@ -173,7 +172,6 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_siphon.ui" line="1564"/>
         <source>Basic &amp;&amp; specific information</source>
         <translation>Informació bàsica i específica</translation>
     </message>
@@ -210,7 +208,7 @@
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_siphon.ui" line="1845"/>
         <source>Workcat end id:</source>
-        <translation>Exp. treball:</translation>
+        <translation>Exp. treball baixa:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_siphon.ui" line="1901"/>
@@ -249,7 +247,6 @@
         <translation>Nom:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ud_man_siphon.ui" line="2226"/>
         <source>Additional information</source>
         <translation>Informació adicional</translation>
     </message>

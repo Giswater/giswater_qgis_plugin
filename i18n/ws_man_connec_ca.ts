@@ -33,7 +33,6 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_fountain.ui" line="197"/>
         <source>Basic information</source>
         <translation>Informació bàsica</translation>
     </message>
@@ -49,13 +48,13 @@
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_fountain.ui" line="321"/>
-        <source>Builtdate:*</source>
-        <translation>Data d&apos;alta:*</translation>
+        <source>Builtdate:</source>
+        <translation>Data d&apos;alta:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_fountain.ui" line="379"/>
-        <source>Workcat id:*</source>
-        <translation>Exp. treball:*</translation>
+        <source>Workcat id:</source>
+        <translation>Exp. treball:</translation>
     </message>
     <message>
         <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_fountain.ui" line="415"/>
@@ -129,7 +128,6 @@
         <translation>Tipus de funció:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_fountain.ui" line="1087"/>
         <source>Specific information</source>
         <translation>Informació específica</translation>
     </message>
@@ -189,7 +187,6 @@
         <translation>Patrimoni arquitectònic:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_fountain.ui" line="1693"/>
         <source>Additional information</source>
         <translation>Informació adicional</translation>
     </message>
@@ -254,7 +251,6 @@
         <translation>Descripció:</translation>
     </message>
     <message>
-        <location filename="../../../.qgis2/python/plugins/giswater/init_ui/ws_man_fountain.ui" line="2387"/>
         <source>Feature graphic design</source>
         <translation>Disseny gràfic de l&apos;element</translation>
     </message>
@@ -480,7 +476,7 @@
     </message>
     <message>
         <source>Valve catalog:</source>
-        <translation>Catàleg de vàlvules:</translation>
+        <translation>Cat.vàlvula:</translation>
     </message>
 </context>
 </TS>

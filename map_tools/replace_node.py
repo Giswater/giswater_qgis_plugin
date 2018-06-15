@@ -6,8 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCompleter, QStringListModel
 from qgis.core import QgsPoint, QgsFeatureRequest
+from PyQt4.QtGui import QCompleter, QStringListModel
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
 
@@ -15,7 +15,6 @@ from functools import partial
 from datetime import datetime
 
 import utils_giswater
-from utils.widget_manager import WidgetManager
 from map_tools.parent import ParentMapTool
 from ui_manager import UDcatalog
 from ui_manager import WScatalog
@@ -34,7 +33,7 @@ class ReplaceNodeMapTool(ParentMapTool):
 
 
     def init_replace_node_form(self, feature):
-        
+
         # Create the dialog and signals
         self.dlg_nodereplace = NodeReplace()
         # utils_giswater.setDialog(self.dlg_nodereplace)
@@ -63,7 +62,10 @@ class ReplaceNodeMapTool(ParentMapTool):
                    " WHERE id ='"+str(work_id)+"'")
             row = self.controller.get_row(sql)
             if row:
-                self.enddate_aux = datetime.strptime(str(row[0]), '%Y-%m-%d').date()
+                if row[0] != 'null' and row[0] is not None:
+                    self.enddate_aux = datetime.strptime(str(row[0]), '%Y-%m-%d').date()
+                else:
+                    self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
             else:
                 self.enddate_aux = datetime.strptime(QDate.currentDate().toString('yyyy-MM-dd'), '%Y-%m-%d').date()
 
@@ -119,9 +121,7 @@ class ReplaceNodeMapTool(ParentMapTool):
     def new_workcat(self):
 
         self.dlg_new_workcat = NewWorkcat()
-        # utils_giswater.setDialog(self.dlg_new_workcat)
         self.load_settings(self.dlg_new_workcat)
-
         utils_giswater.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
         table_object = "cat_work"
@@ -134,6 +134,7 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Open dialog
         self.open_dialog(self.dlg_new_workcat)
+
 
     def manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
@@ -178,8 +179,7 @@ class ReplaceNodeMapTool(ParentMapTool):
                        " FROM " + self.schema_name + "." + str(table_object) + ""
                        " WHERE id = '" + str(cat_work_id) + "'")
                 row = self.controller.get_row(sql, log_info=False, log_sql=True)
-
-                if row is None :
+                if row is None:
                     sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
                     self.controller.execute_sql(sql, log_sql=True)
 
@@ -194,10 +194,18 @@ class ReplaceNodeMapTool(ParentMapTool):
                     msg = "This Workcat is already exist"
                     self.controller.show_info_box(msg, "Warning")
 
+
+    def cancel(self):
+        
+        utils_giswater.setDialog(self.dlg_nodereplace)
+        self.close_dialog(self.dlg_cat)
+
+
     def set_completer_object(self, tablename, widget, field_id):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
         """
+        
         if not widget:
             return
 
@@ -217,6 +225,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         model = QStringListModel()
         model.setStringList(row)
         self.completer.setModel(model)
+
 
     def get_values(self, dialog):
 
@@ -458,8 +467,8 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Set signals and open dialog
         self.dlg_cat.btn_ok.clicked.connect(self.fill_geomcat_id)
-        self.dlg_cat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cat))
-        self.dlg_cat.rejected.connect(partial(self.close_dialog, self.dlg_cat))
+        self.dlg_cat.btn_cancel.clicked.connect(partial(self.cancel))
+        self.dlg_cat.rejected.connect(partial(self.cancel))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -589,3 +598,4 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat, self.dlg_cat.id, rows)
+        

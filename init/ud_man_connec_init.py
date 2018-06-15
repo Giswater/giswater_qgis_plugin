@@ -70,7 +70,8 @@ class ManConnecDialog(ParentDialog):
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
         
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'connec'))
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, self.dialog, 'ud', 'connec'))
+        self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
         
         feature = self.feature
         layer = self.iface.activeLayer()

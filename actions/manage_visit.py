@@ -7,9 +7,7 @@ or (at your option) any later version.
 """
 
 from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
-from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox
-from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget
-from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget
 
 import os
 import sys
@@ -72,10 +70,6 @@ class ManageVisit(ParentManage, QObject):
         # Get expl_id from previus dialog
         self.expl_id = expl_id
 
-        # save previous dialog and set new one. Previous dialog will be set exiting the current one
-        # self.previous_dialog = utils_giswater.dialog()
-        #utils_giswater.setDialog(self.dlg)
-        
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -101,7 +95,6 @@ class ManageVisit(ParentManage, QObject):
         self.set_icon(self.dlg_add_visit.btn_open_doc, "170")
         self.set_icon(self.dlg_add_visit.btn_add_geom, "133")
         
- 
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
         self.button_box = self.dlg_add_visit.findChild(QDialogButtonBox, 'button_box')
@@ -129,7 +122,9 @@ class ManageVisit(ParentManage, QObject):
         self.btn_doc_new = self.dlg_add_visit.findChild(QPushButton, "btn_doc_new")
         self.btn_open_doc = self.dlg_add_visit.findChild(QPushButton, "btn_open_doc")
         self.tbl_document = self.dlg_add_visit.findChild(QTableView, "tbl_document")
+        self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
+        self.set_selectionbehavior(self.dlg)
         # Set current date and time
         current_date = QDate.currentDate()
         self.dlg_add_visit.startdate.setDate(current_date)
@@ -223,18 +218,6 @@ class ManageVisit(ParentManage, QObject):
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         for multiple visits management."""
-        
-        # set the previous dialog
-        # utils_giswater.setDialog(self.previous_dialog)
-
-        # A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
-        # for multiple visits management
-        # sql = ("SELECT gw_fct_om_visit_multiplier ({}, {}})".format(self.currentVisit.id, self.feature_type.currentText().upper()))
-        # status = self.controller.execute_sql(sql)
-        # if not status:
-        #     message = "Error triggering"
-        #     self.controller.show_warning(message)
-        #     return
 
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
@@ -262,9 +245,6 @@ class ManageVisit(ParentManage, QObject):
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
-        
-        # set the previous dialog
-        # utils_giswater.setDialog(self.previous_dialog)
 
         # removed current working visit. This should cascade removing of all related records
         if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
@@ -362,6 +342,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.descript = self.dlg_add_visit.descript.text()
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
+            
         # update or insert but without closing the transaction: autocommit=False
         self.current_visit.upsert(commit=self.autocommit)
 
@@ -448,7 +429,6 @@ class ManageVisit(ParentManage, QObject):
             self.update_relations()
 
         # manage arriving tab
-
         # tab Visit
         self.current_tab_index = index
         if index == self.tab_index('VisitTab'):
@@ -485,14 +465,6 @@ class ManageVisit(ParentManage, QObject):
         """Set all actions related to the table, model and selectionModel.
         It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered."""
-        
-        # Activate Event and Document tabs if at least an element is available
-        # if self.tbl_relation.model():
-        #     has_elements = self.tbl_relation.model().rowCount()
-        # else:
-        #     has_elements = False
-        # for idx in [self.tab_index('EventTab'), self.tab_index('DocumentTab')]:
-        #     self.tabs.setTabEnabled(idx, has_elements)
 
         # configure model visibility
         table_name = "v_edit_" + self.geom_type
@@ -723,32 +695,14 @@ class ManageVisit(ParentManage, QObject):
         self.completer.setModel(model)
 
 
-    def manage_document(self):
+    def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
         
-        manage_document = ManageDocument(
-            self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
-        dlg_docman = manage_document.manage_document()
+        visit_id = utils_giswater.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)        
+        manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        dlg_docman = manage_document.manage_document(tablename='visit', qtable=self.dlg.tbl_document, item_id=visit_id)
+        utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')        
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
-
-
-    def fill_table_visit(self, widget, table_name, filter_):
-        """ Set a model with selected filter. Attach that model to selected table """
-
-        # Set model
-        model = QSqlTableModel()
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.setFilter(filter_)
-        model.select()
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
-
-        # Attach model to table view
-        widget.setModel(model)
-        widget.show()
 
 
     def event_insert(self):
@@ -796,12 +750,8 @@ class ManageVisit(ParentManage, QObject):
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_id)
 
-        #utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         ret = self.dlg_event.exec_()
-                
-        # back to the current dialg
-        #utils_giswater.setDialog(self.dlg)
 
         # check return
         if not ret:
@@ -918,9 +868,6 @@ class ManageVisit(ParentManage, QObject):
         self.tbl_event.model().select()
         self.tbl_event.setModel(self.tbl_event.model())
         self.manage_events_changed()
-
-        # # back to the previous dialog
-        # utils_giswater.setDialog(self.dlg)
 
 
     def event_delete(self):
@@ -1051,7 +998,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.tbl_document.model().select()
 
 
-    def set_configuration(self,  dialog, widget, table_name):
+    def set_configuration(self, dialog, widget, table_name):
         """Configuration of tables. Set visibility and width of columns."""
 
         widget = utils_giswater.getWidget(dialog, widget)

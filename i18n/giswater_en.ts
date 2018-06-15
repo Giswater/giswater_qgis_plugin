@@ -963,6 +963,10 @@
         <source>Mincut done, but has conflict and overlaps with</source>
         <translation>Mincut done, but has conflict and overlaps with </translation>
     </message>
+    <message>
+        <source>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</source>
+        <translation>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</translation>
+    </message>
 
 
 </context>

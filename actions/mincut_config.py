@@ -40,12 +40,13 @@ class MincutConfig(ParentAction):
         
         table = "anl_mincut_selector_valve"
         self.menu_valve = QMenu()
-        self.dlg_multi.btn_insert.clicked.connect(partial(self.fill_insert_menu, table))
-        
-        btn_cancel = self.dlg_multi.findChild(QPushButton, "btn_cancel")
-        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_multi))
+        self.fill_insert_menu(table)
 
-        self.menu_valve.clear()
+        self.dlg_multi.btn_insert.clicked.connect(partial(self.fill_insert_menu, table))
+        btn_close = self.dlg_multi.findChild(QPushButton, "btn_close")
+        btn_close.clicked.connect(partial(self.close_dialog, self.dlg_multi))
+
+
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
         self.dlg_multi.btn_delete.clicked.connect(partial(self.delete_records_config, self.tbl_config, table))
 
@@ -78,6 +79,7 @@ class MincutConfig(ParentAction):
                 self.menu_valve.addAction(elem, partial(self.insert, elem, table))
 
 
+
     def insert(self, id_action, table):
         """ On action(select value from menu) execute SQL """
 
@@ -85,15 +87,17 @@ class MincutConfig(ParentAction):
         sql = "INSERT INTO " + self.schema_name + "." + table + " (id) VALUES ('" + id_action + "')"
         self.controller.execute_sql(sql)
         self.fill_table_config(self.tbl_config, self.schema_name+"."+table)
-
+        self.fill_insert_menu(table)
+        self.dlg_multi.btn_insert.setMenu(self.menu_valve)
 
     def fill_table_config(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
 
         # Set model
-        model = QSqlTableModel();
+        model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setSort(0, 0)
         model.select()
 
         # Check for errors
@@ -131,8 +135,8 @@ class MincutConfig(ParentAction):
                    " WHERE id IN (" + list_id + ")")
             self.controller.execute_sql(sql)
             widget.model().select()
-            
-                    
+        self.fill_insert_menu('anl_mincut_selector_valve')
+
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
 

@@ -677,3 +677,35 @@ class ParentAction(object):
 
 
 
+
+    def multi_rows_delete(self, widget, table_name, column_id):
+        """ Delete selected elements of the table
+        :param QTableView widget: origin
+        :param table_name: table origin
+        :param column_id: Refers to the id of the source table
+        """
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value(str(column_id))
+            inf_text += str(id_) + ", "
+            list_id = list_id + "'" + str(id_) + "', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
+        if answer:
+            sql = "DELETE FROM " + self.schema_name + "." + table_name
+            sql += " WHERE " + column_id + " IN (" + list_id + ")"
+            self.controller.execute_sql(sql)
+            widget.model().select()
