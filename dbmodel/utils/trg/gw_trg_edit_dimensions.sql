@@ -58,7 +58,7 @@ BEGIN
 		
             --distance
        IF (NEW.distance IS NULL) THEN
-            NEW.distance:= ((SELECT ST_Length(NEW.the_geom) FROM dimensions) LIMIT 1);
+            NEW.distance= ST_Length(NEW.the_geom);
         END IF;
 		
 -- FEATURE INSERT      
