@@ -124,7 +124,7 @@ class ManageVisit(ParentManage, QObject):
         self.tbl_document = self.dlg_add_visit.findChild(QTableView, "tbl_document")
         self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.set_selectionbehavior(self.dlg)
+        self.set_selectionbehavior(self.dlg_add_visit)
         # Set current date and time
         current_date = QDate.currentDate()
         self.dlg_add_visit.startdate.setDate(current_date)
@@ -700,7 +700,7 @@ class ManageVisit(ParentManage, QObject):
         
         visit_id = utils_giswater.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)        
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
-        dlg_docman = manage_document.manage_document(tablename='visit', qtable=self.dlg.tbl_document, item_id=visit_id)
+        dlg_docman = manage_document.manage_document(tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
         utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')        
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
 

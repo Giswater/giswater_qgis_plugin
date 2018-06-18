@@ -136,13 +136,13 @@ class ParentDialog(QDialog):
             self.controller.log_info(str(values))
             #utils_giswater.setWidgetText(self.geom_type + "_id", str(values['feature_id']))
             if 'name' in values['muni_id']:
-                utils_giswater.setWidgetText('muni_id', values['muni_id']['name'])
+                utils_giswater.setWidgetText(self.dialog, 'muni_id', values['muni_id']['name'])
             if 'name' in values['sector_id']:
-                utils_giswater.setWidgetText('sector_id', values['sector_id']['name'])
+                utils_giswater.setWidgetText(self.dialog, 'sector_id', values['sector_id']['name'])
             if 'name' in values['expl_id']:
-                utils_giswater.setWidgetText('expl_id', values['expl_id']['name'])
+                utils_giswater.setWidgetText(self.dialog, 'expl_id', values['expl_id']['name'])
             if 'name' in values['dma_id']:
-                utils_giswater.setWidgetText('dma_id', values['dma_id']['name'])
+                utils_giswater.setWidgetText(self.dialog, 'dma_id', values['dma_id']['name'])
        
        
     def load_default(self, dialog):
@@ -393,8 +393,8 @@ class ParentDialog(QDialog):
                 
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
         doc.manage_document()
-        doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, doc))
-        doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, doc))
+        doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
+        doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
                  
         # Set completer
         self.set_completer_object(dialog, self.table_object)
@@ -405,13 +405,13 @@ class ParentDialog(QDialog):
         doc.open_dialog()
 
 
-    def manage_document_new(self, doc):
+    def manage_document_new(self, dialog, doc):
         """ Get inserted doc_id and add it to current feature """
 
         if doc.doc_id is None:
             return
 
-        utils_giswater.setWidgetText("doc_id", doc.doc_id)
+        utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_document")
 
 

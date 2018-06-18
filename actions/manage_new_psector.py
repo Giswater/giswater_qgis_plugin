@@ -218,7 +218,7 @@ class ManageNewPsector(ParentManage):
             self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
             self.tbl_document = self.dlg_plan_psector.findChild(QTableView, "tbl_document")
             filter_ = "psector_id = '" + str(psector_id) + "'"
-            self.fill_table_doc(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
+            self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
