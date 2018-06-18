@@ -169,12 +169,14 @@ class MincutParent(ParentAction, MultipleSelection):
         # Show future id of mincut
         result_mincut_id = 1
         sql = ("SELECT setval('" +self.schema_name+".urn_id_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
-
-        #sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
+        # sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
         row = self.controller.get_row(sql, log_sql=True)
         if row:
-            result_mincut_id = str(int(row[0])+1)
-
+            self.controller.log_info(str(row[0]))
+            if row[0] is not None:
+                result_mincut_id = str(int(row[0])+1)
+            else:
+                result_mincut_id = '0'
         self.result_mincut_id.setText(str(result_mincut_id))
 
         # Set state name
