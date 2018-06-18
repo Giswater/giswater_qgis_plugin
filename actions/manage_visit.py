@@ -286,7 +286,7 @@ class ManageVisit(ParentManage, QObject):
 
         # D) load all related documents in the relative table
         table_name = self.schema_name + ".v_ui_doc_x_visit"
-        self.fill_table_visit(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
+        self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_visit", self.filter)
         self.set_configuration(dialog, self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table

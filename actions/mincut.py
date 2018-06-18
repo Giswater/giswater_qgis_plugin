@@ -175,8 +175,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.controller.log_info(str(row[0]))
             if row[0] is not None:
                 result_mincut_id = str(int(row[0])+1)
-            else:
-                result_mincut_id = '0'
+
         self.result_mincut_id.setText(str(result_mincut_id))
 
         # Set state name
