@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_insertreview"(element_type varchar, srid int4, the_geom varchar, insert_data json) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_insertfeature"(layer_id varchar, table_id varchar, srid int4, the_geom varchar, insert_data json) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -30,7 +30,7 @@ BEGIN
 
 --    Get table coordinates
     schemas_array := current_schemas(FALSE);
-    SRID_var := Find_SRID(schemas_array[1]::TEXT, 'om_visit', 'the_geom');
+    SRID_var := Find_SRID(schemas_array[1]::TEXT, table_id, 'the_geom');
 
 --    Transform from device EPSG to database EPSG
     insert_geom := ST_Transform(insert_geom , SRID_var);
@@ -39,7 +39,7 @@ BEGIN
     insert_data := gw_fct_json_object_set_key(insert_data, 'the_geom', insert_geom);
 
 --    Set table name
-    table_name = concat('review_', element_type);
+    table_name := table_id;
 
     RAISE NOTICE 'Res: % ', insert_data;
 
@@ -52,17 +52,6 @@ BEGIN
     USING insert_data;
 
 
---    ESPECIFIC TASKS:
-    IF element_type = 'arc' THEN
-
-    ELSIF element_type = 'node' THEN
-
-    ELSIF element_type = 'gully' THEN
-
-    ELSIF element_type = 'connect' THEN
-    
-    END IF;
-
 --    Control NULL's
     id_insert := COALESCE(id_insert, '');
 
@@ -73,8 +62,8 @@ BEGIN
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+ --   EXCEPTION WHEN OTHERS THEN 
+     --   RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
