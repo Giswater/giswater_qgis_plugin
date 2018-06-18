@@ -9,6 +9,26 @@ This version of Giswater is provided by Giswater Association
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node();
 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node()
+  RETURNS trigger AS
+$BODY$
+DECLARE 
+    inp_table varchar;
+    man_table varchar;
+    new_man_table varchar;
+    old_man_table varchar;
+    v_sql varchar;
+    v_sql2 varchar;
+    old_nodetype varchar;
+    new_nodetype varchar;
+    man_table_2 varchar;
+	rec Record;
+    node_id_seq int8;
+	code_autofill_bool boolean;
+	count_aux integer;
+	promixity_buffer_aux double precision;
+
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
