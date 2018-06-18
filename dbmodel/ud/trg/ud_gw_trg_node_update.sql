@@ -6,7 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1234
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_node_update() RETURNS trigger LANGUAGE plpgsql AS $$
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update()
+  RETURNS trigger AS
+$BODY$
 DECLARE 
     numNodes numeric;
     rec record;
@@ -85,9 +88,6 @@ BEGIN
 				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          				
 			END IF;
 			
-			
-			
-			
 		-- Updating polygon geometry in case of exists it
 			pol_id_var:= (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id 
 			UNION SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id UNION SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id);
@@ -96,13 +96,14 @@ BEGIN
 				yvar= (st_y(NEW.the_geom)-st_y(OLD.the_geom));		
 				UPDATE polygon SET the_geom=ST_translate(the_geom, xvar, yvar) WHERE pol_id=pol_id_var;
 			END IF;  
-			
 	   
 		-- Select arcs with start-end on the updated node to modify coordinates
 			querystring := 'SELECT * FROM "arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
 
-			IF NEW.custom_top_elev IS NULL THEN top_elev_aux=NEW.top_elev;
-			ELSE top_elev_aux=NEW.custom_top_elev;
+			IF NEW.custom_top_elev IS NULL 
+				THEN top_elev_aux=NEW.top_elev;
+			ELSE 
+				top_elev_aux=NEW.custom_top_elev;
 			END IF;
 	
 			FOR arcrec IN EXECUTE querystring
@@ -122,53 +123,51 @@ BEGIN
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
 						
 						-- Calculating new values of z1 and z2
-						z1 = (top_elev_aux - arcrec.y1);
-						IF nodeRecord2.custom_top_elev IS NULL THEN
-							z2 = (nodeRecord2.top_elev - arcrec.y2);
-						ELSE
-							z2 = (nodeRecord2.custom_top_elev - arcrec.y2);
+						IF arcrec.custom_elev1 IS NULL AND arcrec.elev1 IS NULL THEN
+							z1 = (top_elev_aux - arcrec.y1);
+						END IF;
+
+						IF arcrec.custom_elev2 IS NULL AND arcrec.elev2 IS NULL THEN				
+							IF nodeRecord2.custom_top_elev IS NULL THEN
+								z2 = (nodeRecord2.top_elev - arcrec.y2);
+							ELSE
+								z2 = (nodeRecord2.custom_top_elev - arcrec.y2);
+							END IF;
 						END IF;
 							
-						-- Update direction if necessary
-						IF ((z2 > z1) AND arcrec.inverted_slope is false) OR ((z2 < z1) AND arcrec.inverted_slope is true) THEN
-							EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-							EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 ||', 
-										elev1 = ' || arcrec.elev2 || ', elev2 = ' || arcrec.elev1 ||',
-										custom_y1 = ' || arcrec.custom_y2 || ', custom_y2 = ' || arcrec.custom_y1 ||',
-										custom_elev1 = ' || arcrec.custom_elev2 || ', custom_elev2 = ' || arcrec.custom_elev1 ||',
-										sys_y1 = ' || arcrec.sys_elev2 || ', sys_elev2 = ' || arcrec.sys_elev1 ||',
-										sys_elev1 = ' || arcrec.sys_elev2 || ', sys_elev2 = ' || arcrec.sys_elev1 ||',
-										WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-							EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
-						END IF;
 	
-					ELSE
+					ELSIF (nodeRecord2.node_id = NEW.node_id) THEN
 						-- Coordinates
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
 		
 						-- Calculating new values of z1 and z2
-						z2 = (top_elev_aux - arcrec.y2);
-						IF nodeRecord1.custom_top_elev IS NULL THEN
-							z1 = (nodeRecord1.top_elev - arcrec.y1);
-						ELSE
-							z1 = (nodeRecord1.custom_top_elev - arcrec.y1);
+						IF arcrec.custom_elev2 IS NULL AND arcrec.elev2 IS NULL THEN
+							z2 = (top_elev_aux - arcrec.y2);
+						END IF; 
+
+						IF arcrec.custom_elev1 IS NULL AND arcrec.elev1 IS NULL THEN						
+							IF nodeRecord1.custom_top_elev IS NULL THEN	
+								z1 = (nodeRecord1.top_elev - arcrec.y1);
+							ELSE
+								z1 = (nodeRecord1.custom_top_elev - arcrec.y1);
+							END IF;
 						END IF;
 		
-						-- Update direction if necessary
-						IF (z2 > z1) THEN
-							EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(NEW.node_id) || ', node_2 = ' || quote_literal(nodeRecord1.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-							EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-							EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 ||', 
-										elev1 = ' || arcrec.elev2 || ', elev2 = ' || arcrec.elev1 ||',
-										custom_y1 = ' || arcrec.custom_y2 || ', custom_y2 = ' || arcrec.custom_y1 ||',
-										custom_elev1 = ' || arcrec.custom_elev2 || ', custom_elev2 = ' || arcrec.custom_elev1 ||',
-										sys_y1 = ' || arcrec.sys_elev2 || ', sys_elev2 = ' || arcrec.sys_elev1 ||',
-										sys_elev1 = ' || arcrec.sys_elev2 || ', sys_elev2 = ' || arcrec.sys_elev1 ||',
-										WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 							
-							EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
-						END IF;
-			
 					END IF;
+
+					-- Update direction if necessary
+					IF ((z2 > z1) AND arcrec.inverted_slope is false) OR ((z2 < z1) AND arcrec.inverted_slope is true) THEN
+						EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+						EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 ||', 
+							elev1 = ' || arcrec.elev2 || ', elev2 = ' || arcrec.elev1 ||',
+							custom_y1 = ' || arcrec.custom_y2 || ', custom_y2 = ' || arcrec.custom_y1 ||',
+							custom_elev1 = ' || arcrec.custom_elev2 || ', custom_elev2 = ' || arcrec.custom_elev1 ||',
+							sys_y1 = ' || arcrec.sys_elev2 || ', sys_elev2 = ' || arcrec.sys_elev1 ||',
+							sys_elev1 = ' || arcrec.sys_elev2 || ', sys_elev2 = ' || arcrec.sys_elev1 ||',
+							WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+						EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
+					END IF;
+					
 				END IF;
 			END LOOP; 
 		END IF;
@@ -177,7 +176,9 @@ BEGIN
 RETURN NEW;
     
 END; 
-$$;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
 
 
 DROP TRIGGER IF EXISTS gw_trg_node_update ON "SCHEMA_NAME"."node";

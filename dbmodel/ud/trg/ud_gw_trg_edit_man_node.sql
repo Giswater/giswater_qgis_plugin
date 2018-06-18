@@ -9,26 +9,6 @@ This version of Giswater is provided by Giswater Association
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node();
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node()
-  RETURNS trigger AS
-$BODY$
-DECLARE 
-    inp_table varchar;
-    man_table varchar;
-    new_man_table varchar;
-    old_man_table varchar;
-    v_sql varchar;
-    v_sql2 varchar;
-    old_nodetype varchar;
-    new_nodetype varchar;
-    man_table_2 varchar;
-	rec Record;
-    node_id_seq int8;
-	code_autofill_bool boolean;
-	count_aux integer;
-	promixity_buffer_aux double precision;
-
-
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -212,7 +192,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from node where node_id=NEW.node_id));
 				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
 				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
 				
@@ -229,7 +209,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from node where node_id=NEW.node_id));
 				INSERT INTO man_netgully (node_id,pol_id, sander_depth, gratecat_id, units, groove, siphon ) 
 				VALUES(NEW.node_id, NEW.pol_id, NEW.sander_depth, NEW.gratecat_id, NEW.units, 
 				NEW.groove, NEW.siphon );
@@ -246,7 +226,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from node where node_id=NEW.node_id));
 				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
 				VALUES (NEW.node_id,NEW.pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
 				NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
@@ -264,8 +244,8 @@ BEGIN
 		
 		ELSIF man_table='man_netinit' THEN
 			
-			INSERT INTO man_netinit (node_id,length, width, inlet, bottom_channel, accessibility, name, sander_depth) 
-			VALUES (NEW.node_id, NEW.length,NEW.width,NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.name, NEW.sander_depth);
+			INSERT INTO man_netinit (node_id,length, width, inlet, bottom_channel, accessibility, name) 
+			VALUES (NEW.node_id, NEW.length,NEW.width,NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.name);
 			
 		ELSIF man_table='man_wjump' THEN
 	
@@ -280,7 +260,7 @@ BEGIN
 				END IF;
 				
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)))
-				from "SCHEMA_NAME".node where node_id=NEW.node_id));
+				from node where node_id=NEW.node_id));
 				INSERT INTO man_wwtp (node_id,pol_id, name) VALUES (NEW.node_id,NEW.pol_id,NEW.name);
 			
 			ELSE
@@ -345,6 +325,8 @@ BEGIN
         END IF;
 
     -- UPDATE management values
+
+               
 		IF (NEW.node_type <> OLD.node_type) THEN 
 			new_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
 			old_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = OLD.node_type);
@@ -430,7 +412,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_netinit' THEN
-			UPDATE man_netinit SET length=NEW.length, width=NEW.width, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name, sander_depth=NEW.sander_depth
+			UPDATE man_netinit SET length=NEW.length, width=NEW.width, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_wjump' THEN

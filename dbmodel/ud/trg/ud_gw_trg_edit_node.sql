@@ -6,7 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1220
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node() RETURNS trigger AS
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_node()
+  RETURNS trigger AS
 $BODY$
 DECLARE 
     inp_table varchar;
@@ -204,15 +206,7 @@ BEGIN
         RETURN NEW;
 
 
-    ELSIF TG_OP = 'UPDATE' THEN
-
-
-		IF (NEW.elev <> OLD.elev) THEN
-                RETURN audit_function(1048,1220);  
-		END IF;
-
-        NEW.elev=NEW.top_elev-NEW.ymax;
- 
+    ELSIF TG_OP = 'UPDATE' THEN 
 
         IF (NEW.epa_type !=  OLD.epa_type) THEN    
          
@@ -313,6 +307,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node ON "SCHEMA_NAME".v_edit_node;
 CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_node
