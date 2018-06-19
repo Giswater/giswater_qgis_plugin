@@ -279,7 +279,7 @@ class ManArcDialog(ParentDialog):
             column_name = self.controller.dao.get_column_name(i)
             columns.append(column_name)  
         for column_name in columns:                                      
-            utils_giswater.setWidgetText(column_name, str(row[column_name]))
+            utils_giswater.setWidgetText(self.dialog, column_name, str(row[column_name]))
 
         utils_giswater.setWidgetText("arc_cost_2", str(row["arc_cost"]))
         utils_giswater.setWidgetText("m2pavement_cost", str(row["m2pav_cost"]))
@@ -362,7 +362,7 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         cat_arctype_id = self.dialog.findChild(QLineEdit, 'cat_arctype_id')
-        cat_feature_id = utils_giswater.getWidgetText(cat_arctype_id)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, cat_arctype_id)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter="'arc_type'", duration=10)

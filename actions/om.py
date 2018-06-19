@@ -147,7 +147,7 @@ class Om(ParentAction):
 
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
-        self.insert_or_update_config_param_curuser(aux_widget, "psector_vdefault", "config_param_user")
+        self.insert_or_update_config_param_curuser(dialog, aux_widget, "psector_vdefault", "config_param_user")
         self.controller.execute_sql(sql)
         message = "Values has been updated"
         self.controller.show_info(message)
@@ -158,7 +158,7 @@ class Om(ParentAction):
         dialog.exec_()
 
 
-    def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
+    def insert_or_update_config_param_curuser(self, dialog, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
         sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename
@@ -166,26 +166,26 @@ class Om(ParentAction):
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
-            if utils_giswater.getWidgetText(widget) != "":
+            if utils_giswater.getWidgetText(dialog, widget) != "":
                 for row in rows:
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + utils_giswater.getWidgetText(widget) + "' WHERE parameter='" + parameter + "'"
+                        sql += "'" + utils_giswater.getWidgetText(dialog, widget) + "' WHERE parameter='" + parameter + "'"
                     else:
                         sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "')"
+                                " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "')"
                                 " WHERE parameter = 'state_vdefault'")
                 else:
                     sql = "INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
                     if widget.objectName() != 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
+                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(dialog, widget) + "', current_user)"
                     else:
                         sql += (" VALUES ('" + parameter + "',"
                                 " (SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)")
+                                " WHERE name ='" + utils_giswater.getWidgetText(dialog, widget) + "'), current_user)")
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -204,7 +204,7 @@ class Om(ParentAction):
 
     def filter_by_text(self, table, widget_txt, tablename):
 
-        result_select = utils_giswater.getWidgetText(widget_txt)
+        result_select = utils_giswater.getWidgetText(self.dlg_psector_mng, widget_txt)
         if result_select != 'null':
             expr = " name ILIKE '%" + result_select + "%'"
             # Refresh model with selected filter

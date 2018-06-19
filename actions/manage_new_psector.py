@@ -1111,7 +1111,7 @@ class ManageNewPsector(ParentManage):
     def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
         
-        psector_id = utils_giswater.getText(self.dlg.psector_id)
+        psector_id = utils_giswater.getText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
 
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
