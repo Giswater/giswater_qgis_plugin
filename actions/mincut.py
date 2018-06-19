@@ -585,7 +585,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if exist_id:
             # Read selection and reload table
             self.select_features_connec()
-
+        self.snapping_selection_connec()
         self.dlg_connec.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_connec.show()
 
