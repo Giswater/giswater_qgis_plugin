@@ -71,7 +71,6 @@ class DeleteNodeMapTool(ParentMapTool):
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
             self.dlg_fusion = ArcFusion()
-            # utils_giswater.setDialog(self.dlg_fusion)
             self.load_settings(self.dlg_fusion)
 
             # Fill ComboBox workcat_id_end

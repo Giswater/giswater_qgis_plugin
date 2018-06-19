@@ -348,7 +348,6 @@ class Master(ParentAction):
 
         # Create dialog 
         self.dlg_estimate_result_selector = EstimateResultSelector()
-        # utils_giswater.setDialog(dlg_estimate_result_selector)
         self.load_settings(self.dlg_estimate_result_selector)
         
         # Populate combo

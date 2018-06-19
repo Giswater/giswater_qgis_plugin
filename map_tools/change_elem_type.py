@@ -49,7 +49,6 @@ class ChangeElemType(ParentMapTool):
             self.dlg_cat = UDcatalog()
             self.field2 = 'shape'
             self.field3 = 'geom1'
-        #utils_giswater.setDialog(self.dlg_cat)
         self.load_settings(self.dlg_cat)
 
         self.node_type_text = None
@@ -202,7 +201,6 @@ class ChangeElemType(ParentMapTool):
         
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.id)
         self.close_dialog(self.dlg_cat)
-        #utils_giswater.setDialog(self.dlg_chg_node_type)
         utils_giswater.setWidgetEnabled(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id, True)
         utils_giswater.setWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id, catalog_id)
           
@@ -315,7 +313,6 @@ class ChangeElemType(ParentMapTool):
                         
         # Create the dialog, fill node_type and define its signals
         self.dlg_chg_node_type = ChangeNodeType()
-        #utils_giswater.setDialog(self.dlg_chg_node_type)
         self.load_settings(self.dlg_chg_node_type)
 
         # Get nodetype_id from current node         
@@ -357,7 +354,6 @@ class ChangeElemType(ParentMapTool):
                 self.set_action_pan()
         except AttributeError:
             pass
-        #utils_giswater.setDialog(self.dlg)
                
             
     """ QgsMapTools inherited event functions """

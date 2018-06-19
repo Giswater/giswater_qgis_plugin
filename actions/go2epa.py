@@ -47,7 +47,6 @@ class Go2Epa(ParentAction):
 
         # Create dialog
         self.dlg_go2epa = FileManager()
-        # utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg_go2epa)
         # self.dlg.setWindowTitle("Options Table")
 
@@ -130,7 +129,6 @@ class Go2Epa(ParentAction):
         """ Load the tables in the selection form """
 
         dlg_psector_sel = Multirow_selector()
-        # utils_giswater.setDialog(dlg_psector_sel)
         self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
         dlg_psector_sel.setWindowTitle("Selector")
@@ -152,7 +150,6 @@ class Go2Epa(ParentAction):
         
         # Create dialog
         self.dlg_wsoptions = WSoptions()
-        # utils_giswater.setDialog(self.dlg_wsoptions)
         self.load_settings(self.dlg_wsoptions)
 
         # Allow QTextView only Double text
@@ -253,7 +250,6 @@ class Go2Epa(ParentAction):
         """ Open dialog ws_times.ui"""
         
         dlg_wstimes = WStimes()
-        # utils_giswater.setDialog(dlg_wstimes)
         self.load_settings(dlg_wstimes)
         dlg_wstimes.duration.setValidator(QIntValidator())
         sql = "SELECT id FROM "+self.schema_name+".inp_value_times ORDER BY id"
@@ -348,7 +344,6 @@ class Go2Epa(ParentAction):
         """ Dialog hydrology_selector.ui """
 
         self.dlg_hydrology_selector = HydrologySelector()
-        # utils_giswater.setDialog(self.dlg_hydrology_selector)
         self.load_settings(self.dlg_hydrology_selector)
 
         self.dlg_hydrology_selector.btn_accept.clicked.connect(self.save_hydrology)

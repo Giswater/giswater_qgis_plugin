@@ -79,7 +79,6 @@ class MincutParent(ParentAction, MultipleSelection):
         self.remove_selection()      
 
         self.dlg_mincut = Mincut()
-        #utils_giswater.setDialog(self.dlg_mincut)
         self.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -282,7 +281,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
-        # utils_giswater.setDialog(self.dlg_fin)
         self.load_settings(self.dlg_fin)
 
         mincut = utils_giswater.getWidgetText(self.dlg.result_mincut_id)
@@ -566,7 +564,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog add_connec
         self.dlg_connec = Mincut_add_connec()
-        # utils_giswater.setDialog(self.dlg_connec)
         self.load_settings(self.dlg_connec)
 
         # Set icons
@@ -726,7 +723,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog Mincut_add_hydrometer
         self.dlg_hydro = Mincut_add_hydrometer()
-        # utils_giswater.setDialog(self.dlg_hydro)
         self.load_settings(self.dlg_hydro)
         self.dlg_hydro.btn_snapping.setEnabled(False)
         
@@ -2158,7 +2154,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog add_connec
         self.dlg_comp = MincutComposer()
-        # utils_giswater.setDialog(self.dlg_comp)
         self.load_settings(self.dlg_comp)
 
         # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates

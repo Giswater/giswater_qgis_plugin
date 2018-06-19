@@ -55,7 +55,6 @@ class Om(ParentAction):
         """ Button 82: Psector management """
 
         self.dlg_psector_mng = Psector_management()
-        #utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg_psector_mng)
         table_name = "om_psector"
         column_id = "psector_id"
@@ -219,7 +218,6 @@ class Om(ParentAction):
         """ Button 84: Selector dates """
 
         self.dlg_selector_date = SelectorDate()
-        #utils_giswater.setDialog(self.dlg_selector_date)
         self.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")

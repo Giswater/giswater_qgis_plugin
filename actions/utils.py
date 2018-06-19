@@ -40,7 +40,6 @@ class Utils(ParentAction):
 
         # Create dialog to check wich topology functions we want to execute
         self.dlg_toolbox = Toolbox()
-        # utils_giswater.setDialog(self.dlg_toolbox)
         self.load_settings(self.dlg_toolbox)
         project_type = self.controller.get_project_type()
 
@@ -200,7 +199,6 @@ class Utils(ParentAction):
 
         # Create the dialog and signals
         self.dlg_config = ConfigUtils()
-        # utils_giswater.setDialog(self.dlg_config)
         self.load_settings(self.dlg_config)
 
         self.dlg_config.btn_accept.clicked.connect(self.utils_config_accept)
@@ -654,7 +652,6 @@ class Utils(ParentAction):
         """ Button 83: Import CSV """
 
         self.dlg_csv = Csv2Pg()
-        # utils_giswater.setDialog(self.dlg_csv)
         self.load_settings(self.dlg_csv)
         roles = self.controller.get_rolenames()
 

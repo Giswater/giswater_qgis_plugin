@@ -171,7 +171,6 @@ class SearchPlus(QObject):
         self.zoom_to_polygon(self.dlg_search.workcat_id, 'v_ui_workcat_polygon', 'workcat_id')
 
         self.items_dialog = ListItems()
-        #utils_giswater.setDialog(self.items_dialog)
         self.load_settings(self.items_dialog)
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
@@ -778,7 +777,6 @@ class SearchPlus(QObject):
     def open_hydrometer_dialog(self, connec_id, hydrometer_customer_code):
         
         self.hydro_info_dlg = HydroInfo()
-        #utils_giswater.setDialog(self.hydro_info_dlg)
         self.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))

@@ -187,7 +187,6 @@ class ManageWorkcatEnd(ParentManage):
 
         if row is not None:
             self.dlg_work = WorkcatEndList()
-            # utils_giswater.setDialog(self.dlg_work)
             self.load_settings(self.dlg_work)
 
             self.dlg_work.btn_cancel.clicked.connect(partial(self.close_dialog_workcat_list, self.dlg_work))

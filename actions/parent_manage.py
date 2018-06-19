@@ -699,7 +699,6 @@ class ParentManage(ParentAction, object):
         # reset previous dialog in not in single_tool_mode
         # if hasattr(self, 'single_tool_mode') and not self.single_tool_mode:
         #     if hasattr(self, 'previous_dialog'):
-        #         utils_giswater.setDialog(self.previous_dialog)
 
 
     def selection_init(self, dialog, table_object, query=False):
@@ -980,7 +979,6 @@ class ParentManage(ParentAction, object):
 
         # set previous dialog
         # if hasattr(self, 'previous_dialog'):
-        #     utils_giswater.setDialog(self.previous_dialog)
 
         if table_object == "doc":
             self.manage_document()
