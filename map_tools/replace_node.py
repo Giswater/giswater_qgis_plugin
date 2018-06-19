@@ -36,7 +36,6 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Create the dialog and signals
         self.dlg_nodereplace = NodeReplace()
-        # utils_giswater.setDialog(self.dlg_nodereplace)
         self.load_settings(self.dlg_nodereplace)
 
         sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
@@ -197,7 +196,6 @@ class ReplaceNodeMapTool(ParentMapTool):
 
     def cancel(self):
         
-        utils_giswater.setDialog(self.dlg_nodereplace)
         self.close_dialog(self.dlg_cat)
 
 
@@ -440,7 +438,6 @@ class ReplaceNodeMapTool(ParentMapTool):
             self.dlg_cat = UDcatalog()
             self.field2 = 'shape'
             self.field3 = 'geom1'
-        # utils_giswater.setDialog(self.dlg_cat)
         self.load_settings(self.dlg_cat)
 
         self.node_type_text = None
@@ -482,7 +479,6 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat, self.dlg_cat.id)
 
-        # utils_giswater.setDialog(self.dlg_nodereplace)
         utils_giswater.setWidgetEnabled(self.dlg_nodereplace, self.dlg_nodereplace.node_nodecat_id, True)
         utils_giswater.setWidgetText(self.dlg_nodereplace, self.dlg_nodereplace.node_nodecat_id, catalog_id)
 

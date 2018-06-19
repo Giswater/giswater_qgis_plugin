@@ -32,7 +32,6 @@ class MincutConfig(ParentAction):
         
         # Dialog multi_selector
         self.dlg_multi = Multi_selector()
-        utils_giswater.setDialog(self.dlg_multi)
 
         self.tbl_config = self.dlg_multi.findChild(QTableView, "tbl")
         self.btn_insert = self.dlg_multi.findChild(QPushButton, "btn_insert")
@@ -144,7 +143,6 @@ class MincutConfig(ParentAction):
 
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
-        #utils_giswater.setDialog(self.dlg_min_edit)
         self.load_settings(self.dlg_min_edit)
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")

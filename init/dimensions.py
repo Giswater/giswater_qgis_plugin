@@ -18,8 +18,7 @@ def formOpen(dialog, layer, feature):
     """ Function called when a connec is identified in the map """
     
     global feature_dialog
-    utils_giswater.setDialog(dialog)
-    # Create class to manage Feature Form interaction    
+    # Create class to manage Feature Form interaction
     feature_dialog = Dimensions(dialog, layer, feature)
     init_config()
     

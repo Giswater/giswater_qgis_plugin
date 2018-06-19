@@ -530,7 +530,6 @@ class ManageVisit(ParentManage, QObject):
         # save previous dialog and set new one.
         # previous dialog will be set exiting the current one
         # self.previous_dialog = utils_giswater.dialog()
-        # utils_giswater.setDialog(self.dlg_man)
         self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if geom_type is None:
@@ -850,7 +849,6 @@ class ManageVisit(ParentManage, QObject):
             if value:
                 getattr(self.dlg_event, field_name).setText(str(value))
 
-        utils_giswater.setDialog(self.dlg_event)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         if self.dlg_event.exec_():
             # set record values basing on widget

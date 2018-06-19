@@ -57,7 +57,6 @@ class DrawProfiles(ParentMapTool):
 
         # Set dialog
         self.dlg = DrawProfile()
-        utils_giswater.setDialog(self.dlg)
         self.load_settings(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -163,7 +162,6 @@ class DrawProfiles(ParentMapTool):
         """ Open dialog load_profiles.ui """
 
         self.dlg_load = LoadProfiles()
-        utils_giswater.setDialog(self.dlg_load)
         self.load_settings(self.dlg_load)
 
         self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))

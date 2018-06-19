@@ -976,7 +976,6 @@ class Giswater(QObject):
         """ Fill table 'audit_check_project' with layers data """
 
         self.dlg_audit_project = AuditCheckProjectResult()
-        utils_giswater.setDialog(self.dlg_audit_project)
 
         self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
