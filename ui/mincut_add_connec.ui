@@ -39,7 +39,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QPushButton" name="btn_cancel">
+  <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -49,20 +49,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Cancel</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>85</x>
-     <y>305</y>
-     <width>70</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>OK</string>
+    <string>Accept</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="connec_id">
