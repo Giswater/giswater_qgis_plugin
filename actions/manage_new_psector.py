@@ -524,7 +524,7 @@ class ManageNewPsector(ParentManage):
 
 
     def calulate_percents(self, tablename, psector_id, field):
-        
+        psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = ("UPDATE " + self.schema_name + "." + tablename + " "
                " SET " + field + " = '" + utils_giswater.getText(self.dlg_plan_psector, field) + "'"
                " WHERE psector_id = '" + str(psector_id) + "'")
