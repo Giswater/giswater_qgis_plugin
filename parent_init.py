@@ -133,7 +133,6 @@ class ParentDialog(QDialog):
             sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('"+str(point[0])+"', '"+str(point[1])+"')")
             row = self.controller.get_row(sql)
             values = row[0]
-            self.controller.log_info(str(values))
             #utils_giswater.setWidgetText(self.geom_type + "_id", str(values['feature_id']))
             if 'name' in values['muni_id']:
                 utils_giswater.setWidgetText(self.dialog, 'muni_id', values['muni_id']['name'])

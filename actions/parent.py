@@ -193,8 +193,7 @@ class ParentAction(object):
             program = [self.java_exe, "-jar", self.giswater_file_path, self.file_gsw, parameter]
         else:
             program = [self.java_exe, "-jar", self.giswater_file_path, "", parameter]
-            
-        self.controller.log_info(str(program))
+
         self.controller.start_program(program)               
         
         # Compare Java and Plugin versions

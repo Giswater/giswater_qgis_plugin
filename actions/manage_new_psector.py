@@ -396,7 +396,6 @@ class ManageNewPsector(ParentManage):
         # Generate csv
         if utils_giswater.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
             file_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_csv_detail_path')
-            self.controller.log_info(str(file_name))
             viewname = "v_" + self.plan_om + "_current_psector_budget"
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
@@ -914,7 +913,6 @@ class ManageNewPsector(ParentManage):
             else:
                 values += 'null, '
             values = values[:len(values) - 2]
-            self.controller.log_info(str("VALUES: ")+str(values))
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(" + id_des + ")"
                    " FROM " + self.schema_name + "." + tableright + ""

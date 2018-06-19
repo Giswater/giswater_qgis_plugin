@@ -225,7 +225,6 @@ class MincutConfig(ParentAction):
         state = utils_giswater.getWidgetText(self.dlg_min_edit, widget)
         if state != 'null':
             expr_filter = " state = '" + str(state) + "'"
-            self.controller.log_info(str(expr_filter))
             # Refresh model with selected expr_filter
             table.model().setFilter(expr_filter)
             table.model().select()

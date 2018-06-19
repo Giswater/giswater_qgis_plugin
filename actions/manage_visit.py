@@ -416,7 +416,6 @@ class ManageVisit(ParentManage, QObject):
         # manage leaving tab
         # tab Visit
         if self.current_tab_index == self.tab_index('VisitTab'):
-            self.controller.log_info(str('VisitTab'))
             self.manage_leave_visit_tab()
             # need to create the relation record that is done only
             # changing tab
@@ -425,7 +424,6 @@ class ManageVisit(ParentManage, QObject):
 
         # tab Relation
         if self.current_tab_index == self.tab_index('RelationsTab'):
-            self.controller.log_info(str('RelationsTab'))
             self.update_relations()
 
         # manage arriving tab

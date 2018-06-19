@@ -171,7 +171,6 @@ class MincutParent(ParentAction, MultipleSelection):
         # sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
         row = self.controller.get_row(sql, log_sql=True)
         if row:
-            self.controller.log_info(str(row[0]))
             if row[0] is not None:
                 result_mincut_id = str(int(row[0])+1)
 

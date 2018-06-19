@@ -134,7 +134,6 @@ class ManageWorkcatEnd(ParentManage):
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user "
                " WHERE parameter = 'workcat_vdefault' and cur_user = current_user")
         row = self.controller.get_row(sql, log_info=False)
-        self.controller.log_info(str(row))
         if row:
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
