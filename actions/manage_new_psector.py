@@ -93,6 +93,7 @@ class ManageNewPsector(ParentManage):
 
         if self.plan_om == 'om':
             self.populate_result_id(self.dlg_plan_psector.result_id, self.plan_om + '_result_cat')
+            utils_giswater.remove_tab_by_tabName(self.dlg_plan_psector.tabWidget, 'tab_document')
         elif self.plan_om == 'plan':
             self.dlg_plan_psector.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
@@ -553,6 +554,7 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(2, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(3, enabled)
+        self.dlg_plan_psector.tabWidget.setTabEnabled(4, enabled)
 
 
     def enable_buttons(self, enabled):
