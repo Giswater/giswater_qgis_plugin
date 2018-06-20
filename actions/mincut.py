@@ -1751,7 +1751,10 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
 
-        
+        # Common Actions
+        self.action_mincut_composer.setDisabled(False)
+
+
     def open_mincut_manage_location(self, row):
         """ Management of location parameters: muni, postcode, street, postnumber """
         
