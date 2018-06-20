@@ -75,7 +75,7 @@ SELECT v_node.node_id,
     v_node.macrodma_id,
     v_node.expl_id,
     v_node.num_value
-   FROM ud.v_node;
+   FROM v_node
 	JOIN cat_node ON v_node.nodecat_id=cat_node.id;
 
 
