@@ -967,6 +967,11 @@
         <source>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</source>
         <translation>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</translation>
     </message>
+    <message>
+        <source>CSV not generated. Check fields from table or view: </source>
+        <translation>Check fields from table or view: </translation>
+    </message>
+
 
 
 </context>

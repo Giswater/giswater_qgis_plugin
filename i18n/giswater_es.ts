@@ -967,6 +967,10 @@
         <source>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</source>
         <translation>Poligono de corte hecho, pero tiene conflictos. Revise anl_arc y anl_node para ver los detalles</translation>
     </message>
+    <message>
+        <source>CSV not generated. Check fields from table or view: </source>
+        <translation>Csv no generado. Revise los campos de la tabla o vista: </translation>
+    </message>
 </context>
 
 </TS>

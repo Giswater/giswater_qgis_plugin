@@ -382,9 +382,9 @@ class ManageNewPsector(ParentManage):
         if utils_giswater.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
             file_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, 'txt_csv_path')
             viewname = "v_" + self.plan_om + "_current_psector_budget_detail"
-            if self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex == 0:
+            if self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex() == 0:
                 viewname = 'v_om_current_psector_budget_detail_rec'
-            elif self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex == 1:
+            elif self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex() == 1:
                 viewname = 'v_om_current_psector_budget_detail_reh'
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
@@ -433,12 +433,15 @@ class ManageNewPsector(ParentManage):
 
         # Get columns name in order of the table
         sql = ("SELECT column_name FROM information_schema.columns"
-               " WHERE table_name = '" + "v_" + self.plan_om + "_psector'"
+               " WHERE table_name = '" + str(viewname) + "'"
                " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
                " ORDER BY ordinal_position")
         rows = self.controller.get_rows(sql)
         columns = []
-        if rows is None or rows == '':
+
+        if not rows or rows is None or rows == '':
+            message = "CSV not generated. Check fields from table or view: "
+            self.controller.show_warning(message, parameter=viewname)
             return
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -449,7 +452,7 @@ class ManageNewPsector(ParentManage):
         rows = self.controller.get_rows(sql)
         all_rows = []
         all_rows.append(columns)
-        if rows is None or rows == '':
+        if not rows or rows is None or rows == '':
             return
         for i in rows:
             all_rows.append(i)
