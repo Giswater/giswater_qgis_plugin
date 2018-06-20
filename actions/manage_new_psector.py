@@ -438,6 +438,8 @@ class ManageNewPsector(ParentManage):
                " ORDER BY ordinal_position")
         rows = self.controller.get_rows(sql)
         columns = []
+        if rows is None or rows == '':
+            return
         for i in range(0, len(rows)):
             column_name = rows[i]
             columns.append(str(column_name[0]))
@@ -447,6 +449,8 @@ class ManageNewPsector(ParentManage):
         rows = self.controller.get_rows(sql)
         all_rows = []
         all_rows.append(columns)
+        if rows is None or rows == '':
+            return
         for i in rows:
             all_rows.append(i)
 
