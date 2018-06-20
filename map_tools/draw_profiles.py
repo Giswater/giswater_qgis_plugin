@@ -569,7 +569,7 @@ class DrawProfiles(ParentMapTool):
             parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
-            sql = ("SELECT top_elev, ymax, sys_elev, nodecat_id"
+            sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id"
                    " FROM  " + self.schema_name + ".v_edit_node"
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
@@ -624,7 +624,7 @@ class DrawProfiles(ParentMapTool):
         n = 0
         for element_id in self.arc_id:
 
-            sql = ("SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, y1, y2, slope"
+            sql = ("SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, sys_y1 AS y1, sys_y2 AS y2, slope"
                    " FROM " + self.schema_name + ".v_edit_arc"
                    " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
