@@ -97,7 +97,7 @@ BEGIN
 
 --    Control NULL's
     v_feature_id := COALESCE(v_feature_id, '{}');
-    v_expl_id := COALESCE(v_expl_id, '{}');
+    v_sector_id := COALESCE(v_sector_id, '{}');
     v_dma_id := COALESCE(v_dma_id, '{}');
     v_expl_id := COALESCE(v_expl_id, '{}');
     v_muni_id := COALESCE(v_muni_id, '{}');
