@@ -56,40 +56,39 @@ class DrawProfiles(ParentMapTool):
         self.version = str(row[0][:1])
 
         # Set dialog
-        self.dlg = DrawProfile()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_draw_profile = DrawProfile()
+        self.load_settings(self.dlg_draw_profile)
+        self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Set icons
-        self.set_icon(self.dlg.btn_add_start_point, "111")
-        self.set_icon(self.dlg.btn_add_end_point, "111")
-        self.set_icon(self.dlg.btn_add_additional_point, "111")
-        self.set_icon(self.dlg.btn_delete_additional_point, "112")
+        self.set_icon(self.dlg_draw_profile.btn_add_start_point, "111")
+        self.set_icon(self.dlg_draw_profile.btn_add_end_point, "111")
+        self.set_icon(self.dlg_draw_profile.btn_add_additional_point, "111")
+        self.set_icon(self.dlg_draw_profile.btn_delete_additional_point, "112")
 
-        self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point")
-        self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
-        self.widget_additional_point = self.dlg.findChild(QListWidget, "list_additional_points")
+        self.widget_start_point = self.dlg_draw_profile.findChild(QLineEdit, "start_point")
+        self.widget_end_point = self.dlg_draw_profile.findChild(QLineEdit, "end_point")
+        self.widget_additional_point = self.dlg_draw_profile.findChild(QListWidget, "list_additional_points")
 
         start_point = QgsMapToolEmitPoint(self.canvas)
         end_point = QgsMapToolEmitPoint(self.canvas)
         self.start_end_node = [None, None]
 
         # Set signals
-        self.dlg.rejected.connect(partial(self.close_dialog, self.dlg))
-        self.dlg.btn_add_start_point.clicked.connect(partial(self.activate_snapping, start_point))
-        self.dlg.btn_add_end_point.clicked.connect(partial(self.activate_snapping, end_point))
-        self.dlg.btn_add_start_point.clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_start_point))
-        self.dlg.btn_add_end_point.clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_end_point))
-        self.dlg.btn_add_additional_point.clicked.connect(partial(self.activate_snapping, start_point))
-        self.dlg.btn_add_additional_point.clicked.connect(partial(self.activate_snapping_node, self.dlg.btn_add_additional_point))
-        self.dlg.btn_delete_additional_point.clicked.connect(self.delete_additional_point)
-        self.dlg.btn_save_profile.clicked.connect(self.save_profile)
-        self.dlg.btn_load_profile.clicked.connect(self.load_profile)
+        self.dlg_draw_profile.rejected.connect(partial(self.close_dialog, self.dlg_draw_profile))
+        self.dlg_draw_profile.btn_add_start_point.clicked.connect(partial(self.activate_snapping, start_point))
+        self.dlg_draw_profile.btn_add_end_point.clicked.connect(partial(self.activate_snapping, end_point))
+        self.dlg_draw_profile.btn_add_start_point.clicked.connect(partial(self.activate_snapping_node, self.dlg_draw_profile.btn_add_start_point))
+        self.dlg_draw_profile.btn_add_end_point.clicked.connect(partial(self.activate_snapping_node, self.dlg_draw_profile.btn_add_end_point))
+        self.dlg_draw_profile.btn_add_additional_point.clicked.connect(partial(self.activate_snapping, start_point))
+        self.dlg_draw_profile.btn_add_additional_point.clicked.connect(partial(self.activate_snapping_node, self.dlg_draw_profile.btn_add_additional_point))
+        self.dlg_draw_profile.btn_delete_additional_point.clicked.connect(self.delete_additional_point)
+        self.dlg_draw_profile.btn_save_profile.clicked.connect(self.save_profile)
+        self.dlg_draw_profile.btn_load_profile.clicked.connect(self.load_profile)
 
-        self.dlg.btn_draw.clicked.connect(self.execute_profiles)
-        self.dlg.btn_clear_profile.clicked.connect(self.clear_profile)
-        self.dlg.btn_export_pdf.clicked.connect(self.export_pdf)
+        self.dlg_draw_profile.btn_draw.clicked.connect(self.execute_profiles)
+        self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
+        self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
 
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -99,26 +98,27 @@ class DrawProfiles(ParentMapTool):
         template_files = os.listdir(template_folder)
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
 
-        self.dlg.cbx_template.clear()
-        self.dlg.cbx_template.addItem('')
+        self.dlg_draw_profile.cbx_template.clear()
+        self.dlg_draw_profile.cbx_template.addItem('')
         for template in self.files_qpt:
-            self.dlg.cbx_template.addItem(str(template))
+            self.dlg_draw_profile.cbx_template.addItem(str(template))
 
-        self.dlg.cbx_template.currentIndexChanged.connect(self.set_template)
+            self.dlg_draw_profile.cbx_template.currentIndexChanged.connect(self.set_template)
 
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")        
+        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+
 
         self.nodes = []
         self.list_of_selected_nodes = []
-        
-        self.dlg.open()
 
-        
+        self.dlg_draw_profile.open()
+
+
     def save_profile(self):
         """ Save profile """
         
-        profile_id = self.dlg.profile_id.text()
+        profile_id = self.dlg_draw_profile.profile_id.text()
         start_point = self.widget_start_point.text()
         end_point = self.widget_end_point.text()
         
@@ -139,9 +139,9 @@ class DrawProfiles(ParentMapTool):
             return
 
         list_arc = []
-        n = self.dlg.tbl_list_arc.count()
+        n = self.dlg_draw_profile.tbl_list_arc.count()
         for i in range(n):
-            list_arc.append(str(self.dlg.tbl_list_arc.item(i).text()))
+            list_arc.append(str(self.dlg_draw_profile.tbl_list_arc.item(i).text()))
 
         sql = ""
         for i in range(n):
@@ -163,7 +163,6 @@ class DrawProfiles(ParentMapTool):
         """ Open dialog load_profiles.ui """
 
         self.dlg_load = LoadProfiles()
-        utils_giswater.setDialog(self.dlg_load)
         self.load_settings(self.dlg_load)
 
         self.dlg_load.rejected.connect(partial(self.close_dialog, self.dlg_load.rejected))
@@ -207,7 +206,7 @@ class DrawProfiles(ParentMapTool):
         # Fill widgets of form draw_profile | profile_id, start_point, end_point
         self.widget_start_point.setText(str(start_point))
         self.widget_end_point.setText(str(end_point))
-        self.dlg.profile_id.setText(str(selected_profile))
+        self.dlg_draw_profile.profile_id.setText(str(selected_profile))
 
         # Get all arcs from selected profile
         sql = ("SELECT arc_id"
@@ -303,16 +302,16 @@ class DrawProfiles(ParentMapTool):
         self.canvas.zoomToSelected(self.layer_arc)
 
         # After executing of profile enable btn_draw
-        self.dlg.btn_draw.setDisabled(False)
+        self.dlg_draw_profile.btn_draw.setDisabled(False)
 
         # Clear list
         list_arc = []
-        self.dlg.tbl_list_arc.clear()
+        self.dlg_draw_profile.tbl_list_arc.clear()
 
         # Load list of arcs
         for i in range(len(arc_id)):
             item_arc = QListWidgetItem(arc_id[i])
-            self.dlg.tbl_list_arc.addItem(item_arc)
+            self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
             list_arc.append(arc_id[i])
 
         self.node_id = node_id
@@ -321,10 +320,10 @@ class DrawProfiles(ParentMapTool):
         # Draw profile
         self.paint_event(self.arc_id, self.node_id)
 
-        self.dlg.cbx_template.setDisabled(False)
-        self.dlg.btn_export_pdf.setDisabled(False)
-        self.dlg.title.setDisabled(False)
-        self.dlg.rotation.setDisabled(False)
+        self.dlg_draw_profile.cbx_template.setDisabled(False)
+        self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
+        self.dlg_draw_profile.title.setDisabled(False)
+        self.dlg_draw_profile.rotation.setDisabled(False)
 
         self.close_dialog(self.dlg_load)
         
@@ -384,6 +383,7 @@ class DrawProfiles(ParentMapTool):
 
     def snapping_node(self, point):   # @UnusedVariable
 
+        self.aux = ""
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1197,11 +1197,11 @@ class DrawProfiles(ParentMapTool):
 
         # Clear list
         list_arc = []
-        self.dlg.tbl_list_arc.clear()
+        self.dlg_draw_profile.tbl_list_arc.clear()
         
         for i in range(len(self.arc_id)):
             item_arc = QListWidgetItem(self.arc_id[i])
-            self.dlg.tbl_list_arc.addItem(item_arc)
+            self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
             list_arc.append(self.arc_id[i])
 
 
@@ -1243,21 +1243,21 @@ class DrawProfiles(ParentMapTool):
         self.arcs = []
         self.start_end_node = []
         self.start_end_node = [None, None]
-        self.dlg.list_additional_points.clear()
-        self.dlg.btn_add_start_point.setDisabled(False)
-        self.dlg.btn_add_end_point.setDisabled(True)
-        self.dlg.btn_add_additional_point.setDisabled(True)
-        self.dlg.list_additional_points.setDisabled(True)
-        self.dlg.title.setDisabled(True)
-        self.dlg.rotation.setDisabled(True)
-        self.dlg.btn_export_pdf.setDisabled(True)
-        self.dlg.cbx_template.setDisabled(True)
-        self.dlg.start_point.clear()
-        self.dlg.end_point.clear()
-        self.dlg.profile_id.clear()
+        self.dlg_draw_profile.list_additional_points.clear()
+        self.dlg_draw_profile.btn_add_start_point.setDisabled(False)
+        self.dlg_draw_profile.btn_add_end_point.setDisabled(True)
+        self.dlg_draw_profile.btn_add_additional_point.setDisabled(True)
+        self.dlg_draw_profile.list_additional_points.setDisabled(True)
+        self.dlg_draw_profile.title.setDisabled(True)
+        self.dlg_draw_profile.rotation.setDisabled(True)
+        self.dlg_draw_profile.btn_export_pdf.setDisabled(True)
+        self.dlg_draw_profile.cbx_template.setDisabled(True)
+        self.dlg_draw_profile.start_point.clear()
+        self.dlg_draw_profile.end_point.clear()
+        self.dlg_draw_profile.profile_id.clear()
         
         # Get data from DB for selected item| tbl_list_arc
-        self.dlg.tbl_list_arc.clear()
+        self.dlg_draw_profile.tbl_list_arc.clear()
         
         # Clear selection 
         self.remove_selection()
@@ -1271,13 +1271,13 @@ class DrawProfiles(ParentMapTool):
         composers = self.iface.activeComposers()
 
         # Check if template is selected
-        if str(self.dlg.cbx_template.currentText()) == "":
+        if str(self.dlg_draw_profile.cbx_template.currentText()) == "":
             message = "You need to select a template"
             self.controller.show_warning(str(message))
             return
 
         # Check if title
-        title = self.dlg.title.text()
+        title = self.dlg_draw_profile.title.text()
 
         # Check if composer exist
         index = 0
@@ -1318,8 +1318,8 @@ class DrawProfiles(ParentMapTool):
         map_item.setMapCanvas(self.canvas)
         map_item.zoomToExtent(self.canvas.extent())
 
-        first_node = self.dlg.start_point.text()
-        end_node = self.dlg.end_point.text()
+        first_node = self.dlg_draw_profile.start_point.text()
+        end_node = self.dlg_draw_profile.end_point.text()
 
         # Fill data in composer template
         first_node_item = composition.getComposerItemById('first_node')
@@ -1332,7 +1332,9 @@ class DrawProfiles(ParentMapTool):
         profile_title.setText(str(title))
 
         composition.setAtlasMode(QgsComposition.PreviewAtlas)
-        rotation = float(self.dlg.rotation.text())
+        # if self.dlg_draw_profile.rotation.text() == '':
+
+        rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
         map_item.setMapRotation(rotation)
 
         composition.refreshItems()
@@ -1340,7 +1342,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def set_template(self):
-        template = self.dlg.cbx_template.currentText()
+        template = self.dlg_draw_profile.cbx_template.currentText()
         self.template = template[:-4]
 
 
@@ -1348,6 +1350,8 @@ class DrawProfiles(ParentMapTool):
         """ Export PDF of selected template"""
 
         # Generate Composer
+        if utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation) is  'null':
+            utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, '0')
         self.execute_profiles_composer()
         self.generate_composer()
 
@@ -1493,38 +1497,39 @@ class DrawProfiles(ParentMapTool):
 
             # Clear list
             self.list_arc = []
-            self.dlg.tbl_list_arc.clear()
+            self.dlg_draw_profile.tbl_list_arc.clear()
 
             for i in range(len(self.arc_id)):
                 item_arc = QListWidgetItem(self.arc_id[i])
-                self.dlg.tbl_list_arc.addItem(item_arc)
+                self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
                 self.list_arc.append(self.arc_id[i])
 
 
     def exec_path(self):
 
         if str(self.start_end_node[0]) != None:
-            self.dlg.btn_add_end_point.setDisabled(False)
+            self.dlg_draw_profile.btn_add_end_point.setDisabled(False)
         # Shortest path - if additional point doesn't exist
         if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
             self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
-            self.dlg.btn_add_additional_point.setDisabled(False)
-            self.dlg.list_additional_points.setDisabled(False)
-            self.dlg.title.setDisabled(False)
-            self.dlg.rotation.setDisabled(False)
+            self.dlg_draw_profile.btn_add_additional_point.setDisabled(False)
+            self.dlg_draw_profile.list_additional_points.setDisabled(False)
+            self.dlg_draw_profile.title.setDisabled(False)
+            self.dlg_draw_profile.rotation.setDisabled(False)
             # After executing of path enable btn_draw and open_composer
-            self.dlg.btn_draw.setDisabled(False)
-            self.dlg.btn_save_profile.setDisabled(False)
-            self.dlg.btn_export_pdf.setDisabled(False)
-            self.dlg.cbx_template.setDisabled(False)
+            self.dlg_draw_profile.btn_draw.setDisabled(False)
+            self.dlg_draw_profile.btn_save_profile.setDisabled(False)
+            self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
+            self.dlg_draw_profile.cbx_template.setDisabled(False)
+
 
         if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
-            self.dlg.btn_delete_additional_point.setDisabled(False)
+            self.dlg_draw_profile.btn_delete_additional_point.setDisabled(False)
 
         # Manual path - if additional point exist
         if len(self.start_end_node) > 2:
-            self.dlg.btn_add_start_point.setDisabled(True)
-            self.dlg.btn_add_end_point.setDisabled(True)
+            self.dlg_draw_profile.btn_add_start_point.setDisabled(True)
+            self.dlg_draw_profile.btn_add_end_point.setDisabled(True)
             self.manual_path(self.start_end_node)
 
 
@@ -1566,7 +1571,7 @@ class DrawProfiles(ParentMapTool):
 
     def delete_additional_point(self):
 
-        self.dlg.btn_delete_additional_point.setDisabled(True)
+        self.dlg_draw_profile.btn_delete_additional_point.setDisabled(True)
         self.widget_additional_point.clear()
         self.start_end_node.pop(1)
         # Reload path

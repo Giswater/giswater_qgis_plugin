@@ -18,21 +18,20 @@ def formOpen(dialog, layer, feature):
     """ Function called when a connec is identified in the map """
     
     global feature_dialog
-    utils_giswater.setDialog(dialog)
-    # Create class to manage Feature Form interaction  
+    # Create class to manage Feature Form interaction
     feature_dialog = ManConnecDialog(dialog, layer, feature)
-    init_config()
+    init_config(dialog)
 
     
-def init_config():
+def init_config(dialog):
 
     # Manage 'connec_type'
-    connec_type = utils_giswater.getWidgetText("connec_type") 
-    utils_giswater.setSelectedItem("connec_type", connec_type)
+    connec_type = utils_giswater.getWidgetText(dialog, "connec_type")
+    utils_giswater.setSelectedItem(dialog, "connec_type", connec_type)
      
     # Manage 'connecat_id'
-    connecat_id = utils_giswater.getWidgetText("connecat_id") 
-    utils_giswater.setSelectedItem("connecat_id", connecat_id)   
+    connecat_id = utils_giswater.getWidgetText(dialog, "connecat_id")
+    utils_giswater.setSelectedItem(dialog, "connecat_id", connecat_id)
 
      
 class ManConnecDialog(ParentDialog):
@@ -44,7 +43,7 @@ class ManConnecDialog(ParentDialog):
         self.feature = feature
         self.geom_type = "connec"         
         self.field_id = "connec_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManConnecDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ud_man_connec', dialog) 
@@ -83,10 +82,10 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         
         # Check if exist URL from field 'link' in main tab
-        self.check_link()        
+        self.check_link(self.dialog)
         
         # Manage tab signal
         self.tab_hydrometer_loaded = False        
@@ -98,12 +97,12 @@ class ManConnecDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'connec_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
-            self.load_default()
-            self.load_type_default("connecat_id", "connecat_vdefault")
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
+            self.load_default(self.dialog)
+            self.load_type_default(self.dialog, "connecat_id", "connecat_vdefault")
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
 
 
     def tab_activation(self):
@@ -154,7 +153,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_connec" 
-        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
+        self.fill_tbl_element_man(self.dialog, self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
 
 
@@ -162,7 +161,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_connec"  
-        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.fill_tbl_document_man(self.dialog, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
 
 
@@ -179,7 +178,7 @@ class ManConnecDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         connec_type = self.dialog.findChild(QComboBox, "connec_type")
-        cat_feature_id = utils_giswater.getWidgetText(connec_type)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, connec_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter="'connec_type'", duration=10)

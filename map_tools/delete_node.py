@@ -71,17 +71,16 @@ class DeleteNodeMapTool(ParentMapTool):
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
             self.dlg_fusion = ArcFusion()
-            utils_giswater.setDialog(self.dlg_fusion)
             self.load_settings(self.dlg_fusion)
 
             # Fill ComboBox workcat_id_end
             sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
             rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox("workcat_id_end", rows, False)
+            utils_giswater.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
 
             # Set QDateEdit to current date
             current_date = QDate.currentDate()
-            utils_giswater.setCalendarDate("enddate", current_date)
+            utils_giswater.setCalendarDate(self.dlg_fusion, "enddate", current_date)
 
             # Set signals
             self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)

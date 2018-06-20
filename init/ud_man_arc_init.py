@@ -19,17 +19,16 @@ def formOpen(dialog, layer, feature):
     """ Function called when a connec is identified in the map """
     
     global feature_dialog
-    utils_giswater.setDialog(dialog)
-    # Create class to manage Feature Form interaction  
+    # Create class to manage Feature Form interaction
     feature_dialog = ManArcDialog(dialog, layer, feature)
-    init_config()
+    init_config(dialog)
 
     
-def init_config():
+def init_config(dialog):
 
     # Manage 'arc_type'
-    arc_type = utils_giswater.getWidgetText("arc_type") 
-    utils_giswater.setSelectedItem("arc_type", arc_type)
+    arc_type = utils_giswater.getWidgetText(dialog, "arc_type")
+    utils_giswater.setSelectedItem(dialog, "arc_type", arc_type)
      
 
 class ManArcDialog(ParentDialog):   
@@ -39,7 +38,7 @@ class ManArcDialog(ParentDialog):
         
         self.geom_type = "arc"              
         self.field_id = "arc_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ud_man_arc', dialog)  
@@ -52,8 +51,8 @@ class ManArcDialog(ParentDialog):
         
         # Define class variables
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
-        self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
-        self.connecat_id = utils_giswater.getWidgetText("arccat_id", False) 
+        self.connec_type = utils_giswater.getWidgetText(self.dialog, "cat_arctype_id", False)
+        self.connecat_id = utils_giswater.getWidgetText(self.dialog, "arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
         
         # Get widget controls      
@@ -85,14 +84,14 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'arc'))
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         
         # Manage tab 'Relations'
         self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")
         
         # Check if exist URL from field 'link' in main tab
-        self.check_link()
+        self.check_link(self.dialog)
 
         # Check if feature has geometry object and we are creating a new arc
         geometry = self.feature.geometry()    
@@ -111,12 +110,12 @@ class ManArcDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'arc_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
-            self.load_default()
-            self.load_type_default("arccat_id", "arccat_vdefault")
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
+            self.load_default(self.dialog)
+            self.load_type_default(self.dialog, "arccat_id", "arccat_vdefault")
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
 
 
     def get_nodes(self):
@@ -139,8 +138,8 @@ class ManArcDialog(ParentDialog):
         node_2 = self.get_node_from_point(end_point, node_proximity)
 
         # Fill fields node_1 and node_2
-        utils_giswater.setText("node_1", node_1)
-        utils_giswater.setText("node_2", node_2)
+        utils_giswater.setText(self.dialog, "node_1", node_1)
+        utils_giswater.setText(self.dialog, "node_2", node_2)
         
 
     def open_node_form(self, idx):
@@ -148,7 +147,7 @@ class ManArcDialog(ParentDialog):
         
         field_node = "node_" + str(idx)
         widget = self.dialog.findChild(QLineEdit, field_node)        
-        node_id = utils_giswater.getWidgetText(widget)        
+        node_id = utils_giswater.getWidgetText(self.dialog, widget)
         if not widget:   
             self.controller.log_info("widget not found", parameter=field_node)            
             return
@@ -192,7 +191,7 @@ class ManArcDialog(ParentDialog):
     def set_image(self, widget):
 
         # Manage 'cat_shape'
-        arc_id = utils_giswater.getWidgetText("arc_id")
+        arc_id = utils_giswater.getWidgetText(self.dialog, "arc_id")
 
         # table_name = self.controller.get_layer_source_table_name(cur_layer)
         # column_name = cur_layer.name().lower() + "_cat_shape"
@@ -204,7 +203,7 @@ class ManArcDialog(ParentDialog):
 
         if row is not None:
             if row[0] != 'VIRTUAL':
-                utils_giswater.setImage(widget, row[0])
+                utils_giswater.setImage(self.dialog, widget, row[0])
             # If selected table is Virtual hide tab cost
             else:
                 self.tab_main.removeTab(4)            
@@ -251,7 +250,7 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_arc" 
-        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
+        self.fill_tbl_element_man(self.dialog, self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
                         
 
@@ -259,7 +258,7 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_arc"          
-        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.fill_tbl_document_man(self.dialog, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
                 
             
@@ -292,21 +291,21 @@ class ManArcDialog(ParentDialog):
             column_name = self.controller.dao.get_column_name(i)
             columns.append(column_name)  
         for column_name in columns:                                      
-            utils_giswater.setWidgetText(column_name, str(row[column_name]))
+            utils_giswater.setWidgetText(self.dialog, column_name, str(row[column_name]))
 
-        utils_giswater.setWidgetText("arc_cost_2", str(row["arc_cost"]))
-        utils_giswater.setWidgetText("m2pavement_cost", str(row["m2pav_cost"]))
-        utils_giswater.setWidgetText("m2mlpavement", str(row["m2mlpav"]))
-        utils_giswater.setWidgetText("other_budget", str(row["other_budget"]))
+        utils_giswater.setWidgetText(self.dialog, "arc_cost_2", str(row["arc_cost"]))
+        utils_giswater.setWidgetText(self.dialog, "m2pavement_cost", str(row["m2pav_cost"]))
+        utils_giswater.setWidgetText(self.dialog, "m2mlpavement", str(row["m2mlpav"]))
+        utils_giswater.setWidgetText(self.dialog, "other_budget", str(row["other_budget"]))
 
-        utils_giswater.setWidgetText("m3mlexc_2", str(row["m3mlexc"]))
-        utils_giswater.setWidgetText("m3mlfill_2", str(row["m3mlfill"]))
-        utils_giswater.setWidgetText("m3mlexcess_2", str(row["m3mlexcess"]))
-        utils_giswater.setWidgetText("m2mltrenchl_2", str(row["m2mltrenchl"]))
-        utils_giswater.setWidgetText("m2mlbottom_2", str(row["m2mlbottom"]))
-        utils_giswater.setWidgetText("b_2", str(row["b"]))
-        utils_giswater.setWidgetText("z22", str(row["z2"]))
-        utils_giswater.setWidgetText("z11", str(row["z1"]))
+        utils_giswater.setWidgetText(self.dialog, "m3mlexc_2", str(row["m3mlexc"]))
+        utils_giswater.setWidgetText(self.dialog, "m3mlfill_2", str(row["m3mlfill"]))
+        utils_giswater.setWidgetText(self.dialog, "m3mlexcess_2", str(row["m3mlexcess"]))
+        utils_giswater.setWidgetText(self.dialog, "m2mltrenchl_2", str(row["m2mltrenchl"]))
+        utils_giswater.setWidgetText(self.dialog, "m2mlbottom_2", str(row["m2mlbottom"]))
+        utils_giswater.setWidgetText(self.dialog, "b_2", str(row["b"]))
+        utils_giswater.setWidgetText(self.dialog, "z22", str(row["z2"]))
+        utils_giswater.setWidgetText(self.dialog, "z11", str(row["z1"]))
 
         # Get additional values
         sql_common = ("SELECT descript FROM " + self.schema_name + ".v_price_x_arc"
@@ -331,9 +330,9 @@ class ManArcDialog(ParentDialog):
         if row:
             m3protec = row[0]
         
-        utils_giswater.setWidgetText("arc_element", element)
-        utils_giswater.setWidgetText("arc_bottom", m2bottom)
-        utils_giswater.setWidgetText("arc_protection", m3protec)
+        utils_giswater.setWidgetText(self.dialog, "arc_element", element)
+        utils_giswater.setWidgetText(self.dialog, "arc_bottom", m2bottom)
+        utils_giswater.setWidgetText(self.dialog, "arc_protection", m3protec)
         
         m3exc = None
         m3fill = None
@@ -360,10 +359,10 @@ class ManArcDialog(ParentDialog):
         if row:
             m2trenchl = row[0]
         
-        utils_giswater.setWidgetText("soil_excavation", m3exc)
-        utils_giswater.setWidgetText("soil_filling", m3fill)
-        utils_giswater.setWidgetText("soil_excess", m3excess)
-        utils_giswater.setWidgetText("soil_trenchlining", m2trenchl)
+        utils_giswater.setWidgetText(self.dialog, "soil_excavation", m3exc)
+        utils_giswater.setWidgetText(self.dialog, "soil_filling", m3fill)
+        utils_giswater.setWidgetText(self.dialog, "soil_excess", m3excess)
+        utils_giswater.setWidgetText(self.dialog, "soil_trenchlining", m2trenchl)
         
       
     def fill_tab_relations(self):
@@ -378,7 +377,7 @@ class ManArcDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         arc_type = self.dialog.findChild(QComboBox, 'arc_type')
-        cat_feature_id = utils_giswater.getWidgetText(arc_type)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, arc_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter="'arc_type'", duration=10)

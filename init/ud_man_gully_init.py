@@ -18,21 +18,20 @@ def formOpen(dialog, layer, feature):
     """ Function called when a gully is identified in the map """
     
     global feature_dialog
-    utils_giswater.setDialog(dialog)
-    # Create class to manage Feature Form interaction  
+    # Create class to manage Feature Form interaction
     feature_dialog = ManGullyDialog(dialog, layer, feature)
-    init_config()
+    init_config(dialog)
 
     
-def init_config():
+def init_config(dialog):
      
     # Manage 'gratecat_id'
-    gratecat_id = utils_giswater.getWidgetText("gratecat_id") 
-    utils_giswater.setSelectedItem("gratecat_id", gratecat_id) 
+    gratecat_id = utils_giswater.getWidgetText(dialog, "gratecat_id")
+    utils_giswater.setSelectedItem(dialog, "gratecat_id", gratecat_id)
 
     # Manage 'arccat_id'
-    arccat_id = utils_giswater.getWidgetText("arccat_id") 
-    utils_giswater.setSelectedItem("arccat_id", arccat_id)    
+    arccat_id = utils_giswater.getWidgetText(dialog, "arccat_id")
+    utils_giswater.setSelectedItem(dialog, "arccat_id", arccat_id)
     
      
 class ManGullyDialog(ParentDialog):
@@ -42,7 +41,7 @@ class ManGullyDialog(ParentDialog):
 
         self.geom_type = "gully"      
         self.field_id = "gully_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)          
+        self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('ud_man_gully', dialog) 
@@ -55,7 +54,7 @@ class ManGullyDialog(ParentDialog):
               
         # Define class variables
         self.filter = self.field_id + " = '" + str(self.id) + "'"
-        self.gratecat_id = utils_giswater.getWidgetText("gratecat_id", False) 
+        self.gratecat_id = utils_giswater.getWidgetText(self.dialog, "gratecat_id", False)
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -75,11 +74,10 @@ class ManGullyDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
-        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, True))
-
-
+        self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
+        
         # Check if exist URL from field 'link' in main tab
-        self.check_link()        
+        self.check_link(self.dialog)
                 
         # Manage tab signal     
         self.tab_element_loaded = False        
@@ -90,11 +88,11 @@ class ManGullyDialog(ParentDialog):
 
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'gully_id')
-        if utils_giswater.getWidgetText(widget_id).lower() == 'null':
-            self.load_default()
+        if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
+            self.load_default(self.dialog)
 
-        self.load_state_type(state_type, self.geom_type)
-        self.load_dma(dma_id, self.geom_type)
+        self.load_state_type(self.dialog, state_type, self.geom_type)
+        self.load_dma(self.dialog, dma_id, self.geom_type)
 
 
     def tab_activation(self):
@@ -127,7 +125,7 @@ class ManGullyDialog(ParentDialog):
         """ Fill tab 'Element' """
         
         table_element = "v_ui_element_x_gully" 
-        self.fill_tbl_element_man(self.tbl_element, table_element, self.filter)
+        self.fill_tbl_element_man(self.dialog, self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
 
 
@@ -135,7 +133,7 @@ class ManGullyDialog(ParentDialog):
         """ Fill tab 'Document' """
         
         table_document = "v_ui_doc_x_gully"  
-        self.fill_tbl_document_man(self.tbl_document, table_document, self.filter)
+        self.fill_tbl_document_man(self.dialog, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
         
             
@@ -152,7 +150,7 @@ class ManGullyDialog(ParentDialog):
         """ Fill tab 'Custom fields' """
 
         gully_type = self.dialog.findChild(QComboBox, "gully_type")
-        cat_feature_id = utils_giswater.getWidgetText(gully_type)
+        cat_feature_id = utils_giswater.getWidgetText(self.dialog, gully_type)
         if cat_feature_id.lower() == "null":
             msg = "In order to manage custom fields, that field has to be set"
             self.controller.show_info(msg, parameter='gully_type', duration=10)

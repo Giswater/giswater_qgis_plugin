@@ -31,7 +31,6 @@ class ManageGallery(ParentManage):
         
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
-        utils_giswater.setDialog(self.dlg_gallery)
         self.load_settings(self.dlg_gallery)
 
 
@@ -216,7 +215,6 @@ class ManageGallery(ParentManage):
         handeler_index = i
 
         self.dlg_gallery_zoom = GalleryZoom()
-        utils_giswater.setDialog(self.dlg_gallery_zoom)
         self.load_settings(self.dlg_gallery_zoom)
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
 

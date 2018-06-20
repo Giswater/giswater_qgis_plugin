@@ -45,34 +45,33 @@ class Master(ParentAction):
         """ Button 46: Psector management """
 
         # Create the dialog and signals
-        self.dlg = Psector_management()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
+        self.dlg_psector_mng = Psector_management()
+
+        self.load_settings(self.dlg_psector_mng)
         table_name = "plan_psector"
         column_id = "psector_id"
 
         # Tables
-        qtbl_psm = self.dlg.findChild(QTableView, "tbl_psm")
+        qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
         qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set signals
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
-        self.dlg.rejected.connect(self.close_dialog)
-        self.dlg.btn_delete.clicked.connect(partial(self.multi_rows_delete, qtbl_psm, table_name, column_id))
-        self.dlg.btn_update_psector.clicked.connect(partial(self.update_current_psector, qtbl_psm))
-        self.dlg.txt_name.textChanged.connect(partial(self.filter_by_text, qtbl_psm, self.dlg.txt_name, "plan_psector"))
-        self.dlg.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
+        self.dlg_psector_mng.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_psector_mng, qtbl_psm, table_name, column_id))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(partial(self.update_current_psector, self.dlg_psector_mng, qtbl_psm))
+        self.dlg_psector_mng.txt_name.textChanged.connect(partial(self.filter_by_text, self.dlg_psector_mng, qtbl_psm, self.dlg_psector_mng.txt_name, "plan_psector"))
+        self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, qtbl_psm))
         self.fill_table_psector(qtbl_psm, table_name)
-        self.set_table_columns(qtbl_psm, table_name)
-        self.set_label_current_psector()
+        self.set_table_columns(self.dlg_psector_mng, qtbl_psm, table_name)
+        self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.open_dialog(self.dlg, dlg_name="psector_management")
+        self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.open_dialog(self.dlg_psector_mng, dlg_name="psector_management")
 
 
-
-    def update_current_psector(self, qtbl_psm):
+    def update_current_psector(self, dialog, qtbl_psm):
       
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -83,18 +82,18 @@ class Master(ParentAction):
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
-        self.upsert_config_param_user(aux_widget, "psector_vdefault")
+        self.upsert_config_param_user(dialog, aux_widget, "psector_vdefault")
 
         message = "Values has been updated"
         self.controller.show_info(message)
 
         self.fill_table(qtbl_psm, "plan_psector")
-        self.set_table_columns(qtbl_psm, "plan_psector")
-        self.set_label_current_psector()
-        self.open_dialog(self.dlg)
+        self.set_table_columns(dialog, qtbl_psm, "plan_psector")
+        self.set_label_current_psector(dialog)
+        self.open_dialog(dialog)
 
 
-    def upsert_config_param_user(self, widget, parameter):
+    def upsert_config_param_user(self, dialog,  widget, parameter):
         """ Insert or update values in tables with current_user control """
 
         tablename = "config_param_user"
@@ -103,27 +102,27 @@ class Master(ParentAction):
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
-            if utils_giswater.getWidgetText(widget) != "":
+            if utils_giswater.getWidgetText(dialog, widget) != "":
                 for row in rows:
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value = "
                     if widget.objectName() != 'state_vdefault':
-                        sql += ("'" + utils_giswater.getWidgetText(widget) + "'"
+                        sql += ("'" + utils_giswater.getWidgetText(dialog, widget) + "'"
                                 " WHERE cur_user = current_user AND parameter = '" + parameter + "'")
                     else:
                         sql += ("(SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "')"
+                                " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "')"
                                 " WHERE cur_user = current_user AND parameter = 'state_vdefault'")
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() != 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
+                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(dialog, widget) + "', current_user)"
                     else:
                         sql += (" VALUES ('" + parameter + "',"
                                 " (SELECT id FROM " + self.schema_name + ".value_state"
-                                " WHERE name = '" + utils_giswater.getWidgetText(widget) + "'), current_user)")
+                                " WHERE name = '" + utils_giswater.getWidgetText(dialog, widget) + "'), current_user)")
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -139,9 +138,9 @@ class Master(ParentAction):
         self.controller.execute_sql(sql)
 
 
-    def filter_by_text(self, table, widget_txt, tablename):
+    def filter_by_text(self, dialog, table, widget_txt, tablename):
 
-        result_select = utils_giswater.getWidgetText(widget_txt)
+        result_select = utils_giswater.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
             expr = " name ILIKE '%" + result_select + "%'"
             # Refresh model with selected filter
@@ -160,11 +159,11 @@ class Master(ParentAction):
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
-        self.close_dialog()
+        self.close_dialog(self.dlg_psector_mng)
         self.master_new_psector(psector_id)
 
 
-    def multi_rows_delete(self, widget, table_name, column_id):
+    def multi_rows_delete(self, dialog, widget, table_name, column_id):
         """ Delete selected elements of the table
         :param QTableView widget: origin
         :param table_name: table origin
@@ -204,43 +203,44 @@ class Master(ParentAction):
                        " WHERE parameter = 'psector_vdefault' AND cur_user = current_user"
                        " AND value = '" + row[0] + "'")
                 self.controller.execute_sql(sql)
-                utils_giswater.setWidgetText('lbl_vdefault_psector', '')
+                utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', '')
 
 
     def master_psector_selector(self):
         """ Button 47: Psector selector """
 
         # Create the dialog and signals
-        self.dlg = Multirow_selector()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
-        self.dlg.btn_ok.clicked.connect(self.close_dialog)
-        self.dlg.setWindowTitle("Psector")
-        utils_giswater.setWidgetText(self.dlg.lbl_filter, self.controller.tr('Filter by: Psector name', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg.lbl_unselected, self.controller.tr('Unselected psectors', context_name='labels'))
-        utils_giswater.setWidgetText(self.dlg.lbl_selected, self.controller.tr('Selected psectors', context_name='labels'))
+        self.dlg_psector_selector = Multirow_selector()
+        self.load_settings(self.dlg_psector_selector)
+        self.dlg_psector_selector.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_psector_selector))
+        self.dlg_psector_selector.setWindowTitle("Psector")
+        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_filter, 
+            self.controller.tr('Filter by: Psector name', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_unselected, 
+            self.controller.tr('Unselected psectors', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_selected, 
+            self.controller.tr('Selected psectors', context_name='labels'))
 
         tableleft = "plan_psector"
         tableright = "selector_psector"
         field_id_left = "psector_id"
         field_id_right = "psector_id"
-        self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
-        self.open_dialog(self.dlg, dlg_name="multirow_selector", maximize_button=False)
+        self.multi_row_selector(self.dlg_psector_selector, tableleft, tableright, field_id_left, field_id_right)
+        self.open_dialog(self.dlg_psector_selector, dlg_name="multirow_selector", maximize_button=False)
 
         
     def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
         """ Button 38: New estimate result """
 
         # Create dialog 
-        self.dlg = EstimateResultNew()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
+        dlg_estimate_result_new = EstimateResultNew()
+        self.load_settings(dlg_estimate_result_new)
 
         # Set signals
-        self.dlg.btn_close.clicked.connect(self.close_dialog)
-        self.dlg.prices_coefficient.setValidator(QDoubleValidator())
+        dlg_estimate_result_new.btn_close.clicked.connect(partial(self.close_dialog, dlg_estimate_result_new))
+        dlg_estimate_result_new.prices_coefficient.setValidator(QDoubleValidator())
 
-        self.populate_cmb_result_type(self.dlg.cmb_result_type, 'plan_result_type', False)
+        self.populate_cmb_result_type(dlg_estimate_result_new.cmb_result_type, 'plan_result_type', False)
 
         if result_id != 0 and result_id:         
             sql = ("SELECT * FROM " + self.schema_name + "." + tablename + " "
@@ -251,26 +251,23 @@ class Master(ParentAction):
                 self.controller.show_warning(message, parameter='plan_result_cat')
                 return
 
-            utils_giswater.setWidgetText(self.dlg.result_name, row['result_id'])
-            self.dlg.cmb_result_type.setCurrentIndex(index)
-            utils_giswater.setWidgetText(self.dlg.prices_coefficient, row['network_price_coeff'])
-            utils_giswater.setWidgetText(self.dlg.observ, row['descript'])
-
-            self.dlg.result_name.setEnabled(False)
-            self.dlg.cmb_result_type.setEnabled(False)
-            self.dlg.prices_coefficient.setEnabled(False)
-            self.dlg.observ.setEnabled(False)
-            self.dlg.btn_calculate.setText("Close")
-            self.dlg.btn_calculate.clicked.connect(
-            partial(self.close_dialog))
+            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.result_name, row['result_id'])
+            dlg_estimate_result_new.cmb_result_type.setCurrentIndex(index)
+            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.prices_coefficient, row['network_price_coeff'])
+            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.observ, row['descript'])
+            dlg_estimate_result_new.result_name.setEnabled(False)
+            dlg_estimate_result_new.cmb_result_type.setEnabled(False)
+            dlg_estimate_result_new.prices_coefficient.setEnabled(False)
+            dlg_estimate_result_new.observ.setEnabled(False)
+            dlg_estimate_result_new.btn_calculate.setText("Close")
+            dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.close_dialog))
         else:
-            self.dlg.btn_calculate.clicked.connect(
-            partial(self.master_estimate_result_new_calculate))
+            dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.master_estimate_result_new_calculate, dlg_estimate_result_new))            
 
         # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'estimate_result_new')
+        self.controller.translate_form(dlg_estimate_result_new, 'estimate_result_new')
 
-        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_new", maximize_button=False)
+        self.open_dialog(dlg_estimate_result_new, dlg_name="plan_estimate_result_new", maximize_button=False)
 
 
     def populate_cmb_result_type(self, combo, table_name, allow_nulls=True):
@@ -292,16 +289,16 @@ class Master(ParentAction):
         combo.blockSignals(False)
 
 
-    def master_estimate_result_new_calculate(self):
+    def master_estimate_result_new_calculate(self, dialog):
         """ Execute function 'gw_fct_plan_estimate_result' """
 
         # Get values from form
-        result_name = utils_giswater.getWidgetText("result_name")
-        combo = utils_giswater.getWidget("cmb_result_type")
+        result_name = utils_giswater.getWidgetText(dialog, "result_name")
+        combo = utils_giswater.getWidget(dialog, "cmb_result_type")
         elem = combo.itemData(combo.currentIndex())
         result_type = str(elem[0])
-        coefficient = utils_giswater.getWidgetText("prices_coefficient")
-        observ = utils_giswater.getWidgetText("observ")
+        coefficient = utils_giswater.getWidgetText(dialog, "prices_coefficient")
+        observ = utils_giswater.getWidgetText(dialog, "observ")
 
         if result_name == 'null':
             message = "Please, introduce a result name"
@@ -343,19 +340,18 @@ class Master(ParentAction):
 
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()
-        self.close_dialog()
+        self.close_dialog(dialog)
 
 
     def master_estimate_result_selector(self):
         """ Button 49: Estimate result selector """
 
         # Create dialog 
-        self.dlg = EstimateResultSelector()
-        utils_giswater.setDialog(self.dlg)
-        self.load_settings(self.dlg)
+        self.dlg_estimate_result_selector = EstimateResultSelector()
+        self.load_settings(self.dlg_estimate_result_selector)
         
         # Populate combo
-        self.populate_combo(self.dlg.rpt_selector_result_id, 'plan_result_selector')
+        self.populate_combo(self.dlg_estimate_result_selector.rpt_selector_result_id, 'plan_result_selector')
 
         # Set current value
         table_name = "om_result_cat"
@@ -364,15 +360,15 @@ class Master(ParentAction):
                + self.schema_name + ".plan_result_selector)")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(self.dlg.rpt_selector_result_id, str(row[0]))
+            utils_giswater.setWidgetText(self.dlg_estimate_result_selector, self.dlg_estimate_result_selector.rpt_selector_result_id, str(row[0]))
             
         # Set signals
-        self.dlg.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
-        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
-        
+        self.dlg_estimate_result_selector.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
+        self.dlg_estimate_result_selector.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_estimate_result_selector))
+
         # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'estimate_result_selector')
-        self.open_dialog(self.dlg, dlg_name="plan_estimate_result_selector",maximize_button=False)
+        self.controller.translate_form(self.dlg_estimate_result_selector, 'estimate_result_selector')
+        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector",maximize_button=False)
 
 
     def populate_combo(self, combo, table_result):
@@ -404,7 +400,7 @@ class Master(ParentAction):
                " WHERE cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setSelectedItem(combo, str(row[0]))
+            utils_giswater.setSelectedItem(self.dlg_estimate_result_selector, combo, str(row[0]))
 
 
     def upsert(self, combo, tablename):
@@ -415,7 +411,7 @@ class Master(ParentAction):
             self.controller.show_warning(message, parameter=tablename)
             return
                 
-        result_id = utils_giswater.get_item_data(combo, 1)             
+        result_id = utils_giswater.get_item_data(self.dlg_estimate_result_selector, combo, 1)
         sql = ("DELETE FROM " + self.schema_name + "." + tablename + " WHERE current_user = cur_user;"
                "\nINSERT INTO " + self.schema_name + "." + tablename + " (result_id, cur_user)"
                " VALUES(" + str(result_id) + ", current_user);")
@@ -426,13 +422,13 @@ class Master(ParentAction):
 
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
-        self.close_dialog(self.dlg)
+        self.close_dialog(self.dlg_estimate_result_selector)
         
 
     def master_estimate_result_selector_accept(self):
         """ Update value of table 'plan_result_selector' """
         
-        self.upsert(self.dlg.rpt_selector_result_id, 'plan_result_selector')
+        self.upsert(self.dlg_estimate_result_selector.rpt_selector_result_id, 'plan_result_selector')
 
 
     def master_estimate_result_manager(self):
@@ -440,9 +436,8 @@ class Master(ParentAction):
 
         # Create the dialog and signals
         self.dlg_merm = EstimateResultManager()
-        utils_giswater.setDialog(self.dlg_merm)
         self.load_settings(self.dlg_merm)
-        
+
         #TODO activar este boton cuando sea necesario
         self.dlg_merm.btn_delete.setVisible(False)
 
@@ -469,7 +464,7 @@ class Master(ParentAction):
 
     def charge_plan_estimate_result(self, dialog):
         """ Send selected plan to 'plan_estimate_result_new.ui' """
-        
+
         selected_list = dialog.tbl_om_result_cat.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -485,11 +480,11 @@ class Master(ParentAction):
     def delete_merm(self, dialog):
         """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
         
-        self.multi_rows_delete(dialog.tbl_om_result_cat, 'plan_result_cat', 'result_id')
+        self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat', 'result_id')
 
 
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
         
-        self.filter_by_text(dialog.tbl_om_result_cat, dialog.txt_name, tablename)
+        self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
             

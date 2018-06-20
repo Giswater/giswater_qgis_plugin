@@ -30,7 +30,6 @@ class Info(ParentAction):
         
         # Create form
         self.dlg_info = InfoShowInfo()
-        utils_giswater.setDialog(self.dlg_info)
         self.load_settings(self.dlg_info)
         
         # Get Plugin, Giswater, PostgreSQL and Postgis version
@@ -45,11 +44,11 @@ class Info(ParentAction):
                    "Giswater version:   " + str(giswater_build_version) + "\n" 
                    "PostgreSQL version: " + str(postgresql_version) + "\n" 
                    "Postgis version:    " + str(postgis_version))
-        utils_giswater.setWidgetText(self.dlg_info.txt_info, message)
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, message)
         
         # Set signals
         self.dlg_info.btn_open_giswater.clicked.connect(self.open_giswater)
-        self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, None))
+        self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, self.dlg_info, None))
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
         
         # Open dialog
