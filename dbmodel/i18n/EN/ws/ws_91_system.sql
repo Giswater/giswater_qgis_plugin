@@ -111,10 +111,10 @@ INSERT INTO arc_type VALUES ('VARC', 'VARC', 'PIPE', 'man_varc', 'inp_pipe', TRU
 -- Records of connec_type system table
 -- ----------------------------
 
-INSERT INTO connec_type VALUES ('WJOIN', 'WJOIN', 'man_wjoin', TRUE, TRUE, 'Ornamental fountain');
-INSERT INTO connec_type VALUES ('FOUNTAIN', 'FOUNTAIN', 'man_fountain', TRUE, TRUE, 'Greentap' );
+INSERT INTO connec_type VALUES ('WJOIN', 'WJOIN', 'man_wjoin', TRUE, TRUE, 'Wjoin');
+INSERT INTO connec_type VALUES ('FOUNTAIN', 'FOUNTAIN', 'man_fountain', TRUE, TRUE, 'Ornamental fountain' );
 INSERT INTO connec_type VALUES ('TAP', 'TAP', 'man_tap', TRUE, TRUE, 'Water source');
-INSERT INTO connec_type VALUES ('GREENTAP', 'GREENTAP', 'man_greentap', TRUE, TRUE, 'Wjoin');
+INSERT INTO connec_type VALUES ('GREENTAP', 'GREENTAP', 'man_greentap', TRUE, TRUE, 'Greentap');
 
 
 
