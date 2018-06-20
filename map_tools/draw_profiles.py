@@ -382,6 +382,7 @@ class DrawProfiles(ParentMapTool):
 
     def snapping_node(self, point):   # @UnusedVariable
 
+        self.aux = ""
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
