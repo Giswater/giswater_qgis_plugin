@@ -1,118 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mincut_add_connec</class>
- <widget class="QDialog" name="mincut_add_connec">
+ <class>visit_management</class>
+ <widget class="QDialog" name="visit_management">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>244</width>
-    <height>344</height>
+    <width>744</width>
+    <height>783</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Mincut - add connec</string>
+   <string>Visit management</string>
   </property>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>40</y>
-     <width>211</width>
-     <height>251</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Connec</string>
-   </property>
-   <widget class="QTableView" name="tbl_mincut_connec">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>191</width>
-      <height>221</height>
-     </rect>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>305</y>
-     <width>70</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Accept</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="connec_id">
-   <property name="geometry">
-    <rect>
-     <x>25</x>
-     <y>15</y>
-     <width>116</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_insert">
-   <property name="geometry">
-    <rect>
-     <x>145</x>
-     <y>10</y>
-     <width>25</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_delete">
-   <property name="geometry">
-    <rect>
-     <x>175</x>
-     <y>10</y>
-     <width>25</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_snapping">
-   <property name="geometry">
-    <rect>
-     <x>205</x>
-     <y>10</y>
-     <width>25</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/129.png</normaloff>../icons/129.png</iconset>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLineEdit" name="connec_id">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_insert">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_delete">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_snapping">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTableView" name="tbl_mincut_connec">
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_accept">
+       <property name="text">
+        <string>Accept</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
