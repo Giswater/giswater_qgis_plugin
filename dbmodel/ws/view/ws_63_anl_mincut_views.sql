@@ -5,17 +5,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
-
-
-
-
 -- ----------------------------
 -- MINCUT CATALOG
 -- ----------------------------
 
-
 -- graf auxiliar view
+
+DROP VIEW IF EXISTS "v_anl_mincut_flowtrace" CASCADE; 
 CREATE OR REPLACE VIEW v_anl_mincut_flowtrace AS 
 WITH nodes_a AS (
     SELECT node_id_a
@@ -26,8 +22,6 @@ SELECT anl_mincut_arc_x_node.node_id,
 	FROM anl_mincut_arc_x_node
 	LEFT JOIN nodes_a ON anl_mincut_arc_x_node.node_id = nodes_a.node_id_a
 	WHERE anl_mincut_arc_x_node.flag1 = 0 AND nodes_a.node_id_a IS NOT NULL OR anl_mincut_arc_x_node.flag1 = 1 AND user_name=current_user;
-
-
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_cat" CASCADE; 
@@ -69,8 +63,6 @@ LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state
 	WHERE anl_mincut_result_selector.result_id = anl_mincut_result_cat.id AND anl_mincut_result_selector.cur_user = "current_user"()::text;
 
 
-
-
 DROP VIEW IF EXISTS "v_anl_mincut_selected_valve" CASCADE; 
 CREATE OR REPLACE VIEW v_anl_mincut_selected_valve AS 
  SELECT 
@@ -82,8 +74,6 @@ CREATE OR REPLACE VIEW v_anl_mincut_selected_valve AS
  FROM v_edit_man_valve
      JOIN man_valve ON v_edit_man_valve.node_id::text = man_valve.node_id::text
      JOIN anl_mincut_selector_valve ON nodetype_id::text = anl_mincut_selector_valve.id::text;
-
-
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_arc" CASCADE; 
@@ -101,8 +91,6 @@ JOIN anl_mincut_result_cat ON anl_mincut_result_arc.result_id=anl_mincut_result_
 	ORDER BY anl_mincut_result_arc.arc_id;
 
 
-
-
 DROP VIEW IF EXISTS "v_anl_mincut_result_node" CASCADE; 
 CREATE VIEW "v_anl_mincut_result_node" AS
 SELECT 
@@ -116,7 +104,6 @@ JOIN anl_mincut_result_node ON ((anl_mincut_result_node.node_id) = (node.node_id
 JOIN anl_mincut_result_cat ON anl_mincut_result_node.result_id=anl_mincut_result_cat.id
 WHERE ((anl_mincut_result_selector.result_id::text) = (anl_mincut_result_node.result_id::text)) 
 AND anl_mincut_result_selector.cur_user="current_user"();
-
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_valve" CASCADE;
@@ -137,7 +124,6 @@ WHERE anl_mincut_result_selector.result_id::text = anl_mincut_result_valve.resul
 AND anl_mincut_result_selector.cur_user="current_user"();
 
 
-
 DROP VIEW IF EXISTS "v_anl_mincut_result_connec";
 CREATE OR REPLACE VIEW "v_anl_mincut_result_connec" AS 
 SELECT
@@ -154,7 +140,6 @@ WHERE ((anl_mincut_result_selector.result_id::text) = (anl_mincut_result_connec.
 AND anl_mincut_result_selector.cur_user="current_user"();
 
 
-
 DROP VIEW IF EXISTS "v_anl_mincut_result_polygon";
 CREATE OR REPLACE VIEW "v_anl_mincut_result_polygon" AS 
 SELECT
@@ -167,7 +152,6 @@ FROM anl_mincut_result_selector, anl_mincut_result_polygon
 JOIN anl_mincut_result_cat ON anl_mincut_result_polygon.result_id=anl_mincut_result_cat.id
 WHERE ((anl_mincut_result_selector.result_id::text) = (anl_mincut_result_polygon.result_id::text))
 AND anl_mincut_result_selector.cur_user="current_user"();
-
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_hydrometer";
@@ -267,7 +251,6 @@ FROM anl_mincut_result_connec
 JOIN anl_mincut_result_cat ON anl_mincut_result_connec.result_id = anl_mincut_result_cat.id
 JOIN anl_mincut_cat_type ON mincut_type=anl_mincut_cat_type.id;
 
-
 -- ----------------------------
 -- MINCUT MANAGER VIEW
 -- ----------------------------
@@ -323,31 +306,29 @@ CREATE OR REPLACE VIEW "v_anl_mincut_result_audit" AS
      JOIN arc ON arc.arc_id::text = audit_log_data.feature_id::text
   WHERE audit_log_data.fprocesscat_id = 29 AND audit_log_data.user_name = "current_user"()::text
   ORDER BY audit_log_data.log_message;
-  
-  
-  
+    
 -- ----------------------------
 -- MINCUT CONFLICT
 -- ----------------------------
-   
+
+DROP VIEW IF EXISTS "v_anl_mincut_result_conflict_arc" CASCADE;    
 CREATE VIEW v_anl_mincut_result_conflict_arc AS
 SELECT * FROM anl_arc WHERE fprocesscat_id=31 AND cur_user=current_user;
 
+DROP VIEW IF EXISTS "v_anl_mincut_result_conflict_valve" CASCADE; 
 CREATE VIEW v_anl_mincut_result_conflict_valve AS
 SELECT * FROM anl_node WHERE fprocesscat_id=31 AND cur_user=current_user;
-
-
 
 -- ----------------------------
 -- MINCUT FORECAST
 -- ----------------------------
 
+DROP VIEW IF EXISTS "v_anl_mincut_planified_arc" CASCADE; 
 CREATE VIEW v_anl_mincut_planified_arc AS
 SELECT anl_mincut_result_arc.id, result_id, arc_id, forecast_start, forecast_end, the_geom FROM anl_mincut_result_arc
 JOIN anl_mincut_result_cat ON anl_mincut_result_cat.id=result_id WHERE mincut_state<2;
 
+DROP VIEW IF EXISTS "v_anl_mincut_planified_valve" CASCADE; 
 CREATE VIEW v_anl_mincut_planified_valve AS
 SELECT anl_mincut_result_valve.id, result_id, node_id, closed, unaccess, proposed, forecast_start, forecast_end, the_geom FROM anl_mincut_result_valve
 JOIN anl_mincut_result_cat ON anl_mincut_result_cat.id=result_id WHERE mincut_state<2 and proposed=true
-
-
