@@ -9,7 +9,7 @@ or (at your option) any later version.
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
-from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor
+from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 from PyQt4.QtXml import QDomDocument
 
@@ -45,7 +45,8 @@ class MincutParent(ParentAction, MultipleSelection):
         self.node_group = []
         self.layers_connec = None
         self.arc_group = []
-        self.hydro_list = []        
+        self.hydro_list = []
+        self.aux_list = []
 
         # Serialize data of table 'anl_mincut_cat_state'
         self.set_states()
@@ -75,6 +76,8 @@ class MincutParent(ParentAction, MultipleSelection):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
+        self.hydro_list = []
+        self.aux_list = []
         # Refresh canvas, remove all old selections
         self.remove_selection()      
 
@@ -489,6 +492,8 @@ class MincutParent(ParentAction, MultipleSelection):
                             self.dlg_mincut.close()
                 else:
                     self.dlg_mincut.close()
+            else:
+                self.dlg_mincut.close()
         else:
             self.dlg_mincut.close()
 
@@ -564,7 +569,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set dialog add_connec
         self.dlg_connec = Mincut_add_connec()
         self.load_settings(self.dlg_connec)
-
+        self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
         self.set_icon(self.dlg_connec.btn_insert, "111")
         self.set_icon(self.dlg_connec.btn_delete, "112")
@@ -594,7 +599,7 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Set autocompleter for 'customer_code' """
         
         # Get list of 'customer_code'
-        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec"
+        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".v_edit_connec"
         rows = self.controller.get_rows(sql)
         values = []
         if rows:
@@ -628,7 +633,7 @@ class MincutParent(ParentAction, MultipleSelection):
         multiple_snapping = MultipleSelection(self.iface, self.controller, self.layers_connec, self)
         self.canvas.setMapTool(multiple_snapping)
         self.canvas.selectionChanged.connect(
-            partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer_x_connec", "connec_id"))
+            partial(self.snapping_selection_hydro, self.layers_connec, "rtc_hydrometer", "connec_id"))
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)        
 
@@ -644,7 +649,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 features = layer.selectedFeatures()
                 # Get id from all selected features
                 for feature in features:
-                    connec_id = feature.attribute("connec_id")                   
+                    connec_id = feature.attribute("connec_id")
                     # Add element
                     if connec_id in self.connec_list:
                         message = "Feature already in the list"
@@ -678,7 +683,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 features = layer.selectedFeatures()
                 # Get id from all selected features
                 for feature in features:
-                    connec_id = feature.attribute("connec_id")                   
+                    connec_id = feature.attribute("connec_id")
                     # Add element
                     if connec_id not in self.connec_list:
                         self.connec_list.append(connec_id)
@@ -701,9 +706,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def add_hydrometer(self):
         """ B4-122: Hydrometer selector """
-
         self.connec_list = []
-
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in table 'anl_mincut_result_cat'
@@ -723,19 +726,19 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set dialog Mincut_add_hydrometer
         self.dlg_hydro = Mincut_add_hydrometer()
         self.load_settings(self.dlg_hydro)
-        self.dlg_hydro.btn_snapping.setEnabled(False)
+        self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # self.dlg_hydro.btn_snapping.setEnabled(False)
         
         # Set icons
         self.set_icon(self.dlg_hydro.btn_insert, "111")
         self.set_icon(self.dlg_hydro.btn_delete, "112")
-        self.set_icon(self.dlg_hydro.btn_snapping, "129")
+        #self.set_icon(self.dlg_hydro.btn_snapping, "129")
 
         # Set dignals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self.insert_hydro))
         self.dlg_hydro.btn_delete.clicked.connect(partial(self.delete_records_hydro))
-        self.dlg_hydro.btn_snapping.clicked.connect(self.snapping_init_hydro)
+        # self.dlg_hydro.btn_snapping.clicked.connect(self.snapping_init_hydro)
         self.dlg_hydro.btn_accept.clicked.connect(partial(self.accept_hydro, self.dlg_hydro, "hydrometer"))
-        self.dlg_hydro.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_hydro))     
 
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_hydro.customer_code_connec, True)
@@ -753,7 +756,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Adding auto-completion to a QLineEdit - hydrometer_id
         self.completer_hydro = QCompleter()
-        self.dlg_hydro.hydrometer_id.setCompleter(self.completer_hydro)
+        self.dlg_hydro.hydrometer_cc.setCompleter(self.completer_hydro)
         model = QStringListModel()
 
         # Get 'connec_id' from 'customer_code'
@@ -763,8 +766,8 @@ class MincutParent(ParentAction, MultipleSelection):
             return        
         
         # Get 'hydrometers' related with this 'connec'
-        sql = ("SELECT DISTINCT(hydrometer_id)"
-               " FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
+        sql = ("SELECT DISTINCT(hydrometer_customer_code)"
+               " FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE connec_id = '" + str(connec_id) + "'")
         rows = self.controller.get_rows(sql)
         values = []
@@ -779,31 +782,38 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table 
         """
-              
+
         # Check if user entered hydrometer_id
-        hydrometer_id = utils_giswater.getWidgetText(self.dlg_hydro, self.dlg_hydro.hydrometer_id)
-        if hydrometer_id == "null":
+        hydrometer_cc = utils_giswater.getWidgetText(self.dlg_hydro, self.dlg_hydro.hydrometer_cc)
+        if hydrometer_cc == "null":
             message = "You need to enter hydrometer_id"
             self.controller.show_info_box(message)
             return
                         
         # Show message if element is already in the list
-        if hydrometer_id in self.hydro_list:
+        if hydrometer_cc in self.hydro_list:
             message = "Selected element already in the list"
-            self.controller.show_info_box(message, parameter=hydrometer_id)
+            self.controller.show_info_box(message, parameter=hydrometer_cc)
             return
         
         # Check if hydrometer_id belongs to any 'connec_id'
-        sql = ("SELECT connec_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
-               " WHERE hydrometer_id = '" + str(hydrometer_id) + "'")
-        row = self.controller.get_row(sql)
+        sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".v_rtc_hydrometer"
+               " WHERE hydrometer_customer_code = '" + str(hydrometer_cc) + "'")
+        row = self.controller.get_row(sql, log_sql=True)
         if not row:
             message = "Selected hydrometer_id not found"
-            self.controller.show_info_box(message, parameter=hydrometer_id)
-            return    
-                                
+            self.controller.show_info_box(message, parameter=hydrometer_cc)
+            return
+
+        if row[0] in self.hydro_list:
+            message = "Selected element already in the list"
+            self.controller.show_info_box(message, parameter=hydrometer_cc)
+            return
+
         # Set expression filter with 'hydro_list'
-        self.hydro_list.append(hydrometer_id)
+        self.hydro_list.append(row[0])
+        self.aux_list.append(row[0])
+
         expr_filter = "\"hydrometer_id\" IN ("
         for i in range(len(self.hydro_list)):
             expr_filter += "'" + str(self.hydro_list[i]) + "', "
@@ -886,7 +896,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
             # Select features of the layers filtering by @expr
             self.select_features_group_layers(expr)
-        
+
+
         self.hydro_list = []
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
@@ -894,16 +905,18 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".anl_mincut_result_hydrometer"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
+        expr_filter = "\"hydrometer_id\" IN ("
+        for hydro_id in self.aux_list:
+            expr_filter += "'" + str(hydro_id) + "', "
+            self.hydro_list.append(str(hydro_id))
         if rows:
-            expr_filter = "\"hydrometer_id\" IN ("            
-            for row in rows:                   
+            for row in rows:
                 expr_filter += "'" + str(row[0]) + "', "
                 self.hydro_list.append(str(row[0]))
-            expr_filter = expr_filter[:-2] + ")"   
-            
-            # Reload contents of table 'hydro' with expr_filter            
-            self.reload_table_hydro(expr_filter) 
-                
+        expr_filter = expr_filter[:-2] + ")"
+        # Reload contents of table 'hydro' with expr_filter
+        self.reload_table_hydro(expr_filter)
+
 
     def insert_connec(self):
         """ Select feature with entered id. Set a model with selected filter.
@@ -954,7 +967,7 @@ class MincutParent(ParentAction, MultipleSelection):
             for i in range(len(self.connec_list)):
                 expr_filter += "'" + str(self.connec_list[i]) + "', "
             expr_filter = expr_filter[:-2] + ")"
-    
+
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
@@ -976,7 +989,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def get_connec_id_from_customer_code(self, customer_code):
         """ Get 'connec_id' from @customer_code """
                    
-        sql = ("SELECT connec_id FROM " + self.schema_name + ".connec"
+        sql = ("SELECT connec_id FROM " + self.schema_name + ".v_edit_connec"
                " WHERE customer_code = '" + customer_code + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -1023,17 +1036,19 @@ class MincutParent(ParentAction, MultipleSelection):
             # Check expression          
             (is_valid, expr) = self.check_expression(expr_filter)    #@UnusedVariable
             if not is_valid:
-                return expr              
+                return expr
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
 
         # Set a model with selected filter expression
-        model = QSqlTableModel();
+        model = QSqlTableModel()
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.select()
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
             return expr
-        
         # Attach model to selected table 
         if expr_filter:
             widget.setModel(model)
@@ -1048,7 +1063,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def reload_table_connec(self, expr_filter=None):
         """ Reload contents of table 'connec' with selected @expr_filter """
                          
-        table_name = self.schema_name + ".connec"
+        table_name = self.schema_name + ".v_edit_connec"
         widget = self.dlg_connec.tbl_mincut_connec     
         expr = self.set_table_model(widget, table_name, expr_filter)
         return expr
@@ -1056,8 +1071,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def reload_table_hydro(self, expr_filter=None):
         """ Reload contents of table 'hydro' """
-        
-        table_name = self.schema_name + ".rtc_hydrometer_x_connec"
+        table_name = self.schema_name + ".v_rtc_hydrometer"
         widget = self.dlg_hydro.tbl_hydro  
         expr = self.set_table_model(widget, table_name, expr_filter)
         return expr        
@@ -1081,16 +1095,22 @@ class MincutParent(ParentAction, MultipleSelection):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
+            # id to delete
             id_feature = widget.model().record(row).value("connec_id")
-            inf_text += str(id_feature) + ", "
             list_id = list_id + "'" + str(id_feature) + "', "
             del_id.append(id_feature)
+            # id to ask
+            customer_code = widget.model().record(row).value("customer_code")
+            inf_text += str(customer_code) + ", "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
-        if answer:
+
+        if not answer:
+            return
+        else:
             for el in del_id:
                 self.connec_list.remove(el)
                 
@@ -1099,6 +1119,9 @@ class MincutParent(ParentAction, MultipleSelection):
         for i in range(len(self.connec_list)):
             expr_filter += "'" + str(self.connec_list[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
+
+        if len(self.connec_list) == 0:
+            expr_filter = "connec_id=''"
 
         # Update model of the widget with selected expr_filter     
         expr = self.reload_table_connec(expr_filter)               
@@ -1129,16 +1152,20 @@ class MincutParent(ParentAction, MultipleSelection):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_feature = widget.model().record(row).value("hydrometer_id")
+            id_feature = widget.model().record(row).value("hydrometer_customer_code")
+            hydro_id = widget.model().record(row).value("hydrometer_id")
             inf_text += str(id_feature) + ", "
             list_id = list_id + "'" + str(id_feature) + "', "
-            del_id.append(id_feature)
+            del_id.append(hydro_id)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
-        if answer:
+
+        if not answer:
+            return
+        else:
             for el in del_id:
                 self.hydro_list.remove(el)
 
@@ -1148,10 +1175,13 @@ class MincutParent(ParentAction, MultipleSelection):
             expr_filter += "'" + str(self.hydro_list[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
 
-        # Update model of the widget with selected expr_filter    
-        self.reload_table_hydro(expr_filter)    
+        if len(self.hydro_list) == 0:
+            expr_filter = "hydrometer_id=''"
+
+        # Update model of the widget with selected expr_filter
+        self.reload_table_hydro(expr_filter)
         
-        self.connect_signal_selection_changed("mincut_hydro")           
+        self.connect_signal_selection_changed("mincut_hydro")
         
 
     def accept_connec(self, dlg, element):
@@ -1170,7 +1200,7 @@ class MincutParent(ParentAction, MultipleSelection):
                     " (result_id, " + str(element) + "_id) "
                     " VALUES ('" + str(result_mincut_id) + "', '" + str(element_id) + "');\n")
             # Get hydrometer_id of selected connec
-            sql2 = ("SELECT hydrometer_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec"
+            sql2 = ("SELECT hydrometer_id FROM " + self.schema_name + ".v_rtc_hydrometer"
                     " WHERE connec_id = '" + str(element_id) + "'")
             rows = self.controller.get_rows(sql2)
             if rows:
@@ -1189,7 +1219,6 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog 
             Insert into table 'anl_mincut_result_hydrometer' values of current mincut 
         """
-        
         result_mincut_id = utils_giswater.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
@@ -1203,7 +1232,7 @@ class MincutParent(ParentAction, MultipleSelection):
         
         self.sql_hydro = sql
         self.dlg_mincut.btn_start.setDisabled(False)
-        dlg.close()
+        self.close_dialog(self.dlg_hydro)
 
 
     def auto_mincut(self):
