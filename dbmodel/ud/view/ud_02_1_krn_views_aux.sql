@@ -280,7 +280,7 @@ v_arc.custom_y1,
 v_arc.elev1,
 v_arc.custom_elev1,
 v_arc.sys_elev1,
-v_arc.sys_y1
+v_arc.sys_y1,
 v_arc.sys_y1 - geom1 AS r1,
 (CASE WHEN (a.sys_ymax IS NULL OR sys_y1 IS NULL) THEN 0 ELSE a.sys_ymax - v_arc.sys_y1 END) AS z1,
 node_2,
