@@ -89,6 +89,8 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_draw.clicked.connect(self.execute_profiles)
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
+        self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.save_rotation_vdefault)
+
 
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -1349,11 +1351,38 @@ class DrawProfiles(ParentMapTool):
     def export_pdf(self):
         """ Export PDF of selected template"""
 
+
         # Generate Composer
-        if utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation) is  'null':
-            utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, '0')
         self.execute_profiles_composer()
         self.generate_composer()
+
+    def save_rotation_vdefault(self):
+
+        # Save vdefault value from rotation
+        tablename = "config_param_user"
+        rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation)
+
+        if self.rotation_vd_exist:
+            self.controller.log_info(str("test1") + str(rotation))
+            if str(rotation) != 'null':
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '" + str(rotation) + "'"
+                       " WHERE parameter = 'rotation_vdefault'")
+            else:
+                sql = ("UPDATE " + self.schema_name + "." + tablename + ""
+                       " SET value = '0'"
+                       " WHERE parameter = 'rotation_vdefault'")
+        else:
+            if str(rotation) != 'null':
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                       " VALUES ('rotation_vdefault', '" + str(
+                    rotation) + "', current_user)")
+            else:
+                sql = ("INSERT INTO " + self.schema_name + "." + tablename + "(parameter, value, cur_user)"
+                       " VALUES ('rotation_vdefault', '0', current_user)")
+
+        if sql:
+            self.controller.execute_sql(sql)
 
 
     def manual_path(self, list_points):
@@ -1507,6 +1536,7 @@ class DrawProfiles(ParentMapTool):
 
     def exec_path(self):
 
+        self.rotation_vd_exist = False
         if str(self.start_end_node[0]) != None:
             self.dlg_draw_profile.btn_add_end_point.setDisabled(False)
         # Shortest path - if additional point doesn't exist
@@ -1516,6 +1546,18 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.list_additional_points.setDisabled(False)
             self.dlg_draw_profile.title.setDisabled(False)
             self.dlg_draw_profile.rotation.setDisabled(False)
+
+            # Get rotation vdefaut if exist
+            sql = "SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'rotation_vdefault' AND cur_user = current_user"
+            rows = self.controller.get_rows(sql)
+            if rows:
+                row = rows[0]
+                if row:
+                    utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, row[0])
+                    self.rotation_vd_exist = True
+            else:
+                utils_giswater.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation, '0')
+
             # After executing of path enable btn_draw and open_composer
             self.dlg_draw_profile.btn_draw.setDisabled(False)
             self.dlg_draw_profile.btn_save_profile.setDisabled(False)
