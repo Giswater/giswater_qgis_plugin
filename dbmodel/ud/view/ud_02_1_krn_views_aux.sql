@@ -118,12 +118,6 @@ elev1,
 elev2,
 custom_elev1,
 custom_elev2,
-(CASE 
-	WHEN (arc.custom_y1 IS NOT NULL) THEN arc.custom_y1::numeric (12,3)    
-	ELSE y1::numeric (12,3) END) AS sys_y1,													-- field to customize the different options of y1 (mts or cms, field name or behaviour about the use of y1/custom_y1 fields
-(CASE 
-	WHEN (arc.custom_y2 IS NOT NULL) THEN arc.custom_y2::numeric (12,3)		
-	ELSE y2::numeric (12,3) END) AS sys_y2,													-- field to customize the different options of y2 (mts or cms, field name or behaviour about the use of y2/custom_y2 fields
 sys_elev1,
 sys_elev2,
 sys_slope,												
@@ -264,7 +258,8 @@ CREATE OR REPLACE VIEW v_node_x_arc AS
 SELECT
 node.node_id,
 (CASE WHEN (node.custom_top_elev IS NOT NULL) THEN node.custom_top_elev::numeric (12,3) ELSE top_elev::numeric (12,3) END) AS sys_top_elev,										
-(CASE WHEN (node.custom_ymax IS NOT NULL) THEN node.custom_ymax::numeric (12,3) ELSE ymax::numeric (12,3) END) AS sys_ymax
+(CASE WHEN (node.custom_ymax IS NOT NULL) THEN node.custom_ymax::numeric (12,3) ELSE ymax::numeric (12,3) END) AS sys_ymax,
+sys_elev
 FROM node;
 
    	 
@@ -281,17 +276,18 @@ v_arc.elev1,
 v_arc.custom_elev1,
 v_arc.sys_elev1,
 v_arc.sys_y1,
-v_arc.sys_y1 - geom1 AS r1,
-(CASE WHEN (a.sys_ymax IS NULL OR sys_y1 IS NULL) THEN 0 ELSE a.sys_ymax - v_arc.sys_y1 END) AS z1,
+a.sys_top_elev-sys_elev1 AS sys_y1,
+a.sys_top_elev-sys_elev1 - v_arc.geom1 AS r1,
+a.sys_elev-sys_elev1 AS z1,
 node_2,
 v_arc.y2,
 v_arc.custom_y2,
 v_arc.elev2,
 v_arc.custom_elev2,
 v_arc.sys_elev2,
-v_arc.sys_y2,
-v_arc.sys_y2 - geom1 AS r2,
-(CASE WHEN (b.sys_ymax IS NULL OR sys_y2 IS NULL) THEN 0 ELSE b.sys_ymax - v_arc.sys_y2 END) AS z2,
+b.sys_top_elev-sys_elev2 AS sys_y2,
+b.sys_top_elev-sys_elev2 - v_arc.geom1 AS r2,
+b.sys_elev-sys_elev2 AS z2,
 sys_slope AS slope,
 arc_type,
 type as sys_type,
