@@ -55,9 +55,12 @@ BEGIN
 			END IF;
 			
 		-- Control insertions ID
-			IF (NEW.psector_id IS NULL) THEN
-				NEW.psector_id:= (SELECT nextval('psector_psector_id_seq'));
+			IF (NEW.psector_id IS NULL and om_aux='om') THEN
+				NEW.psector_id:= (SELECT nextval('om_psector_id_seq'));
+			ELSIF (NEW.psector_id IS NULL and om_aux='plan') THEN
+				NEW.psector_id:= (SELECT nextval('plan_psector_id_seq'));
 			END IF;
+			
 			
           
 	

@@ -179,5 +179,29 @@ INSERT INTO audit_cat_param_user VALUES ('edit_noderotation_update_dissbl', null
 INSERT INTO config_param_user VALUES (113, 'edit_noderotation_update_dissbl', 'FALSE', 'postgres');
 
 
+----------------------
+--22/06/2018
+-----------------------
+CREATE SEQUENCE om_psector_id_seq
+  INCREMENT 1
+  NO MINVALUE
+  NO MAXVALUE
+  START 1
+  CACHE 1;
+ALTER TABLE om_psector ALTER COLUMN psector_id SET DEFAULT nextval('SCHEMA_NAME.om_psector_id_seq'::regclass);
+UPDATE audit_cat_table SET sys_sequence='om_psector_id_seq' WHERE id='om_psector';
+  
+  
+CREATE SEQUENCE plan_psector_id_seq
+  INCREMENT 1
+  NO MINVALUE
+  NO MAXVALUE
+  START 1
+  CACHE 1;
+ALTER TABLE plan_psector ALTER COLUMN psector_id SET DEFAULT nextval('SCHEMA_NAME.plan_psector_id_seq'::regclass);
+UPDATE audit_cat_table SET sys_sequence='plan_psector_id_seq' WHERE id='plan_psector';
+
+select gw_fct_audit_check_project(1);
+
 
 
