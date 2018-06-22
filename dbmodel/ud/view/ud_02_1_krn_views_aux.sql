@@ -57,16 +57,16 @@ SELECT
 
 EXCEPT
     SELECT plan_psector_x_node.node_id
-    FROM SCHEMA_NAME.selector_psector, SCHEMA_NAME.selector_expl, SCHEMA_NAME.plan_psector_x_node 
-	JOIN SCHEMA_NAME.plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
+    FROM selector_psector, selector_expl, plan_psector_x_node 
+	JOIN plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
     WHERE plan_psector_x_node.psector_id = selector_psector.psector_id 
 	AND selector_psector.cur_user = "current_user"()::text AND plan_psector_x_node.state = 0
     AND plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
 
 UNION
 	SELECT plan_psector_x_node.node_id
-    FROM SCHEMA_NAME.selector_psector, SCHEMA_NAME.selector_expl, SCHEMA_NAME.plan_psector_x_node 
-	JOIN SCHEMA_NAME.plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
+    FROM selector_psector, selector_expl, plan_psector_x_node 
+	JOIN plan_psector ON plan_psector.psector_id=plan_psector_x_node.psector_id
     WHERE plan_psector_x_node.psector_id = selector_psector.psector_id 
 	AND selector_psector.cur_user = "current_user"()::text 	AND plan_psector_x_node.state = 1
     AND plan_psector.expl_id = selector_expl.expl_id 
@@ -75,11 +75,11 @@ UNION
 		
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_state_connec AS 
+CREATE OR REPLACE VIEW v_state_connec AS 
  SELECT connec.connec_id
-   FROM SCHEMA_NAME.selector_state,
-    SCHEMA_NAME.selector_expl,
-    SCHEMA_NAME.connec
+   FROM selector_state,
+    selector_expl,
+    connec
   WHERE connec.state = selector_state.state_id 
   AND selector_state.cur_user = "current_user"()::text 
   AND selector_expl.cur_user = "current_user"()::text 
@@ -275,7 +275,6 @@ v_arc.custom_y1,
 v_arc.elev1,
 v_arc.custom_elev1,
 v_arc.sys_elev1,
-v_arc.sys_y1,
 a.sys_top_elev-sys_elev1 AS sys_y1,
 a.sys_top_elev-sys_elev1 - v_arc.geom1 AS r1,
 a.sys_elev-sys_elev1 AS z1,
