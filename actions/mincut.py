@@ -47,7 +47,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.arc_group = []
         self.hydro_list = []
         self.aux_list = []
-
+        self.connec_list = []
         # Serialize data of table 'anl_mincut_cat_state'
         self.set_states()
         self.current_state = None
@@ -75,7 +75,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
-
+        self.connec_list = []
         self.hydro_list = []
         self.aux_list = []
         # Refresh canvas, remove all old selections
@@ -847,8 +847,6 @@ class MincutParent(ParentAction, MultipleSelection):
     def select_features_connec(self):
         """ Select features of 'connec' of selected mincut """
                     
-        self.connec_list = []
-
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_connec, self.result_mincut_id)
         sql = ("SELECT connec_id FROM " + self.schema_name + ".anl_mincut_result_connec"
@@ -856,10 +854,12 @@ class MincutParent(ParentAction, MultipleSelection):
         rows = self.controller.get_rows(sql)
         if rows:
             expr_filter = "\"connec_id\" IN ("
-            for row in rows:                   
-                expr_filter += "'" + str(row[0]) + "', "
+            for row in rows:
+                if row[0] not in self.connec_list and row[0] not in self.aux_list:
+                    self.connec_list.append(row[0])
+            for connec_id in self.connec_list:
+                expr_filter += "'" + str(connec_id) + "', "
             expr_filter = expr_filter[:-2] + ")"                    
-
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
@@ -925,8 +925,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
         self.disconnect_signal_selection_changed()   
         
-        # Clear list of connec_list
-        self.connec_list = []
+        # # Clear list of connec_list
+        # self.connec_list = []
 
         # Get 'connec_id' from selected 'customer_code'
         customer_code = utils_giswater.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
@@ -947,7 +947,8 @@ class MincutParent(ParentAction, MultipleSelection):
                 for feature in features:
                     # Append 'connec_id' into 'connec_list'
                     selected_id = feature.attribute("connec_id")
-                    self.connec_list.append(selected_id)                          
+                    if selected_id not in self.connec_list:
+                        self.connec_list.append(selected_id)
 
         # Show message if element is already in the list
         if connec_id in self.connec_list:
