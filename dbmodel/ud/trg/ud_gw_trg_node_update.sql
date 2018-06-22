@@ -158,13 +158,12 @@ BEGIN
 					-- Update direction if necessary
 					IF ((z2 > z1) AND arcrec.inverted_slope is false) OR ((z2 < z1) AND arcrec.inverted_slope is true) THEN
 						EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-						EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 ||', 
-							elev1 = ' || arcrec.elev2 || ', elev2 = ' || arcrec.elev1 ||',
-							custom_y1 = ' || arcrec.custom_y2 || ', custom_y2 = ' || arcrec.custom_y1 ||',
-							custom_elev1 = ' || arcrec.custom_elev2 || ', custom_elev2 = ' || arcrec.custom_elev1 ||',
-							sys_y1 = ' || arcrec.sys_elev2 || ', sys_elev2 = ' || arcrec.sys_elev1 ||',
-							sys_elev1 = ' || arcrec.sys_elev2 || ', sys_elev2 = ' || arcrec.sys_elev1 ||',
-							WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+						EXECUTE 'UPDATE arc SET y1 = ' || quote_nullable(arcrec.y2) || ', y2 = ' || quote_nullable(arcrec.y1) ||', 
+								elev1 = ' || quote_nullable(arcrec.elev2) || ', elev2 = ' || quote_nullable(arcrec.elev1) ||',
+								custom_y1 = ' || quote_nullable(arcrec.custom_y2) || ', custom_y2 = ' || quote_nullable(arcrec.custom_y1) ||',
+								custom_elev1 = ' || quote_nullable(arcrec.custom_elev2) || ', custom_elev2 = ' || quote_nullable(arcrec.custom_elev1) ||',
+								sys_elev1 = ' || quote_nullable(arcrec.sys_elev2) || ', sys_elev2 = ' || quote_nullable(arcrec.sys_elev1) ||' 
+								WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
 						EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
 					END IF;
 					
