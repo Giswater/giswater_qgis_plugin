@@ -46,7 +46,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.layers_connec = None
         self.arc_group = []
         self.hydro_list = []
-        self.aux_list = []
+        self.deleted_list = []
         self.connec_list = []
         # Serialize data of table 'anl_mincut_cat_state'
         self.set_states()
@@ -77,7 +77,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         self.connec_list = []
         self.hydro_list = []
-        self.aux_list = []
+        self.deleted_list = []
         # Refresh canvas, remove all old selections
         self.remove_selection()      
 
@@ -663,7 +663,8 @@ class MincutParent(ParentAction, MultipleSelection):
         for i in range(len(self.connec_list)):
             expr_filter += "'" + str(self.connec_list[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
-
+        if len(self.connec_list) == 0:
+            expr_filter = "\"connec_id\" =''"
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
@@ -695,7 +696,8 @@ class MincutParent(ParentAction, MultipleSelection):
             for i in range(len(self.connec_list)):
                 expr_filter += "'" + str(self.connec_list[i]) + "', "
             expr_filter = expr_filter[:-2] + ")"
-    
+            if len(self.connec_list) == 0:
+                expr_filter = "\"connec_id\" =''"
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
             if not is_valid:
@@ -811,9 +813,10 @@ class MincutParent(ParentAction, MultipleSelection):
             return
 
         # Set expression filter with 'hydro_list'
-        self.hydro_list.append(row[0])
-        self.aux_list.append(row[0])
 
+        if row[0] in self.deleted_list:
+            self.deleted_list.remove(row[0])
+        self.hydro_list.append(row[0])
         expr_filter = "\"hydrometer_id\" IN ("
         for i in range(len(self.hydro_list)):
             expr_filter += "'" + str(self.hydro_list[i]) + "', "
@@ -855,11 +858,13 @@ class MincutParent(ParentAction, MultipleSelection):
         if rows:
             expr_filter = "\"connec_id\" IN ("
             for row in rows:
-                if row[0] not in self.connec_list and row[0] not in self.aux_list:
+                if row[0] not in self.connec_list and row[0] not in self.deleted_list:
                     self.connec_list.append(row[0])
             for connec_id in self.connec_list:
                 expr_filter += "'" + str(connec_id) + "', "
-            expr_filter = expr_filter[:-2] + ")"                    
+            expr_filter = expr_filter[:-2] + ")"
+            if len(self.connec_list) == 0:
+                expr_filter = "\"connec_id\" =''"
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
@@ -887,8 +892,9 @@ class MincutParent(ParentAction, MultipleSelection):
             expr_filter = "\"connec_id\" IN ("
             for row in rows:                   
                 expr_filter += "'" + str(row[0]) + "', "
-            expr_filter = expr_filter[:-2] + ")"                    
-
+            expr_filter = expr_filter[:-2] + ")"
+            if len(self.connec_list) == 0:
+                expr_filter = "\"connec_id\" =''"
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
@@ -898,22 +904,28 @@ class MincutParent(ParentAction, MultipleSelection):
             self.select_features_group_layers(expr)
 
 
-        self.hydro_list = []
+        #self.hydro_list = []
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_hydro, self.result_mincut_id)
         sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".anl_mincut_result_hydrometer"
                " WHERE result_id = " + str(result_mincut_id))
         rows = self.controller.get_rows(sql)
+
         expr_filter = "\"hydrometer_id\" IN ("
-        for hydro_id in self.aux_list:
-            expr_filter += "'" + str(hydro_id) + "', "
-            self.hydro_list.append(str(hydro_id))
         if rows:
             for row in rows:
-                expr_filter += "'" + str(row[0]) + "', "
-                self.hydro_list.append(str(row[0]))
+                if row[0] not in self.hydro_list:
+                    self.hydro_list.append(row[0])
+        for hyd in self.deleted_list:
+            if hyd in self.hydro_list:
+                self.hydro_list.remove(hyd)
+        for hyd in self.hydro_list:
+            expr_filter += "'" + str(hyd) + "', "
+
         expr_filter = expr_filter[:-2] + ")"
+        if len(self.hydro_list) == 0:
+            expr_filter = "\"hydrometer_id\" =''"
         # Reload contents of table 'hydro' with expr_filter
         self.reload_table_hydro(expr_filter)
 
@@ -968,7 +980,8 @@ class MincutParent(ParentAction, MultipleSelection):
             for i in range(len(self.connec_list)):
                 expr_filter += "'" + str(self.connec_list[i]) + "', "
             expr_filter = expr_filter[:-2] + ")"
-
+            if len(self.connec_list) == 0:
+                expr_filter = "\"connec_id\" =''"
             # Check expression
             (is_valid, expr) = self.check_expression(expr_filter)
             if not is_valid:
@@ -1169,7 +1182,8 @@ class MincutParent(ParentAction, MultipleSelection):
         else:
             for el in del_id:
                 self.hydro_list.remove(el)
-
+                if el not in self.deleted_list:
+                    self.deleted_list.append(el)
         # Select features that are in the list
         expr_filter = "\"hydrometer_id\" IN ("
         for i in range(len(self.hydro_list)):
