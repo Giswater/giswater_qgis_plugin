@@ -148,6 +148,9 @@ class ManageNewPsector(ParentManage):
         if isinstance(psector_id, bool):
             psector_id = 0
         self.delete_psector_selector(self.plan_om + '_psector_selector')
+        # tab 'Document'
+        self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
+        self.tbl_document = self.dlg_plan_psector.findChild(QTableView, "tbl_document")
 
         if psector_id != 0:
             
@@ -215,9 +218,7 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
 
-            # tab 'Document'
-            self.doc_id = self.dlg_plan_psector.findChild(QLineEdit, "doc_id")
-            self.tbl_document = self.dlg_plan_psector.findChild(QTableView, "tbl_document")
+
             filter_ = "psector_id = '" + str(psector_id) + "'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
@@ -256,7 +257,7 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(self.document_delete)
-        self.dlg_plan_psector.btn_doc_new.clicked.connect(self.manage_document)
+        self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(self.document_open)
 
         self.set_completer()
