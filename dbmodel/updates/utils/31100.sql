@@ -204,4 +204,8 @@ UPDATE audit_cat_table SET sys_sequence='plan_psector_id_seq' WHERE id='plan_pse
 select gw_fct_audit_check_project(1);
 
 
+INSERT INTO sys_fprocess_cat VALUES (32, 'Node proximity analysis', 'EDIT', 'Node proximity analysis', 'utils');
+
+
+
 
