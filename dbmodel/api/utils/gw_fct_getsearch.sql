@@ -18,14 +18,14 @@ DECLARE
     formSearch json;
     formPsector json;
     api_version json;
-    formAdress json;
+    formAddress json;
     rec_tab record;
     v_firsttab boolean;
     v_active boolean;
     rec_fields record;
 
 
-    --adress
+    --Address
     v_search_vdef text;
     v_search_muni_table text;
     v_search_muni_id_field text;
@@ -73,7 +73,8 @@ BEGIN
 
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='net_code';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType',
+        'string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
         
         -- Create array with network fields
         fieldsJson := '[' || comboType || ',' || editCode || ']';
@@ -100,7 +101,8 @@ BEGIN
     
         -- Create search field
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='generic_search';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead', 'searchService', 
+        (SELECT value FROM config_param_system WHERE parameter='api_search_service' LIMIT 1),'dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
         
         fieldsJson := '[' ||  editCode || ']';
         fieldsJson := COALESCE(fieldsJson, '[]');
@@ -121,9 +123,9 @@ BEGIN
     END IF;
 
 
--- Adress tab
+-- Address tab
 -------------
-    SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabAdress' ;
+    SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabAddress' ;
     IF rec_tab IS NOT NULL THEN
 
         -- Parameters of the municipality layer
@@ -167,7 +169,9 @@ BEGIN
 
         -- Create postnumber search field
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='add_postnumber';
-        editCode2 := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode2 := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','threshold', 
+        (SELECT value::integer FROM config_param_system WHERE parameter='api_search_minimsearch' LIMIT 1),
+        'dataType','string','placeholder','','disabled',true,'noresultsMsg','No results','loadingMsg','Searching...');
 
     
         -- Create array with network fields
@@ -175,14 +179,14 @@ BEGIN
         fieldsJson := COALESCE(fieldsJson, '[]');
 
         --    Create network tab form
-        formAdress := json_build_object('tabName','adress','tabLabel',rec_tab.tablabel, 'active', v_active );
-        formAdress := gw_fct_json_object_set_key(formAdress, 'fields', fieldsJson);
+        formAddress := json_build_object('tabName','address','tabLabel',rec_tab.tablabel, 'active', v_active );
+        formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
 
         -- Create tabs array
         IF v_firsttab THEN 
-            formTabs := formTabs || ',' || formAdress::text;
+            formTabs := formTabs || ',' || formAddress::text;
         ELSE 
-            formTabs := formTabs || formAdress::text;
+            formTabs := formTabs || formAddress::text;
         END IF;
 
         v_firsttab := TRUE;
@@ -348,11 +352,21 @@ BEGIN
 --    Check null
     formTabs := COALESCE(formTabs, '[]');    
 
---    Return
-    RETURN ('{"status":"Accepted"' ||
+--     Return
+    IF v_firsttab IS FALSE THEN
+        -- Return not implemented
+        RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
-        ', "formTabs":' || formTabs ||
+        ', "enabled":false'||
         '}')::json;
+    ELSE 
+        -- Return formtabs
+        RETURN ('{"status":"Accepted"' ||
+            ', "apiVersion":'|| api_version ||
+            ', "enabled":true'||
+            ', "formTabs":' || formTabs ||
+            '}')::json;
+    END IF;
 
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 

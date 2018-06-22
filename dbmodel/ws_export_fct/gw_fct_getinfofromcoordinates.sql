@@ -21,7 +21,7 @@ DECLARE
     
 BEGIN
 
-   v_usevisiblearray=false;
+   v_usevisiblearray=true;
 
 --  Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
@@ -98,13 +98,13 @@ BEGIN
         IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
 
             --  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)
-            EXECUTE 'SELECT '||v_idname||' FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
+            EXECUTE 'SELECT "'||v_idname||'" FROM "'||v_layer||'" WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
             ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc LIMIT 1'
                 INTO v_id
                 USING v_point, v_sensibility;
         ELSE
             --  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-            EXECUTE 'SELECT '||v_idname||' FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
+            EXECUTE 'SELECT "'||v_idname||'" FROM "'||v_layer||'" WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
             ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc LIMIT 1'
                 INTO v_id
                 USING v_point, v_sensibility;
@@ -122,8 +122,7 @@ BEGIN
 
 --    Control NULL's
     IF v_id IS NULL THEN
-
-     RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||', "formTabs":[] , "tableName":"", "idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+     RETURN ('{"status":"Accepted", "apiVersion":'|| api_version || ', "results":0' ||', "formTabs":[] , "tableName":"", "idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 
 
     END IF;

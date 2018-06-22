@@ -16,7 +16,6 @@ DECLARE
     v_active boolean=true;
     v_firsttab boolean=false;
 
-
 BEGIN
 
 
@@ -48,7 +47,7 @@ BEGIN
         formTabs_explotations := gw_fct_json_object_set_key(formTabs_explotations, 'tabName', 'selector_expl'::TEXT);
         formTabs_explotations := gw_fct_json_object_set_key(formTabs_explotations, 'tabLabel', rec_tab.tablabel::TEXT);
         formTabs_explotations := gw_fct_json_object_set_key(formTabs_explotations, 'tabIdName', 'expl_id'::TEXT);
-        formTabs_explotations := gw_fct_json_object_set_key(formTabs_explotations, 'active', v_active::TEXT);
+        formTabs_explotations := gw_fct_json_object_set_key(formTabs_explotations, 'active', v_active);
 
         -- Create tabs array
         IF v_firsttab THEN 
@@ -79,7 +78,7 @@ BEGIN
         formTabs_networkStates := gw_fct_json_object_set_key(formTabs_networkStates, 'tabName', 'selector_state'::TEXT);
         formTabs_networkStates := gw_fct_json_object_set_key(formTabs_networkStates, 'tabLabel', rec_tab.tablabel::TEXT);
         formTabs_networkStates := gw_fct_json_object_set_key(formTabs_networkStates, 'tabIdName', 'state_id'::TEXT);
-        formTabs_networkStates := gw_fct_json_object_set_key(formTabs_networkStates, 'active', v_active::TEXT);
+        formTabs_networkStates := gw_fct_json_object_set_key(formTabs_networkStates, 'active', v_active);
 
         -- Create tabs array
         IF v_firsttab THEN 
@@ -110,7 +109,7 @@ BEGIN
         formTabs_hydroStates := gw_fct_json_object_set_key(formTabs_hydroStates, 'tabName', 'selector_hydrometer'::TEXT);
         formTabs_hydroStates := gw_fct_json_object_set_key(formTabs_hydroStates, 'tabLabel', rec_tab.tablabel::TEXT);
         formTabs_hydroStates := gw_fct_json_object_set_key(formTabs_hydroStates, 'tabIdName', 'state_id'::TEXT);
-        formTabs_hydroStates := gw_fct_json_object_set_key(formTabs_hydroStates, 'active', false::TEXT);
+        formTabs_hydroStates := gw_fct_json_object_set_key(formTabs_hydroStates, 'active', false);
 
         -- Create tabs array
         IF v_firsttab THEN 
@@ -126,16 +125,24 @@ BEGIN
 -- Finish the construction of the tabs array
     formTabs := formTabs ||']';
 
-RAISE NOTICE 'formTabs %', formTabs;
 
 -- Check null
     formTabs := COALESCE(formTabs, '[]');    
 
 -- Return
-    RETURN ('{"status":"Accepted"' ||
+    IF v_firsttab IS FALSE THEN
+        -- Return not implemented
+        RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
-        ', "formTabs":' || formTabs ||
+        ', "message":"Not implemented"'||
         '}')::json;
+    ELSE 
+        -- Return formtabs
+        RETURN ('{"status":"Accepted"' ||
+            ', "apiVersion":'|| api_version ||
+            ', "formTabs":' || formTabs ||
+            '}')::json;
+    END IF;
 
 -- Exception handling
 --    EXCEPTION WHEN OTHERS THEN 

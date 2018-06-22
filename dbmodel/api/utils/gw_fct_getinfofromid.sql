@@ -26,6 +26,7 @@ DECLARE
     v_geometry json;
     v_the_geom text;
     v_coherence boolean = false;
+    v_results json;
     table_arg_return text = table_id_arg;
 
 
@@ -290,12 +291,14 @@ raise notice'No parent-child and inforole table: %' , table_id_arg;
     v_geometry := COALESCE(v_geometry, '{}');
     link_path := COALESCE(link_path, '{}');
     editable_data := COALESCE(editable_data, '{}');
+    v_results:= ('{"number":1}')::json;
 
     
 --    Return
 -----------------------
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
+        ', "results":1'||
         ', "formTabs":' || form_info ||
         ', "tableName":'|| table_arg_return ||
         ', "idName": "' || v_idname ||'"'||

@@ -25,12 +25,12 @@
     v_street_muni_id_field varchar;
     v_street_geom_id_field varchar;
 
-    -- Adress
-    v_adress_layer varchar;
-    v_adress_id_field varchar;
-    v_adress_display_field varchar;
-    v_adress_street_id_field varchar;
-    v_adress_geom_id_field varchar;
+    -- address
+    v_address_layer varchar;
+    v_address_id_field varchar;
+    v_address_display_field varchar;
+    v_address_street_id_field varchar;
+    v_address_geom_id_field varchar;
 
 
 
@@ -50,9 +50,9 @@ BEGIN
     tab_arg := search_data->>'tabName';
 
 
--- Adress
+-- address
 ---------
-IF tab_arg = 'adress' THEN
+IF tab_arg = 'address' THEN
 
     -- Parameters of the street layer
     SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
@@ -62,30 +62,31 @@ IF tab_arg = 'adress' THEN
     SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
 
     -- Parameters of the postnumber layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_adress_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-    SELECT ((value::json)->>'sys_id_field') INTO v_adress_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-    SELECT ((value::json)->>'sys_search_field') INTO v_adress_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-    SELECT ((value::json)->>'sys_parent_field') INTO v_adress_street_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_adress_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_table_id') INTO v_address_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_id_field') INTO v_address_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_search_field') INTO v_address_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_parent_field') INTO v_address_street_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_address_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
 
     --Text to search
     combo1 := search_data->>'add_street';
-    id_arg := combo1->>'id';
+    id_arg := combo1->>'text';
     edit1 := search_data->>'add_postnumber';
-    text_arg := concat('%', edit1 ,'%');
+    edit2 := edit1->>'text';
+    text_arg := concat('%', edit2 ,'%');
 
-    raise notice 'name_arg %', name_arg;
+    raise notice 'name_arg %', id_arg;
     raise notice 'text_arg %', text_arg;
 
     
-    -- Get adress
+    -- Get address
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||v_adress_layer||'.'||v_adress_display_field||' as display_name, st_x ('||v_adress_layer||'.'||v_adress_geom_id_field||') as sys_x
-        ,st_y ('||v_adress_layer||'.'||v_adress_geom_id_field||') as sys_y
-        FROM '||v_adress_layer||'
-        JOIN '||v_street_layer||' ON '||v_street_layer||'.'||v_street_id_field||' = '||v_adress_layer||'.'||v_adress_street_id_field ||'
-        WHERE '||v_street_layer||'.'||v_street_id_field||' = '''||id_arg||'''
-        AND '||v_adress_layer||'.'||v_adress_display_field||' ILIKE '''||text_arg||''' LIMIT 10 
+        FROM (SELECT '||v_address_layer||'.'||v_address_display_field||' as display_name, st_x ('||v_address_layer||'.'||v_address_geom_id_field||') as sys_x
+        ,st_y ('||v_address_layer||'.'||v_address_geom_id_field||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid
+        FROM '||v_address_layer||'
+        JOIN '||v_street_layer||' ON '||v_street_layer||'.'||v_street_id_field||' = '||v_address_layer||'.'||v_address_street_id_field ||'
+        WHERE '||v_street_layer||'.'||v_street_display_field||' = $$'||id_arg||'$$
+        AND '||v_address_layer||'.'||v_address_display_field||' ILIKE '''||text_arg||''' LIMIT 10 
         )a'
         INTO response_json;
 

@@ -57,12 +57,12 @@
     v_street_muni_id_field varchar;
     v_street_geom_field varchar;
 
-    -- adress
-    v_adress_layer varchar;
-    v_adress_id_field varchar;
-    v_adress_display_field varchar;
-    v_adress_street_id_field varchar;
-    v_adress_geom_id_field varchar;
+    -- address
+    v_address_layer varchar;
+    v_address_id_field varchar;
+    v_address_display_field varchar;
+    v_address_street_id_field varchar;
+    v_address_geom_id_field varchar;
 
     --hydro    
     v_hydro_layer varchar;
@@ -209,9 +209,9 @@ IF tab_arg = 'network' THEN
                     INTO response_json;
     END IF;
     
--- Adress
+-- address
 ---------
-ELSIF tab_arg = 'adress' THEN
+ELSIF tab_arg = 'address' THEN
 
     -- Parameters of the municipality layer
     SELECT ((value::json)->>'sys_table_id') INTO v_muni_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
@@ -239,12 +239,14 @@ ELSIF tab_arg = 'adress' THEN
 
     -- Get street
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||v_street_layer||'.'||v_street_display_field||' as display_name, st_astext(st_envelope('||v_street_layer||'.'||v_street_geom_field||'))
+        FROM (SELECT '||v_street_layer||'.'||v_street_id_field||' as id,'||v_street_layer||'.'||v_street_display_field||' as display_name, 
+        st_astext(st_envelope('||v_street_layer||'.'||v_street_geom_field||'))
         FROM '||v_street_layer||'
         JOIN '||v_muni_layer||' ON '||v_muni_layer||'.'||v_muni_id_field||' = '||v_street_layer||'.'||v_street_muni_id_field ||'
         WHERE '||v_muni_layer||'.'||v_muni_display_field||' = '||quote_literal(name_arg)||'
         AND '||v_street_layer||'.'||v_street_display_field||' ILIKE '''||text_arg||''' LIMIT 10 )a'
         INTO response_json;
+    raise notice'response %', response_json;
 
 -- Hydro tab
 ------------
@@ -342,7 +344,7 @@ ELSIF tab_arg = 'adress' THEN
         AND '||v_psector_layer||'.'||v_psector_display_field||' ILIKE '''||text_arg||''' LIMIT 10 )a'
         INTO response_json;
     ELSE
-        RETURN ('{"status":"Failed","SQLERR":"Only tab Network, Hydro and WorkCat are available","SQLSTATE":"NULL"}')::json;
+ 
 
     END IF;
 

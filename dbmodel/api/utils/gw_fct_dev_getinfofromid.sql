@@ -1,14 +1,10 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_dev_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
     form_info json;    
     form_tabs varchar[];
-    form_tablabel varchar[];
-    form_tabtext varchar[];
     form_tabs_json json;
-    form_tablabel_json json;
-    form_tabtext_json json;
     editable_data json;
     info_data json;
     field_wms json[2];
@@ -25,15 +21,10 @@ DECLARE
     api_version json;
     v_geometry json;
     v_the_geom text;
-    v_coherence boolean = false;
-    v_results json;
-    table_arg_return text = table_id_arg;
 
 
     -- fixed info type parameter(to do)
-    --p_info_type integer=200;
-
-    
+    p_info_type integer:=1;
 
 BEGIN
 
@@ -45,15 +36,23 @@ BEGIN
 -------------------------------------
     SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
-
-  
+    
 --      Get api version
 ------------------------
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
-raise notice 'Get api version: %', api_version;
+--    Check if request coherence againts alias_id_arg & table_id_arg (if not exists it means navigation)
+--------------------------------------------------------------------------------------------------------
+    IF (SELECT alias_id FROM config_web_layer WHERE layer_id=table_id_arg)IS NOT NULL 
+    AND (SELECT alias_id FROM config_web_layer WHERE layer_id=table_id_arg)!=alias_id_arg THEN
 
+        -- Get real layer from alias
+        EXECUTE 'SELECT layer_id from config_web_layer WHERE alias_id=$1 LIMIT 1'
+            INTO table_id_arg
+            USING alias_id_arg;
+
+    END IF;
 
 --      Get form (if exists) for the layer 
 ------------------------------------------
@@ -62,8 +61,6 @@ raise notice 'Get api version: %', api_version;
             FROM config_web_layer WHERE layer_id = $1 LIMIT 1) row'
             INTO form_info
             USING table_id_arg; 
-            
-raise notice 'Form number: %', form_info;
 
 
 --    Get id column
@@ -96,34 +93,23 @@ raise notice 'Form number: %', form_info;
         USING schemas_array[1], table_id_arg, v_idname
         INTO column_type;
 
-
-raise notice 'v_idname: %  column_type: %', v_idname, column_type;
-
-
 --     Get geometry_column
 ------------------------------------------
-        EXECUTE 'SELECT attname FROM pg_attribute a        
-            JOIN pg_class t on a.attrelid = t.oid
-            JOIN pg_namespace s on t.relnamespace = s.oid
-            WHERE a.attnum > 0 
-            AND NOT a.attisdropped
-            AND t.relname = $1
-            AND s.nspname = $2
-            AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-            ORDER BY a.attnum' 
-            INTO v_the_geom
-            USING table_id_arg, schemas_array[1];
-
-            
+    EXECUTE 'SELECT attname FROM pg_attribute a        
+        JOIN pg_class t on a.attrelid = t.oid
+        JOIN pg_namespace s on t.relnamespace = s.oid
+        WHERE a.attnum > 0 
+        AND NOT a.attisdropped
+        AND t.relname = ''v_edit_node''
+        AND s.nspname = ''SCHEMA_NAME''
+        AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+        ORDER BY a.attnum' 
+        INTO v_the_geom;
+    
 --     Get geometry (to feature response)
 ------------------------------------------
-    IF v_the_geom IS NOT NULL THEN
-        EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||v_the_geom||') FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
-            INTO v_geometry;
-    END IF;
-
-raise notice 'Feature geometry: % ', v_geometry;
-
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||v_the_geom||') FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
+        INTO v_geometry;
 
 --      Get link (if exists) for the layer
 ------------------------------------------
@@ -135,34 +121,13 @@ raise notice 'Feature geometry: % ', v_geometry;
         EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||link_id_aux||' FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
         INTO link_path;
 
-raise notice 'Layer link path: % ', link_path;
-
-
         END IF;
          
 --        Get tabs for the layer
 --------------------------------
-        EXECUTE 'SELECT array_agg(formtab) FROM (SELECT formtab FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
+        EXECUTE 'SELECT array_agg(formtab) FROM config_web_layer_tab WHERE layer_id = $1'
             INTO form_tabs
             USING table_id_arg;
-
-raise notice 'form_tabs; %', form_tabs;
-
---        Get tab label for tabs form
---------------------------------
-        EXECUTE 'SELECT array_agg(tablabel) FROM (SELECT tablabel FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
-            INTO form_tablabel
-            USING table_id_arg;
-
-raise notice 'form_tablabel; %', form_tablabel;
-
---        Get header text for tabs form
---------------------------------
-        EXECUTE 'SELECT array_agg(tabtext) FROM (SELECT tabtext FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
-            INTO form_tabtext
-            USING table_id_arg;
-
-raise notice 'form_tabtext; %', form_tabtext;
 
 
 --        Check if it is parent table 
@@ -177,7 +142,7 @@ raise notice 'form_tabtext; %', form_tabtext;
                 INTO tableparent_id_arg
                 USING table_id_arg;
                 
-raise notice'Parent-Child. Table parent: %' , tableparent_id_arg;
+        raise notice'Parent-Child. Table parent: %' , tableparent_id_arg;
 
 
         -- Identify tableinforole_id 
@@ -188,16 +153,10 @@ raise notice'Parent-Child. Table parent: %' , tableparent_id_arg;
             INTO table_id_arg
             USING id, p_info_type;
 
-raise notice'p_info_type: %' , p_info_type;
-
-raise notice'Parent-Child. Table child: %' , table_id_arg;
+        raise notice'Parent-Child. Table: %' , table_id_arg;
 
     -- Check if it is not editable layer (is_editable is false)
         ELSIF table_id_arg IN (SELECT layer_id FROM config_web_layer WHERE is_editable IS FALSE) THEN
-
-
-raise notice'No parent-child and no editable table: %' , table_id_arg;
-
 
         -- Identify tableinforole_id 
         EXECUTE 'SELECT tableinforole_id FROM config_web_layer
@@ -206,32 +165,10 @@ raise notice'No parent-child and no editable table: %' , table_id_arg;
                 INTO table_id_arg
             USING table_id_arg, p_info_type;
 
-raise notice'p_info_type: %' , p_info_type;
-
-raise notice'No parent-child and inforole table: %' , table_id_arg;
-
+        raise notice'No parent-child and no editable table: %' , table_id_arg;
 
         END IF;
         
-
---    Get id column
----------------------
-    EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-        INTO v_idname
-        USING table_id_arg;
-        
-    -- For views it suposse pk is the first column
-    IF v_idname ISNULL THEN
-        EXECUTE '
-        SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-        AND t.relname = $1 
-        AND s.nspname = $2
-        ORDER BY a.attnum LIMIT 1'
-        INTO v_idname
-        USING table_id_arg, schemas_array[1];
-    END IF;
-
-
 
 --  Take form_id 
 ----------------
@@ -249,58 +186,46 @@ raise notice'No parent-child and inforole table: %' , table_id_arg;
 --    Add default tab
 ---------------------
       form_tabs_json := array_to_json(array_append(form_tabs, 'tabInfo'));
-      form_tablabel_json := array_to_json(array_append(form_tablabel, 'Data'));
-      form_tabtext_json := array_to_json(array_append(form_tabtext, ''));
-
 
 --    Join json
      form_info := gw_fct_json_object_set_key(form_info, 'formTabs', form_tabs_json);
-     form_info := gw_fct_json_object_set_key(form_info, 'tabLabel', form_tablabel_json);
-     form_info := gw_fct_json_object_set_key(form_info, 'tabText', form_tabtext_json);
 
 
-  
+--    Check editability
+-----------------------
+
     -- If editable layer
-    IF editable THEN
+    IF editable AND parent_child_relation IS FALSE THEN
 
         -- call editable form using table information
         EXECUTE 'SELECT gw_fct_getinsertform($1, $2, $3)'
             INTO editable_data
             USING table_id_arg, lang, id;
-
-    ELSIF table_id_arg is not null THEN
+    
+    -- If no editable layer
+    ELSE
 
         -- call getinfoform using table information
         EXECUTE 'SELECT gw_fct_getinfoform($1, $2, $3, $4)'
             INTO editable_data
             USING table_id_arg, lang, id, formid_arg;
-    
-
     END IF;
 
-    table_arg_return:= (to_json(table_arg_return));
-
-    raise notice 'table_arg_return %', table_arg_return;
-
 --    Control NULL's
-----------------------
+-----------------------
     api_version := COALESCE(api_version, '{}');
     form_info := COALESCE(form_info, '{}');
-    table_arg_return := COALESCE(table_arg_return, '{}');
     v_idname := COALESCE(v_idname, '{}');
     v_geometry := COALESCE(v_geometry, '{}');
     link_path := COALESCE(link_path, '{}');
     editable_data := COALESCE(editable_data, '{}');
-    v_results:= ('{"number":1}')::json;
 
     
 --    Return
 -----------------------
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
-        ', "results":1'||
         ', "formTabs":' || form_info ||
-        ', "tableName":'|| table_arg_return ||
         ', "idName": "' || v_idname ||'"'||
         ', "geometry":' || v_geometry ||
         ', "linkPath":' || link_path ||
@@ -309,8 +234,8 @@ raise notice'No parent-child and inforole table: %' , table_id_arg;
 
 
 --    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
