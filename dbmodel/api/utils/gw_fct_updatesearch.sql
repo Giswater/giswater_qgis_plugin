@@ -67,6 +67,7 @@
     --hydro    
     v_hydro_layer varchar;
     v_hydro_id_field varchar;
+    v_hydro_connec_field varchar;
     v_hydro_search_field_1 varchar;
     v_hydro_search_field_2 varchar;
     v_hydro_search_field_3 varchar;
@@ -113,32 +114,32 @@ BEGIN
 IF tab_arg = 'network' THEN
 
     -- Layers to search:
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_arc FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_node FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_connec FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_arc FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_node FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_connec FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
 
     -- Layer's primary key;
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_node_id FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_connec_id FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_node_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_connec_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
 
     -- Layer's field to search:
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_node FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_connec FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_node FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_connec FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
    
     -- Layer's catalog field;
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_node_cat FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_connec_cat FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
-    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_node_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_connec_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
 
     
     -- Text to search
@@ -147,6 +148,8 @@ IF tab_arg = 'network' THEN
     name_arg := combo1->>'name';
     edit1 := search_data->>'net_code';
     text_arg := concat('%',edit1->>'text' ,'%');
+
+    raise notice'text_arg %', text_arg;
 
 
    IF p_network_layer_arc IS NOT NULL THEN
@@ -193,6 +196,10 @@ IF tab_arg = 'network' THEN
                  quote_literal(p_network_layer_element), '::text AS sys_table_id FROM ', p_network_layer_element);
    END IF;
 
+    raise notice'query_text %', query_text;
+
+
+
     IF id_arg = '' THEN 
         -- Get Ids for type combo
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
@@ -208,23 +215,26 @@ IF tab_arg = 'network' THEN
                     ORDER BY search_field LIMIT 10) a'
                     INTO response_json;
     END IF;
+
+    raise notice'response_json %', response_json;
+
     
 -- address
 ---------
 ELSIF tab_arg = 'address' THEN
 
     -- Parameters of the municipality layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_muni_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
-    SELECT ((value::json)->>'sys_id_field') INTO v_muni_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
-    SELECT ((value::json)->>'sys_search_field') INTO v_muni_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_muni_geom_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
+    SELECT ((value::json)->>'sys_table_id') INTO v_muni_layer FROM config_param_system WHERE parameter='api_search_muni';
+    SELECT ((value::json)->>'sys_id_field') INTO v_muni_id_field FROM config_param_system WHERE parameter='api_search_muni';
+    SELECT ((value::json)->>'sys_search_field') INTO v_muni_display_field FROM config_param_system WHERE parameter='api_search_muni';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_muni_geom_field FROM config_param_system WHERE parameter='api_search_muni';
 
     -- Parameters of the street layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
-    SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
-    SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
-    SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
+    SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM config_param_system WHERE parameter='api_search_street';
+    SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM config_param_system WHERE parameter='api_search_street';
+    SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM config_param_system WHERE parameter='api_search_street';
+    SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM config_param_system WHERE parameter='api_search_street';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_field FROM config_param_system WHERE parameter='api_search_street';
 
     --Text to search
     combo1 := search_data->>'add_muni';
@@ -232,6 +242,9 @@ ELSIF tab_arg = 'address' THEN
     name_arg := combo1->>'name';
     edit1 := search_data->>'add_street';
     text_arg := concat('%', edit1->>'text' ,'%');
+
+    raise notice'text_arg %', text_arg;
+
 
     -- Fix municipality vdefault
     DELETE FROM config_param_user WHERE parameter='search_municipality_vdefault' AND cur_user=current_user;
@@ -253,12 +266,13 @@ ELSIF tab_arg = 'address' THEN
     ELSIF tab_arg = 'hydro' THEN
 
         -- Parameters of the hydro layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_hydro_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_id_field') INTO v_hydro_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_search_field_1') INTO v_hydro_search_field_1 FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_search_field_2') INTO v_hydro_search_field_2 FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_search_field_3') INTO v_hydro_search_field_3 FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_parent_field') INTO v_exploitation_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_hydrometer';
+    SELECT ((value::json)->>'sys_table_id') INTO v_hydro_layer FROM config_param_system WHERE parameter='api_search_hydrometer';
+    SELECT ((value::json)->>'sys_id_field') INTO v_hydro_id_field FROM config_param_system WHERE parameter='api_search_hydrometer';
+    SELECT ((value::json)->>'sys_connec_id') INTO v_hydro_connec_field FROM config_param_system WHERE parameter='api_search_hydrometer';
+    SELECT ((value::json)->>'sys_search_field_1') INTO v_hydro_search_field_1 FROM config_param_system WHERE parameter='api_search_hydrometer';
+    SELECT ((value::json)->>'sys_search_field_2') INTO v_hydro_search_field_2 FROM config_param_system WHERE parameter='api_search_hydrometer';
+    SELECT ((value::json)->>'sys_search_field_3') INTO v_hydro_search_field_3 FROM config_param_system WHERE parameter='api_search_hydrometer';
+    SELECT ((value::json)->>'sys_parent_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='api_search_hydrometer';
 
     -- Text to search
     combo1 := search_data->>'hydro_expl';
@@ -274,12 +288,14 @@ ELSIF tab_arg = 'address' THEN
     
     -- Get hydrometer 
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-        SELECT v_rtc_hydrometer.hydrometer_id AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
-        concat ('||v_hydro_search_field_1||','' - '','||v_hydro_search_field_2||','' - '','||v_hydro_search_field_3||') AS display_name, ''v_rtc_hydrometer'' AS sys_table_id, ''hydrometer_id'' AS sys_idname
-        FROM v_rtc_hydrometer
-        JOIN connec ON (connec.connec_id = v_rtc_hydrometer.connec_id)
-        WHERE v_rtc_hydrometer.'||v_exploitation_display_field||' = '||quote_literal(name_arg)||'
-                AND concat ('||v_hydro_search_field_1||','' - '','||v_hydro_search_field_2||','' - '','||v_hydro_search_field_3||') ILIKE '||quote_literal(text_arg)||'
+        SELECT '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
+        concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+         AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
+        FROM '||quote_ident(v_hydro_layer)||'
+        JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_connec_field)||')
+        WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
+                AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+                ILIKE '||quote_literal(text_arg)||'
                 LIMIT 10) a'
         INTO response_json; 
 
@@ -288,10 +304,10 @@ ELSIF tab_arg = 'address' THEN
     ELSIF tab_arg = 'workcat' THEN
 
         -- Parameters of the workcat layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_workcat_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_workcat';
-    SELECT ((value::json)->>'sys_id_field') INTO v_workcat_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_workcat';
-    SELECT ((value::json)->>'sys_search_field') INTO v_workcat_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_workcat';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_workcat_geom_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_workcat';
+    SELECT ((value::json)->>'sys_table_id') INTO v_workcat_layer FROM config_param_system WHERE parameter='api_search_workcat';
+    SELECT ((value::json)->>'sys_id_field') INTO v_workcat_id_field FROM config_param_system WHERE parameter='api_search_workcat';
+    SELECT ((value::json)->>'sys_search_field') INTO v_workcat_display_field FROM config_param_system WHERE parameter='api_search_workcat';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_workcat_geom_field FROM config_param_system WHERE parameter='api_search_workcat';
     
     -- Text to search
     edit1 := search_data->>'workcat_search';
@@ -310,17 +326,17 @@ ELSIF tab_arg = 'address' THEN
     ELSIF tab_arg = 'psector' THEN
 
         -- Parameters of the exploitation layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_exploitation_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_exploitation';
-    SELECT ((value::json)->>'sys_id_field') INTO v_exploitation_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_exploitation';
-    SELECT ((value::json)->>'sys_search_field') INTO v_exploitation_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_exploitation';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_exploitation_geom_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_exploitation';
+    SELECT ((value::json)->>'sys_table_id') INTO v_exploitation_layer FROM config_param_system WHERE parameter='api_search_exploitation';
+    SELECT ((value::json)->>'sys_id_field') INTO v_exploitation_id_field FROM config_param_system WHERE parameter='api_search_exploitation';
+    SELECT ((value::json)->>'sys_search_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='api_search_exploitation';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_exploitation_geom_field FROM config_param_system WHERE parameter='api_search_exploitation';
  
         -- Parameters of the psector layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_psector_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_psector';
-    SELECT ((value::json)->>'sys_id_field') INTO v_psector_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_psector';
-    SELECT ((value::json)->>'sys_search_field') INTO v_psector_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_psector';
-    SELECT ((value::json)->>'sys_parent_field') INTO v_psector_parent_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_psector';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_psector_geom_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_psector';
+    SELECT ((value::json)->>'sys_table_id') INTO v_psector_layer FROM config_param_system WHERE parameter='api_search_psector';
+    SELECT ((value::json)->>'sys_id_field') INTO v_psector_id_field FROM config_param_system WHERE parameter='api_search_psector';
+    SELECT ((value::json)->>'sys_search_field') INTO v_psector_display_field FROM config_param_system WHERE parameter='api_search_psector';
+    SELECT ((value::json)->>'sys_parent_field') INTO v_psector_parent_field FROM config_param_system WHERE parameter='api_search_psector';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_psector_geom_field FROM config_param_system WHERE parameter='api_search_psector';
     
    
     --Text to search

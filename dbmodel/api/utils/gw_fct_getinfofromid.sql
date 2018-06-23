@@ -28,11 +28,11 @@ DECLARE
     v_coherence boolean = false;
     v_results json;
     table_arg_return text = table_id_arg;
-
+    v_formheader text;
+	v_query_text text;
 
     -- fixed info type parameter(to do)
     --p_info_type integer=200;
-
     
 
 BEGIN
@@ -52,7 +52,7 @@ BEGIN
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
-raise notice 'Get api version: %', api_version;
+    raise notice 'Get api version: %', api_version;
 
 
 --      Get form (if exists) for the layer 
@@ -97,7 +97,7 @@ raise notice 'Form number: %', form_info;
         INTO column_type;
 
 
-raise notice 'v_idname: %  column_type: %', v_idname, column_type;
+    raise notice 'v_idname: %  column_type: %', v_idname, column_type;
 
 
 --     Get geometry_column
@@ -122,7 +122,7 @@ raise notice 'v_idname: %  column_type: %', v_idname, column_type;
             INTO v_geometry;
     END IF;
 
-raise notice 'Feature geometry: % ', v_geometry;
+    raise notice 'Feature geometry: % ', v_geometry;
 
 
 --      Get link (if exists) for the layer
@@ -132,37 +132,38 @@ raise notice 'Feature geometry: % ', v_geometry;
     IF  link_id_aux IS NOT NULL THEN 
         
         -- Get link field value
-        EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||link_id_aux||' FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
+        EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||link_id_aux||' AS link FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
         INTO link_path;
 
-raise notice 'Layer link path: % ', link_path;
+    raise notice 'Layer link path: % ', link_path;
 
 
         END IF;
          
 --        Get tabs for the layer
 --------------------------------
+    
         EXECUTE 'SELECT array_agg(formtab) FROM (SELECT formtab FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
             INTO form_tabs
             USING table_id_arg;
 
-raise notice 'form_tabs; %', form_tabs;
+    raise notice 'form_tabs %', form_tabs;
 
---        Get tab label for tabs form
---------------------------------
+    -- Get tab label for tabs form
+    ------------------------------
         EXECUTE 'SELECT array_agg(tablabel) FROM (SELECT tablabel FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
             INTO form_tablabel
             USING table_id_arg;
 
-raise notice 'form_tablabel; %', form_tablabel;
+    raise notice 'form_tablabel; %', form_tablabel;
 
---        Get header text for tabs form
---------------------------------
+    -- Get header text for tabs form
+    --------------------------------
         EXECUTE 'SELECT array_agg(tabtext) FROM (SELECT tabtext FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
             INTO form_tabtext
             USING table_id_arg;
 
-raise notice 'form_tabtext; %', form_tabtext;
+    raise notice 'form_tabtext; %', form_tabtext;
 
 
 --        Check if it is parent table 
@@ -171,47 +172,60 @@ raise notice 'form_tabtext; %', form_tabtext;
 
         -- parent-child relation exits    
         parent_child_relation:=true;
-
+    
         -- check parent_view
         EXECUTE 'SELECT tableparent_id from config_web_layer WHERE layer_id=$1'
-                INTO tableparent_id_arg
-                USING table_id_arg;
+            INTO tableparent_id_arg
+            USING table_id_arg;
                 
-raise notice'Parent-Child. Table parent: %' , tableparent_id_arg;
-
+        raise notice'Parent-Child. Table parent: %' , tableparent_id_arg;
 
         -- Identify tableinforole_id 
-        EXECUTE' SELECT tableinforole_id FROM config_web_layer_child
+        
+        v_query_text := ' SELECT tableinforole_id FROM config_web_layer_child
         JOIN config_web_tableinfo_x_inforole ON config_web_layer_child.tableinfo_id=config_web_tableinfo_x_inforole.tableinfo_id 
-        WHERE featurecat_id= (SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1) 
-        AND inforole_id=$2'
-            INTO table_id_arg
-            USING id, p_info_type;
+        WHERE featurecat_id= (SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text='||id||'::text) 
+        AND inforole_id='||p_info_type;
+    
+        -- Identify tableinforole_id 
+        EXECUTE v_query_text INTO table_id_arg;
 
-raise notice'p_info_type: %' , p_info_type;
+        -- Identify Name of feature type (to put on header of form)
+        EXECUTE' SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1'
+            INTO v_formheader
+            USING id;
 
-raise notice'Parent-Child. Table child: %' , table_id_arg;
+        raise notice'p_info_type: %' , p_info_type;
+        raise notice'Parent-Child. Table child: %' , table_id_arg;
+
 
     -- Check if it is not editable layer (is_editable is false)
         ELSIF table_id_arg IN (SELECT layer_id FROM config_web_layer WHERE is_editable IS FALSE) THEN
 
-
-raise notice'No parent-child and no editable table: %' , table_id_arg;
-
+        raise notice'No parent-child and no editable table: %' , table_id_arg;
 
         -- Identify tableinforole_id 
         EXECUTE 'SELECT tableinforole_id FROM config_web_layer
         JOIN config_web_tableinfo_x_inforole ON config_web_layer.tableinfo_id=config_web_tableinfo_x_inforole.tableinfo_id 
         WHERE layer_id=$1 AND inforole_id=$2'
-                INTO table_id_arg
+            INTO table_id_arg
             USING table_id_arg, p_info_type;
-
-raise notice'p_info_type: %' , p_info_type;
-
-raise notice'No parent-child and inforole table: %' , table_id_arg;
-
+    
+        raise notice'p_info_type: %' , p_info_type;
+        raise notice'No parent-child and inforole table: %' , table_id_arg;
 
         END IF;
+
+-- Control layer's
+------------------
+    EXECUTE 'SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = '||quote_literal(schemas_array[1])||' 
+        AND table_name = '||quote_literal(table_id_arg)||')'
+        INTO v_query_text;
+            
+    IF v_query_text::boolean IS FALSE THEN
+        RETURN ('{"status":"Failed","message":'||to_json('The info table does not exists. Check your parent-child and inforole configurations'::text)
+        ||', "apiVersion":'|| api_version ||'}')::json;
+    END IF;
         
 
 --    Get id column
@@ -233,27 +247,27 @@ raise notice'No parent-child and inforole table: %' , table_id_arg;
 
 
 
---  Take form_id 
-----------------
-    EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
-        INTO formid_arg
-        USING alias_id_arg; 
-            
+   
 --    Check generic
 -------------------
     IF form_info ISNULL THEN
-        form_info := json_build_object('formName','F16','formId','GENERIC');
+    v_formheader:='GENERIC';
+        form_info := json_build_object('formName','F16','formId',v_formheader);
+        form_tablabel_json := array_to_json(array_append(form_tablabel, 'DADES'));
         formid_arg := 'F16';
+    ELSE 
+      form_tablabel_json := array_to_json(array_append(form_tablabel, 'Dades'));
     END IF;
 
 --    Add default tab
 ---------------------
       form_tabs_json := array_to_json(array_append(form_tabs, 'tabInfo'));
-      form_tablabel_json := array_to_json(array_append(form_tablabel, 'Data'));
       form_tabtext_json := array_to_json(array_append(form_tabtext, ''));
 
 
 --    Join json
+     v_formheader:=concat(v_formheader,' - ',id);
+     form_info := gw_fct_json_object_set_key(form_info, 'formName', v_formheader);
      form_info := gw_fct_json_object_set_key(form_info, 'formTabs', form_tabs_json);
      form_info := gw_fct_json_object_set_key(form_info, 'tabLabel', form_tablabel_json);
      form_info := gw_fct_json_object_set_key(form_info, 'tabText', form_tabtext_json);

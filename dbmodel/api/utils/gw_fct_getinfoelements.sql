@@ -9,11 +9,8 @@ DECLARE
 
 BEGIN
 
-
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
-
-   
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -39,20 +36,18 @@ BEGIN
 
     raise notice 'query_result_elements %', query_result_elements;
 
-
 --    Control NULL's
     type_element_arg := COALESCE(type_element_arg, '{}');
     query_result_elements := COALESCE(query_result_elements, '{}');
     
 --    Return
     RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||
-    --',"typeElement":' ||type_element_arg||
     ', "elements":' || query_result_elements || '}')::json;
           
 
 --    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-      --  RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||', "SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+--    EXCEPTION WHEN OTHERS THEN 
+  --      RETURN ('{"status":"Failed","SQLERR":' || to_json('Please check the coherence againts config_web_forms table, (*)_x_element/hydro and the primary key (*) for this element'::text) || ', "apiVersion":'|| api_version ||', "SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
