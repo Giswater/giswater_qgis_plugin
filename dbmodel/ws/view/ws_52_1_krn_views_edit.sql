@@ -47,6 +47,20 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
   WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state AND selector_hydrometer.cur_user = "current_user"()::text;
 
   
+  
+  
+drop view v_ui_hydrometer;
+CREATE OR REPLACE VIEW v_ui_hydrometer AS 
+ SELECT v_rtc_hydrometer.hydrometer_id AS sys_hydrometer_id,
+    v_rtc_hydrometer.connec_id AS sys_connec_id,
+    v_rtc_hydrometer.hydrometer_customer_code AS "Hydro ccode:",
+    v_rtc_hydrometer.connec_customer_code AS "Connec ccode:",
+    v_rtc_hydrometer.state AS "State:",
+    v_rtc_hydrometer.expl_name AS "Exploitation:",
+    v_rtc_hydrometer.hydrometer_link
+   FROM v_rtc_hydrometer; 
+
+  
  
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec CASCADE;
