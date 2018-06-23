@@ -337,75 +337,70 @@ UNION
    where state=1;
 
 
-   
-
-DROP VIEW IF EXISTS v_ui_workcat_x_feature_end;
+ 
+DROP VIEW v_ui_workcat_x_feature_end ;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS 
- SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,
-    arc.feature_type,
-    arc.arccat_id AS featurecat_id,
-    arc.arc_id AS feature_id,
-    arc.code,
+ SELECT row_number() OVER (ORDER BY arc_id) + 1000000 AS rid,
+    'ARC'::varchar as feature_type,
+    v_edit_arc.arccat_id AS featurecat_id,
+    v_edit_arc.arc_id AS feature_id,
+    v_edit_arc.code,
     exploitation.name AS expl_name,
-    workcat_id_end AS workcat_id,
-	exploitation.expl_id
-   FROM arc
-   JOIN exploitation ON exploitation.expl_id=arc.expl_id
-   where state=0
+    v_edit_arc.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_arc
+     JOIN exploitation ON exploitation.expl_id = v_edit_arc.expl_id
+  WHERE v_edit_arc.state = 0
 UNION
- SELECT row_number() OVER (ORDER BY node.node_id) + 2000000 AS rid,
-    node.feature_type,
-    node.nodecat_id AS featurecat_id,
-    node.node_id AS feature_id,
-    node.code,
+ SELECT row_number() OVER (ORDER BY node_id) + 2000000 AS rid,
+    'NODE',
+    v_edit_node.nodecat_id AS featurecat_id,
+    v_edit_node.node_id AS feature_id,
+    v_edit_node.code,
     exploitation.name AS expl_name,
-    workcat_id_end AS workcat_id,
-	exploitation.expl_id
-   FROM node
-   JOIN exploitation ON exploitation.expl_id=node.expl_id
-   where state=0
+    v_edit_node.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_node
+     JOIN exploitation ON exploitation.expl_id = v_edit_node.expl_id
+  WHERE v_edit_node.state = 0
 UNION
- SELECT row_number() OVER (ORDER BY connec.connec_id) + 3000000 AS rid,
-    connec.feature_type,
-    connec.connecat_id AS featurecat_id,
-    connec.connec_id AS feature_id,
-    connec.code,
+ SELECT row_number() OVER (ORDER BY connec_id) + 3000000 AS rid,
+    'CONNEC',
+    v_edit_connec.connecat_id AS featurecat_id,
+    v_edit_connec.connec_id AS feature_id,
+    v_edit_connec.code,
     exploitation.name AS expl_name,
-    workcat_id_end AS workcat_id,
-	exploitation.expl_id
-   FROM connec
-   JOIN exploitation ON exploitation.expl_id=connec.expl_id
-   where state=0
- UNION 
-   	SELECT row_number() OVER (ORDER BY gully.gully_id) + 4000000 AS rid,
-	gully.feature_type,
-	gully.gratecat_id as featurecat_id,
-	gully.gully_id as feature_id,
-	gully.code as code,
+    v_edit_connec.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_connec
+     JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id
+  WHERE v_edit_connec.state = 0
+UNION
+ SELECT row_number() OVER (ORDER BY element_id) + 4000000 AS rid,
+    'ELEMENT',
+    v_edit_element.elementcat_id AS featurecat_id,
+    v_edit_element.element_id AS feature_id,
+    v_edit_element.code,
     exploitation.name AS expl_name,
-    workcat_id_end AS workcat_id,
+    v_edit_element.workcat_id_end AS workcat_id,
+    exploitation.expl_id
+   FROM v_edit_element
+     JOIN exploitation ON exploitation.expl_id = v_edit_element.expl_id
+  WHERE v_edit_element.state = 0
+   UNION 
+   	SELECT row_number() OVER (ORDER BY gully_id) + 4000000 AS rid,
+    'GULLY',
+	v_edit_gully.gratecat_id as featurecat_id,
+	v_edit_gully.gully_id as feature_id,
+	v_edit_gully.code as code,
+    exploitation.name AS expl_name,
+    v_edit_workcat_id_end AS workcat_id,
 	exploitation.expl_id
 	FROM gully
-    JOIN exploitation ON exploitation.expl_id=gully.expl_id
-    where state=0
-UNION
- SELECT row_number() OVER (ORDER BY element.element_id) + 5000000 AS rid,
-    element.feature_type,
-    element.elementcat_id AS featurecat_id,
-    element.element_id AS feature_id,
-    element.code,
-    exploitation.name AS expl_name,
-    workcat_id_end AS workcat_id,
-	exploitation.expl_id
-   FROM element
-   JOIN exploitation ON exploitation.expl_id=element.expl_id
-   where state=0;
-
-   
-   
-
-	
-	
+    JOIN exploitation ON exploitation.expl_id=v_edit_gully.expl_id
+    where state=0;
+  
+  
 
 CREATE OR REPLACE VIEW v_rtc_scada AS 
  SELECT ext_rtc_scada.scada_id,
