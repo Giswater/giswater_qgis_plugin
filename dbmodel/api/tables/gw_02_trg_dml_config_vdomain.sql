@@ -29,6 +29,16 @@ INSERT INTO config_web_layer_cat_formtab VALUES ('tabElement');
 INSERT INTO config_web_layer_cat_formtab VALUES ('tabVisit');
 INSERT INTO config_web_layer_cat_formtab VALUES ('tabHydro');
 INSERT INTO config_web_layer_cat_formtab VALUES ('tabMincut');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabNetwork');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabSearch');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabWorkcat');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabPsector');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabState');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabExpl');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabExploitation');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabNetworkState');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabHydroState');
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabAddress');
 
 
 INSERT INTO config_web_layer_cat_form VALUES ('F11', 'INFO_UD_NODE');
@@ -52,10 +62,45 @@ INSERT INTO config_web_layer_cat_form VALUES ('F42', 'MINCUT_ADD_CONNEC');
 INSERT INTO config_web_layer_cat_form VALUES ('F43', 'MINCUT_ADD_HYDROMETER');
 INSERT INTO config_web_layer_cat_form VALUES ('F44', 'MINCUT_END');
 INSERT INTO config_web_layer_cat_form VALUES ('F45', 'MINCUT_MANAGEMENT');
-INSERT INTO config_web_layer_cat_form VALUES ('F51', 'REVIEW_UD_ARC');
-INSERT INTO config_web_layer_cat_form VALUES ('F52', 'REVIEW_UD_NODE');
-INSERT INTO config_web_layer_cat_form VALUES ('F53', 'REVIEW_UD_CONNEC');
-INSERT INTO config_web_layer_cat_form VALUES ('F54', 'REVIEW_UD_GULLY');
-INSERT INTO config_web_layer_cat_form VALUES ('F55', 'REVIEW_WS_ARC');
-INSERT INTO config_web_layer_cat_form VALUES ('F56', 'REVIEW_WS_NODE');
-INSERT INTO config_web_layer_cat_form VALUES ('F57', 'REVIEW_WS_CONNEC');
+
+
+
+
+INSERT INTO config_web_fields VALUES (1, 'F22', 'parameter_id', NULL, 'string', 30, NULL, 'parameter', 'parameter_id', 'text', NULL, NULL, NULL, NULL, true, 1);
+INSERT INTO config_web_fields VALUES (2, 'F22', 'value', NULL, 'string', NULL, NULL, '0.00', 'value', 'text', NULL, NULL, NULL, NULL, true, 2);
+INSERT INTO config_web_fields VALUES (3, 'F22', 'text', NULL, 'string', NULL, NULL, '', 'text', 'text', NULL, NULL, NULL, NULL, true, 3);
+
+
+INSERT INTO config_web_fields VALUES (4, 'F23', 'parameter_id', NULL, 'string', NULL, NULL, 'parameter', 'parameter_id', 'text', NULL, NULL, NULL, NULL, true, 1);
+INSERT INTO config_web_fields VALUES (5, 'F23', 'position_id', NULL, 'string', NULL, NULL, '', 'position_id', 'text', NULL, NULL, NULL, NULL, true, 2);
+INSERT INTO config_web_fields VALUES (6, 'F23', 'position_value', NULL, 'string', NULL, NULL, '', 'position_value', 'text', NULL, NULL, NULL, NULL, true, 3);
+INSERT INTO config_web_fields VALUES (7, 'F23', 'value', NULL, 'string', NULL, NULL, '0.00', 'value', 'text', NULL, NULL, NULL, NULL, true, 4);
+INSERT INTO config_web_fields VALUES (8, 'F23', 'text', NULL, 'string', NULL, NULL, '', 'text', 'text', NULL, NULL, NULL, NULL, true, 5);
+
+
+INSERT INTO config_web_fields VALUES (10, 'F24', 'parameter_id', NULL, 'string', 30, NULL, 'parameter', 'id', 'text', NULL, NULL, NULL, NULL, false, 1);
+INSERT INTO config_web_fields VALUES (11, 'F24', 'position_id', NULL, 'string', 30, NULL, '', 'position_id', 'text', NULL, NULL, NULL, NULL, true, 3);
+INSERT INTO config_web_fields VALUES (12, 'F24', 'position_value', NULL, 'string', 12, NULL, '0.00', 'position_value', 'text', NULL, NULL, NULL, NULL, true, 4);
+INSERT INTO config_web_fields VALUES (13, 'F24', 'value1', NULL, 'string', NULL, NULL, '0.00', 'value1', 'text', NULL, NULL, NULL, NULL, true, 6);
+INSERT INTO config_web_fields VALUES (14, 'F24', 'value2', NULL, 'string', NULL, NULL, '0.00', 'value2', 'text', NULL, NULL, NULL, NULL, true, 7);
+INSERT INTO config_web_fields VALUES (15, 'F24', 'geom1', NULL, 'string', NULL, NULL, '0.00', 'geom1', 'text', NULL, NULL, NULL, NULL, true, 8);
+INSERT INTO config_web_fields VALUES (16, 'F24', 'geom2', NULL, 'string', NULL, NULL, '0.00', 'geom2', 'text', NULL, NULL, NULL, NULL, true, 9);
+INSERT INTO config_web_fields VALUES (17, 'F24', 'geom3', NULL, 'string', NULL, NULL, '0.00', 'geom3', 'text', NULL, NULL, NULL, NULL, true, 10);
+INSERT INTO config_web_fields VALUES (18, 'F24', 'value', NULL, 'string', 12, NULL, '0.00', 'value', 'text', NULL, NULL, NULL, NULL, true, 5);
+
+
+INSERT INTO config_web_fields VALUES (24, 'F31', 'hydro_expl', NULL, NULL, NULL, NULL, NULL, 'Explotació:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (25, 'F31', 'hydro_search', NULL, NULL, NULL, NULL, NULL, 'Abonat:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (26, 'F31', 'workcat_search', NULL, NULL, NULL, NULL, NULL, 'Expedient:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (27, 'F31', 'psector_expl', NULL, NULL, NULL, NULL, NULL, 'Explotació:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (28, 'F31', 'psector_search', NULL, NULL, NULL, NULL, NULL, 'Psector:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (29, 'F31', 'add_postnumber', NULL, NULL, NULL, NULL, NULL, 'Núm.:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (30, 'F31', 'generic_search', NULL, NULL, NULL, NULL, NULL, 'Cerca:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (31, 'F31', 'net_type', NULL, NULL, NULL, NULL, NULL, 'Tipus:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (32, 'F31', 'net_code', NULL, NULL, NULL, NULL, NULL, 'Codi:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (33, 'F31', 'add_muni', NULL, NULL, NULL, NULL, NULL, 'Municipi:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (34, 'F31', 'add_street', NULL, NULL, NULL, NULL, NULL, 'Carrer:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+
+
+
