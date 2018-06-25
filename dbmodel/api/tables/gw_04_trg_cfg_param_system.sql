@@ -18,6 +18,8 @@ INSERT INTO config_param_system VALUES (83, 'api_search_street', '{"sys_table_id
 INSERT INTO config_param_system VALUES (74, 'api_sensibility_factor_mobile', '2', NULL, NULL, NULL);
 INSERT INTO config_param_system VALUES (71, 'api_sensibility_factor_web', '1', NULL, NULL, NULL);
 INSERT INTO config_param_system VALUES (78, 'api_search_connec', '{"sys_table_id":"v_edit_connec", "sys_id_field":"connec_id", "sys_search_field":"code", "alias":"Escomeses", "cat_field":"connecat_id", "orderby":"3"}', NULL, 'api_search_network', NULL);
+INSERT INTO config_param_system VALUES (78, 'api_search_gully', {"sys_table_id":"v_edit_gully", "sys_id_field":"gully_id", "sys_search_field":"gully_id", "alias":"Embornal", "cat_field":"gratecat_id", "orderby":"4"}, NULL, 'api_search_network', NULL);
+
 INSERT INTO config_param_system VALUES (87, 'api_search_psector', '{"sys_table_id":"v_edit_plan_psector", "sys_id_field":"psector_id", "sys_search_field":"name", "sys_parent_field":"expl_id", "sys_geom_field":"the_geom"}', NULL, 'apì_search_psector', NULL);
 INSERT INTO config_param_system VALUES (88, 'api_search_exploitation', '{"sys_table_id":"exploitation", "sys_id_field":"expl_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}', NULL, 'apì_search_psector', NULL);
 INSERT INTO config_param_system VALUES (82, 'api_search_muni', '{"sys_table_id":"ext_municipality", "sys_id_field":"muni_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}', NULL, 'apì_search_adress', NULL);

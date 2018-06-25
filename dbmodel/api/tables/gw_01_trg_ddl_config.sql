@@ -56,13 +56,14 @@ CREATE TABLE "config_web_layer_child"(
 
 
 
-CREATE TABLE "config_web_layer_tab"(
-  id serial NOT NULL,
+CREATE TABLE config_web_tabs
+( id integer NOT NULL,
   layer_id character varying(50),
   formtab text,
-  tableview_id text,
-  CONSTRAINT config_web_layer_tab_pkey PRIMARY KEY (id),
-  CONSTRAINT config_web_layer_formtab_fkey FOREIGN KEY (formtab)
+  tablabel text,
+  tabtext text,
+  CONSTRAINT config_web_tabs_pkey PRIMARY KEY (id),
+  CONSTRAINT config_web_layer_tab_fkey FOREIGN KEY (formtab)
       REFERENCES config_web_layer_cat_formtab (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE RESTRICT);
 

@@ -216,17 +216,6 @@ raise notice 'Form number: %', form_info;
 
         END IF;
 
--- Control layer's
-------------------
-    EXECUTE 'SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = '||quote_literal(schemas_array[1])||' 
-        AND table_name = '||quote_literal(table_id_arg)||')'
-        INTO v_query_text;
-            
-    IF v_query_text::boolean IS FALSE THEN
-        RETURN ('{"status":"Failed","message":'||to_json('The info table does not exists. Check your parent-child and inforole configurations'::text)
-        ||', "apiVersion":'|| api_version ||'}')::json;
-    END IF;
-        
 
 --    Get id column
 ---------------------
