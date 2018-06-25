@@ -321,6 +321,51 @@ FROM gully
 	LEFT JOIN sector ON gully.sector_id = sector.sector_id
 	LEFT JOIN gully_type ON gully.gully_type=gully_type.id;
 
+
+   
+  
+
+DROP VIEW IF EXISTS v_edit_element CASCADE;
+CREATE VIEW v_edit_element AS SELECT
+	element.element_id,
+	code,
+	elementcat_id,
+	cat_element.elementtype_id,
+	serial_number,
+	state,
+	state_type,
+	num_elements,
+	observ,
+	comment,
+	function_type,
+	category_type,
+	location_type,
+	fluid_type,
+	workcat_id,
+	workcat_id_end,
+	buildercat_id,
+	builtdate,
+	enddate,
+	ownercat_id,
+	rotation,
+	concat(element_type.link_path, element.link) AS link,
+	verified,
+	element.the_geom,
+	label_x,
+	label_y,
+	label_rotation,
+	publish,
+	inventory,
+	element.undelete,
+	element.expl_id
+FROM selector_expl,element
+JOIN v_state_element ON element.element_id=v_state_element.element_id
+JOIN cat_element ON elementcat_id = id
+JOIN element_type ON element_type.id=elementtype_id
+	WHERE ((element.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());	
+	
+	
 	
 DROP VIEW IF EXISTS v_edit_link;
 CREATE OR REPLACE VIEW v_edit_link AS 

@@ -49,7 +49,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
   
   
   
-drop view v_ui_hydrometer;
+drop view IF EXISTS v_ui_hydrometer cascade;
 CREATE OR REPLACE VIEW v_ui_hydrometer AS 
  SELECT v_rtc_hydrometer.hydrometer_id AS sys_hydrometer_id,
     v_rtc_hydrometer.connec_id AS sys_connec_id,

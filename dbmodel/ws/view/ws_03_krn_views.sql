@@ -83,8 +83,9 @@ CREATE MATERIALIZED VIEW v_ui_workcat_polygon_aux AS
         END AS the_geom
    FROM workcat_polygon
    WHERE workcat_id IS NOT NULL;
+	
 
-
+  
 DROP VIEW IF EXISTS v_ui_workcat_x_feature;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature AS 
  SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,
@@ -137,7 +138,7 @@ UNION
 
 
    
-DROP VIEW v_ui_workcat_x_feature_end ;
+DROP VIEW IF EXISTS v_ui_workcat_x_feature_end;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS 
  SELECT row_number() OVER (ORDER BY arc_id) + 1000000 AS rid,
     'ARC'::varchar as feature_type,
@@ -186,8 +187,7 @@ UNION
    FROM v_edit_element
      JOIN exploitation ON exploitation.expl_id = v_edit_element.expl_id
   WHERE v_edit_element.state = 0;
-	
-	
+
 
 DROP VIEW IF EXISTS v_ui_node_x_relations;
 CREATE OR REPLACE VIEW v_ui_node_x_relations AS 

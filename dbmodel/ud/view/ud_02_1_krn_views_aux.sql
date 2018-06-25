@@ -14,6 +14,16 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- STATE VIEWS & JOINED WITH MASTERPLAN (ALTERNATIVES)
 -------------------------------------------------------
 
+	
+DROP VIEW IF EXISTS v_state_element CASCADE;
+CREATE VIEW v_state_element AS
+SELECT 
+	element_id
+	FROM selector_state,element
+	WHERE element.state=selector_state.state_id
+	AND selector_state.cur_user=current_user;
+
+	
 DROP VIEW IF EXISTS v_state_samplepoint CASCADE;
 CREATE VIEW v_state_samplepoint AS
 SELECT 

@@ -338,7 +338,7 @@ UNION
 
 
  
-DROP VIEW v_ui_workcat_x_feature_end ;
+DROP VIEW IF EXISTS v_ui_workcat_x_feature_end ;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS 
  SELECT row_number() OVER (ORDER BY arc_id) + 1000000 AS rid,
     'ARC'::varchar as feature_type,
@@ -394,9 +394,9 @@ UNION
 	v_edit_gully.gully_id as feature_id,
 	v_edit_gully.code as code,
     exploitation.name AS expl_name,
-    v_edit_workcat_id_end AS workcat_id,
+    workcat_id_end AS workcat_id,
 	exploitation.expl_id
-	FROM gully
+	FROM v_edit_gully
     JOIN exploitation ON exploitation.expl_id=v_edit_gully.expl_id
     where state=0;
   
