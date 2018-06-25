@@ -56,10 +56,7 @@ SELECT v_ui_workcat_polygon_aux.workcat_id,
 	workid_key2, 
 	builtdate,
     v_ui_workcat_polygon_aux.the_geom
-   FROM selector_workcat, v_ui_workcat_polygon_aux JOIN cat_work ON workcat_id=id
-   WHERE selector_workcat.workcat_id = v_ui_workcat_polygon_aux.workcat_id::text AND selector_workcat.cur_user = "current_user"()::text;
-
-
+   FROM v_ui_workcat_polygon_aux JOIN cat_work ON workcat_id=id
 
 
 DROP VIEW IF EXISTS v_ui_arc_x_node;
