@@ -429,11 +429,15 @@ BEGIN
 						
 		END IF;
 	
-		--Label rotation
+		--Symbol rotation
 		IF (NEW.rotation != OLD.rotation) THEN
 			   UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;	
 
+		--Hemisphere
+		IF (NEW.hemisphere != OLD.hemisphere) THEN
+			   UPDATE node SET hemisphere=NEW.hemisphere WHERE node_id = OLD.node_id;
+		END IF;	
 		
 		UPDATE node 
 		SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, arc_id=NEW.arc_id, parent_id=NEW.parent_id,
@@ -441,7 +445,7 @@ BEGIN
 		function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,  
 		buildercat_id=NEW.buildercat_id,builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, 
 		streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode,postnumber=NEW.postnumber,postnumber2=NEW.postnumber2, descript=NEW.descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, 
-		label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.hemisphere, num_value=NEW.num_value
+		label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value
 		WHERE node_id = OLD.node_id;
 		
 		IF man_table ='man_junction' THEN
