@@ -1081,6 +1081,7 @@ class MincutParent(ParentAction, MultipleSelection):
         table_name = self.schema_name + ".v_edit_connec"
         widget = self.dlg_connec.tbl_mincut_connec     
         expr = self.set_table_model(widget, table_name, expr_filter)
+        self.set_table_columns(self.dlg_connec, widget, 'v_edit_connec')
         return expr
 
 
@@ -1089,6 +1090,7 @@ class MincutParent(ParentAction, MultipleSelection):
         table_name = self.schema_name + ".v_rtc_hydrometer"
         widget = self.dlg_hydro.tbl_hydro  
         expr = self.set_table_model(widget, table_name, expr_filter)
+        self.set_table_columns(self.dlg_hydro, widget, 'v_rtc_hydrometer')
         return expr        
 
 
