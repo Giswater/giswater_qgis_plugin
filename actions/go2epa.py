@@ -10,7 +10,6 @@ from PyQt4.QtCore import QTime, QDate, Qt
 from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
 
-
 import os
 import csv
 from functools import partial
