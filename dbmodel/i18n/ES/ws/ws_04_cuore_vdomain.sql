@@ -39,38 +39,3 @@ INSERT INTO value_verified VALUES ('VERIFICADO');
 INSERT INTO value_yesno VALUES ('NO');
 INSERT INTO value_yesno VALUES ('SI');
 
-
-
-
--- ----------------------------
--- Records of man_type_category
--- ----------------------------
-INSERT INTO man_type_category VALUES (1, 'Categoría estándar', 'NODE');
-INSERT INTO man_type_category VALUES (2, 'Categoría estándar', 'ARC');
-INSERT INTO man_type_category VALUES (3, 'Categoría estándar', 'CONNEC');
-INSERT INTO man_type_category VALUES (4, 'Categoría estándar', 'ELEMENT');
-
--- ----------------------------
--- Records of man_type_fluid
--- ----------------------------
-INSERT INTO man_type_fluid VALUES (1, 'Fluido estándar', 'NODE');
-INSERT INTO man_type_fluid VALUES (2, 'Fluido estándar', 'ARC');
-INSERT INTO man_type_fluid VALUES (3, 'Fluido estándar', 'CONNEC');
-INSERT INTO man_type_fluid VALUES (4, 'Fluido estándar', 'ELEMENT');
-
--- ----------------------------
--- Records of man_type_location
--- ----------------------------
-INSERT INTO man_type_location VALUES (1, 'Localización estándar', 'NODE');
-INSERT INTO man_type_location VALUES (2, 'Localización estándar', 'ARC');
-INSERT INTO man_type_location VALUES (3, 'Localización estándar', 'CONNEC');
-INSERT INTO man_type_location VALUES (4, 'Localización estándar', 'ELEMENT');
-
--- ----------------------------
--- Records of man_type_function
--- ----------------------------
-INSERT INTO man_type_function VALUES (1, 'Función estándar', 'NODE');
-INSERT INTO man_type_function VALUES (2, 'Función estándar', 'ARC');
-INSERT INTO man_type_function VALUES (3, 'Función estándar', 'CONNEC');
-INSERT INTO man_type_function VALUES (4, 'Función estándar', 'ELEMENT');
-

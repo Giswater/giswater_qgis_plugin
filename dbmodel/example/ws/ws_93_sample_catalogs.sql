@@ -175,3 +175,36 @@ INSERT INTO cat_work VALUES ('work1', 'Description work1', NULL, NULL, NULL, '20
 INSERT INTO cat_work VALUES ('work2', 'Description work2', NULL, NULL, NULL, '2017-12-09');
 INSERT INTO cat_work VALUES ('work3', 'Description work3', NULL, NULL, NULL, '2017-12-11');
 INSERT INTO cat_work VALUES ('work4', 'Description work4', NULL, NULL, NULL, '2017-12-22');
+
+
+-- ----------------------------
+-- Records of man_type_category
+-- ----------------------------
+INSERT INTO man_type_category VALUES (1, 'Standard Category', 'NODE');
+INSERT INTO man_type_category VALUES (2, 'Standard Category', 'ARC');
+INSERT INTO man_type_category VALUES (3, 'Standard Category', 'CONNEC');
+INSERT INTO man_type_category VALUES (4, 'Standard Category', 'ELEMENT');
+
+-- ----------------------------
+-- Records of man_type_fluid
+-- ----------------------------
+INSERT INTO man_type_fluid VALUES (1, 'Standard Fluid', 'NODE');
+INSERT INTO man_type_fluid VALUES (2, 'Standard Fluid', 'ARC');
+INSERT INTO man_type_fluid VALUES (3, 'Standard Fluid', 'CONNEC');
+INSERT INTO man_type_fluid VALUES (4, 'Standard Fluid', 'ELEMENT');
+
+-- ----------------------------
+-- Records of man_type_location
+-- ----------------------------
+INSERT INTO man_type_location VALUES (1, 'Standard Location', 'NODE');
+INSERT INTO man_type_location VALUES (2, 'Standard Location', 'ARC');
+INSERT INTO man_type_location VALUES (3, 'Standard Location', 'CONNEC');
+INSERT INTO man_type_location VALUES (4, 'Standard Location', 'ELEMENT');
+
+-- ----------------------------
+-- Records of man_type_function
+-- ----------------------------
+INSERT INTO man_type_function VALUES (1, 'Standard Function', 'NODE');
+INSERT INTO man_type_function VALUES (2, 'Standard Function', 'ARC');
+INSERT INTO man_type_function VALUES (3, 'Standard Function', 'CONNEC');
+INSERT INTO man_type_function VALUES (4, 'Standard Function', 'ELEMENT');

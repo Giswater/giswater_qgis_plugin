@@ -28,7 +28,7 @@ INSERT INTO cat_feature VALUES ('SIFON', 'SIPHON', 'ARC');
 INSERT INTO cat_feature VALUES ('RAPIDO', 'WACCEL', 'ARC');
 INSERT INTO cat_feature VALUES ('FICTICIO', 'VARC',  'ARC');
 INSERT INTO cat_feature VALUES ('ACOMETIDA', 'CONNEC', 'CONNEC');
-INSERT INTO cat_feature VALUES ('IMBORNAL', 'GULLY', 'GULLY');
+INSERT INTO cat_feature VALUES ('SUMIDERO', 'GULLY', 'GULLY');
 INSERT INTO cat_feature VALUES ('REJA', 'GULLY', 'GULLY');
 
 
@@ -68,7 +68,7 @@ INSERT INTO connec_type VALUES ('ACOMETIDA', 'CONNEC', 'man_connec',true);
 -- ----------------------------
 -- Records of gully_type
 -- ----------------------------
-INSERT INTO gully_type VALUES ('IMBORNAL', 'GULLY', 'man_gully',true);
+INSERT INTO gully_type VALUES ('SUMIDERO', 'GULLY', 'man_gully',true);
 INSERT INTO gully_type VALUES ('REJA', 'GULLY', 'man_gully',true);
 
 -- ----------------------------
