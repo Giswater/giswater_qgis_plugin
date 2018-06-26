@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Default values of column views
 -- ----------------------------
-
+/*
 -- System values  (fields need values. User can customize, but it's forbidden to delete default values from this fields) 
 ALTER VIEW v_edit_node ALTER top_elev SET DEFAULT 0.00;
 ALTER VIEW v_edit_node ALTER ymax SET DEFAULT 0.00;
@@ -34,3 +34,4 @@ ALTER TABLE element ALTER COLUMN verified SET DEFAULT 'PER REVISAR';
 
 
 -- Custom values (User can customize other fields....)
+*/

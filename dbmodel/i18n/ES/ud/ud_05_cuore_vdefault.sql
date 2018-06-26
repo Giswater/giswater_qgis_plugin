@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 
 -- System values  (fields need values. User can customize, but it's forbidden to delete default values from this fields) 
-ALTER VIEW v_edit_node ALTER top_elev SET DEFAULT 0.00;
+/*ALTER VIEW v_edit_node ALTER top_elev SET DEFAULT 0.00;
 ALTER VIEW v_edit_node ALTER ymax SET DEFAULT 0.00;
 ALTER VIEW v_edit_node ALTER state SET DEFAULT 'EN_SERVICIO';
 ALTER VIEW v_edit_node ALTER verified SET DEFAULT 'PARA REVISAR';
@@ -31,6 +31,6 @@ ALTER VIEW v_edit_connec ALTER verified SET DEFAULT 'PARA REVISAR';
 
 ALTER TABLE element ALTER COLUMN state SET DEFAULT 'EN_SERVICIO';
 ALTER TABLE element ALTER COLUMN verified SET DEFAULT 'PARA REVISAR';
-
+*/
 
 -- Custom values (User can customize other fields....)
