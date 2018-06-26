@@ -17,8 +17,20 @@ INSERT INTO config_web_layer VALUES ('v_edit_man_junction', false, NULL, true, N
 INSERT INTO config_web_layer VALUES ('v_edit_man_pipe', false, NULL, true, NULL, 'F13', 'Pipe', NULL, NULL);
 INSERT INTO config_web_layer VALUES ('v_edit_man_wjoin', false, NULL, true, NULL, 'F14', 'Wjoin', NULL, NULL);
 INSERT INTO config_web_layer VALUES ('v_edit_arc', true, 'v_web_parent_arc', false, NULL, 'F13', 'Arc', 2, 'link');
-INSERT INTO config_web_layer VALUES ('v_edit_connec', true, 'v_web_parent_connec', false, NULL, 'F14', 'Connec', 3, 'link');
 INSERT INTO config_web_layer VALUES ('v_ui_hydrometer', false, NULL, false, 'v_ui_hydrometer', 'F11', 'Hydrometer', 99, 'hydrometer_link');
+
+--ws specific
+--INSERT INTO config_web_layer VALUES ('v_edit_connec', true, 'v_web_parent_connec', false, NULL, 'F14', 'Connec', 3, 'link');
+
+
+
+--ud speficic
+INSERT INTO config_web_layer VALUES ('v_edit_connec', false, null, false, 'v_edit_gully', 'F14', 'Connec', 3, 'link');
+INSERT INTO config_web_layer VALUES ('v_edit_gully', false, null, false, 'v_edit_gully', 'F15', 'Gully', 3, 'link');
+
+INSERT INTO config_web_tabs VALUES (242, 'v_edit_connec', 'tabElement', 'Element', 'Llistat d''elements');
+INSERT INTO config_web_tabs VALUES (245, 'v_edit_connec', 'tabVisit', 'Visit', 'Històric d''events');
+INSERT INTO config_web_tabs VALUES (246, 'v_edit_connec', 'tabDoc', 'Doc', 'Documents associats');
 
 
 
@@ -50,17 +62,16 @@ INSERT INTO config_web_tabs VALUES (101, 'F31', 'tabNetwork', 'Xarxa', 'Elements
 INSERT INTO config_web_tabs VALUES (102, 'F31', 'tabAddress', 'Carrerer', 'Carrerer dades PG');
 
 
-
 --inserts on config_web_layer_child (dinamyc insert)
 INSERT INTO config_web_layer_child
-SELECT cat_feature.id, tablename FROM SCHEMA_NAME.cat_feature JOIN SCHEMA_NAME.sys_feature_cat ON system_id=sys_feature_cat.id;
+SELECT cat_feature.id, tablename FROM ud.cat_feature JOIN ud.sys_feature_cat ON system_id=sys_feature_cat.id;
 
 
 --inserts on config_web_tableinfo_x_inforole (dinamyc insert)
-insert into SCHEMA_NAME.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
-select tableinfo_id, 100, tableinfo_id  FROM SCHEMA_NAME.config_web_layer ;
+insert into ud.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
+select tableinfo_id, 100, tableinfo_id  FROM ud.config_web_layer where tableinfo_id is not null ;
 
-insert into SCHEMA_NAME.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
-select tableinfo_id, 100, tableinfo_id  FROM SCHEMA_NAME.config_web_layer_child ;
+insert into ud.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
+select tableinfo_id, 100, tableinfo_id  FROM ud.config_web_layer_child;
 
 
