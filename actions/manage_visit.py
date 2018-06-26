@@ -12,6 +12,7 @@ from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEd
 import os
 import sys
 import subprocess
+import webbrowser
 from functools import partial
 
 import utils_giswater
