@@ -54,7 +54,7 @@ class Utils(ParentAction):
         role_edit = self.controller.check_role_user("role_edit")
         
         # Manage user 'postgres'
-        if self.controller.user == 'postgres':
+        if self.controller.user == 'postgres' or self.controller.user == 'gisadmin':
             role_admin = True
 
         # Remove tab for role
@@ -215,7 +215,7 @@ class Utils(ParentAction):
         role_basic = self.controller.check_role_user("role_basic")
 
         # Manage user 'postgres'
-        if self.controller.user == 'postgres':
+        if self.controller.user == 'postgres' or self.controller.user == 'gisadmin':
             role_admin = True
 
         if role_admin:
