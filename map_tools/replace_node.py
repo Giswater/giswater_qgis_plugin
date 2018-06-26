@@ -472,7 +472,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
         self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
-        self.dlg_cat.open()
+        self.open_dialog(self.dlg_cat)
 
 
     def fill_geomcat_id(self):
