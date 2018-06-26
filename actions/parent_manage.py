@@ -16,8 +16,8 @@ from PyQt4.QtCore import Qt
 from functools import partial
 
 import utils_giswater
-from parent import ParentAction
-from actions.multiple_selection import MultipleSelection
+from giswater.actions.parent import ParentAction
+from giswater.actions.multiple_selection import MultipleSelection
 
 
 class ParentManage(ParentAction, object):

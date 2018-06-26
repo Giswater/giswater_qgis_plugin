@@ -13,11 +13,11 @@ from datetime import datetime
 from functools import partial
 
 import utils_giswater
-from parent import ParentAction
-from actions.manage_visit import ManageVisit
-from actions.manage_new_psector import ManageNewPsector
-from ui_manager import Psector_management
-from ui_manager import SelectorDate
+from giswater.actions.parent import ParentAction
+from giswater.actions.manage_visit import ManageVisit
+from giswater.actions.manage_new_psector import ManageNewPsector
+from giswater.ui_manager import Psector_management
+from giswater.ui_manager import SelectorDate
 
 
 class Om(ParentAction):

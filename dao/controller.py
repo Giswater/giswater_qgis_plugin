@@ -17,10 +17,8 @@ import sys
 import subprocess
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
-from pg_dao import PgDao
-from logger import Logger
+from giswater.dao.pg_dao import PgDao
+from giswater.dao.logger import Logger
 
 
 class DaoController():

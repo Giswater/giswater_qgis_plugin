@@ -12,11 +12,11 @@ from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 
 from functools import partial
-from init.thread import Thread
+from giswater.init.thread import Thread
 
 import utils_giswater
-from parent_init import ParentDialog
-from map_tools.snapping_utils import SnappingConfigManager
+from giswater.parent_init import ParentDialog
+from giswater.map_tools.snapping_utils import SnappingConfigManager
 
 
 def formOpen(dialog, layer, feature):

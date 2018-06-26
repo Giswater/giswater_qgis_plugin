@@ -9,9 +9,9 @@ or (at your option) any later version.
 import os
 from functools import partial
 
-import utils_giswater
-from ui_manager import Multirow_selector
-from parent import ParentAction
+import giswater.utils_giswater
+from giswater.ui_manager import Multirow_selector
+from giswater.actions.parent import ParentAction
 
 
 class Basic(ParentAction):

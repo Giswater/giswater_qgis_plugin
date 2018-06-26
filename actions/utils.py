@@ -16,11 +16,11 @@ from functools import partial
 from encodings.aliases import aliases
 
 import utils_giswater
-from parent import ParentAction
-from actions.manage_visit import ManageVisit
-from ui_manager import ConfigUtils
-from ui_manager import Toolbox
-from ui_manager import Csv2Pg
+from giswater.actions.parent import ParentAction
+from giswater.actions.manage_visit import ManageVisit
+from giswater.ui_manager import ConfigUtils
+from giswater.ui_manager import Toolbox
+from giswater.ui_manager import Csv2Pg
 
 
 class Utils(ParentAction):

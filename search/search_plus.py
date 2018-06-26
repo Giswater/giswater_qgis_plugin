@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QGridLayout
-from PyQt4.QtGui import QPushButton
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
-
 from PyQt4 import uic
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog
-from PyQt4.QtGui import QLineEdit, QLabel
-
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 
 from functools import partial
 import operator
@@ -18,11 +13,11 @@ import csv
 import sys
 import webbrowser
 
-import utils_giswater      
-from search.ui.list_items import ListItems
-from search.ui.hydro_info import HydroInfo
-from search.ui.search_plus_dockwidget import SearchPlusDockWidget
-from actions.manage_new_psector import ManageNewPsector
+import utils_giswater
+from giswater.search.ui.list_items import ListItems
+from giswater.search.ui.hydro_info import HydroInfo
+from giswater.search.ui.search_plus_dockwidget import SearchPlusDockWidget
+from giswater.actions.manage_new_psector import ManageNewPsector
 
 
 class SearchPlus(QObject):

@@ -13,9 +13,9 @@ from PyQt4.QtSql import QSqlTableModel
 from functools import partial
 
 import utils_giswater
-from ui_manager import Multi_selector
-from ui_manager import Mincut_edit
-from parent import ParentAction
+from giswater.ui_manager import Multi_selector
+from giswater.ui_manager import Mincut_edit
+from giswater.actions.parent import ParentAction
 
 
 class MincutConfig(ParentAction):

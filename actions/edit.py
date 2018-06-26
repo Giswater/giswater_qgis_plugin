@@ -6,10 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-          
-from actions.manage_element import ManageElement        
-from actions.manage_document import ManageDocument      
-from actions.manage_workcat_end import ManageWorkcatEnd      
-from parent import ParentAction
+from giswater.actions.manage_element import ManageElement        
+from giswater.actions.manage_document import ManageDocument      
+from giswater.actions.manage_workcat_end import ManageWorkcatEnd      
+from giswater.actions.parent import ParentAction
 
 
 class Edit(ParentAction):

@@ -18,15 +18,14 @@ import operator
 from functools import partial
 
 import utils_giswater
-from parent import ParentAction
-from mincut_config import MincutConfig
-from actions.multiple_selection import MultipleSelection                  
-from ui_manager import Mincut
-from ui_manager import Mincut_fin
-from ui_manager import Mincut_add_hydrometer
-from ui_manager import Mincut_add_connec     
-from ui_manager import MincutComposer
-
+from giswater.actions.parent import ParentAction
+from giswater.actions.mincut_config import MincutConfig
+from giswater.actions.multiple_selection import MultipleSelection
+from giswater.ui_manager import Mincut
+from giswater.ui_manager import Mincut_fin
+from giswater.ui_manager import Mincut_add_hydrometer
+from giswater.ui_manager import Mincut_add_connec     
+from giswater.ui_manager import MincutComposer
 
 
 class MincutParent(ParentAction, MultipleSelection):

@@ -16,20 +16,20 @@ import webbrowser
 from functools import partial
 
 import utils_giswater
-from dao.om_visit_event import OmVisitEvent
-from dao.om_visit import OmVisit
-from dao.om_visit_x_arc import OmVisitXArc
-from dao.om_visit_x_connec import OmVisitXConnec
-from dao.om_visit_x_node import OmVisitXNode
-from dao.om_visit_x_gully import OmVisitXGully
-from dao.om_visit_parameter import OmVisitParameter
-from ui_manager import AddVisit
-from ui_manager import EventStandard
-from ui_manager import EventUDarcStandard
-from ui_manager import EventUDarcRehabit
-from ui_manager import VisitManagement
-from actions.parent_manage import ParentManage
-from actions.manage_document import ManageDocument
+from giswater.dao.om_visit_event import OmVisitEvent
+from giswater.dao.om_visit import OmVisit
+from giswater.dao.om_visit_x_arc import OmVisitXArc
+from giswater.dao.om_visit_x_connec import OmVisitXConnec
+from giswater.dao.om_visit_x_node import OmVisitXNode
+from giswater.dao.om_visit_x_gully import OmVisitXGully
+from giswater.dao.om_visit_parameter import OmVisitParameter
+from giswater.ui_manager import AddVisit
+from giswater.ui_manager import EventStandard
+from giswater.ui_manager import EventUDarcStandard
+from giswater.ui_manager import EventUDarcRehabit
+from giswater.ui_manager import VisitManagement
+from giswater.actions.parent_manage import ParentManage
+from giswater.actions.manage_document import ManageDocument
 
 
 class ManageVisit(ParentManage, QObject):
@@ -927,12 +927,12 @@ class ManageVisit(ParentManage, QObject):
         path = selected_list[0].data()
         # Check if file exist
         if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
+        # Open the document
+        if sys.platform == "win32":
+            os.startfile(path)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, path])
         else:
             webbrowser.open(path)
 

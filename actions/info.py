@@ -10,8 +10,8 @@ import sys
 from functools import partial
 
 import utils_giswater
-from parent import ParentAction
-from ui_manager import InfoShowInfo
+from giswater.actions.parent import ParentAction
+from giswater.ui_manager import InfoShowInfo
 
 
 class Info(ParentAction):

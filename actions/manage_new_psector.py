@@ -21,11 +21,11 @@ import operator
 from functools import partial
 
 import utils_giswater
-from ui_manager import Plan_psector
-from ui_manager import Psector_rapport
-from actions.parent_manage import ParentManage
-from actions.multiple_selection import MultipleSelection
-from actions.manage_document import ManageDocument
+from giswater.ui_manager import Plan_psector
+from giswater.ui_manager import Psector_rapport
+from giswater.actions.parent_manage import ParentManage
+from giswater.actions.multiple_selection import MultipleSelection
+from giswater.actions.manage_document import ManageDocument
 
 
 class ManageNewPsector(ParentManage):

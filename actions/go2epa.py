@@ -16,16 +16,16 @@ import csv
 from functools import partial
 
 import utils_giswater
-from ui_manager import FileManager
-from ui_manager import Multirow_selector
-from ui_manager import WSoptions
-from ui_manager import WStimes
-from ui_manager import UDoptions
-from ui_manager import UDtimes
-from ui_manager import HydrologySelector
-from ui_manager import EpaResultCompareSelector
-from ui_manager import EpaResultManager
-from parent import ParentAction
+from giswater.ui_manager import FileManager
+from giswater.ui_manager import Multirow_selector
+from giswater.ui_manager import WSoptions
+from giswater.ui_manager import WStimes
+from giswater.ui_manager import UDoptions
+from giswater.ui_manager import UDtimes
+from giswater.ui_manager import HydrologySelector
+from giswater.ui_manager import EpaResultCompareSelector
+from giswater.ui_manager import EpaResultManager
+from giswater.actions.parent import ParentAction
 
 
 class Go2Epa(ParentAction):

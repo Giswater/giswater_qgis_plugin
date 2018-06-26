@@ -11,9 +11,10 @@ from functools import partial
 from PyQt4.QtGui import QAbstractItemView
 
 import utils_giswater
-from ui_manager import AddElement                
-from ui_manager import ElementManagement
-from actions.parent_manage import ParentManage
+from giswater.ui_manager import AddElement                
+from giswater.ui_manager import ElementManagement
+from giswater.actions.parent_manage import ParentManage
+
 
 class ManageElement(ParentManage):
 

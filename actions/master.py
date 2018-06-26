@@ -14,13 +14,13 @@ import operator
 from functools import partial
 
 import utils_giswater
-from actions.manage_new_psector import ManageNewPsector
-from ui_manager import Psector_management
-from ui_manager import EstimateResultNew
-from ui_manager import EstimateResultSelector
-from ui_manager import EstimateResultManager
-from ui_manager import Multirow_selector
-from parent import ParentAction
+from giswater.actions.manage_new_psector import ManageNewPsector
+from giswater.ui_manager import Psector_management
+from giswater.ui_manager import EstimateResultNew
+from giswater.ui_manager import EstimateResultSelector
+from giswater.ui_manager import EstimateResultManager
+from giswater.ui_manager import Multirow_selector
+from giswater.actions.parent import ParentAction
 
 
 class Master(ParentAction):

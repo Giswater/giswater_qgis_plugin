@@ -15,9 +15,9 @@ from PyQt4.QtGui import QAbstractItemView, QTableView, QCompleter, QStringListMo
 from functools import partial
 
 import utils_giswater
-from actions.parent_manage import ParentManage
-from ui_manager import WorkcatEnd, NewWorkcat
-from ui_manager import WorkcatEndList
+from giswater.actions.parent_manage import ParentManage
+from giswater.ui_manager import WorkcatEnd, NewWorkcat
+from giswater.ui_manager import WorkcatEndList
 
 
 class ManageWorkcatEnd(ParentManage):

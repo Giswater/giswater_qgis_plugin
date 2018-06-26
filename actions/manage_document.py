@@ -11,9 +11,9 @@ from PyQt4.QtGui import QAbstractItemView
 from functools import partial
 
 import utils_giswater
-from ui_manager import AddDoc                           
-from ui_manager import DocManagement
-from actions.parent_manage import ParentManage
+from giswater.ui_manager import AddDoc
+from giswater.ui_manager import DocManagement
+from giswater.actions.parent_manage import ParentManage
 
 
 class ManageDocument(ParentManage):

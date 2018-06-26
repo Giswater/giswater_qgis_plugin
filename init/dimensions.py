@@ -11,7 +11,7 @@ from qgis.core import QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapCanvasSnapper, QgsVertexMarker
 
 import utils_giswater
-from parent_init import ParentDialog
+from giswater.parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
