@@ -261,7 +261,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>295</height>
+         <height>307</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1091,7 +1091,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="est_y1">
+       <widget class="QLineEdit" name="custom_y1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1101,7 +1101,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="est_y2">
+       <widget class="QLineEdit" name="custom_y2">
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -1283,7 +1283,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="est_elev1">
+       <widget class="QLineEdit" name="custom_elev1">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1373,7 +1373,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="est_elev2">
+       <widget class="QLineEdit" name="custom_elev2">
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -1556,8 +1556,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>295</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2231,8 +2231,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>295</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3242,15 +3242,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -3262,15 +3262,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLineEdit" name="doc_id">
@@ -3411,15 +3411,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_from">
@@ -3572,15 +3572,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_to">
@@ -7093,9 +7093,9 @@
   <tabstop>node_1</tabstop>
   <tabstop>btn_node_1</tabstop>
   <tabstop>y1</tabstop>
-  <tabstop>est_y1</tabstop>
+  <tabstop>custom_y1</tabstop>
   <tabstop>elev1</tabstop>
-  <tabstop>est_elev1</tabstop>
+  <tabstop>custom_elev1</tabstop>
   <tabstop>sys_elev1</tabstop>
   <tabstop>z1</tabstop>
   <tabstop>r1</tabstop>
@@ -7106,9 +7106,9 @@
   <tabstop>node_2</tabstop>
   <tabstop>btn_node_2</tabstop>
   <tabstop>y2</tabstop>
-  <tabstop>est_y2</tabstop>
+  <tabstop>custom_y2</tabstop>
   <tabstop>elev2</tabstop>
-  <tabstop>est_elev2</tabstop>
+  <tabstop>custom_elev2</tabstop>
   <tabstop>sys_elev2</tabstop>
   <tabstop>z2</tabstop>
   <tabstop>r2</tabstop>
