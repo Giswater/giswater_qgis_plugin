@@ -43,7 +43,7 @@ class ManageVisit(ParentManage, QObject):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None):
+    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, is_new=False):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -70,6 +70,9 @@ class ManageVisit(ParentManage, QObject):
 
         # Get expl_id from previus dialog
         self.expl_id = expl_id
+
+        # Set if is new visit or come from info
+        self.is_new = is_new
 
         # Get layers of every geom_type
         self.reset_lists()
@@ -450,12 +453,17 @@ class ManageVisit(ParentManage, QObject):
 
     def set_parameter_id_combo(self, dialog):
         """set parameter_id combo basing on current selections."""
+        dialog.parameter_id.clear()
         sql = ("SELECT id, descript"
                " FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
-               " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'"
-               " ORDER BY id")
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
+               " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
+        if self.is_new:
+            sql += " AND form_type ='event_standard' "
+
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
+
         if rows:
             utils_giswater.set_item_data(dialog.parameter_id, rows, 1)
 
@@ -730,9 +738,11 @@ class ManageVisit(ParentManage, QObject):
         elif form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
             self.load_settings(self.dlg_event)
+            self.populate_position_id()
+
             # disable position_x fields because not allowed in multiple view
-            self.dlg_event.position_id.setEnabled(False)
-            self.dlg_event.position_value.setEnabled(False)
+            self.dlg_event.position_id.setEnabled(True)
+            self.dlg_event.position_value.setEnabled(True)
         elif form_type == 'event_standard':
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
@@ -765,7 +775,10 @@ class ManageVisit(ParentManage, QObject):
         for field_name in event.field_names():
             if not hasattr(self.dlg_event, field_name):
                 continue
-            value = getattr(self.dlg_event, field_name).text()
+            if type(getattr(self.dlg_event, field_name)) is QLineEdit:
+                value = getattr(self.dlg_event, field_name).text()
+            if type(getattr(self.dlg_event, field_name)) is QComboBox:
+                value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
             if value:
                 setattr(event, field_name, value)
 
@@ -828,9 +841,10 @@ class ManageVisit(ParentManage, QObject):
         elif om_event_parameter.form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
             self.load_settings(self.dlg_event)
+            self.populate_position_id()
             # disable position_x fields because not allowed in multiple view
-            self.dlg_event.position_id.setEnabled(False)
-            self.dlg_event.position_value.setEnabled(False)
+            self.dlg_event.position_id.setEnabled(True)
+            self.dlg_event.position_value.setEnabled(True)
 
         elif om_event_parameter.form_type == 'event_standard':
             self.dlg_event = EventStandard()
@@ -844,9 +858,12 @@ class ManageVisit(ParentManage, QObject):
         for field_name in event.field_names():
             if not hasattr(self.dlg_event, field_name):
                 continue
-            value = getattr(event, field_name)
+            if type(getattr(self.dlg_event, field_name)) is QLineEdit:
+                value = getattr(self.dlg_event, field_name).text()
+            if type(getattr(self.dlg_event, field_name)) is QComboBox:
+                value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
             if value:
-                getattr(self.dlg_event, field_name).setText(str(value))
+                setattr(event, field_name, value)
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         if self.dlg_event.exec_():
@@ -854,9 +871,12 @@ class ManageVisit(ParentManage, QObject):
             for field_name in event.field_names():
                 if not hasattr(self.dlg_event, field_name):
                     continue
-                value = getattr(self.dlg_event, field_name).text()
+                if type(getattr(self.dlg_event, field_name)) is QLineEdit:
+                    value = getattr(self.dlg_event, field_name).text()
+                if type(getattr(self.dlg_event, field_name)) is QComboBox:
+                    value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
                 if value:
-                    setattr(event, field_name, str(value))
+                    setattr(event, field_name, value)
 
             # update the record
             event.upsert(commit=self.autocommit)
@@ -1028,4 +1048,14 @@ class ManageVisit(ParentManage, QObject):
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
+
+
+    def populate_position_id(self):
+        node_list = []
+        node_1 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_1')
+        node_2 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_2')
+        node_list.append([node_1, "node 1: " + str(node_1)])
+        node_list.append([node_2, "node 2: " + str(node_2)])
+        utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
+
 

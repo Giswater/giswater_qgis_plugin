@@ -38,7 +38,7 @@ class Om(ParentAction):
 
     def om_add_visit(self):
         """ Button 64: Add visit """
-        self.manage_visit.manage_visit()
+        self.manage_visit.manage_visit(is_new=True)
 
 
     def om_visit_management(self):
