@@ -272,11 +272,6 @@ BEGIN
 		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
 		END IF;
-	
-		--Label rotation
-		IF (NEW.rotation != OLD.rotation) THEN
-			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
-		END IF;
 		
 
 		UPDATE node 
@@ -286,7 +281,7 @@ BEGIN
 			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, 
 			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode,streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
 			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, 
-			label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id,
+			label_rotation=NEW.label_rotation, publish=NEW.publish, rotation=NEW.rotation, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id,
 			num_value=NEW.num_value
 			WHERE node_id = OLD.node_id;
                 
