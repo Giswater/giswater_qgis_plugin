@@ -64,7 +64,8 @@ BEGIN
 	
 	-- Find closest arc inside tolerance
 	SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
-	WHERE ST_DWithin(node_geom, a.the_geom, arc_divide_tolerance_aux) ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
+	WHERE ST_DWithin(node_geom, a.the_geom, arc_divide_tolerance_aux) AND node_1 != node_id_arg AND node_2 != node_id_arg 
+	ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
 	
 	IF arc_id_aux IS NOT NULL THEN 
 	
