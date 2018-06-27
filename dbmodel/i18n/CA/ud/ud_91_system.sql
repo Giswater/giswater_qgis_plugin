@@ -7,22 +7,45 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- ----------------------------
+-- Records of cat_feature
+-- ----------------------------
+INSERT INTO cat_feature VALUES ('NODE VIRTUAL','JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('REGISTRE','JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('POU_RECTANGULAR','JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('POU_CIRCULAR', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('CANVI DE SECCIO','JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('PUNT ALT','JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('SALT','JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('ARQUETA SORRERA','JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('PRESA','JUNCTION',  'NODE');
+INSERT INTO cat_feature VALUES ('DIPOSIT','STORAGE', 'NODE');
+INSERT INTO cat_feature VALUES ('DIPOSIT DE DESBORDAMENT', 'STORAGE', 'NODE');
+INSERT INTO cat_feature VALUES ('DESGUAS','OUTFALL', 'NODE');
+INSERT INTO cat_feature VALUES ('CONDUCTE', 'CONDUIT', 'ARC');
+INSERT INTO cat_feature VALUES ('IMPULSIO', 'CONDUIT', 'ARC');
+INSERT INTO cat_feature VALUES ('SIFO', 'SIPHON', 'ARC');
+INSERT INTO cat_feature VALUES ('RAPID', 'WACCEL', 'ARC');
+INSERT INTO cat_feature VALUES ('FICTICI', 'VARC', 'ARC');
+INSERT INTO cat_feature VALUES ('ESCOMESA', 'CONNEC', 'CONNEC');
+INSERT INTO cat_feature VALUES ('EMBORNAL', 'GULLY', 'GULLY');
+INSERT INTO cat_feature VALUES ('REIXA', 'GULLY', 'GULLY');
 
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------
-INSERT INTO "node_type" VALUES ('NODE VIRTUAL','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'event_x_junction');
-INSERT INTO "node_type" VALUES ('REGISTRE','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('POU_RECTANGULAR','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('POU_CIRCULAR','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('CANVI DE SECCIO','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('PUNT ALT','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('SALT','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('ARQUETA SORRERA','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('PRESA','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('DIPOSIT','STORAGE', 'STORAGE', 'man_storage', 'inp_storage','event_x_storage');
-INSERT INTO "node_type" VALUES ('DIPOSIT DE DESBORDAMENT','STORAGE', 'STORAGE', 'man_storage', 'inp_storage','event_x_storage');
-INSERT INTO "node_type" VALUES ('DESGUAS','OUTFALL','OUTFALL', 'man_outfall', 'inp_outfall', 'event_x_outfall');
+INSERT INTO "node_type" VALUES ('NODE VIRTUAL','JUNCTION','JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('REGISTRE','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('POU_RECTANGULAR','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('POU_CIRCULAR','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('CANVI DE SECCIO','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('PUNT ALT','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('SALT','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('ARQUETA SORRERA','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('PRESA','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
+INSERT INTO "node_type" VALUES ('DIPOSIT','STORAGE', 'STORAGE', 'man_storage', 'inp_storage',true);
+INSERT INTO "node_type" VALUES ('DIPOSIT DE DESBORDAMENT','STORAGE', 'STORAGE', 'man_storage', 'inp_storage',true);
+INSERT INTO "node_type" VALUES ('DESGUAS','OUTFALL','OUTFALL', 'man_outfall', 'inp_outfall',true);
 
 
 
@@ -30,26 +53,32 @@ INSERT INTO "node_type" VALUES ('DESGUAS','OUTFALL','OUTFALL', 'man_outfall', 'i
 -- Records of arc type system table
 -- ----------------------------
 
-INSERT INTO arc_type VALUES ('CONDUCTE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
-INSERT INTO arc_type VALUES ('IMPULSIO', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
-INSERT INTO arc_type VALUES ('SIFO', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit', 'om_visit_x_arc');
-INSERT INTO arc_type VALUES ('RAPID', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit', 'om_visit_x_arc');
-INSERT INTO arc_type VALUES ('FICTICI', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet', 'om_visit_x_arc');
+INSERT INTO arc_type VALUES ('CONDUCTE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit',true);
+INSERT INTO arc_type VALUES ('IMPULSIO', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit',true);
+INSERT INTO arc_type VALUES ('SIFO', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit',true);
+INSERT INTO arc_type VALUES ('RAPID', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit',true);
+INSERT INTO arc_type VALUES ('FICTICI', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet',true);
 
 
 -- ----------------------------
 -- Records of connec_type
 -- ----------------------------
-INSERT INTO connec_type VALUES ('ESCOMESA', 'CONNEC', 'man_connec' ,'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('ESCOMESA', 'CONNEC', 'man_connec',true);
+
+-- ----------------------------
+-- Records of gully_type
+-- ----------------------------
+INSERT INTO gully_type VALUES ('EMBORNAL', 'GULLY', 'man_gully',true);
+INSERT INTO gully_type VALUES ('REIXA', 'GULLY', 'man_gully',true);
 
 
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO "element_type" VALUES ('TAPA', 'COVER');
-INSERT INTO "element_type" VALUES ('PATE', 'STEP');
-INSERT INTO "element_type" VALUES ('BOMBA', 'PUMP');
-INSERT INTO "element_type" VALUES ('COMPORTA', 'GATE');
+INSERT INTO "element_type" VALUES ('TAPA', true, true, NULL, NULL);
+INSERT INTO "element_type" VALUES ('PATE', true, true, NULL, NULL);
+INSERT INTO "element_type" VALUES ('BOMBA', true, true, NULL, NULL);
+INSERT INTO "element_type" VALUES ('COMPORTA', true, true, NULL, NULL);
 
 
 -- ----------------------------

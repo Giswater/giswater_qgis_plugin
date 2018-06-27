@@ -8,11 +8,19 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 -- Records of value_state
 -- ----------------------------
-INSERT INTO "value_state" VALUES ('OBSOLETO');
-INSERT INTO "value_state" VALUES ('EN_SERVICIO');
-INSERT INTO "value_state" VALUES ('RECONSTRUIR');
-INSERT INTO "value_state" VALUES ('SUBSTITUIR');
-INSERT INTO "value_state" VALUES ('PLANIFICADO');
+INSERT INTO "value_state" VALUES (0,'OBSOLETO');
+INSERT INTO "value_state" VALUES (1,'EN_SERVICIO');
+INSERT INTO "value_state" VALUES (2,'PLANIFICADO');
+
+
+-- ----------------------------
+-- Records of value_state_type
+-- ----------------------------
+INSERT INTO value_state_type VALUES (1, 0, 'OBSOLETO', false, false);
+INSERT INTO value_state_type VALUES (2, 1, 'EN_SERVICIO', true, true);
+INSERT INTO value_state_type VALUES (3, 2, 'PLANIFICADO', true, true);
+INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUIDO', true, false);
+INSERT INTO value_state_type VALUES (5, 1, 'PROVISIONAL', false, true);
 
 
 -- ----------------------------
@@ -29,27 +37,4 @@ INSERT INTO "value_yesno" VALUES ('NO');
 INSERT INTO "value_yesno" VALUES ('SI');
 
 
--- ----------------------------
--- Records of connec_type
--- ----------------------------
-INSERT INTO connec_type VALUES ('DOMESTICO', NULL);
-INSERT INTO connec_type VALUES ('COMERCIAL', NULL);
-INSERT INTO connec_type VALUES ('INDUSTRIAL', NULL);
 
-
--- ----------------------------
--- Records of man_type_category
--- ----------------------------
-INSERT INTO "man_type_category" VALUES ('SIN DATOS DE CATEGORIA', null);
-
-
--- ----------------------------
--- Records of man_type_fluid
--- ----------------------------
-INSERT INTO "man_type_fluid" VALUES ('SIN DATOS DE FLUIDOS', null);
-
-
--- ----------------------------
--- Records of man_type_location
--- ----------------------------
-INSERT INTO "man_type_location" VALUES ('SIN DATOS DE LOCALITZACION', null);

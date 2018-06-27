@@ -17,9 +17,9 @@ ALTER TABLE "config_web_fields" DROP CONSTRAINT IF EXISTS "config_web_fields_typ
 
 ALTER TABLE "config_web_layer_cat_form" DROP CONSTRAINT IF EXISTS "config_web_layer_cat_form_name_unique" CASCADE ;
 
-ALTER TABLE "config_web_layer_tab" DROP CONSTRAINT IF EXISTS "config_web_layer_formtab_fkey";
-ALTER TABLE "config_web_layer_tab" DROP CONSTRAINT IF EXISTS "config_web_layer_formid_fkey";
-ALTER TABLE "config_web_layer_tab" DROP CONSTRAINT IF EXISTS "config_web_layer_formname_fkey";
+ALTER TABLE "config_web_tabs" DROP CONSTRAINT IF EXISTS "config_web_layer_formtab_fkey";
+ALTER TABLE "config_web_tabs" DROP CONSTRAINT IF EXISTS "config_web_layer_formid_fkey";
+ALTER TABLE "config_web_tabs" DROP CONSTRAINT IF EXISTS "config_web_layer_formname_fkey";
 
 
 
@@ -32,4 +32,4 @@ ALTER TABLE "config_web_fields" ADD CONSTRAINT "config_web_fields_type_fkey" FOR
 
 ALTER TABLE "config_web_layer_cat_form" ADD CONSTRAINT "config_web_layer_cat_form_name_unique" UNIQUE  ("name");
 
-ALTER TABLE "config_web_layer_tab" ADD CONSTRAINT "config_web_layer_formtab_fkey" FOREIGN KEY ("formtab") REFERENCES "config_web_layer_cat_formtab" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE "config_web_tabs" ADD CONSTRAINT "config_web_layer_formtab_fkey" FOREIGN KEY ("formtab") REFERENCES "config_web_layer_cat_formtab" ("id") MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
