@@ -109,15 +109,22 @@ BEGIN
 			update arc set the_geom=the_geom where arc_id=rec_aux2.arc_id;
 			-- restore the state_topocontrol variable
 			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
-	
-			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 			
+			--Copy addfields from old arc to new arcs	
+			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
 			SELECT 
 			rec_aux2.arc_id,
 			parameter_id,
 			value_param
 			FROM man_addfields_value WHERE feature_id=arc_id_aux;
 			
+			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
+			SELECT 
+			rec_aux1.arc_id,
+			parameter_id,
+			value_param
+			FROM man_addfields_value WHERE feature_id=arc_id_aux;
+
 			-- Redraw the link and vnode (only userdefined_geom false and directly connected to arc
 			FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=arc_id_aux
 			LOOP
