@@ -19,15 +19,21 @@ ALTER TABLE cat_grate ADD COLUMN label varchar(255);
 -------------
 --28/06/2018
 -------------
--- DROP TABLE vpat.om_reh_value_loc_condition;
-CREATE TABLE om_reh_cat_location
+DROP TABLE om_reh_parameter_x_works;
+CREATE TABLE om_reh_parameter_x_works
 (
-  id serial PRIMARY KEY,
-  idval text,
-  from_value integer,
-  to_value integer,
-  descript text
+  id serial NOT NULL,
+  parameter_id character varying(50),
+  init_condition integer,
+  end_condition integer,
+  arcclass_id integer,
+  loc_condition_id character varying(30),
+  catwork_id character varying(30),
+  CONSTRAINT om_reh_parameter_x_works_pkey PRIMARY KEY (id)
 )
+WITH (
+  OIDS=FALSE
+);
 
 
 
