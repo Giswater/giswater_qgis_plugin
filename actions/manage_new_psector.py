@@ -18,6 +18,7 @@ import os
 import sys
 import csv
 import operator
+import webbrowser
 from functools import partial
 
 import utils_giswater
@@ -1144,17 +1145,15 @@ class ManageNewPsector(ParentManage):
 
         path = selected_list[0].data()
         # Check if file exist
-        if not os.path.exists(path):
-            message = "File not found"
-            self.controller.show_warning(message, parameter=path)
-            return
-
-        # Open the document
-        if sys.platform == "win32":
-            os.startfile(path)
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
         else:
-            opener = "open" if sys.platform == "darwin" else "xdg-open"
-            subprocess.call([opener, path])
+            webbrowser.open(path)
 
 
     def set_completer(self):
