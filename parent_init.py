@@ -644,7 +644,7 @@ class ParentDialog(QDialog):
         # Get selected values in Comboboxes        
         doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type")
         if doc_type_value != 'null' or doc_type_value is not None:
-            expr+= " AND doc_type = '"+doc_type_value+"'"
+            expr += " AND doc_type = '"+str(doc_type_value)+"'"
   
         # Refresh model with selected filter
         widget.model().setFilter(expr)
