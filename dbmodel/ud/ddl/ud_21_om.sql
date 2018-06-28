@@ -53,7 +53,7 @@ pcompost_id varchar(16)
 
 
 CREATE TABLE om_reh_value_loc_condition (
-id varchar(30),
+id varchar(30) PRIMARY KEY,
 descript text
 );
 
