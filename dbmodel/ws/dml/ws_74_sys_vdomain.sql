@@ -472,12 +472,12 @@ INSERT INTO audit_cat_table VALUES ('element', 'GIS feature', 'Contains the elem
 INSERT INTO audit_cat_table VALUES ('polygon', 'GIS feature', 'Table of spatial objects representing polygons (always related to one node)', 'role_edit', 2, '=@select ((select count(*) from man_fountain WHERE pol_id IS NOT NULL) + (select count(*) from man_register WHERE pol_id IS NOT NULL)+ (select count(*) from man_tank WHERE pol_id IS NOT NULL))', NULL, 0, NULL, 'urn_id_seq', 'pol_id');
 INSERT INTO audit_cat_table VALUES ('connec', 'GIS feature', 'Table of spatial objects representing connects.', 'role_edit', 2, '=@select ((select count(*) from man_wjoin) + (select count(*) from man_fountain)+ (select count(*) from man_greentap)+ (select count(*) from man_tap))
 ', NULL, 0, NULL, 'urn_id_seq', 'connec_id');
-INSERT INTO audit_cat_table VALUES ('plan_psector', 'masterplan', 'Table of plan sector.', 'role_master', 2, '>1', NULL, 0, NULL, 'psector_psector_id_seq', 'psector_id');
+INSERT INTO audit_cat_table VALUES ('plan_psector', 'masterplan', 'Table of plan sector.', 'role_master', 2, '>1', NULL, 0, NULL, 'plan_psector_id_seq', 'psector_id');
 INSERT INTO audit_cat_table VALUES ('doc', 'Document management', 'Document information', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic data', 'doc_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('doc_type', 'Document management', 'Contains the document''s types', 'role_admin', 1, '>1', 'role_edit', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_current_psector', 'O&M', 'View to show current operation sector', NULL, 0, NULL, 'role_om', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('selector_date', 'Selector', 'Selector of dates', 'role_om', 0, NULL, NULL, NULL, NULL, 'selector_date_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', 'Contains om psector features', 'role_om', 0, NULL, NULL, 0, NULL, 'psector_psector_id_seq', 'psector_id');
+INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', 'Contains om psector features', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_id_seq', 'psector_id');
 INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', 'Temporary table to store import csv file', 'role_om', 0, NULL, NULL, 0, NULL, 'temp_csv2pg_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('v_plan_current_psector', 'masterplan', 'View to show current planified sector', NULL, 0, NULL, 'role_master', 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_psector', 'masterplan', 'View to show planified sectors', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);

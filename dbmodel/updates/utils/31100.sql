@@ -206,4 +206,4 @@ INSERT INTO sys_fprocess_cat VALUES (32, 'Node proximity analysis', 'EDIT', 'Nod
 
 
 
-
+DROP SEQUENCE IF EXISTS psector_psector_id_seq;

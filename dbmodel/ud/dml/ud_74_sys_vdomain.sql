@@ -591,7 +591,7 @@ INSERT INTO audit_cat_table VALUES ('selector_state', 'Selector', 'Selector of t
 INSERT INTO audit_cat_table VALUES ('temp_table', 'Auxiliar table', 'Temporary table of elements with results from temporal works', 'role_edit', 0, NULL, NULL, 0, NULL, 'temp_table_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('version', 'System', 'Table to control de version of the software used on the project.', 'role_admin', 2, '>1', 'role_basic', 3, 'Global crash', 'version_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('vnode', 'GIS feature', 'Table of spatial objects representing vnodes.', 'role_edit', 0, NULL, NULL, 0, NULL, 'vnode_vnode_id_seq', 'vnode_id');
-INSERT INTO audit_cat_table VALUES ('plan_psector', 'Masterplan', 'Table of plan sector', 'role_master', 2, '>1', NULL, 0, NULL, 'psector_psector_id_seq', 'psector_id');
+INSERT INTO audit_cat_table VALUES ('plan_psector', 'Masterplan', 'Table of plan sector', 'role_master', 2, '>1', NULL, 0, NULL, 'plan_psector_id_seq', 'psector_id');
 INSERT INTO audit_cat_table VALUES ('doc', 'Document management', 'Document information', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic data', 'doc_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_psector_x_node', 'O&M information', 'Contains arcs related to om psector', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_x_node_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_psector_x_other', 'O&M information', 'Contains arcs related to om psector', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_x_other_id_seq', 'id');
@@ -622,7 +622,7 @@ INSERT INTO audit_cat_table VALUES ('om_rec_result_node', 'O&M information', 'Co
 INSERT INTO audit_cat_table VALUES ('v_edit_review_audit_connec', 'Review', 'Used to edit the review information', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_review_connec', 'Review', 'Used to edit the review information', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('selector_date', 'System table', 'Selector of dates', 'role_om', 0, NULL, NULL, NULL, NULL, 'selector_date_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', 'Contains om psector features', 'role_om', 0, NULL, NULL, 0, NULL, 'psector_psector_id_seq', 'psector_id');
+INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', 'Contains om psector features', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_id_seq', 'psector_id');
 INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', 'Temporary table to store import csv file', 'role_om', 0, NULL, NULL, 0, NULL, 'temp_csv2pg_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('v_plan_current_psector', 'masterplan', 'View to show current planified sector', NULL, 0, NULL, 'role_master', 1, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_psector_x_other', 'O&M', 'Shows other prices related to om psector', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);

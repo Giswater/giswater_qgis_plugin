@@ -53,7 +53,7 @@ ALTER TABLE ONLY man_type_category ALTER COLUMN id SET DEFAULT nextval('man_type
 ALTER TABLE ONLY man_type_fluid ALTER COLUMN id SET DEFAULT nextval('man_type_fluid_id_seq'::regclass);
 ALTER TABLE ONLY man_type_function ALTER COLUMN id SET DEFAULT nextval('man_type_function_id_seq'::regclass);
 ALTER TABLE ONLY man_type_location ALTER COLUMN id SET DEFAULT nextval('man_type_location_id_seq'::regclass);
-ALTER TABLE ONLY om_psector ALTER COLUMN psector_id SET DEFAULT nextval('om_psector_psector_id_seq'::regclass);
+ALTER TABLE ONLY om_psector ALTER COLUMN psector_id SET DEFAULT nextval('om_psector_id_seq'::regclass);
 ALTER TABLE ONLY om_psector_selector ALTER COLUMN id SET DEFAULT nextval('om_psector_selector_id_seq'::regclass);
 ALTER TABLE ONLY om_psector_x_arc ALTER COLUMN id SET DEFAULT nextval('om_psector_x_arc_id_seq'::regclass);
 ALTER TABLE ONLY om_psector_x_node ALTER COLUMN id SET DEFAULT nextval('om_psector_x_node_id_seq'::regclass);
@@ -73,7 +73,7 @@ ALTER TABLE ONLY om_visit_x_arc ALTER COLUMN id SET DEFAULT nextval('om_visit_x_
 ALTER TABLE ONLY om_visit_x_connec ALTER COLUMN id SET DEFAULT nextval('om_visit_x_connec_id_seq'::regclass);
 ALTER TABLE ONLY om_visit_x_node ALTER COLUMN id SET DEFAULT nextval('om_visit_x_node_id_seq'::regclass);
 ALTER TABLE ONLY plan_arc_x_pavement ALTER COLUMN id SET DEFAULT nextval('plan_arc_x_pavement_id_seq'::regclass);
-ALTER TABLE ONLY plan_psector ALTER COLUMN psector_id SET DEFAULT nextval('plan_psector_psector_id_seq'::regclass);
+ALTER TABLE ONLY plan_psector ALTER COLUMN psector_id SET DEFAULT nextval('plan_psector_id_seq'::regclass);
 ALTER TABLE ONLY plan_psector_x_arc ALTER COLUMN id SET DEFAULT nextval('plan_psector_x_arc_id_seq'::regclass);
 ALTER TABLE ONLY plan_psector_x_node ALTER COLUMN id SET DEFAULT nextval('plan_psector_x_node_id_seq'::regclass);
 ALTER TABLE ONLY plan_psector_x_other ALTER COLUMN id SET DEFAULT nextval('plan_psector_x_other_id_seq'::regclass);
