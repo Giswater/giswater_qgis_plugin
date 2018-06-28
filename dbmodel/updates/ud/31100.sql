@@ -16,3 +16,18 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 ALTER TABLE cat_grate ADD COLUMN label varchar(255);
 
 
+-------------
+--28/06/2018
+-------------
+-- DROP TABLE vpat.om_reh_value_loc_condition;
+CREATE TABLE om_reh_cat_location
+(
+  id serial PRIMARY KEY,
+  idval text,
+  from_value integer,
+  to_value integer,
+  descript text
+)
+
+
+
