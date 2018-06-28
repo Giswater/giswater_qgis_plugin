@@ -205,5 +205,9 @@ UPDATE audit_cat_table SET sys_sequence='plan_psector_id_seq' WHERE id='plan_pse
 INSERT INTO sys_fprocess_cat VALUES (32, 'Node proximity analysis', 'EDIT', 'Node proximity analysis', 'utils');
 
 
-
+----------------------
+--28/06/2018
+-----------------------
 DROP SEQUENCE IF EXISTS psector_psector_id_seq;
+
+INSERT INTO audit_cat_error values('3008','The values of addfields are different for both arcs.','Review your data to make them equal.',2,TRUE,'utils')

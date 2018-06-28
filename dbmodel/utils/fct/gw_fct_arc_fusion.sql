@@ -37,6 +37,10 @@ DECLARE
 	array_agg varchar[];
 	connec_id_aux varchar;
 	gully_id_aux varchar;
+    addfieldRecord1 record;
+    addfieldRecord2 record;
+    rec_param integer;
+
 
 BEGIN
 
@@ -99,7 +103,28 @@ BEGIN
                 newRecord.node_2 := (SELECT node_id FROM v_edit_node WHERE  ST_DWithin(ST_EndPoint(arc_geom), v_edit_node.the_geom, 0.001) LIMIT 1);
 				newRecord.arc_id := (SELECT nextval('urn_id_seq'));
 
-				INSERT INTO v_edit_arc SELECT newRecord.*;
+            --Compare addfields and assign them to new arc
+            FOR rec_param IN SELECT DISTINCT parameter_id FROM man_addfields_value WHERE feature_id=myRecord1.arc_id
+                OR feature_id=myRecord2.arc_id
+            LOOP
+
+            SELECT * INTO addfieldRecord1 FROM man_addfields_value WHERE feature_id=myRecord1.arc_id and parameter_id=rec_param;
+            SELECT * INTO addfieldRecord2 FROM man_addfields_value WHERE feature_id=myRecord2.arc_id and parameter_id=rec_param;
+
+                IF addfieldRecord1.value_param!=addfieldRecord2.value_param  THEN
+                    RETURN audit_function(3008,2112);
+                ELSIF addfieldRecord2.value_param IS NULL and addfieldRecord1.value_param IS NOT NULL THEN
+                    UPDATE man_addfields_value SET feature_id=newRecord.arc_id WHERE feature_id=myRecord1.arc_id AND parameter_id=rec_param;
+                ELSIF addfieldRecord1.value_param IS NULL and addfieldRecord2.value_param IS NOT NULL THEN
+                    UPDATE man_addfields_value SET feature_id=newRecord.arc_id WHERE feature_id=myRecord2.arc_id AND parameter_id=rec_param;
+                ELSE
+                   UPDATE man_addfields_value SET feature_id=newRecord.arc_id WHERE feature_id=myRecord1.arc_id AND parameter_id=rec_param;
+               END IF;
+
+            END LOOP;
+
+
+			INSERT INTO v_edit_arc SELECT newRecord.*;
 					
 			--Insert data on audit_log_arc_traceability table
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
