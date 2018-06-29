@@ -333,12 +333,18 @@ class ManNodeDialog(ParentDialog):
         if not status:
             self.disable_rotation()
             return
+        sql = ("SELECT rotation FROM " + self.schema_name +".node "
+               " WHERE node_id='"+str(self.id)+"'")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(dialog, "rotation", str(row[0]))
+
 
         sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
                " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
         row = self.controller.get_row(sql)
         if row:
-            utils_giswater.setWidgetText(dialog, "hemisphere" , str(row[0]))
+            utils_giswater.setWidgetText(dialog, "hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             self.controller.show_info(message, parameter=str(row[0]))
    
