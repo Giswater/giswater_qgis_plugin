@@ -64,12 +64,8 @@ class MoveNodeMapTool(ParentMapTool):
                     self.controller.show_warning(message, parameter=function_name)
                     return
             sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
-            row = self.controller.get_row(sql, commit=True)
-            if row:
-                if row[0] > 1: 
-                    message = ("There are linked features related to the new arcs (connec/gully) without the automatic updated of the arc_id after the division.\n"
-                               "Please review it.\nNumber of features missupdated") 
-                    self.controller.show_info_box(message, parameter=row[0])
+            self.controller.execute_sql(sql, commit=True)
+
         else:
             message = "Move node: Error updating geometry"
             self.controller.show_warning(message)

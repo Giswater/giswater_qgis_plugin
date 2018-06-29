@@ -933,8 +933,7 @@ class ManageVisit(ParentManage, QObject):
         
         # Get selected rows
         field_index = self.tbl_document.model().fieldIndex('path')
-        selected_list = self.dlg_add_visit.tbl_document.selectionModel().selectedRows(
-            field_index)
+        selected_list = self.dlg_add_visit.tbl_document.selectionModel().selectedRows(field_index)
         if not selected_list:
             message = "Any record selected"
             self.controller.show_info_box(message)
