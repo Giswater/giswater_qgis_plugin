@@ -21,6 +21,7 @@ import os
 import sys  
 import urlparse
 import webbrowser
+import subprocess
 
 import utils_giswater
 from dao.controller import DaoController
@@ -597,34 +598,18 @@ class ParentDialog(QDialog):
         
         # Get document path (can be relative or absolute)
         row = selected_list[0].row()
-        path_relative = widget.model().record(row).value("path")
+        path = widget.model().record(row).value("path")
 
-        # Get parameter 'doc_absolute_path' from table 'config_param_system'
-        doc_absolute_path = self.controller.get_value_config_param_system('doc_absolute_path')
-        if doc_absolute_path is None:
-            path_absolute = path_relative
-        else:
-            # Parse a URL into components
-            path_absolute = doc_absolute_path + path_relative
-
-        url = urlparse.urlsplit(path_absolute)
-
-        # Check if path is URL
-        if url.scheme == "http" or url.scheme == "https":
-            # If path is URL open URL in browser
-            webbrowser.open(path_absolute) 
-        else: 
-            # Check if 'path_absolute' exists
-            if os.path.exists(path_absolute):
-                os.startfile(path_absolute)    
+        # Check if file exist
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
             else:
-                # Check if 'path_relative' exists
-                if os.path.exists(path_relative):
-                    os.startfile(path_relative)    
-                else:
-                    message = "File not found"
-                    self.controller.show_warning(message, parameter=path_absolute, duration=30)
-        
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
+        else:
+            webbrowser.open(path)
         
     def set_filter_table_man(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
