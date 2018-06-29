@@ -255,34 +255,10 @@ class ManNodeDialog(ParentDialog):
     
         # Set map tool emit point and signals    
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.previous_map_tool = self.canvas.mapTool()
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-        self.canvas.xyCoordinates.connect(self.action_rotation_mouse_move)
-        self.emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked,self.dialog))
-        
-        # Store user snapping configuration
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.store_snapping_options()
+        self.emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, self.dialog))
 
-        # Clear snapping
-        self.snapper_manager.clear_snapping()
-
-        # Set snapping 
-        layer = self.controller.get_layer_by_tablename("v_edit_arc")
-        self.snapper_manager.snap_to_layer(layer)             
-        layer = self.controller.get_layer_by_tablename("v_edit_connec")
-        self.snapper_manager.snap_to_layer(layer)             
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
-        self.snapper_manager.snap_to_layer(layer)     
-        
-        # Set marker
-        color = QColor(255, 100, 255)
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setColor(color)
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setPenWidth(3)                     
-        
         
     def action_rotation_mouse_move(self, point):
         """ Slot function when mouse is moved in the canvas. 
@@ -313,8 +289,8 @@ class ManNodeDialog(ParentDialog):
     def action_rotation_canvas_clicked(self, dialog, point, btn):
         
         if btn == Qt.RightButton:
-            self.disable_rotation() 
-            return           
+            self.canvas.setMapTool(self.previous_map_tool)
+            return
         
         viewname = self.controller.get_layer_source_table_name(self.layer) 
         sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
@@ -331,7 +307,7 @@ class ManNodeDialog(ParentDialog):
                " WHERE node_id = '" + str(self.id) + "'")
         status = self.controller.execute_sql(sql)
         if not status:
-            self.disable_rotation()
+            self.canvas.setMapTool(self.previous_map_tool)
             return
         sql = ("SELECT rotation FROM " + self.schema_name +".node "
                " WHERE node_id='"+str(self.id)+"'")
@@ -347,26 +323,9 @@ class ManNodeDialog(ParentDialog):
             utils_giswater.setWidgetText(dialog, "hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             self.controller.show_info(message, parameter=str(row[0]))
-   
-        self.disable_rotation()
-               
-   
-    def disable_rotation(self):
-        """ Disable actionRotation and set action 'Identify' """
-        
-        action_widget = self.dialog.findChild(QAction, "actionRotation")
-        if action_widget:
-            action_widget.setChecked(False) 
-          
-        try:  
-            self.snapper_manager.recover_snapping_options()            
-            self.vertex_marker.hide()           
-            self.set_action_identify()
-            self.canvas.xyCoordinates.disconnect()        
-            self.emit_point.canvasClicked.disconnect()            
-        except:
-            pass
-           
+
+        self.canvas.setMapTool(self.previous_map_tool)
+                      
 
     def tab_activation(self):
         """ Call functions depend on tab selection """
