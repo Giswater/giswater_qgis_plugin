@@ -89,7 +89,14 @@ class ManNodeDialog(ParentDialog):
 
         feature = self.feature
         layer = self.iface.activeLayer()
-        
+
+        action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
+        layer.editingStarted.connect(partial(self.enabled_actions, action_copypaste, True))
+        layer.editingStopped.connect(partial(self.enabled_actions, action_copypaste, False))
+        action_rotation = self.dialog.findChild(QAction, "actionRotation")
+        layer.editingStarted.connect(partial(self.enabled_actions, action_rotation, True))
+        layer.editingStopped.connect(partial(self.enabled_actions, action_rotation, False))
+
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
         action.setChecked(layer.isEditable())

@@ -103,6 +103,14 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
         feature = self.feature
         layer = self.iface.activeLayer()
+        action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
+        layer.editingStarted.connect(partial(self.enabled_actions, action_copypaste, True))
+        layer.editingStopped.connect(partial(self.enabled_actions, action_copypaste, False))
+        action_rotation = self.dialog.findChild(QAction, "actionRotation")
+        layer.editingStarted.connect(partial(self.enabled_actions, action_rotation, True))
+        layer.editingStopped.connect(partial(self.enabled_actions, action_rotation, False))
+
+        self.dialog.destroyed.connect(self.set_dlg_destroyed)
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")

@@ -56,8 +56,8 @@ class ParentDialog(QDialog):
         self.tab_scada_removed = 0        
         self.parameters = None              
         self.init_config()     
-        self.set_signals()    
-        
+        self.set_signals()
+        self.dlg_is_destroyed = False
         # Set default encoding 
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
@@ -2492,3 +2492,11 @@ class ParentDialog(QDialog):
         # Open dialog
         dlg.open()
 
+
+    def set_dlg_destroyed(self):
+        self.dlg_is_destroyed = True
+
+
+    def enabled_actions(self, action, enabled):
+        if not self.dlg_is_destroyed:
+            action.setEnabled(enabled)
