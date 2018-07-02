@@ -259,6 +259,7 @@ DROP VIEW IF EXISTS "v_ui_anl_mincut_result_cat";
 CREATE OR REPLACE VIEW "v_ui_anl_mincut_result_cat" AS
 SELECT
 anl_mincut_result_cat.id,
+anl_mincut_result_cat.id as name,
 work_order,
 anl_mincut_cat_state.name as state,
 anl_mincut_cat_class.name as class,
