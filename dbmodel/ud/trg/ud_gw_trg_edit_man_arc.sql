@@ -233,6 +233,14 @@ This version of Giswater is provided by Giswater Association
 			-- State
 			IF (NEW.state != OLD.state) THEN
 				UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
+				IF NEW.state = 2 AND OLD.state=1 THEN
+					INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable)
+					VALUES (NEW.arc_id, (SELECT config_param_user.value::integer AS value FROM ws_sample.config_param_user	WHERE config_param_user.parameter::text
+					= 'psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
+				END IF;
+				IF NEW.state = 1 AND OLD.state=2 THEN
+					DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;					
+				END IF;				
 			END IF;
 			
 			-- State_type
