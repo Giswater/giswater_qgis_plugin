@@ -22,11 +22,11 @@ num_arcs,
 fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_node.the_geom
-FROM selector_expl, anl_node
-	JOIN exploitation ON anl_node.expl_id=exploitation.expl_id
+FROM selector_audit, anl_node
 	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
-	WHERE anl_node.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"()
+	JOIN exploitation ON anl_node.expl_id=exploitation.expl_id
+	WHERE anl_node.fprocesscat_id=selector_audit.fprocesscat_id
+	AND selector_audit.cur_user="current_user"()
 	AND anl_node.cur_user="current_user"();
 
 
@@ -38,16 +38,16 @@ connec_id,
 connecat_id,
 state,
 connec_id_aux,
-connecat_id_aux,
+connecat_id_aux
 state_aux,
 fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_connec.the_geom
-FROM selector_expl, anl_connec
-	JOIN exploitation ON anl_connec.expl_id=exploitation.expl_id
+FROM selector_audit, anl_connec
 	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
-	WHERE anl_connec.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"()
+	JOIN exploitation ON anl_connec.expl_id=exploitation.expl_id
+	WHERE anl_connec.fprocesscat_id=selector_audit.fprocesscat_id
+	AND selector_audit.cur_user="current_user"()
 	AND anl_connec.cur_user="current_user"();
 
 
@@ -63,11 +63,11 @@ arc_id_aux,
 fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_arc.the_geom
-FROM selector_expl, anl_arc
-	JOIN exploitation ON anl_arc.expl_id=exploitation.expl_id
+FROM selector_audit, anl_arc
 	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
-	WHERE anl_arc.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"()
+	JOIN exploitation ON anl_arc.expl_id=exploitation.expl_id
+	WHERE anl_arc.fprocesscat_id=selector_audit.fprocesscat_id
+	AND selector_audit.cur_user="current_user"()
 	AND anl_arc.cur_user="current_user"();
 
 
@@ -82,11 +82,11 @@ arc_id_aux,
 fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_arc.the_geom_p
-FROM selector_expl, anl_arc
-	JOIN exploitation ON anl_arc.expl_id=exploitation.expl_id
+FROM selector_audit, anl_arc
 	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
-	WHERE anl_arc.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"()
+	JOIN exploitation ON anl_arc.expl_id=exploitation.expl_id
+	WHERE anl_arc.fprocesscat_id=selector_audit.fprocesscat_id
+	AND selector_audit.cur_user="current_user"()
 	AND anl_arc.cur_user="current_user"();
 	
 
@@ -104,11 +104,11 @@ node_id,
 fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_arc_x_node.the_geom
-FROM selector_expl, anl_arc_x_node
-	JOIN exploitation ON anl_arc_x_node.expl_id=exploitation.expl_id
+FROM selector_audit, anl_arc_x_node
 	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
-	WHERE anl_arc_x_node.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"()
+	JOIN exploitation ON anl_arc_x_node.expl_id=exploitation.expl_id
+	WHERE anl_arc_x_node.fprocesscat_id=selector_audit.fprocesscat_id
+	AND selector_audit.cur_user="current_user"()
 	AND anl_arc_x_node.cur_user="current_user"();
 
 	
@@ -123,9 +123,9 @@ node_id,
 fprocess_i18n AS fprocess,
 exploitation.name AS expl_name,
 anl_arc_x_node.the_geom_p
-FROM selector_expl, anl_arc_x_node
+FROM selector_audit, anl_arc_x_node
 	JOIN exploitation ON anl_arc_x_node.expl_id=exploitation.expl_id
 	JOIN sys_fprocess_cat ON fprocesscat_id=sys_fprocess_cat.id
-	WHERE anl_arc_x_node.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"()
+	WHERE anl_arc_x_node.fprocesscat_id=selector_audit.fprocesscat_id
+	AND selector_audit.cur_user="current_user"()
 	AND anl_arc_x_node.cur_user="current_user"();
