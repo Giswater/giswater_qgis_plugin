@@ -76,9 +76,9 @@ class ManArcDialog(ParentDialog):
         feature = self.feature
         layer = self.iface.activeLayer()
 
-        action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
-        layer.editingStarted.connect(partial(self.enabled_actions, action_copypaste, True))
-        layer.editingStopped.connect(partial(self.enabled_actions, action_copypaste, False))
+        #action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
+        #layer.editingStarted.connect(partial(self.enabled_actions, action_copypaste, True))
+        #layer.editingStopped.connect(partial(self.enabled_actions, action_copypaste, False))
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
