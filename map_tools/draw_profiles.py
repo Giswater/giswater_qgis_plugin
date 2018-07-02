@@ -568,18 +568,18 @@ class DrawProfiles(ParentMapTool):
         for node_id in self.node_id:
             # self.parameters : list of parameters for one node
             # self.parameters [start_point, top_elev, y_max,z1, z2, cat_geom1, geom1, slope, elev1, elev2,y1 ,y2, node_id, elev]
-            parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None]
+            parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None, None]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
-            sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id"
+            sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code"
                    " FROM  " + self.schema_name + ".v_edit_node"
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
 
-            columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id']
+            columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
 
             if row:
-                if row[0] is None or row[1] is None or row[2] is None or row[3] is None:
+                if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None:
                     message = "Some parameters are missing for node (Values Defaults used for)"
                     self.controller.show_info_box(message, "Info", node_id)
                 # Check if we have all data for drawing
@@ -594,6 +594,8 @@ class DrawProfiles(ParentMapTool):
                 parameters[2] = row[1]
                 parameters[13] = row[2]
                 nodecat_id = row[3]
+                parameters[14] = row[4]
+
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
@@ -653,7 +655,8 @@ class DrawProfiles(ParentMapTool):
                 self.memory[n][5] = row[2]
                 self.memory[n][8] = row[3]
                 self.memory[n][9] = row[4]
-                self.memory[n][10] = row[5]
+                self.memory[n][10] = row[5
+				]
                 self.memory[n][11] = row[6]
                 self.memory[n][7] = row[7]
                 n = n + 1
@@ -758,7 +761,7 @@ class DrawProfiles(ParentMapTool):
 
         c = (self.fix_x - self.fix_x * Decimal(0.2)) / 2
         plt.text(-(c + self.fix_x * Decimal(0.2)),
-                 self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2), 'NODE ID', fontsize=7.5,
+                 self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2), 'CODE', fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
 
         # Fill table with values
@@ -816,7 +819,7 @@ class DrawProfiles(ParentMapTool):
 
         # Draw node_id
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
-                 self.memory[indx][12], fontsize=7.5,
+                 self.memory[indx][14], fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
 
 
