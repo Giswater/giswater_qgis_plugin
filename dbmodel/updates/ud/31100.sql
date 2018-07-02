@@ -19,6 +19,7 @@ ALTER TABLE cat_grate ADD COLUMN label varchar(255);
 -------------
 --28/06/2018
 -------------
+/*
 DROP TABLE IF EXISTS om_reh_cat_location;
 CREATE TABLE om_reh_cat_location(
   id serial NOT NULL,
@@ -70,3 +71,5 @@ CREATE TABLE om_reh_parameter_x_works(
   work_id character varying(30),
   CONSTRAINT om_reh_parameter_x_works_pkey PRIMARY KEY (id)
 );
+
+*/
