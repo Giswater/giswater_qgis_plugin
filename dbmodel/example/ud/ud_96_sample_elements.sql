@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+UPDATE config_param_system SET value=FALSE WHERE parameter='state_topocontrol' ;
 
 
 INSERT INTO node VALUES ('N118', 'N118', 44.550, 2.010, 42.540, NULL, NULL, NULL, NULL, 'CIRC-MANHOLE', 'C_MANHOLE-CON100', 'JUNCTION', 1, 1, 2, NULL, NULL, NULL, 1, 'Standard Soil', 'Standard Function', 'Standard Category', 'Standard Fluid', 'Standard Location', 'work1', NULL, 'builder1', '2017-12-05', NULL, 'owner1', 1, 8830, '1-10000C', 177, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'TO REVIEW', '0101000020E7640000E9263108689519413D0AD7B383755141', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, 1, NULL, 'NODE', NULL);
@@ -10412,6 +10413,7 @@ INSERT INTO man_addfields_cat_combo VALUES (35, 'combo4', NULL);
 
 
 
+UPDATE config_param_system SET value=TRUE WHERE parameter='state_topocontrol' ;
 
 
 

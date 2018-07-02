@@ -240,7 +240,7 @@ This version of Giswater is provided by Giswater Association
 				END IF;
 				IF NEW.state = 1 AND OLD.state=2 THEN
 					DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;					
-				END IF;				
+				END IF;			
 			END IF;
 			
 			-- State_type
