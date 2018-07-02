@@ -47,7 +47,7 @@ JOIN exploitation ON v_edit_connec.expl_id=exploitation.expl_id;
 
 */
 
-
+DROP VIEW IF EXISTS v_ui_arc_x_node;
 CREATE OR REPLACE VIEW v_ui_workcat_polygon AS 
 SELECT v_ui_workcat_polygon_aux.workcat_id,
 	descript, 
@@ -59,6 +59,21 @@ SELECT v_ui_workcat_polygon_aux.workcat_id,
    FROM v_ui_workcat_polygon_aux JOIN cat_work ON workcat_id=id;
 
 
+DROP VIEW IF EXISTS v_ui_workcat_polygon_filtered;
+CREATE OR REPLACE VIEW v_ui_workcat_polygon_filtered AS 
+ SELECT v_ui_workcat_polygon_aux.workcat_id,
+    cat_work.descript,
+    cat_work.link,
+    cat_work.workid_key1,
+    cat_work.workid_key2,
+    cat_work.builtdate,
+    v_ui_workcat_polygon_aux.the_geom
+   FROM selector_workcat,
+    v_ui_workcat_polygon_aux
+     JOIN cat_work ON v_ui_workcat_polygon_aux.workcat_id::text = cat_work.id::text
+  WHERE selector_workcat.workcat_id = v_ui_workcat_polygon_aux.workcat_id::text AND selector_workcat.cur_user = "current_user"()::text;
+
+   
 DROP VIEW IF EXISTS v_ui_arc_x_node;
 CREATE OR REPLACE VIEW v_ui_arc_x_node AS
 SELECT 
