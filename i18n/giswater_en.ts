@@ -971,7 +971,10 @@
         <source>CSV not generated. Check fields from table or view: </source>
         <translation>Check fields from table or view: </translation>
     </message>
-
+    <message>
+        <source>To see the conflicts load the views</source>
+        <translation>To see the conflicts load the views</translation>
+    </message>
 
 
 </context>

@@ -972,6 +972,10 @@
         <source>CSV not generated. Check fields from table or view: </source>
         <translation>Csv no generat. Revisi els camps de la table o vista: </translation>
     </message>
+    <message>
+        <source>To see the conflicts load the views</source>
+        <translation>Per veure els conflictes carregarles vistes</translation>
+    </message>
 </context>
 
 </TS>
