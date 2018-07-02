@@ -132,6 +132,9 @@ BEGIN
 			INSERT INTO anl_node (node_id, nodecat_id, node_id_aux, nodecat_id_aux, fprocesscat_id, cur_user, the_geom) SELECT node_id, 
 						concat ('result_id:', result_id_arg), concat ('{', conflict_id_text, '}'), (CASE WHEN proposed=false THEN 'OPEN' ELSE 'CLOSED' END),
 						31, current_user, the_geom FROM anl_mincut_result_valve WHERE result_id=id_last;
+			INSERT INTO anl_connec (connec_id, connecat_id, connec_id_aux, connecat_id_aux, fprocesscat_id, cur_user, the_geom) SELECT connec_id, 
+						concat ('result_id:', result_id_arg), concat ('{', conflict_id_text, '}'), null,
+						31, current_user, the_geom FROM anl_mincut_result_connec WHERE result_id=id_last;
 
 			conflict_text:=conflict_id_text;
 		ELSE 
