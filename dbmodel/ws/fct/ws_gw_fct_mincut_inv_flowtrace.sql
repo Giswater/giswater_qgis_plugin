@@ -44,7 +44,7 @@ BEGIN
 		FOR rec_tank IN SELECT v_edit_node.node_id, v_edit_node.the_geom FROM anl_mincut_inlet_x_exploitation
 		JOIN v_edit_node ON v_edit_node.node_id=anl_mincut_inlet_x_exploitation.node_id
 		JOIN value_state_type ON state_type=value_state_type.id JOIN node_type ON node_type.id=nodetype_id
-		WHERE AND (is_operative IS TRUE) AND (anl_mincut_inlet_x_exploitation.expl_id=mincut_rec.expl_id) 
+		WHERE (is_operative IS TRUE) AND (anl_mincut_inlet_x_exploitation.expl_id=mincut_rec.expl_id) 
 		AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM anl_mincut_result_node WHERE result_id=result_id_arg)
 		ORDER BY 1
 		LOOP

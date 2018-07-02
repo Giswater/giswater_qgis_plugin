@@ -280,7 +280,7 @@ CREATE TABLE "arc" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"sys_slope" numeric (12,2),
+"sys_slope" numeric (12,4),
 "inverted_slope" boolean,
 "sys_length" numeric (12,2),
 "custom_length" numeric (12,2),
