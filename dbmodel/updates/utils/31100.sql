@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -38,6 +38,7 @@ INSERT INTO audit_cat_table VALUES ('doc_x_psector', 'doc', 'Doc psector', 'role
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN state int2;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN expl_id integer;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN connec_customer_code varchar (30);
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydrometer_customer_code varchar (30);
 
 
 
@@ -83,16 +84,16 @@ INSERT INTO audit_cat_table VALUES ('selector_hydrometer', 'System', 'Selector o
 -----------------------
 --system tables
 -----------------------
-INSERT INTO config_param_system VALUES (60, 'basic_search_hyd_hydro_layer_name', 'v_rtc_hydrometer', 'varchar', 'searchplus', 'layer name');
-INSERT INTO config_param_system VALUES (61, 'basic_search_hyd_hydro_field_expl_name', 'expl_name', 'varchar', 'searchplus', 'field exploitation.name');
-INSERT INTO config_param_system VALUES (62, 'basic_search_hyd_hydro_field_cc', 'connec_id', 'text', 'searchplus', 'field connec.code');
-INSERT INTO config_param_system VALUES (63, 'basic_search_hyd_hydro_field_erhc', 'hydrometer_customer_code', 'text', 'searchplus', 'field ext_rtc_hydrometer.code');
-INSERT INTO config_param_system VALUES (64, 'basic_search_hyd_hydro_field_ccc', 'connec_customer_code', 'text', 'searchplus', 'field connec.customer_code');
-INSERT INTO config_param_system VALUES (66, 'basic_search_hyd_hydro_field_1', 'hydrometer_customer_code', 'text', 'searchplus', 'field ext_rtc_hydrometer.code');
-INSERT INTO config_param_system VALUES (67, 'basic_search_hyd_hydro_field_2', 'connec_customer_code', 'text', 'searchplus', 'field connec.customer_code');
-INSERT INTO config_param_system VALUES (68, 'basic_search_hyd_hydro_field_3', 'state', 'text', 'searchplus', 'field value_state.name');
-INSERT INTO config_param_system VALUES (69, 'basic_search_workcat_filter', 'code', 'text', 'searchplus', NULL);
-INSERT INTO config_param_system VALUES (70, 'om_mincut_use_pgrouting', 'TRUE', 'boolean', 'mincut', NULL);
+INSERT INTO config_param_system VALUES (160, 'basic_search_hyd_hydro_layer_name', 'v_rtc_hydrometer', 'varchar', 'searchplus', 'layer name');
+INSERT INTO config_param_system VALUES (161, 'basic_search_hyd_hydro_field_expl_name', 'expl_name', 'varchar', 'searchplus', 'field exploitation.name');
+INSERT INTO config_param_system VALUES (162, 'basic_search_hyd_hydro_field_cc', 'connec_id', 'text', 'searchplus', 'field connec.code');
+INSERT INTO config_param_system VALUES (163, 'basic_search_hyd_hydro_field_erhc', 'hydrometer_customer_code', 'text', 'searchplus', 'field ext_rtc_hydrometer.code');
+INSERT INTO config_param_system VALUES (164, 'basic_search_hyd_hydro_field_ccc', 'connec_customer_code', 'text', 'searchplus', 'field connec.customer_code');
+INSERT INTO config_param_system VALUES (166, 'basic_search_hyd_hydro_field_1', 'hydrometer_customer_code', 'text', 'searchplus', 'field ext_rtc_hydrometer.code');
+INSERT INTO config_param_system VALUES (167, 'basic_search_hyd_hydro_field_2', 'connec_customer_code', 'text', 'searchplus', 'field connec.customer_code');
+INSERT INTO config_param_system VALUES (168, 'basic_search_hyd_hydro_field_3', 'state', 'text', 'searchplus', 'field value_state.name');
+INSERT INTO config_param_system VALUES (169, 'basic_search_workcat_filter', 'code', 'text', 'searchplus', NULL);
+INSERT INTO config_param_system VALUES (170, 'om_mincut_use_pgrouting', 'TRUE', 'boolean', 'mincut', NULL);
 
 
 
@@ -121,26 +122,26 @@ INSERT INTO sys_fprocess_cat VALUES (29, 'Audit mincut data', 'OM', 'Audit mincu
 -----------------------
 
 
-INSERT INTO config_param_system VALUES (84, 'ymax_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
-INSERT INTO config_param_system VALUES (83, 'top_elev_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
-INSERT INTO config_param_system VALUES (85, 'sys_elev_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
-INSERT INTO config_param_system VALUES (86, 'geom1_vd', '0.4', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
-INSERT INTO config_param_system VALUES (87, 'z1_vd', '0.1', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
-INSERT INTO config_param_system VALUES (88, 'z2_vd', '0.1', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
-INSERT INTO config_param_system VALUES (89, 'cat_geom1_vd', '1', 'decimal', 'draw_profile', 'For Node Catalog. Only for UD');
-INSERT INTO config_param_system VALUES (90, 'sys_elev1_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-INSERT INTO config_param_system VALUES (91, 'sys_elev2_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-INSERT INTO config_param_system VALUES (92, 'y1_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-INSERT INTO config_param_system VALUES (93, 'y2_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-INSERT INTO config_param_system VALUES (94, 'slope_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
+INSERT INTO config_param_system VALUES (184, 'ymax_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
+INSERT INTO config_param_system VALUES (183, 'top_elev_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
+INSERT INTO config_param_system VALUES (185, 'sys_elev_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
+INSERT INTO config_param_system VALUES (186, 'geom1_vd', '0.4', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
+INSERT INTO config_param_system VALUES (187, 'z1_vd', '0.1', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
+INSERT INTO config_param_system VALUES (188, 'z2_vd', '0.1', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
+INSERT INTO config_param_system VALUES (189, 'cat_geom1_vd', '1', 'decimal', 'draw_profile', 'For Node Catalog. Only for UD');
+INSERT INTO config_param_system VALUES (190, 'sys_elev1_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
+INSERT INTO config_param_system VALUES (191, 'sys_elev2_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
+INSERT INTO config_param_system VALUES (192, 'y1_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
+INSERT INTO config_param_system VALUES (193, 'y2_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
+INSERT INTO config_param_system VALUES (194, 'slope_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
 
 
 ----------------------
 --29/05/2018
 -----------------------
 
-INSERT INTO config_param_system VALUES (95, 'om_mincut_disable_check_temporary_overlap', 'FALSE', 'Boolean', 'Mincut', 'Only for WS');
-INSERT INTO config_param_system VALUES (96, 'om_mincut_valve2tank_traceability', 'FALSE', 'Boolean', 'Mincut', 'Only for WS');
+INSERT INTO config_param_system VALUES (195, 'om_mincut_disable_check_temporary_overlap', 'FALSE', 'Boolean', 'Mincut', 'Only for WS');
+INSERT INTO config_param_system VALUES (196, 'om_mincut_valve2tank_traceability', 'FALSE', 'Boolean', 'Mincut', 'Only for WS');
 
 INSERT INTO sys_fprocess_cat VALUES (30, 'Analysis mincut areas', 'OM', 'Analysis mincut areas', 'ws');
 
