@@ -23,7 +23,7 @@ INSERT INTO config_param_system VALUES (179, 'api_search_gully', '{"sys_table_id
 INSERT INTO config_param_system VALUES (187, 'api_search_psector', '{"sys_table_id":"v_edit_plan_psector", "sys_id_field":"psector_id", "sys_search_field":"name", "sys_parent_field":"expl_id", "sys_geom_field":"the_geom"}', NULL, 'apì_search_psector', NULL);
 INSERT INTO config_param_system VALUES (188, 'api_search_exploitation', '{"sys_table_id":"exploitation", "sys_id_field":"expl_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}', NULL, 'apì_search_psector', NULL);
 INSERT INTO config_param_system VALUES (182, 'api_search_muni', '{"sys_table_id":"ext_municipality", "sys_id_field":"muni_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}', NULL, 'apì_search_adress', NULL);
-INSERT INTO config_param_system VALUES (186, 'api_search_workcat', '{"sys_table_id":"v_ui_workcat_polygon", "sys_id_field":"workcat_id", "sys_search_field":"workcat_id", "sys_geom_field":"the_geom"}', NULL, 'apì_search_workcat', NULL);
+INSERT INTO config_param_system VALUES (186, 'api_search_workcat', '{"sys_table_id":"v_ui_workcat_polygon_all", "sys_id_field":"workcat_id", "sys_search_field":"workcat_id", "sys_geom_field":"the_geom"}', NULL, 'apì_search_workcat', NULL);
 INSERT INTO config_param_system VALUES (190, 'api_search_network_null', '{"sys_table_id":"", "sys_id_field":"", "sys_search_field":"", "alias":"", "cat_field":"", "orderby":"0"}', NULL, 'api_search_network', NULL);
 INSERT INTO config_param_system VALUES (191, 'api_search_service', 'amb', NULL, 'api_search_search', NULL);
 INSERT INTO config_param_system VALUES (192, 'api_search_minimsearch', '1', NULL, 'api_search', NULL);

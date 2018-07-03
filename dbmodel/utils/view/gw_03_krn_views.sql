@@ -47,8 +47,8 @@ JOIN exploitation ON v_edit_connec.expl_id=exploitation.expl_id;
 
 */
 
-DROP VIEW IF EXISTS v_ui_arc_x_node;
-CREATE OR REPLACE VIEW v_ui_workcat_polygon AS 
+DROP VIEW IF EXISTS v_ui_workcat_polygon_all;
+CREATE OR REPLACE VIEW v_ui_workcat_polygon_all AS 
 SELECT v_ui_workcat_polygon_aux.workcat_id,
 	descript, 
 	link, 
@@ -59,8 +59,8 @@ SELECT v_ui_workcat_polygon_aux.workcat_id,
    FROM v_ui_workcat_polygon_aux JOIN cat_work ON workcat_id=id;
 
 
-DROP VIEW IF EXISTS v_ui_workcat_polygon_filtered;
-CREATE OR REPLACE VIEW v_ui_workcat_polygon_filtered AS 
+DROP VIEW IF EXISTS v_ui_workcat_polygon;
+CREATE OR REPLACE VIEW v_ui_workcat_polygon AS 
  SELECT v_ui_workcat_polygon_aux.workcat_id,
     cat_work.descript,
     cat_work.link,
@@ -87,8 +87,6 @@ st_y(b.the_geom) AS y2
 FROM v_arc
 LEFT JOIN node a ON a.node_id::text = v_arc.node_1::text
 LEFT JOIN node b ON b.node_id::text = v_arc.node_2::text;
-
-
 
 
 
