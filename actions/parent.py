@@ -377,26 +377,30 @@ class ParentAction(object):
             pass
         
         
-    def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right):
+    def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
+                           index=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+                                  25, 26, 27, 28, 29, 30]):
         
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
-        query_left += "(SELECT name FROM " + self.schema_name + "." + tableleft
+        query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE " + name + " NOT IN "
+        query_left += "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft
         query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
+
         self.fill_table_by_query(tbl_all_rows, query_left)
-        self.hide_colums(tbl_all_rows, [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+        self.hide_colums(tbl_all_rows, index)
         tbl_all_rows.setColumnWidth(1, 200)
 
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        query_right = "SELECT name, cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.schema_name + "." + tableleft
+        query_right = "SELECT " + tableleft + "."  + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.schema_name + "." + tableleft
         query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_right += " WHERE cur_user = current_user"
+
         self.fill_table_by_query(tbl_selected_rows, query_right)
         self.hide_colums(tbl_selected_rows, [1, 2, 3])
         tbl_selected_rows.setColumnWidth(0, 200)
@@ -408,7 +412,7 @@ class ParentAction(object):
         query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
-        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name))
 
 
     def hide_colums(self, widget, comuns_to_hide):
@@ -537,15 +541,15 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())  
             
 
-    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name'):
         """ Fill the QTableView by filtering through the QLineEdit"""
         
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
-        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE name NOT IN "
-               "(SELECT name FROM " + self.schema_name + "." + tableleft + ""
+        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE " + name + " NOT IN "
+               "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft + ""
                " RIGHT JOIN " + self.schema_name + "." + tableright + ""
-               " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id + ""
-               " WHERE cur_user = current_user) AND LOWER(name) LIKE '%" + query + "%'")
+               " ON " + tableleft + "." + field_id_l + " = " + tableright + "." + field_id_r + ""
+               " WHERE cur_user = current_user) AND LOWER(" + name + "::text) LIKE '%" + query + "%'")
         self.fill_table_by_query(qtable, sql)
         
         
