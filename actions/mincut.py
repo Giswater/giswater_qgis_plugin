@@ -492,7 +492,6 @@ class MincutParent(ParentAction, MultipleSelection):
                             sql = ("SELECT * FROM "+ self.schema_name + ".selector_audit"
                                    " WHERE fprocesscat_id='31' AND cur_user=current_user")
                             row = self.controller.get_row(sql, log_sql=False)
-
                             if not row:
                                 sql = ("INSERT INTO " + self.schema_name + ".selector_audit(fprocesscat_id, cur_user) "
                                        " VALUES('31', current_user)")
@@ -500,7 +499,6 @@ class MincutParent(ParentAction, MultipleSelection):
                             views = 'v_anl_arc, v_anl_node, v_anl_connec'
                             message = "To see the conflicts load the views"
                             self.controller.show_info_box(message, "See layers", parameter=views)
-
                             self.dlg_mincut.close()
                 else:
                     self.dlg_mincut.close()

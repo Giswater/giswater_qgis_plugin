@@ -13,8 +13,10 @@ from PyQt4.QtSql import QSqlTableModel
 from functools import partial
 
 import utils_giswater
+from giswater.ui_manager import Multirow_selector
 from giswater.ui_manager import Multi_selector
 from giswater.ui_manager import Mincut_edit
+
 from giswater.actions.parent import ParentAction
 
 
@@ -23,6 +25,8 @@ class MincutConfig(ParentAction):
     def __init__(self, mincut):
         """ Class constructor """
         self.mincut = mincut
+        self.canvas = mincut.canvas
+        self.plugin_dir = mincut.plugin_dir
         self.controller = self.mincut.controller
         self.schema_name = self.controller.schema_name
         
@@ -144,6 +148,7 @@ class MincutConfig(ParentAction):
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         self.load_settings(self.dlg_min_edit)
+        self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
@@ -168,6 +173,7 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
+        self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector))
 
         # Fill ComboBox state
         sql = ("SELECT name"
@@ -180,13 +186,34 @@ class MincutConfig(ParentAction):
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_anl_mincut_result_cat")
         self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
-        self.controller.log_info("test set table columns for mincut management ")
+
         #self.mincut.set_table_columns(self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat")
 
         # Open the dialog
         self.dlg_min_edit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_min_edit.show()
 
+
+    def mincut_selector(self):
+        self.dlg_mincut_sel = Multirow_selector()
+        self.load_settings(self.dlg_mincut_sel)
+
+        self.dlg_mincut_sel.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_mincut_sel))
+        self.dlg_mincut_sel.rejected.connect(partial(self.close_dialog, self.dlg_mincut_sel))
+        self.dlg_mincut_sel.setWindowTitle("Mincut selector")
+        utils_giswater.setWidgetText(self.dlg_mincut_sel, 'lbl_filter', self.controller.tr('Filter by: Mincut id', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_mincut_sel, 'lbl_unselected', self.controller.tr('Unselected mincut', context_name='labels'))
+        utils_giswater.setWidgetText(self.dlg_mincut_sel, 'lbl_selected', self.controller.tr('Selected mincut', context_name='labels'))
+
+        tableleft = "v_ui_anl_mincut_result_cat"
+        tableright = "anl_mincut_result_selector"
+        field_id_left = "id"
+        field_id_right = "result_id"
+        index = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+        self.multi_row_selector(self.dlg_mincut_sel, tableleft, tableright, field_id_left, field_id_right, index=index)
+
+        # Open dialog
+        self.open_dialog(self.dlg_mincut_sel, maximize_button=False)
 
     def open_mincut(self):
         """ Open mincut form with selected record of the table """
