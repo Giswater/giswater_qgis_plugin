@@ -77,6 +77,8 @@ class ManArcDialog(ParentDialog):
         action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
         layer.editingStarted.connect(partial(self.enabled_actions, action_copypaste, True))
         layer.editingStopped.connect(partial(self.enabled_actions, action_copypaste, False))
+        self.dialog.destroyed.connect(self.set_dlg_destroyed)
+
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
