@@ -212,7 +212,7 @@ class ManageNewPsector(ParentManage):
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
             if utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id) != 'null':
-                sql = ("DELETE FROM "+ self.schema_name + "."+self.plan_om + "_psector_selector "
+                sql = ("DELETE FROM " + self.schema_name + "."+self.plan_om + "_psector_selector "
                        " WHERE cur_user= current_user")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id',
@@ -224,6 +224,14 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
 
+            layer = self.controller.get_layer_by_tablename('v_edit_'+self.plan_om+'_psector')
+            expr_filter = "psector_id = '" + str(psector_id) + "'"
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            if not is_valid:
+                return
+            self.select_features_by_expr(layer, expr)
+            self.zoom_to_selected_features(layer)
+            layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
@@ -296,8 +304,8 @@ class ManageNewPsector(ParentManage):
         value = utils_giswater.isChecked(self.dlg_plan_psector, "chk_enable_all")
         psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = ("SELECT gw_fct_plan_psector_enableall("+str(value)+", '"+str(psector_id)+"')")
-        self.controller.execute_sql(sql, log_sql=True)
-
+        self.controller.execute_sql(sql)
+        self.refresh_map_canvas()
 
     def update_total(self, dialog, qtable):
         """ Show description of product plan/om _psector as label """
