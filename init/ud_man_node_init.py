@@ -7,8 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
-from PyQt4.QtCore import QPoint, Qt
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
+from PyQt4.QtCore import QPoint, Qt, SIGNAL
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 
 from functools import partial
@@ -58,10 +58,14 @@ class ManNodeDialog(ParentDialog):
         
     def init_config_form(self):
         """ Custom form initial configuration """
-              
+        # Get last point clicked on canvas
+        last_click = self.canvas.mouseLastXY()
+        self.last_point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
+
         # Define class variables
-        self.filter = self.field_id + " = '" + str(self.id) + "'"                    
-        
+        self.filter = self.field_id + " = '" + str(self.id) + "'"
+        emit_point = QgsMapToolEmitPoint(self.canvas)
+
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -96,6 +100,9 @@ class ManNodeDialog(ParentDialog):
         action_rotation = self.dialog.findChild(QAction, "actionRotation")
         layer.editingStarted.connect(partial(self.enabled_actions, action_rotation, True))
         layer.editingStopped.connect(partial(self.enabled_actions, action_rotation, False))
+        action_interpolate = self.dialog.findChild(QAction, "actionInterpolate")
+        layer.editingStarted.connect(partial(self.enabled_actions, action_interpolate, True))
+        layer.editingStopped.connect(partial(self.enabled_actions, action_interpolate, False))
         self.dialog.destroyed.connect(self.set_dlg_destroyed)
 
         # Toolbar actions
@@ -111,7 +118,8 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
-        
+        self.dialog.findChild(QAction, "actionInterpolate").triggered.connect(partial(self.activate_snapping, emit_point))
+
         # Manage tab 'Scada'
         self.manage_tab_scada()        
         
@@ -168,6 +176,77 @@ class ManNodeDialog(ParentDialog):
         self.load_state_type(self.dialog, state_type, self.geom_type)
         self.load_dma(self.dialog, dma_id, self.geom_type)
 
+
+    def activate_snapping(self, emit_point):
+        # Set circle vertex marker
+        color = QColor(255, 100, 255)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)
+
+        self.node1 = None
+        self.node2 = None
+        self.canvas.setMapTool(emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+        emit_point.canvasClicked.connect(partial(self.snapping_node))
+
+
+    def snapping_node(self, point):
+        """ Get id of selected nodes (node1 and node2) """
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+        # That's the snapped point
+        if result:
+            # Check feature
+            for snapped_point in result:
+                if snapped_point.layer == self.layer:
+                    # Get the point
+                    snapp_feature = next(snapped_point.layer.getFeatures(
+                        QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                    element_id = snapp_feature.attribute('node_id')
+                    if self.node1 is None:
+                        self.node1 = str(element_id)
+                    elif self.node1 != str(element_id):
+                        self.node2 = str(element_id)
+
+        if self.node1 is not None and self.node2 is not None:
+            self.iface.actionPan().trigger()
+            self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
+            sql = ("SELECT " + self.schema_name + ".gw_fct_node_interpolate('"
+                   ""+str(self.last_point[0])+"', '"+str(self.last_point[1])+"', '"
+                   ""+str(self.node1)+"', '"+self.node2+"')")
+            row = self.controller.get_row(sql, log_sql=True)
+            self.controller.log_info(str(row))
+
+
+    def mouse_move(self, p):
+        map_point = self.canvas.getCoordinateTransform().transform(p)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
+
+        # That's the snapped features
+        if result:
+            for snapped_point in result:
+                if snapped_point.layer == self.layer:
+                    point = QgsPoint(snapped_point.snappedVertex)
+                    # Add marker
+                    self.vertex_marker.setCenter(point)
+                    self.vertex_marker.show()
+        else:
+            self.vertex_marker.hide()
 
     def open_up_down_stream(self, qtable):
         """ Open selected node from @qtable """
