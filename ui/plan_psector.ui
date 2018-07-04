@@ -657,6 +657,19 @@
       <string>Active</string>
      </property>
     </widget>
+    <widget class="QCheckBox" name="chk_enable_all">
+     <property name="geometry">
+      <rect>
+       <x>175</x>
+       <y>432</y>
+       <width>141</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enable all</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="Elements">
     <attribute name="title">
@@ -798,8 +811,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>460</width>
+        <height>448</height>
        </rect>
       </property>
       <attribute name="label">
@@ -885,8 +898,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">

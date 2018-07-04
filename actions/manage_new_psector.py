@@ -81,6 +81,7 @@ class ManageNewPsector(ParentManage):
         self.cmb_result_id = self.dlg_plan_psector.findChild(QComboBox, "result_id")
         self.dlg_plan_psector.lbl_result_id.setVisible(True)
         self.cmb_result_id.setVisible(True)
+
         scale = self.dlg_plan_psector.findChild(QLineEdit, "scale")
         scale.setValidator(QDoubleValidator())
         rotation = self.dlg_plan_psector.findChild(QLineEdit, "rotation")
@@ -95,9 +96,12 @@ class ManageNewPsector(ParentManage):
         if self.plan_om == 'om':
             self.populate_result_id(self.dlg_plan_psector.result_id, self.plan_om + '_result_cat')
             utils_giswater.remove_tab_by_tabName(self.dlg_plan_psector.tabWidget, 'tab_document')
+            self.dlg_plan_psector.chk_enable_all.setVisible(False)
         elif self.plan_om == 'plan':
             self.dlg_plan_psector.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
+            self.dlg_plan_psector.chk_enable_all.setEnabled(False)
+
 
         self.priority = self.dlg_plan_psector.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".value_priority ORDER BY id"
@@ -157,7 +161,8 @@ class ManageNewPsector(ParentManage):
             
             self.enable_tabs(True)
             self.enable_buttons(True)
-            self.dlg_plan_psector.name.setEnabled(False)
+            self.dlg_plan_psector.name.setEnabled(True)
+            self.dlg_plan_psector.chk_enable_all.setDisabled(False)
             self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc", set_edit_triggers=QTableView.DoubleClicked)
             self.set_table_columns(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc")
             self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node", set_edit_triggers=QTableView.DoubleClicked)
@@ -236,6 +241,8 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.psector_type.currentIndexChanged.connect(partial(self.populate_result_id, self.dlg_plan_psector.result_id, self.plan_om + '_result_cat'))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
+        self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self.enable_all))
+
 
         self.lbl_descript = self.dlg_plan_psector.findChild(QLabel, "lbl_descript")
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
@@ -283,6 +290,13 @@ class ManageNewPsector(ParentManage):
 
         # Open dialog
         self.open_dialog(self.dlg_plan_psector, maximize_button=False)
+
+
+    def enable_all(self):
+        value = utils_giswater.isChecked(self.dlg_plan_psector, "chk_enable_all")
+        psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
+        sql = ("SELECT gw_fct_plan_psector_enableall("+str(value)+", '"+str(psector_id)+"')")
+        self.controller.execute_sql(sql, log_sql=True)
 
 
     def update_total(self, dialog, qtable):
@@ -646,6 +660,8 @@ class ManageNewPsector(ParentManage):
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
+
+        self.dlg_plan_psector.chk_enable_all.setEnabled(True)
 
 
     def populate_result_id(self, combo, table_name):
