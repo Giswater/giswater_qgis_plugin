@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression
+from qgis.core import QgsExpression, QgsFeatureRequest
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
@@ -713,3 +713,45 @@ class ParentAction(object):
             sql += " WHERE " + column_id + " IN (" + list_id + ")"
             self.controller.execute_sql(sql)
             widget.model().select()
+
+    def select_features_by_expr(self, layer, expr):
+        """ Select features of @layer applying @expr """
+
+        if expr is None:
+            layer.removeSelection()
+        else:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
+
+    def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
+        """ Zoom to selected features of the @layer with @geom_type """
+
+        if not layer:
+            return
+
+        self.iface.setActiveLayer(layer)
+        self.iface.actionZoomToSelected().trigger()
+
+        if geom_type:
+
+            # Set scale = scale_zoom
+            if geom_type in ('node', 'connec', 'gully'):
+                scale = self.scale_zoom
+
+            # Set scale = max(current_scale, scale_zoom)
+            elif geom_type == 'arc':
+                scale = self.iface.mapCanvas().scale()
+                if int(scale) < int(self.scale_zoom):
+                    scale = self.scale_zoom
+            else:
+                scale = 5000
+
+            if zoom is not None:
+                scale = zoom
+
+            self.iface.mapCanvas().zoomScale(float(scale))
