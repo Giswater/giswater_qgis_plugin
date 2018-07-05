@@ -88,6 +88,7 @@ class ManageElement(ParentManage):
         self.populate_combo(self.dlg_add_element, "workcat_id_end", "cat_work")
 
         # Set combo boxes
+        self.set_combo(self.dlg_add_element, 'element_type', 'cat_element', 'elementtype_vdefault', field_id='elementtype_id',field_name='elementtype_id')
         self.set_combo(self.dlg_add_element, 'elementcat_id', 'cat_element', 'elementcat_vdefault', field_id='id', field_name='id')
         self.set_combo(self.dlg_add_element, 'state', 'value_state', 'state_vdefault', field_name='name')
         self.set_combo(self.dlg_add_element, 'expl_id', 'exploitation', 'exploitation_vdefault', field_id='expl_id', field_name='name')

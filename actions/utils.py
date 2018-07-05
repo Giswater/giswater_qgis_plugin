@@ -254,6 +254,8 @@ class Utils(ParentAction):
         # Fill combo boxes of the form and related events
         self.dlg_config.exploitation_vdefault.currentIndexChanged.connect(partial(self.filter_dma_vdefault))
         self.dlg_config.state_vdefault.currentIndexChanged.connect(partial(self.filter_statetype_vdefault))
+        self.dlg_config.elementtype_vdefault.currentIndexChanged.connect(partial(self.filter_elementcat_vdefault))
+
 
         # Populate General combo boxes
         # Om
@@ -293,7 +295,11 @@ class Utils(ParentAction):
         sql = "SELECT id, id FROM " + self.schema_name + ".cat_connec ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_config.connecat_vdefault, rows, 1)
-        sql = "SELECT id, id FROM " + self.schema_name + ".cat_element ORDER BY id"
+        sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM " + self.schema_name + ".cat_element ORDER BY elementtype_id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_config.elementtype_vdefault, rows, 1)
+        sql = ("SELECT id, id FROM " + self.schema_name + ".cat_element "
+               " WHERE elementtype_id = '" + str(utils_giswater.get_item_data(self.dlg_config, self.dlg_config.elementtype_vdefault)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_config.elementcat_vdefault, rows, 1)
         sql = "SELECT expl_id, name FROM " + self.schema_name + ".exploitation ORDER BY name"
@@ -512,6 +518,7 @@ class Utils(ParentAction):
         self.manage_config_param_user("arccat_vdefault")
         self.manage_config_param_user("nodecat_vdefault")
         self.manage_config_param_user("connecat_vdefault")
+        self.manage_config_param_user("elementtype_vdefault")
         self.manage_config_param_user("elementcat_vdefault")
         self.manage_config_param_user("exploitation_vdefault")
         self.manage_config_param_user("municipality_vdefault")
@@ -1212,6 +1219,13 @@ class Utils(ParentAction):
                " WHERE state = '" + str(utils_giswater.get_item_data(self.dlg_config, self.dlg_config.state_vdefault)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_config.statetype_vdefault, rows, 1)
+
+    def filter_elementcat_vdefault(self):
+        """ Filter QComboBox @elementcat_vdefault according  @elementtype_vdefault """
+        sql = ("SELECT id, id FROM " + self.schema_name + ".cat_element"
+               " WHERE elementtype_id = '" + str(utils_giswater.get_item_data(self.dlg_config, self.dlg_config.elementtype_vdefault)) + "'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_config.elementcat_vdefault, rows, 1)
 
 
     def populate_cmb_templates(self, combo):
