@@ -110,6 +110,7 @@ class ManNodeDialog(ParentDialog):
         action.setChecked(layer.isEditable())
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
+        self.dialog.findChild(QAction, "actionInterpolate").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
@@ -224,8 +225,12 @@ class ManNodeDialog(ParentDialog):
             sql = ("SELECT " + self.schema_name + ".gw_fct_node_interpolate('"
                    ""+str(self.last_point[0])+"', '"+str(self.last_point[1])+"', '"
                    ""+str(self.node1)+"', '"+self.node2+"')")
-            row = self.controller.get_row(sql, log_sql=True)
-            self.controller.log_info(str(row))
+            row = self.controller.get_row(sql)
+            if row:
+                if 'elev' in row[0]:
+                    utils_giswater.setWidgetText(self.dialog, 'elev', row[0]['elev'])
+                if 'top_elev' in row[0]:
+                    utils_giswater.setWidgetText(self.dialog, 'top_elev', row[0]['top_elev'])
 
 
     def mouse_move(self, p):

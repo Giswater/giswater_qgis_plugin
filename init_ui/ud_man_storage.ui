@@ -1012,8 +1012,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1520,8 +1520,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2214,8 +2214,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4401,6 +4401,7 @@
    <addaction name="actionCentered"/>
    <addaction name="actionCopyPaste"/>
    <addaction name="actionRotation"/>
+   <addaction name="actionInterpolate"/>
    <addaction name="actionLink"/>
    <addaction name="actionHelp"/>
   </widget>
@@ -4502,6 +4503,15 @@
    </property>
    <property name="toolTip">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionInterpolate">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/194.png</normaloff>../icons/194.png</iconset>
+   </property>
+   <property name="text">
+    <string>interpolate</string>
    </property>
   </action>
  </widget>
