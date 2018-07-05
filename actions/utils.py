@@ -256,6 +256,16 @@ class Utils(ParentAction):
         self.dlg_config.state_vdefault.currentIndexChanged.connect(partial(self.filter_statetype_vdefault))
         self.dlg_config.elementtype_vdefault.currentIndexChanged.connect(partial(self.filter_elementcat_vdefault))
 
+        # Set signals check box
+
+        self.dlg_config.chk_elementcat_vdefault.stateChanged.connect(partial(
+            self.check_child_to_parent, self.dlg_config.chk_elementcat_vdefault, self.dlg_config.chk_elementtype_vdefault))
+        self.dlg_config.chk_elementtype_vdefault.stateChanged.connect(partial(
+            self.check_parent_to_child, self.dlg_config.chk_elementtype_vdefault, self.dlg_config.chk_elementcat_vdefault))
+        self.dlg_config.chk_statetype_vdefault.stateChanged.connect(partial(
+            self.check_child_to_parent, self.dlg_config.chk_statetype_vdefault, self.dlg_config.chk_state_vdefault))
+        self.dlg_config.chk_state_vdefault.stateChanged.connect(partial(
+            self.check_parent_to_child, self.dlg_config.chk_state_vdefault, self.dlg_config.chk_statetype_vdefault))
 
         # Populate General combo boxes
         # Om
@@ -1227,6 +1237,13 @@ class Utils(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_config.elementcat_vdefault, rows, 1)
 
+    def check_child_to_parent(self, widget_child, widget_parent):
+        if widget_child.isChecked():
+            widget_parent.setChecked(True)
+
+    def check_parent_to_child(self, widget_parent, widget_child):
+        if widget_parent.isChecked() == False:
+            widget_child.setChecked(False)
 
     def populate_cmb_templates(self, combo):
 
@@ -1238,5 +1255,3 @@ class Utils(ParentAction):
             records.append(elem)
             index = index +1
         utils_giswater.set_item_data(combo, records, 1)
-
-        
