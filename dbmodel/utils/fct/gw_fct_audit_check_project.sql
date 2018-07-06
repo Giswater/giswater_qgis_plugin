@@ -58,20 +58,20 @@ BEGIN
 	--urn
 	IF project_type_aux='WS' THEN
 		SELECT GREATEST (
-		(SELECT max(node_id::integer) FROM node WHERE node_id ~ '^\d+$'),
-		(SELECT max(arc_id::integer) FROM arc WHERE arc_id ~ '^\d+$'),
-		(SELECT max(connec_id::integer) FROM connec WHERE connec_id ~ '^\d+$'),
-		(SELECT max(element_id::integer) FROM element WHERE element_id ~ '^\d+$'),
-		(SELECT max(pol_id::integer) FROM polygon WHERE pol_id ~ '^\d+$')
+		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
+		(SELECT max(arc_id::int8) FROM arc WHERE arc_id ~ '^\d+$'),
+		(SELECT max(connec_id::int8) FROM connec WHERE connec_id ~ '^\d+$'),
+		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
+		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
 		) INTO max_aux;
 	ELSIF project_type_aux='UD' THEN
 		SELECT GREATEST (
-		(SELECT max(node_id::integer) FROM node WHERE node_id ~ '^\d+$'),
-		(SELECT max(arc_id::integer) FROM arc WHERE arc_id ~ '^\d+$'),
-		(SELECT max(connec_id::integer) FROM connec WHERE connec_id ~ '^\d+$'),
-		(SELECT max(gully_id::integer) FROM gully WHERE gully_id ~ '^\d+$'),
-		(SELECT max(element_id::integer) FROM element WHERE element_id ~ '^\d+$'),
-		(SELECT max(pol_id::integer) FROM polygon WHERE pol_id ~ '^\d+$')
+		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
+		(SELECT max(arc_id::int8) FROM arc WHERE arc_id ~ '^\d+$'),
+		(SELECT max(connec_id::int8) FROM connec WHERE connec_id ~ '^\d+$'),
+		(SELECT max(gully_id::int8) FROM gully WHERE gully_id ~ '^\d+$'),
+		(SELECT max(element_id::int8) FROM element WHERE element_id ~ '^\d+$'),
+		(SELECT max(pol_id::int8) FROM polygon WHERE pol_id ~ '^\d+$')
 		) INTO max_aux;
 	END IF;	
 	IF max_aux IS NOT null THEN

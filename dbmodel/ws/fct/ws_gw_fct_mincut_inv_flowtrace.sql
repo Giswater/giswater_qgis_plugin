@@ -58,7 +58,7 @@ BEGIN
 			*/
 		
 			query_text:= 'SELECT * FROM pgr_dijkstra( 
-				''SELECT v_edit_arc.arc_id::integer as id, node_1::int8 as source, node_2::int8 as target, 
+				''SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
 				(case when closed=true then -1 else 1 end) as cost,
 				(case when closed=true then -1 else 1 end) as reverse_cost
 				FROM SCHEMA_NAME.v_edit_arc 
