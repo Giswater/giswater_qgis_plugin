@@ -12,7 +12,7 @@ INSERT INTO sys_csv2pg_cat VALUES (1, 'Import db prices', 'Import db prices',
 - The column price must be numeric with two decimals. 
 - You can choose a catalog name for these prices setting an import label. 
 - Be careful, csv file needs a header line', 'role_master');
-INSERT INTO sys_csv2pg_cat VALUES (2, 'Import om visit table', 'Import om visit table', 'The csv file must contains next columns on same position: node_id, unit', 'role_om');
+INSERT INTO sys_csv2pg_cat VALUES (2, 'Import node visit table', 'Import node visit table', 'The csv file must contains next columns on same position: node_id, unit', 'role_om');
 INSERT INTO sys_csv2pg_cat VALUES (3, 'Import elements', 'Import elements', 
 'The csv file must containts next columns on same position: feature_id, elementcat_id, observ, comment, num_elements. 
 - You have to fill Import label with the element type you need to import (node, arc, connec, gully).
@@ -20,6 +20,7 @@ INSERT INTO sys_csv2pg_cat VALUES (3, 'Import elements', 'Import elements',
 - Be careful, csv file needs a header line', 'role_admin');
 INSERT INTO sys_csv2pg_cat VALUES (4, 'Import addfields', 'Import addfields', 'The csv file must containts next columns on same position: 
 feature_id (can be arc, node or connec), parameter_id (choose from man_addfields_parameter), value_param. 
-- Import label is mandatory, but you can put whatever you what in this option. 
 - Be careful, csv file needs a header line', 'role_admin');
-
+INSERT INTO sys_csv2pg_cat VALUES (5, 'Import arc visit table', 'Import arc visit table', 'The csv file must contains next columns on same position: arc_id, unit', 'role_om');
+INSERT INTO sys_csv2pg_cat VALUES (6, 'Import connec visit table', 'Import connec visit table', 'The csv file must contains next columns on same position: connec_id, unit', 'role_om');
+INSERT INTO sys_csv2pg_cat VALUES (7, 'Import gully visit table', 'Import gully visit table', 'The csv file must contains next columns on same position: gully_id, unit', 'role_om');
