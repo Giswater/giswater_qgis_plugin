@@ -976,6 +976,10 @@
         <source>To see the conflicts load the views</source>
         <translation>Per veure els conflictes carregarles vistes</translation>
     </message>
+    <message>
+        <source>Selected node</source>
+        <translation>Node seleccionat</translation>
+    </message>
 </context>
 
 </TS>

@@ -191,6 +191,8 @@ class ManNodeDialog(ParentDialog):
         self.node2 = None
         self.canvas.setMapTool(emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
@@ -209,18 +211,23 @@ class ManNodeDialog(ParentDialog):
         if result:
             # Check feature
             for snapped_point in result:
-                if snapped_point.layer == self.layer:
+                if snapped_point.layer == self.layer_node:
                     # Get the point
                     snapp_feature = next(snapped_point.layer.getFeatures(
                         QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
                     element_id = snapp_feature.attribute('node_id')
+
+                    message = "Selected node"
                     if self.node1 is None:
                         self.node1 = str(element_id)
+                        self.controller.show_message(message, message_level=0, duration=1, parameter=self.node1)
                     elif self.node1 != str(element_id):
                         self.node2 = str(element_id)
+                        self.controller.show_message(message, message_level=0, duration=1, parameter=self.node2)
 
         if self.node1 is not None and self.node2 is not None:
             self.iface.actionPan().trigger()
+            self.iface.setActiveLayer(self.layer)
             self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
             sql = ("SELECT " + self.schema_name + ".gw_fct_node_interpolate('"
                    ""+str(self.last_point[0])+"', '"+str(self.last_point[1])+"', '"
@@ -245,7 +252,7 @@ class ManNodeDialog(ParentDialog):
         # That's the snapped features
         if result:
             for snapped_point in result:
-                if snapped_point.layer == self.layer:
+                if snapped_point.layer == self.layer_node:
                     point = QgsPoint(snapped_point.snappedVertex)
                     # Add marker
                     self.vertex_marker.setCenter(point)
