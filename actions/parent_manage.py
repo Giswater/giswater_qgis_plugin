@@ -907,14 +907,15 @@ class ParentManage(ParentAction, object):
         widget.setModel(model)
 
 
-    def filter_by_id(self, dialog, widget_table, widget_txt, table_object):
+    def filter_by_id(self, dialog, widget_table, widget_txt, table_object, field_object_id='id'):
 
         field_object_id = "id"
         if table_object == "element":
             field_object_id = table_object + "_id"
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         if object_id != 'null':
-            expr = field_object_id + " ILIKE '%" + str(object_id) + "%'"
+            expr = field_object_id + "::text ILIKE '%" + str(object_id) + "%'"
+            self.controller.log_info(str(expr))
             # Refresh model with selected filter
             widget_table.model().setFilter(expr)
             widget_table.model().select()

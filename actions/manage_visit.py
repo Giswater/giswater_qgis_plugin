@@ -555,7 +555,7 @@ class ManageVisit(ParentManage, QObject):
 
         # manage save and rollback when closing the dialog
         self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.accepted.connect(partial(self.open_selected_object,self.dlg_man, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
 
         # Set dignals
         self.dlg_man.tbl_visit.doubleClicked.connect(
@@ -564,6 +564,8 @@ class ManageVisit(ParentManage, QObject):
             partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.txt_filter.textChanged.connect(
+            partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object))
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()        
