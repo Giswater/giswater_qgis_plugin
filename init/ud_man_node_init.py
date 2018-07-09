@@ -103,7 +103,7 @@ class ManNodeDialog(ParentDialog):
         action_interpolate = self.dialog.findChild(QAction, "actionInterpolate")
         layer.editingStarted.connect(partial(self.enabled_actions, action_interpolate, True))
         layer.editingStopped.connect(partial(self.enabled_actions, action_interpolate, False))
-        self.dialog.destroyed.connect(self.set_dlg_destroyed)
+        self.dialog.destroyed.connect(self.dlg_destroyed)
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
