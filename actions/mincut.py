@@ -590,6 +590,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_connec.btn_delete.clicked.connect(partial(self.delete_records_connec))
         self.dlg_connec.btn_snapping.clicked.connect(self.snapping_init_connec)
         self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, self.dlg_connec, "connec"))
+        self.dlg_connec.rejected.connect(partial(self.close_dialog, self.dlg_connec))
         # self.dlg_connec.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_connec))
         
         # Set autocompleter for 'customer_code'
