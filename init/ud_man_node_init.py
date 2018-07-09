@@ -196,9 +196,11 @@ class ManNodeDialog(ParentDialog):
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
-
-    def snapping_node(self, point):
+    def snapping_node(self, point, button):
         """ Get id of selected nodes (node1 and node2) """
+        if button == 2:
+            self.dlg_destroyed()
+            return
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
