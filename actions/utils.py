@@ -686,11 +686,12 @@ class Utils(ParentAction):
         self.dlg_csv.rejected.connect(partial(self.close_dialog, self.dlg_csv))
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
+        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.disable_import_label, self.dlg_csv))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self.preview_csv, self.dlg_csv))
-
+        self.disable_import_label(self.dlg_csv)
         self.load_settings_values()
 
         if str(utils_giswater.getWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
@@ -699,6 +700,16 @@ class Utils(ParentAction):
 
         # Open dialog
         self.open_dialog(self.dlg_csv, maximize_button=False)
+
+
+    def disable_import_label(self, dialog):
+        csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
+        if csv2pgcat_id_aux == 4:
+            dialog.txt_import.setEnabled(False)
+            dialog.txt_import.setReadOnly(True)
+        else:
+            dialog.txt_import.setEnabled(True)
+            dialog.txt_import.setReadOnly(False)
 
 
     def populate_cmb_unicodes(self, combo):
@@ -752,10 +763,12 @@ class Utils(ParentAction):
         self.preview_csv(dialog)
         if path is None or path == 'null':
             return False
-        if label_aux is None or label_aux == 'null':
-            message = "Please put a import label"
-            self.controller.show_warning(message)
-            return False
+        csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
+        if csv2pgcat_id_aux != 4:
+            if label_aux is None or label_aux == 'null':
+                message = "Please put a import label"
+                self.controller.show_warning(message)
+                return False
 
         return True
 
@@ -839,7 +852,9 @@ class Utils(ParentAction):
             with open(path, 'rb') as csvfile:
                 # counts rows in csvfile, using var "row_count" to do progresbar
                 row_count = sum(1 for rows in csvfile)  #@UnusedVariable
-                dialog.progressBar.setMaximum(row_count - 20)  # -20 for see 100% complete progress
+                if row_count > 20:
+                    row_count -= 20
+                dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress
                 csvfile.seek(0)  # Position the cursor at position 0 of the file
                 reader = csv.reader(csvfile, delimiter=delimiter)
                 for row in reader:
@@ -878,7 +893,7 @@ class Utils(ParentAction):
 
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg("
                + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
-        self.controller.execute_sql(sql)
+        self.controller.execute_sql(sql, log_sql=True)
 
         self.save_settings_values()
 
