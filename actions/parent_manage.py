@@ -762,13 +762,15 @@ class ParentManage(ParentAction, object):
         # Reload contents of table 'tbl_@table_object_x_@geom_type'
         if query:
             self.insert_feature_to_plan(dialog, self.geom_type)
-            self.remove_selection()
+            if self.plan_om == 'plan':
+                self.remove_selection()
             self.reload_qtable(dialog, geom_type, self.plan_om)
         else:
             self.reload_table(dialog, table_object, self.geom_type, expr_filter)
             self.apply_lazy_init(table_object)            
         # Remove selection in generic 'v_edit' layers
-        self.remove_selection(False)
+        if self.plan_om == 'plan':
+            self.remove_selection(False)
                     
         self.connect_signal_selection_changed(dialog, table_object)
 
