@@ -133,9 +133,11 @@ BEGIN
 			
 	END IF;
 	
+	EXCEPTION WHEN  invalid_text_representation THEN
+	RETURN 1;
 	
 	
-RETURN 1;
+RETURN 0;
 	
 	
 END;
