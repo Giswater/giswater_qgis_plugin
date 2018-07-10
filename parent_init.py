@@ -2493,13 +2493,20 @@ class ParentDialog(QDialog):
         dlg.open()
 
 
-    def dlg_destroyed(self):
+    def dlg_destroyed(self, layer=None, vertex=None):
         self.dlg_is_destroyed = True
         self.iface.actionPan().trigger()
-        if self.layer is not None:
-            self.iface.setActiveLayer(self.layer)
-        if self.vertex_marker is not None:
-            self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
+        if layer:
+            self.iface.setActiveLayer(layer)
+        else:
+            if self.layer is not None:
+                self.iface.setActiveLayer(self.layer)
+
+        if vertex:
+            self.iface.mapCanvas().scene().removeItem(vertex)
+        else:
+            if self.vertex_marker is not None:
+                self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
 
 
     def enabled_actions(self, action, enabled):
