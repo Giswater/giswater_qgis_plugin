@@ -973,6 +973,8 @@ class ParentManage(ParentAction, object):
             field_object_id = table_object + "_id"
         if table_object == "om_visit":
             widget_id = "visit_id"
+        elif "v_ui_om_visitman_x_" in table_object:
+            field_object_id = "visit_id"
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
@@ -989,7 +991,8 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
         elif table_object == "om_visit":
             self.manage_visit(visit_id=selected_object_id)
-
+        elif "v_ui_om_visitman_x_" in table_object:
+            self.manage_visit(visit_id=selected_object_id)
 
     def set_selectionbehavior(self, dialog):
         
