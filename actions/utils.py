@@ -888,16 +888,17 @@ class Utils(ParentAction):
             self.controller.show_warning(str(e))
             return
 
-        message = "Import has been satisfactory"
-        self.controller.show_info(message)
-
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg("
                + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
-        self.controller.execute_sql(sql, log_sql=True)
-
+        row = self.controller.get_row(sql, log_sql=True)
+        self.controller.log_info(str(row))
         self.save_settings_values()
-
-
+        if row == 0:
+            message = "Import has been satisfactory"
+            self.close_dialog(self.dlg_csv)
+        else:
+            message = "Import failed"
+        self.controller.show_info_box(message)
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
 
         if roles is None:
