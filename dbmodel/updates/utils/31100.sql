@@ -222,3 +222,10 @@ DROP RULE IF EXISTS delete_plan_psector_x_arc ON arc;
 
 DROP RULE IF EXISTS update_plan_psector_x_node ON node;
 DROP RULE IF EXISTS delete_plan_psector_x_node ON node;
+
+
+----------------------
+--11/07/2018
+-----------------------
+
+ALTER TABLE plan_psector ADD COLUMN enable_all boolean NOT NULL DEFAULT FALSE;
