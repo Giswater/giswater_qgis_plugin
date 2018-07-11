@@ -163,6 +163,11 @@ class ManageNewPsector(ParentManage):
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(True)
             self.dlg_plan_psector.chk_enable_all.setDisabled(False)
+            sql = ("SELECT enable_all FROM " + self.schema_name + "." + self.plan_om+"_psector "
+                   " WHERE psector_id = '"+str(psector_id)+"'")
+            row = self.controller.get_row(sql)
+            if row:
+                self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
             self.fill_table(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc", set_edit_triggers=QTableView.DoubleClicked)
             self.set_table_columns(self.dlg_plan_psector, self.qtbl_arc, self.plan_om + "_psector_x_arc")
             self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.plan_om + "_psector_x_node", set_edit_triggers=QTableView.DoubleClicked)
