@@ -310,6 +310,12 @@ class ManageNewPsector(ParentManage):
         psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = ("SELECT gw_fct_plan_psector_enableall("+str(value)+", '"+str(psector_id)+"')")
         self.controller.execute_sql(sql)
+        self.reload_qtable(self.dlg_plan_psector, 'arc', self.plan_om)
+        self.reload_qtable(self.dlg_plan_psector, 'node', self.plan_om)
+        sql = ("UPDATE " + self.schema_name + ".plan_psector "
+               " SET enable_all = '" + str(value) + "' "
+               " WHERE psector_id = '" + str(psector_id) + "'")
+        self.controller.execute_sql(sql, log_sql=True)
         self.refresh_map_canvas()
 
     def update_total(self, dialog, qtable):
