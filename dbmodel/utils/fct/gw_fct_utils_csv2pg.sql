@@ -64,7 +64,9 @@ BEGIN
 		FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
 
 		-- Insert into price_cat_simple table
+		IF label_aux NOT IN (SELECT id FROM price_cat_simple) THEN
 		INSERT INTO price_cat_simple (id) VALUES (label_aux);
+		END IF;
 
 		-- Upsert into price_simple table
 		INSERT INTO price_simple (id, pricecat_id, unit, descript, text, price)
