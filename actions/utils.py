@@ -826,8 +826,8 @@ class Utils(ParentAction):
     def delete_table_csv(self, temp_tablename, csv2pgcat_id_aux):
         """ Delete records from temp_csv2pg for current user and selected cat """
         sql = ("DELETE FROM " + self.schema_name + "." + temp_tablename + " "
-               " WHERE csv2pgcat_id = '" +str(csv2pgcat_id_aux) + "' AND user_name = current_user")
-        self.controller.execute_sql(sql)
+               " WHERE csv2pgcat_id = '" + str(csv2pgcat_id_aux) + "' AND user_name = current_user")
+        self.controller.execute_sql(sql, log_sql=True)
 
 
     def write_csv(self, dialog, temp_tablename):
@@ -890,15 +890,20 @@ class Utils(ParentAction):
 
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg("
                + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
-        row = self.controller.get_row(sql, log_sql=True)
-        self.controller.log_info(str(row))
+        status = self.controller.execute_sql(sql, log_sql=False)
         self.save_settings_values()
-        if row == 0:
+        if status:
             message = "Import has been satisfactory"
+            self.controller.show_info_box(message)
             self.close_dialog(self.dlg_csv)
         else:
             message = "Import failed"
-        self.controller.show_info_box(message)
+            self.controller.show_info_box(message)
+
+
+
+
+
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
 
         if roles is None:
