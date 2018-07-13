@@ -9,6 +9,7 @@ or (at your option) any later version.
 from qgis.core import QgsExpression, QgsFeatureRequest
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
+from PyQt4.QtGui import QStringListModel, QCompleter
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 import os
@@ -755,3 +756,32 @@ class ParentAction(object):
                 scale = zoom
 
             self.iface.mapCanvas().zoomScale(float(scale))
+
+    def set_completer(self, tablename, widget, field_search, color='black'):
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object
+        """
+
+        if not widget:
+            return
+
+        # Set SQL
+        sql = ("SELECT DISTINCT(" + field_search + ")"
+               " FROM " + self.schema_name + "." + tablename + ""
+               " ORDER BY " + field_search + "")
+        row = self.controller.get_rows(sql)
+
+        for i in range(0, len(row)):
+            aux = row[i]
+            row[i] = str(aux[0])
+
+        # Set completer and model: add autocomplete in the widget
+        self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.completer.setCompletionMode(0)
+        self.completer.popup().setStyleSheet("color: "+color+";")
+        widget.setCompleter(self.completer)
+
+        model = QStringListModel()
+        model.setStringList(row)
+        self.completer.setModel(model)
