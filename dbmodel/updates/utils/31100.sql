@@ -222,3 +222,32 @@ DROP RULE IF EXISTS delete_plan_psector_x_arc ON arc;
 
 DROP RULE IF EXISTS update_plan_psector_x_node ON node;
 DROP RULE IF EXISTS delete_plan_psector_x_node ON node;
+
+
+----------------------
+--10/07/2018
+-----------------------
+
+-- Harmonize pivot table of ext_rtc_hydrometer
+ALTER TABLE ext_rtc_hydrometer RENAME hydrometer_id TO id;
+ALTER TABLE ext_rtc_hydrometer RENAME instalation_date TO start_date;
+ALTER TABLE ext_rtc_hydrometer RENAME client_name TO customer_name;
+ALTER TABLE ext_rtc_hydrometer RENAME connec_customer_code TO connec_id;
+ALTER TABLE ext_rtc_hydrometer RENAME hydrometer_number TO hydro_number;
+ALTER TABLE ext_rtc_hydrometer RENAME state TO state_id;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN plot_code integer;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN priority_id integer;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN catalog_id integer;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN category_id integer;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN crm_number integer;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN muni_id integer;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN address1 text;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN address2 text;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN address3 text;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN address2_1 text;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN address2_2 text;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN address2_3 text;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN m3_volume integer;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydro_man_date date;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN end_date date;
+ALTER TABLE ext_rtc_hydrometer ADD COLUMN update_date date;
