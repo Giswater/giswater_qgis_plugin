@@ -13,13 +13,11 @@ SET search_path = "crm", public, pg_catalog;
 -- CRM FUNCTIONS
 -- ----------------------------
 
-
 CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis_hydro_data()
   RETURNS void AS
 $BODY$DECLARE
-rec_hydrometer record;
-rec_connec record;
-
+v_new_hydrometer integer;
+v_new_hydrometer_x_connec integer;
 
 
 BEGIN
@@ -29,19 +27,34 @@ BEGIN
 
 	ALTER TABLE ws.rtc_hydrometer DISABLE TRIGGER gw_trg_rtc_hydrometer;
 
+	-- count new hydrometer
+	SELECT count(*) INTO v_new_hydrometer FROM crm.hydrometer except (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer);
 
 	-- insert into rtc_hydrometer
 	INSERT INTO ws.rtc_hydrometer (hydrometer_id)
-	SELECT id FROM crm.hydrometer WHERE id NOT IN (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer);
+	SELECT id FROM crm.hydrometer except (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer);
+
+	-- count new hydrometer_x_connec
+	SELECT count(*) INTO v_new_hydrometer_x_connec
+		FROM crm.hydrometer 
+		JOIN ws.connec ON hydrometer.connec_id::text=customer_code
+		JOIN (SELECT id FROM crm.hydrometer EXCEPT (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer_x_connec))a ON a.id=hydrometer.id
+		WHERE hydrometer.connec_id is not null
+		and hydrometer.connec_id::text in (SELECT customer_code FROM ws.connec);
 
 	-- insert into rtc_hydrometer_x_connec
 	INSERT INTO ws.rtc_hydrometer_x_connec (hydrometer_id, connec_id)
-	SELECT id, connec.connec_id FROM crm.hydrometer JOIN ws.connec ON hydrometer.connec_id::text=customer_code
-	WHERE id NOT IN (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer_x_connec) 
-	and hydrometer.connec_id is not null
-	and hydrometer.connec_id::text in (SELECT customer_code FROM ws.connec);
+	SELECT hydrometer.id, connec.connec_id 
+		FROM crm.hydrometer 
+		JOIN ws.connec ON hydrometer.connec_id::text=customer_code
+		JOIN (SELECT id FROM crm.hydrometer EXCEPT (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer_x_connec))a ON a.id=hydrometer.id
+		WHERE hydrometer.connec_id is not null
+		and hydrometer.connec_id::text in (SELECT customer_code FROM ws.connec);
 
 	ALTER TABLE ws.rtc_hydrometer ENABLE TRIGGER gw_trg_rtc_hydrometer;
+
+	-- insert into traceability table
+	INSERT INTO crm.crm2gis_traceability (new_hydrometer,  new_hydrometer_x_connec) VALUES (v_new_hydrometer, v_new_hydrometer_x_connec);
 
     RETURN;
         

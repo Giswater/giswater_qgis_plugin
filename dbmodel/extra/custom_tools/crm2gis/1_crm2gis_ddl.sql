@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "crm", public, pg_catalog;
 
+-- warning: this script affects tables on ws (rtc_hydrometer and rtc_hydrometer_x_connec)
 
 -- ----------------------------
 -- CRM TABLES
@@ -92,6 +93,19 @@ CREATE TABLE hydro_cat_priority(
 "id" integer PRIMARY KEY,
 "code" character varying(16) NOT NULL,
 "observ" character varying(100));
+
+
+
+CREATE TABLE crm2gis_traceability
+(
+  id bigserial PRIMARY KEY,
+  new_hydro_number integer,
+  tstamp timestamp DEFAULT now()
+);
+
+
+ALTER TABLE ws.rtc_hydrometer ADD COLUMN tstamp timestamp default now();
+ALTER TABLE ws.rtc_hydrometer_x_connec ADD COLUMN tstamp timestamp default now();
 
 
 CREATE INDEX hydrometer_code ON crm.hydrometer USING btree (code);

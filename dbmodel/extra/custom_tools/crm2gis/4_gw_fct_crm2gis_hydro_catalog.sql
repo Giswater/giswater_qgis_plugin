@@ -17,16 +17,21 @@ $BODY$DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "crm", SCHEMA_NAME, public;
+ 
+	-- period values
+	INSERT INTO ws.ext_cat_period (id)
+	SELECT id FROM crm.hydro_cat_period WHERE id NOT IN (SELECT id::integer FROM ws.ext_cat_period);
 
 	-- state values
-	INSERT INTO ext_rtc_hydrometer_state (name, observ)
-	SELECT id, code FROM hydro_val_state WHERE id NOT IN (SELECT id FROM ext_rtc_hydrometer_state);
-
-
+	INSERT INTO ws.ext_rtc_hydrometer_state (id, name, observ)
+	SELECT id, code, observ FROM crm.hydro_val_state WHERE id NOT IN (SELECT id FROM ws.ext_rtc_hydrometer_state);
+	
+	
     RETURN;
         
-END;$BODY$
+END;
+
+$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
