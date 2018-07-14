@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>361</width>
+    <width>366</width>
     <height>564</height>
    </rect>
   </property>
@@ -23,7 +23,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="VisitTab">
          <attribute name="title">
@@ -578,37 +578,7 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,1">
-            <item>
-             <widget class="QLabel" name="label_flexunion_code_8">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>Parameter type:*</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::AutoText</enum>
-              </property>
-              <property name="scaledContents">
-               <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1">
             <item>
              <widget class="QComboBox" name="parameter_type_id">
               <property name="editable">
@@ -619,37 +589,7 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,1">
-            <item>
-             <widget class="QLabel" name="label_flexunion_code_9">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>Parameter:*          </string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::AutoText</enum>
-              </property>
-              <property name="scaledContents">
-               <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1">
             <item>
              <widget class="QComboBox" name="parameter_id">
               <property name="editable">
@@ -662,26 +602,30 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <item>
-             <spacer name="horizontalSpacer_8">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
              <widget class="QPushButton" name="btn_event_insert">
               <property name="text">
-               <string>Insert event</string>
+               <string>INSERT EVENT</string>
+              </property>
+              <property name="autoDefault">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>From toolbar only STANDARD EVENTS are enabled.</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="Line" name="line">
@@ -695,18 +639,18 @@
             <item>
              <widget class="QPushButton" name="btn_event_update">
               <property name="text">
-               <string>Update event</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_event_delete">
-              <property name="text">
-               <string>Delete event</string>
+               <string>UPDATE EVENT</string>
               </property>
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_event_delete">
+            <property name="text">
+             <string>DELETE EVENT</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QTableView" name="tbl_event">

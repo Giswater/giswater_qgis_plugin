@@ -187,7 +187,7 @@ class ManageVisit(ParentManage, QObject):
         
         # disable tab
         index = self.tab_index('RelationsTab')
-        self.tabs.setTabEnabled(index, False)
+        self.tabs.setTabEnabled(index, True)
 
         # set geometry_type
         feature_type_index = self.feature_type.findText(self.locked_geom_type.upper())
