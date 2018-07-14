@@ -188,7 +188,7 @@ BEGIN
 	
 		-- upgrading and downgrading nodes
 		UPDATE node SET state=0, workcat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id=old_node_id_aux;
-		UPDATE node SET state=1, workcat_id=workcat_id_end_aux, builtdate=enddate_aux, enddate=NULL WHERE node_id=quote_literal(v_node_id);
+		UPDATE node SET state=1, workcat_id=workcat_id_end_aux, builtdate=enddate_aux, enddate=NULL WHERE node_id=v_node_id::text;
 	
 		-- enable config parameter arc_searchnodes
 		UPDATE config SET arc_searchnodes_control=TRUE;

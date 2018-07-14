@@ -224,9 +224,6 @@ DROP RULE IF EXISTS update_plan_psector_x_node ON node;
 DROP RULE IF EXISTS delete_plan_psector_x_node ON node;
 
 
-----------------------
---10/07/2018
------------------------
 
 -- Harmonize pivot table of ext_rtc_hydrometer
 ALTER TABLE ext_rtc_hydrometer RENAME hydrometer_id TO id;
@@ -251,3 +248,7 @@ ALTER TABLE ext_rtc_hydrometer ADD COLUMN m3_volume integer;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydro_man_date date;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN end_date date;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN update_date date;
+
+
+ALTER TABLE plan_psector ADD COLUMN enable_all boolean NOT NULL DEFAULT FALSE;
+

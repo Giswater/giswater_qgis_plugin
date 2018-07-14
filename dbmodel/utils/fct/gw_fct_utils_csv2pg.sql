@@ -6,13 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2440
 
-
-
 --DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_utils_csv2pg(integer, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg (csv2pgcat_id_aux integer, label_aux text)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg(
+    csv2pgcat_id_aux integer,
+    label_aux text)
+  RETURNS integer AS
+$BODY$
 DECLARE
 
 units_rec record;
+element_rec record;
+addfields_rec record;
+id_last int8;
 
 BEGIN
 
@@ -59,7 +64,9 @@ BEGIN
 		FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=1;
 
 		-- Insert into price_cat_simple table
+		IF label_aux NOT IN (SELECT id FROM price_cat_simple) THEN
 		INSERT INTO price_cat_simple (id) VALUES (label_aux);
+		END IF;
 
 		-- Upsert into price_simple table
 		INSERT INTO price_simple (id, pricecat_id, unit, descript, text, price)
@@ -81,12 +88,55 @@ BEGIN
 		(csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20)
 		SELECT csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
 		FROM temp_csv2pg;
+
+	-- elements import
+	ELSIF csv2pgcat_id_aux=3 THEN
 	
+		FOR element_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=3
+		LOOP 
+			IF label_aux='node' THEN
+				INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')),element_rec.csv2, element_rec.csv3, element_rec.csv4, element_rec.csv5::integer) RETURNING element_id INTO id_last;
+				INSERT INTO element_x_node (element_id, node_id) VALUES (id_last, element_rec.csv1);
+				
+			ELSIF label_aux='arc' THEN 
+				INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')),element_rec.csv2, element_rec.csv3, element_rec.csv4, element_rec.csv5::integer) RETURNING element_id INTO id_last;
+				INSERT INTO element_x_arc (element_id, arc_id) VALUES (id_last, element_rec.csv1);
+				
+			ELSIF label_aux='connec' THEN	
+				INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')),element_rec.csv2, element_rec.csv3, element_rec.csv4, element_rec.csv5::integer) RETURNING element_id INTO id_last;
+				INSERT INTO element_x_connec (element_id, connec_id) VALUES (id_last, element_rec.csv1);
+				
+			ELSIF label_aux='gully' THEN
+				INSERT INTO element (element_id, elementcat_id,observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')),element_rec.csv2, element_rec.csv3, element_rec.csv4, element_rec.csv5::integer) RETURNING element_id INTO id_last;
+				INSERT INTO element_x_gully (element_id, gully_id) VALUES (id_last, element_rec.csv1);
+			END IF;	
+
+		END LOOP;
+
+		-- Delete values on temporal table
+		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=3;
+
+	-- addfields import
+	ELSIF csv2pgcat_id_aux=4 THEN
+
+		FOR addfields_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=4
+		LOOP
+				INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES
+				(addfields_rec.csv1, addfields_rec.csv2::integer, addfields_rec.csv3);			
+		END LOOP;
+		
+		-- Delete values on temporal table
+		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=4;
+
+			
 	END IF;
 	
 	
-	
-RETURN 1;
+RETURN 0;
 	
 	
 END;
