@@ -41,7 +41,9 @@ DECLARE
 	v_vnode_type text;	
 	v_exit_id text;
 	point_aux public.geometry;
-
+	v_new_vnode_type text;
+	aux_geom public.geometry;
+	new_arc_id_aux text;
 	
 BEGIN
 
@@ -60,13 +62,12 @@ BEGIN
 	SELECT userdefined_geom, the_geom, exit_type, exit_id INTO userDefined, v_link_geom, v_exit_type, v_exit_id FROM link WHERE feature_id = connect_id_aux AND feature_type=feature_type_aux;
 
 	IF v_exit_type='VNODE' THEN
-		SELECT vnode_type INTO v_vnode_type FROM vnode WHERE vnode_id::text=v_exit_id;
+		SELECT vnode_type, the_geom INTO v_vnode_type, vnode_geom FROM vnode WHERE vnode_id::text=v_exit_id;
 	END IF;
 
 	IF (v_exit_type!='VNODE') THEN
 		RETURN;
 	END IF;
-
 
         -- Get connec or gully geometry and arc_id  (if it has)
 	IF feature_type_aux ='CONNEC' THEN          
@@ -79,13 +80,57 @@ BEGIN
 
 	END IF;
 
-	IF (arc_id_aux is null) OR (v_link_geom IS NOT NULL AND v_exit_type='VNODE' AND v_vnode_type!='CUSTOM') THEN
+	-- get arc_id if vnode exists and it is 'CUSTOM VNODE'
+	IF (v_vnode_type='CUSTOM') THEN  
+
+		-- If vnode is custom, new vnode_type must be CUSTOM VNODE
+		v_new_vnode_type = 'CUSTOM';
+
+		IF arc_id_aux IS NOT NULL THEN
+			-- arc founded using 5 meter tolerance
+			new_arc_id_aux = (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(vnode_geom, the_geom, 5)
+			   	     ORDER BY ST_Distance(vnode_geom, the_geom) LIMIT 1);
+			   	     
+			IF new_arc_id_aux IS NOT NULL THEN
+
+				-- update vnode_geom using 5 meter tolerance
+				aux_geom := ST_ShortestLine(connect_geom, (SELECT the_geom FROM v_edit_arc WHERE arc_id=new_arc_id_aux));
+				vnode_geom := ST_EndPoint(aux_geom);
+			ELSE 
+				-- update vnode_geom using userdefined arc_id
+				aux_geom := ST_ShortestLine(connect_geom, (SELECT the_geom FROM v_edit_arc WHERE arc_id=arc_id_aux));
+				vnode_geom := ST_EndPoint(aux_geom);			
+			END IF;
+
+			arc_id_aux := new_arc_id_aux;
+
+		ELSE 
+			-- arc founded as inifity buffer from vnode 
+			WITH index_query AS(
+			SELECT ST_Distance(the_geom, vnode_geom) as d, arc_id FROM v_edit_arc ORDER BY the_geom <-> connect_geom LIMIT 10)
+			SELECT arc_id INTO arc_id_aux FROM index_query ORDER BY d limit 1;
+			
+			-- update vnode_geom using inifity buffer from vnode
+			aux_geom := ST_ShortestLine(vnode_geom, (SELECT the_geom FROM v_edit_arc WHERE arc_id=arc_id_aux));
+			vnode_geom := ST_EndPoint(aux_geom);
+			
+		END IF;
+	END IF;
+
+	-- get arc_id if arc_id is not defined
+	IF (arc_id_aux is null) THEN 
+
+		v_new_vnode_type = 'AUTO';
+		
 		-- Improved version for curved lines (not perfect!)
 		WITH index_query AS
 		(
 			SELECT ST_Distance(the_geom, connect_geom) as d, arc_id FROM v_edit_arc ORDER BY the_geom <-> connect_geom LIMIT 10
 		)
 		SELECT arc_id INTO arc_id_aux FROM index_query ORDER BY d limit 1;
+	ELSE
+	
+		v_new_vnode_type = 'CUSTOM';
 
 	END IF;
 
@@ -95,31 +140,41 @@ BEGIN
 	-- Compute link
 	IF arcrec.the_geom IS NOT NULL THEN
 
-	        IF userDefined IS TRUE THEN
-	        -- update only last point
+	        IF userDefined IS TRUE THEN	        
 
 			-- Reverse (if it's need) the existing link geometry
 			IF (SELECT link.link_id FROM link WHERE st_dwithin (st_startpoint(link.the_geom), connect_geom, 0.01) LIMIT 1) IS NULL THEN
-				point_aux := St_closestpoint(arcrec.the_geom, St_startpoint(v_link_geom));
+				-- Get aux point
+				IF (v_vnode_type = 'CUSTOM') THEN  
+					point_aux := vnode_geom;
+				ELSE 
+					point_aux := St_closestpoint(arcrec.the_geom, St_startpoint(v_link_geom));
+				END IF;
 				link_geom = ST_SetPoint(v_link_geom, 0, point_aux) ; 
 			ELSE
-				point_aux := St_closestpoint(arcrec.the_geom, St_endpoint(v_link_geom));
+				-- Get aux point
+				IF (v_vnode_type = 'CUSTOM') THEN  					
+					point_aux := vnode_geom;
+				ELSE 
+					point_aux := St_closestpoint(arcrec.the_geom, St_endpoint(v_link_geom));
+				END IF;
 				link_geom = ST_SetPoint(v_link_geom, (ST_NumPoints(v_link_geom) - 1),point_aux); 
 			END IF;
 
+
 		ELSE	
-		-- make the whole link
-			link_geom := ST_ShortestLine(connect_geom, arcrec.the_geom);
-			userDefined:=FALSE;
-			
+			IF (v_vnode_type = 'CUSTOM') THEN  
+				link_geom := ST_Makeline(connect_geom, vnode_geom);
+			ELSE
+				link_geom := ST_ShortestLine(connect_geom, arcrec.the_geom);
+				vnode_geom := ST_EndPoint(link_geom);
+			END IF;
+			userDefined:=FALSE;	
 		END IF;
 
-		-- Line end point
-		vnode_geom := ST_EndPoint(link_geom);
-                
-		-- Delete old link
+		-- Delete old link / vnode
 		SELECT exit_id INTO vnode_id_aux FROM link WHERE feature_id = connect_id_aux AND feature_type=feature_type_aux;
-		DELETE FROM vnode WHERE vnode_id=vnode_id_aux ;
+		DELETE FROM vnode WHERE vnode_id = vnode_id_aux::int8;
 		DELETE FROM link WHERE feature_id = connect_id_aux AND feature_type=feature_type_aux;
 
 		--Checking if there is vnode exiting
@@ -136,7 +191,7 @@ BEGIN
 
 			-- Insert new vnode
 			INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-			VALUES (vnode_id_aux, 'AUTO',state_aux, sector_aux, dma_aux, expl_aux, vnode_geom);
+			VALUES (vnode_id_aux, v_new_vnode_type ,state_aux, sector_aux, dma_aux, expl_aux, vnode_geom);
 		END IF;
   
 		-- Insert new link

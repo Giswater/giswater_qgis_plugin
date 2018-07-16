@@ -242,8 +242,20 @@ BEGIN
         
 		END IF;
 
-         -- Looking for state control
-        IF (NEW.state != OLD.state) THEN   
+
+		-- Reconnect arc_id
+		IF NEW.arc_id != OLD.arc_id THEN
+			UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
+			IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
+				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.connec_id AND exit_type='VNODE' LIMIT 1)::int8;
+				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+			ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' AND cur_user=current_user LIMIT 1) IS TRUE THEN
+				PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
+			END IF;
+		END IF;
+
+		-- Looking for state control
+		IF (NEW.state != OLD.state) THEN   
 			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);
 			
 		END IF;
@@ -276,7 +288,7 @@ BEGIN
 			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=NEW.streetaxis2_id, 
 			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, descript=NEW.descript, verified=NEW.verified, 
 			postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
-			publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, arc_id=NEW.arc_id
+			publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length
 			WHERE connec_id=OLD.connec_id;
 			
         IF man_table ='man_greentap' THEN

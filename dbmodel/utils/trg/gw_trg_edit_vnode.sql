@@ -85,31 +85,30 @@ BEGIN
   
 	INSERT INTO vnode (vnode_id, vnode_type, sector_id, dma_id, state, annotation, the_geom, expl_id)
 	VALUES (NEW.vnode_id, 'CUSTOM', NEW.sector_id, NEW.dma_id, NEW.state, NEW.annotation, NEW.the_geom, NEW.expl_id);
-				
+
 	RETURN NEW;
-						
+
 
 -- UPDATE
 
-
     ELSIF TG_OP = 'UPDATE' THEN
 
+		-- The geom
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) THEN
+			NEW.vnode_type='CUSTOM';
+		END IF;
 
-			UPDATE vnode
-			SET vnode_id=NEW.vnode_id, vnode_type=NEW.vnode_type, sector_id=NEW.sector_id, state=NEW.state, annotation=NEW.annotation, the_geom=NEW.the_geom, expl_id=NEW.expl_id
-			WHERE vnode_id=NEW.vnode_id;
+		UPDATE vnode
+		SET vnode_id=NEW.vnode_id, vnode_type=NEW.vnode_type, sector_id=NEW.sector_id, state=NEW.state, annotation=NEW.annotation, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+		WHERE vnode_id=NEW.vnode_id;
 
-
-			RETURN NEW;
-    
+		RETURN NEW;
 
 -- DELETE
 
     ELSIF TG_OP = 'DELETE' THEN
 
 		DELETE FROM vnode WHERE vnode_id=OLD.vnode_id;
-		
-
 		
         RETURN NULL;
    
