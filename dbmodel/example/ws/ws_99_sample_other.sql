@@ -55,13 +55,13 @@ update rtc_hydrometer set link='https://www.giswater.org';
 refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
 
-update ext_rtc_hydrometer SET state=1;
+update ext_rtc_hydrometer SET state_id=1;
 
 INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, 'postgres');
 
-update ext_rtc_hydrometer set connec_customer_code=b.customer_code from rtc_hydrometer_x_connec  a 
+update ext_rtc_hydrometer set connec_id=b.customer_code from rtc_hydrometer_x_connec  a 
 join connec b on a.connec_id = b.connec_id
-where ext_rtc_hydrometer.hydrometer_id = a.hydrometer_id;
+where ext_rtc_hydrometer.id = a.hydrometer_id;
 
 
 select gw_fct_audit_check_project(1);

@@ -5,30 +5,39 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
-
-DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
- SELECT row_number() OVER (ORDER BY rtc_hydrometer.hydrometer_id) AS rid,
-    rtc_hydrometer.hydrometer_id,
-    v_edit_connec.code AS connec_id,
-    v_edit_connec.customer_code AS connec_customer_code,
-    v_edit_connec.expl_id,
-    ext_rtc_hydrometer_state.name  AS state,
-    exploitation.name AS expl_name,
+ SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
-    ext_rtc_hydrometer.hydrometer_category,
-    ext_rtc_hydrometer.house_number,
-    ext_rtc_hydrometer.id_number,
-    ext_rtc_hydrometer.cat_hydrometer_id,
-    ext_rtc_hydrometer.hydrometer_number,
-    ext_rtc_hydrometer.identif,
-    ext_cat_hydrometer.madeby,
-    ext_cat_hydrometer.class AS hydrometer_class,
-    ext_cat_hydrometer.ulmc,
-    ext_cat_hydrometer.voltman_flow,
-    ext_cat_hydrometer.multi_jet_flow,
-    ext_cat_hydrometer.dnom,
+        CASE
+            WHEN v_edit_connec.connec_id IS NULL THEN 'XXXX'::character varying
+            ELSE v_edit_connec.connec_id
+        END AS connec_id,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id::text
+        END AS connec_customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    v_edit_connec.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
         CASE
             WHEN (( SELECT config_param_system.value
                FROM config_param_system
@@ -39,14 +48,13 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
         END AS hydrometer_link
    FROM selector_hydrometer,
     rtc_hydrometer
-     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
-     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state
-     JOIN v_edit_connec ON v_edit_connec.customer_code::text = ext_rtc_hydrometer.connec_customer_code::text
-     LEFT JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id  
-  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state AND selector_hydrometer.cur_user = "current_user"()::text;
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN v_edit_connec ON v_edit_connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = v_edit_connec.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id
+     WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text;
 
-  
   
   
 drop view IF EXISTS v_ui_hydrometer cascade;
@@ -59,7 +67,6 @@ CREATE OR REPLACE VIEW v_ui_hydrometer AS
     v_rtc_hydrometer.expl_name AS "Exploitation:",
     v_rtc_hydrometer.hydrometer_link
    FROM v_rtc_hydrometer; 
-
   
  
 

@@ -60,7 +60,7 @@ JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id = rtc_scada_node.sc
 	 
 	 
 CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
- SELECT ext_rtc_hydrometer.hydrometer_id,
+ SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     ext_cat_period.id AS period_id,
     connec.dma_id,
         CASE
@@ -72,9 +72,9 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS
             ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
         END AS lps_avg
    FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id = ext_rtc_hydrometer.id
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id = ext_cat_period.id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id = ext_rtc_hydrometer.id
      JOIN connec ON connec.connec_id = rtc_hydrometer_x_connec.connec_id
      JOIN inp_options ON inp_options.rtc_period_id = ext_cat_period.id;
 
