@@ -1002,8 +1002,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>263</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2310,99 +2310,50 @@
      <attribute name="title">
       <string>Hydrometer</string>
      </attribute>
-     <widget class="QTabWidget" name="tabWidget_2">
+     <widget class="QTabWidget" name="tab_scada">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>49</y>
+        <x>7</x>
+        <y>4</y>
         <width>560</width>
-        <height>391</height>
+        <height>373</height>
        </rect>
-      </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_11">
+      <widget class="QWidget" name="page_event_node">
        <attribute name="title">
         <string>Hydrometer</string>
        </attribute>
-       <widget class="QTableView" name="tbl_hydro">
+       <widget class="QTableView" name="tbl_hydrometer">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>40</y>
+          <y>36</y>
           <width>530</width>
-          <height>251</height>
+          <height>307</height>
          </rect>
         </property>
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QPushButton" name="open_link">
-        <property name="geometry">
-         <rect>
-          <x>514</x>
-          <y>8</y>
-          <width>24</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../icons/70b.png</normaloff>../icons/70b.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="hydrometer_id">
         <property name="geometry">
          <rect>
-          <x>13</x>
-          <y>12</y>
+          <x>10</x>
+          <y>9</y>
           <width>156</width>
           <height>18</height>
          </rect>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_delete_hydrometer">
-        <property name="geometry">
-         <rect>
-          <x>209</x>
-          <y>10</y>
-          <width>24</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>22</width>
-          <height>22</height>
-         </size>
-        </property>
-       </widget>
        <widget class="QPushButton" name="btn_add_hydrometer">
         <property name="geometry">
          <rect>
-          <x>176</x>
-          <y>10</y>
+          <x>173</x>
+          <y>7</y>
           <width>24</width>
           <height>24</height>
          </rect>
@@ -2421,134 +2372,94 @@
          </size>
         </property>
        </widget>
+       <widget class="QPushButton" name="btn_delete_hydrometer">
+        <property name="geometry">
+         <rect>
+          <x>206</x>
+          <y>7</y>
+          <width>24</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="open_link">
+        <property name="geometry">
+         <rect>
+          <x>512</x>
+          <y>5</y>
+          <width>24</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../icons/70b.png</normaloff>../icons/70b.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
+        </property>
+       </widget>
       </widget>
-      <widget class="QWidget" name="tab_12">
+      <widget class="QWidget" name="page_event_element_2">
        <attribute name="title">
         <string>Hydrometer values</string>
        </attribute>
-       <widget class="QTableView" name="tbl_hydro_value">
+       <widget class="QTableView" name="tbl_hydrometer_value">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>20</y>
+          <y>54</y>
           <width>530</width>
-          <height>281</height>
+          <height>285</height>
          </rect>
         </property>
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="QComboBox" name="cat_period_id_filter">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>26</y>
+          <width>121</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_cat_period_id_filter">
+        <property name="geometry">
+         <rect>
+          <x>14</x>
+          <y>4</y>
+          <width>105</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Cat period filter :</string>
+        </property>
+       </widget>
       </widget>
-     </widget>
-     <widget class="QLabel" name="label_hydrometer_to">
-      <property name="geometry">
-       <rect>
-        <x>153</x>
-        <y>0</y>
-        <width>113</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="text">
-       <string>To:</string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="margin">
-       <number>3</number>
-      </property>
-     </widget>
-     <widget class="QDateEdit" name="date_el_to">
-      <property name="geometry">
-       <rect>
-        <x>153</x>
-        <y>22</y>
-        <width>121</width>
-        <height>18</height>
-       </rect>
-      </property>
-      <property name="date">
-       <date>
-        <year>2017</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_hydrometer_from">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>90</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <property name="text">
-       <string>From:</string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-      <property name="margin">
-       <number>3</number>
-      </property>
-     </widget>
-     <widget class="QDateEdit" name="date_el_from">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>22</y>
-        <width>121</width>
-        <height>18</height>
-       </rect>
-      </property>
-      <property name="date">
-       <date>
-        <year>2016</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_13">
@@ -3997,7 +3908,6 @@
   <tabstop>publish</tabstop>
   <tabstop>ok</tabstop>
   <tabstop>tab_main</tabstop>
-  <tabstop>date_el_from</tabstop>
   <tabstop>tbl_document</tabstop>
   <tabstop>doc_type</tabstop>
   <tabstop>date_document_from</tabstop>
@@ -4017,15 +3927,7 @@
   <tabstop>btn_new_visit</tabstop>
   <tabstop>btn_open_visit_event</tabstop>
   <tabstop>btn_open_visit</tabstop>
-  <tabstop>open_link</tabstop>
-  <tabstop>tbl_hydro</tabstop>
-  <tabstop>btn_delete_hydrometer</tabstop>
-  <tabstop>hydrometer_id</tabstop>
-  <tabstop>tbl_hydro_value</tabstop>
-  <tabstop>date_el_to</tabstop>
-  <tabstop>btn_add_hydrometer</tabstop>
   <tabstop>btn_delete</tabstop>
-  <tabstop>tabWidget_2</tabstop>
   <tabstop>btn_element_delete</tabstop>
   <tabstop>element_id</tabstop>
   <tabstop>new_element</tabstop>

@@ -190,7 +190,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>247</height>
+         <height>263</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2817,123 +2817,17 @@
      <attribute name="title">
       <string>Hydrometer</string>
      </attribute>
-     <widget class="QDateEdit" name="date_el_from">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>25</y>
-        <width>121</width>
-        <height>18</height>
-       </rect>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
-      <property name="date">
-       <date>
-        <year>2016</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
-      </property>
-     </widget>
-     <widget class="QDateEdit" name="date_el_to">
-      <property name="geometry">
-       <rect>
-        <x>153</x>
-        <y>25</y>
-        <width>121</width>
-        <height>18</height>
-       </rect>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
-      <property name="date">
-       <date>
-        <year>2017</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_hydrometer_to">
-      <property name="geometry">
-       <rect>
-        <x>153</x>
-        <y>3</y>
-        <width>119</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="text">
-       <string>To:</string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="margin">
-       <number>3</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_hydrometer_from">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>3</y>
-        <width>31</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>8</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="text">
-       <string>From:</string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::AutoText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="margin">
-       <number>3</number>
-      </property>
-     </widget>
      <widget class="QTabWidget" name="tab_scada">
       <property name="geometry">
        <rect>
         <x>7</x>
-        <y>59</y>
+        <y>4</y>
         <width>560</width>
-        <height>381</height>
+        <height>373</height>
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_event_node">
        <attribute name="title">
@@ -2944,8 +2838,8 @@
          <rect>
           <x>10</x>
           <y>36</y>
-          <width>536</width>
-          <height>241</height>
+          <width>530</width>
+          <height>307</height>
          </rect>
         </property>
         <property name="sortingEnabled">
@@ -3011,7 +2905,7 @@
        <widget class="QPushButton" name="open_link">
         <property name="geometry">
          <rect>
-          <x>520</x>
+          <x>512</x>
           <y>5</y>
           <width>24</width>
           <height>24</height>
@@ -3040,31 +2934,36 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>20</y>
+          <y>54</y>
           <width>530</width>
-          <height>259</height>
+          <height>285</height>
          </rect>
         </property>
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>
        </widget>
-      </widget>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Page</string>
-       </attribute>
-       <widget class="QTableView" name="tbl_mincut">
+       <widget class="QComboBox" name="cat_period_id_filter">
         <property name="geometry">
          <rect>
-          <x>15</x>
-          <y>18</y>
-          <width>530</width>
-          <height>259</height>
+          <x>10</x>
+          <y>26</y>
+          <width>121</width>
+          <height>18</height>
          </rect>
         </property>
-        <property name="sortingEnabled">
-         <bool>true</bool>
+       </widget>
+       <widget class="QLabel" name="label_cat_period_id_filter">
+        <property name="geometry">
+         <rect>
+          <x>14</x>
+          <y>4</y>
+          <width>105</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Cat period filter :</string>
         </property>
        </widget>
       </widget>
@@ -3122,15 +3021,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_from">
@@ -3221,15 +3120,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -3521,15 +3420,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_7">
@@ -3554,15 +3453,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QComboBox" name="event_type">
@@ -4446,8 +4345,6 @@
   <tabstop>undelete</tabstop>
   <tabstop>publish</tabstop>
   <tabstop>ok</tabstop>
-  <tabstop>open_link</tabstop>
-  <tabstop>tbl_hydrometer_value</tabstop>
   <tabstop>delete_row_doc</tabstop>
   <tabstop>tbl_document</tabstop>
   <tabstop>date_document_from</tabstop>
@@ -4468,21 +4365,14 @@
   <tabstop>btn_open_visit_event</tabstop>
   <tabstop>btn_open_visit</tabstop>
   <tabstop>btn_new_visit</tabstop>
-  <tabstop>btn_delete_hydrometer</tabstop>
   <tabstop>delete_row_info</tabstop>
   <tabstop>tab_main</tabstop>
   <tabstop>tbl_element</tabstop>
   <tabstop>btn_insert</tabstop>
   <tabstop>open_element</tabstop>
-  <tabstop>tbl_hydrometer</tabstop>
-  <tabstop>btn_add_hydrometer</tabstop>
-  <tabstop>date_el_to</tabstop>
   <tabstop>new_element</tabstop>
-  <tabstop>hydrometer_id</tabstop>
   <tabstop>element_id</tabstop>
   <tabstop>btn_delete</tabstop>
-  <tabstop>date_el_from</tabstop>
-  <tabstop>tab_scada</tabstop>
  </tabstops>
  <resources/>
  <connections/>

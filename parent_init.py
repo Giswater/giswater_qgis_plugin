@@ -1324,38 +1324,34 @@ class ParentDialog(QDialog):
         """ Fill the table control to show documents"""
 
         # Get widgets
-        self.date_el_to = self.dialog.findChild(QDateEdit, "date_el_to")
-        self.date_el_from = self.dialog.findChild(QDateEdit, "date_el_from")
-        date = QDate.currentDate();
-        self.date_el_to.setDate(date);
+        self.cat_period_id_filter = self.dialog.findChild(QComboBox, "cat_period_id_filter")
+
+        # Populate combo filter hydrometer value
+        sql = "SELECT distinct(cat_period_id) FROM " + self.schema_name + ".v_edit_rtc_hydro_data_x_connec ORDER BY cat_period_id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dialog, self.cat_period_id_filter, rows)
+        self.controller.log_info(str(sql))
 
         # Set signals
-        self.date_el_to.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
-        self.date_el_from.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
+        if widget == self.tbl_hydrometer_value:
+            self.cat_period_id_filter.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, widget))
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
 
+    def set_filter_hydrometer_values(self, widget):
+        """ Get Filter for table hydrometer value with combo value"""
 
-    def set_filter_hydrometer(self, widget):
-        """ Get values selected by the user and sets a new filter for its table model """
-
-        # Get selected dates
-        date_from = self.date_el_from.date().toString('yyyyMMdd')
-        date_to = self.date_el_to.date().toString('yyyyMMdd')
-        if (date_from > date_to):
-            message = "Selected date interval is not valid"
-            self.controller.show_warning(message)
-            return
+        # Get combo value
+        cat_period_id_filter = str(self.cat_period_id_filter.currentText())
 
         # Set filter
         expr = self.field_id + " = '" + self.id + "'"
-        expr+= " AND date >= '" + date_from + "' AND date <= '" + date_to + "'"
+        expr += " AND cat_period_id = '" + cat_period_id_filter + "'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
-
 
     def action_centered(self, feature, canvas, layer):
         """ Center map to current feature """
