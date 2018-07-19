@@ -72,9 +72,9 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS
             ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
         END AS lps_avg
    FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id = ext_rtc_hydrometer.id
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::int8 = ext_rtc_hydrometer.id::int8
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id = ext_cat_period.id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id = ext_rtc_hydrometer.id
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::int8= ext_rtc_hydrometer.id::int8
      JOIN connec ON connec.connec_id = rtc_hydrometer_x_connec.connec_id
      JOIN inp_options ON inp_options.rtc_period_id = ext_cat_period.id;
 
@@ -87,7 +87,7 @@ CREATE OR REPLACE VIEW v_rtc_dma_hydrometer_period AS
     sum(v_rtc_hydrometer_period.m3_total_period) AS m3_total_period, 
     ext_cat_period.period_seconds
    FROM v_rtc_hydrometer_period
-   JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id = v_rtc_hydrometer_period.hydrometer_id
+   JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::int8= v_rtc_hydrometer_period.hydrometer_id::int8
    JOIN inp_options ON inp_options.rtc_period_id = ext_rtc_hydrometer_x_data.cat_period_id
    JOIN ext_cat_period ON inp_options.rtc_period_id = ext_cat_period.id
   GROUP BY v_rtc_hydrometer_period.dma_id, ext_cat_period.id, ext_cat_period.period_seconds;
@@ -137,7 +137,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS
     v_rtc_dma_parameter_period.cmax,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmax AS lps_max
    FROM v_rtc_hydrometer_x_arc
-     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id = v_rtc_hydrometer_x_arc.hydrometer_id
+     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::int8= v_rtc_hydrometer_x_arc.hydrometer_id::int8
      LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id = v_rtc_dma_parameter_period.period_id
 UNION
  SELECT 
@@ -154,7 +154,7 @@ UNION
     v_rtc_dma_parameter_period.cmax,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmax AS lps_max
    FROM v_rtc_hydrometer_x_arc
-     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id = v_rtc_hydrometer_x_arc.hydrometer_id
+     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::int8 = v_rtc_hydrometer_x_arc.hydrometer_id::int8
      LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id = v_rtc_dma_parameter_period.period_id;
 
 

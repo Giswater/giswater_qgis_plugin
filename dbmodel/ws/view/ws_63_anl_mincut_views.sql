@@ -164,7 +164,7 @@ anl_mincut_result_hydrometer.hydrometer_id,
 ext_rtc_hydrometer.code AS hydrometer_customer_code,
 rtc_hydrometer_x_connec.connec_id
 FROM anl_mincut_result_selector, anl_mincut_result_hydrometer
-JOIN ext_rtc_hydrometer ON anl_mincut_result_hydrometer.hydrometer_id = ext_rtc_hydrometer.id
+JOIN ext_rtc_hydrometer ON anl_mincut_result_hydrometer.hydrometer_id::int8 = ext_rtc_hydrometer.id::int8
 JOIN rtc_hydrometer_x_connec ON anl_mincut_result_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
 JOIN anl_mincut_result_cat ON anl_mincut_result_hydrometer.result_id=anl_mincut_result_cat.id
 WHERE ((anl_mincut_result_selector.result_id::text) = (anl_mincut_result_hydrometer.result_id::text))
@@ -208,7 +208,7 @@ exec_appropiate,
         END AS end_date
 FROM anl_mincut_result_hydrometer
 JOIN anl_mincut_result_cat ON anl_mincut_result_hydrometer.result_id = anl_mincut_result_cat.id
-JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id=anl_mincut_result_hydrometer.hydrometer_id;
+JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::int8=anl_mincut_result_hydrometer.hydrometer_id::int8;
 
 
 

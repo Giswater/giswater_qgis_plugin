@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -6,45 +6,84 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
-DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
+drop view IF EXISTS v_rtc_hydrometer cascade;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
- SELECT row_number() OVER (ORDER BY rtc_hydrometer.hydrometer_id) AS rid,
-    rtc_hydrometer.hydrometer_id,
-    rtc_hydrometer_x_connec.connec_id,
-    connec.customer_code AS connec_customer_code,
-	connec.expl_id,
-	value_state.name AS state,
-	exploitation.name AS expl_name,
+ SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
-    ext_rtc_hydrometer.hydrometer_category,
-    ext_rtc_hydrometer.house_number,
-    ext_rtc_hydrometer.id_number,
-    ext_rtc_hydrometer.cat_hydrometer_id,
-    ext_rtc_hydrometer.hydrometer_number,
-    ext_rtc_hydrometer.identif,
-    ext_cat_hydrometer.madeby,
-    ext_cat_hydrometer.class as hydrometer_class,
-    ext_cat_hydrometer.ulmc,
-    ext_cat_hydrometer.voltman_flow,
-    ext_cat_hydrometer.multi_jet_flow,
-    ext_cat_hydrometer.dnom,
-    case when (SELECT config_param_system.value FROM config_param_system 
-		WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text) IS NULL THEN rtc_hydrometer.link
-	 else concat(( SELECT config_param_system.value FROM config_param_system
-		WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link) END AS hydrometer_link
-   FROM rtc_hydrometer
-     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
-	 JOIN exploitation ON exploitation.expl_id=connec.expl_id
-	 JOIN value_state ON value_state.id=connec.state;
+        CASE
+            WHEN v_edit_connec.connec_id IS NULL THEN 'XXXX'::character varying
+            ELSE v_edit_connec.connec_id
+        END AS connec_id,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id::text
+        END AS connec_customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    v_edit_connec.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link
+   FROM selector_hydrometer,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN v_edit_connec ON v_edit_connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = v_edit_connec.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id
+     WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text;
 
+  
+  
+
+CREATE OR REPLACE VIEW v_ui_hydrometer AS 
+ SELECT v_rtc_hydrometer.hydrometer_id AS sys_hydrometer_id,
+    v_rtc_hydrometer.connec_id AS sys_connec_id,
+    v_rtc_hydrometer.hydrometer_customer_code AS "Hydro ccode:",
+    v_rtc_hydrometer.connec_customer_code AS "Connec ccode:",
+    v_rtc_hydrometer.state AS "State:",
+    v_rtc_hydrometer.expl_name AS "Exploitation:",
+    v_rtc_hydrometer.hydrometer_link
+   FROM v_rtc_hydrometer; 
+  
+ 
+
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec CASCADE;
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec AS
+SELECT 
+rtc_hydrometer_x_connec.connec_id,
+count(v_rtc_hydrometer.hydrometer_id)::integer as n_hydrometer
+FROM rtc_hydrometer_x_connec
+JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
+group by rtc_hydrometer_x_connec.connec_id;
 
 	 
 CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
- SELECT ext_rtc_hydrometer.hydrometer_id,
+ SELECT ext_rtc_hydrometer.id as hydrometer_id,
     ext_cat_period.id AS period_id,
     connec.dma_id,
         CASE
@@ -56,9 +95,9 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS
             ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
         END AS lps_avg
    FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::int8= ext_rtc_hydrometer.id::int8
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id = ext_cat_period.id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::int8= ext_rtc_hydrometer.id::int8
      JOIN connec ON connec.connec_id = rtc_hydrometer_x_connec.connec_id
      JOIN inp_options ON inp_options.rtc_period_id = ext_cat_period.id;
 
@@ -71,7 +110,7 @@ CREATE OR REPLACE VIEW v_rtc_dma_hydrometer_period AS
     sum(v_rtc_hydrometer_period.m3_total_period) AS m3_total_period, 
     ext_cat_period.period_seconds
    FROM v_rtc_hydrometer_period
-   JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id = v_rtc_hydrometer_period.hydrometer_id
+   JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::int8= v_rtc_hydrometer_period.hydrometer_id::int8
    JOIN inp_options ON inp_options.rtc_period_id = ext_rtc_hydrometer_x_data.cat_period_id
    JOIN ext_cat_period ON inp_options.rtc_period_id = ext_cat_period.id
   GROUP BY v_rtc_hydrometer_period.dma_id, ext_cat_period.id, ext_cat_period.period_seconds;
@@ -119,7 +158,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS
     v_rtc_dma_parameter_period.cmax,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmax AS lps_max
    FROM v_rtc_hydrometer_x_arc
-     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id = v_rtc_hydrometer_x_arc.hydrometer_id
+     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::int8= v_rtc_hydrometer_x_arc.hydrometer_id::int8
      LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id = v_rtc_dma_parameter_period.period_id
 UNION
  SELECT 
@@ -136,5 +175,6 @@ UNION
     v_rtc_dma_parameter_period.cmax,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmax AS lps_max
    FROM v_rtc_hydrometer_x_arc
-     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id = v_rtc_hydrometer_x_arc.hydrometer_id
+     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::int8 = v_rtc_hydrometer_x_arc.hydrometer_id::int8
      LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id = v_rtc_dma_parameter_period.period_id;
+	 
