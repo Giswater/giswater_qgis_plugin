@@ -26,25 +26,23 @@ BEGIN
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
 	
-	
-	-- Starting process
-	-- Grant access on database
-	FOR table_record IN SELECT * FROM sys_role
-	LOOP
-		query_text:= 'GRANT ALL ON DATABASE '||db_name_aux||' TO '||table_record.id||';'; 
-		EXECUTE query_text;
-	END LOOP;
-	
 	-- Grant generic permissions
-	FOR table_record IN SELECT * FROM sys_role
-	LOOP
-		query_text:= 'GRANT ALL ON SCHEMA '||schema_name_aux||' TO '||table_record.id||';'; 
+	query_text:= 'GRANT ALL ON DATABASE '||db_name_aux||' TO "role_basic";';
+	EXECUTE query_text;	
+
+	query_text:= 'GRANT ALL ON SCHEMA '||schema_name_aux||' TO "role_basic";';
+	EXECUTE query_text;
+
+	query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||schema_name_aux||' TO "role_basic";';
+	EXECUTE query_text;
+
+	query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||schema_name_aux||' TO "role_basic";'; 
+	EXECUTE query_text;
+	
+	-- Grant all in order to ensure the functionality. We need to review the catalog function before downgrade ALL to SELECT
+	query_text:= 'GRANT ALL ON ALL FUNCTIONS IN SCHEMA '||schema_name_aux||' TO role_basic'; 
 		EXECUTE query_text;
-		query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||schema_name_aux||' TO '||table_record.id||';'; 
-		EXECUTE query_text;
-		query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||schema_name_aux||' TO "role_basic";'; 
-		EXECUTE query_text;
-	END LOOP;
+	
 
 	-- Grant specificic permissions for tables
 	FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_role_id IS NOT NULL
@@ -52,9 +50,6 @@ BEGIN
 		query_text:= 'GRANT ALL ON TABLE '||table_record.id||' TO '||table_record.sys_role_id||';';
 		EXECUTE query_text;
 	END LOOP;
-	
-	query_text:= 'GRANT ALL ON ALL FUNCTIONS IN SCHEMA '||schema_name_aux||' TO role_basic'; 
-		EXECUTE query_text;
 	
 	-- Grant specificic permissions for functions
 	FOR table_record IN SELECT * FROM audit_cat_function WHERE project_type=project_type_aux
