@@ -287,7 +287,7 @@ v_arc.custom_elev1,
 v_arc.sys_elev1,
 a.sys_top_elev-sys_elev1 AS sys_y1,
 a.sys_top_elev-sys_elev1 - v_arc.geom1 AS r1,
-a.sys_elev-sys_elev1 AS z1,
+sys_elev1-a.sys_elev AS z1,
 node_2,
 v_arc.y2,
 v_arc.custom_y2,
@@ -296,7 +296,7 @@ v_arc.custom_elev2,
 v_arc.sys_elev2,
 b.sys_top_elev-sys_elev2 AS sys_y2,
 b.sys_top_elev-sys_elev2 - v_arc.geom1 AS r2,
-b.sys_elev-sys_elev2 AS z2,
+sys_elev2-b.sys_elev AS z2,
 sys_slope AS slope,
 arc_type,
 type as sys_type,
@@ -355,7 +355,7 @@ FROM v_arc
 	JOIN sector ON sector.sector_id=v_arc.sector_id
 	JOIN arc_type ON arc_type=arc_type.id
 	JOIN dma ON v_arc.dma_id=dma.dma_id
-	LEFT JOIN v_node_x_arc a ON a.node_id=node_1
-	LEFT JOIN v_node_x_arc b ON b.node_id=node_2;
+	LEFT JOIN v_node a ON a.node_id=node_1
+	LEFT JOIN v_node b ON b.node_id=node_2;
 
 	
