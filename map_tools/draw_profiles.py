@@ -641,7 +641,7 @@ class DrawProfiles(ParentMapTool):
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
                    row[5] is None or row[6] is None or row[7] is None:
                     message = "Some parameters are missing for arc (Values Defaults used for)"
-                    self.controller.show_info_box(message, "Info", node_id)
+                    self.controller.show_info_box(message, "Info", element_id)
                 for x in range(0, len(columns)):
                     if row[x] is None:
                         sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
