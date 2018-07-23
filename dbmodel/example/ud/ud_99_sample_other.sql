@@ -15,22 +15,33 @@ INSERT INTO cat_users VALUES (4,'user4');
 
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
+	
+
+/*INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (1, '20602', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (2, '20603', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (3, '20604', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (4, '20606', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (5, '20605', 1, 1, true, NULL);*/
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (8, '20608', 2, 0, false, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (10, '177', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (11, '178', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (13, '179', 1, 0, false, NULL);
+--INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (6, '251', 2, 1, true, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (9, '157', 2, 0, false, NULL);
+--INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (7, '252', 2, 1, true, NULL);
+INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (12, '339', 1, 0, false, NULL);
 
 
-UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = 'A252';
-UPDATE plan_psector_x_arc SET psector_id = 2 WHERE arc_id = 'A251';
-
-INSERT INTO plan_psector_x_arc VALUES (8, '20608', 2, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (9, 'A157', 2, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (10, 'A177', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (11, 'A178', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (12, 'A239', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc VALUES (13, 'A179', 1, 0, false, NULL);
 
 
-INSERT INTO plan_psector_x_node VALUES (5, 'N91', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_node VALUES (6, 'N92', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_node VALUES (7, 'N94', 1, 0, false, NULL);
+/*INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (1, '20599', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (2, '20596', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (3, '20597', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (4, '20598', 1, 1, true, NULL);*/
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (7, '94', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (6, '92', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (5, '91', 1, 0, false, NULL);
+	
 
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
