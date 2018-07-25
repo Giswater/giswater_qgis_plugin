@@ -377,6 +377,129 @@ FROM v_arc
 	JOIN man_varc ON man_varc.arc_id=v_arc.arc_id;
 
 
+	
+DROP VIEW IF EXISTS v_edit_man_pipe CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_pipe AS
+SELECT 
+v_arc.arc_id,
+code,
+node_1,
+node_2,
+arccat_id, 
+arctype_id AS "cat_arctype_id",
+matcat_id AS "matcat_id",
+pnom AS "cat_pnom",
+dnom AS "cat_dnom",
+epa_type,
+sector_id, 
+macrosector_id,
+state,
+state_type,
+annotation,
+observ,
+"comment",
+gis_length,
+custom_length,
+dma_id,
+presszonecat_id,
+soilcat_id,
+function_type,
+category_type,
+fluid_type,
+location_type,
+workcat_id,
+workcat_id_end,
+buildercat_id,
+builtdate,
+enddate,
+ownercat_id,
+muni_id,
+postcode,
+streetaxis_id,
+postnumber,
+postcomplement,
+postcomplement2,
+streetaxis2_id,
+postnumber2,
+descript,
+link,
+verified,
+the_geom,
+undelete,
+label_x,
+label_y,
+label_rotation,
+publish,
+inventory,
+macrodma_id,
+expl_id,
+num_value
+FROM v_arc
+	JOIN man_pipe ON man_pipe.arc_id=v_arc.arc_id;
+
+
+
+DROP VIEW IF EXISTS ve_arc_pipe CASCADE;
+CREATE OR REPLACE VIEW ve_arc_pipe AS
+SELECT 
+v_arc.arc_id,
+code,
+node_1,
+node_2,
+arccat_id, 
+arctype_id AS "cat_arctype_id",
+matcat_id AS "matcat_id",
+pnom  AS "cat_pnom",
+dnom  AS "cat_dnom",
+epa_type,
+sector_id, 
+macrosector_id,
+state,
+state_type,
+annotation,
+observ,
+comment,
+gis_length,
+custom_length,
+dma_id,
+presszonecat_id,
+soilcat_id,
+function_type,
+category_type,
+fluid_type,
+location_type,
+workcat_id,
+workcat_id_end,
+buildercat_id,
+builtdate,
+enddate,
+ownercat_id,
+muni_id,
+postcode,
+streetaxis_id,
+postnumber,
+postcomplement,
+postcomplement2,
+streetaxis2_id,
+postnumber2,
+descript,
+link,
+verified,
+the_geom,
+undelete,
+label_x,
+label_y,
+label_rotation,
+publish,
+inventory,
+macrodma_id,
+expl_id,
+num_value
+FROM v_arc 
+	JOIN man_varc ON man_varc.arc_id=v_arc.arc_id;
+	
+	
+	
 DROP VIEW IF EXISTS v_edit_man_hydrant CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_hydrant AS 
 SELECT 

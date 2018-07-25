@@ -320,5 +320,5 @@ $BODY$
   COST 100;
   
 
-DROP TRIGGER IF EXISTS gw_trg_edit_ve_pipe ON "ws".ve_arc_pipe;
-CREATE TRIGGER gw_trg_edit_ve_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".ve_arc_pipe FOR EACH ROW EXECUTE PROCEDURE "ws".gw_trg_edit_ve_arc('PIPE');    
+DROP TRIGGER IF EXISTS gw_trg_edit_ve_pipe ON "SCHEMA_NAME".ve_arc_pipe;
+CREATE TRIGGER gw_trg_edit_ve_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_arc_pipe FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_ve_arc('PIPE');    
