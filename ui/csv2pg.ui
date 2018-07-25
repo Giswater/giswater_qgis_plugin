@@ -411,6 +411,18 @@ p, li { white-space: pre-wrap; }
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>cmb_import_type</tabstop>
+  <tabstop>txt_import</tabstop>
+  <tabstop>txt_file_csv</tabstop>
+  <tabstop>cmb_unicode_list</tabstop>
+  <tabstop>rb_comma</tabstop>
+  <tabstop>rb_semicolon</tabstop>
+  <tabstop>btn_file_csv</tabstop>
+  <tabstop>tbl_csv</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

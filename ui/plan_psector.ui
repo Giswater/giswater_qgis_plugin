@@ -685,7 +685,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="Arc">
       <attribute name="title">
@@ -898,8 +898,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1767,6 +1767,59 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>psector_id</tabstop>
+  <tabstop>name</tabstop>
+  <tabstop>priority</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>psector_type</tabstop>
+  <tabstop>result_id</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>text1</tabstop>
+  <tabstop>text2</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>active</tabstop>
+  <tabstop>chk_enable_all</tabstop>
+  <tabstop>scale</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>atlas_id</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>tab_feature</tabstop>
+  <tabstop>tbl_psector_x_arc</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_snapping</tabstop>
+  <tabstop>total_arc</tabstop>
+  <tabstop>total_node</tabstop>
+  <tabstop>total_other</tabstop>
+  <tabstop>pem</tabstop>
+  <tabstop>gexpenses</tabstop>
+  <tabstop>pec_pem</tabstop>
+  <tabstop>pec</tabstop>
+  <tabstop>vat</tabstop>
+  <tabstop>pecvat_pem</tabstop>
+  <tabstop>pec_vat</tabstop>
+  <tabstop>other</tabstop>
+  <tabstop>pca_pecvat</tabstop>
+  <tabstop>pca</tabstop>
+  <tabstop>btn_rapports</tabstop>
+  <tabstop>all_rows</tabstop>
+  <tabstop>tbl_psector_x_node</tabstop>
+  <tabstop>btn_unselect</tabstop>
+  <tabstop>selected_rows</tabstop>
+  <tabstop>txt_name</tabstop>
+  <tabstop>btn_select</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>btn_doc_new</tabstop>
+  <tabstop>btn_doc_insert</tabstop>
+  <tabstop>btn_open_doc</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>doc_id</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -1003,17 +1003,38 @@
   </widget>
  </widget>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>element_id</tabstop>
+  <tabstop>element_type</tabstop>
+  <tabstop>elementcat_id</tabstop>
+  <tabstop>num_elements</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>ownercat_id</tabstop>
   <tabstop>location_type</tabstop>
   <tabstop>buildercat_id</tabstop>
-  <tabstop>state</tabstop>
-  <tabstop>ownercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>enddate</tabstop>
   <tabstop>workcat_id</tabstop>
   <tabstop>workcat_id_end</tabstop>
   <tabstop>comment</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>link</tabstop>
   <tabstop>verified</tabstop>
   <tabstop>rotation</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>btn_add_geom</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
+  <tabstop>tab_feature</tabstop>
+  <tabstop>tbl_element_x_arc</tabstop>
+  <tabstop>tbl_element_x_node</tabstop>
+  <tabstop>tbl_element_x_connec</tabstop>
+  <tabstop>tbl_element_x_gully</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>btn_snapping</tabstop>
  </tabstops>
  <resources/>
  <connections/>

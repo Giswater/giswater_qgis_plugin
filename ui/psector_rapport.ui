@@ -261,6 +261,19 @@
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>txt_path</tabstop>
+  <tabstop>btn_path</tabstop>
+  <tabstop>chk_composer</tabstop>
+  <tabstop>cmb_templates</tabstop>
+  <tabstop>txt_composer_path</tabstop>
+  <tabstop>chk_csv_detail</tabstop>
+  <tabstop>txt_csv_detail_path</tabstop>
+  <tabstop>chk_csv</tabstop>
+  <tabstop>txt_csv_path</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -464,6 +464,28 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>id</tabstop>
+  <tabstop>event_code</tabstop>
+  <tabstop>visit_id</tabstop>
+  <tabstop>position_id</tabstop>
+  <tabstop>position_value</tabstop>
+  <tabstop>parameter_id</tabstop>
+  <tabstop>value</tabstop>
+  <tabstop>value1</tabstop>
+  <tabstop>value2</tabstop>
+  <tabstop>geom1</tabstop>
+  <tabstop>geom2</tabstop>
+  <tabstop>geom3</tabstop>
+  <tabstop>xcoord</tabstop>
+  <tabstop>ycoord</tabstop>
+  <tabstop>compass</tabstop>
+  <tabstop>tstamp</tabstop>
+  <tabstop>text</tabstop>
+  <tabstop>index_val</tabstop>
+  <tabstop>is_last</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

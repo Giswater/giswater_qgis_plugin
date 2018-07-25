@@ -281,6 +281,24 @@
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>btn_sector_selection</tabstop>
+  <tabstop>btn_hs_ds</tabstop>
+  <tabstop>btn_options</tabstop>
+  <tabstop>btn_times</tabstop>
+  <tabstop>txt_result_name</tabstop>
+  <tabstop>chk_only_check</tabstop>
+  <tabstop>chk_export</tabstop>
+  <tabstop>chk_export_subcatch</tabstop>
+  <tabstop>txt_file_inp</tabstop>
+  <tabstop>btn_file_inp</tabstop>
+  <tabstop>chk_exec</tabstop>
+  <tabstop>txt_file_rpt</tabstop>
+  <tabstop>btn_file_rpt</tabstop>
+  <tabstop>chk_import</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

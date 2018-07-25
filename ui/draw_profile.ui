@@ -383,6 +383,25 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>profile_id</tabstop>
+  <tabstop>start_point</tabstop>
+  <tabstop>btn_add_start_point</tabstop>
+  <tabstop>end_point</tabstop>
+  <tabstop>btn_add_end_point</tabstop>
+  <tabstop>list_additional_points</tabstop>
+  <tabstop>btn_add_additional_point</tabstop>
+  <tabstop>btn_delete_additional_point</tabstop>
+  <tabstop>btn_load_profile</tabstop>
+  <tabstop>btn_save_profile</tabstop>
+  <tabstop>btn_clear_profile</tabstop>
+  <tabstop>btn_draw</tabstop>
+  <tabstop>cbx_template</tabstop>
+  <tabstop>title</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>btn_export_pdf</tabstop>
+  <tabstop>tbl_list_arc</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

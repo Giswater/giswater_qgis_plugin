@@ -551,6 +551,37 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>check_qgis_project</tabstop>
+  <tabstop>check_user_vdefault_parameters</tabstop>
+  <tabstop>check_create_nodes_from_arcs</tabstop>
+  <tabstop>check_arcs_without_nodes_start_end</tabstop>
+  <tabstop>check_arc_same_start_end</tabstop>
+  <tabstop>check_connec_duplicated</tabstop>
+  <tabstop>check_node_duplicated</tabstop>
+  <tabstop>check_node_orphan</tabstop>
+  <tabstop>check_topology_coherence</tabstop>
+  <tabstop>check_arc_searchnodes</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>check_mincut_data</tabstop>
+  <tabstop>Admin</tabstop>
+  <tabstop>tabWidget_3</tabstop>
+  <tabstop>check_arc_intersection_without_node</tabstop>
+  <tabstop>check_node_exit_upper_node_entry</tabstop>
+  <tabstop>check_node_flow_regulator</tabstop>
+  <tabstop>check_node_sink</tabstop>
+  <tabstop>check_inverted_arcs</tabstop>
+  <tabstop>check_profile_tool_data</tabstop>
+  <tabstop>check_rehabilitation_price</tabstop>
+  <tabstop>check_reconstruction_price</tabstop>
+  <tabstop>check_node_multi_psector</tabstop>
+  <tabstop>check_arc_multi_psector</tabstop>
+  <tabstop>check_node_duplicated_2</tabstop>
+  <tabstop>check_node_orphan_2</tabstop>
+  <tabstop>check_arcs_without_nodes_start_end_2</tabstop>
+  <tabstop>check_schema_data</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

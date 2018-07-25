@@ -173,6 +173,13 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>cbx_template</tabstop>
+  <tabstop>title</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

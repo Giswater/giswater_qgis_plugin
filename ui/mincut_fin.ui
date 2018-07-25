@@ -650,6 +650,22 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>mincut</tabstop>
+  <tabstop>work_order</tabstop>
+  <tabstop>address_exploitation</tabstop>
+  <tabstop>address_postal_code</tabstop>
+  <tabstop>address_street</tabstop>
+  <tabstop>address_number</tabstop>
+  <tabstop>cbx_date_start_fin</tabstop>
+  <tabstop>cbx_hours_start_fin</tabstop>
+  <tabstop>cbx_date_end_fin</tabstop>
+  <tabstop>cbx_hours_end_fin</tabstop>
+  <tabstop>exec_user</tabstop>
+  <tabstop>btn_set_real_location</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

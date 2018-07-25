@@ -310,6 +310,16 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>cat_work_id</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>workid_key_1</tabstop>
+  <tabstop>workid_key_2</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -23,7 +23,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="VisitTab">
          <attribute name="title">
@@ -740,6 +740,36 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tab_widget</tabstop>
+  <tabstop>visit_id</tabstop>
+  <tabstop>startdate</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>user_name</tabstop>
+  <tabstop>ext_code</tabstop>
+  <tabstop>visitcat_id</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>btn_add_geom</tabstop>
+  <tabstop>button_box</tabstop>
+  <tabstop>feature_type</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>btn_feature_insert</tabstop>
+  <tabstop>btn_feature_delete</tabstop>
+  <tabstop>btn_feature_snapping</tabstop>
+  <tabstop>tbl_relation</tabstop>
+  <tabstop>parameter_type_id</tabstop>
+  <tabstop>parameter_id</tabstop>
+  <tabstop>btn_event_insert</tabstop>
+  <tabstop>btn_event_update</tabstop>
+  <tabstop>btn_event_delete</tabstop>
+  <tabstop>tbl_event</tabstop>
+  <tabstop>doc_id</tabstop>
+  <tabstop>btn_doc_insert</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>btn_doc_new</tabstop>
+  <tabstop>btn_open_doc</tabstop>
+  <tabstop>tbl_document</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

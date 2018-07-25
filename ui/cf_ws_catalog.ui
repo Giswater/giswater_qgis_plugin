@@ -179,6 +179,14 @@
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>matcat_id</tabstop>
+  <tabstop>filter2</tabstop>
+  <tabstop>filter3</tabstop>
+  <tabstop>id</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

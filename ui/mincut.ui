@@ -1131,6 +1131,38 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>result_mincut_id</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>work_order</tabstop>
+  <tabstop>address_exploitation</tabstop>
+  <tabstop>address_postal_code</tabstop>
+  <tabstop>address_street</tabstop>
+  <tabstop>address_number</tabstop>
+  <tabstop>type</tabstop>
+  <tabstop>cause</tabstop>
+  <tabstop>cbx_recieved_day</tabstop>
+  <tabstop>cbx_recieved_time</tabstop>
+  <tabstop>cbx_date_start_predict</tabstop>
+  <tabstop>cbx_hours_start_predict</tabstop>
+  <tabstop>cbx_date_end_predict</tabstop>
+  <tabstop>cbx_hours_end_predict</tabstop>
+  <tabstop>assigned_to</tabstop>
+  <tabstop>pred_description</tabstop>
+  <tabstop>btn_start</tabstop>
+  <tabstop>cbx_date_start</tabstop>
+  <tabstop>cbx_hours_start</tabstop>
+  <tabstop>real_description</tabstop>
+  <tabstop>distance</tabstop>
+  <tabstop>depth</tabstop>
+  <tabstop>appropiate</tabstop>
+  <tabstop>btn_end</tabstop>
+  <tabstop>cbx_date_end</tabstop>
+  <tabstop>cbx_hours_end</tabstop>
+  <tabstop>exec_user</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

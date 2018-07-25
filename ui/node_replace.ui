@@ -365,6 +365,18 @@
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>btn_new_workcat</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>node_node_type</tabstop>
+  <tabstop>node_node_type_new</tabstop>
+  <tabstop>node_nodecat_id</tabstop>
+  <tabstop>btn_catalog</tabstop>
+  <tabstop>keep_elements</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

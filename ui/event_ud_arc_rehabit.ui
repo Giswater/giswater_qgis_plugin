@@ -482,6 +482,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>parameter_id</tabstop>
+  <tabstop>position_id</tabstop>
+  <tabstop>position_value</tabstop>
+  <tabstop>value1</tabstop>
+  <tabstop>value2</tabstop>
+  <tabstop>geom1</tabstop>
+  <tabstop>geom2</tabstop>
+  <tabstop>geom3</tabstop>
+  <tabstop>text</tabstop>
+  <tabstop>btn_add_picture</tabstop>
+  <tabstop>btn_view_gallery</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
