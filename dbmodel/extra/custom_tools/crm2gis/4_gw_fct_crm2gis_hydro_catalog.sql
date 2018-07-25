@@ -19,13 +19,21 @@ BEGIN
     -- Search path
  
 	-- period values
-	INSERT INTO ws.ext_cat_period (id)
-	SELECT id FROM crm.hydro_cat_period WHERE id NOT IN (SELECT id::integer FROM ws.ext_cat_period);
+	INSERT INTO ws.ext_cat_period (id, code, start_date, end_date)
+	SELECT id, code, start_date, end_date FROM crm.hydro_cat_period WHERE id NOT IN (SELECT id::integer FROM ws.ext_cat_period);
 
 	-- state values
 	INSERT INTO ws.ext_rtc_hydrometer_state (id, name, observ)
 	SELECT id, code, observ FROM crm.hydro_val_state WHERE id NOT IN (SELECT id FROM ws.ext_rtc_hydrometer_state);
-	
+
+	-- priority values
+	INSERT INTO ws.ext_cat_hydrometer_priority (id, code, observ)
+	SELECT id, code, observ FROM crm.hydro_cat_priority WHERE id NOT IN (SELECT id FROM ws.ext_cat_hydrometer_priority);
+
+	-- type values
+	INSERT INTO ws.ext_cat_hydrometer_type (id, code, observ)
+	SELECT id, code, observ FROM crm.hydro_cat_type WHERE id NOT IN (SELECT id FROM ws.ext_cat_hydrometer_type);
+		
 	
     RETURN;
         

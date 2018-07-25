@@ -252,3 +252,29 @@ ALTER TABLE ext_rtc_hydrometer ADD COLUMN update_date date;
 
 ALTER TABLE plan_psector ADD COLUMN enable_all boolean NOT NULL DEFAULT FALSE;
 
+
+----------------------
+--25/07/2018
+-----------------------
+ALTER TABLE ext_cat_hydrometer ADD COLUMN code text;
+ALTER TABLE ext_cat_hydrometer ADD COLUMN observ text;
+
+ALTER TABLE ext_hydrometer_category ADD COLUMN code text;
+ALTER TABLE ext_cat_period ADD COLUMN code text;
+
+
+
+CREATE TABLE ext_cat_hydrometer_priority(
+"id" integer PRIMARY KEY,
+"code" character varying(16) NOT NULL,
+"observ" character varying(100));
+
+
+
+CREATE TABLE ext_cat_hydrometer_type(
+"id" integer PRIMARY KEY,
+"code" character varying(16) NOT NULL,
+"observ" character varying(100)
+);
+
+
