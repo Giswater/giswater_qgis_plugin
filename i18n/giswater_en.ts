@@ -38,7 +38,7 @@
         <translation>State selector</translation>
     </message>
     <message>
-        <source>51_text</source>
+        <source>86_text</source>
         <translation>Hydrometer selector</translation>
     </message>
 	<message>

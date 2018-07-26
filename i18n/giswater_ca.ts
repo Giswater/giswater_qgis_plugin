@@ -39,7 +39,7 @@
         <translation>Selector d'estat</translation>
     </message>
     <message>
-        <source>51_text</source>
+        <source>86_text</source>
         <translation>Selector d'hydrometres</translation>
     </message>
 	<message>
