@@ -26,6 +26,8 @@ BEGIN
 		VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id);
     END LOOP;
 
+    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (7, current_user) ON CONFLICT DO NOTHING;
+
     RETURN;
         
 END;

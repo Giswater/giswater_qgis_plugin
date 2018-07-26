@@ -24,7 +24,9 @@ BEGIN
     SELECT arc_id, expl_id, 10, the_geom 
 	FROM v_edit_arc
 	WHERE slope < 0;
-
+    
+    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (10, current_user) ON CONFLICT DO NOTHING;
+    
     RETURN 1;
                 
 END;

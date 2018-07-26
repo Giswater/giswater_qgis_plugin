@@ -30,8 +30,10 @@ BEGIN
         (SELECT COUNT(*) FROM arc WHERE node_1 = node_id_var OR node_2 = node_id_var), 13, point_aux);
     END LOOP;
     
+    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (13, current_user) ON CONFLICT DO NOTHING;
+
     RETURN (SELECT COUNT(*) FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=13);
-        
+    
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

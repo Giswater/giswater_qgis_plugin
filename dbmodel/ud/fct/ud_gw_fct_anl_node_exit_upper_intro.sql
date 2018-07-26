@@ -51,6 +51,8 @@ BEGIN
 		
 	END LOOP;
 	
+	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (11, current_user) ON CONFLICT DO NOTHING;
+
 RETURN 1;
         
 END;

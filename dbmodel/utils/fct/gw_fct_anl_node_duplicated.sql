@@ -31,6 +31,8 @@ BEGIN
     WHERE t1.node_id != t2.node_id  
     ORDER BY t1.node_id;
 
+    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (6, current_user) ON CONFLICT DO NOTHING;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
