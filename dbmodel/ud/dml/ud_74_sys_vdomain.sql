@@ -123,7 +123,7 @@ INSERT INTO audit_cat_table VALUES ('v_ui_element_x_arc', 'User interface view',
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_node', 'User interface view', 'Shows the visits related to node elements. User Interface view.', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visitman_x_connec', 'User interface view', 'Shows the visits related to management of connec elements. User Interface view.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_flow_node', 'Analysis', 'View with the result of flow trace and flow exit results (node)', NULL, 0, NULL, 'role_om', 2, 'Flow trace tool', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_edit_om_psector', 'O&M', 'Shows the om psector information', 'role_om', 0, NULL, 'role_om', 2, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_edit_om_psector', 'O&M', 'Shows the om psector information', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_arc', 'System', 'Shows the arc data.', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_man_gully', 'GIS feature', 'Shows editable information about gully management', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_node', 'System', 'Shows the node data', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -626,8 +626,8 @@ INSERT INTO audit_cat_table VALUES ('om_psector', 'O&M information', 'Contains o
 INSERT INTO audit_cat_table VALUES ('temp_csv2pg', 'Temporal table', 'Temporary table to store import csv file', 'role_om', 0, NULL, NULL, 0, NULL, 'temp_csv2pg_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('v_plan_current_psector', 'masterplan', 'View to show current planified sector', NULL, 0, NULL, 'role_master', 1, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_psector_x_other', 'O&M', 'Shows other prices related to om psector', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_om_psector_x_node', 'O&M', 'Shows node related to om psector', NULL, 0, NULL, 'role_om', 1, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_om_psector_x_arc', 'O&M', 'Shows arc related to om psector', NULL, 0, NULL, 'role_om', 1, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_om_psector_x_node', 'O&M', 'Shows node related to om psector', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_om_psector_x_arc', 'O&M', 'Shows arc related to om psector', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_psector', 'O&M', 'Shows the psector elements', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_current_psector_budget_detail_reh', 'O&M', 'Shows the detalied budget of current om psector (reh)', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_current_psector_budget_detail_rec', 'O&M', 'Shows the detalied budget of current om psector  (rec)', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -656,7 +656,7 @@ INSERT INTO audit_cat_table VALUES ('audit_log_data', 'System', 'Result of the a
 INSERT INTO audit_cat_table VALUES ('audit_price_simple', 'System', 'Audit prices table. Traceability of the whole prices of db', 'role_master', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('plan_psector_selector', 'masterplan', 'Selector of the current plan_psector', 'role_master', 0, NULL, NULL, 0, NULL, 'plan_psector_selector_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('om_psector_selector', 'O&M information', 'Selector of the current om_psector', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_selector_id_seq', 'id');
-INSERT INTO audit_cat_table VALUES ('v_edit_om_psector_x_other', 'O&M', 'Shows the om_psector other idata', 'role_om', 0, NULL, 'role_om', 2, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_edit_om_psector_x_other', 'O&M', 'Shows the om_psector other idata', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_plan_psector_x_other', 'Masterplan', 'Shows editable information about plan sector.', 'role_master', 0, NULL, 'role_master', 2, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_csv2pg_cat', 'System table', 'Catalog of functions of csv import ', 'role_admin', 1, '=3', NULL, 0, NULL, 'sys_csv2pg_cat_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('v_edit_review_arc', 'Review', 'Used to edit the review information', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);

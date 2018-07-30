@@ -485,8 +485,8 @@ INSERT INTO audit_cat_table VALUES ('v_plan_result_arc', 'masterplan', 'Shows th
 INSERT INTO audit_cat_table VALUES ('v_plan_psector_x_other', 'masterplan', 'View to show other issues of budget related to plan sectors.', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_plan_result_node', 'masterplan', 'Shows the result of node cost', NULL, 0, NULL, 'role_master', 1, 'Masterplan result', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_psector_x_other', 'O&M', 'Shows other prices related to om psector', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_om_psector_x_node', 'O&M', 'Shows node related to om psector', NULL, 0, NULL, 'role_om', 1, 'Basic operation', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_om_psector_x_arc', 'O&M', 'Shows arc related to om psector', NULL, 0, NULL, 'role_om', 1, 'Basic operation', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_om_psector_x_node', 'O&M', 'Shows node related to om psector', NULL, 0, NULL, NULL, 0, 'Basic operation', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_om_psector_x_arc', 'O&M', 'Shows arc related to om psector', NULL, 0, NULL, NULL, 0, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_psector', 'O&M', 'Shows the psector elements', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_current_psector_budget_detail_reh', 'O&M', 'Shows the detalied budget of current om psector (reh)', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_om_current_psector_budget_detail_rec', 'O&M', 'Shows the detalied budget of current om psector  (rec)', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
@@ -523,8 +523,8 @@ INSERT INTO audit_cat_table VALUES ('plan_psector_selector', 'masterplan', 'Sele
 INSERT INTO audit_cat_table VALUES ('om_psector_selector', 'O&M information', 'Selector of the current om_psector', 'role_om', 0, NULL, NULL, 0, NULL, 'om_psector_selector_id_seq', 'id');
 INSERT INTO audit_cat_table VALUES ('plan_result_type', 'masterplan', 'Domain value table of result types', 'role_admin', 3, '=2', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('price_cat_simple', 'Prices', 'Catalog of prices (imported using csv import file button)', 'role_master', 1, '=1', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_edit_om_psector', 'O&M', 'Shows the om psector information', 'role_om', 0, NULL, 'role_om', 2, 'Basic operation', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_edit_om_psector_x_other', 'O&M', 'Shows the om_psector other idata', 'role_om', 0, NULL, 'role_om', 2, 'Basic operation', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_edit_om_psector', 'O&M', 'Shows the om psector information', 'role_om', 0, NULL, NULL, 0, 'Basic operation', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_edit_om_psector_x_other', 'O&M', 'Shows the om_psector other idata', 'role_om', 0, NULL, NULL, 0, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_om_visit', 'O&M', 'Shows editable information about visits.', 'role_om', 0, NULL, 'role_om', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_plan_psector_x_other', 'Masterplan', 'Shows editable information about plan sector.', 'role_master', 0, NULL, 'role_master', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_pond', 'GIS feature', 'Shows editable information about ponds.', 'role_edit', 0, NULL, 'role_edit', 2, 'Basic operation', NULL, NULL);
