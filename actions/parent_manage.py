@@ -331,7 +331,8 @@ class ParentManage(ParentAction, object):
         message = "Geometry has been added!"
         self.controller.show_info(message)
         self.emit_point.canvasClicked.disconnect()
-        self.iface.actionPan().trigger()
+        self.iface.actionIdentify().trigger()
+        self.iface.mapCanvas().refreshAllLayers()
 
     def get_values_from_form(self, dialog):
         self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
