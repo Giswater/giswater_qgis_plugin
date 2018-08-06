@@ -304,7 +304,7 @@ class ManageElement(ParentManage):
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
-                sql+= ("\nINSERT INTO " + self.schema_name + ".element_x_arc (element_id, arc_id)"
+                sql += ("\nINSERT INTO " + self.schema_name + ".element_x_arc (element_id, arc_id)"
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
         if self.list_ids['node']:
             for feature_id in self.list_ids['node']:
@@ -312,17 +312,17 @@ class ManageElement(ParentManage):
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
-                sql+= ("\nINSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id)"
+                sql += ("\nINSERT INTO " + self.schema_name + ".element_x_connec (element_id, connec_id)"
                        " VALUES ('" + str(element_id) + "', '" + str(feature_id) + "');")
                 
         status = self.controller.execute_sql(sql, log_sql=True)
         if status:
             self.element_id = element_id
             self.manage_close(self.dlg_add_element, table_object)
-            #TODO Reload table tbl_element
-            filter_ = "node_id = '" + str(feature_id) + "'"
-            table_element = "v_ui_element_x_node"
-            #self.set_model_to_table(self.tbl_element, table_element, filter_)
+            # TODO Reload table tbl_element
+            # filter_ = "node_id = '" + str(feature_id) + "'"
+            # table_element = "v_ui_element_x_node"
+            # self.set_model_to_table(self.tbl_element, table_element, filter_)
 
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
