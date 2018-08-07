@@ -211,9 +211,10 @@ class MincutConfig(ParentAction):
         field_id_right = "result_id"
         index = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
         self.multi_row_selector(self.dlg_mincut_sel, tableleft, tableright, field_id_left, field_id_right, index=index)
-
+        self.dlg_mincut_sel.btn_select.clicked.connect(partial(self.mincut.set_visible_mincut_layers))
         # Open dialog
         self.open_dialog(self.dlg_mincut_sel, maximize_button=False)
+
 
     def open_mincut(self):
         """ Open mincut form with selected record of the table """
