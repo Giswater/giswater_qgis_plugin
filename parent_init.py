@@ -259,10 +259,9 @@ class ParentDialog(QDialog):
         status = self.iface.activeLayer().commitChanges()
         if not status:
             self.parse_commit_error_message()
-        else:
-            feature_id = self.feature.attribute(self.geom_type + '_id')
-            # self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', feature_id)
-            # self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', feature_id)
+        elif self.id and self.id.upper() != 'NULL':
+            self.update_filters('value_state_type', 'id', self.geom_type, 'state_type', self.id)
+            self.update_filters('dma', 'dma_id', self.geom_type, 'dma_id', self.id)
 
         # Close dialog
         if close_dialog:
