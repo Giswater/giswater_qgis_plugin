@@ -113,6 +113,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <widget class="QLabel" name="label_flexunion_code_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -142,11 +148,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="position_id">
-          <property name="frame">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <widget class="QComboBox" name="position_id"/>
         </item>
        </layout>
       </item>
@@ -267,7 +269,6 @@
  <tabstops>
   <tabstop>parameter_id</tabstop>
   <tabstop>value</tabstop>
-  <tabstop>position_id</tabstop>
   <tabstop>position_value</tabstop>
   <tabstop>text</tabstop>
   <tabstop>btn_add_picture</tabstop>

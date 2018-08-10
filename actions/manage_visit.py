@@ -459,8 +459,6 @@ class ManageVisit(ParentManage, QObject):
                " FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
-        if self.is_new:
-            sql += " AND form_type ='event_standard' "
 
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
@@ -736,8 +734,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event = EventUDarcStandard()
             self.load_settings(self.dlg_event)
             # disable position_x fields because not allowed in multiple view
-            self.dlg_event.position_id.setEnabled(False)
-            self.dlg_event.position_value.setEnabled(False)
+            self.populate_position_id()
         elif form_type == 'event_ud_arc_rehabit':
             self.dlg_event = EventUDarcRehabit()
             self.load_settings(self.dlg_event)
