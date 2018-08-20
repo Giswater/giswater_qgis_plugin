@@ -134,7 +134,8 @@ class ParentDialog(QDialog):
             sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('"+str(point[0])+"', '"+str(point[1])+"')")
             row = self.controller.get_row(sql)
             values = row[0]
-            #utils_giswater.setWidgetText(self.geom_type + "_id", str(values['feature_id']))
+            # if 'feature_id' in values:
+            #     utils_giswater.setWidgetText(self.dialog, self.geom_type + "_id", str(values['feature_id']))
             if 'name' in values['muni_id']:
                 utils_giswater.setWidgetText(self.dialog, 'muni_id', values['muni_id']['name'])
             if 'name' in values['sector_id']:
@@ -158,22 +159,6 @@ class ParentDialog(QDialog):
             date_value = QDateTime.currentDateTime()
         utils_giswater.setCalendarDate(dialog, "builtdate", date_value)
 
-        # Exploitation
-        sql = ("SELECT name FROM " + self.schema_name + ".exploitation WHERE expl_id::text ="
-               " (SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'exploitation_vdefault')::text")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(dialog, "expl_id", row[0])
-            
-        # DMA
-        sql = ("SELECT name FROM " + self.schema_name + ".dma WHERE dma_id::text ="
-               " (SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'dma_vdefault')::text")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(dialog, "dma_id", row[0])
-
         # State
         sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
                " (SELECT value FROM " + self.schema_name + ".config_param_user"
@@ -193,8 +178,6 @@ class ParentDialog(QDialog):
         self.set_vdefault(dialog, 'presszone_vdefault', 'presszonecat_id')
         self.set_vdefault(dialog, 'verified_vdefault', 'verified')
         self.set_vdefault(dialog, 'workcat_vdefault', 'workcat_id')
-        self.set_vdefault(dialog, 'sector_vdefault', 'sector_id')
-        self.set_vdefault(dialog, 'municipality_vdefault', 'muni_id')
         self.set_vdefault(dialog, 'soilcat_vdefault', 'soilcat_id')
 
 
@@ -2173,7 +2156,7 @@ class ParentDialog(QDialog):
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
                " WHERE t2.name = '" + str(utils_giswater.getWidgetText(dialog, exploitation)) + "'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
             utils_giswater.fillComboBox(dialog, dma, list_items, allow_nulls=False)
