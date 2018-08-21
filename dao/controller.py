@@ -321,7 +321,9 @@ class DaoController():
         msg_box.setDefaultButton(QMessageBox.No)        
         msg_box.exec_()
                           
-            
+    def get_conn_encoding(self):
+        return self.dao.get_conn_encoding()
+
     def get_row(self, sql, log_info=True, log_sql=False, commit=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         

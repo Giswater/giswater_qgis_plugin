@@ -22,6 +22,8 @@ class PgDao():
             status = False
         return status
 
+    def get_conn_encoding(self):
+        return self.conn.encoding
 
     def set_params(self, host, port, dbname, user, password):
         """ Set database parameters """
