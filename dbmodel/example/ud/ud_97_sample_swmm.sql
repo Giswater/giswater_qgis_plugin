@@ -597,9 +597,6 @@ INSERT INTO inp_project_id VALUES ('title', NULL, 'Dec-2017');
 
 INSERT INTO inp_selector_hydrology VALUES ('1', '1', current_user);
 
-INSERT INTO inp_selector_result VALUES ('120', 'testing', current_user);
-
-
 INSERT INTO inp_storage (node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond) VALUES ('18828', 'TABULAR', 'EBAR-02', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
 INSERT INTO inp_storage (node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond) VALUES ('238', 'TABULAR', 'EBAR-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
 

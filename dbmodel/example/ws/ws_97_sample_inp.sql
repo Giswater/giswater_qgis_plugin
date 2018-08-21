@@ -499,8 +499,6 @@ INSERT INTO inp_rules_x_node VALUES (12, '113952', 'THEN PUMP 113951_n2a STATUS 
 INSERT INTO inp_rules_x_node VALUES (8, '113952', 'IF TANK 113952 LEVEL ABOVE 2.8');
 INSERT INTO inp_rules_x_node VALUES (11, '113952', 'IF TANK 113952 LEVEL BELOW 10');
 
-INSERT INTO inp_selector_result VALUES (81, 'resultprova', current_user);
-
 
 INSERT INTO inp_shortpipe VALUES ('1088', NULL, NULL, 'OPEN');
 INSERT INTO inp_shortpipe VALUES ('1089', NULL, NULL, 'OPEN');
