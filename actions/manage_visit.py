@@ -562,8 +562,9 @@ class ManageVisit(ParentManage, QObject):
             partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+        expr_filter = geom_type + "_id = '" + feature_id + "'"
         self.dlg_man.txt_filter.textChanged.connect(
-            partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object))
+            partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()        
@@ -579,26 +580,38 @@ class ManageVisit(ParentManage, QObject):
                 self.dlg_man.date_event_to.setDate(current_date)
 
         # set date events
-        self.dlg_man.date_event_from.dateChanged.connect(self.set_visit_date_filter)
-        self.dlg_man.date_event_to.dateChanged.connect(self.set_visit_date_filter)
+        self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+        self.dlg_man.date_event_to.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+
 
         # Open form
         self.open_dialog(self.dlg_man, dlg_name="visit_management")
 
 
-    def set_visit_date_filter(self):
-        """Filter om_visit in self.dlg_man.tbl_visit basing on new date."""
-        
+    def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter):
+        """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
+        object_id = utils_giswater.getWidgetText(dialog, widget_txt)
+        visit_start = dialog.date_event_from.date()
+        visit_end = dialog.date_event_to.date()
+        if visit_start > visit_end:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
-        min_date = self.dlg_man.date_event_from.date()
-        max_date = self.dlg_man.date_event_to.date()
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            min_date.toString(format_low), max_date.toString(format_high))
-        filter_ = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
-        model = self.dlg_man.tbl_visit.model()
-        model.setFilter(filter_)
-        model.select
+            visit_start.toString(format_low), visit_end.toString(format_high))
+        expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
+
+        if object_id != 'null':
+            expr_filter += " AND visit_id::TEXT ILIKE '%" + str(object_id) + "%'"
+
+            # Refresh model with selected filter
+            widget_table.model().setFilter(expr_filter)
+            widget_table.model().select()
+        else:
+            self.fill_table_object(widget_table, self.schema_name + "." + table_object, expr_filter)
 
 
     def fill_combos(self):
