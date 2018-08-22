@@ -64,8 +64,8 @@ class ManConnecDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec")  
-        self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydro") 
-        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydro_value")
+        self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer")
+        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
         
