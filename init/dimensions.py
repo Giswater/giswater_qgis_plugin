@@ -171,9 +171,9 @@ class Dimensions(ParentDialog):
                 if not row:
                     return
                 
-                utils_giswater.setText("depth", row[0])
-                utils_giswater.setText("feature_id", element_id)
-                utils_giswater.setText("feature_type", feat_type.upper())
+                utils_giswater.setText(self.dialog, "depth", row[0])
+                utils_giswater.setText(self.dialog, "feature_id", element_id)
+                utils_giswater.setText(self.dialog, "feature_type", feat_type.upper())
                
     
     def create_map_tips(self):
