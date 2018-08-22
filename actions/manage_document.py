@@ -110,11 +110,10 @@ class ManageDocument(ParentManage):
         """ Insert or update table 'document'. Add document to selected feature """
         
         # Get values from dialog
-        doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id")
-        doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type")
-        observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ")
-        path = utils_giswater.getWidgetText(self.dlg_add_doc, "path")
-
+        doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id", return_string_null=False)
+        doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=False)
+        observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
+        path = utils_giswater.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
         if doc_type == 'null':
             message = "You need to insert doc_type"
             self.controller.show_warning(message)
