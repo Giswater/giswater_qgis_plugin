@@ -35,7 +35,7 @@ BEGIN
 
 
   --Insert Catalog of visit
-    INSERT INTO om_visit_cat (id, name, startdate, enddate) VALUES(1, 'Test', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)));
+    INSERT INTO om_visit_cat (id, name, startdate, enddate) VALUES(1, 'Test', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 5)));
          
  
 
@@ -45,7 +45,7 @@ BEGIN
         LOOP
 
             --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), rec_node.expl_id, 'demo_user', rec_node.the_geom) RETURNING id INTO id_last;
+            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 5)), rec_node.expl_id, 'demo_user', rec_node.the_geom) RETURNING id INTO id_last;
             INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
 
             --Insert event 'inspection'
@@ -70,7 +70,7 @@ BEGIN
         LOOP
 
             --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), rec_arc.expl_id, 'demo_user') RETURNING id INTO id_last;
+            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 5)), rec_arc.expl_id, 'demo_user') RETURNING id INTO id_last;
             INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);
 
             --Insert event 'inspection'
@@ -104,7 +104,7 @@ BEGIN
         LOOP
 
             --Insert visit
-            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)),  rec_connec.expl_id, 'demo_user', rec_connec.the_geom) RETURNING id INTO id_last;
+            INSERT INTO om_visit (visitcat_id, startdate, enddate, expl_id, user_name, the_geom) VALUES(1, now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 5)),  rec_connec.expl_id, 'demo_user', rec_connec.the_geom) RETURNING id INTO id_last;
             INSERT INTO om_visit_x_connec (visit_id, connec_id) VALUES(id_last, rec_connec.connec_id);
 
             --Insert event 'inspection'
