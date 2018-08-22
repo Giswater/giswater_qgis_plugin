@@ -27,8 +27,8 @@ BEGIN
 				
 			
         -- FEATURE INSERT
-			INSERT INTO sector (sector_id, name, descript, the_geom, undelete)
-			VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete);
+			INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete)
+			VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.macrosector_id, NEW.the_geom, NEW.undelete);
 	
 			INSERT INTO inp_selector_sector (sector_id, cur_user) VALUES (NEW.sector_id, current_user);
 		
@@ -40,7 +40,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
    -- FEATURE UPDATE		
 			UPDATE sector 
-			SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete
+			SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=NEW.macrosector_id, the_geom=NEW.the_geom, undelete=NEW.undelete
 			WHERE sector_id=NEW.sector_id;
 				
         RETURN NEW;
