@@ -1216,6 +1216,15 @@ class ParentDialog(QDialog):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dialog, "event_type", rows)
 
+        # Get selected dates
+        date_from = self.date_event_from.date().toString('yyyyMMdd')
+        date_to = self.date_event_to.date().toString('yyyyMMdd')
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+        filter_ += " AND tstamp >= '" + date_from + "' AND tstamp <= '" + date_to + "'"
+
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
 
