@@ -277,4 +277,9 @@ CREATE TABLE ext_cat_hydrometer_type(
 "observ" character varying(100)
 );
 
+--------------------
+--23/08/2018
+--------------------
+INSERT INTO audit_cat_error values('3010','The minimum arc length of this exportation is: ', 'This length is less than nod2arc parameter. You need to update config.node2arc parameter to value less than it.',2,TRUE,'utils');
+
 

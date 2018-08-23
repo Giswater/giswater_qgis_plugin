@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2430
 
 
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(result_id_var character varying)
   RETURNS integer AS
 $BODY$
@@ -23,6 +22,7 @@ count_aux			integer;
 infiltration_aux	text;
 rgage_rec			record;
 scenario_aux		text;
+v_min_node2arc		float;
 
 
 BEGIN
@@ -33,6 +33,7 @@ BEGIN
 	-- select config values
 	SELECT * INTO rec_options FROM inp_options;
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	SELECT st_length(the_geom) INTO v_min_node2arc FROM rpt_inp_arc WHERE result_id=result_id_var ORDER BY 1 asc LIMIT 1;
 	
 
 	-- init variables
@@ -248,7 +249,12 @@ BEGIN
 	ELSIF project_type_aux='WS' THEN
 
 		SELECT dscenario_id INTO scenario_aux FROM inp_selector_dscenario WHERE cur_user=current_user;
-
+		
+		-- nod2arc control
+		IF (SELECT node2arc FROM config LIMIT 1) >  v_min_node2arc THEN 
+			PERFORM audit_function(3010,2430,v_min_node2arc::numeric(12,3)::text) ;
+		END IF;
+		
 		--WS check and set value default
 		-- nothing
 		
@@ -350,4 +356,6 @@ RETURN count_global_aux;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
-  cost 100;
+  COST 100;
+ALTER FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(character varying)
+  OWNER TO postgres;
