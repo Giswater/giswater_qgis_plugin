@@ -1638,6 +1638,9 @@
        <height>26</height>
       </rect>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
       <string>Generate rapports</string>
      </property>
@@ -1749,6 +1752,9 @@
      <height>26</height>
     </rect>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
    <property name="text">
     <string>Accept</string>
    </property>
@@ -1761,6 +1767,9 @@
      <width>71</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
    </property>
    <property name="text">
     <string>Cancel</string>
