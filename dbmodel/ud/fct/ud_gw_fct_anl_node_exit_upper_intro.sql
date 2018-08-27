@@ -51,7 +51,8 @@ BEGIN
 		
 	END LOOP;
 	
-	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (11, current_user) ON CONFLICT DO NOTHING;
+    DELETE FROM selector_audit WHERE fprocesscat_id=11 AND cur_user=current_user;	
+	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (11, current_user);
 
 RETURN 1;
         

@@ -25,7 +25,8 @@ BEGIN
 	FROM v_edit_arc
 	WHERE slope < 0;
     
-    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (10, current_user) ON CONFLICT DO NOTHING;
+    DELETE FROM selector_audit WHERE fprocesscat_id=10 AND cur_user=current_user;	
+    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (10, current_user);
     
     RETURN 1;
                 

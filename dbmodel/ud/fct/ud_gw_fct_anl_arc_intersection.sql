@@ -25,7 +25,8 @@ BEGIN
     WHERE ST_Intersects(a.the_geom, b.the_geom) AND a.arc_id != b.arc_id AND NOT ST_Touches(a.the_geom, b.the_geom)
     AND a.the_geom is not null and b.the_geom is not null;
 
-    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (9, current_user) ON CONFLICT DO NOTHING;
+    DELETE FROM selector_audit WHERE fprocesscat_id=9 AND cur_user=current_user;		
+	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (9, current_user);
 
     RETURN 1;
         

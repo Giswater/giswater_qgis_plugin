@@ -25,7 +25,8 @@ BEGIN
     FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
     WHERE node.node_type != 'OUTFALL' GROUP BY node.node_id HAVING COUNT(*) = 1;
 
-    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (8, current_user) ON CONFLICT DO NOTHING;
+    DELETE FROM selector_audit WHERE fprocesscat_id=8 AND cur_user=current_user;    
+	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (8, current_user);
 
     RETURN 1;
 

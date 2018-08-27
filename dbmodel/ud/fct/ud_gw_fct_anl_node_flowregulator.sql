@@ -29,7 +29,8 @@ BEGIN
 	HAVING count(node_1)> 1 
 	ORDER BY 2 desc;
 
-  INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (12, current_user) ON CONFLICT DO NOTHING;
+    DELETE FROM selector_audit WHERE fprocesscat_id=12 AND cur_user=current_user;    
+	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (12, current_user);
     
     RETURN 1;
   

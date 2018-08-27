@@ -22,7 +22,8 @@ BEGIN
     SELECT arc_id, state, expl_id, 4, the_geom
     FROM arc WHERE node_1::text=node_2::text;
 
-    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (4, current_user) ON CONFLICT DO NOTHING;
+    DELETE FROM selector_audit WHERE fprocesscat_id=4 AND cur_user=current_user;	
+    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (4, current_user);
 
     RETURN;
             

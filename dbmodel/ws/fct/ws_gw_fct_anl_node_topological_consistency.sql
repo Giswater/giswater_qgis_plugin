@@ -38,7 +38,8 @@ BEGIN
     SELECT node_id, nodecat_id, node.state, COUNT(*), node.expl_id, 8, node.the_geom FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
 	GROUP BY node.node_id, nodecat_id, node.state, node.expl_id, node.the_geom HAVING COUNT(*) != 1;
     
-    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (8, current_user) ON CONFLICT DO NOTHING;
+    DELETE FROM selector_audit WHERE fprocesscat_id=8 AND cur_user=current_user;	
+    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (8, current_user);
 
     RETURN;
 

@@ -32,7 +32,8 @@ BEGIN
 		WHERE t1.node_id != t2.node_id 
 		ORDER BY t1.node_id';
 
-    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (32, current_user) ON CONFLICT DO NOTHING;
+    DELETE FROM selector_audit WHERE fprocesscat_id=32 AND cur_user=current_user;    
+	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (32, current_user);
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
