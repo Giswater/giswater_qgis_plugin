@@ -33,11 +33,13 @@ anl_mincut_cat_state.name as state,
 anl_mincut_cat_class.name as class,
 mincut_type,
 received_date,
-expl_id,
-macroexpl_id,
-muni_id,
+anl_mincut_result_cat.expl_id,
+exploitation.name AS expl_name,
+anl_mincut_result_cat.macroexpl_id,
+anl_mincut_result_cat.muni_id,
 postcode,
 streetaxis_id,
+ext_streetaxis.name AS street_name,
 postnumber,
 anl_cause,
 anl_tstamp ,
@@ -60,6 +62,8 @@ exec_appropiate
 FROM anl_mincut_result_selector, anl_mincut_result_cat
 LEFT JOIN anl_mincut_cat_class ON anl_mincut_cat_class.id = mincut_class
 LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state
+LEFT JOIN ws_sample.exploitation ON anl_mincut_result_cat.expl_id = exploitation.expl_id
+LEFT JOIN ws_sample.ext_streetaxis ON anl_mincut_result_cat.streetaxis_id::text = ext_streetaxis.id::text
 	WHERE anl_mincut_result_selector.result_id = anl_mincut_result_cat.id AND anl_mincut_result_selector.cur_user = "current_user"()::text;
 
 
