@@ -268,7 +268,7 @@ def setSelectedItem(dialog, widget, text):
     if type(widget) is str or type(widget) is unicode:
         widget = dialog.findChild(QComboBox, widget)
     if widget:
-        index = widget.findText(str(text))
+        index = widget.findText(text)
         if index == -1:
             index = 0
         widget.setCurrentIndex(index)
