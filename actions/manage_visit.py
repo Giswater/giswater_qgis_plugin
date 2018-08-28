@@ -541,6 +541,7 @@ class ManageVisit(ParentManage, QObject):
         if geom_type is None:
             # Set a model with selected filter. Attach that model to selected table
             table_object = "om_visit"
+            expr_filter = ""
             self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
             self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
@@ -562,7 +563,6 @@ class ManageVisit(ParentManage, QObject):
             partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
-        expr_filter = geom_type + "_id = '" + feature_id + "'"
         self.dlg_man.txt_filter.textChanged.connect(
             partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
 
@@ -598,20 +598,25 @@ class ManageVisit(ParentManage, QObject):
             self.controller.show_warning(message)
             return
 
+        # Create interval dates
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
-        expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
 
-        if object_id != 'null':
-            expr_filter += " AND visit_id::TEXT ILIKE '%" + str(object_id) + "%'"
-
-            # Refresh model with selected filter
-            widget_table.model().setFilter(expr_filter)
-            widget_table.model().select()
+        if table_object == "om_visit":
+            expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
+            if object_id != 'null':
+                expr_filter += " AND visitcat_id::TEXT ILIKE '%" + str(object_id) + "%'"
         else:
-            self.fill_table_object(widget_table, self.schema_name + "." + table_object, expr_filter)
+            expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
+            if object_id != 'null':
+                expr_filter += " AND visit_id::TEXT ILIKE '%" + str(object_id) + "%'"
+
+        # Refresh model with selected filter
+        widget_table.model().setFilter(expr_filter)
+        widget_table.model().select()
+
 
 
     def fill_combos(self):
