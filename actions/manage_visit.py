@@ -822,6 +822,8 @@ class ManageVisit(ParentManage, QObject):
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
+        # check a parameter_id is selected (can be that no value is available)
+        parameter_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
@@ -850,23 +852,50 @@ class ManageVisit(ParentManage, QObject):
             return
 
         if om_event_parameter.form_type == 'event_ud_arc_standard':
+            _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
+            position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
+            text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = EventUDarcStandard()
             self.load_settings(self.dlg_event)
             # disable position_x fields because not allowed in multiple view
+            self.populate_position_id()
+            # set fixed values
+            self.dlg_event.value.setText(_value)
+            self.dlg_event.position_value.setText(str(position_value))
+            self.dlg_event.text.setText(text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
         elif om_event_parameter.form_type == 'event_ud_arc_rehabit':
+            position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
+            value1 = self.dlg_add_visit.tbl_event.model().record(0).value('value1')
+            value2 = self.dlg_add_visit.tbl_event.model().record(0).value('value2')
+            geom1 = self.dlg_add_visit.tbl_event.model().record(0).value('geom1')
+            geom2 = self.dlg_add_visit.tbl_event.model().record(0).value('geom2')
+            geom3 = self.dlg_add_visit.tbl_event.model().record(0).value('geom3')
+            text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = EventUDarcRehabit()
             self.load_settings(self.dlg_event)
             self.populate_position_id()
+            self.dlg_event.position_value.setText(str(position_value))
+            self.dlg_event.value1.setText(str(value1))
+            self.dlg_event.value2.setText(str(value2))
+            self.dlg_event.geom1.setText(str(geom1))
+            self.dlg_event.geom2.setText(str(geom2))
+            self.dlg_event.geom3.setText(str(geom3))
+            self.dlg_event.text.setText(text)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
 
         elif om_event_parameter.form_type == 'event_standard':
+            _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
+            text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
+            self.populate_position_id()
+            self.dlg_event.value.setText(_value)
+            self.dlg_event.text.setText(text)
 
         # because of multiple view disable add picture and view gallery
         self.dlg_event.btn_add_picture.setEnabled(False)
@@ -882,6 +911,9 @@ class ManageVisit(ParentManage, QObject):
                 value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
             if value:
                 setattr(event, field_name, value)
+
+        # set fixed values
+        self.dlg_event.parameter_id.setText(parameter_id)
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         if self.dlg_event.exec_():
