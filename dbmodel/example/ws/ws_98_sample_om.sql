@@ -13,10 +13,10 @@ INSERT INTO om_visit_cat VALUES (3, 'prueba num.3','2017-8-1', '2017-9-30', NULL
 INSERT INTO om_visit_cat VALUES (4, 'prueba num.4','2017-10-1', '2017-12-31', NULL, TRUE);
 
 
-INSERT INTO om_visit_parameter VALUES ('Arc rehabit type 1', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 1', 'event_ud_arc_rehabit', 'a');
-INSERT INTO om_visit_parameter VALUES ('Arc rehabit type 2', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 2', 'event_ud_arc_rehabit', 'b');
-INSERT INTO om_visit_parameter VALUES ('Arc inspection type 1', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 3', 'event_ud_arc_standard', 'c');
-INSERT INTO om_visit_parameter VALUES ('Arc inspection type 2', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 4', 'event_ud_arc_standard', 'f');
+INSERT INTO om_visit_parameter VALUES ('Arc rehabit type 1', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Rehabilitation arc parameter 1', 'event_ud_arc_rehabit', 'a');
+INSERT INTO om_visit_parameter VALUES ('Arc rehabit type 2', NULL, 'REHABIT', 'ARC', 'TEXT', NULL, 'Rehabilitation arc parameter 2', 'event_ud_arc_rehabit', 'b');
+INSERT INTO om_visit_parameter VALUES ('Arc inspection type 1', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 1', 'event_ud_arc_standard', 'c');
+INSERT INTO om_visit_parameter VALUES ('Arc inspection type 2', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Inspection arc parameter 2', 'event_ud_arc_standard', 'f');
 INSERT INTO om_visit_parameter VALUES ('Connec inspection type 1', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Inspection connec parameter 1', 'event_standard', 'd');
 INSERT INTO om_visit_parameter VALUES ('Connec inspection type 2', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Inspection connec parameter 2', 'event_standard', 'e');
 INSERT INTO om_visit_parameter VALUES ('Node inspection type 1', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Inspection node parameter 1', 'event_standard', 'f');
