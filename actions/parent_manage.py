@@ -938,8 +938,12 @@ class ParentManage(ParentAction, object):
         inf_text = ""
         list_id = ""
         field_object_id = "id"
+
         if table_object == "element":
             field_object_id = table_object + "_id"
+        elif "v_ui_om_visitman_x_" in table_object:
+            field_object_id = "visit_id"
+
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(field_object_id))
