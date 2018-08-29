@@ -101,7 +101,8 @@ CREATE TABLE hydro_cat_priority(
 CREATE TABLE crm2gis_traceability
 (
   id bigserial PRIMARY KEY,
-  new_hydro_number integer,
+  new_hydrometer integer,
+  new_hydrometer_x_connec integer,
   tstamp timestamp DEFAULT now()
 );
 
