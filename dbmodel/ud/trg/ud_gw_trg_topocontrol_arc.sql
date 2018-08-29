@@ -35,6 +35,7 @@ DECLARE
     gully_id_aux varchar;
     array_agg varchar [];
 	project_type_aux text;
+	v_dsbl_error boolean;
 		
 
 BEGIN 
@@ -48,7 +49,9 @@ BEGIN
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol' ;
 	SELECT value::boolean INTO geom_slp_direction_bool FROM config_param_system WHERE parameter='geom_slp_direction' ;
-		
+	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
+
+	
 	IF state_topocontrol_bool IS FALSE OR state_topocontrol_bool IS NULL THEN
 
 		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
@@ -151,10 +154,14 @@ BEGIN
 	--  Control of start/end node
 	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
 
-	-- Control de lineas de longitud 0
+		-- Control de lineas de longitud 0
 		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-			PERFORM audit_function (1040,1244, nodeRecord1.node_id);
-            
+			IF v_dsbl_error IS NOT TRUE THEN
+				PERFORM audit_function (1040,1244, nodeRecord1.node_id);	
+			ELSE
+				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
+			END IF;
+			
 		ELSE
 
 			-- Calculate system parameters
@@ -282,15 +289,21 @@ BEGIN
 
 	-- Error, no existing nodes
 	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
-		PERFORM audit_function (1042,1244,NEW.arc_id);
+		IF v_dsbl_error IS NOT TRUE THEN
+			PERFORM audit_function (1042,1244,NEW.arc_id);
+		ELSE
+			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
+		END IF;
 		
 	--Not existing nodes but accepted insertion
 	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
 		RETURN NEW;
-        
+
 	ELSE
-		PERFORM audit_function (1042,1244,NEW.arc_id);
-	
+		IF v_dsbl_error IS NOT TRUE THEN
+			PERFORM audit_function (1042,1244,NEW.arc_id);
+		END IF;
+		
 	END IF;
 
 RETURN NEW;
