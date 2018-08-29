@@ -339,8 +339,8 @@ class ManageVisit(ParentManage, QObject):
 
         # A) fill Visit basing on GUI values
         self.current_visit.id = int(self.visit_id.text())
-        self.current_visit.startdate = self.dlg_add_visit.startdate.date().toString(Qt.ISODate)
-        self.current_visit.enddate = self.dlg_add_visit.enddate.date().toString(Qt.ISODate)
+        self.current_visit.startdate = utils_giswater.getCalendarDate(self.dlg_add_visit, self.dlg_add_visit.startdate)
+        self.current_visit.enddate = utils_giswater.getCalendarDate(self.dlg_add_visit, self.dlg_add_visit.enddate)
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
         self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)

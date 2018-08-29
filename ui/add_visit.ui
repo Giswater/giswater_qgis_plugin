@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
+    <width>442</width>
     <height>564</height>
    </rect>
   </property>
@@ -93,9 +93,15 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1">
+           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
             <item>
              <widget class="QLabel" name="label_node_type_3">
+              <property name="maximumSize">
+               <size>
+                <width>66</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -143,7 +149,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QDateEdit" name="startdate">
+             <widget class="QDateTimeEdit" name="startdate">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -154,6 +160,9 @@
                 <day>1</day>
                </date>
               </property>
+              <property name="displayFormat">
+               <string>dd/MM/yyyy</string>
+              </property>
               <property name="calendarPopup">
                <bool>true</bool>
               </property>
@@ -162,9 +171,15 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,1">
+           <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
             <item>
              <widget class="QLabel" name="label_node_type_2">
+              <property name="maximumSize">
+               <size>
+                <width>59</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -212,7 +227,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QDateEdit" name="enddate">
+             <widget class="QDateTimeEdit" name="enddate">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -222,6 +237,9 @@
                 <month>1</month>
                 <day>1</day>
                </date>
+              </property>
+              <property name="displayFormat">
+               <string>dd/MM/yyyy</string>
               </property>
               <property name="calendarPopup">
                <bool>true</bool>
