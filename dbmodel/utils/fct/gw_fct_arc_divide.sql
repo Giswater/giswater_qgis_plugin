@@ -33,10 +33,11 @@ DECLARE
     count_aux1 smallint;
     count_aux2 smallint;
     return_aux smallint;
-	arc_divide_tolerance_aux float =0.01;
+	arc_divide_tolerance_aux float =0.05;
 	plan_arc_vdivision_dsbl_aux boolean;
 	array_agg_connec varchar [];
 	array_agg_gully varchar [];
+	v_arcsearch_nodes float;
 
 
 	
@@ -52,8 +53,9 @@ BEGIN
     SELECT the_geom INTO node_geom FROM node WHERE node_id = node_id_arg;
 	SELECT state INTO state_node_arg FROM node WHERE node_id=node_id_arg;
 
-    -- Get node tolerance from config table
+    -- Get parameters from configs table
 	SELECT value::boolean INTO plan_arc_vdivision_dsbl_aux FROM config_param_user WHERE "parameter"='plan_arc_vdivision_dsbl' AND cur_user=current_user;
+	SELECT arc_searchnodes INTO v_arcsearch_nodes FROM config;
 	
 	-- State control
 	IF state_aux=0 THEN
@@ -61,13 +63,24 @@ BEGIN
 	ELSIF state_node_arg=0 THEN
 		PERFORM audit_function(1052,2114);
 	END IF;
-	
+
+	-- Check if it's a end/start point node in case of wrong topology without start or end nodes
+	SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), node_geom, v_arcsearch_nodes) 
+		    OR ST_DWithin(ST_endpoint(the_geom), node_geom, v_arcsearch_nodes) LIMIT 1;
+	IF arc_id_aux IS NOT NULL THEN 
+		IF (SELECT arc_id FROM v_edit_arc WHERE arc_id=arc_id_aux AND node_1 IS NULL OR node_2 IS NULL LIMIT 1) IS NOT NULL THEN
+			UPDATE arc SET the_geom=the_geom WHERE arc_id=arc_id_aux;
+			RETURN 0;
+		END IF;
+	END IF;
+
 	-- Find closest arc inside tolerance
 	SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
-	WHERE ST_DWithin(node_geom, a.the_geom, arc_divide_tolerance_aux) AND node_1 != node_id_arg AND node_2 != node_id_arg 
+	WHERE ST_DWithin(node_geom, a.the_geom, arc_divide_tolerance_aux) AND node_1 != node_id_arg AND node_2 != node_id_arg
 	ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
-	
+
 	IF arc_id_aux IS NOT NULL THEN 
+
 	
 		--  Locate position of the nearest point
 		intersect_loc := ST_LineLocatePoint(arc_geom, node_geom);
