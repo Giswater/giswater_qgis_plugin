@@ -287,3 +287,8 @@ INSERT INTO config_param_system VALUES (200, 'edit_red_copy_dnom_dint', 'FALSE',
 
 
 
+--------------------
+--29/08/2018
+--------------------
+
+INSERT INTO config_param_system VALUES (198, 'edit_node_reduction_auto_d1d2', 'FALSE', 'Boolean', 'Edit', 'Only for WS');

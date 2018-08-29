@@ -55,8 +55,7 @@ ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_streetaxis_id_fkey";
 
 ALTER TABLE "sys_csv2pg_cat" DROP CONSTRAINT IF EXISTS "sys_csv2pg_cat_sys_role_fkey";
 
-ALTER TABLE "temp_csv2pg" DROP CONSTRAINT IF EXISTS "temp_csv2pg_csv2pgcat_id_fkey"
-;
+ALTER TABLE "temp_csv2pg" DROP CONSTRAINT IF EXISTS "temp_csv2pg_csv2pgcat_id_fkey";
 
 
 
