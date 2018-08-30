@@ -110,3 +110,4 @@ ALTER TABLE "sys_csv2pg_cat" ADD CONSTRAINT "sys_csv2pg_cat_sys_role_fkey" FOREI
 ALTER TABLE "temp_csv2pg" ADD CONSTRAINT "temp_csv2pg_csv2pgcat_id_fkey" FOREIGN KEY ("csv2pgcat_id") REFERENCES "sys_csv2pg_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
+select SCHEMA_NAME.gw_fct_utils_ext_fk();

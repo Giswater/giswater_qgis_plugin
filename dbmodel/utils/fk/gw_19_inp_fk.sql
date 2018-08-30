@@ -27,11 +27,11 @@ ALTER TABLE rpt_selector_result ADD CONSTRAINT rpt_selector_result_id_cur_user_u
 ALTER TABLE rpt_selector_result ADD CONSTRAINT "rpt_selector_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE rpt_selector_compare ADD CONSTRAINT rpt_selector_compare_result_id_cur_user_unique UNIQUE(result_id, cur_user);
-ALTER TABLE rpt_selector_compare ADD CONSTRAINT "rpt_selector_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rpt_selector_compare ADD CONSTRAINT "rpt_selector_compare_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE inp_selector_sector ADD CONSTRAINT inp_selector_sector_sector_id_cur_user_unique UNIQUE(sector_id, cur_user);
-ALTER TABLE inp_selector_sector ADD CONSTRAINT "rpt_selector_result_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_selector_sector ADD CONSTRAINT "inp_selector_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE inp_selector_result ADD CONSTRAINT inp_selector_result_result_id_cur_user_unique UNIQUE(result_id, cur_user);
-ALTER TABLE inp_selector_result ADD CONSTRAINT "rpt_selector_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_selector_result ADD CONSTRAINT "inp_selector_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON UPDATE CASCADE ON DELETE CASCADE;
 
