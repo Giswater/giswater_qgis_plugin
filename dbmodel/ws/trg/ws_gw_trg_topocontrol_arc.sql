@@ -17,6 +17,8 @@ DECLARE
     state_topocontrol_bool boolean;
     connec_id_aux varchar;
     array_agg varchar [];
+	v_dsbl_error boolean;
+
 	
 BEGIN 
 
@@ -25,7 +27,8 @@ BEGIN
  -- Get data from config table
     SELECT * INTO rec FROM config;  
     SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol';
-    
+   	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
+
 
     IF state_topocontrol_bool IS FALSE OR state_topocontrol_bool IS NULL THEN
 
@@ -138,8 +141,12 @@ BEGIN
     
         -- Control of same node initial and final
 			IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-				RETURN audit_function (1040, 1344, nodeRecord1.node_id);
-			
+				IF v_dsbl_error IS NOT TRUE THEN
+					PERFORM audit_function (1040,1344, nodeRecord1.node_id);	
+				ELSE
+					INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
+				END IF;
+				
 			ELSE
 				-- Update coordinates
 				NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
@@ -177,14 +184,22 @@ BEGIN
 		
 	--	Error, no existing nodes
 		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
-			PERFORM audit_function (1042,1344,NEW.arc_id);
+			IF v_dsbl_error IS NOT TRUE THEN
+				PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
+			ELSE
+				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
+			END IF;
 		
 	--	Not existing nodes but accepted insertion
 		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
 			RETURN NEW;
 			
-		ELSE
-			PERFORM audit_function (1042,1344,NEW.arc_id);
+		ELSE		
+			IF v_dsbl_error IS NOT TRUE THEN
+				PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
+			ELSE
+				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
+			END IF;
 		END IF;
 		
 RETURN NEW;
