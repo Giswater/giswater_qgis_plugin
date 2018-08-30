@@ -14,7 +14,6 @@ DECLARE
     arcrec Record;
     v_count integer;
     v_count_partial integer=0;
-    rec record;
 
 BEGIN 
 
@@ -24,9 +23,6 @@ BEGIN
 	DELETE FROM audit_log_data WHERE fprocesscat_id=3 AND user_name=current_user;
 	DELETE FROM audit_log_data WHERE fprocesscat_id=4 AND user_name=current_user;
     
-	-- Get data from config table
-	SELECT * INTO rec FROM config;    
-
 	-- Set config parameter
 	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_dsbl_error' ;
 	

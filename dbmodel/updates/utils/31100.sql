@@ -101,14 +101,9 @@ INSERT INTO sys_fprocess_cat VALUES (29, 'Audit mincut data', 'OM', 'Audit mincu
 
 
 
-
-
 ----------------------
 --22/05/2018
 -----------------------
-
-
-
 --Inserted on i18n file: gw_74_audit_vdomain_error
 --INSERT INTO audit_cat_error VALUES (3002, 'The selected arc has state=0 (num. node,feature_id)=', 'Please, select another one In order to use mincut, we recommend to disable network state=0.', 2, true, NULL);
 --INSERT INTO audit_cat_error VALUES (3004, 'The selected arc has state=0 (num. node,feature_id)=', 'Please, select another one In order to use mincut, we recommend to disable network state=0.', 2, true, NULL);
@@ -263,12 +258,10 @@ ALTER TABLE ext_hydrometer_category ADD COLUMN code text;
 ALTER TABLE ext_cat_period ADD COLUMN code text;
 
 
-
 CREATE TABLE ext_cat_hydrometer_priority(
 "id" integer PRIMARY KEY,
 "code" character varying(16) NOT NULL,
 "observ" character varying(100));
-
 
 
 CREATE TABLE ext_cat_hydrometer_type(
@@ -285,10 +278,12 @@ INSERT INTO audit_cat_error values('3010','The minimum arc length of this export
 INSERT INTO config_param_system VALUES (198, 'edit_topocontrol_dsbl_error', 'FALSE', 'Boolean', 'Edit', 'Only for UD');
 INSERT INTO config_param_system VALUES (200, 'edit_red_copy_dnom_dint', 'FALSE', 'Boolean', 'Edit', 'Only for WS');
 
-
-
 --------------------
 --29/08/2018
 --------------------
-
 INSERT INTO config_param_system VALUES (202, 'edit_node_reduction_auto_d1d2', 'FALSE', 'Boolean', 'Edit', 'Only for WS');
+
+--------------------
+--30/08/2018
+--------------------
+INSERT INTO audit_cat_function VALUES (2496, 'gw_fct_arc_repair', 'edit', NULL, 'p_arc_id', 'Massive repair function. All the arcs that are not connected with extremal node will be reconected using the parameter arc_searchnodes', NULL, NULL, NULL);
