@@ -164,13 +164,13 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>chk_delete_prev</tabstop>
   <tabstop>dist_x</tabstop>
   <tabstop>dist_y</tabstop>
-  <tabstop>rb_left</tabstop>
-  <tabstop>rb_right</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
+  <tabstop>chk_delete_prev</tabstop>
+  <tabstop>rb_left</tabstop>
+  <tabstop>rb_right</tabstop>
  </tabstops>
  <resources/>
  <connections/>
