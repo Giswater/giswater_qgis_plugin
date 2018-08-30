@@ -292,3 +292,4 @@ INSERT INTO config_param_system VALUES (200, 'edit_red_copy_dnom_dint', 'FALSE',
 --------------------
 
 INSERT INTO config_param_system VALUES (202, 'edit_node_reduction_auto_d1d2', 'FALSE', 'Boolean', 'Edit', 'Only for WS');
+INSERT INTO config_param_system VALUES (203, 'ext_utils_schema', NULL, 'Text', NULL, NULL);
