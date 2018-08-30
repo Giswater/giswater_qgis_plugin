@@ -76,9 +76,6 @@ ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_workcat_id_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_workcat_id_end_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_buildercat_id_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_ownercat_id_fkey";
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_muni_id_fkey" ;
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_streetaxis_id_fkey";
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_streetaxis2_id_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_verified_fkey";
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_expl_fkey" ;
 ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_expl_fkey" ;
@@ -104,9 +101,6 @@ ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_soilcat_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_workcat_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_workcat_id_end_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_buildercat_id_fkey";
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_muni_id_fkey" ;
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_streetaxis_id_fkey";
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_streetaxis2_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_ownercat_id_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_verified_fkey";
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_expl_fkey" ;
@@ -132,9 +126,6 @@ ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_workcat_id_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_workcat_id_end_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_buildercat_id_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_ownercat_id_fkey";
-ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_muni_id_fkey" ;
-ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_streetaxis_id_fkey";
-ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_streetaxis2_id_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_verified_fkey";
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_expl_fkey" ;
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_feature_type_fkey";
@@ -161,9 +152,6 @@ ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_workcat_id_fkey";
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_workcat_id_end_fkey";
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_buildercat_id_fkey";
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_ownercat_id_fkey";
-ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_muni_id_fkey" ;
-ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_streetaxis_id_fkey";
-ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_streetaxis2_id_fkey";
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_featurecat_id_fkey";
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_feature_type_fkey" ;
 ALTER TABLE "gully" DROP CONSTRAINT IF EXISTS "gully_function_type_feature_type_fkey";
@@ -183,9 +171,7 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_exploitation_id
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_verified_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_end_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis2_id_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey";
+
 
 
 --MAN_TABLE

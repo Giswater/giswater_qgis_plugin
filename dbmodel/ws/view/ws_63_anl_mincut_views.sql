@@ -62,8 +62,8 @@ exec_appropiate
 FROM anl_mincut_result_selector, anl_mincut_result_cat
 LEFT JOIN anl_mincut_cat_class ON anl_mincut_cat_class.id = mincut_class
 LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state
-LEFT JOIN ws_sample.exploitation ON anl_mincut_result_cat.expl_id = exploitation.expl_id
-LEFT JOIN ws_sample.ext_streetaxis ON anl_mincut_result_cat.streetaxis_id::text = ext_streetaxis.id::text
+LEFT JOIN SCHEMA_NAME.exploitation ON anl_mincut_result_cat.expl_id = exploitation.expl_id
+LEFT JOIN SCHEMA_NAME.ext_streetaxis ON anl_mincut_result_cat.streetaxis_id::text = ext_streetaxis.id::text
 	WHERE anl_mincut_result_selector.result_id = anl_mincut_result_cat.id AND anl_mincut_result_selector.cur_user = "current_user"()::text;
 
 

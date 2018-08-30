@@ -718,4 +718,4 @@ INSERT INTO audit_cat_param_user VALUES ('statetype_plan_vdefault', NULL, NULL, 
 
 
 --temporal insert of version data in order to use fk function for ud
-INSERT INTO version VALUES (1,'3.0.100','UD','PostgreSQL 9.5.10, compiled by Visual C++ build 1800, 64-bit','''',now(),en,25831);
+INSERT INTO version VALUES (1,'3.0.100','UD','PostgreSQL 9.5.10, compiled by Visual C++ build 1800, 64-bit','''',now(),'en',25831);

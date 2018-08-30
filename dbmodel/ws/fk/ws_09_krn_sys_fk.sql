@@ -59,9 +59,6 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_exploitation_id
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_verified_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_end_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis2_id_fkey";
-ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey";
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_presszonecat_id_fkey";
 
 
@@ -102,9 +99,7 @@ ALTER TABLE node DROP CONSTRAINT IF EXISTS node_function_type_feature_type_fkey;
 ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_category_type_feature_type_fkey;
 ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_fluid_type_feature_type_fkey;
 ALTER TABLE node DROP CONSTRAINT IF EXISTS  node_location_type_feature_type_fkey;
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_muni_id_fkey" ;
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_streetaxis_id_fkey" ;
-ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_streetaxis2_id_fkey";
+
 
 
 
@@ -129,9 +124,7 @@ ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_function_type_feature_type_fkey;
 ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_category_type_feature_type_fkey;
 ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_fluid_type_feature_type_fkey;
 ALTER TABLE arc DROP CONSTRAINT IF EXISTS  arc_location_type_feature_type_fkey;
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_muni_id_fkey" ;
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_streetaxis_id_fkey" ;
-ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_streetaxis2_id_fkey";
+
 
 
 ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_connecat_id_fkey";
@@ -154,9 +147,7 @@ ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_function_type_feature_type_
 ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_category_type_feature_type_fkey;
 ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_fluid_type_feature_type_fkey;
 ALTER TABLE connec DROP CONSTRAINT IF EXISTS  connec_location_type_feature_type_fkey;
-ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_muni_id_fkey" ;
-ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_streetaxis_id_fkey" ;
-ALTER TABLE "connec" DROP CONSTRAINT IF EXISTS "connec_streetaxis2_id_fkey";
+
 
 
 --MAN_TABLE
