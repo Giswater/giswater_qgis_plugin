@@ -75,6 +75,8 @@ class ManConnecDialog(ParentDialog):
         feature = self.feature
         layer = self.iface.activeLayer()
 
+        self.dialog.destroyed.connect(self.dlg_destroyed)
+
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
         action.setChecked(layer.isEditable())

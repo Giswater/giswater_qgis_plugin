@@ -2483,7 +2483,7 @@ class ParentDialog(QDialog):
 
     def dlg_destroyed(self, layer=None, vertex=None):
         self.dlg_is_destroyed = True
-        self.iface.actionPan().trigger()
+
         if layer:
             self.iface.setActiveLayer(layer)
         else:
