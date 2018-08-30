@@ -22,7 +22,7 @@ BEGIN
 
     query_aux='(select * from pg_catalog.pg_namespace where nspname = '''||ext_utils_schema_aux||''');';
 
-	IF query_aux IS NOT NULL THEN
+	IF query_aux ='TRUE' THEN
 
 		--LOCAL search_path = 'testschema'
 		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_streetaxis DROP CONSTRAINT IF EXISTS ext_streetaxis_exploitation_id_fkey;';
