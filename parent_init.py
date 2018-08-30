@@ -1217,8 +1217,8 @@ class ParentDialog(QDialog):
         utils_giswater.fillComboBox(self.dialog, "event_type", rows)
 
         # Get selected dates
-        date_from = self.date_event_from.date().toString('yyyyMMdd')
-        date_to = self.date_event_to.date().toString('yyyyMMdd')
+        date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
+        date_to = self.date_event_to.date().toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
@@ -1233,8 +1233,9 @@ class ParentDialog(QDialog):
         """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
-        date_from = self.date_event_from.date().toString('yyyyMMdd') 
-        date_to = self.date_event_to.date().toString('yyyyMMdd') 
+        date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
+        date_to = self.date_event_to.date().toString('yyyyMMdd 23:59:59')
+
         if date_from > date_to:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
@@ -1287,8 +1288,8 @@ class ParentDialog(QDialog):
         """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
-        date_from = self.date_event_from.date().toString('yyyyMMdd')
-        date_to = self.date_event_to.date().toString('yyyyMMdd')
+        date_from = self.date_event_from.date().toString('yyyyMMdd 00:00:00')
+        date_to = self.date_event_to.date().toString('yyyyMMdd 23:59:59')
         if (date_from > date_to):
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
