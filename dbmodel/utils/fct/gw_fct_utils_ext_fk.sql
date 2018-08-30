@@ -22,122 +22,122 @@ BEGIN
 
     query_aux='(select * from pg_catalog.pg_namespace where nspname = '''||ext_utils_schema_aux||''');';
 
-	IF query_aux ='TRUE' THEN
+	IF query_aux IS NOT NULL THEN
 
 		--LOCAL search_path = 'testschema'
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_streetaxis DROP CONSTRAINT IF EXISTS ext_streetaxis_exploitation_id_fkey;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_exploitation_id_fkey;';
 		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_streetaxis DROP CONSTRAINT IF EXISTS ext_streetaxis_muni_id_fkey;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_muni_id_fkey;';
 		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_streetaxis DROP CONSTRAINT IF EXISTS ext_streetaxis_type_street_fkey;';
-		EXECUTE alter_query_aux;
-
-
-
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_address DROP CONSTRAINT IF EXISTS ext_address_exploitation_id_fkey;';
-		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_address DROP CONSTRAINT IF EXISTS ext_address_muni_id_fkey;';
-		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_address DROP CONSTRAINT IF EXISTS ext_address_streetaxis_id_fkey;';
-		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_address DROP CONSTRAINT IF EXISTS ext_address_plot_id_fkey;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_type_street_fkey;';
 		EXECUTE alter_query_aux;
 
 
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_plot DROP CONSTRAINT IF EXISTS ext_plot_exploitation_id_fkey;';
+
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_exploitation_id_fkey;';
 		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_plot DROP CONSTRAINT IF EXISTS ext_plot_muni_id_fkey;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_muni_id_fkey;';
 		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_plot DROP CONSTRAINT IF EXISTS ext_plot_streetaxis_id_fkey;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_streetaxis_id_fkey;';
+		EXECUTE alter_query_aux;
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_plot_id_fkey;';
+		EXECUTE alter_query_aux;
+
+
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_exploitation_id_fkey;';
+		EXECUTE alter_query_aux;
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_muni_id_fkey;';
+		EXECUTE alter_query_aux;
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_streetaxis_id_fkey;';
 		EXECUTE alter_query_aux;
 
 		--FOREIGN KEY ON UTILS
 		--ALTER TABLE ext_utils_schema_aux."ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_exploitation_id_fkey" FOREIGN KEY ("expl_id") 
 		--REFERENCES '|| ext_utils_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_streetaxis ADD CONSTRAINT "ext_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ADD CONSTRAINT "streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") 
+		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_streetaxis ADD CONSTRAINT "ext_streetaxis_type_street_fkey" FOREIGN KEY ("type") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ADD CONSTRAINT "streetaxis_type_street_fkey" FOREIGN KEY ("type") 
+		REFERENCES '|| ext_utils_schema_aux||'."type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 
 
 		--ALTER TABLE ext_utils_schema_aux."ext_address" ADD CONSTRAINT "ext_address_exploitation_id_fkey" FOREIGN KEY ("expl_id") 
 		--REFERENCES '|| ext_utils_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_address ADD CONSTRAINT "ext_address_muni_id_fkey" FOREIGN KEY ("muni_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.address ADD CONSTRAINT "address_muni_id_fkey" FOREIGN KEY ("muni_id") 
+		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_address ADD CONSTRAINT "ext_address_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.address ADD CONSTRAINT "address_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_address ADD CONSTRAINT "ext_address_plot_id_fkey" FOREIGN KEY ("plot_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_plot" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.address ADD CONSTRAINT "address_plot_id_fkey" FOREIGN KEY ("plot_id") 
+		REFERENCES '|| ext_utils_schema_aux||'."plot" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 
 
 		--ALTER TABLE ext_utils_schema_aux."ext_plot" ADD CONSTRAINT "ext_plot_exploitation_id_fkey" FOREIGN KEY ("expl_id") 
 		--REFERENCES '|| ext_utils_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_plot ADD CONSTRAINT "ext_plot_muni_id_fkey" FOREIGN KEY ("muni_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.plot ADD CONSTRAINT "plot_muni_id_fkey" FOREIGN KEY ("muni_id") 
+		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
-		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.ext_plot ADD CONSTRAINT "ext_plot_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		alter_query_aux:='ALTER TABLE '|| ext_utils_schema_aux||'.plot ADD CONSTRAINT "plot_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 
 		--FOREIGN KEY
 		
 		alter_query_aux:='ALTER TABLE node ADD CONSTRAINT "node_muni_id_fkey" FOREIGN KEY ("muni_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		alter_query_aux:='ALTER TABLE node ADD CONSTRAINT "node_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		alter_query_aux:='ALTER TABLE node ADD CONSTRAINT "node_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 
 		alter_query_aux:='ALTER TABLE arc ADD CONSTRAINT "arc_muni_id_fkey" FOREIGN KEY ("muni_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		alter_query_aux:='ALTER TABLE arc ADD CONSTRAINT "arc_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		alter_query_aux:='ALTER TABLE arc ADD CONSTRAINT "arc_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 
 		alter_query_aux:='ALTER TABLE connec ADD CONSTRAINT "connec_muni_id_fkey" FOREIGN KEY ("muni_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		alter_query_aux:='ALTER TABLE connec ADD CONSTRAINT "connec_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		alter_query_aux:='ALTER TABLE connec ADD CONSTRAINT "connec_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 
 		alter_query_aux:='ALTER TABLE samplepoint ADD CONSTRAINT "samplepoint_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		alter_query_aux:='ALTER TABLE samplepoint ADD CONSTRAINT "samplepoint_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		alter_query_aux:='ALTER TABLE samplepoint ADD CONSTRAINT "samplepoint_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") 
-		REFERENCES '|| ext_utils_schema_aux||'."ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		EXECUTE alter_query_aux;
 		
 		IF project_type_aux='UD' THEN
 			alter_query_aux:='ALTER TABLE gully ADD CONSTRAINT "gully_muni_id_fkey" FOREIGN KEY ("muni_id") 
-			REFERENCES '|| ext_utils_schema_aux||'."ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+			REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 			EXECUTE alter_query_aux;
 			alter_query_aux:='ALTER TABLE gully ADD CONSTRAINT "gully_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") 
-			REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+			REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 			EXECUTE alter_query_aux;
 			alter_query_aux:='ALTER TABLE gully ADD CONSTRAINT "gully_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") 
-			REFERENCES '|| ext_utils_schema_aux||'."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
+			REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 			EXECUTE alter_query_aux;
 		END IF;
 
