@@ -161,9 +161,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>45</y>
+      <y>40</y>
       <width>591</width>
-      <height>401</height>
+      <height>411</height>
      </rect>
     </property>
     <property name="font">
@@ -189,7 +189,7 @@
         <x>0</x>
         <y>0</y>
         <width>581</width>
-        <height>371</height>
+        <height>381</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -201,7 +201,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>247</height>
+         <height>257</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1247,8 +1247,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>257</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1389,7 +1389,7 @@
        <widget class="QLabel" name="label_postcode">
         <property name="geometry">
          <rect>
-          <x>365</x>
+          <x>360</x>
           <y>0</y>
           <width>77</width>
           <height>22</height>
@@ -1552,7 +1552,7 @@
        <widget class="QLabel" name="label_postnumber">
         <property name="geometry">
          <rect>
-          <x>365</x>
+          <x>360</x>
           <y>23</y>
           <width>81</width>
           <height>22</height>
@@ -1588,9 +1588,9 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>360</x>
+          <x>355</x>
           <y>233</y>
-          <width>83</width>
+          <width>86</width>
           <height>22</height>
          </rect>
         </property>
@@ -1821,9 +1821,9 @@
        <widget class="QLabel" name="label_postnumber2">
         <property name="geometry">
          <rect>
-          <x>365</x>
+          <x>360</x>
           <y>45</y>
-          <width>81</width>
+          <width>86</width>
           <height>22</height>
          </rect>
         </property>
@@ -1941,8 +1941,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>257</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2108,12 +2108,12 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_rotation">
+       <widget class="QLabel" name="label_symbol_rotation">
         <property name="geometry">
          <rect>
-          <x>310</x>
+          <x>305</x>
           <y>30</y>
-          <width>90</width>
+          <width>101</width>
           <height>22</height>
          </rect>
         </property>
@@ -2160,7 +2160,7 @@
        <widget class="QLabel" name="label_hemisphere">
         <property name="geometry">
          <rect>
-          <x>310</x>
+          <x>305</x>
           <y>55</y>
           <width>90</width>
           <height>22</height>
@@ -2196,7 +2196,7 @@
        <widget class="QLabel" name="label_svg">
         <property name="geometry">
          <rect>
-          <x>310</x>
+          <x>305</x>
           <y>5</y>
           <width>90</width>
           <height>22</height>

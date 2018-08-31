@@ -161,9 +161,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
+      <y>45</y>
       <width>581</width>
-      <height>401</height>
+      <height>411</height>
      </rect>
     </property>
     <property name="font">
@@ -189,7 +189,7 @@
         <x>0</x>
         <y>0</y>
         <width>571</width>
-        <height>371</height>
+        <height>381</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -201,7 +201,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>263</height>
+         <height>257</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1209,7 +1209,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>263</height>
+         <height>247</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2013,7 +2013,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>263</height>
+         <height>257</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2273,9 +2273,9 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>355</x>
+          <x>350</x>
           <y>233</y>
-          <width>90</width>
+          <width>91</width>
           <height>22</height>
          </rect>
         </property>
@@ -2406,7 +2406,7 @@
        <widget class="QLabel" name="label_postnumber2">
         <property name="geometry">
          <rect>
-          <x>355</x>
+          <x>350</x>
           <y>45</y>
           <width>85</width>
           <height>22</height>
@@ -2493,7 +2493,7 @@
        <widget class="QLabel" name="label_postcode">
         <property name="geometry">
          <rect>
-          <x>355</x>
+          <x>350</x>
           <y>0</y>
           <width>83</width>
           <height>22</height>
@@ -2529,7 +2529,7 @@
        <widget class="QLabel" name="label_postnumber">
         <property name="geometry">
          <rect>
-          <x>355</x>
+          <x>350</x>
           <y>23</y>
           <width>83</width>
           <height>22</height>
@@ -2707,13 +2707,13 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>263</height>
+         <height>257</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Feature graphic design</string>
        </attribute>
-       <widget class="QLabel" name="label_rotation">
+       <widget class="QLabel" name="label_symbol_rotation">
         <property name="geometry">
          <rect>
           <x>300</x>
@@ -3251,15 +3251,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -3271,15 +3271,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_doc_type">
@@ -3614,15 +3614,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_open_gallery">
@@ -3696,15 +3696,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QTableView" name="tbl_event_node">
@@ -3972,15 +3972,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_el_to">
@@ -3992,15 +3992,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QTabWidget" name="tbl_scada_3">
@@ -4297,7 +4297,7 @@
     <property name="geometry">
      <rect>
       <x>467</x>
-      <y>470</y>
+      <y>475</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4307,7 +4307,7 @@
     <property name="geometry">
      <rect>
       <x>205</x>
-      <y>490</y>
+      <y>495</y>
       <width>119</width>
       <height>23</height>
      </rect>
@@ -4345,7 +4345,7 @@
     <property name="geometry">
      <rect>
       <x>467</x>
-      <y>510</y>
+      <y>515</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4355,7 +4355,7 @@
     <property name="geometry">
      <rect>
       <x>467</x>
-      <y>490</y>
+      <y>495</y>
       <width>111</width>
       <height>22</height>
      </rect>
@@ -4391,7 +4391,7 @@
     <property name="geometry">
      <rect>
       <x>335</x>
-      <y>535</y>
+      <y>540</y>
       <width>71</width>
       <height>17</height>
      </rect>
@@ -4404,7 +4404,7 @@
     <property name="geometry">
      <rect>
       <x>337</x>
-      <y>510</y>
+      <y>515</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4414,7 +4414,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>535</y>
+      <y>540</y>
       <width>91</width>
       <height>17</height>
      </rect>
@@ -4427,7 +4427,7 @@
     <property name="geometry">
      <rect>
       <x>16</x>
-      <y>450</y>
+      <y>455</y>
       <width>171</width>
       <height>22</height>
      </rect>
@@ -4465,7 +4465,7 @@
     <property name="geometry">
      <rect>
       <x>335</x>
-      <y>452</y>
+      <y>457</y>
       <width>109</width>
       <height>22</height>
      </rect>
@@ -4503,7 +4503,7 @@
     <property name="geometry">
      <rect>
       <x>467</x>
-      <y>450</y>
+      <y>455</y>
       <width>111</width>
       <height>22</height>
      </rect>
@@ -4539,7 +4539,7 @@
     <property name="geometry">
      <rect>
       <x>336</x>
-      <y>490</y>
+      <y>495</y>
       <width>109</width>
       <height>22</height>
      </rect>
@@ -4575,7 +4575,7 @@
     <property name="geometry">
      <rect>
       <x>207</x>
-      <y>470</y>
+      <y>475</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4597,7 +4597,7 @@
     <property name="geometry">
      <rect>
       <x>205</x>
-      <y>510</y>
+      <y>515</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4610,7 +4610,7 @@
     <property name="geometry">
      <rect>
       <x>17</x>
-      <y>490</y>
+      <y>495</y>
       <width>141</width>
       <height>22</height>
      </rect>
@@ -4648,7 +4648,7 @@
     <property name="geometry">
      <rect>
       <x>185</x>
-      <y>535</y>
+      <y>540</y>
       <width>86</width>
       <height>17</height>
      </rect>
@@ -4661,7 +4661,7 @@
     <property name="geometry">
      <rect>
       <x>207</x>
-      <y>450</y>
+      <y>455</y>
       <width>103</width>
       <height>22</height>
      </rect>
@@ -4699,7 +4699,7 @@
     <property name="geometry">
      <rect>
       <x>17</x>
-      <y>510</y>
+      <y>515</y>
       <width>181</width>
       <height>18</height>
      </rect>
@@ -4718,7 +4718,7 @@
     <property name="geometry">
      <rect>
       <x>17</x>
-      <y>470</y>
+      <y>475</y>
       <width>181</width>
       <height>18</height>
      </rect>
@@ -4737,7 +4737,7 @@
     <property name="geometry">
      <rect>
       <x>335</x>
-      <y>470</y>
+      <y>475</y>
       <width>121</width>
       <height>18</height>
      </rect>
@@ -4938,7 +4938,7 @@
   <tabstop>num_value</tabstop>
   <tabstop>label_x</tabstop>
   <tabstop>label_y</tabstop>
-  <tabstop>label_rotation</tabstop>
+  <tabstop>label_symbol_rotation</tabstop>
   <tabstop>svg</tabstop>
   <tabstop>rotation</tabstop>
   <tabstop>hemisphere</tabstop>

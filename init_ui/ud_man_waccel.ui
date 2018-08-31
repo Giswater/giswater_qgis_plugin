@@ -267,7 +267,7 @@
          <x>0</x>
          <y>0</y>
          <width>571</width>
-         <height>316</height>
+         <height>304</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1572,8 +1572,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>304</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1582,7 +1582,7 @@
        <widget class="QLabel" name="label_location_type">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>295</x>
           <y>99</y>
           <width>101</width>
           <height>22</height>
@@ -1618,7 +1618,7 @@
        <widget class="QLabel" name="label_fluid_type">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>295</x>
           <y>74</y>
           <width>101</width>
           <height>22</height>
@@ -1690,7 +1690,7 @@
        <widget class="QLabel" name="label_soilcat_id">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>295</x>
           <y>0</y>
           <width>101</width>
           <height>22</height>
@@ -1736,7 +1736,7 @@
        <widget class="QLabel" name="label_function_type">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>295</x>
           <y>49</y>
           <width>101</width>
           <height>22</height>
@@ -1840,7 +1840,7 @@
        <widget class="QLabel" name="label_workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>295</x>
           <y>124</y>
           <width>101</width>
           <height>22</height>
@@ -1896,7 +1896,7 @@
        <widget class="QLabel" name="label_category_type">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>295</x>
           <y>24</y>
           <width>101</width>
           <height>22</height>
@@ -1978,7 +1978,7 @@
        <widget class="QLabel" name="label_enddate">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>295</x>
           <y>149</y>
           <width>101</width>
           <height>22</height>
@@ -2360,9 +2360,9 @@
        <widget class="QLabel" name="label_prot_surface">
         <property name="geometry">
          <rect>
-          <x>298</x>
+          <x>293</x>
           <y>182</y>
-          <width>101</width>
+          <width>111</width>
           <height>22</height>
          </rect>
         </property>
@@ -2461,8 +2461,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>304</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2603,7 +2603,7 @@
        <widget class="QLabel" name="label_postcode">
         <property name="geometry">
          <rect>
-          <x>355</x>
+          <x>350</x>
           <y>10</y>
           <width>81</width>
           <height>22</height>
@@ -2766,7 +2766,7 @@
        <widget class="QLabel" name="label_postnumber">
         <property name="geometry">
          <rect>
-          <x>355</x>
+          <x>350</x>
           <y>33</y>
           <width>79</width>
           <height>22</height>
@@ -2802,9 +2802,9 @@
        <widget class="QLabel" name="label_num_value">
         <property name="geometry">
          <rect>
-          <x>350</x>
+          <x>345</x>
           <y>243</y>
-          <width>85</width>
+          <width>91</width>
           <height>22</height>
          </rect>
         </property>
@@ -3035,9 +3035,9 @@
        <widget class="QLabel" name="label_postnumber2">
         <property name="geometry">
          <rect>
-          <x>355</x>
+          <x>350</x>
           <y>55</y>
-          <width>79</width>
+          <width>86</width>
           <height>22</height>
          </rect>
         </property>
@@ -3472,15 +3472,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDateEdit" name="date_document_to">
@@ -3492,15 +3492,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLineEdit" name="doc_id">
@@ -3638,15 +3638,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_from">
@@ -3799,15 +3799,15 @@
         <height>18</height>
        </rect>
       </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
-      </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_data_event_to">
