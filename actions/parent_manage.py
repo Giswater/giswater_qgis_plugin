@@ -6,12 +6,15 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest
-from qgis.gui import QgsMapToolEmitPoint
+
+
+from qgis.core import QgsFeatureRequest, QgsPoint
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper,QgsVertexMarker
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QCompleter, QStringListModel, QAbstractItemView, QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
+from PyQt4.QtGui import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
+from PyQt4.QtGui import QColor, QCompleter, QStringListModel, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QPoint, SIGNAL
 
 from functools import partial
 
@@ -35,7 +38,7 @@ class ParentManage(ParentAction, object):
         self.autocommit = True
         self.lazy_widget = None
         self.workcat_id_end = None
-
+        self.xyCoordinates_conected = False
 
     def reset_lists(self):
         """ Reset list of selected records """
@@ -316,22 +319,68 @@ class ParentManage(ParentAction, object):
 
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
-        
+        active_layer = self.iface.activeLayer()
+        if active_layer is None:
+            active_layer = self.controller.get_layer_by_tablename('version')
+            self.iface.setActiveLayer(active_layer)
+
+        # Vertex marker
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
+
+        # Snapper
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.previous_map_tool = self.canvas.mapTool()
         self.canvas.setMapTool(self.emit_point)
+        #self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+        self.canvas.xyCoordinates.connect(self.mouse_move)
+        self.xyCoordinates_conected = True
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
 
+
+    def mouse_move(self, p):
+        self.snapped_point = None
+        self.vertex_marker.hide()
+        map_point = self.canvas.getCoordinateTransform().transform(p)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+
+        # That's the snapped point
+        if result:
+            # Check feature
+            for snapped_point in result:
+                self.snapped_point = QgsPoint(snapped_point.snappedVertex)
+                self.vertex_marker.setCenter(self.snapped_point)
+                self.vertex_marker.show()
+        else:
+            self.vertex_marker.hide()
+
     def get_xy(self, point):
         """ Get coordinates of selected point """
-        
-        self.x = point.x()
-        self.y = point.y()
+
+        if self.snapped_point:
+            self.x = self.snapped_point.x()
+            self.y = self.snapped_point.y()
+        else:
+            self.x = point.x()
+            self.y = point.y()
         message = "Geometry has been added!"
         self.controller.show_info(message)
         self.emit_point.canvasClicked.disconnect()
+        self.canvas.xyCoordinates.disconnect()
         self.iface.mapCanvas().refreshAllLayers()
+        self.vertex_marker.hide()
+
 
     def get_values_from_form(self, dialog):
         self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
@@ -699,6 +748,10 @@ class ParentManage(ParentAction, object):
         # reset previous dialog in not in single_tool_mode
         # if hasattr(self, 'single_tool_mode') and not self.single_tool_mode:
         #     if hasattr(self, 'previous_dialog'):
+
+        if self.xyCoordinates_conected:
+            self.canvas.xyCoordinates.disconnect()
+            self.xyCoordinates_conected = None
 
 
     def selection_init(self, dialog, table_object, query=False):
