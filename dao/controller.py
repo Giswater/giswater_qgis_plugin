@@ -13,7 +13,6 @@ from PyQt4.Qt import QToolBox
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QgsDataSourceURI, QgsCredentials
 
 import os.path
-import sys
 import subprocess
 from functools import partial
 
@@ -132,20 +131,25 @@ class DaoController():
         
         layer_source = self.get_layer_source(layer)    
         self.schema_name = layer_source['schema']
-               
         conn_info = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).connectionInfo()
-        (success, user, pwd) = QgsCredentials.instance().get(conn_info, None, None)  
+           
+        attempts = 1           
+        logged = self.connect_to_database(layer_source['host'], layer_source['port'], 
+                                          layer_source['db'], layer_source['user'], layer_source['password'])  
+        while not logged:
+            attempts+=1
+            if attempts <= 2:   
+                (success, layer_source['user'], layer_source['password']) = QgsCredentials.instance().get(conn_info, layer_source['user'], layer_source['password'])                                                    
+                logged = self.connect_to_database(layer_source['host'], layer_source['port'], 
+                                                  layer_source['db'], layer_source['user'], layer_source['password'])  
+            else:              
+                return None          
+        
         # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
-        if success: 
-            QgsCredentials.instance().put(conn_info, user, pwd)            
-            layer_source['user'] = user            
-            layer_source['password'] = pwd   
-            return layer_source         
-        else:
-            self.log_info("Error getting credentials")
-            self.last_error = "Error getting credentials"  
-            return None
-                
+        QgsCredentials.instance().put(conn_info, layer_source['user'], layer_source['password'])
+            
+        return layer_source    
+    
     
     def connect_to_database(self, host, port, db, user, pwd):
         """ Connect to database with selected parameters """
