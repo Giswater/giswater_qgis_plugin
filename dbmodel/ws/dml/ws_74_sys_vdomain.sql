@@ -606,3 +606,8 @@ INSERT INTO audit_cat_param_user VALUES ('edit_arc_downgrade_force', NULL, NULL,
 INSERT INTO audit_cat_param_user VALUES ('edit_arc_division_dsbl', NULL, NULL, 'boolean', 'edit', NULL);
 INSERT INTO audit_cat_param_user VALUES ('plan_arc_vdivision_dsbl', NULL, NULL, 'boolean', 'edit', NULL);
 INSERT INTO audit_cat_param_user VALUES ('statetype_plan_vdefault', NULL, NULL, 'smallint', 'plan', NULL);
+
+
+
+--temporal insert of version data in order to use fk function for ws
+INSERT INTO version VALUES (1,'3.0.100','WS','PostgreSQL 9.5.10, compiled by Visual C++ build 1800, 64-bit','''',now(),'en',25831);

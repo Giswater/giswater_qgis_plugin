@@ -15,14 +15,14 @@ SET search_path = "utils", public, pg_catalog;
 CREATE TABLE utils.address
 (
   id character varying(16) NOT NULL,
-  muni_id integer NOT NULL,
+  muni_id integer ,
   postcode character varying(16),
-  streetaxis_id character varying(16) NOT NULL,
-  postnumber character varying(16) NOT NULL,
+  streetaxis_id character varying(16),
+  postnumber character varying(16),
   plot_id character varying(16),
   the_geom geometry(Point,25831),
-  ud_expl_id integer NOT NULL,
-  ws_expl_id integer NOT NULL,
+  ud_expl_id integer,
+  ws_expl_id integer,
   CONSTRAINT address_pkey PRIMARY KEY (id))
 ;
 
@@ -41,12 +41,12 @@ CREATE TABLE utils.streetaxis
   id character varying(16) NOT NULL,
   code character varying(16),
   type character varying(18),
-  name character varying(100) NOT NULL,
+  name character varying(100),
   text text,
   the_geom geometry(MultiLineString,25831),
-  ud_expl_id integer NOT NULL,
-  ws_expl_id integer NOT NULL,
-  muni_id integer NOT NULL,
+  ud_expl_id integer,
+  ws_expl_id integer,
+  muni_id integer,
   CONSTRAINT streetaxis_pkey PRIMARY KEY (id))
 ;
 
@@ -64,7 +64,7 @@ GRANT ALL ON TABLE utils.streetaxis TO postgres;
 CREATE TABLE utils.municipality
 (
   muni_id integer NOT NULL,
-  name text NOT NULL,
+  name text,
   observ text,
   the_geom geometry(MultiPolygon,25831),
   CONSTRAINT municipality_pkey PRIMARY KEY (muni_id)
@@ -85,9 +85,9 @@ CREATE TABLE utils.plot
 (
   id character varying(16) NOT NULL,
   plot_code character varying(30),
-  muni_id integer NOT NULL,
+  muni_id integer ,
   postcode integer,
-  streetaxis_id character varying(16) NOT NULL,
+  streetaxis_id character varying(16) ,
   postnumber character varying(16),
   complement character varying(16),
   placement character varying(16),
@@ -95,8 +95,8 @@ CREATE TABLE utils.plot
   observ text,
   text text,
   the_geom geometry(MultiPolygon,25831),
-  ws_expl_id integer NOT NULL,
-  ud_expl_id integer NOT NULL,
+  ws_expl_id integer,
+  ud_expl_id integer,
   CONSTRAINT plot_pkey PRIMARY KEY (id)
 );
 

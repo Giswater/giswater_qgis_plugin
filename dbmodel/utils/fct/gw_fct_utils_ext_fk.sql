@@ -1,5 +1,13 @@
 
---select SCHEMA_NAME.gw_fct_utils_ext_fk() 
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+
+--DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_ext_fk();
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_ext_fk() RETURNS void AS
@@ -178,10 +186,67 @@ BEGIN
 			
 		END IF;
 
+		--DROP NOT NULL ON UTILS
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.municipality ALTER COLUMN name DROP NOT NULL;';
+
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ALTER COLUMN muni_id DROP NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ALTER COLUMN name DROP NOT NULL;';
+
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ALTER COLUMN muni_id DROP NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ALTER COLUMN streetaxis_id DROP NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ALTER COLUMN postnumber DROP NOT NULL;';
+
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN muni_id DROP NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN streetaxis_id DROP NOT NULL;';
+
+		--ADD NOT NULL ON UTILS
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.municipality ALTER COLUMN name SET NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ALTER COLUMN muni_id SET NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ALTER COLUMN name SET NOT NULL;';
+
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ALTER COLUMN muni_id SET NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ALTER COLUMN streetaxis_id SET NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ALTER COLUMN postnumber SET NOT NULL;';
+
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN muni_id SET NOT NULL;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN streetaxis_id SET NOT NULL;';
+
+		--DROP CHECK EXPL
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_expl_id_check;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_expl_id_check;';
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_expl_id_check;';
+
+		--CREATE CHECK EXPL
+
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ADD CONSTRAINT streetaxis_expl_id_check CHECK 
+		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
+		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL );';
+
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ADD CONSTRAINT address_expl_id_check CHECK 
+		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
+		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL  );';
+
+		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ADD CONSTRAINT plot_expl_id_check CHECK 
+		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
+		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL  );';
+
 	ELSE
 
 
 		--DROP FK
+		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_exploitation_id_fkey";
+		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_muni_id_fkey";
+		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_type_street_fkey";
+
+		ALTER TABLE "ext_address" DROP CONSTRAINT IF EXISTS "ext_address_exploitation_id_fkey";
+		ALTER TABLE "ext_address" DROP CONSTRAINT IF EXISTS "ext_address_muni_id_fkey";
+		ALTER TABLE "ext_address" DROP CONSTRAINT IF EXISTS "ext_address_streetaxis_id_fkey";
+		ALTER TABLE "ext_address" DROP CONSTRAINT IF EXISTS "ext_address_plot_id_fkey";
+
+
+		ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_exploitation_id_fkey";
+		ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_muni_id_fkey";
+		ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_streetaxis_id_fkey";
 
 		ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_muni_id_fkey"; 
 		ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_streetaxis_id_fkey"; 
@@ -197,6 +262,19 @@ BEGIN
 		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey"; 
 
 		--ADD FK
+
+		ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_type_street_fkey" FOREIGN KEY ("type") REFERENCES "ext_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_plot_id_fkey" FOREIGN KEY ("plot_id") REFERENCES "ext_plot" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 		ALTER TABLE "node" ADD CONSTRAINT "node_muni_id_fkey" FOREIGN KEY ("muni_id") 
 		REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -238,6 +316,39 @@ BEGIN
 			ALTER TABLE "gully" ADD CONSTRAINT "gully_streetaxis2_id_fkey" FOREIGN KEY ("streetaxis2_id") 
 			REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		END IF;
+
+
+		--NOT NULL DROP
+		ALTER TABLE ext_municipality ALTER COLUMN name DROP NOT NULL;
+
+		ALTER TABLE ext_streetaxis ALTER COLUMN expl_id DROP NOT NULL;
+		ALTER TABLE ext_streetaxis ALTER COLUMN muni_id DROP NOT NULL;
+		ALTER TABLE ext_streetaxis ALTER COLUMN name DROP NOT NULL;
+
+		ALTER TABLE ext_address ALTER COLUMN muni_id DROP NOT NULL;
+		ALTER TABLE ext_address ALTER COLUMN expl_id DROP NOT NULL;
+		ALTER TABLE ext_address ALTER COLUMN streetaxis_id DROP NOT NULL;
+		ALTER TABLE ext_address ALTER COLUMN postnumber DROP NOT NULL;
+
+		ALTER TABLE ext_plot ALTER COLUMN muni_id DROP NOT NULL;
+		ALTER TABLE ext_plot ALTER COLUMN expl_id DROP NOT NULL;
+		ALTER TABLE ext_plot ALTER COLUMN streetaxis_id DROP NOT NULL;
+
+		--NOT NULL ADD
+		ALTER TABLE ext_municipality ALTER COLUMN name SET NOT NULL;
+
+		ALTER TABLE ext_streetaxis ALTER COLUMN expl_id SET NOT NULL;
+		ALTER TABLE ext_streetaxis ALTER COLUMN muni_id SET NOT NULL;
+		ALTER TABLE ext_streetaxis ALTER COLUMN name SET NOT NULL;
+
+		ALTER TABLE ext_address ALTER COLUMN muni_id SET NOT NULL;
+		ALTER TABLE ext_address ALTER COLUMN expl_id SET NOT NULL;
+		ALTER TABLE ext_address ALTER COLUMN streetaxis_id SET NOT NULL;
+		ALTER TABLE ext_address ALTER COLUMN postnumber SET NOT NULL;
+
+		ALTER TABLE ext_plot ALTER COLUMN muni_id SET NOT NULL;
+		ALTER TABLE ext_plot ALTER COLUMN expl_id SET NOT NULL;
+		ALTER TABLE ext_plot ALTER COLUMN streetaxis_id SET NOT NULL;
 	END IF;
 
 

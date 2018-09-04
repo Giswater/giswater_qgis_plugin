@@ -49,20 +49,7 @@ ALTER TABLE dimensions ALTER COLUMN expl_id DROP NOT NULL;
 
 ALTER TABLE audit_cat_function ALTER COLUMN function_name DROP NOT NULL;
 
-ALTER TABLE ext_municipality ALTER COLUMN name DROP NOT NULL;
 
-ALTER TABLE ext_streetaxis ALTER COLUMN expl_id DROP NOT NULL;
-ALTER TABLE ext_streetaxis ALTER COLUMN muni_id DROP NOT NULL;
-ALTER TABLE ext_streetaxis ALTER COLUMN name DROP NOT NULL;
-
-ALTER TABLE ext_address ALTER COLUMN muni_id DROP NOT NULL;
-ALTER TABLE ext_address ALTER COLUMN expl_id DROP NOT NULL;
-ALTER TABLE ext_address ALTER COLUMN streetaxis_id DROP NOT NULL;
-ALTER TABLE ext_address ALTER COLUMN postnumber DROP NOT NULL;
-
-ALTER TABLE ext_plot ALTER COLUMN muni_id DROP NOT NULL;
-ALTER TABLE ext_plot ALTER COLUMN expl_id DROP NOT NULL;
-ALTER TABLE ext_plot ALTER COLUMN streetaxis_id DROP NOT NULL;
 
 
 --SET
@@ -109,18 +96,5 @@ ALTER TABLE dimensions ALTER COLUMN expl_id SET NOT NULL;
 
 ALTER TABLE audit_cat_function ALTER COLUMN function_name SET NOT NULL;
 
-ALTER TABLE ext_municipality ALTER COLUMN name SET NOT NULL;
 
-ALTER TABLE ext_streetaxis ALTER COLUMN expl_id SET NOT NULL;
-ALTER TABLE ext_streetaxis ALTER COLUMN muni_id SET NOT NULL;
-ALTER TABLE ext_streetaxis ALTER COLUMN name SET NOT NULL;
-
-ALTER TABLE ext_address ALTER COLUMN muni_id SET NOT NULL;
-ALTER TABLE ext_address ALTER COLUMN expl_id SET NOT NULL;
-ALTER TABLE ext_address ALTER COLUMN streetaxis_id SET NOT NULL;
-ALTER TABLE ext_address ALTER COLUMN postnumber SET NOT NULL;
-
-ALTER TABLE ext_plot ALTER COLUMN muni_id SET NOT NULL;
-ALTER TABLE ext_plot ALTER COLUMN expl_id SET NOT NULL;
-ALTER TABLE ext_plot ALTER COLUMN streetaxis_id SET NOT NULL;
 
