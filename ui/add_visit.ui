@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>442</width>
-    <height>564</height>
+    <width>344</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -463,14 +463,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="descript">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
+           <widget class="QTextEdit" name="descript"/>
           </item>
           <item>
            <widget class="QPushButton" name="btn_add_geom">
@@ -766,7 +759,6 @@
   <tabstop>user_name</tabstop>
   <tabstop>ext_code</tabstop>
   <tabstop>visitcat_id</tabstop>
-  <tabstop>descript</tabstop>
   <tabstop>btn_add_geom</tabstop>
   <tabstop>button_box</tabstop>
   <tabstop>feature_type</tabstop>

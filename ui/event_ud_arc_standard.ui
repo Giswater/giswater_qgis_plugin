@@ -224,17 +224,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="text">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <widget class="QTextEdit" name="text"/>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -270,7 +260,6 @@
   <tabstop>parameter_id</tabstop>
   <tabstop>value</tabstop>
   <tabstop>position_value</tabstop>
-  <tabstop>text</tabstop>
   <tabstop>btn_add_picture</tabstop>
   <tabstop>btn_view_gallery</tabstop>
   <tabstop>buttonBox</tabstop>
