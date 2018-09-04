@@ -48,6 +48,7 @@ class ManConnecDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
+        self.dlg_is_destroyed = False
         self.controller.manage_translation('ws_man_connec', dialog)
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
@@ -92,6 +93,8 @@ class ManConnecDialog(ParentDialog):
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
         action.setChecked(layer.isEditable())
+        layer.editingStarted.connect(partial(self.check_actions, action, True))
+        layer.editingStopped.connect(partial(self.check_actions, action, False))
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))

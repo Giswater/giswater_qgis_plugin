@@ -66,7 +66,7 @@
          <x>0</x>
          <y>0</y>
          <width>569</width>
-         <height>319</height>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1069,7 +1069,7 @@
          <x>0</x>
          <y>0</y>
          <width>569</width>
-         <height>319</height>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1938,15 +1938,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_6">
@@ -2099,15 +2099,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="btn_doc_new">
@@ -2238,15 +2238,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2017</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_event_parameter">
@@ -2291,15 +2291,15 @@
         <height>18</height>
        </rect>
       </property>
-      <property name="calendarPopup">
-       <bool>true</bool>
-      </property>
       <property name="date">
        <date>
         <year>2016</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_9">
@@ -2605,8 +2605,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6014,25 +6014,6 @@
     <string>Centered</string>
    </property>
   </action>
-  <action name="actionEnabled">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/101.png</normaloff>
-     <normalon>../icons/102.png</normalon>../icons/101.png</iconset>
-   </property>
-   <property name="text">
-    <string>enabled</string>
-   </property>
-   <property name="toolTip">
-    <string>Edit</string>
-   </property>
-   <property name="visible">
-    <bool>false</bool>
-   </property>
-  </action>
   <action name="actionZoomOut">
    <property name="icon">
     <iconset>
@@ -6067,6 +6048,21 @@
    </property>
    <property name="toolTip">
     <string>Copy&amp;Paste</string>
+   </property>
+  </action>
+  <action name="actionEnabled">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/101.png</normaloff>../icons/101.png</iconset>
+   </property>
+   <property name="text">
+    <string>Enabled</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit</string>
    </property>
   </action>
  </widget>

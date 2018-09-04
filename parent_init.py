@@ -57,7 +57,7 @@ class ParentDialog(QDialog):
         self.parameters = None              
         self.init_config()     
         self.set_signals()
-        self.dlg_is_destroyed = False
+        self.dlg_is_destroyed = None
         # Set default encoding 
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
@@ -2500,3 +2500,8 @@ class ParentDialog(QDialog):
     def enabled_actions(self, action, enabled):
         if not self.dlg_is_destroyed:
             action.setEnabled(enabled)
+
+
+    def check_actions(self, action, enabled):
+        if not self.dlg_is_destroyed:
+            action.setChecked(enabled)

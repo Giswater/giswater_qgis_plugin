@@ -51,6 +51,7 @@ class ManNodeDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(dialog, self.field_id, False)
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
+        self.dlg_is_destroyed = False
         self.controller.manage_translation('ws_man_node', dialog)
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
@@ -110,11 +111,14 @@ class ManNodeDialog(ParentDialog):
         layer.editingStarted.connect(partial(self.enabled_actions, action_rotation, True))
         layer.editingStopped.connect(partial(self.enabled_actions, action_rotation, False))
 
+
         self.dialog.destroyed.connect(self.dlg_destroyed)
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
         action.setChecked(layer.isEditable())
+        layer.editingStarted.connect(partial(self.check_actions, action, True))
+        layer.editingStopped.connect(partial(self.check_actions, action, False))
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
