@@ -17,19 +17,19 @@ INSERT INTO cat_users VALUES (4,'user4');
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
 	
 
-/*INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (1, '20602', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (2, '20603', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (3, '20604', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (4, '20606', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (5, '20605', 1, 1, true, NULL);*/
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (8, '20608', 2, 0, false, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (10, '177', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (11, '178', 1, 0, false, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (13, '179', 1, 0, false, NULL);
---INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (6, '251', 2, 1, true, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (9, '157', 2, 0, false, NULL);
---INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (7, '252', 2, 1, true, NULL);
-INSERT INTO plan_psector_x_arc (id, arc_id, psector_id, state, doable, descript) VALUES (12, '339', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc VALUES (2, '20604', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc VALUES (3, '20605', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc VALUES (5, '20602', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc VALUES (6, '20606', 1, 1, true, NULL);
+INSERT INTO plan_psector_x_arc VALUES (4, '252', 2, 1, true, NULL);
+INSERT INTO plan_psector_x_arc VALUES (7, '251', 2, 1, true, NULL);
+INSERT INTO plan_psector_x_arc VALUES (8, '20608', 2, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (9, '157', 2, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (10, '177', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (11, '178', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (13, '179', 1, 0, false, NULL);
+INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL);
 
 
 
