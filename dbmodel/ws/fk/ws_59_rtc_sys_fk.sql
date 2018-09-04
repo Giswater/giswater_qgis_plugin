@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -23,7 +23,7 @@ ALTER TABLE "rtc_hydrometer_x_connec" DROP CONSTRAINT IF EXISTS "rtc_hydrometer_
 ALTER TABLE "rtc_hydrometer_x_connec" DROP CONSTRAINT IF EXISTS "rtc_hydrometer_x_connec_connec_id_fkey";
 
 ALTER TABLE "ext_rtc_hydrometer_x_value" DROP CONSTRAINT IF EXISTS "ext_rtc_hydrometer_x_value_hydrometer_id_fkey";
-
+ALTER TABLE "ext_rtc_hydrometer_x_data" DROP CONSTRAINT IF EXISTS "ext_rtc_hydrometer_x_data_hydrometer_id_fkey";
 
 
 --ADD

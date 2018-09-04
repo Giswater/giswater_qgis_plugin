@@ -168,6 +168,7 @@ ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_hydraulics_fkey" FOREIGN K
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_headloss_fkey" FOREIGN KEY ("headloss") REFERENCES "inp_value_opti_headloss" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_quality_fkey" FOREIGN KEY ("quality") REFERENCES "inp_value_opti_qual" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_unbalanced_fkey" FOREIGN KEY ("unbalanced") REFERENCES "inp_value_opti_unbal" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_period_id_fkey" FOREIGN KEY ("rtc_period_id") REFERENCES "ext_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_coefficient_fkey" FOREIGN KEY ("rtc_coefficient") REFERENCES "inp_value_opti_rtc_coef" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_valve_mode_mincut_result_fkey" FOREIGN KEY ("valve_mode_mincut_result") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_valve_mode_fkey" FOREIGN KEY ("valve_mode") REFERENCES "inp_value_opti_valvemode" ("id") ON DELETE CASCADE ON UPDATE CASCADE;

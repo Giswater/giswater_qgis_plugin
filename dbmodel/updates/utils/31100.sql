@@ -289,4 +289,3 @@ INSERT INTO config_param_system VALUES (202, 'edit_node_reduction_auto_d1d2', 'F
 INSERT INTO audit_cat_function VALUES (2496, 'gw_fct_arc_repair', 'edit', NULL, 'p_arc_id', 'Massive repair function. All the arcs that are not connected with extremal node will be reconected using the parameter arc_searchnodes', NULL, NULL, NULL);
 INSERT INTO config_param_system VALUES (203, 'ext_utils_schema', NULL, 'Text', NULL, NULL);
 
-INSERT INTO config_param_system VALUES (204, 'crm_utils_schema', NULL, 'Text',NULL , NULL);
