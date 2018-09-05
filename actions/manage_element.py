@@ -62,7 +62,7 @@ class ManageElement(ParentManage):
         self.remove_selection(True)
         if feature:
             layer = self.iface.activeLayer()
-            layer.setSelectedFeatures([feature.id()])
+            layer.selectByIds([feature.id()])
 
         # Manage i18n of the form
         #self.controller.translate_form(self.dlg, 'element')
