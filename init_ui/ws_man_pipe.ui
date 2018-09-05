@@ -207,7 +207,7 @@
          <rect>
           <x>102</x>
           <y>210</y>
-          <width>130</width>
+          <width>160</width>
           <height>18</height>
          </rect>
         </property>
@@ -1093,19 +1093,6 @@
         </property>
         <property name="margin">
          <number>3</number>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="btn_new_workcat">
-        <property name="geometry">
-         <rect>
-          <x>237</x>
-          <y>210</y>
-          <width>26</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>...</string>
         </property>
        </widget>
       </widget>

@@ -101,7 +101,6 @@ class ManNodeDialog(ParentDialog):
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, self.dialog, 'ws', 'node', nodetype_id.text()))
-        self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
         feature = self.feature
         layer = self.iface.activeLayer()
         action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
@@ -110,6 +109,9 @@ class ManNodeDialog(ParentDialog):
         action_rotation = self.dialog.findChild(QAction, "actionRotation")
         layer.editingStarted.connect(partial(self.enabled_actions, action_rotation, True))
         layer.editingStopped.connect(partial(self.enabled_actions, action_rotation, False))
+
+        # New Workcat
+        # self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
 
 
         self.dialog.destroyed.connect(self.dlg_destroyed)
