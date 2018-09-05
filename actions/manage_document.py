@@ -98,7 +98,8 @@ class ManageDocument(ParentManage):
         self.dlg_add_doc.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_doc,  table_object))
         self.dlg_add_doc.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_doc, table_object))
-        self.dlg_add_doc.tabWidget.currentChanged.connect(partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type+"_id"]))
+        if feature:
+            self.dlg_add_doc.tabWidget.currentChanged.connect(partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type+"_id"]))
 
 
         # Set default tab 'arc'

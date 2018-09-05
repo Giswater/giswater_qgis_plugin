@@ -368,7 +368,7 @@ class Master(ParentAction):
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg_estimate_result_selector, 'estimate_result_selector')
-        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector",maximize_button=False)
+        self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector", maximize_button=False)
 
 
     def populate_combo(self, combo, table_result):
