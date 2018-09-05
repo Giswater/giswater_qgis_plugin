@@ -1390,7 +1390,7 @@ class ParentDialog(QDialog):
 
         if status:
             layer.startEditing()
-            action.setActive(True)
+            action.setChecked(True)
         else:
             layer.rollBack()
             
