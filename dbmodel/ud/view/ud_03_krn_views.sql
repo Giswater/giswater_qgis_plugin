@@ -106,6 +106,7 @@ element_x_gully.id,
 element_x_gully.gully_id,
 element_x_gully.element_id,
 element.elementcat_id,
+cat_element.descript,
 element.num_elements,
 element.state,
 element.observ,
@@ -114,6 +115,7 @@ element.builtdate,
 element.enddate
 FROM element_x_gully
 JOIN element ON element.element_id = element_x_gully.element_id
+LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
 WHERE state=1;
 
 

@@ -97,6 +97,7 @@ element_x_arc.id,
 element_x_arc.arc_id,
 element_x_arc.element_id,
 element.elementcat_id,
+cat_element.descript,
 element.num_elements,
 element.state,
 element.state_type,
@@ -109,6 +110,7 @@ element.publish,
 element.inventory
 FROM element_x_arc
 JOIN element ON element.element_id = element_x_arc.element_id
+LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
 WHERE state=1;
 
 
@@ -120,6 +122,7 @@ element_x_node.id,
 element_x_node.node_id,
 element_x_node.element_id,
 element.elementcat_id,
+cat_element.descript,
 element.num_elements,
 element.state,
 element.state_type,
@@ -132,6 +135,7 @@ element.publish,
 element.inventory
 FROM element_x_node
 JOIN element ON element.element_id = element_x_node.element_id
+LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
 WHERE state=1;
 
 
@@ -143,6 +147,7 @@ element_x_connec.id,
 element_x_connec.connec_id,
 element_x_connec.element_id,
 element.elementcat_id,
+cat_element.descript,
 element.num_elements,
 element.state,
 element.state_type,
@@ -155,6 +160,7 @@ element.publish,
 element.inventory
 FROM element_x_connec
 JOIN element ON element.element_id = element_x_connec.element_id
+LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
 WHERE state=1;
 
 

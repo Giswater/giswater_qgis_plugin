@@ -96,6 +96,7 @@ INSERT INTO config_client_forms VALUES (8060, 'node form', 'utils', 'v_ui_elemen
 INSERT INTO config_client_forms VALUES (8070, 'node form', 'utils', 'v_ui_element_x_node', 'link', 12, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (8080, 'node form', 'utils', 'v_ui_element_x_node', 'publish', 13, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (8090, 'node form', 'utils', 'v_ui_element_x_node', 'inventory', 14, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (8091, 'node form', 'utils', 'v_ui_element_x_node', 'descript', 15, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (8100, 'node form', 'utils', 'v_ui_doc_x_node', 'id', 1, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (8110, 'node form', 'utils', 'v_ui_doc_x_node', 'node_id', 2, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (8120, 'node form', 'utils', 'v_ui_doc_x_node', 'doc_id', 3, true, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -156,6 +157,7 @@ INSERT INTO config_client_forms VALUES (8570, 'arc form', 'utils', 'v_ui_element
 INSERT INTO config_client_forms VALUES (8580, 'arc form', 'utils', 'v_ui_element_x_arc', 'link', 12, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (8590, 'arc form', 'utils', 'v_ui_element_x_arc', 'publish', 13, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (8600, 'arc form', 'utils', 'v_ui_element_x_arc', 'inventory', 14, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (8601, 'arc form', 'utils', 'v_ui_element_x_arc', 'descript', 15, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (18570, 'arc form', 'utils', 'v_ui_arc_x_relations', 'arc_id', 2, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (18580, 'arc form', 'utils', 'v_ui_arc_x_relations', 'featurecat_id', 3, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (8330, 'node form', 'utils', 'v_ui_om_visit_x_node', 'xcoord', 17, true, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -378,6 +380,7 @@ INSERT INTO config_client_forms VALUES (9000, 'connec form', 'utils', 'v_ui_elem
 INSERT INTO config_client_forms VALUES (9010, 'connec form', 'utils', 'v_ui_element_x_connec', 'link', 12, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (9020, 'connec form', 'utils', 'v_ui_element_x_connec', 'publish', 13, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (9030, 'connec form', 'utils', 'v_ui_element_x_connec', 'inventory', 14, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (9031, 'connec form', 'utils', 'v_ui_element_x_connec', 'descript', 15, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (9040, 'connec form', 'utils', 'v_rtc_hydrometer_x_connec', 'connec_id', 1, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (9050, 'connec form', 'utils', 'v_rtc_hydrometer_x_connec', 'n_hydrometer', 2, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (9060, 'connec form', 'utils', 'v_ui_doc_x_connec', 'id', 1, true, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -478,6 +481,7 @@ INSERT INTO config_client_forms VALUES (10300, 'gully form', 'ud', 'v_ui_element
 INSERT INTO config_client_forms VALUES (10310, 'gully form', 'ud', 'v_ui_element_x_gully', 'comment', 8, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (10320, 'gully form', 'ud', 'v_ui_element_x_gully', 'builtdate', 9, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (10330, 'gully form', 'ud', 'v_ui_element_x_gully', 'enddate', 10, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19010, 'gully form', 'ud', 'v_ui_element_x_gully', 'descript', 11, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (10340, 'gully form', 'ud', 'v_ui_doc_x_gully', 'id', 1, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (10350, 'gully form', 'ud', 'v_ui_doc_x_gully', 'gully_id', 2, true, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (10360, 'gully form', 'ud', 'v_ui_doc_x_gully', 'doc_id', 3, true, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -517,7 +521,7 @@ INSERT INTO config_client_forms VALUES (18950, 'node form', 'utils', 'v_plan_nod
 INSERT INTO config_client_forms VALUES (18910, 'node form', 'utils', 'v_plan_node', 'cost_unit', 11, false, 30, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (18920, 'node form', 'utils', 'v_plan_node', 'descript', 12, true, 318, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (18960, 'node form', 'utils', 'v_plan_node', 'expl_id', 16, false, NULL, NULL, NULL, NULL, NULL, NULL);
-
+INSERT INTO config_client_forms VALUES (18960, 'node form', 'utils', 'v_plan_node', 'expl_id', 16, false, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 --delete temporal version information needed for fk function;
