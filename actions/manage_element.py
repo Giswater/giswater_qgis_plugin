@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-    
 from functools import partial
 
-from PyQt4.QtGui import QAbstractItemView
+from PyQt4.QtGui import QAbstractItemView, QTableView
 
 import utils_giswater
 from giswater.ui_manager import AddElement                
@@ -23,9 +23,9 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         
          
-    def manage_element(self, new_element_id=True):
+    def manage_element(self, new_element_id=True, feature=None):
         """ Button 33: Add element """
-        
+
         self.new_element_id = new_element_id
         # Create the dialog and signals
         self.dlg_add_element = AddElement()
@@ -59,7 +59,10 @@ class ManageElement(ParentManage):
         self.set_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections
-        self.remove_selection(True)        
+        self.remove_selection(True)
+        if feature:
+            layer = self.iface.activeLayer()
+            layer.setSelectedFeatures([feature.id()])
 
         # Manage i18n of the form
         #self.controller.translate_form(self.dlg, 'element')
@@ -98,7 +101,12 @@ class ManageElement(ParentManage):
         # Adding auto-completion to a QLineEdit
         table_object = "element"        
         self.set_completer_object(self.dlg_add_element, table_object)
-        
+
+        # Adding auto-completion to a QLineEdit for default feature
+        geom_type = "node"
+        viewname = "v_edit_" + geom_type
+        self.set_completer_feature_id(self.dlg_add_element.feature_id, geom_type, viewname)
+
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
@@ -109,12 +117,9 @@ class ManageElement(ParentManage):
         self.dlg_add_element.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
-        
-        # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "node"
-        viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(self.dlg_add_element.feature_id, geom_type, viewname)
-        
+        self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type+"_id"]))
+
+
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
@@ -131,7 +136,21 @@ class ManageElement(ParentManage):
         self.open_dialog(self.dlg_add_element, maximize_button=False)
         return self.dlg_add_element
     
- 
+    def fill_tbl_new_element(self, dialog, geom_type, feature_id):
+
+        widget = "tbl_element_x_" + geom_type
+        widget = dialog.findChild(QTableView, widget)
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        expr_filter = geom_type + "_id = '" + str(feature_id) + "'"
+        # Set model of selected widget
+        table_name = self.schema_name + ".v_edit_" + geom_type
+        self.set_model_to_table(widget, table_name, expr_filter)
+
+        # Adding auto-completion to a QLineEdit
+        self.table_object = "element"
+        self.set_completer_object(dialog, self.table_object)
+
+
     def manage_element_accept(self, table_object):
         """ Insert or update table 'element'. Add element to selected feature """
 

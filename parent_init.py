@@ -397,11 +397,11 @@ class ParentDialog(QDialog):
         self.add_object(self.tbl_document, "doc", "v_ui_document")
 
 
-    def manage_element(self, dialog, element_id=None):
+    def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
         
         elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
-        elem.manage_element()
+        elem.manage_element(feature=feature)
         elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
 
@@ -785,7 +785,7 @@ class ParentDialog(QDialog):
         open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
         btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
-        new_element.clicked.connect(partial(self.manage_element, dialog))
+        new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
         
         # Set model of selected widget
         table_name = self.schema_name + "." + table_name   
