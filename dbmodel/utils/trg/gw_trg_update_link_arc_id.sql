@@ -54,12 +54,3 @@ $BODY$
   COST 100;
 
 
-
-DROP TRIGGER IF EXISTS gw_trg_update_link_arc_id ON "SCHEMA_NAME".connec;
-CREATE TRIGGER gw_trg_update_link_arc_id AFTER UPDATE OF arc_id ON "SCHEMA_NAME".connec
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_update_link_arc_id(connec);
-
-
-DROP TRIGGER IF EXISTS gw_trg_update_link_arc_id ON "SCHEMA_NAME".gully;
-CREATE TRIGGER gw_trg_update_link_arc_id AFTER UPDATE OF arc_id ON "SCHEMA_NAME".gully
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_update_link_arc_id(gully);

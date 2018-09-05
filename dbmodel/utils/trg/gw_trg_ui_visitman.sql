@@ -46,18 +46,4 @@ $BODY$
   COST 100;
   
 
-DROP TRIGGER IF EXISTS gw_trg_ui_visitman ON "SCHEMA_NAME".v_ui_om_visitman_x_arc;
-CREATE TRIGGER gw_trg_ui_visitman_x_arc INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visitman_x_arc FOR EACH ROW EXECUTE PROCEDURE 
-"SCHEMA_NAME".gw_trg_ui_visitman();
 
-DROP TRIGGER IF EXISTS gw_trg_ui_visitman ON "SCHEMA_NAME".v_ui_om_visitman_x_node;
-CREATE TRIGGER gw_trg_ui_visitman_x_node INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visitman_x_node FOR EACH ROW EXECUTE PROCEDURE 
-"SCHEMA_NAME".gw_trg_ui_visitman();
-
-DROP TRIGGER IF EXISTS gw_trg_ui_visitman ON "SCHEMA_NAME".v_ui_om_visitman_x_connec;
-CREATE TRIGGER gw_trg_ui_visitman_x_connec INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visitman_x_connec FOR EACH ROW EXECUTE PROCEDURE 
-"SCHEMA_NAME".gw_trg_ui_visitman();
-
-/*DROP TRIGGER IF EXISTS gw_trg_ui_visitman ON "SCHEMA_NAME".v_ui_om_visitman_x_gully;
-CREATE TRIGGER gw_trg_ui_visitman_x_gully INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visitman_x_gully FOR EACH ROW EXECUTE PROCEDURE 
-"SCHEMA_NAME".gw_trg_ui_visitman();*/
