@@ -16,7 +16,7 @@ INSERT INTO cat_users VALUES (4,'user4');
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
 	
-
+TRUNCATE plan_psector_x_arc;
 INSERT INTO plan_psector_x_arc VALUES (1, '20603', 1, 1, true, NULL);
 INSERT INTO plan_psector_x_arc VALUES (2, '20604', 1, 1, true, NULL);
 INSERT INTO plan_psector_x_arc VALUES (3, '20605', 1, 1, true, NULL);
@@ -33,11 +33,11 @@ INSERT INTO plan_psector_x_arc VALUES (12, '339', 1, 0, false, NULL);
 
 
 
-
-/*INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (1, '20599', 1, 1, true, NULL);
+TRUNCATE plan_psector_x_node;
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (1, '20599', 1, 1, true, NULL);
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (2, '20596', 1, 1, true, NULL);
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (3, '20597', 1, 1, true, NULL);
-INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (4, '20598', 1, 1, true, NULL);*/
+INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (4, '20598', 1, 1, true, NULL);
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (7, '94', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (6, '92', 1, 0, false, NULL);
 INSERT INTO plan_psector_x_node (id, node_id, psector_id, state, doable, descript) VALUES (5, '91', 1, 0, false, NULL);
