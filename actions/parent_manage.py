@@ -387,7 +387,7 @@ class ParentManage(ParentAction, object):
         self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
         self.description = utils_giswater.getWidgetText(dialog, "descript")
         
-    def tab_feature_changed(self, dialog, table_object):
+    def tab_feature_changed(self, dialog, table_object, feature_id=None):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """

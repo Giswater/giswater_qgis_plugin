@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-    
-from PyQt4.QtGui import QAbstractItemView
+from PyQt4.QtGui import QAbstractItemView, QTableView
 
 from functools import partial
 
@@ -32,7 +32,7 @@ class ManageDocument(ParentManage):
         self.manage_document()
                 
 
-    def manage_document(self, tablename=None, qtable=None, item_id=None):
+    def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None):
         """ Button 34: Add document """
 
         # Create the dialog and signals
@@ -63,6 +63,9 @@ class ManageDocument(ParentManage):
         # Remove all previous selections
         if self.single_tool_mode:
             self.remove_selection(True)
+        if feature is not None:
+            layer = self.iface.activeLayer()
+            layer.selectByIds([feature.id()])
         
         # Set icons
         self.set_icon(self.dlg_add_doc.btn_insert, "111")
@@ -79,6 +82,11 @@ class ManageDocument(ParentManage):
         table_object = "doc"        
         self.set_completer_object(self.dlg_add_doc, table_object)
 
+        # Adding auto-completion to a QLineEdit for default feature
+        geom_type = "node"
+        viewname = "v_edit_" + geom_type
+        self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
+
         # Set signals
         self.dlg_add_doc.path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
@@ -90,11 +98,8 @@ class ManageDocument(ParentManage):
         self.dlg_add_doc.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_doc, table_object))
         self.dlg_add_doc.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_doc,  table_object))
         self.dlg_add_doc.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_doc, table_object))
-                
-        # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "node"
-        viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
+        self.dlg_add_doc.tabWidget.currentChanged.connect(partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type+"_id"]))
+
 
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
@@ -104,6 +109,16 @@ class ManageDocument(ParentManage):
         # Open the dialog
         self.open_dialog(self.dlg_add_doc, maximize_button=False)
         return self.dlg_add_doc
+
+
+    def fill_table_doc(self, dialog, geom_type, feature_id):
+        widget = "tbl_doc_x_" + geom_type
+        widget = dialog.findChild(QTableView, widget)
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        expr_filter = geom_type + "_id = '" + str(feature_id) + "'"
+        # Set model of selected widget
+        table_name = self.schema_name + ".v_edit_" + geom_type
+        self.set_model_to_table(widget, table_name, expr_filter)
 
 
     def manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None):
@@ -196,7 +211,6 @@ class ManageDocument(ParentManage):
         # Create the dialog
         self.dlg_man = DocManagement()
         self.load_settings(self.dlg_man)
-        self.dlg_man.tbl_document
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
                 
         # Adding auto-completion to a QLineEdit

@@ -370,11 +370,11 @@ class ParentDialog(QDialog):
             self.controller.log_info("set_model_to_table: widget not found")
 
 
-    def manage_document(self, dialog, doc_id=None):
+    def manage_document(self, dialog, doc_id=None, feature=None):
         """ Execute action of button 34 """
                 
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
-        doc.manage_document()
+        doc.manage_document(feature=feature)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
                  
@@ -676,7 +676,7 @@ class ParentDialog(QDialog):
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
         btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
-        btn_doc_new.clicked.connect(partial(self.manage_document, dialog))
+        btn_doc_new.clicked.connect(partial(self.manage_document, dialog, None, self.feature))
 
         # Set dates
         date = QDate.currentDate()
