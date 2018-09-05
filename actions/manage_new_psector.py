@@ -981,7 +981,7 @@ class ManageNewPsector(ParentManage):
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
         self.set_table_columns(dialog, tbl_selected_rows, tableright)
-
+        self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
     def rows_unselector(self, dialog, tbl_selected_rows, tableright, field_id_right):
         
@@ -1007,7 +1007,7 @@ class ManageNewPsector(ParentManage):
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
         self.set_table_columns(dialog, tbl_selected_rows, tableright)
-
+        self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit"""
