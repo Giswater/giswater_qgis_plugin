@@ -114,7 +114,7 @@ class ManNodeDialog(ParentDialog):
         # self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
 
 
-        self.dialog.destroyed.connect(self.dlg_destroyed)
+        self.dialog.destroyed.connect(partial(self.dlg_destroyed, layer=layer))
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")

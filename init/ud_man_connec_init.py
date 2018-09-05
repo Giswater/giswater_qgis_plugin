@@ -78,7 +78,7 @@ class ManConnecDialog(ParentDialog):
         feature = self.feature
         layer = self.iface.activeLayer()
 
-        self.dialog.destroyed.connect(self.dlg_destroyed)
+        self.dialog.destroyed.connect(partial(self.dlg_destroyed, layer=layer))
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
