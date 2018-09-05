@@ -521,7 +521,7 @@ INSERT INTO config_client_forms VALUES (18950, 'node form', 'utils', 'v_plan_nod
 INSERT INTO config_client_forms VALUES (18910, 'node form', 'utils', 'v_plan_node', 'cost_unit', 11, false, 30, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (18920, 'node form', 'utils', 'v_plan_node', 'descript', 12, true, 318, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (18960, 'node form', 'utils', 'v_plan_node', 'expl_id', 16, false, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO config_client_forms VALUES (18960, 'node form', 'utils', 'v_plan_node', 'expl_id', 16, false, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (18970, 'node form', 'utils', 'v_plan_node', 'expl_id', 16, false, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 --delete temporal version information needed for fk function;
