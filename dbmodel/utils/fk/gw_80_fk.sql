@@ -7,4 +7,4 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-select SCHEMA_NAME.gw_fct_utils_ext_fk();
+select gw_fct_utils_ext_fk();
