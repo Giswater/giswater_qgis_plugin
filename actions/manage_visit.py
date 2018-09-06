@@ -249,9 +249,11 @@ class ManageVisit(ParentManage, QObject):
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
-        if self.xyCoordinates_conected:
-            self.canvas.xyCoordinates.disconnect()
-            self.xyCoordinates_conected = None
+
+        if hasattr(self, 'xyCoordinates_conected'):
+            if self.xyCoordinates_conected:
+                self.canvas.xyCoordinates.disconnect()
+                self.xyCoordinates_conected = None
         self.canvas.setMapTool(self.previous_map_tool)
         # removed current working visit. This should cascade removing of all related records
         if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:

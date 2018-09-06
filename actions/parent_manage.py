@@ -749,9 +749,6 @@ class ParentManage(ParentAction, object):
         # if hasattr(self, 'single_tool_mode') and not self.single_tool_mode:
         #     if hasattr(self, 'previous_dialog'):
 
-        if self.xyCoordinates_conected:
-            self.canvas.xyCoordinates.disconnect()
-            self.xyCoordinates_conected = None
 
 
     def selection_init(self, dialog, table_object, query=False):
