@@ -361,7 +361,8 @@ class Go2Epa(ParentAction):
         sql = ("SELECT DISTINCT(t1.name) FROM " + self.schema_name + ".cat_hydrology AS t1"
                " INNER JOIN " + self.schema_name + ".inp_selector_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
                " WHERE t2.cur_user = current_user")
-        row = self.controller.get_rows(sql)
+        row = self.controller.get_row(sql)
+
         if row:
             utils_giswater.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
         else:
