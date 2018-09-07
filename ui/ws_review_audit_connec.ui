@@ -568,6 +568,24 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>connec_id</tabstop>
+  <tabstop>old_matcat_id</tabstop>
+  <tabstop>new_matcat_id</tabstop>
+  <tabstop>old_pnom</tabstop>
+  <tabstop>new_pnom</tabstop>
+  <tabstop>old_dnom</tabstop>
+  <tabstop>new_dnom</tabstop>
+  <tabstop>old_connectype_id</tabstop>
+  <tabstop>new_connectype_id</tabstop>
+  <tabstop>old_connecat_id</tabstop>
+  <tabstop>new_connecat_id</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>review_status_id</tabstop>
+  <tabstop>is_validated</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

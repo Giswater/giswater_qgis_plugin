@@ -423,6 +423,26 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>btn_new_workcat</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_snapping</tabstop>
+  <tabstop>tab_feature</tabstop>
+  <tabstop>tbl_cat_work_x_element</tabstop>
+  <tabstop>tbl_cat_work_x_connec</tabstop>
+  <tabstop>tbl_cat_work_x_node</tabstop>
+  <tabstop>tbl_cat_work_x_gully</tabstop>
+  <tabstop>tbl_cat_work_x_arc</tabstop>
+  <tabstop>tabWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

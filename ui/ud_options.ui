@@ -1193,15 +1193,17 @@
   <tabstop>ignore_routing</tabstop>
   <tabstop>ignore_quality</tabstop>
   <tabstop>force_main_equation</tabstop>
-  <tabstop>normal_flow_limited</tabstop>
-  <tabstop>lengthening_step</tabstop>
-  <tabstop>max_trials</tabstop>
-  <tabstop>sys_flow_tol</tabstop>
   <tabstop>variable_step</tabstop>
+  <tabstop>normal_flow_limited</tabstop>
   <tabstop>inertial_damping</tabstop>
+  <tabstop>lengthening_step</tabstop>
   <tabstop>min_surfarea</tabstop>
+  <tabstop>max_trials</tabstop>
   <tabstop>head_tolerance</tabstop>
+  <tabstop>sys_flow_tol</tabstop>
   <tabstop>lat_flow_tol</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

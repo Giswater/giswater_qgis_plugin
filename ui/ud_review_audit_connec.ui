@@ -718,6 +718,30 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>connec_id</tabstop>
+  <tabstop>old_y1</tabstop>
+  <tabstop>new_y1</tabstop>
+  <tabstop>old_y2</tabstop>
+  <tabstop>new_y2</tabstop>
+  <tabstop>old_connec_type</tabstop>
+  <tabstop>new_connec_type</tabstop>
+  <tabstop>old_geom1</tabstop>
+  <tabstop>new_geom1</tabstop>
+  <tabstop>old_geom2</tabstop>
+  <tabstop>new_geom2</tabstop>
+  <tabstop>old_matcat_id</tabstop>
+  <tabstop>new_matcat_id</tabstop>
+  <tabstop>old_shape</tabstop>
+  <tabstop>new_shape</tabstop>
+  <tabstop>old_connecat_id</tabstop>
+  <tabstop>new_connecat_id</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>review_status_id</tabstop>
+  <tabstop>is_validated</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

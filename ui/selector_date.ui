@@ -121,7 +121,10 @@
   </widget>
  </widget>
  <tabstops>
+  <tabstop>date_from</tabstop>
+  <tabstop>date_to</tabstop>
   <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
  <connections/>

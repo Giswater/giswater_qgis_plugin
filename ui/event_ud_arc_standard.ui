@@ -259,7 +259,9 @@
  <tabstops>
   <tabstop>parameter_id</tabstop>
   <tabstop>value</tabstop>
+  <tabstop>position_id</tabstop>
   <tabstop>position_value</tabstop>
+  <tabstop>text</tabstop>
   <tabstop>btn_add_picture</tabstop>
   <tabstop>btn_view_gallery</tabstop>
   <tabstop>buttonBox</tabstop>

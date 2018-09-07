@@ -640,14 +640,24 @@
  </widget>
  <tabstops>
   <tabstop>duration</tabstop>
-  <tabstop>quality_timestep</tabstop>
-  <tabstop>pattern_timestep</tabstop>
-  <tabstop>report_timestep</tabstop>
+  <tabstop>hydraulic_timestep_day</tabstop>
   <tabstop>hydraulic_timestep</tabstop>
+  <tabstop>quality_timestep_day</tabstop>
+  <tabstop>quality_timestep</tabstop>
+  <tabstop>rule_timestep_day</tabstop>
   <tabstop>rule_timestep</tabstop>
+  <tabstop>pattern_timestep_day</tabstop>
+  <tabstop>pattern_timestep</tabstop>
+  <tabstop>pattern_start_day</tabstop>
   <tabstop>pattern_start</tabstop>
+  <tabstop>report_timestep_day</tabstop>
+  <tabstop>report_timestep</tabstop>
+  <tabstop>report_start_day</tabstop>
   <tabstop>report_start</tabstop>
+  <tabstop>start_clocktime</tabstop>
   <tabstop>statistic</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

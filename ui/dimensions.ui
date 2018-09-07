@@ -266,6 +266,17 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>id</tabstop>
+  <tabstop>distance</tabstop>
+  <tabstop>btn_snapping</tabstop>
+  <tabstop>depth</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>feature_type</tabstop>
+  <tabstop>btn_orientation</tabstop>
+  <tabstop>x_symbol</tabstop>
+  <tabstop>y_symbol</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

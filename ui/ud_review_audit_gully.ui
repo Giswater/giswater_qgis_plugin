@@ -721,8 +721,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>466</width>
-       <height>272</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1170,20 +1170,46 @@
     <string>Validated:</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="new_featurecat_id">
-   <property name="geometry">
-    <rect>
-     <x>315</x>
-     <y>285</y>
-     <width>160</width>
-     <height>18</height>
-    </rect>
-   </property>
-   <property name="frame">
-    <bool>true</bool>
-   </property>
-  </widget>
  </widget>
+ <tabstops>
+  <tabstop>gully_id</tabstop>
+  <tabstop>old_top_elev</tabstop>
+  <tabstop>new_top_elev</tabstop>
+  <tabstop>old_ymax</tabstop>
+  <tabstop>new_ymax</tabstop>
+  <tabstop>old_sandbox</tabstop>
+  <tabstop>new_sandbox</tabstop>
+  <tabstop>old_gully_type</tabstop>
+  <tabstop>new_gully_type</tabstop>
+  <tabstop>old_matcat_id</tabstop>
+  <tabstop>new_matcat_id</tabstop>
+  <tabstop>old_gratecat_id</tabstop>
+  <tabstop>new_gratecat_id</tabstop>
+  <tabstop>old_units</tabstop>
+  <tabstop>new_units</tabstop>
+  <tabstop>old_groove</tabstop>
+  <tabstop>new_groove</tabstop>
+  <tabstop>old_siphon</tabstop>
+  <tabstop>new_siphon</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>review_status_id</tabstop>
+  <tabstop>is_validated</tabstop>
+  <tabstop>new_feature_id</tabstop>
+  <tabstop>old_connec_geom1</tabstop>
+  <tabstop>new_connec_geom1</tabstop>
+  <tabstop>old_feature_id</tabstop>
+  <tabstop>new_connec_matcat_id</tabstop>
+  <tabstop>new_connec_geom2</tabstop>
+  <tabstop>old_connec_geom2</tabstop>
+  <tabstop>new_connec_shape</tabstop>
+  <tabstop>old_featurecat_id</tabstop>
+  <tabstop>old_connec_arccat_id</tabstop>
+  <tabstop>old_connec_shape</tabstop>
+  <tabstop>old_connec_matcat_id</tabstop>
+  <tabstop>new_connec_arccat_id</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

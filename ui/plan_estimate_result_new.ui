@@ -209,6 +209,14 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>result_name</tabstop>
+  <tabstop>cmb_result_type</tabstop>
+  <tabstop>prices_coefficient</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>btn_calculate</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

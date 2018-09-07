@@ -96,6 +96,9 @@
   </widget>
  </widget>
  <tabstops>
+  <tabstop>chk_delete_prev</tabstop>
+  <tabstop>radius</tabstop>
+  <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>

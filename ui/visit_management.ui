@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
-    <height>783</height>
+    <width>419</width>
+    <height>669</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -188,6 +188,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_filter</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>btn_open</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>tbl_visit</tabstop>
+  <tabstop>btn_box</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -114,6 +114,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_name</tabstop>
+  <tabstop>btn_update_psector</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>tbl_psm</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -759,17 +759,27 @@
  </widget>
  <tabstops>
   <tabstop>start_date</tabstop>
+  <tabstop>start_time_day</tabstop>
   <tabstop>start_time</tabstop>
   <tabstop>end_date</tabstop>
+  <tabstop>end_time_day</tabstop>
   <tabstop>endtime</tabstop>
   <tabstop>report_start_date</tabstop>
+  <tabstop>report_start_time_day</tabstop>
+  <tabstop>report_start_time</tabstop>
+  <tabstop>report_step_day</tabstop>
   <tabstop>report_step</tabstop>
+  <tabstop>wet_step_day</tabstop>
   <tabstop>wet_step</tabstop>
+  <tabstop>dry_step_day</tabstop>
   <tabstop>dry_step</tabstop>
+  <tabstop>routing_step_day</tabstop>
   <tabstop>routing_step</tabstop>
   <tabstop>sweep_start</tabstop>
   <tabstop>sweep_end</tabstop>
   <tabstop>dry_days</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

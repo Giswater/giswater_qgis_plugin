@@ -518,6 +518,22 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>node_id</tabstop>
+  <tabstop>old_elevation</tabstop>
+  <tabstop>new_elevation</tabstop>
+  <tabstop>old_depth</tabstop>
+  <tabstop>new_depth</tabstop>
+  <tabstop>old_nodetype_id</tabstop>
+  <tabstop>new_nodetype_id</tabstop>
+  <tabstop>old_nodecat_id</tabstop>
+  <tabstop>new_nodecat_id</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>review_status_id</tabstop>
+  <tabstop>is_validated</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

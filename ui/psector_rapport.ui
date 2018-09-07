@@ -262,7 +262,6 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>txt_path</tabstop>
   <tabstop>btn_path</tabstop>
   <tabstop>chk_composer</tabstop>
   <tabstop>cmb_templates</tabstop>
@@ -273,6 +272,7 @@
   <tabstop>txt_csv_path</tabstop>
   <tabstop>btn_ok</tabstop>
   <tabstop>btn_cancel</tabstop>
+  <tabstop>txt_path</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -1265,7 +1265,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>                              </string>
+    <string/>
    </property>
    <widget class="QLabel" name="label_quality_6">
     <property name="geometry">
@@ -1379,24 +1379,31 @@
  <tabstops>
   <tabstop>units</tabstop>
   <tabstop>headloss</tabstop>
-  <tabstop>hydraulics</tabstop>
-  <tabstop>quality</tabstop>
-  <tabstop>unbalanced</tabstop>
-  <tabstop>viscosity</tabstop>
-  <tabstop>trials</tabstop>
-  <tabstop>accuracy</tabstop>
-  <tabstop>emitter_exponent</tabstop>
-  <tabstop>checkfreq</tabstop>
+  <tabstop>demand_multiplier</tabstop>
+  <tabstop>pattern</tabstop>
   <tabstop>maxcheck</tabstop>
   <tabstop>damplimit</tabstop>
-  <tabstop>hydraulics_fname</tabstop>
-  <tabstop>node_id</tabstop>
-  <tabstop>unbalanced_n</tabstop>
+  <tabstop>viscosity</tabstop>
   <tabstop>specific_gravity</tabstop>
+  <tabstop>trials</tabstop>
   <tabstop>diffusivity</tabstop>
+  <tabstop>accuracy</tabstop>
   <tabstop>tolerance</tabstop>
-  <tabstop>pattern</tabstop>
-  <tabstop>demand_multiplier</tabstop>
+  <tabstop>emitter_exponent</tabstop>
+  <tabstop>checkfreq</tabstop>
+  <tabstop>unbalanced</tabstop>
+  <tabstop>unbalanced_n</tabstop>
+  <tabstop>hydraulics</tabstop>
+  <tabstop>hydraulics_fname</tabstop>
+  <tabstop>quality</tabstop>
+  <tabstop>node_id</tabstop>
+  <tabstop>valve_mode</tabstop>
+  <tabstop>valve_mode_mincut_result</tabstop>
+  <tabstop>chk_enabled</tabstop>
+  <tabstop>rtc_period_id</tabstop>
+  <tabstop>rtc_coefficient</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

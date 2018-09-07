@@ -718,6 +718,30 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>node_id</tabstop>
+  <tabstop>old_top_elev</tabstop>
+  <tabstop>new_top_elev</tabstop>
+  <tabstop>old_ymax</tabstop>
+  <tabstop>new_ymax</tabstop>
+  <tabstop>old_node_type</tabstop>
+  <tabstop>new_node_type</tabstop>
+  <tabstop>old_geom1</tabstop>
+  <tabstop>new_geom1</tabstop>
+  <tabstop>old_geom2</tabstop>
+  <tabstop>new_geom2</tabstop>
+  <tabstop>old_matcat_id</tabstop>
+  <tabstop>new_matcat_id</tabstop>
+  <tabstop>old_shape</tabstop>
+  <tabstop>new_shape</tabstop>
+  <tabstop>old_nodecat_id</tabstop>
+  <tabstop>new_nodecat_id</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>review_status_id</tabstop>
+  <tabstop>is_validated</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

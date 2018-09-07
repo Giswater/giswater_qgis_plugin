@@ -759,6 +759,7 @@
   <tabstop>user_name</tabstop>
   <tabstop>ext_code</tabstop>
   <tabstop>visitcat_id</tabstop>
+  <tabstop>descript</tabstop>
   <tabstop>btn_add_geom</tabstop>
   <tabstop>button_box</tabstop>
   <tabstop>feature_type</tabstop>
