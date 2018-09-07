@@ -68,3 +68,5 @@ refresh MATERIALIZED VIEW v_ui_workcat_polygon_aux;
 
 select gw_fct_audit_check_project(1);
 
+INSERT INTO inp_virtual (arc_id, fusion_node, add_length) VALUES ('300', '250', false);
+
