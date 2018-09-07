@@ -230,10 +230,7 @@ arc.inventory,
 dma.macrodma_id,
 arc.expl_id,
 arc.num_value,
-CASE
-	WHEN arc.builtdate IS NOT NULL THEN arc.builtdate
-	ELSE '1900-01-01'::date
-	END AS builtdate, 
+arc.builtdate, 
 CASE
 	WHEN arc.custom_length IS NOT NULL THEN arc.custom_length::numeric(12,3)
 	ELSE st_length2d(arc.the_geom)::numeric(12,3)

@@ -140,10 +140,7 @@ cat_arc.geom2,
 cat_arc.width,
 arc.epa_type,
 arc.sector_id, 
-CASE
-	WHEN arc.builtdate IS NOT NULL THEN arc.builtdate
-	ELSE '1900-01-01'::date
-	END AS builtdate, 
+arc.builtdate, 
 arc.state,
 arc.state_type,
 arc.annotation,
