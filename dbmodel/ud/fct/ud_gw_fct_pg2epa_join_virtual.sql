@@ -23,7 +23,6 @@ pointArray2 geometry[];
 new_arc_geom public.geometry;
 
 
-                
 BEGIN
 
 --  Search path
@@ -32,6 +31,7 @@ BEGIN
 	-- Loop for the virtual arcs
 	FOR rec_virtual IN SELECT * FROM rpt_inp_arc WHERE epa_type='VIRTUAL' AND result_id=result_id_var
 	LOOP
+		RAISE NOTICE 'rec_virtual %', rec_virtual;
 
 		-- Taking values from inp_virtual arc
 		SELECT fusion_node, add_length INTO fusion_node_aux, add_length_bool FROM inp_virtual WHERE arc_id=rec_virtual.arc_id;
@@ -62,15 +62,14 @@ BEGIN
 			DELETE FROM rpt_inp_arc WHERE arc_id=rec_virtual.arc_id AND result_id=result_id_var;
 
 			-- Updating arc
-			UPDATE rpt_inp_arc SET node_1=rec_virtual.node_1, arc_id=rec_virtual.arc_id, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id AND result_id=result_id_var;
-	
+			UPDATE rpt_inp_arc SET node_1=rec_virtual.node_1, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id AND result_id=result_id_var;	
 
 		END LOOP;
 		
 		-- Taking values from the fusion node (as node2)
 		FOR rec_arc IN SELECT * FROM rpt_inp_arc WHERE node_2=rec_virtual.node_1 AND node_2=fusion_node_aux
 		LOOP
-		
+	
 			-- Looking for add or not the length of virtual arc to the destination arc
 			IF add_length_bool IS TRUE THEN
 				length_aux=st_length2d(rec_virtual.the_geom);
@@ -88,12 +87,9 @@ BEGIN
 			DELETE FROM rpt_inp_arc WHERE arc_id=rec_virtual.arc_id AND result_id=result_id_var;
 
 			-- Updating arc
-			UPDATE rpt_inp_arc SET node_2=rec_virtual.node_2, arc_id=rec_virtual.arc_id, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id AND result_id=result_id_var;
-	
+			UPDATE rpt_inp_arc SET node_2=rec_virtual.node_2, length=length+length_aux, the_geom=new_arc_geom WHERE arc_id=rec_arc.arc_id AND result_id=result_id_var;
 
 		END LOOP;
-
-
 
 	END LOOP;
 

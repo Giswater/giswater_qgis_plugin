@@ -11,9 +11,7 @@ DECLARE
 flw_type_aux text;
 
 
-
 BEGIN
-
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
@@ -22,10 +20,6 @@ BEGIN
 	-- check to_arc only to that arcs that have node_1 as the flowregulator node
 	IF NEW.to_arc IS NULL THEN
 		RETURN audit_function(2070,2420);
-	ELSE 
-		IF ((SELECT arc_id FROM v_edit_arc WHERE arc_id=NEW.to_arc AND node_1=NEW.node_id) IS NULL) THEN
-			RETURN audit_function(2072,2420);
-		END IF;
 	END IF;
 
 	-- flwreg_length
@@ -42,7 +36,6 @@ BEGIN
 		EXECUTE 'SELECT COUNT(*) FROM inp_flwreg_'||flw_type_aux||' WHERE to_arc='||quote_literal(NEW.to_arc)||' AND node_id='||quote_literal(NEW.node_id) INTO  NEW.flwreg_id;
 		NEW.flwreg_id=NEW.flwreg_id+1;
 	END IF;
-
 
 RETURN NEW;
     

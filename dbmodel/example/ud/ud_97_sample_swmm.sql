@@ -390,13 +390,13 @@ INSERT INTO inp_curve VALUES (13, 'PUMP-02', 40.000000, 0.033000);
 
 
 INSERT INTO inp_flwreg_pump (id, node_id, to_arc, flwreg_id, flwreg_length, curve_id, status, startup, shutoff) VALUES (2, '18828', '18964', 1, 1, 'PUMP-02', 'ON', 2.0000, 0.4000);
-INSERT INTO inp_flwreg_pump (id, node_id, to_arc, flwreg_id, flwreg_length, curve_id, status, startup, shutoff) VALUES (3, '238', '303', 1, 1, 'PUMP-01', 'ON', 2.0000, 0.4000);
-INSERT INTO inp_flwreg_pump (id, node_id, to_arc, flwreg_id, flwreg_length, curve_id, status, startup, shutoff) VALUES (4, '238', '303', 2, 1, 'PUMP-01', 'ON', 2.0000, 0.4000);
-INSERT INTO inp_flwreg_pump (id, node_id, to_arc, flwreg_id, flwreg_length, curve_id, status, startup, shutoff) VALUES (7, '238', '303', 3, 1, 'PUMP-01', 'ON', 2.0000, 0.4000);
+INSERT INTO inp_flwreg_pump (id, node_id, to_arc, flwreg_id, flwreg_length, curve_id, status, startup, shutoff) VALUES (3, '238', '245', 1, 1, 'PUMP-01', 'ON', 2.0000, 0.4000);
+INSERT INTO inp_flwreg_pump (id, node_id, to_arc, flwreg_id, flwreg_length, curve_id, status, startup, shutoff) VALUES (4, '238', '245', 2, 1, 'PUMP-01', 'ON', 2.0000, 0.4000);
+INSERT INTO inp_flwreg_pump (id, node_id, to_arc, flwreg_id, flwreg_length, curve_id, status, startup, shutoff) VALUES (7, '238', '245', 3, 1, 'PUMP-01', 'ON', 2.0000, 0.4000);
 
-INSERT INTO inp_flwreg_weir (id, node_id, to_arc, flwreg_id, flwreg_length, weir_type, "offset", cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge) VALUES (3, '18828', '18968', 1, 0.5, 'TRANSVERSE', 17.1500, 1.5000, NULL, NULL, 'NO', 1.0000, 1.0000, 0.0000, 0.0000, NULL);
-INSERT INTO inp_flwreg_weir (id, node_id, to_arc, flwreg_id, flwreg_length, weir_type, "offset", cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge) VALUES (1, '237', '300', 1, 0.5, 'TRANSVERSE', 16.3500, 1.5000, NULL, NULL, 'NO', 2.0000, 2.0000, 0.0000, 0.0000, NULL);
-INSERT INTO inp_flwreg_weir (id, node_id, to_arc, flwreg_id, flwreg_length, weir_type, "offset", cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge) VALUES (2, '238', '342', 1, 1, 'TRANSVERSE', 29.0000, 1.5000, NULL, NULL, 'NO', 1.0000, 1.0000, 0.0000, 0.0000, NULL);
+INSERT INTO inp_flwreg_weir (id, node_id, to_arc, flwreg_id, flwreg_length, weir_type, "offset", cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge) VALUES (3, '18828', '18969', 1, 0.5, 'TRANSVERSE', 17.1500, 1.5000, NULL, NULL, 'NO', 1.0000, 1.0000, 0.0000, 0.0000, NULL);
+INSERT INTO inp_flwreg_weir (id, node_id, to_arc, flwreg_id, flwreg_length, weir_type, "offset", cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge) VALUES (1, '237', '242', 1, 0.5, 'TRANSVERSE', 16.3500, 1.5000, NULL, NULL, 'NO', 2.0000, 2.0000, 0.0000, 0.0000, NULL);
+INSERT INTO inp_flwreg_weir (id, node_id, to_arc, flwreg_id, flwreg_length, weir_type, "offset", cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge) VALUES (2, '238', '244', 1, 1, 'TRANSVERSE', 29.0000, 1.5000, NULL, NULL, 'NO', 1.0000, 1.0000, 0.0000, 0.0000, NULL);
 
 INSERT INTO inp_junction (node_id, y0, ysur, apond) VALUES ('20598', 0.0000, 0.0000, 0.0000);
 INSERT INTO inp_junction (node_id, y0, ysur, apond) VALUES ('20599', 0.0000, 0.0000, 0.0000);
