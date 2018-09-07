@@ -29,3 +29,11 @@ INSERT INTO config_param_system VALUES (191, 'api_search_service', 'amb', NULL, 
 INSERT INTO config_param_system VALUES (192, 'api_search_minimsearch', '1', NULL, 'api_search', NULL);
 INSERT INTO config_param_system VALUES (189, 'api_search_hydrometer', '{"sys_table_id":"v_ui_hydrometer", "sys_id_field":"sys_hydrometer_id", "sys_connec_id":"sys_connec_id", "sys_search_field_1":"Hydro ccode:",  "sys_search_field_2":"Connec ccode:",  "sys_search_field_3":"State:", "sys_parent_field":"Exploitation:"}', NULL, 'apì_search_hydrometer', NULL);
 INSERT INTO config_param_system VALUES (195, 'api_search_character_number', '3', NULL, NULL, NULL);
+
+INSERT INTO config_param_system VALUES (1099, 'api_edit_force_form_refresh', '{v_anl_mincut_result_valve}', 'array', 'api', NULL);
+INSERT INTO config_param_system VALUES (1100, 'api_edit_force_canvas_refresh', '{v_anl_mincut_result_valve}', NULL, NULL, NULL);
+INSERT INTO config_param_system VALUES (1101, 'api_edit_dsbl_geom_button', '{v_anl_mincut_result_valve}', NULL, NULL, NULL);
+INSERT INTO config_param_system VALUES (1102, 'api_edit_dsbl_del_feature', '{v_anl_mincut_result_valve}', NULL, NULL, NULL);
+INSERT INTO config_param_system VALUES (1103, 'api_mincut_parameters', '{"mincut_valve_layer":"v_anl_mincut_result_valve"}', NULL, NULL, NULL);
+INSERT INTO config_param_system VALUES (1097, 'api_mincut_new_vdef', '{"mincut_state":"0", "mincut_type":"Real", "anl_cause":"Accidental", "assigned_to":"1"}', 'json', 'api_mincut', NULL);
+INSERT INTO config_param_system VALUES (1098, 'api_publish_user', 'user_dev', 'text', 'api', NULL);

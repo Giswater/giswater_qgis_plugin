@@ -30,7 +30,7 @@ BEGIN
 	-- INSERT NEW DATA INTO EXT_RTC_HYDROMETER_X_DATA
 	INSERT INTO ext_rtc_hydrometer_x_data (hydrometer_id, avg, sum, cat_period_id)
 	SELECT 
-	id,
+	hydrometer_id,
 	null,
 	m3value,
 	period_id
