@@ -73,7 +73,6 @@ class ManArcDialog(ParentDialog):
         
         # Manage buttons node forms
         self.set_button_node_form()
-        self.set_button_node_form()
 
         feature = self.feature
         layer = self.iface.activeLayer()
