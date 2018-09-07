@@ -1070,7 +1070,7 @@ CREATE TABLE "inp_treatment_node_x_pol" (
 
 
 CREATE TABLE "inp_virtual" (
-"arc_id" varchar(16),
+"arc_id" varchar(16) PRIMARY KEY,
 "fusion_node" varchar(16),
 "add_length" boolean
 );
