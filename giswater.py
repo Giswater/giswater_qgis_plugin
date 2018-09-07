@@ -12,7 +12,6 @@ from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbst
 from PyQt4.QtSql import QSqlQueryModel
 import os.path
 import sys  
-import utils_giswater
 from functools import partial
 
 from actions.go2epa import Go2Epa
@@ -551,6 +550,9 @@ class Giswater(QObject):
         # Manage layer names of the tables present in table 'sys_feature_cat'
         self.manage_layer_names()   
         
+        # Manage snapping layers
+        self.manage_snapping_layers()    
+        
         # Get SRID from table node
         self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
@@ -731,34 +733,6 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
-                if 'v_edit_man_pipe' == uri_table:
-                    v_edit_man_pipe = self.controller.get_layer_by_tablename('v_edit_man_pipe')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_pipe.id(), True, 2, 1, 15.0, False)
-                if 'v_edit_arc' == uri_table:
-                    v_edit_arc = self.controller.get_layer_by_tablename('v_edit_arc')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_arc.id(), True, 2, 1, 15.0, False)
-                if 'v_edit_connec' == uri_table:
-                    v_edit_connec = self.controller.get_layer_by_tablename('v_edit_connec')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_connec.id(), True, 0, 1, 15.0, False)
-                if 'v_edit_node' == uri_table:
-                    v_edit_node = self.controller.get_layer_by_tablename('v_edit_node')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_node.id(), True, 0, 1, 15.0, False)
-                if 'v_edit_gully' == uri_table:
-                    v_edit_gully = self.controller.get_layer_by_tablename('v_edit_gully')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_gully.id(), True, 0, 1, 15.0, False)
-                if 'v_edit_man_varc' == uri_table:
-                    v_edit_man_varc = self.controller.get_layer_by_tablename('v_edit_man_varc')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_varc.id(), True, 2, 1, 15.0, False)
-                if 'v_edit_man_conduit' == uri_table:
-                    v_edit_man_conduit = self.controller.get_layer_by_tablename('v_edit_man_conduit')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_conduit.id(), True, 2, 1, 15.0, False)
-                if 'v_edit_man_siphon' == uri_table:
-                    v_edit_man_siphon = self.controller.get_layer_by_tablename('v_edit_man_siphon')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_siphon.id(), True, 2, 1, 15.0, False)
-                if 'v_edit_man_vaccel' == uri_table:
-                    v_edit_man_vaccel = self.controller.get_layer_by_tablename('v_edit_man_vaccel')
-                    QgsProject.instance().setSnapSettingsForLayer(v_edit_man_vaccel.id(), True, 2, 1, 15.0, False)
-
         # Set arrow cursor
         QApplication.setOverrideCursor(Qt.ArrowCursor)       
         layers = self.iface.legendInterface().layers()        
@@ -770,24 +744,47 @@ class Giswater(QObject):
         return True
 
 
+    def manage_snapping_layers(self):
+        ''' Manage snapping of layers '''
+        
+        layer = self.controller.get_layer_by_tablename('v_edit_man_pipe')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+        layer = self.controller.get_layer_by_tablename('v_edit_arc')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+        layer = self.controller.get_layer_by_tablename('v_edit_connec')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+        layer = self.controller.get_layer_by_tablename('v_edit_node')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+        layer = self.controller.get_layer_by_tablename('v_edit_gully')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+        layer = self.controller.get_layer_by_tablename('v_edit_man_conduit')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)            
+        layer = self.controller.get_layer_by_tablename('v_edit_man_varc')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+        layer = self.controller.get_layer_by_tablename('v_edit_man_siphon')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+        layer = self.controller.get_layer_by_tablename('v_edit_man_vaccel')
+        if layer:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+            
+                    
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
         
-        if self.layer_arc_man_ud:
-            for i in range(len(self.layer_arc_man_ud)):
-                if self.layer_arc_man_ud[i]:    
-                    self.set_layer_custom_form(self.layer_arc_man_ud[i], 'man_arc')
-                    
+        # WS        
         if self.layer_arc_man_ws: 
             for i in range(len(self.layer_arc_man_ws)):
                 if self.layer_arc_man_ws[i]:      
                     self.set_layer_custom_form(self.layer_arc_man_ws[i], 'man_arc')
             
-        if self.layer_node_man_ud: 
-            for i in range(len(self.layer_node_man_ud)):
-                if self.layer_node_man_ud[i]:       
-                    self.set_layer_custom_form(self.layer_node_man_ud[i], 'man_node')
-        
         if self.layer_node_man_ws:  
             for i in range(len(self.layer_node_man_ws)):
                 if self.layer_node_man_ws[i]:   
@@ -796,16 +793,27 @@ class Giswater(QObject):
         if self.layer_connec:       
             self.set_layer_custom_form(self.layer_connec, 'connec')
             
+        if self.layer_connec_man_ws:   
+            for i in range(len(self.layer_connec_man_ws)):
+                if self.layer_connec_man_ws[i]:  
+                    self.set_layer_custom_form(self.layer_connec_man_ws[i], 'man_connec')  
+              
+        # UD      
+        if self.layer_arc_man_ud:
+            for i in range(len(self.layer_arc_man_ud)):
+                if self.layer_arc_man_ud[i]:    
+                    self.set_layer_custom_form(self.layer_arc_man_ud[i], 'man_arc')
+            
+        if self.layer_node_man_ud: 
+            for i in range(len(self.layer_node_man_ud)):
+                if self.layer_node_man_ud[i]:       
+                    self.set_layer_custom_form(self.layer_node_man_ud[i], 'man_node')                                               
+            
         if self.layer_connec_man_ud:
             for i in range(len(self.layer_connec_man_ud)):
                 if self.layer_connec_man_ud[i]:      
                     self.set_layer_custom_form(self.layer_connec_man_ud[i], 'man_connec')
             
-        if self.layer_connec_man_ws:   
-            for i in range(len(self.layer_connec_man_ws)):
-                if self.layer_connec_man_ws[i]:  
-                    self.set_layer_custom_form(self.layer_connec_man_ws[i], 'man_connec')     
-             
         if self.layer_gully:       
             self.set_layer_custom_form(self.layer_gully, 'gully') 
         if self.layer_man_gully:       
