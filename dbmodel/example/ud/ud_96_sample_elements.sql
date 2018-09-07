@@ -10376,6 +10376,7 @@ INSERT INTO man_varc (arc_id) VALUES ('20584');
 INSERT INTO man_varc (arc_id) VALUES ('20589');
 INSERT INTO man_varc (arc_id) VALUES ('20591');
 INSERT INTO man_varc (arc_id) VALUES ('20594');
+INSERT INTO man_varc (arc_id) VALUES ('300');
 INSERT INTO man_varc (arc_id) VALUES ('303');
 INSERT INTO man_varc (arc_id) VALUES ('342');
 
