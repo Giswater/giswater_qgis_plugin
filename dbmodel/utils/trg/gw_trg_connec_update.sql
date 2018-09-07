@@ -25,8 +25,8 @@ BEGIN
 	FOR linkrec IN EXECUTE querystring
 	LOOP
 		-- Initial and final connec of the LINK
-		SELECT * INTO connecRecord1 FROM v_edit_connec WHERE v_edit_connec.connec_id = linkrec.feature_id AND feature_type='CONNEC';
-		SELECT * INTO connecRecord2 FROM v_edit_connec WHERE v_edit_connec.connec_id = linkrec.exit_id AND exit_type='CONNEC'; 
+		SELECT * INTO connecRecord1 FROM v_edit_connec WHERE v_edit_connec.connec_id = linkrec.feature_id AND linkrec.feature_type='CONNEC';
+		SELECT * INTO connecRecord2 FROM v_edit_connec WHERE v_edit_connec.connec_id = linkrec.exit_id AND linkrec.exit_type='CONNEC'; 
 
 		-- Update link
 		IF (connecRecord1.connec_id = NEW.connec_id) THEN
