@@ -765,15 +765,15 @@ class Giswater(QObject):
         layer = self.controller.get_layer_by_tablename('v_edit_man_conduit')
         if layer:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)            
-        layer = self.controller.get_layer_by_tablename('v_edit_man_varc')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_man_siphon')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_man_vaccel')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+#         layer = self.controller.get_layer_by_tablename('v_edit_man_varc')
+#         if layer:
+#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+#         layer = self.controller.get_layer_by_tablename('v_edit_man_siphon')
+#         if layer:
+#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+#         layer = self.controller.get_layer_by_tablename('v_edit_man_vaccel')
+#         if layer:
+#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
             
                     
     def manage_custom_forms(self):
