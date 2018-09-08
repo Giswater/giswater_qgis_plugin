@@ -47,7 +47,7 @@ class Go2Epa(ParentAction):
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
-        # self.dlg.setWindowTitle("Options Table")
+        self.dlg_go2epa.setFixedSize(620, 300)        
 
         # Set widgets
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
@@ -636,15 +636,6 @@ class Go2Epa(ParentAction):
         self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
         self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
         
-
-    def go2epa_express(self):
-        """ Button 24: Open giswater in silent mode
-            Executes all options of File Manager: Export INP, Execute EPA software and Import results
-        """
-        
-        self.get_last_gsw_file(False)   
-        self.execute_giswater("mg_go2epa_express")
-
 
     def go2epa_result_selector(self):
         """ Button 29: Epa result selector """
