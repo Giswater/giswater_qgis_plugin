@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>617</width>
-    <height>475</height>
+    <height>302</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>File manager</string>
@@ -16,8 +22,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>422</x>
-     <y>426</y>
+     <x>642</x>
+     <y>588</y>
      <width>81</width>
      <height>23</height>
     </rect>
@@ -29,23 +35,23 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>522</x>
-     <y>426</y>
-     <width>81</width>
+     <x>462</x>
+     <y>261</y>
+     <width>133</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>Cancel</string>
+    <string>Ok</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>21</x>
-     <y>6</y>
-     <width>580</width>
-     <height>79</height>
+     <x>18</x>
+     <y>36</y>
+     <width>589</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="title">
@@ -54,8 +60,8 @@
    <widget class="QPushButton" name="btn_times">
     <property name="geometry">
      <rect>
-      <x>441</x>
-      <y>33</y>
+      <x>444</x>
+      <y>39</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -67,8 +73,8 @@
    <widget class="QPushButton" name="btn_hs_ds">
     <property name="geometry">
      <rect>
-      <x>153</x>
-      <y>33</y>
+      <x>156</x>
+      <y>39</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -80,8 +86,8 @@
    <widget class="QPushButton" name="btn_sector_selection">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>33</y>
+      <x>13</x>
+      <y>39</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -93,8 +99,8 @@
    <widget class="QPushButton" name="btn_options">
     <property name="geometry">
      <rect>
-      <x>297</x>
-      <y>33</y>
+      <x>300</x>
+      <y>39</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -107,8 +113,8 @@
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>24</x>
-     <y>105</y>
+     <x>27</x>
+     <y>576</y>
      <width>580</width>
      <height>304</height>
     </rect>
@@ -279,6 +285,51 @@
      <string>only check</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>39</x>
+     <y>201</y>
+     <width>511</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>When you finish the definition of the preprocessing options, you can use the Giswater program to export / import the files to exchange data with EPA software.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>39</x>
+     <y>162</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>INFO:</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>36</x>
+     <y>234</y>
+     <width>562</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
   </widget>
  </widget>
  <tabstops>
