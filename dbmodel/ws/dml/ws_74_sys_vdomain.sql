@@ -218,7 +218,7 @@ INSERT INTO audit_cat_table VALUES ('price_compost', 'masterplan', 'Table of com
 INSERT INTO audit_cat_table VALUES ('price_simple', 'masterplan', 'Table of simple price.', 'role_master', 0, NULL, 'role_master', 1, ' Masterplan value', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_mincut_selector_valve', 'Mincut', 'Table to config what types of valves works on mincut process', 'role_admin', 2, '>1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_shortpipe', 'Hydraulic input data', 'Contains information about short pipes (nodes on GIS features, arc on model as shutoff valve, flowmeteror check valve', 'role_edit', 2, '=arc WHERE epa_type= ''SHORTPIPE''', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_edit_rtc_hydro_data_x_connec', 'Real time control', 'Shows editable information data from hydrometers related to connecs', 'role_edit', 0, NULL, 'role_edit', 1, 'Basic operation', NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_edit_rtc_hydro_data_x_connec', 'Real time control', 'Shows editable information data from hydrometers related to connecs', 'role_edit', 0, NULL, NULL, 1, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_times', 'Hydraulic input data', 'Values of simulation times of hydraulic model', 'role_epa', 1, '>1', NULL, 1, 'Input data for hydraulic model', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('anl_mincut_cat_state', 'Mincut', 'Catalog of mincut states', 'role_admin', 3, '=3', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('sys_role', 'System', 'Table with the diferent roles of the system', 'role_admin', 3, '=6', NULL, 0, NULL, NULL, NULL);
