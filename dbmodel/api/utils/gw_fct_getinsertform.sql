@@ -19,7 +19,11 @@ DECLARE
     field_value character varying;
     formtodisplay text;
     api_version json;
-
+    v_force_formrefresh text = 'FALSE';
+    v_force_canvasrefresh text = 'FALSE';
+    v_enable_editgeom text = 'TRUE';
+    v_enable_delfeaeture text = 'TRUE';
+    
 
 BEGIN
 
@@ -38,7 +42,27 @@ BEGIN
     EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
         INTO formtodisplay
         USING table_id; 
-            
+
+--  force form refresh
+    IF table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_force_form_refresh')::text[]) THEN
+    v_force_formrefresh := 'TRUE';
+    END IF;
+
+--  force canvas refresh
+    IF table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_force_canvas_refresh')::text[]) THEN
+    v_force_canvasrefresh := 'TRUE';
+    END IF;
+
+--  dissable editgeom button
+    IF table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_dsbl_geom_button')::text[]) THEN
+    v_enable_editgeom := 'FALSE';
+    END IF;
+
+--  dissable delete button
+    IF table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_dsbl_del_feature')::text[]) THEN
+    v_enable_delfeaeture := 'FALSE';
+    END IF;
+    
 --    Check generic
     IF formtodisplay ISNULL THEN
         formtodisplay := 'F16';
@@ -143,6 +167,14 @@ raise notice 'fields %', fields;
 
 --    Control NULL's
     formtodisplay := COALESCE(formtodisplay, '');
+    v_force_formrefresh := COALESCE(v_force_formrefresh, '');
+    v_force_canvasrefresh := COALESCE(v_force_canvasrefresh, '');
+    v_enable_editgeom := COALESCE(v_enable_editgeom, '');
+    v_enable_delfeaeture := COALESCE(v_enable_delfeaeture, '');
+
+
+
+    
     fields := COALESCE(fields, '[]');    
     position := COALESCE(position, '[]');
 
@@ -150,6 +182,10 @@ raise notice 'fields %', fields;
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
         ', "formToDisplay":"' || formtodisplay || '"' ||
+    ', "forceFormRefresh":"' || v_force_formrefresh || '"' ||
+    ', "forceCanvasRefresh":"' || v_force_canvasrefresh || '"' ||
+    ', "allowEditGeometry":"' || v_enable_editgeom || '"' ||
+    ', "allowDeleteGeometry":"' || v_enable_delfeaeture || '"' ||       
         ', "fields":' || fields ||
         '}')::json;
 

@@ -19,6 +19,7 @@ DECLARE
     formPsector json;
     api_version json;
     formAddress json;
+    formVisit json;
     rec_tab record;
     v_firsttab boolean;
     v_active boolean;
@@ -57,7 +58,7 @@ BEGIN
         comboType := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','combo','dataType','string','placeholder','','disabled',false);
         
         -- Get Ids for type combo
-        SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'sys_table_id') AS id FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' ORDER BY ((value)::json->>'orderby'))a;
+        SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'sys_table_id') AS id FROM config_param_system WHERE context='api_search_network' ORDER BY ((value)::json->>'orderby'))a;
         comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
         -- Add default
@@ -68,7 +69,7 @@ BEGIN
         END IF;
     
         -- Get Names for type combo
-        SELECT array_to_json(array_agg(id))  INTO combo_json FROM (SELECT ((value)::json->'alias') AS id FROM SCHEMA_NAME.config_param_system WHERE context='api_search_network' ORDER BY ((value)::json->>'orderby'))a;    
+        SELECT array_to_json(array_agg(id))  INTO combo_json FROM (SELECT ((value)::json->'alias') AS id FROM config_param_system WHERE context='api_search_network' ORDER BY ((value)::json->>'orderby'))a;    
         comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 
         -- Add edit box to introduce search text
@@ -129,13 +130,13 @@ BEGIN
     IF rec_tab IS NOT NULL THEN
 
         -- Parameters of the municipality layer
-        SELECT ((value::json)->>'sys_table_id') INTO v_search_muni_table FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
-        SELECT ((value::json)->>'sys_id_field') INTO v_search_muni_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
-        SELECT ((value::json)->>'sys_search_field') INTO v_search_muni_search_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
-        SELECT ((value::json)->>'sys_geom_field') INTO v_search_muni_geom_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_muni';
+        SELECT ((value::json)->>'sys_table_id') INTO v_search_muni_table FROM config_param_system WHERE parameter='api_search_muni';
+        SELECT ((value::json)->>'sys_id_field') INTO v_search_muni_id_field FROM config_param_system WHERE parameter='api_search_muni';
+        SELECT ((value::json)->>'sys_search_field') INTO v_search_muni_search_field FROM config_param_system WHERE parameter='api_search_muni';
+        SELECT ((value::json)->>'sys_geom_field') INTO v_search_muni_geom_field FROM config_param_system WHERE parameter='api_search_muni';
         
         -- Get municipality vdefault
-        SELECT value::integer INTO v_search_vdef FROM SCHEMA_NAME.config_param_user WHERE parameter='search_municipality_vdefault' AND cur_user=current_user;
+        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='search_municipality_vdefault' AND cur_user=current_user;
         
         -- Init combo json
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='add_muni';
@@ -205,7 +206,7 @@ BEGIN
         comboType := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','combo','dataType','string','placeholder','','disabled',false);
 
         -- Get exploitation vdefault
-        SELECT value::integer INTO v_search_vdef FROM SCHEMA_NAME.config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user 
+        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user 
         AND value::integer IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
         IF v_search_vdef IS NULL THEN v_search_vdef=(SELECT expl_id FROM selector_expl WHERE cur_user=current_user LIMIT 1); END IF;
         
@@ -286,7 +287,8 @@ BEGIN
         v_active :=FALSE;    
 
     END IF;
-    
+       
+
 
 -- Psector tab
 --------------
@@ -298,7 +300,7 @@ BEGIN
         comboType := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','combo','dataType','string','placeholder','','disabled',false);
 
         -- Get exploitation vdefault
-        SELECT value::integer INTO v_search_vdef FROM SCHEMA_NAME.config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user 
+        SELECT value::integer INTO v_search_vdef FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user 
         AND value::integer IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
         IF v_search_vdef IS NULL THEN v_search_vdef=(SELECT expl_id FROM selector_expl WHERE cur_user=current_user LIMIT 1); END IF;
             
@@ -345,6 +347,38 @@ BEGIN
         END IF;
 
     END IF;
+
+
+-- Visit tab
+--------------
+    SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabVisit' ;
+    IF rec_tab IS NOT NULL THEN
+
+        -- Add edit box to introduce search text
+        SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='visit_search';
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+
+        -- Create array with workcat fields
+        fieldsJson := '[' || editCode || ']';
+        fieldsJson := COALESCE(fieldsJson, '[]');
+
+        -- Create workcat tab form
+        formVisit := json_build_object('tabName','visit','tabLabel','Visita', 'active', v_active );
+        formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
+
+        -- Create tabs array
+        IF v_firsttab THEN 
+            formTabs := formTabs || ',' || formVisit::text;
+        ELSE 
+            formTabs := formTabs || formVisit::text;
+        END IF;
+
+        v_firsttab := TRUE;
+        v_active :=FALSE;    
+
+    END IF;
+
+
 
 --    Finish the construction of formtabs
     formTabs := formtabs ||']';

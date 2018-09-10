@@ -29,7 +29,8 @@ DECLARE
     v_results json;
     table_arg_return text = table_id_arg;
     v_formheader text;
-	v_query_text text;
+    v_query_text text;
+    mincut_act boolean;
 
     -- fixed info type parameter(to do)
     --p_info_type integer=200;
@@ -113,12 +114,12 @@ raise notice 'Form number: %', form_info;
             ORDER BY a.attnum' 
             INTO v_the_geom
             USING table_id_arg, schemas_array[1];
-
+    
             
 --     Get geometry (to feature response)
 ------------------------------------------
     IF v_the_geom IS NOT NULL THEN
-        EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||v_the_geom||') FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
+        EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText(St_simplify('||v_the_geom||',0)) FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
             INTO v_geometry;
     END IF;
 
@@ -216,6 +217,17 @@ raise notice 'Form number: %', form_info;
 
         END IF;
 
+-- Control layer's
+------------------
+    EXECUTE 'SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = '||quote_literal(schemas_array[1])||' 
+        AND table_name = '||quote_literal(table_id_arg)||')'
+        INTO v_query_text;
+            
+    IF v_query_text::boolean IS FALSE THEN
+        RETURN ('{"status":"Failed","message":'||to_json('The info table does not exists. Check your parent-child and inforole configurations'::text)
+        ||', "apiVersion":'|| api_version ||'}')::json;
+    END IF;
+        
 
 --    Get id column
 ---------------------
@@ -235,6 +247,13 @@ raise notice 'Form number: %', form_info;
     END IF;
 
 
+--    Set mincut
+------------------
+    IF v_idname = 'arc_id'::text OR v_idname = 'node_id'::text OR v_idname = 'connec_id'::text OR v_idname = 'gully_id'::text OR v_idname = 'sys_hydrometer_id'::text THEN
+        mincut_act = TRUE;
+    ELSE
+        mincut_act = FALSE;    
+    END IF;
 
    
 --    Check generic
@@ -285,6 +304,15 @@ raise notice 'Form number: %', form_info;
 
     raise notice 'table_arg_return %', table_arg_return;
 
+
+--    Hydrometer 'id' fix
+-------------------------
+    IF v_idname = 'sys_hydrometer_id' THEN
+        v_idname = 'hydrometer_id';
+    END IF;
+
+
+
 --    Control NULL's
 ----------------------
     api_version := COALESCE(api_version, '{}');
@@ -308,6 +336,7 @@ raise notice 'Form number: %', form_info;
         ', "geometry":' || v_geometry ||
         ', "linkPath":' || link_path ||
         ', "editData":' || editable_data ||
+        ', "mincut":'    || mincut_act ||
         '}')::json;
 
 

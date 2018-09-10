@@ -37,3 +37,6 @@ INSERT INTO config_param_system VALUES (1102, 'api_edit_dsbl_del_feature', '{v_a
 INSERT INTO config_param_system VALUES (1103, 'api_mincut_parameters', '{"mincut_valve_layer":"v_anl_mincut_result_valve"}', NULL, NULL, NULL);
 INSERT INTO config_param_system VALUES (1097, 'api_mincut_new_vdef', '{"mincut_state":"0", "mincut_type":"Real", "anl_cause":"Accidental", "assigned_to":"1"}', 'json', 'api_mincut', NULL);
 INSERT INTO config_param_system VALUES (1098, 'api_publish_user', 'user_dev', 'text', 'api', NULL);
+INSERT INTO config_param_system VALUES (1100, 'api_search_visit', '{"sys_table_id":"om_visit", "sys_id_field":"id", "sys_search_field":"ext_code", "alias":"Visita", "cat_field":"ext_code", "orderby":"6"}', 'text', 'api_search_network', NULL);
+
+

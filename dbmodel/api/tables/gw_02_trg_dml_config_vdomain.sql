@@ -100,6 +100,7 @@ INSERT INTO config_web_fields VALUES (31, 'F31', 'net_type', NULL, NULL, NULL, N
 INSERT INTO config_web_fields VALUES (32, 'F31', 'net_code', NULL, NULL, NULL, NULL, NULL, 'Codi:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (33, 'F31', 'add_muni', NULL, NULL, NULL, NULL, NULL, 'Municipi:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (34, 'F31', 'add_street', NULL, NULL, NULL, NULL, NULL, 'Carrer:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_web_fields VALUES (38, 'F31', 'visit_search', NULL, NULL, NULL, NULL, NULL, 'Visita:', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 

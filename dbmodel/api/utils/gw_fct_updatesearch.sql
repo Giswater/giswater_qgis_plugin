@@ -25,24 +25,29 @@
     p_network_layer_connec varchar;
     p_network_layer_gully varchar;
     p_network_layer_element varchar;
+    p_network_layer_visit varchar;
 
     p_network_search_field_arc_id varchar;
     p_network_search_field_node_id varchar;
     p_network_search_field_connec_id varchar;
     p_network_search_field_gully_id varchar;
     p_network_search_field_element_id varchar;
+    p_network_search_field_visit_id varchar;
 
     p_network_search_field_arc_cat varchar; 
     p_network_search_field_node_cat varchar;
     p_network_search_field_connec_cat varchar;
     p_network_search_field_gully_cat varchar;
     p_network_search_field_element_cat varchar;
+    p_network_search_field_visit_cat varchar;
 
     p_network_search_field_arc varchar;
     p_network_search_field_node varchar;
     p_network_search_field_connec varchar;
     p_network_search_field_gully varchar;
     p_network_search_field_element varchar;
+    p_network_search_field_visit varchar;
+    
   
     --muni
     v_muni_layer varchar;
@@ -78,6 +83,12 @@
     v_workcat_id_field varchar;
     v_workcat_display_field varchar;
     v_workcat_geom_field varchar;
+
+    --visit
+    v_visit_layer varchar;
+    v_visit_id_field varchar;
+    v_visit_display_field varchar;
+    v_visit_geom_field varchar;
 
     --psector
     v_psector_layer varchar;
@@ -119,6 +130,7 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_connec FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
     SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
     SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_visit FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
 
     -- Layer's primary key;
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
@@ -126,6 +138,7 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_connec_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_visit_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
 
     -- Layer's field to search:
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
@@ -133,6 +146,7 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_connec FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_visit FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
    
     -- Layer's catalog field;
     SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
@@ -140,7 +154,7 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'cat_field') INTO p_network_search_field_connec_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_connec';
     SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
     SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
-
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_visit_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
     
     -- Text to search
     combo1 := search_data->>'net_type';
@@ -196,7 +210,14 @@ IF tab_arg = 'network' THEN
                  quote_literal(p_network_layer_element), '::text AS sys_table_id FROM ', p_network_layer_element);
    END IF;
 
-    raise notice'query_text %', query_text;
+  IF p_network_layer_visit IS NOT NULL THEN 
+           IF query_text IS NOT NULL THEN query_text=concat(query_text,' UNION '); END IF;
+        query_text=concat (query_text, 'SELECT ',p_network_search_field_visit_id,'::varchar AS sys_id, ',
+                 p_network_search_field_visit,'::varchar AS search_field, ', 
+                 p_network_search_field_visit_cat,'::varchar AS cat_id, ',
+                 p_network_search_field_visit_id, '::varchar AS sys_idname, ',
+                 quote_literal(p_network_layer_visit), '::text AS sys_table_id FROM ', p_network_layer_visit);
+   END IF;
 
 
 
@@ -317,9 +338,33 @@ ELSIF tab_arg = 'address' THEN
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
         FROM (SELECT '||v_workcat_display_field||' as display_name, '||quote_literal(v_workcat_layer)||' AS sys_table_id , 
         '||(v_workcat_id_field)||' AS sys_id, '||quote_literal(v_workcat_layer)||' 
-        AS sys_idname FROM '||v_workcat_layer||'  
-        WHERE '||v_workcat_display_field||' ILIKE '''||text_arg||''' LIMIT 10 )a'
+        AS sys_idname FROM '||v_workcat_layer|| '
+        WHERE '||v_workcat_display_field||'::text ILIKE '''||text_arg||''' LIMIT 10 )a'
         INTO response_json;
+
+-- Visit tab
+--------------
+    ELSIF tab_arg = 'visit' THEN
+
+        -- Parameters of the workcat layer
+    SELECT ((value::json)->>'sys_table_id') INTO v_visit_layer FROM config_param_system WHERE parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_id_field') INTO v_visit_id_field FROM config_param_system WHERE parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_search_field') INTO v_visit_display_field FROM config_param_system WHERE parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_visit_geom_field FROM config_param_system WHERE parameter='api_search_visit';
+    
+    -- Text to search
+    edit1 := search_data->>'visit_search';
+    text_arg := concat('%', edit1->>'text' ,'%');
+
+    --  Search in the visit
+    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
+        FROM (SELECT '||v_visit_display_field||' as display_name, '||quote_literal(v_visit_layer)||' AS sys_table_id , 
+        '||(v_visit_id_field)||' AS sys_id, '||quote_literal(v_visit_layer)||' 
+        AS sys_idname FROM '||v_visit_layer||'  
+        WHERE '||v_visit_display_field||'::text ILIKE '''||text_arg||''' LIMIT 10 )a'
+        INTO response_json;
+
+
 
 -- Psector tab
 --------------

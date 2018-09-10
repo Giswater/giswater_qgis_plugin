@@ -33,14 +33,11 @@ INSERT INTO config_web_tabs VALUES (245, 'v_edit_connec', 'tabVisit', 'Visit', '
 INSERT INTO config_web_tabs VALUES (246, 'v_edit_connec', 'tabDoc', 'Doc', 'Documents associats');
 
 
-
-
 INSERT INTO config_web_tabs VALUES (212, 'v_edit_node', 'tabElement', 'Element', 'Llistat d''elements');
 INSERT INTO config_web_tabs VALUES (214, 'v_edit_node', 'tabConnect', 'Connect', '{"node", "Trams aigües amunt", "Trams aigües avall"}');
 INSERT INTO config_web_tabs VALUES (215, 'v_edit_node', 'tabVisit', 'Visit', 'Històric d''events');
 INSERT INTO config_web_tabs VALUES (252, 'sector', 'tabElement', 'Elements', 'Llistat de elements que pertanyen al sector');
 INSERT INTO config_web_tabs VALUES (234, 'v_edit_connec', 'tabHydro', 'Abonat', 'Llista abonats');
-INSERT INTO config_web_tabs VALUES (262, 'v_edit_plan_psector', 'tabElement', 'Element', 'Llistat d''elements');
 INSERT INTO config_web_tabs VALUES (106, 'F31', 'tabPsector', 'Psector', 'Sectors de planejament');
 INSERT INTO config_web_tabs VALUES (105, 'F31', 'tabWorkcat', 'Expedient', 'Expedients');
 INSERT INTO config_web_tabs VALUES (104, 'F31', 'tabHydro', 'Abonat', 'Abonat');
