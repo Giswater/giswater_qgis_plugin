@@ -9,18 +9,19 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- inserts on config_web_layer
-INSERT INTO config_web_layer VALUES ('v_edit_plan_psector', false, NULL, false, 'v_edit_plan_psector', 'F11', 'Psector', 4, NULL);
-INSERT INTO config_web_layer VALUES ('v_edit_node', true, 'v_web_parent_node', false, NULL, 'F11', 'Node', 1, 'link');
+INSERT INTO config_web_layer VALUES ('v_edit_plan_psector', false, NULL, false, 'v_edit_plan_psector', 'F11', 'Psector', 5, NULL);
+INSERT INTO config_web_layer VALUES ('v_edit_node', true, 'v_web_parent_node', false, NULL, 'F11', 'Node', 2, 'link');
 INSERT INTO config_web_layer VALUES ('v_ui_element', false, NULL, false, 'v_ui_element', 'F11', 'Element', 99, 'link');
-INSERT INTO config_web_layer VALUES ('v_ui_workcat_polygon', false, NULL, false, 'v_ui_workcat_polygon', 'F14', 'Workcat', 5, NULL);
+INSERT INTO config_web_layer VALUES ('v_ui_workcat_polygon', false, NULL, false, 'v_ui_workcat_polygon', 'F14', 'Workcat', 6, NULL);
 INSERT INTO config_web_layer VALUES ('v_edit_man_junction', false, NULL, true, NULL, 'F11', 'Node', NULL, NULL);
 INSERT INTO config_web_layer VALUES ('v_edit_man_pipe', false, NULL, true, NULL, 'F13', 'Pipe', NULL, NULL);
 INSERT INTO config_web_layer VALUES ('v_edit_man_wjoin', false, NULL, true, NULL, 'F14', 'Wjoin', NULL, NULL);
-INSERT INTO config_web_layer VALUES ('v_edit_arc', true, 'v_web_parent_arc', false, NULL, 'F13', 'Arc', 2, 'link');
+INSERT INTO config_web_layer VALUES ('v_edit_arc', true, 'v_web_parent_arc', false, NULL, 'F13', 'Arc', 3, 'link');
 INSERT INTO config_web_layer VALUES ('v_ui_hydrometer', false, NULL, false, 'v_ui_hydrometer', 'F11', 'Hydrometer', 99, 'hydrometer_link');
 
 --ws specific
---INSERT INTO config_web_layer VALUES ('v_edit_connec', true, 'v_web_parent_connec', false, NULL, 'F14', 'Connec', 3, 'link');
+--INSERT INTO config_web_layer VALUES ('v_edit_connec', true, 'v_web_parent_connec', false, NULL, 'F14', 'Connec', 4, 'link');
+--INSERT INTO config_web_layer VALUES ('v_anl_mincut_result_valve', false, NULL, TRUE, NULL, 'F11', 'Mincut Valve', 1, 'link');
 
 
 
