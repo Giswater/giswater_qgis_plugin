@@ -20,6 +20,19 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA "ud" TO "qgisserver";
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ud" TO "qgisserver";
 
 
+--test
+GRANT ALL ON DATABASE "gis" TO "test" ;
+
+GRANT ALL ON SCHEMA "ws" TO "qgisserver";
+GRANT SELECT ON ALL TABLES IN SCHEMA "ws" TO "test";
+GRANT ALL ON ALL SEQUENCES IN SCHEMA "ws" TO "test";
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ws" TO "test";
+
+GRANT ALL ON SCHEMA "ud" TO "test";
+GRANT SELECT ON ALL TABLES IN SCHEMA "ud" TO "test";
+GRANT ALL ON ALL SEQUENCES IN SCHEMA "ud" TO "test";
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ud" TO "test";
+
 
 --role_basic (ampliación de permisos con las nuevas tablas y vistas de la API
 GRANT ALL ON ALL TABLES IN SCHEMA "ud" TO "role_basic";
