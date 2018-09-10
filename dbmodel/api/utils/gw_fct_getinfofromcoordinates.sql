@@ -1,4 +1,11 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromcoordinates"(p_x float8, p_y float8, p_epsg int4, p_active_layer text, p_visible_layer text, p_editable_layer text, p_zoom_ratio float8, p_device int4, p_info_type int4, p_lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromcoordinates"(p_x float8, p_y float8, p_epsg int4, p_active_layer text, p_visible_layer text, p_editable_layer text, p_zoom_ratio float8, p_device int4, p_info_type int4, p_lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
