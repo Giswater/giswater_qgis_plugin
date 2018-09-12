@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4 import QtGui, uic
+from PyQt4 import QtGui, uic, QtCore
 import os
 
 
@@ -10,6 +10,33 @@ def get_ui_class(ui_file_name):
     ui_folder_path = os.path.dirname(__file__) + os.sep + 'ui'
     ui_file_path = os.path.abspath(os.path.join(ui_folder_path, ui_file_name))
     return uic.loadUiType(ui_file_path)[0]
+
+
+FORM_CLASS = get_ui_class('api_cf.ui')
+class ApiCfUi(QtGui.QMainWindow, FORM_CLASS):
+    dlg_closed = QtCore.pyqtSignal()
+    def __init__(self):
+        QtGui.QMainWindow.__init__(self)
+        self.setupUi(self)
+
+    def closeEvent(self, event):
+        print('event: {0}'.format(event))
+        self.dlg_closed.emit()
+        return super(ApiCfUi, self).closeEvent(event)
+
+
+FORM_CLASS = get_ui_class('_api_test.ui')
+class ApiTest(QtGui.QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QtGui.QMainWindow.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('api_search.ui')
+class ApiSearchUi(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
 
 
 FORM_CLASS = get_ui_class('add_doc.ui')

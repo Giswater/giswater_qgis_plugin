@@ -10,8 +10,9 @@ from PyQt4.QtGui import QDoubleValidator
 
 """ Module with utility functions to interact with dialog and its widgets """
 from qgis.gui import QgsDateTimeEdit
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
-from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
+from PyQt4.QtGui import QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QLabel, QTextEdit, QDateEdit
+from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit
+from PyQt4.QtGui import QPixmap, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime
 
@@ -90,7 +91,7 @@ def getText(dialog, widget, return_string_null=True):
     if type(widget) is str or type(widget) is unicode:
         widget = dialog.findChild(QWidget, widget)
     if widget:
-        if type(widget) is QLineEdit:
+        if type(widget) is QLineEdit or type(widget) is QPushButton:
             text = widget.text()
         elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.value()
@@ -206,7 +207,8 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
         return None
 
     text = None
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox \
+            or type(widget) is QSpinBox or type(widget) is QPushButton:
         text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)

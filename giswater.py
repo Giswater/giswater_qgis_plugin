@@ -14,6 +14,10 @@ import os.path
 import sys  
 from functools import partial
 
+from actions.api_cf import ApiCF
+from actions.api_move_node import ApiMoveNode
+from actions.api_search import ApiSearch
+
 from actions.go2epa import Go2Epa
 from actions.basic import Basic
 from actions.edit import Edit
@@ -142,7 +146,19 @@ class Giswater(QObject):
             # Info toolbar actions
             elif int(index_action) == 36:
                 callback_function = getattr(self.info, function_name)
-                action.triggered.connect(callback_function)                
+                action.triggered.connect(callback_function)
+            elif int(index_action) == 37:
+                callback_function = getattr(self.api_cf, function_name)
+                action.triggered.connect(callback_function)
+            elif int(index_action) == 40:
+                callback_function = getattr(self.api_move_node, function_name)
+                action.triggered.connect(callback_function)
+            elif int(index_action) == 332:
+                callback_function = getattr(self.api_search, function_name)
+                action.triggered.connect(callback_function)
+            elif int(index_action) == 100:
+                callback_function = getattr(self.search_plus_api, function_name)
+                action.triggered.connect(callback_function)
             # Generic function
             else:        
                 callback_function = getattr(self, 'action_triggered')  
@@ -230,7 +246,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
+                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99, 100, 332):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -315,7 +331,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)                                      
             
         toolbar_id = "info"
-        list_actions = ['36']               
+        list_actions = ['36', '37', '40', '332']
         self.manage_toolbar(toolbar_id, list_actions)                                      
 
         # Manage action group of every toolbar
@@ -532,6 +548,9 @@ class Giswater(QObject):
         self.wsoftware = self.controller.get_project_type()
 
         # Set actions classes (define one class per plugin toolbar)
+        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_move_node = ApiMoveNode(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic.set_giswater(self)

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ws_man_node</class>
+ <widget class="QMainWindow" name="ws_man_node">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1111</width>
+    <height>676</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Junction</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QGridLayout" name="top_layout"/>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tab_main">
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab1">
+       <attribute name="title">
+        <string>Junction</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QToolBox" name="toolBox">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="page1">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>1069</width>
+             <height>457</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Page 1</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <layout class="QGridLayout" name="tab1_layout1"/>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="tab1_layout2"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>1069</width>
+             <height>403</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Page 2</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <layout class="QGridLayout" name="tab1_layout3"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="bot_layout_1"/>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="bot_layout_2"/>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_accept">
+        <property name="text">
+         <string>Accept</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>18</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionEdit"/>
+   <addaction name="actionCopyPaste"/>
+   <addaction name="actionRotation"/>
+   <addaction name="actionCatalog"/>
+   <addaction name="actionWorkcat"/>
+   <addaction name="separator"/>
+   <addaction name="actionZoom"/>
+   <addaction name="actionZoomOut"/>
+   <addaction name="actionCentered"/>
+   <addaction name="actionLink"/>
+  </widget>
+  <action name="actionZoom">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/103.png</normaloff>../icons/103.png</iconset>
+   </property>
+   <property name="text">
+    <string>zoom</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom</string>
+   </property>
+  </action>
+  <action name="actionCentered">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/104.png</normaloff>../icons/104.png</iconset>
+   </property>
+   <property name="text">
+    <string>Centered</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/107.png</normaloff>../icons/107.png</iconset>
+   </property>
+   <property name="text">
+    <string>zoomOut</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="actionCopyPaste">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/107b.png</normaloff>../icons/107b.png</iconset>
+   </property>
+   <property name="text">
+    <string>CopyPaste</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy&amp;Paste</string>
+   </property>
+  </action>
+  <action name="actionRotation">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/107c.png</normaloff>../icons/107c.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotation</string>
+   </property>
+  </action>
+  <action name="actionLink">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
+   </property>
+   <property name="text">
+    <string>actionLink</string>
+   </property>
+   <property name="toolTip">
+    <string>Link</string>
+   </property>
+  </action>
+  <action name="actionEdit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/101.png</normaloff>../icons/101.png</iconset>
+   </property>
+   <property name="text">
+    <string>edit</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionSwicthArcid">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/141.png</normaloff>../icons/141.png</iconset>
+   </property>
+   <property name="text">
+    <string>switch_arc_id</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch Arc Id</string>
+   </property>
+  </action>
+  <action name="actionWorkcat">
+   <property name="text">
+    <string>Workcat</string>
+   </property>
+  </action>
+  <action name="actionCatalog">
+   <property name="text">
+    <string>Catalog</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>tab_main</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
