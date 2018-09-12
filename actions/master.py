@@ -213,7 +213,7 @@ class Master(ParentAction):
         self.dlg_psector_selector = Multirow_selector()
         self.load_settings(self.dlg_psector_selector)
         self.dlg_psector_selector.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_psector_selector))
-        self.dlg_psector_selector.setWindowTitle("Psector")
+        self.dlg_psector_selector.setWindowTitle("Psector selector")
         utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_filter, 
             self.controller.tr('Filter by: Psector name', context_name='labels'))
         utils_giswater.setWidgetText(self.dlg_psector_selector, self.dlg_psector_selector.lbl_unselected, 

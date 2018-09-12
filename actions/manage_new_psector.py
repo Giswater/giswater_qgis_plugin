@@ -44,7 +44,7 @@ class ManageNewPsector(ParentManage):
 
         self.load_settings(self.dlg_plan_psector)
         self.plan_om = str(plan_om)
-        self.dlg_plan_psector.setWindowTitle(self.plan_om + " psector")
+        # self.dlg_plan_psector.setWindowTitle(self.plan_om + " psector")
         
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
