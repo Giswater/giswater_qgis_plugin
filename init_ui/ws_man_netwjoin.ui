@@ -301,6 +301,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="cat_pnom">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -350,6 +353,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="cat_matcat_id">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -892,6 +898,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="cat_dnom">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
