@@ -63,9 +63,9 @@ class ManageElement(ParentManage):
         if feature:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
-
+        # TODO pending translation
         # Manage i18n of the form
-        #self.controller.translate_form(self.dlg, 'element')
+        # self.controller.translate_form(self.dlg, 'element')
 
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))

@@ -263,9 +263,9 @@ class Master(ParentAction):
             dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.close_dialog))
         else:
             dlg_estimate_result_new.btn_calculate.clicked.connect(partial(self.master_estimate_result_new_calculate, dlg_estimate_result_new))            
-
+        # TODO pending translation
         # Manage i18n of the form and open it
-        self.controller.translate_form(dlg_estimate_result_new, 'estimate_result_new')
+        # self.controller.translate_form(dlg_estimate_result_new, 'estimate_result_new')
 
         self.open_dialog(dlg_estimate_result_new, dlg_name="plan_estimate_result_new", maximize_button=False)
 
@@ -365,9 +365,9 @@ class Master(ParentAction):
         # Set signals
         self.dlg_estimate_result_selector.btn_accept.clicked.connect(partial(self.master_estimate_result_selector_accept))
         self.dlg_estimate_result_selector.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_estimate_result_selector))
-
+        # TODO pending translation
         # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg_estimate_result_selector, 'estimate_result_selector')
+        # self.controller.translate_form(self.dlg_estimate_result_selector, 'estimate_result_selector')
         self.open_dialog(self.dlg_estimate_result_selector, dlg_name="plan_estimate_result_selector", maximize_button=False)
 
 

@@ -71,9 +71,9 @@ class ManageDocument(ParentManage):
         self.set_icon(self.dlg_add_doc.btn_insert, "111")
         self.set_icon(self.dlg_add_doc.btn_delete, "112")
         self.set_icon(self.dlg_add_doc.btn_snapping, "137")
-
+        # TODO pending translation
         # Manage i18n of the form
-        #self.controller.translate_form(self.dlg, 'file')
+        # self.controller.translate_form(self.dlg, 'file')
                 
         # Fill combo boxes
         self.populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
