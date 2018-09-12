@@ -303,7 +303,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QTimeEdit" name="endtime">
+   <widget class="QTimeEdit" name="end_time">
     <property name="geometry">
      <rect>
       <x>217</x>
@@ -763,7 +763,7 @@
   <tabstop>start_time</tabstop>
   <tabstop>end_date</tabstop>
   <tabstop>end_time_day</tabstop>
-  <tabstop>endtime</tabstop>
+  <tabstop>end_time</tabstop>
   <tabstop>report_start_date</tabstop>
   <tabstop>report_start_time_day</tabstop>
   <tabstop>report_start_time</tabstop>

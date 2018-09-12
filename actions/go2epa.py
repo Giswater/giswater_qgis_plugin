@@ -445,7 +445,7 @@ class Go2Epa(ParentAction):
                         time = dialog.findChild(QTimeEdit, str(column_name))
                         timeparts = time.dateTime().toString('HH:mm:ss').split(':')
                         h = int(timeparts[0]) + int(aux)
-                        aux = str(h) + ":" + str(timeparts[1]) + ":00"
+                        aux = str(h) + ":" + str(timeparts[1]) + ":" + str(timeparts[2])
                         value = aux
                     elif widget_type is QSpinBox:
                         x = dialog.findChild(QSpinBox, str(column_name))
