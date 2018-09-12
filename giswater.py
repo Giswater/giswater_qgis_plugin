@@ -15,7 +15,6 @@ import sys
 from functools import partial
 
 from actions.api_cf import ApiCF
-from actions.api_move_node import ApiMoveNode
 from actions.api_search import ApiSearch
 
 from actions.go2epa import Go2Epa
@@ -149,9 +148,6 @@ class Giswater(QObject):
                 action.triggered.connect(callback_function)
             elif int(index_action) == 37:
                 callback_function = getattr(self.api_cf, function_name)
-                action.triggered.connect(callback_function)
-            elif int(index_action) == 40:
-                callback_function = getattr(self.api_move_node, function_name)
                 action.triggered.connect(callback_function)
             elif int(index_action) == 332:
                 callback_function = getattr(self.api_search, function_name)
@@ -331,7 +327,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)                                      
             
         toolbar_id = "info"
-        list_actions = ['36', '37', '40', '332']
+        list_actions = ['36', '37', '332']
         self.manage_toolbar(toolbar_id, list_actions)                                      
 
         # Manage action group of every toolbar
@@ -549,7 +545,6 @@ class Giswater(QObject):
 
         # Set actions classes (define one class per plugin toolbar)
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.api_move_node = ApiMoveNode(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
