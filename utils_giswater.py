@@ -15,7 +15,7 @@ from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit
 from PyQt4.QtGui import QPixmap, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime
-
+from actions.ExtendedQLabel import ExtendedQLabel
 from functools import partial
 import inspect
 import os
@@ -91,7 +91,8 @@ def getText(dialog, widget, return_string_null=True):
     if type(widget) is str or type(widget) is unicode:
         widget = dialog.findChild(QWidget, widget)
     if widget:
-        if type(widget) is QLineEdit or type(widget) is QPushButton:
+        if type(widget) is QLineEdit or type(widget) is QPushButton or type(widget) is QLabel \
+                or type(widget) is ExtendedQLabel:
             text = widget.text()
         elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.value()
@@ -207,8 +208,8 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
         return None
 
     text = None
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox \
-            or type(widget) is QSpinBox or type(widget) is QPushButton:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is ExtendedQLabel \
+            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton:
         text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)
