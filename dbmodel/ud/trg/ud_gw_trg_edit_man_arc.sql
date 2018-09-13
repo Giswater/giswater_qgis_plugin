@@ -316,7 +316,7 @@ This version of Giswater is provided by Giswater Association
 				SET  y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2 , 
 				arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 				annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
-				soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
+				soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
 				buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, 
 				muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id,  postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,
 				postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, 
