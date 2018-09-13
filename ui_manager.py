@@ -24,11 +24,10 @@ class ApiCfUi(QtGui.QMainWindow, FORM_CLASS):
         self.dlg_closed.emit()
         return super(ApiCfUi, self).closeEvent(event)
 
-
-FORM_CLASS = get_ui_class('_api_test.ui')
-class ApiTest(QtGui.QMainWindow, FORM_CLASS):
+FORM_CLASS = get_ui_class('api_config.ui')
+class ApiConfigUi(QtGui.QMainWindow, FORM_CLASS):
     def __init__(self):
-        QtGui.QMainWindow.__init__(self)
+        QtGui.QDialog.__init__(self)
         self.setupUi(self)
 
 
@@ -104,13 +103,6 @@ class Cad_add_point(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('change_node_type.ui')
 class ChangeNodeType(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('config.ui')
-class ConfigUtils(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
