@@ -20,12 +20,11 @@ from PyQt4.QtCore import Qt, SIGNAL, SLOT
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-
+from actions.HyperLinkLabel import HyperLinkLabel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 import utils_giswater
-
-from api_parent import ApiParent
+from giswater.actions.api_parent import ApiParent
 from catalog import Catalog
 from ui_manager import ApiCfUi
 from ui_manager import NewWorkcat
@@ -170,7 +169,7 @@ class ApiCF(ApiParent):
             label = QLabel()
             label.setObjectName('lbl_' + field['form_label'])
             label.setText(field['form_label'].capitalize())
-            if field['widgettype'] == 1 or field['widgettype'] == 5:
+            if field['widgettype'] == 1 or field['widgettype'] == 10:
                 widget = self.add_lineedit(self.dlg_cf, field)
                 if widget.objectName() == field_id:
                     feature_id = widget.text()
@@ -184,7 +183,8 @@ class ApiCF(ApiParent):
                 pass
             elif field['widgettype'] == 8:
                 widget = self.add_button(self.dlg_cf, field)
-
+            elif field['widgettype'] == 9:
+                widget = self.add_hyperlink(self.dlg_cf, field)
             if field['layout_id'] == 0:
                 top_layout.addWidget(label, 0, field['layout_order'])
                 top_layout.addWidget(widget, 1, field['layout_order'])
@@ -376,7 +376,7 @@ class ApiCF(ApiParent):
                 validator.setNotation(QDoubleValidator().StandardNotation)
                 widget.setValidator(validator)
 
-        if field['widgettype'] == 5:
+        if field['widgettype'] == 10:
             if 'dv_table' in field:
                 table_name = field['dv_table']
                 completer = QCompleter()
@@ -451,6 +451,27 @@ class ApiCF(ApiParent):
         widget.setText(field['value'])
         # widget.setStyleSheet("Text-align:left; Text-decoration:underline")
         # widget.setFlat(True)
+        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+        function_name = 'no_function_asociated'
+
+        if 'button_function' in field:
+            if field['button_function'] is not None:
+                function_name = field['button_function']
+            else:
+                msg = ("parameter button_function is null for button " + widget.objectName())
+                self.controller.show_message(msg, 2)
+        else:
+            msg = "parameter button_function not found"
+            self.controller.show_message(msg, 2)
+
+        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
+        return widget
+
+    def add_hyperlink(self, dialog, field):
+        widget = HyperLinkLabel()
+        widget.setObjectName(field['column_id'])
+        widget.setText(field['value'])
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
         function_name = 'no_function_asociated'
@@ -613,9 +634,21 @@ class ApiCF(ApiParent):
     def no_function_asociated(self, widget=None, message_level=1):
         self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)
 
+    def action_open_url(self, dialog, result, message_level=None):
+        widget = None
+        function_name = 'no_function_associated'
+        for field in result["fields"]:
+                if field['action_function'] == 'action_link':
+                    function_name = field['button_function']
+                    widget = dialog.findChild(HyperLinkLabel, field['column_id'])
+                    break
+        if widget:
+            getattr(self, function_name)(dialog, widget, 2)
+
+
     def open_url(self, dialog, widget, message_level=None):
         path = utils_giswater.getWidgetText(dialog, widget)
-
+        self.controller.log_info(str(path))
         # Check if file exist
         if os.path.exists(path):
             # Open the document
