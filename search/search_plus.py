@@ -56,18 +56,15 @@ class SearchPlus(QObject):
             return False
 
         self.street_field_expl = self.params['street_field_expl']
-        portal_field_postal = self.params['portal_field_postal']
 
         # Set signals
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-            (self.address_fill_postal_code, self.dlg_search.address_postal_code))
-        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
             (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        # self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-        #     (self.address_get_numbers, self.dlg_search.address_exploitation, self.street_field_expl, False, False))
+        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
+            (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'name'))
         
-        self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
-            (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
+        # self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
+        #     (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
         self.dlg_search.address_street.activated.connect(partial
             (self.address_get_numbers, self.dlg_search.address_street, self.params['portal_field_code'], True))
         self.dlg_search.address_number.activated.connect(partial(self.address_zoom_portal))
@@ -486,53 +483,6 @@ class SearchPlus(QObject):
             expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
         self.set_table_columns(dialog, qtable, table_name)
-
-
-    def address_fill_postal_code(self, combo):
-        """ Fill @combo """
-
-        # Get exploitation code: 'expl_id'
-        elem = self.dlg_search.address_exploitation.itemData(self.dlg_search.address_exploitation.currentIndex())
-        code = elem[0]
-
-        # Select features of @layer applying @expr
-        layer = self.layers['expl_layer']
-        expr_filter = self.street_field_expl + " = '" + str(code) + "'"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return        
-        self.select_features_by_expr(layer, expr)
-
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)      
-        layer.removeSelection()
-        
-        # Get postcodes related with selected 'expl_id'
-        sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
-        if code != -1:
-            sql += " WHERE " + self.street_field_expl + " = '" + str(code) + "'"
-        sql += " ORDER BY postcode"
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return False
-        
-        records = [(-1, '', '')]
-        for row in rows:
-            field_code = row[0]
-            elem = [field_code, field_code, None]
-            records.append(elem)
-
-        # Fill combo
-        combo.blockSignals(True)
-        combo.clear()
-        records_sorted = sorted(records, key=operator.itemgetter(1))
-
-        for i in range(len(records_sorted)):
-            record = records_sorted[i]
-            combo.addItem(record[1], record)
-            combo.blockSignals(False)
-            
-        return True
 
 
     def load_config_data(self):
@@ -1029,7 +979,9 @@ class SearchPlus(QObject):
                 
     def address_populate(self, combo, layername, field_code, field_name):
         """ Populate @combo """
-        
+        self.dlg_search.address_street.blockSignals(True)
+        self.dlg_search.address_street.clear()
+        self.dlg_search.address_street.blockSignals(False)
         # Check if we have this search option available
         if layername not in self.layers:
             return False
@@ -1070,6 +1022,11 @@ class SearchPlus(QObject):
                 elem = [value_code, value_name, None]
             records.append(elem)
 
+        # Clear combo address_number
+        self.dlg_search.address_number.blockSignals(True)
+        self.dlg_search.address_number.clear()
+        self.dlg_search.address_number.blockSignals(False)
+
         # Fill combo     
         combo.blockSignals(True)
         combo.clear()
@@ -1085,6 +1042,10 @@ class SearchPlus(QObject):
         """ Populate civic numbers depending on value of selected @combo. 
         Build an expression with @field_code """
 
+        # Clear combo address_number
+        self.dlg_search.address_number.blockSignals(True)
+        self.dlg_search.address_number.clear()
+        self.dlg_search.address_number.blockSignals(False)
         # Get selected street
         selected = utils_giswater.getWidgetText(self.dlg_search, combo)
         if selected == 'null':
