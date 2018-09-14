@@ -63,11 +63,11 @@ class SearchPlus(QObject):
             (self.address_fill_postal_code, self.dlg_search.address_postal_code))
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
             (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-            (self.address_get_numbers, self.dlg_search.address_exploitation, self.street_field_expl, False, False))
+        # self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
+        #     (self.address_get_numbers, self.dlg_search.address_exploitation, self.street_field_expl, False, False))
         
         self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
-            (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False))
+            (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
         self.dlg_search.address_street.activated.connect(partial
             (self.address_get_numbers, self.dlg_search.address_street, self.params['portal_field_code'], True))
         self.dlg_search.address_number.activated.connect(partial(self.address_zoom_portal))

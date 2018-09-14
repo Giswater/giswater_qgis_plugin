@@ -2162,7 +2162,7 @@ class MincutParent(ParentAction, MultipleSelection):
         dialog.address_exploitation.currentIndexChanged.connect(
             partial(self.address_get_numbers, dialog, dialog.address_exploitation, self.street_field_expl[0], False, False))
         dialog.address_postal_code.currentIndexChanged.connect(
-            partial(self.address_get_numbers, dialog, dialog.address_postal_code, portal_field_postal[0], False))
+            partial(self.address_get_numbers, dialog, dialog.address_postal_code, portal_field_postal[0], False, False))
         dialog.address_street.currentIndexChanged.connect(
             partial(self.address_get_numbers, dialog, dialog.address_street, self.params['portal_field_code'], True))
         dialog.address_number.activated.connect(partial(self.address_zoom_portal, dialog))
