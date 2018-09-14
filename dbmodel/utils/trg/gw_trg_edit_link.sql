@@ -59,7 +59,7 @@ DECLARE
 	
 	count_int integer;
 	
-	link_buffer_aux double precision;
+	v_link_searchbuffer double precision;
 	
 	init_aux_arc text;
 	init_aux_node text;
@@ -73,7 +73,10 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     man_table:= TG_ARGV[0];
 
-    SELECT arc_searchnodes into link_buffer_aux FROM config;
+	-- To do (enhance link buffer using the same strategy of arcs, moving the endpoint of the link to the node candidate)
+	-- Meanwhile, v_link_searchbuffer is forced to 0.001
+	-- SELECT ??? into v_link_searchbuffer FROM config_param_system;
+	v_link_searchbuffer=0.001
 
     -- control of project type
     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
@@ -143,35 +146,35 @@ BEGIN
 		
 
 		-- arc as end point
-		SELECT arc_id, the_geom INTO arc_id_end, arc_geom_end FROM v_edit_arc WHERE ST_DWithin(link_end, v_edit_arc.the_geom, link_buffer_aux) 
+		SELECT arc_id, the_geom INTO arc_id_end, arc_geom_end FROM v_edit_arc WHERE ST_DWithin(link_end, v_edit_arc.the_geom, v_link_searchbuffer) 
 		ORDER by st_distance(link_end, v_edit_arc.the_geom) LIMIT 1;
 		
 		-- node as end point
-		SELECT node_id, the_geom INTO node_id_end, node_geom_end FROM v_edit_node WHERE ST_DWithin(link_end, v_edit_node.the_geom, link_buffer_aux) 
+		SELECT node_id, the_geom INTO node_id_end, node_geom_end FROM v_edit_node WHERE ST_DWithin(link_end, v_edit_node.the_geom, v_link_searchbuffer) 
 		ORDER by st_distance(link_end, v_edit_node.the_geom) LIMIT 1;
 		
 		-- connec as init/end point
-		SELECT connec_id, state, the_geom INTO connec_id_start, state_start, connec_geom_start FROM v_edit_connec WHERE ST_DWithin(link_start, v_edit_connec.the_geom,link_buffer_aux) 
+		SELECT connec_id, state, the_geom INTO connec_id_start, state_start, connec_geom_start FROM v_edit_connec WHERE ST_DWithin(link_start, v_edit_connec.the_geom,v_link_searchbuffer) 
 		ORDER by st_distance(link_start, v_edit_connec.the_geom) LIMIT 1;
 		
-		SELECT connec_id, the_geom INTO connec_id_end, connec_geom_end FROM v_edit_connec WHERE ST_DWithin(link_end, v_edit_connec.the_geom,link_buffer_aux) 
+		SELECT connec_id, the_geom INTO connec_id_end, connec_geom_end FROM v_edit_connec WHERE ST_DWithin(link_end, v_edit_connec.the_geom,v_link_searchbuffer) 
 		ORDER by st_distance(link_end, v_edit_connec.the_geom) LIMIT 1;
 
 		--gully as init/end point
 		IF project_type_aux='UD' then
-			SELECT gully_id, state, the_geom INTO gully_id_start, state_start, gully_geom_start FROM v_edit_gully WHERE ST_DWithin(link_start, v_edit_gully.the_geom,link_buffer_aux) 
+			SELECT gully_id, state, the_geom INTO gully_id_start, state_start, gully_geom_start FROM v_edit_gully WHERE ST_DWithin(link_start, v_edit_gully.the_geom,v_link_searchbuffer) 
 			ORDER by st_distance(link_start, v_edit_gully.the_geom) LIMIT 1;
 			
-			SELECT gully_id, the_geom INTO gully_id_end, gully_geom_end FROM v_edit_gully WHERE ST_DWithin(link_end, v_edit_gully.the_geom,link_buffer_aux) 
+			SELECT gully_id, the_geom INTO gully_id_end, gully_geom_end FROM v_edit_gully WHERE ST_DWithin(link_end, v_edit_gully.the_geom,v_link_searchbuffer) 
 			ORDER by st_distance(link_end, v_edit_gully.the_geom) LIMIT 1;
 		END IF;
 				
 		-- vnode as init/end point
 		SELECT vnode_id, state, expl_id, sector_id, dma_id, the_geom INTO vnode_id_start, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, vnode_geom_start 
-		FROM v_edit_vnode WHERE ST_DWithin(link_start, v_edit_vnode.the_geom, link_buffer_aux) ORDER by st_distance(link_start, v_edit_vnode.the_geom) LIMIT 1;
+		FROM v_edit_vnode WHERE ST_DWithin(link_start, v_edit_vnode.the_geom, v_link_searchbuffer) ORDER by st_distance(link_start, v_edit_vnode.the_geom) LIMIT 1;
 		
 		SELECT vnode_id, state, expl_id, sector_id, dma_id, the_geom INTO vnode_id_end, state_arg, expl_id_arg, sector_id_arg, dma_id_arg, vnode_geom_end 
-		FROM v_edit_vnode WHERE ST_DWithin(link_end, v_edit_vnode.the_geom, link_buffer_aux) ORDER by st_distance(link_end, v_edit_vnode.the_geom) LIMIT 1;
+		FROM v_edit_vnode WHERE ST_DWithin(link_end, v_edit_vnode.the_geom, v_link_searchbuffer) ORDER by st_distance(link_end, v_edit_vnode.the_geom) LIMIT 1;
 
 
 		-- Control init (ony enabled for connec / gully / vnode)

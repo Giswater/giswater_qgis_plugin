@@ -75,7 +75,7 @@ SELECT row_number() OVER () + 1000000 AS rid,
     v_edit_connec.state AS feature_state,
     st_x(v_edit_connec.the_geom) AS x,
     st_y(v_edit_connec.the_geom) AS y
-   FROM ud_sample.v_edit_connec
+   FROM SCHEMA_NAME.v_edit_connec
   WHERE v_edit_connec.arc_id IS NOT NULL
 
 UNION
@@ -90,7 +90,7 @@ UNION
     v_edit_gully.state AS feature_state,
     st_x(v_edit_gully.the_geom) AS x,
     st_y(v_edit_gully.the_geom) AS y
-   FROM ud_sample.v_edit_gully
+   FROM SCHEMA_NAME.v_edit_gully
   WHERE v_edit_gully.arc_id IS NOT NULL;
 
 
