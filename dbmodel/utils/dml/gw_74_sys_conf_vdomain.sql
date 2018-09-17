@@ -521,6 +521,33 @@ INSERT INTO config_client_forms VALUES (18950, 'node form', 'utils', 'v_plan_nod
 INSERT INTO config_client_forms VALUES (18910, 'node form', 'utils', 'v_plan_node', 'cost_unit', 11, false, 30, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (18920, 'node form', 'utils', 'v_plan_node', 'descript', 12, true, 318, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_client_forms VALUES (18960, 'node form', 'utils', 'v_plan_node', 'expl_id', 16, false, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19038, 'connec form', 'utils', 'v_rtc_hydrometer', 'hydrometer_id', 1, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19039, 'connec form', 'utils', 'v_rtc_hydrometer', 'hydrometer_customer_code', 2, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19040, 'connec form', 'utils', 'v_rtc_hydrometer', 'connec_id', 3, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19041, 'connec form', 'utils', 'v_rtc_hydrometer', 'connec_customer_code', 4, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19042, 'connec form', 'utils', 'v_rtc_hydrometer', 'state', 5, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19043, 'connec form', 'utils', 'v_rtc_hydrometer', 'muni_name', 6, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19044, 'connec form', 'utils', 'v_rtc_hydrometer', 'expl_id', 7, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19045, 'connec form', 'utils', 'v_rtc_hydrometer', 'expl_name', 8, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19046, 'connec form', 'utils', 'v_rtc_hydrometer', 'plot_code', 9, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19047, 'connec form', 'utils', 'v_rtc_hydrometer', 'priority_id', 10, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19048, 'connec form', 'utils', 'v_rtc_hydrometer', 'catalog_id', 11, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19049, 'connec form', 'utils', 'v_rtc_hydrometer', 'category_id', 12, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19050, 'connec form', 'utils', 'v_rtc_hydrometer', 'hydro_number', 13, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19051, 'connec form', 'utils', 'v_rtc_hydrometer', 'hydro_man_date', 14, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19052, 'connec form', 'utils', 'v_rtc_hydrometer', 'crm_number', 15, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19053, 'connec form', 'utils', 'v_rtc_hydrometer', 'customer_name', 16, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19054, 'connec form', 'utils', 'v_rtc_hydrometer', 'address1', 17, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19055, 'connec form', 'utils', 'v_rtc_hydrometer', 'address2', 18, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19056, 'connec form', 'utils', 'v_rtc_hydrometer', 'address3', 19, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19057, 'connec form', 'utils', 'v_rtc_hydrometer', 'address2_1', 20, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19058, 'connec form', 'utils', 'v_rtc_hydrometer', 'address2_2', 21, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19059, 'connec form', 'utils', 'v_rtc_hydrometer', 'address2_3', 22, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19060, 'connec form', 'utils', 'v_rtc_hydrometer', 'm3_volume', 23, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19061, 'connec form', 'utils', 'v_rtc_hydrometer', 'start_date', 24, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19062, 'connec form', 'utils', 'v_rtc_hydrometer', 'end_date', 25, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19063, 'connec form', 'utils', 'v_rtc_hydrometer', 'update_date', 26, true, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_client_forms VALUES (19064, 'connec form', 'utils', 'v_rtc_hydrometer', 'hydrometer_link', 27, true, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 
