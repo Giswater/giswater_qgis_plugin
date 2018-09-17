@@ -437,20 +437,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="text">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <widget class="QTextEdit" name="text"/>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -491,7 +478,6 @@
   <tabstop>geom1</tabstop>
   <tabstop>geom2</tabstop>
   <tabstop>geom3</tabstop>
-  <tabstop>text</tabstop>
   <tabstop>btn_add_picture</tabstop>
   <tabstop>btn_view_gallery</tabstop>
   <tabstop>buttonBox</tabstop>
