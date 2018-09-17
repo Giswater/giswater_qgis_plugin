@@ -901,7 +901,6 @@ class ManageVisit(ParentManage, QObject):
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
-            #self.populate_position_id()
             self.dlg_event.value.setText(_value)
             self.dlg_event.text.setText(text)
 
