@@ -739,6 +739,7 @@ class ManageVisit(ParentManage, QObject):
         
         # check a paramet3er_id is selected (can be that no value is available)
         parameter_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
+        parameter_text = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 1)
 
         if not parameter_id:
             message = "You need to select a valid parameter id"
@@ -778,7 +779,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_event.btn_view_gallery.setEnabled(False)
 
         # set fixed values
-        self.dlg_event.parameter_id.setText(parameter_id)
+        self.dlg_event.parameter_id.setText(parameter_text)
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         ret = self.dlg_event.exec_()
@@ -798,7 +799,10 @@ class ManageVisit(ParentManage, QObject):
             if not hasattr(self.dlg_event, field_name):
                 continue
             if type(getattr(self.dlg_event, field_name)) is QLineEdit:
-                value = getattr(self.dlg_event, field_name).text()
+                if field_name == 'parameter_id':
+                    value = parameter_id
+                else:
+                    value = getattr(self.dlg_event, field_name).text()
             if type(getattr(self.dlg_event, field_name)) is QComboBox:
                 value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
             if value:
