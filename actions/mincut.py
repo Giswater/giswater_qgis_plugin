@@ -423,7 +423,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if work_order != "":        
             sql += ", work_order = '" + str(work_order) + "'"        
         if anl_descript != "":        
-            sql += ", anl_descript = '" + str(anl_descript) + "'"        
+            sql += ", anl_descript = $$'" + str(anl_descript) + "'$$ "
         
         # Manage address
         if address_exploitation_id != -1:        
@@ -439,11 +439,11 @@ class MincutParent(ParentAction, MultipleSelection):
         if mincut_result_state == 1 or mincut_result_state == 2:
             sql += ", exec_start = '" + str(forecast_start_real) + "', exec_end = '" + str(forecast_end_real) + "'"
             if exec_from_plot != '':
-                sql += ", exec_from_plot = '" + str(exec_from_plot) + "'"
+                sql += ", exec_from_plot = $$'" + str(exec_from_plot) + "'$$"
             if exec_depth != '':
-                sql += ",  exec_depth = '" + str(exec_depth) + "'"
+                sql += ",  exec_depth = $$'" + str(exec_depth) + "'$$"
             if exec_descript != '':
-                sql += ", exec_descript = '" + str(exec_descript) + "'"     
+                sql += ", exec_descript = $$'" + str(exec_descript) + "'$$"
             if exec_user != '':
                 sql += ", exec_user = '" + str(exec_user) + "'"    
             else:
