@@ -76,7 +76,7 @@ class ApiCF(ApiParent):
         """
         self.dlg_is_destroyed = False
         self.layer = None
-        self.my_json = ''
+        self.my_json = {}
         # Get srid
         self.srid = self.controller.plugin_settings_value('srid')
 
@@ -257,7 +257,7 @@ class ApiCF(ApiParent):
             self.close_dialog(self.dlg_cf)
             return
 
-        my_json = '{' + self.my_json[:-2] + '}'
+        my_json = json.dumps(self.my_json)
         p_table_id = complet_result['tableName']
 
         sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertfields('"+str(p_table_id)+"', '"+str(feature_id)+""
@@ -342,8 +342,10 @@ class ApiCF(ApiParent):
         # Only get values if layer is editable
         if self.layer.isEditable():
             # If widget.isEditable(False) return None, here control it.
-            if value is not None:
-                self.my_json += '"'+str(widget.objectName())+'": "'+str(value)+'", '
+            if str(value)=='':
+                self.my_json[str(widget.objectName())] = None
+            else:
+                self.my_json[str(widget.objectName())] = str(value)
         self.controller.log_info(str(self.my_json))
 
     def add_lineedit(self, dialog, field):
