@@ -102,7 +102,8 @@ class ManageVisit(ParentManage, QObject):
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
         self.button_box = self.dlg_add_visit.findChild(QDialogButtonBox, 'button_box')
-        self.button_box.button(QDialogButtonBox.Ok).setEnabled(False)
+        if visit_id is None:
+            self.button_box.button(QDialogButtonBox.Ok).setEnabled(False)
 
         # Tab 'Data'/'Visit'
         self.visit_id = self.dlg_add_visit.findChild(QLineEdit, "visit_id")
@@ -222,6 +223,9 @@ class ManageVisit(ParentManage, QObject):
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
         for multiple visits management."""
+        # tab Visit
+        if self.current_tab_index == self.tab_index('VisitTab'):
+            self.manage_leave_visit_tab()
 
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
