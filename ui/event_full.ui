@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>306</width>
-    <height>622</height>
+    <height>587</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QLineEdit" name="id">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>111</x>
      <y>20</y>
      <width>181</width>
      <height>20</height>
@@ -26,7 +26,7 @@
   <widget class="QLabel" name="label_id">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>10</x>
      <y>20</y>
      <width>91</width>
      <height>19</height>
@@ -40,7 +40,7 @@
    <property name="geometry">
     <rect>
      <x>222</x>
-     <y>585</y>
+     <y>550</y>
      <width>71</width>
      <height>25</height>
     </rect>
@@ -52,7 +52,7 @@
   <widget class="QLabel" name="label_event_code">
    <property name="geometry">
     <rect>
-     <x>9</x>
+     <x>10</x>
      <y>45</y>
      <width>91</width>
      <height>19</height>
@@ -75,8 +75,8 @@
   <widget class="QLabel" name="label_visit_id">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>72</y>
+     <x>10</x>
+     <y>70</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -89,7 +89,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>72</y>
+     <y>70</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -99,7 +99,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>99</y>
+     <y>95</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -108,8 +108,8 @@
   <widget class="QLabel" name="label_position_id">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>99</y>
+     <x>10</x>
+     <y>95</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -122,7 +122,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>126</y>
+     <y>120</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -131,8 +131,8 @@
   <widget class="QLabel" name="label_position_value">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>126</y>
+     <x>10</x>
+     <y>120</y>
      <width>97</width>
      <height>19</height>
     </rect>
@@ -145,7 +145,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>153</y>
+     <y>145</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -154,8 +154,8 @@
   <widget class="QLabel" name="label_parameter_id">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>153</y>
+     <x>10</x>
+     <y>145</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -168,7 +168,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>180</y>
+     <y>170</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -177,8 +177,8 @@
   <widget class="QLabel" name="label_value">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>180</y>
+     <x>10</x>
+     <y>170</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -191,7 +191,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>207</y>
+     <y>195</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -200,8 +200,8 @@
   <widget class="QLabel" name="label_value1">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>207</y>
+     <x>10</x>
+     <y>195</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -214,7 +214,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>396</y>
+     <y>370</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -224,7 +224,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>369</y>
+     <y>345</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -233,8 +233,8 @@
   <widget class="QLabel" name="label_value2">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>234</y>
+     <x>10</x>
+     <y>220</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -246,8 +246,8 @@
   <widget class="QLabel" name="label_xcoord">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>342</y>
+     <x>10</x>
+     <y>320</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -260,7 +260,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>261</y>
+     <y>245</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -269,8 +269,8 @@
   <widget class="QLabel" name="label_compass">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>396</y>
+     <x>10</x>
+     <y>370</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -283,7 +283,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>342</y>
+     <y>320</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -293,7 +293,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>234</y>
+     <y>220</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -302,8 +302,8 @@
   <widget class="QLabel" name="label_hydrometer_id_1">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>369</y>
+     <x>10</x>
+     <y>345</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -315,8 +315,8 @@
   <widget class="QLabel" name="label_geom2">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>288</y>
+     <x>10</x>
+     <y>270</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -329,7 +329,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>288</y>
+     <y>270</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -338,8 +338,8 @@
   <widget class="QLabel" name="label_geom1">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>261</y>
+     <x>10</x>
+     <y>245</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -351,8 +351,8 @@
   <widget class="QLabel" name="label_geom3">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>315</y>
+     <x>10</x>
+     <y>295</y>
      <width>97</width>
      <height>19</height>
     </rect>
@@ -365,7 +365,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>315</y>
+     <y>295</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -374,8 +374,8 @@
   <widget class="QLabel" name="label_tstamp">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>423</y>
+     <x>10</x>
+     <y>395</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -384,21 +384,11 @@
     <string>Tstamp:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="text">
-   <property name="geometry">
-    <rect>
-     <x>111</x>
-     <y>450</y>
-     <width>181</width>
-     <height>67</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="tstamp">
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>423</y>
+     <y>395</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -407,8 +397,8 @@
   <widget class="QLabel" name="label_index_val">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>525</y>
+     <x>10</x>
+     <y>492</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -421,7 +411,7 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>525</y>
+     <y>492</y>
      <width>181</width>
      <height>20</height>
     </rect>
@@ -430,8 +420,8 @@
   <widget class="QLabel" name="label_text">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>450</y>
+     <x>10</x>
+     <y>420</y>
      <width>91</width>
      <height>19</height>
     </rect>
@@ -443,8 +433,8 @@
   <widget class="QLabel" name="label_is_last">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>552</y>
+     <x>10</x>
+     <y>517</y>
      <width>97</width>
      <height>19</height>
     </rect>
@@ -457,9 +447,19 @@
    <property name="geometry">
     <rect>
      <x>111</x>
-     <y>552</y>
+     <y>517</y>
      <width>181</width>
      <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="text">
+   <property name="geometry">
+    <rect>
+     <x>111</x>
+     <y>420</y>
+     <width>181</width>
+     <height>66</height>
     </rect>
    </property>
   </widget>
@@ -481,7 +481,6 @@
   <tabstop>ycoord</tabstop>
   <tabstop>compass</tabstop>
   <tabstop>tstamp</tabstop>
-  <tabstop>text</tabstop>
   <tabstop>index_val</tabstop>
   <tabstop>is_last</tabstop>
   <tabstop>btn_close</tabstop>
