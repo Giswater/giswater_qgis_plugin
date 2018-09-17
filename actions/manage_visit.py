@@ -43,7 +43,7 @@ class ManageVisit(ParentManage, QObject):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, is_new=False):
+    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -71,8 +71,6 @@ class ManageVisit(ParentManage, QObject):
         # Get expl_id from previus dialog
         self.expl_id = expl_id
 
-        # Set if is new visit or come from info
-        self.is_new = is_new
 
         # Get layers of every geom_type
         self.reset_lists()
