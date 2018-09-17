@@ -1178,8 +1178,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>273</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1243,8 +1243,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>273</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1937,8 +1937,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>273</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2326,7 +2326,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/33b.png</normaloff>../icons/33b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -2628,7 +2628,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/171b.png</normaloff>../icons/171b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -3072,7 +3072,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Event data&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Event data&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="styleSheet">
        <string notr="true"/>
@@ -3247,7 +3247,7 @@
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_26">
        <attribute name="title">

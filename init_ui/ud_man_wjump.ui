@@ -2530,7 +2530,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/33b.png</normaloff>../icons/33b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -2778,7 +2778,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/171b.png</normaloff>../icons/171b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -2795,6 +2795,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Link document</string>
       </property>
       <property name="text">
        <string/>
@@ -2820,7 +2823,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink document&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Unlink document</string>
       </property>
       <property name="text">
        <string/>

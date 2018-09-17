@@ -2261,7 +2261,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/33b.png</normaloff>../icons/33b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -2278,6 +2278,9 @@
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="whatsThis">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -2563,7 +2566,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/171b.png</normaloff>../icons/171b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -3182,7 +3185,7 @@
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_26">
        <attribute name="title">

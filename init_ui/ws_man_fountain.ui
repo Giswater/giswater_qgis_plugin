@@ -2754,7 +2754,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/33b.png</normaloff>../icons/33b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -2852,6 +2852,9 @@
           <height>24</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>Link hydrometer</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -2875,6 +2878,9 @@
           <height>24</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>Unlink hydrometer</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -2897,6 +2903,9 @@
           <width>24</width>
           <height>24</height>
          </rect>
+        </property>
+        <property name="toolTip">
+         <string>Open link</string>
         </property>
         <property name="text">
          <string/>
@@ -3207,7 +3216,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/171b.png</normaloff>../icons/171b.png</iconset>
       </property>
       <property name="iconSize">
        <size>

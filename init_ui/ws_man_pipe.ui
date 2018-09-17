@@ -1948,7 +1948,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/33b.png</normaloff>../icons/33b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -2160,7 +2160,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>../icons/131b.png</normaloff>../icons/131b.png</iconset>
+        <normaloff>../icons/171b.png</normaloff>../icons/171b.png</iconset>
       </property>
       <property name="iconSize">
        <size>
@@ -2638,8 +2638,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>566</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
