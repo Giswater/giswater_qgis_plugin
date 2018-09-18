@@ -20,14 +20,14 @@ from PyQt4.QtCore import Qt, SIGNAL, SLOT
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-from actions.HyperLinkLabel import HyperLinkLabel
+from giswater.actions.HyperLinkLabel import HyperLinkLabel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
-from catalog import Catalog
-from ui_manager import ApiCfUi
-from ui_manager import NewWorkcat
+from giswater.actions.catalog import Catalog
+from giswater.ui_manager import ApiCfUi
+from giswater.ui_manager import NewWorkcat
 
 
 class ApiCF(ApiParent):
