@@ -169,6 +169,7 @@ class ApiCF(ApiParent):
             label = QLabel()
             label.setObjectName('lbl_' + field['form_label'])
             label.setText(field['form_label'].capitalize())
+            label.setToolTip(field['tooltip'])
             if field['widgettype'] == 1 or field['widgettype'] == 10:
                 widget = self.add_lineedit(self.dlg_cf, field)
                 if widget.objectName() == field_id:

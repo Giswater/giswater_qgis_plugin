@@ -28,7 +28,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;New element&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string/>
       </property>
       <property name="tabShape">
        <enum>QTabWidget::Rounded</enum>
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>555</width>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
