@@ -40,6 +40,7 @@ class ParentManage(ParentAction, object):
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
 
+
     def reset_lists(self):
         """ Reset list of selected records """
 
@@ -260,7 +261,6 @@ class ParentManage(ParentAction, object):
         if table_object != 'doc':
             dialog.enddate.setEnabled(True)
 
-
         # Fill input widgets with data of the @row
         self.fill_widgets(dialog, table_object, row)
 
@@ -319,6 +319,7 @@ class ParentManage(ParentAction, object):
 
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
+        
         active_layer = self.iface.activeLayer()
         if active_layer is None:
             active_layer = self.controller.get_layer_by_tablename('version')
@@ -343,7 +344,6 @@ class ParentManage(ParentAction, object):
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
 
-
     def mouse_move(self, p):
         self.snapped_point = None
         self.vertex_marker.hide()
@@ -365,6 +365,7 @@ class ParentManage(ParentAction, object):
         else:
             self.vertex_marker.hide()
 
+
     def get_xy(self, point):
         """ Get coordinates of selected point """
 
@@ -383,14 +384,17 @@ class ParentManage(ParentAction, object):
 
 
     def get_values_from_form(self, dialog):
+        
         self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
         self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
         self.description = utils_giswater.getWidgetText(dialog, "descript")
+        
         
     def tab_feature_changed(self, dialog, table_object, feature_id=None):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
+        
         self.get_values_from_form(dialog)
         if dialog.tab_feature.currentIndex() == 3:
             dialog.btn_snapping.setEnabled(False)
@@ -750,7 +754,6 @@ class ParentManage(ParentAction, object):
         #     if hasattr(self, 'previous_dialog'):
 
 
-
     def selection_init(self, dialog, table_object, query=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
@@ -834,7 +837,6 @@ class ParentManage(ParentAction, object):
         self.controller.execute_sql(sql)
 
 
-
     def insert_feature(self, dialog, table_object, query=False):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
@@ -845,7 +847,6 @@ class ParentManage(ParentAction, object):
         # Clear list of ids
         self.ids = []
         field_id = self.geom_type + "_id"
-
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
         if feature_id == 'null':
             message = "You need to enter a feature id"
@@ -1049,6 +1050,7 @@ class ParentManage(ParentAction, object):
             self.manage_visit(visit_id=selected_object_id)
         elif "v_ui_om_visitman_x_" in table_object:
             self.manage_visit(visit_id=selected_object_id)
+
 
     def set_selectionbehavior(self, dialog):
         

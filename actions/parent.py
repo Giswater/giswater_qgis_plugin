@@ -681,8 +681,6 @@ class ParentAction(object):
         utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
 
 
-
-
     def multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
         :param QTableView widget: origin
@@ -715,6 +713,7 @@ class ParentAction(object):
             self.controller.execute_sql(sql)
             widget.model().select()
 
+
     def select_features_by_expr(self, layer, expr):
         """ Select features of @layer applying @expr """
 
@@ -728,6 +727,7 @@ class ParentAction(object):
                 layer.selectByIds(id_list)
             else:
                 layer.removeSelection()
+
 
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
@@ -757,6 +757,7 @@ class ParentAction(object):
 
             self.iface.mapCanvas().zoomScale(float(scale))
 
+
     def set_completer(self, tablename, widget, field_search, color='black'):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
@@ -784,4 +785,6 @@ class ParentAction(object):
 
         model = QStringListModel()
         model.setStringList(row)
+        
+        
         self.completer.setModel(model)

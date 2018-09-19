@@ -91,7 +91,6 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.save_rotation_vdefault)
 
-
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -109,8 +108,7 @@ class DrawProfiles(ParentMapTool):
 
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
-
-
+        
         self.nodes = []
         self.list_of_selected_nodes = []
 
@@ -575,7 +573,6 @@ class DrawProfiles(ParentMapTool):
                    " FROM  " + self.schema_name + ".v_edit_node"
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
-
             columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
 
             if row:
@@ -589,13 +586,11 @@ class DrawProfiles(ParentMapTool):
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
-
                 parameters[1] = row[0]
                 parameters[2] = row[1]
                 parameters[13] = row[2]
                 nodecat_id = row[3]
                 parameters[14] = row[4]
-
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
@@ -604,9 +599,7 @@ class DrawProfiles(ParentMapTool):
                    " FROM " + self.schema_name + ".cat_node"
                    " WHERE id = '" + str(nodecat_id) + "'")
             row = self.controller.get_row(sql)
-
             columns = ['geom1']
-
             if row:
                 if row[0] is None:
                     message = "Some parameters are missing for node catalog (Values Defaults used for)"
@@ -632,10 +625,7 @@ class DrawProfiles(ParentMapTool):
                    " FROM " + self.schema_name + ".v_edit_arc"
                    " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
-
-
             columns = ['z1','z2','cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
-
             if row:
                 # Check if we have all data for drawing
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
@@ -647,8 +637,6 @@ class DrawProfiles(ParentMapTool):
                         sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
-
-
 
                 self.memory[n][3] = row[0]
                 self.memory[n][4] = row[1]
@@ -1567,7 +1555,6 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
             self.dlg_draw_profile.cbx_template.setDisabled(False)
 
-
         if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
             self.dlg_draw_profile.btn_delete_additional_point.setDisabled(False)
 
@@ -1630,6 +1617,4 @@ class DrawProfiles(ParentMapTool):
             if type(layer) is QgsVectorLayer:
                 layer.removeSelection()
         self.canvas.refresh()
-        
-                
         

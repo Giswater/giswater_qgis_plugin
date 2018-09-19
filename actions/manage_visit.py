@@ -183,7 +183,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def set_locked_relation(self):
-        """Set geom_type and listed feature_id in tbl_relation to lock it => disable related tab."""
+        """ Set geom_type and listed feature_id in tbl_relation to lock it => disable related tab """
         
         # disable tab
         index = self.tab_index('RelationsTab')
@@ -218,10 +218,10 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_accepted(self):
-        """Do all action when closed the dialog with Ok.
+        """ Do all action when closed the dialog with Ok.
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
-        for multiple visits management."""
+        for multiple visits management. """
 
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
@@ -247,8 +247,8 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_rejected(self):
-        """Do all action when closed the dialog with Cancel or X.
-        e.g. all necessary rollbacks and cleanings."""
+        """ Do all action when closed the dialog with Cancel or X.
+        e.g. all necessary rollbacks and cleanings. """
 
         if hasattr(self, 'xyCoordinates_conected'):
             if self.xyCoordinates_conected:
@@ -264,7 +264,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def tab_index(self, tab_name):
-        """Get the index of a tab basing on objectName."""
+        """ Get the index of a tab basing on objectName """
         
         for idx in range(self.tabs.count()):
             if self.tabs.widget(idx).objectName() == tab_name:
@@ -273,11 +273,11 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit_id_change(self, dialog, text):
-        """manage action when the visit id is changed.
+        """ Manage action when the visit id is changed.
         A) Update current Visit record
         B) Fill the GUI values of the current visit
         C) load all related events in the relative table
-        D) load all related documents in the relative table."""
+        D) load all related documents in the relative table. """
 
         # A) Update current Visit record
         self.current_visit.id = int(text)
@@ -303,10 +303,10 @@ class ManageVisit(ParentManage, QObject):
 
 
     def set_feature_type_by_visit_id(self):
-        """Set the feature_type in Relation tab basing on visit_id.
+        """ Set the feature_type in Relation tab basing on visit_id.
         The steps to follow are:
         1) check geometry type looking what table contain records related with visit_id
-        2) set gemetry type."""
+        2) set gemetry type. """
         
         feature_type = None
         feature_type_index = None
@@ -338,8 +338,8 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_leave_visit_tab(self):
-        """ manage all the action when leaving the VisitTab
-        A) Manage sync between GUI values and Visit record in DB."""
+        """ Manage all the action when leaving the VisitTab
+        A) Manage sync between GUI values and Visit record in DB. """
 
         # A) fill Visit basing on GUI values
         self.current_visit.id = int(self.visit_id.text())
@@ -357,9 +357,9 @@ class ManageVisit(ParentManage, QObject):
 
 
     def update_relations(self):
-        """Save current selected features in tbl_relations. Steps are:
+        """ Save current selected features in tbl_relations. Steps are:
         A) remove all old relations related with current visit_id.
-        B) save new relations get from that listed in tbl_relations."""
+        B) save new relations get from that listed in tbl_relations. """
         
         # A) remove all old relations related with current visit_id.
         db_record = None
@@ -419,8 +419,8 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_tab_changed(self, dialog, index):
-        """Do actions when tab is exit and entered.
-        Actions depend on tab index"""
+        """ Do actions when tab is exit and entered.
+        Actions depend on tab index """
         
         # manage leaving tab
         # tab Visit
@@ -452,12 +452,13 @@ class ManageVisit(ParentManage, QObject):
 
 
     def entered_event_tab(self, dialog):
-        """Manage actions when the Event tab is entered."""
+        """ Manage actions when the Event tab is entered """
         self.set_parameter_id_combo(dialog)
 
 
     def set_parameter_id_combo(self, dialog):
-        """set parameter_id combo basing on current selections."""
+        """ Set parameter_id combo basing on current selections """
+        
         dialog.parameter_id.clear()
         sql = ("SELECT id, descript"
                " FROM " + self.schema_name + ".om_visit_parameter"
@@ -472,9 +473,9 @@ class ManageVisit(ParentManage, QObject):
 
 
     def config_relation_table(self, dialog):
-        """Set all actions related to the table, model and selectionModel.
+        """ Set all actions related to the table, model and selectionModel.
         It's necessary a centralised call because base class can create a None model
-        where all callbacks are lost ance can't be registered."""
+        where all callbacks are lost ance can't be registered. """
 
         # configure model visibility
         table_name = "v_edit_" + self.geom_type
@@ -482,9 +483,9 @@ class ManageVisit(ParentManage, QObject):
 
 
     def event_feature_type_selected(self, dialog):
-        """Manage selection change in feature_type combo box.
+        """ Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
-        setup model for features to select table."""
+        setup model for features to select table. """
         
         # 1) set the model linked to selecte features
         # 2) check if there are features related to the current visit
@@ -593,7 +594,8 @@ class ManageVisit(ParentManage, QObject):
 
 
     def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter):
-        """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
+        """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates) """
+        
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
@@ -620,7 +622,6 @@ class ManageVisit(ParentManage, QObject):
         # Refresh model with selected filter
         widget_table.model().setFilter(expr_filter)
         widget_table.model().select()
-
 
 
     def fill_combos(self):
@@ -725,7 +726,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_document(self, qtable):
-        """Access GUI to manage documents e.g Execute action of button 34 """
+        """ Access GUI to manage documents e.g Execute action of button 34 """
         
         visit_id = utils_giswater.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)        
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
@@ -735,7 +736,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def event_insert(self):
-        """Add and event basing on form asociated to the selected parameter_id."""
+        """ Add and event basing on form asociated to the selected parameter_id """
         
         # check a paramet3er_id is selected (can be that no value is available)
         parameter_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
@@ -813,14 +814,14 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_events_changed(self):
-        """Action when at a Event model is changed.
-        A) if some record is available => enable OK button of VisitDialog"""
+        """ Action when at a Event model is changed.
+        A) if some record is available => enable OK button of VisitDialog """
         state = (self.tbl_event.model().rowCount() > 0)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(state)
 
 
     def event_update(self):
-        """Update selected event."""
+        """ Update selected event """
         
         if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
@@ -942,7 +943,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def event_delete(self):
-        """Delete a selected event."""
+        """ Delete a selected event """
         
         if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
@@ -983,7 +984,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def document_open(self):
-        """Open selected document."""
+        """ Open selected document """
         
         # Get selected rows
         field_index = self.tbl_document.model().fieldIndex('path')
@@ -1011,7 +1012,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def document_delete(self):
-        """Delete record from selected rows in tbl_document."""
+        """ Delete record from selected rows in tbl_document """
         
         # Get selected rows. 0 is the column of the pk 0 'id'
         selected_list = self.tbl_document.selectionModel().selectedRows(0)  
@@ -1042,7 +1043,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def document_insert(self):
-        """Insert a docmet related to the current visit."""
+        """ Insert a docmet related to the current visit """
         
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()
@@ -1067,7 +1068,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def set_configuration(self, dialog, widget, table_name):
-        """Configuration of tables. Set visibility and width of columns."""
+        """ Configuration of tables. Set visibility and width of columns """
 
         widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
@@ -1104,11 +1105,11 @@ class ManageVisit(ParentManage, QObject):
 
 
     def populate_position_id(self):
+        
         node_list = []
         node_1 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_1')
         node_2 = self.dlg_add_visit.tbl_relation.model().record(0).value('node_2')
         node_list.append([node_1, "node 1: " + str(node_1)])
         node_list.append([node_2, "node 2: " + str(node_2)])
         utils_giswater.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
-
 

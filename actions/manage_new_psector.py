@@ -6,8 +6,6 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import subprocess
-
 from qgis.core import QgsComposition
 from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence, QCompleter
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel, QStringListModel
@@ -18,6 +16,7 @@ import os
 import sys
 import csv
 import operator
+import subprocess
 import webbrowser
 from functools import partial
 
@@ -101,7 +100,6 @@ class ManageNewPsector(ParentManage):
             self.dlg_plan_psector.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
             self.dlg_plan_psector.chk_enable_all.setEnabled(False)
-
 
         self.priority = self.dlg_plan_psector.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".value_priority ORDER BY id"
@@ -306,6 +304,7 @@ class ManageNewPsector(ParentManage):
 
 
     def enable_all(self):
+        
         value = utils_giswater.isChecked(self.dlg_plan_psector, "chk_enable_all")
         psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = ("SELECT gw_fct_plan_psector_enableall("+str(value)+", '"+str(psector_id)+"')")
@@ -317,6 +316,7 @@ class ManageNewPsector(ParentManage):
                " WHERE psector_id = '" + str(psector_id) + "'")
         self.controller.execute_sql(sql, log_sql=True)
         self.refresh_map_canvas()
+
 
     def update_total(self, dialog, qtable):
         """ Show description of product plan/om _psector as label """
@@ -567,6 +567,7 @@ class ManageNewPsector(ParentManage):
 
 
     def calulate_percents(self, tablename, psector_id, field):
+        
         psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = ("UPDATE " + self.schema_name + "." + tablename + " "
                " SET " + field + " = '" + utils_giswater.getText(self.dlg_plan_psector, field) + "'"
@@ -1009,6 +1010,7 @@ class ManageNewPsector(ParentManage):
         self.set_table_columns(dialog, tbl_selected_rows, tableright)
         self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
+
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit"""
         
@@ -1036,7 +1038,6 @@ class ManageNewPsector(ParentManage):
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
-
 
 
     def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
@@ -1087,7 +1088,7 @@ class ManageNewPsector(ParentManage):
 
 
     def document_insert(self):
-        """Insert a docmet related to the current visit."""
+        """ Insert a document related to the current visit """
 
         doc_id = self.doc_id.text()
         psector_id = self.psector_id.text()
@@ -1109,7 +1110,6 @@ class ManageNewPsector(ParentManage):
             self.controller.show_warning(message)
             return
 
-
         # Insert into new table
         sql = ("INSERT INTO " + self.schema_name + ".doc_x_psector (doc_id, psector_id)"
                " VALUES ('" + str(doc_id) + "', " + str(psector_id) + ")")
@@ -1122,7 +1122,7 @@ class ManageNewPsector(ParentManage):
 
 
     def document_delete(self):
-        """Delete record from selected rows in tbl_document."""
+        """ Delete record from selected rows in tbl_document """
 
         # Get selected rows. 0 is the column of the pk 0 'id'
         selected_list = self.tbl_document.selectionModel().selectedRows(0)
@@ -1153,10 +1153,9 @@ class ManageNewPsector(ParentManage):
 
 
     def manage_document(self, qtable):
-        """Access GUI to manage documents e.g Execute action of button 34 """
+        """ Access GUI to manage documents e.g Execute action of button 34 """
         
         psector_id = utils_giswater.getText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
-
         manage_document = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
         dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
@@ -1164,7 +1163,7 @@ class ManageNewPsector(ParentManage):
 
 
     def document_open(self):
-        """Open selected document."""
+        """ Open selected document """
 
         # Get selected rows
         field_index = self.tbl_document.model().fieldIndex('path')

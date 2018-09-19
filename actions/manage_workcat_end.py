@@ -226,6 +226,7 @@ class ManageWorkcatEnd(ParentManage):
 
     def update_geom_type(self, geom_type, ids_list):
         """ Get elements from @geom_type and update his corresponding table """
+        
         tablename = "v_edit_" + geom_type
         if self.selected_list is None:
             return

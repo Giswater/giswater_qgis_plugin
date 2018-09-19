@@ -22,6 +22,7 @@ from giswater.ui_manager import Toolbox
 from giswater.ui_manager import Csv2Pg
 from actions.api_config import ApiConfig
 
+
 class Utils(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -192,6 +193,7 @@ class Utils(ParentAction):
         # Refresh map canvas
         self.refresh_map_canvas()
 
+
     def api_config(self):
         self.config = ApiConfig(self.iface, self.settings, self.controller, self.plugin_dir)
         self.config.api_config()
@@ -235,6 +237,7 @@ class Utils(ParentAction):
 
 
     def disable_import_label(self, dialog):
+        
         csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
         if csv2pgcat_id_aux == 4:
             dialog.txt_import.setEnabled(False)
@@ -491,3 +494,4 @@ class Utils(ParentAction):
             sql = ("INSERT INTO " + self.schema_name + "." + tablename + " (fprocesscat_id, cur_user)"
                    " VALUES (" + str(fprocesscat_id) + ", current_user);")
         self.controller.execute_sql(sql)
+        

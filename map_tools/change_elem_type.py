@@ -286,7 +286,6 @@ class ChangeElemType(ParentMapTool):
             message = "The node has not been updated because no catalog has been selected!"
             self.controller.show_warning(message)
 
-
         # Close form
         self.close_dialog(self.dlg_chg_node_type)
 
@@ -301,6 +300,7 @@ class ChangeElemType(ParentMapTool):
         if layer:
             self.open_custom_form(layer, expr)
 
+
     def open_custom_form(self, layer, expr):
         """ Open custom from selected layer """
 
@@ -308,6 +308,7 @@ class ChangeElemType(ParentMapTool):
         features = [i for i in it]
         if features:
             self.iface.openFeatureForm(layer, features[0])
+             
              
     def change_elem_type(self, feature):
                         
@@ -390,8 +391,6 @@ class ChangeElemType(ParentMapTool):
                   
             # Change node type
             self.change_elem_type(snapped_feat)
-
-
 
 
     def activate(self):

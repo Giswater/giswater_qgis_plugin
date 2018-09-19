@@ -91,6 +91,7 @@ class SearchPlus(QObject):
 
         return True
 
+
     def workcat_populate(self, dialog, combo):
         """ Fill @combo """
 
@@ -240,6 +241,7 @@ class SearchPlus(QObject):
             qtable.setEnabled(False)
             qbutton.setEnabled(True)
 
+
     def force_expl(self,  workcat_id):
         """ Active exploitations are compared with workcat farms.
             If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
@@ -315,6 +317,7 @@ class SearchPlus(QObject):
                 widget.setText("Total arcs length: " + str(length))
             # TODO END
 
+
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
         folder_path = utils_giswater.getWidgetText(dialog, path)
@@ -377,6 +380,7 @@ class SearchPlus(QObject):
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
+        
         if 'nt' in sys.builtin_module_names:
             folder_path = os.path.expanduser("~\Documents")
         else:
@@ -818,17 +822,18 @@ class SearchPlus(QObject):
                 grid_layout.addWidget(button, x, 1, 1, 1)
                 self.button_link = button
 
-
         url = str(row['hydrometer_link'])
         if url is not None or url != '':
             self.button_link.clicked.connect(partial(self.open_url, url))
 
         self.hydro_info_dlg.open()
 
+
     def open_url(self, url):
         """ Open URL """
         if url:
             webbrowser.open(url)
+
 
     def network_code_create_lists(self):
         """ Create one list for each geom type and other one with all geom types """
@@ -930,6 +935,7 @@ class SearchPlus(QObject):
 
 
     def expl_name_changed(self):
+        
         self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'name')
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
 
@@ -1301,8 +1307,6 @@ class SearchPlus(QObject):
             self.controller.show_info(message)
             # Clear combo workcat_id
             utils_giswater.setWidgetText(self.dlg_search, self.dlg_search.workcat_id, "")
-            # Get layer by table_name
-            layer = self.iface.activeLayer()
             # Refresh canvas
             self.refresh_map_canvas()
 

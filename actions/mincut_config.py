@@ -16,7 +16,6 @@ import utils_giswater
 from giswater.ui_manager import Multirow_selector
 from giswater.ui_manager import Multi_selector
 from giswater.ui_manager import Mincut_edit
-
 from giswater.actions.parent import ParentAction
 
 
@@ -36,7 +35,6 @@ class MincutConfig(ParentAction):
         
         # Dialog multi_selector
         self.dlg_multi = Multi_selector()
-
         self.tbl_config = self.dlg_multi.findChild(QTableView, "tbl")
         self.btn_insert = self.dlg_multi.findChild(QPushButton, "btn_insert")
         self.btn_delete = self.dlg_multi.findChild(QPushButton, "btn_delete")
@@ -48,7 +46,6 @@ class MincutConfig(ParentAction):
         self.dlg_multi.btn_insert.clicked.connect(partial(self.fill_insert_menu, table))
         btn_close = self.dlg_multi.findChild(QPushButton, "btn_close")
         btn_close.clicked.connect(partial(self.close_dialog, self.dlg_multi))
-
 
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
         self.dlg_multi.btn_delete.clicked.connect(partial(self.delete_records_config, self.tbl_config, table))
@@ -82,7 +79,6 @@ class MincutConfig(ParentAction):
                 self.menu_valve.addAction(elem, partial(self.insert, elem, table))
 
 
-
     def insert(self, id_action, table):
         """ On action(select value from menu) execute SQL """
 
@@ -92,6 +88,7 @@ class MincutConfig(ParentAction):
         self.fill_table_config(self.tbl_config, self.schema_name+"."+table)
         self.fill_insert_menu(table)
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
+
 
     def fill_table_config(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
@@ -139,6 +136,7 @@ class MincutConfig(ParentAction):
             self.controller.execute_sql(sql)
             widget.model().select()
         self.fill_insert_menu('anl_mincut_selector_valve')
+
 
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
@@ -195,6 +193,7 @@ class MincutConfig(ParentAction):
 
 
     def mincut_selector(self):
+        
         self.dlg_mincut_sel = Multirow_selector()
         self.load_settings(self.dlg_mincut_sel)
 
@@ -323,3 +322,5 @@ class MincutConfig(ParentAction):
             layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_hydrometer')
             if layer is not None:
                 layer.triggerRepaint()
+                
+                
