@@ -7,19 +7,37 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 """ Module with utility functions to interact with dialog and its widgets """
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
+    from PyQt4.Qt import QDate, QDateTime
+    from PyQt4.QtCore import QTime
+    from PyQt4.QtGui import QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QLabel, QTextEdit, QDateEdit
+    from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit
+    from PyQt4.QtGui import QPixmap, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDoubleValidator
+    import sys    
+    if 'nt' in sys.builtin_module_names:
+        import winreg as winreg  
+else:
+    from qgis.PyQt.Qt import QDate, QDateTime
+    from qgis.PyQt.QtCore import QTime, QSortFilterProxyModel, QStringListModel
+    from qgis.PyQt.QtGui import QDoubleValidator, QPixmap
+    from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QCompleter, QDateTimeEdit
+    from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
+    import sys    
+    if 'nt' in sys.builtin_module_names:
+        import winreg 
+
 from qgis.gui import QgsDateTimeEdit
-from PyQt4.QtGui import QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QLabel, QTextEdit, QDateEdit
-from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit
-from PyQt4.QtGui import QPixmap, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDoubleValidator
-from PyQt4.Qt import QDate, QDateTime
-from PyQt4.QtCore import QTime
-from actions.HyperLinkLabel import HyperLinkLabel
-from functools import partial
+
 import os
-import sys
 import operator
-if 'nt' in sys.builtin_module_names:
-    import _winreg
+from functools import partial
+
+from actions.HyperLinkLabel import HyperLinkLabel
 
 
 def setDialog(p_dialog):
@@ -175,7 +193,7 @@ def setTimeEdit(dialog, widget, time):
         return
     if type(widget) is QTimeEdit:
         if time is None:
-            time = QTime(00, 00, 00)
+            time = QTime(0, 0, 0)
         widget.setTime(time)
 
 
@@ -316,11 +334,6 @@ def setImage(dialog, widget,cat_shape):
         widget.show()
 
 
-# def setRow(p_row):
-#     global _row
-#     _row = p_row
-
-
 def fillWidget(dialog, widget, row):
 
     if type(widget) is str or type(widget) is unicode:
@@ -346,15 +359,15 @@ def get_reg(reg_hkey, reg_path, reg_name):
     if 'nt' in sys.builtin_module_names:
         reg_root = None
         if reg_hkey == "HKEY_LOCAL_MACHINE":
-            reg_root = _winreg.HKEY_LOCAL_MACHINE
+            reg_root = winreg.HKEY_LOCAL_MACHINE
         elif reg_hkey == "HKEY_CURRENT_USER":
-            reg_root = _winreg.HKEY_CURRENT_USER
+            reg_root = winreg.HKEY_CURRENT_USER
 
         if reg_root is not None:
             try:
-                registry_key = _winreg.OpenKey(reg_root, reg_path)
-                value, regtype = _winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
-                _winreg.CloseKey(registry_key)
+                registry_key = winreg.OpenKey(reg_root, reg_path)
+                value, regtype = winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
+                winreg.CloseKey(registry_key)
                 return value
             except WindowsError:
                 return None

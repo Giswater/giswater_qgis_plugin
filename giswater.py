@@ -6,17 +6,27 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QObject, QSettings, Qt
+    from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView
+    from PyQt4.QtSql import QSqlQueryModel
+else:
+    from qgis.PyQt.QtCore import QObject, QSettings, Qt
+    from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView
+    
 from qgis.core import QgsExpressionContextUtils, QgsProject
-from PyQt4.QtCore import QObject, QSettings, Qt
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView
-from PyQt4.QtSql import QSqlQueryModel
+
 import os.path
 import sys  
 from functools import partial
 
-from actions.api_cf import ApiCF
-from actions.api_search import ApiSearch
-
+# from actions.api_cf import ApiCF
+# from actions.api_search import ApiSearch
 from actions.go2epa import Go2Epa
 from actions.basic import Basic
 from actions.edit import Edit
@@ -127,7 +137,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (01, 02, 33, 34, 66, 67, 68):
+            elif int(index_action) in (1, 2, 33, 34, 66, 67, 68):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
