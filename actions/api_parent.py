@@ -13,7 +13,7 @@ from PyQt4.QtGui import QAction
 from qgis.core import QgsMapLayerRegistry
 import utils_giswater
 
-from parent import ParentAction
+from giswater.actions.parent import ParentAction
 
 class ApiParent(ParentAction):
 
@@ -68,6 +68,7 @@ class ApiParent(ParentAction):
 
 
     def start_editing(self):
+        """ start or stop the edition based on your current status"""
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
 
 
