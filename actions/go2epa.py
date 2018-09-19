@@ -6,10 +6,21 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QTime, QDate, Qt
-from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox
-from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
+try:
+    from qgis.core import Qgis as Qgis
+except:
+    from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QTime, QDate, Qt
+    from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox
+    from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
+else:
+    from qgis.PyQt.QtCore import QTime, QDate, Qt
+    from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox
+    from qgis.PyQt.QtWidgets import QFileDialog
+    
 import os
 import csv
 from functools import partial

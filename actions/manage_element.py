@@ -5,10 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-    
-from functools import partial
+# -*- coding: utf-8 -*-   
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
 
-from PyQt4.QtGui import QAbstractItemView, QTableView
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900: 
+    from PyQt4.QtGui import QAbstractItemView, QTableView   
+else:
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView      
+    
+from functools import partial
 
 import utils_giswater
 from giswater.ui_manager import AddElement                

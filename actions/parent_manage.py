@@ -6,15 +6,28 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.Qt import QDate
+    from PyQt4.QtCore import Qt, QPoint
+    from PyQt4.QtGui import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
+    from PyQt4.QtGui import QColor, QCompleter, QStringListModel, QAbstractItemView
+    from PyQt4.QtSql import QSqlTableModel
+    from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker    
+else:
+    from qgis.PyQt.Qt import QDate
+    from qgis.PyQt.QtCore import Qt, QPoint, QStringListModel
+    from qgis.PyQt.QtGui import QColor
+    from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
+    from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView
+    from qgis.PyQt.QtSql import QSqlTableModel
+    from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvas, QgsVertexMarker    
 
 from qgis.core import QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper,QgsVertexMarker
-from PyQt4.Qt import QDate
-from PyQt4.QtGui import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
-from PyQt4.QtGui import QColor, QCompleter, QStringListModel, QAbstractItemView
-from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtCore import Qt, QPoint, SIGNAL
 
 from functools import partial
 
@@ -333,12 +346,15 @@ class ParentManage(ParentAction, object):
         self.vertex_marker.setPenWidth(3)
 
         # Snapper
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            self.snapper = QgsMapCanvasSnapper(self.canvas)
+        else:
+            # TODO Snapping
+            self.snapper = QgsMapCanvas.snappingUtils()
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.previous_map_tool = self.canvas.mapTool()
         self.canvas.setMapTool(self.emit_point)
-        #self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         self.canvas.xyCoordinates.connect(self.mouse_move)
         self.xyCoordinates_conected = True
         self.emit_point.canvasClicked.connect(partial(self.get_xy))

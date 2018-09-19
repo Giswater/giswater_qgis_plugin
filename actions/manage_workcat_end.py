@@ -6,11 +6,23 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.Qt import QDate
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import QAbstractItemView, QTableView, QCompleter, QStringListModel
+    from PyQt4.QtSql import QSqlTableModel
+else:
+    from qgis.PyQt.Qt import QDate
+    from qgis.PyQt.QtCore import Qt, QStringListModel
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
+    from qgis.PyQt.QtSql import QSqlTableModel
+
 from qgis.core import QgsExpression, QgsFeatureRequest
-from PyQt4.Qt import QDate
-from PyQt4.QtCore import Qt
-from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtGui import QAbstractItemView, QTableView, QCompleter, QStringListModel
 
 from functools import partial
 

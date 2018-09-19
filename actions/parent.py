@@ -6,16 +6,30 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import Qt, QSettings
+    from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
+    from PyQt4.QtGui import QStringListModel, QCompleter
+    from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+    import ConfigParser as configparser
+else:
+    from qgis.PyQt.QtCore import Qt, QSettings, QStringListModel
+    from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QApplication, QCompleter, QFileDialog, QTableView
+    from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel 
+    import configparser 
+
+#QStringListModel
 from qgis.core import QgsExpression, QgsFeatureRequest
-from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
-from PyQt4.QtGui import QStringListModel, QCompleter
-from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 import os
 import sys
 import webbrowser
-import ConfigParser
 from functools import partial
 
 import utils_giswater    
@@ -63,7 +77,7 @@ class ParentAction(object):
             self.controller.show_warning(message, parameter=metadata_file)
             return None
           
-        metadata = ConfigParser.ConfigParser()
+        metadata = configparser.ConfigParser()
         metadata.read(metadata_file)
         plugin_version = metadata.get('general', 'version')
         if plugin_version is None:
@@ -199,7 +213,7 @@ class ParentAction(object):
         self.controller.start_program(program)               
         
         # Compare Java and Plugin versions
-        if self.plugin_version <> self.giswater_build_version:
+        if self.plugin_version != self.giswater_build_version:
             msg = ("Giswater and plugin versions are different. "
                    "Giswater version: " + self.giswater_build_version + ""
                    " - Plugin version: " + self.plugin_version)
