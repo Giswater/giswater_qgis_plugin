@@ -6,14 +6,15 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import os
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QAction
-
 from qgis.core import QgsMapLayerRegistry
-import utils_giswater
 
+import os
+
+import utils_giswater
 from giswater.actions.parent import ParentAction
+
 
 class ApiParent(ParentAction):
 
@@ -21,8 +22,10 @@ class ApiParent(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
 
+
     def get_visible_layers(self):
         """ Return string as {...} with name of table in DB of all visible layer in TOC """
+        
         visible_layer = '{'
         for layer in QgsMapLayerRegistry.instance().mapLayers().values():
             if self.iface.legendInterface().isLayerVisible(layer):
@@ -34,6 +37,7 @@ class ApiParent(ParentAction):
 
     def get_editable_layers(self):
         """ Return string as {...}  with name of table in DB of all editable layer in TOC """
+        
         editable_layer = '{'
         for layer in QgsMapLayerRegistry.instance().mapLayers().values():
             if not layer.isReadOnly():
@@ -57,6 +61,7 @@ class ApiParent(ParentAction):
         model.setStringList(list_items)
         completer.setModel(model)
 
+
     def close_dialog(self, dlg=None):
         """ Close dialog """
         try:
@@ -76,11 +81,11 @@ class ApiParent(ParentAction):
         if not self.dlg_is_destroyed:
             action.setChecked(enabled)
 
+
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:
         #     self.controller.log_info(str("IT WORK S"))
         self.controller.log_info(str("IT WORK S"))
         return 0
         #self.controller.log_info(str(widget.objectName()))
-
 

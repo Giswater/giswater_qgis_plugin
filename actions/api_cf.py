@@ -12,18 +12,16 @@ import os
 import subprocess
 import sys
 import webbrowser
-import operator
-
 from functools import partial
 
 from PyQt4.QtCore import Qt, SIGNAL, SLOT
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-from giswater.actions.HyperLinkLabel import HyperLinkLabel
-from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
+from qgis.gui import QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 import utils_giswater
+from giswater.actions.HyperLinkLabel import HyperLinkLabel
 from giswater.actions.api_parent import ApiParent
 from giswater.actions.catalog import Catalog
 from giswater.ui_manager import ApiCfUi
@@ -53,6 +51,7 @@ class ApiCF(ApiParent):
 
 
     def get_point(self, point, button_clicked):
+        
         if button_clicked == Qt.LeftButton:
             self.open_form(point)
         elif button_clicked == Qt.RightButton:
@@ -66,7 +65,6 @@ class ApiCF(ApiParent):
 
 
     def open_form(self, point=None, table_name=None, node_type=None, node_id=None):
-
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -74,6 +72,7 @@ class ApiCF(ApiParent):
         :param node_id: id of feature to do info
         :return:
         """
+        
         self.dlg_is_destroyed = False
         self.layer = None
         self.my_json = {}
@@ -224,7 +223,6 @@ class ApiCF(ApiParent):
             self.disable_all(result, False)
 
         # SIGNALS
-
         self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
         self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
         self.layer.editingStarted.connect(partial(self.enable_all, result))
@@ -277,6 +275,7 @@ class ApiCF(ApiParent):
 
 
     def disable_all(self, result, enable):
+        
         if not self.dlg_is_destroyed:
             widget_list = self.dlg_cf.findChildren(QWidget)
             for widget in widget_list:
@@ -297,6 +296,7 @@ class ApiCF(ApiParent):
 
 
     def enable_all(self, result):
+        
         if not self.dlg_is_destroyed:
             widget_list = self.dlg_cf.findChildren(QWidget)
             for widget in widget_list:
@@ -331,6 +331,7 @@ class ApiCF(ApiParent):
 
 
     def get_values(self, dialog, widget, value=None):
+        
         if type(widget) is QLineEdit and not widget.isReadOnly():
             value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox and widget.isEnabled():
@@ -348,6 +349,7 @@ class ApiCF(ApiParent):
             else:
                 self.my_json[str(widget.objectName())] = str(value)
         self.controller.log_info(str(self.my_json))
+
 
     def add_lineedit(self, dialog, field):
 
@@ -390,6 +392,7 @@ class ApiCF(ApiParent):
 
 
     def add_combobox(self, dialog, field):
+        
         widget = QComboBox()
         widget.setObjectName(field['column_id'])
         self.populate_combo(widget, field)
@@ -399,8 +402,10 @@ class ApiCF(ApiParent):
 
         return widget
 
+
     def populate_combo(self, widget, field):
         # Generate list of items to add into combo
+        
         widget.blockSignals(True)
         widget.clear()
         widget.blockSignals(False)
@@ -417,6 +422,7 @@ class ApiCF(ApiParent):
 
 
     def fill_child(self, dialog, widget):
+        
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(dialog, widget)
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('" + str(self.tablename) + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "')")
@@ -427,9 +433,11 @@ class ApiCF(ApiParent):
 
 
     def populate_child(self, combo_child):
+        
         child = self.dlg_cf.findChild(QComboBox, str(combo_child['childName']))
         if child:
             self.populate_combo(child, combo_child)
+
 
     def add_checkbox(self, dialog, field):
         widget = QCheckBox()
@@ -442,6 +450,7 @@ class ApiCF(ApiParent):
 
 
     def add_calendar(self, dialog, field):
+        
         widget = QgsDateTimeEdit()
         widget.setObjectName(field['column_id'])
         widget.setCalendarPopup(True)
@@ -449,6 +458,7 @@ class ApiCF(ApiParent):
 
 
     def add_button(self, dialog, field):
+        
         widget = QPushButton()
         widget.setObjectName(field['column_id'])
         widget.setText(field['value'])
@@ -471,7 +481,9 @@ class ApiCF(ApiParent):
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
+
     def add_hyperlink(self, dialog, field):
+        
         widget = HyperLinkLabel()
         widget.setObjectName(field['column_id'])
         widget.setText(field['value'])
@@ -491,8 +503,10 @@ class ApiCF(ApiParent):
 
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
+    
 
     def open_catalog(self, dialog, result, message_level=None):
+        
         self.catalog = Catalog(self.iface, self.settings, self.controller, self.plugin_dir)
         wsoftware = self.controller.get_project_type()
         geom_type = "node"
@@ -510,6 +524,7 @@ class ApiCF(ApiParent):
             msg = ("No function associated to this action, review column action_function "
                    "from table config_api_layer_field for " + str(self.tablename) + " ")
             self.controller.show_message(msg, 2)
+
 
     def populate_lineedit(self, completer, model, tablename, dialog, widget, field_id):
         """ Set autocomplete of widget @table_object + "_id"
@@ -550,6 +565,7 @@ class ApiCF(ApiParent):
 
         # Open dialog
         self.cf_open_dialog(self.dlg_new_workcat)
+
 
     def cf_manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
@@ -637,7 +653,9 @@ class ApiCF(ApiParent):
     def no_function_asociated(self, widget=None, message_level=1):
         self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)
 
+
     def action_open_url(self, dialog, result, message_level=None):
+        
         widget = None
         function_name = 'no_function_associated'
         for field in result["fields"]:
@@ -650,6 +668,7 @@ class ApiCF(ApiParent):
 
 
     def open_url(self, dialog, widget, message_level=None):
+        
         path = utils_giswater.getWidgetText(dialog, widget)
         self.controller.log_info(str(path))
         # Check if file exist
@@ -663,24 +682,10 @@ class ApiCF(ApiParent):
         else:
             webbrowser.open(path)
 
+
     def open_node(self, dialog, widget=None, message_level=None):
+        
         node_id = utils_giswater.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
         self.ApiCF.open_form(table_name='ve_node',  node_type='node', node_id=node_id)
-
-
-
-    # def disconnect_snapping(self, refresh_canvas=True):
-    #     """ Select 'refreshAllLayers' as current map tool and disconnect snapping """
-    #
-    #     try:
-    #         self.canvas.xyCoordinates.disconnect()
-    #         self.emit_point.canvasClicked.disconnect()
-    #         if refresh_canvas:
-    #             self.iface.mapCnavas().refreshAllLayers()
-    #
-    #     except Exception:
-    #         pass
-
-
 

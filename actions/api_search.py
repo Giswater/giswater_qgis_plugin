@@ -6,21 +6,16 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from functools import partial
-
-import operator
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter
 from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox
 
+import operator
+from functools import partial
+
 import utils_giswater
-
-
-
-
 from api_parent import ApiParent
 from ui_manager import ApiSearchUi
-
 
 
 class ApiSearch(ApiParent):
@@ -29,7 +24,9 @@ class ApiSearch(ApiParent):
         """ Class constructor """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
 
+
     def api_search(self):
+        
         # Dialog
         self.dlg_search = ApiSearchUi()
         self.load_settings(self.dlg_search)
@@ -88,6 +85,7 @@ class ApiSearch(ApiParent):
         self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_search.show()
 
+
     def add_lineedit(self, field):
 
         widget = QLineEdit()
@@ -100,7 +98,7 @@ class ApiSearch(ApiParent):
                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
                                      " color: rgb(100, 100, 100)}")
 
-          # if str(table_name) == '-1':
+        # if str(table_name) == '-1':
         #     return widget
 
         completer = QCompleter()
@@ -113,6 +111,7 @@ class ApiSearch(ApiParent):
 
     def make_list(self, completer, model, widget):
         """ Create a list of ids and populate widget (QLineEdit)"""
+        
         # # Set SQL
         # my_json = {}
         # index = self.dlg_search.main_tab.currentIndex()
@@ -137,7 +136,6 @@ class ApiSearch(ApiParent):
         else:
             self.table_name = self.dlg_search.main_tab.widget(index).objectName()
 
-
         sql = ("SELECT " + self.schema_name + ".gw_api_get_rowslineedit('" + str(self.table_name) + "', '" +
                "" + str(self.id_type) + "', '" + str(utils_giswater.getWidgetText(widget)) + "')")
         row = self.controller.get_rows(sql, log_sql=True)
@@ -148,7 +146,9 @@ class ApiSearch(ApiParent):
             self.list_items.append(_id[str(self.id_type)])
         self.set_completer_object(completer, model, widget, self.list_items)
 
+
     def add_combobox(self, field):
+        
         widget = QComboBox()
         widget.setObjectName(field['name'])
         self.populate_combo(widget, field)
@@ -158,11 +158,15 @@ class ApiSearch(ApiParent):
         #widget.removeItem(0)
         return widget
 
+
     def get_params(self, widget):
+        
         self.table_name = utils_giswater.get_item_data(widget, 0)
         self.id_type = utils_giswater.get_item_data(widget, 1) +"_id"
 
+
     def populate_combo(self, widget, field, allow_blank=True):
+        
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()

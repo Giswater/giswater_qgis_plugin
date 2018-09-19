@@ -6,38 +6,30 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
+from PyQt4.QtCore import QDate
+from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit
+from PyQt4.QtGui import QGridLayout, QWidget, QLabel
 
 import json
 import sys
-# import config
-from functools import partial
-
 import operator
-from PyQt4.QtCore import QDate
-from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QHBoxLayout, QFormLayout, \
-    QSpacerItem, QSizePolicy, QIntValidator, QDoubleValidator, QLineEdit
-from PyQt4.QtGui import QGridLayout
-from PyQt4.QtGui import QLabel
-from PyQt4.QtGui import QLineEdit
+from functools import partial
 
 import utils_giswater
 from actions.api_parent import ApiParent
-from parent import ParentAction
-
-from ui_manager import InfoShowInfo, ApiConfigUi
-
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QTabWidget, QWidget, QVBoxLayout
-from datetime import datetime
+from ui_manager import ApiConfigUi
 
 
 class ApiConfig(ApiParent):
+    
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
 
+
     def set_project_type(self, project_type):
         self.project_type = project_type
+
 
     def api_config(self):
         """ Button 36: Info show info, open giswater and visit web page """
@@ -51,7 +43,6 @@ class ApiConfig(ApiParent):
         self.load_settings(self.dlg_config)
         self.dlg_config.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_config))
         self.dlg_config.btn_accept.clicked.connect(partial(self.update_values))
-
 
         page1_layout1 = self.dlg_config.tab_main.findChild(QGridLayout, 'page1_layout1')
         page1_layout2 = self.dlg_config.tab_main.findChild(QGridLayout, 'page1_layout2')
@@ -98,10 +89,8 @@ class ApiConfig(ApiParent):
         self.system_form = QGridLayout()
 
         # Construct form for config and admin
-
         self.construct_form(row, 'fields')
         self.construct_form(row, 'fields_admin')
-
 
         groupBox_1.setLayout(self.basic_form)
         groupBox_2.setLayout(self.om_form)
@@ -185,7 +174,9 @@ class ApiConfig(ApiParent):
 
 
     def construct_form(self, row, fields):
+        
         for field in row[0][fields]:
+            
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['name'])
@@ -218,7 +209,6 @@ class ApiConfig(ApiParent):
                     widget.valueChanged.connect(partial(self.get_values_changed, chk, widget, field))
 
                 widget.setObjectName(field['name'])
-
 
                 # Set signals
                 chk.stateChanged.connect(partial(self.get_values_checked, chk, widget, field))
@@ -260,6 +250,7 @@ class ApiConfig(ApiParent):
 
 
     def get_event_combo_parent(self, fields, row):
+        
         if fields == 'fields':
             for field in row[0]["fields"]:
                 if field['dv_isparent']:
@@ -268,6 +259,7 @@ class ApiConfig(ApiParent):
 
 
     def populate_combo(self, widget, field):
+        
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()
@@ -287,23 +279,26 @@ class ApiConfig(ApiParent):
 
 
     def fill_child(self, widget):
+        
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
 
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "')")
         row = self.controller.get_row(sql, log_sql=True)
-
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child, row)
 
+
     def populate_child(self, combo_child, result):
+        
         child = self.dlg_config.findChild(QComboBox, str(combo_child['childName']))
         if child:
             self.populate_combo(child, combo_child)
 
 
     def order_widgets(self, field, form, lbl, chk, widget):
+        
         if field['widgettype'] != 3:
             form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(chk, field['layout_order'], 1)
@@ -312,7 +307,9 @@ class ApiConfig(ApiParent):
             form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(chk, field['layout_order'], 1)
 
+
     def get_values_checked(self, chk, widget, field, value=None):
+        
         elem = {}
         elem['widget'] = str(widget.objectName())
         elem['chk'] = str(chk.objectName())
@@ -330,17 +327,15 @@ class ApiConfig(ApiParent):
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value
         elem['sys_role_id'] = str(field['sys_role_id'])
-
         self.list_update.append(elem)
 
+
     def get_values_changed(self, chk, widget, field, value=None):
+        
         elem = {}
-
-
         if type(widget) is QLineEdit:
             value = utils_giswater.getWidgetText(self.dlg_config, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-
             value = utils_giswater.get_item_data(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
             value = utils_giswater.isChecked(self.dlg_config, chk)
@@ -348,14 +343,13 @@ class ApiConfig(ApiParent):
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
 
         if chk.isChecked():
-
             elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
             elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
             elem['value'] = value
             elem['sys_role_id'] = str(field['sys_role_id'])
-
             self.list_update.append(elem)
+
 
     def update_values(self):
 
@@ -366,16 +360,20 @@ class ApiConfig(ApiParent):
         # Close dialog
         self.close_dialog(self.dlg_config)
 
+
     def check_child_to_parent(self, widget_child, widget_parent):
         if widget_child.isChecked():
             widget_parent.setChecked(True)
+
 
     def check_parent_to_child(self, widget_parent, widget_child):
         if widget_parent.isChecked() == False:
             widget_child.setChecked(False)
 
+
     # TODO:
     def remove_empty_groupBox(self, layout):
+        
         self.controller.log_info(str("TEST"))
         groupBox_list = layout.findChild(QWidget)
         self.controller.log_info(str(layout.objectName()))
@@ -386,3 +384,5 @@ class ApiConfig(ApiParent):
             widget_list = groupBox.findChildren(QWidget)
             if not widget_list:
                 groupBox.setVisible(False)
+                
+                

@@ -6,27 +6,19 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
+from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QApplication
+from PyQt4.QtGui import QAction
+from qgis.gui import QgsMapToolEmitPoint
+
 import json
-import operator
-import os
-import subprocess
-import sys
-import webbrowser
 import operator
 import win32api, win32con
 from functools import partial
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QApplication
-from PyQt4.QtGui import QAction
-
-from qgis.core import QgsMapLayerRegistry
-from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
-
-import utils_giswater
-
 from api_parent import ApiParent
 from actions.api_cf import ApiCF
+
 
 class ApiMoveNode(ApiParent):
 
@@ -39,8 +31,10 @@ class ApiMoveNode(ApiParent):
         self.controller = controller
         self.plugin_dir = plugin_dir
 
+
     def api_move_node(self):
         """ Button 37: Own Giswater info """
+        
         # Create the appropriate map tool and connect the gotPoint() signal.
         QApplication.setOverrideCursor(Qt.CrossCursor)
         self.canvas = self.iface.mapCanvas()
@@ -56,6 +50,7 @@ class ApiMoveNode(ApiParent):
         x = map_point.x()
         y = map_point.y()
 
+
     def click(self):
         #win32api.SetCursorPos((x, y))
         x, y = win32api.GetCursorPos()
@@ -63,6 +58,8 @@ class ApiMoveNode(ApiParent):
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
         #self.api_cf.open_form(self, point=None, node_id=None)
+        
+        
     def get_point(self, point, button_clicked):
 
         if button_clicked == Qt.RightButton:
@@ -74,6 +71,7 @@ class ApiMoveNode(ApiParent):
 
 
     def start_tool(self, point=None, node_id=None):
+        
         # Get srid
         self.srid = self.controller.plugin_settings_value('srid')
         if self.iface.activeLayer() is None:
@@ -124,6 +122,8 @@ class ApiMoveNode(ApiParent):
             # self.emit_point.canvasClicked.connect(self.button)
 
             self.controller.log_info(str("TEST 30"))
+            
+            
     def button(self, point, button_clicked):
 
         if button_clicked == Qt.RightButton:
@@ -132,7 +132,10 @@ class ApiMoveNode(ApiParent):
         else:
             self.emit_point.canvasClicked.disconnect()
             self.start_tool(point)
+            
+            
     def open_form(self):
+        
         self.controller.log_info(str("TEST 21"))
         sql = ("SELECT parameter, value  FROM " + self.schema_name + ".config_param_user "
                " WHERE parameter  = 'open_info' AND cur_user=current_user")
@@ -144,3 +147,4 @@ class ApiMoveNode(ApiParent):
         node_id = '1040'
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
         self.ApiCF.open_form(table_name=self.table_parent, node_type=self.node_type, node_id=node_id)
+        
