@@ -59,6 +59,7 @@ class ManNodeDialog(ParentDialog):
         
     def init_config_form(self):
         """ Custom form initial configuration """
+        
         # Get last point clicked on canvas
         last_click = self.canvas.mouseLastXY()
         self.last_point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), last_click.x(), last_click.y())
@@ -90,11 +91,8 @@ class ManNodeDialog(ParentDialog):
 
         # New Workcat
         # self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
-
         self.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
         self.tbl_downstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
-
-        feature = self.feature
         layer = self.iface.activeLayer()
 
         action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
@@ -107,6 +105,7 @@ class ManNodeDialog(ParentDialog):
         layer.editingStarted.connect(partial(self.enabled_actions, action_interpolate, True))
         layer.editingStopped.connect(partial(self.enabled_actions, action_interpolate, False))
         self.dialog.destroyed.connect(partial(self.dlg_destroyed, layer=layer))
+        
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
         action.setChecked(layer.isEditable())
@@ -184,6 +183,7 @@ class ManNodeDialog(ParentDialog):
 
     def activate_snapping(self, emit_point):
         # Set circle vertex marker
+        
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
@@ -200,8 +200,10 @@ class ManNodeDialog(ParentDialog):
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
+
     def snapping_node(self, point, button):
         """ Get id of selected nodes (node1 and node2) """
+        
         if button == 2:
             self.dlg_destroyed()
             return
@@ -247,6 +249,7 @@ class ManNodeDialog(ParentDialog):
 
 
     def mouse_move(self, p):
+        
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
@@ -265,6 +268,7 @@ class ManNodeDialog(ParentDialog):
                     self.vertex_marker.show()
         else:
             self.vertex_marker.hide()
+
 
     def open_up_down_stream(self, qtable):
         """ Open selected node from @qtable """

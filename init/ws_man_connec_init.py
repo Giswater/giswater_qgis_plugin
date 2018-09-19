@@ -86,10 +86,7 @@ class ManConnecDialog(ParentDialog):
         open_link = self.dialog.findChild(QPushButton, "open_link")
         utils_giswater.setWidgetEnabled(self.dialog, "open_link", False)
         open_link.clicked.connect(self.open_url)
-        
-        feature = self.feature
         layer = self.iface.activeLayer()
-
         self.dialog.destroyed.connect(partial(self.dlg_destroyed, layer=layer))
 
         # Toolbar actions

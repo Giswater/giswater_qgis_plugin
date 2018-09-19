@@ -76,7 +76,6 @@ class ManArcDialog(ParentDialog):
         # Manage 'cat_shape'
         self.set_image("label_image_ud_shape")
         
-        feature = self.feature
         layer = self.iface.activeLayer()
 
         action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
@@ -90,10 +89,10 @@ class ManArcDialog(ParentDialog):
         layer.editingStarted.connect(partial(self.check_actions, action, True))
         layer.editingStopped.connect(partial(self.check_actions, action, False))
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'arc'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))

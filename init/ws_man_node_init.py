@@ -96,12 +96,10 @@ class ManNodeDialog(ParentDialog):
         self.tbl_relations = self.dialog.findChild(QTableView, "tbl_relations")
         state_type = self.dialog.findChild(QComboBox, 'state_type')
         dma_id = self.dialog.findChild(QComboBox, 'dma_id')
-        presszonecat_id = self.dialog.findChild(QComboBox, 'presszonecat_id')
               
         # Set signals
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, self.dialog, 'ws', 'node', nodetype_id.text()))
-        feature = self.feature
         layer = self.iface.activeLayer()
         action_copypaste = self.dialog.findChild(QAction, "actionCopyPaste")
         layer.editingStarted.connect(partial(self.enabled_actions, action_copypaste, True))
@@ -112,8 +110,6 @@ class ManNodeDialog(ParentDialog):
 
         # New Workcat
         # self.dialog.findChild(QPushButton, "btn_new_workcat").clicked.connect(partial(self.cf_new_workcat, self.dialog))
-
-
         self.dialog.destroyed.connect(partial(self.dlg_destroyed, layer=layer))
 
         # Toolbar actions
