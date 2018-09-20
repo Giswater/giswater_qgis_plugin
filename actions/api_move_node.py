@@ -6,9 +6,19 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QApplication
-from PyQt4.QtGui import QAction
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import QApplication
+    from PyQt4.QtGui import QAction
+else:
+    from qgis.PyQt.QtCore import Qt
+    from qgis.PyQt.QtWidgets import QAction, QApplication
+
 from qgis.gui import QgsMapToolEmitPoint
 
 import json

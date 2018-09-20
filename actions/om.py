@@ -6,8 +6,17 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QDate, Qt
-from PyQt4.QtGui import QTableView, QAbstractItemView, QLineEdit, QDateEdit, QPushButton
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
+    from PyQt4.QtCore import QDate, Qt
+    from PyQt4.QtGui import QTableView, QAbstractItemView, QLineEdit, QDateEdit, QPushButton
+else:
+    from qgis.PyQt.QtCore import QDate, Qt
+    from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QLineEdit, QDateEdit, QPushButton
 
 from datetime import datetime
 from functools import partial

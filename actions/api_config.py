@@ -6,9 +6,18 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-from PyQt4.QtCore import QDate
-from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit
-from PyQt4.QtGui import QGridLayout, QWidget, QLabel
+try:
+    from qgis.core import Qgis as Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QDate
+    from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit
+    from PyQt4.QtGui import QGridLayout, QWidget, QLabel
+else:
+    from qgis.PyQt.QtCore import QDate
+    from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit, QGridLayout, QWidget, QLabel
 
 import json
 import sys

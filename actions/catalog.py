@@ -6,11 +6,20 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import os
-from PyQt4.QtCore import Qt
-from functools import partial
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
 
-from PyQt4.QtGui import QLineEdit
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import QLineEdit
+else:
+    from qgis.PyQt.QtCore import Qt
+    from qgis.PyQt.QtWidgets import QLineEdit
+    
+import os
+from functools import partial
 
 import utils_giswater
 from ui_manager import Multirow_selector

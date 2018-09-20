@@ -6,8 +6,18 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QDate
-from PyQt4.QtGui import QDateEdit, QFileDialog, QStandardItem, QStandardItemModel, QCheckBox, QDoubleSpinBox
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
+    from PyQt4.QtCore import QDate
+    from PyQt4.QtGui import QStandardItem, QStandardItemModel, QDateEdit, QFileDialog, QCheckBox, QDoubleSpinBox
+else:
+    from qgis.PyQt.QtCore import QDate
+    from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel    
+    from qgis.PyQt.QtWidgets import QDateEdit, QFileDialog, QCheckBox, QDoubleSpinBox
 
 import os
 import csv
@@ -28,7 +38,6 @@ class Utils(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
 
 
     def set_project_type(self, project_type):

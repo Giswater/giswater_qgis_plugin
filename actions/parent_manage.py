@@ -19,8 +19,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtSql import QSqlTableModel
     from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker    
 else:
-    from qgis.PyQt.Qt import QDate
-    from qgis.PyQt.QtCore import Qt, QPoint, QStringListModel
+    from qgis.PyQt.QtCore import Qt, QPoint, QStringListModel, QDate
     from qgis.PyQt.QtGui import QColor
     from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
     from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView

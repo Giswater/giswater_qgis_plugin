@@ -5,9 +5,17 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
 
-from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
-from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
+    from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
+    from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget
+else:
+    from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject, QStringListModel
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView, QPushButton, QComboBox, QTabWidget    
 
 import os
 import sys

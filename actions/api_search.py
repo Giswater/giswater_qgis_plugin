@@ -6,9 +6,18 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter
+    from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox
+else:
+    from qgis.PyQt.QtCore import Qt, QStringListModel
+    from qgis.PyQt.QtWidgets import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QSizePolicy, QSpacerItem, QCompleter
 
 import operator
 from functools import partial

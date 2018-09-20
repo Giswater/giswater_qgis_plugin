@@ -6,6 +6,23 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import Qt, SIGNAL, SLOT
+    from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
+    from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
+    from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
+else:
+    from qgis.PyQt.QtCore import Qt, QStringListModel, SIGNAL, SLOT
+    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator
+    from qgis.PyQt.QtWidgets import QApplication, QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QGridLayout, QSpacerItem, QSizePolicy, QCompleter
+
+from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
+
 import json
 import operator
 import os
@@ -13,12 +30,6 @@ import subprocess
 import sys
 import webbrowser
 from functools import partial
-
-from PyQt4.QtCore import Qt, SIGNAL, SLOT
-from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
-from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
-from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-from qgis.gui import QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 import utils_giswater
 from giswater.actions.HyperLinkLabel import HyperLinkLabel

@@ -6,12 +6,25 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
+    from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
+    from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor, QAbstractItemView
+    from PyQt4.QtSql import QSqlTableModel
+    from PyQt4.QtXml import QDomDocument
+    from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
+else:
+    from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant, QStringListModel
+    from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QColor, QAbstractItemView
+    from qgis.PyQt.QtSql import QSqlTableModel
+    from qgis.PyQt.QtXml import QDomDocument
+    from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvas, QgsVertexMarker
+
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition, QgsVectorLayer
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
-from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor, QAbstractItemView
-from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtXml import QDomDocument
 
 import os
 import operator
@@ -457,10 +470,10 @@ class MincutParent(ParentAction, MultipleSelection):
                " (current_user, " + str(result_mincut_id) + ");")
         
         # Check if any 'connec' or 'hydro' associated
-        if self.sql_connec <> "":
+        if self.sql_connec != "":
             sql += self.sql_connec
                 
-        if self.sql_hydro <> "":
+        if self.sql_hydro != "":
             sql += self.sql_hydro
                             
         status = self.controller.execute_sql(sql, log_error=True, log_sql=True)

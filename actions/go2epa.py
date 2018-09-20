@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 try:
-    from qgis.core import Qgis as Qgis
+    from qgis.core import Qgis
 except:
     from qgis.core import QGis as Qgis
 
