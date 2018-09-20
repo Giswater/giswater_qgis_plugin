@@ -10,7 +10,7 @@ import os
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QAction
 
-from qgis.core import QgsMapLayerRegistry
+from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest
 import utils_giswater
 
 from giswater.actions.parent import ParentAction
@@ -66,6 +66,34 @@ class ApiParent(ParentAction):
         except AttributeError:
             pass
 
+    def check_expression(self, expr_filter, log_info=False):
+        """ Check if expression filter @expr is valid """
+
+        if log_info:
+            self.controller.log_info(expr_filter)
+        expr = QgsExpression(expr_filter)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.log_warning(message, parameter=expr_filter)
+            return (False, expr)
+        return (True, expr)
+
+
+
+    def select_features_by_expr(self, layer, expr):
+        """ Select features of @layer applying @expr """
+
+        if expr is None:
+            layer.removeSelection()
+        else:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            # Build a list of feature id's from the previous result and select them
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
+
 
     def start_editing(self):
         """ start or stop the edition based on your current status"""
@@ -79,7 +107,7 @@ class ApiParent(ParentAction):
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:
         #     self.controller.log_info(str("IT WORK S"))
-        self.controller.log_info(str("IT WORK S"))
+        self.controller.log_info(str("---------------IT WORK S----------------"))
         return 0
         #self.controller.log_info(str(widget.objectName()))
 
