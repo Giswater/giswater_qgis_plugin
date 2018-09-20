@@ -9,9 +9,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-/* Inserted on i18n file: ws_74_audit_vdomain_error
+
 INSERT INTO audit_cat_error VALUES (3006, 'There are one or more arc(s) with null nodes. Mincut is broken (arc_id=)','Please review your data',2, true, NULL);
-*/
+
 
 
 ----------------------
