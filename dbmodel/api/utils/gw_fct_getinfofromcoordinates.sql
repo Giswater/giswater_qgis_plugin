@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromcoordinates"(p_x float8, p_y float8, p_epsg int4, p_active_layer text, p_visible_layer text, p_editable_layer text, p_zoom_ratio float8, p_device int4, p_info_type int4, p_lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromcoordinates"(p_x float8, p_y float8, p_epsg int4, p_active_layer text, p_visible_layer text, p_editable_layer text, p_istilemap bool, p_zoom_ratio float8, p_device int4, p_info_type int4, p_lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -24,11 +24,9 @@ DECLARE
     v_geometrytype text;
     api_version text;
     v_the_geom text;
-    v_usevisiblearray boolean;
+    v_tiled_layer text[];
     
 BEGIN
-
-   v_usevisiblearray=true;
 
 --  Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
@@ -49,24 +47,26 @@ BEGIN
 
     -- 10 pixels of base sensibility
     v_sensibility = (p_zoom_ratio * 10 * v_sensibility_f);
-   
          
 --   Make point
      SELECT ST_SetSRID(ST_MakePoint(p_x,p_y),p_epsg) INTO v_point;
 
---  Get element
-    IF v_usevisiblearray IS TRUE THEN
+--  Get layer and element
+    IF p_istilemap IS TRUE THEN
     v_sql := 'SELECT layer_id, 0 as orderby FROM config_web_layer WHERE layer_id= '||quote_literal(p_active_layer)||' UNION 
-        SELECT layer_id, orderby FROM config_web_layer WHERE layer_id = any('''||p_visible_layer||'''::text[]) ORDER BY orderby';
+          SELECT layer_id, orderby FROM config_web_layer WHERE is_tiled IS TRUE UNION
+          SELECT layer_id, orderby FROM config_web_layer WHERE layer_id = any('''||p_visible_layer||'''::text[]) ORDER BY orderby';
     ELSE
 
     v_sql := 'SELECT layer_id, 0 as orderby FROM config_web_layer WHERE layer_id= '||quote_literal(p_active_layer)||' UNION 
-        SELECT layer_id, orderby FROM config_web_layer ORDER BY orderby';
+          SELECT layer_id, orderby FROM config_web_layer WHERE layer_id = any('''||p_visible_layer||'''::text[]) ORDER BY orderby';
     END IF;
-    
 
     FOR v_layer IN EXECUTE v_sql 
     LOOP
+
+        RAISE NOTICE 'v_layer %', v_layer;
+        
         v_count=v_count+1;
             --    Get id column
         EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
@@ -135,10 +135,14 @@ BEGIN
     END IF;
 
 --   Get editability of layer
-    EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id = any('''||p_visible_layer||'''::text[]) THEN TRUE ELSE FALSE END) 
+    EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id='||quote_literal(p_active_layer)||' AND layer_id = any('''||p_editable_layer||'''::text[]) THEN TRUE ELSE FALSE END) 
             FROM config_web_layer WHERE layer_id='||quote_literal(v_layer)||';'
         INTO v_iseditable;
 
+----------------------------------------------
+-- IMPROVE THE EDITABILITY OF THE LAYER......
+----------------------------------------------
+-- TODO
     
 --   Call getinfofromid
     SELECT gw_fct_getinfofromid(v_alias, v_layer, v_id, v_iseditable, p_device, p_info_type, p_lang) INTO v_return;

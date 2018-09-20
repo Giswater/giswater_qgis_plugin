@@ -29,11 +29,12 @@ DECLARE
     conflict_text text;
     v_publish_user text;
     v_mincut_class int2;
-
-
-
+    v_old_planified_interval date;
+    v_new_planified_interval date;
+    v_old_values record;
+    v_message text;
+    
 BEGIN
-
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;   
@@ -98,7 +99,9 @@ BEGIN
         insert_data := gw_fct_json_object_set_key(insert_data, 'mincut_state', 0);
 
     ELSE
-
+        --getting old values
+        SELECT * INTO v_old_values FROM anl_mincut_result_cat where id=mincut_id;
+        
         -- Location data is not combo components, the ID's are computed from values
 
         -- Find municipality ID
@@ -126,6 +129,8 @@ BEGIN
         insert_data := gw_fct_json_object_set_key(insert_data, 'anl_feature_type', upper(p_element_type));
     END IF;
 
+/*
+
 --    Update state: Check start
     IF (insert_data->>'mincut_state')::INT = 0 AND insert_data->>'exec_start' != '' THEN
         insert_data := gw_fct_json_object_set_key(insert_data, 'mincut_state', 1);
@@ -136,6 +141,8 @@ BEGIN
         insert_data := gw_fct_json_object_set_key(insert_data, 'mincut_state', 2);
         insert_data := gw_fct_json_object_set_key(insert_data, 'exec_user', current_user_var);
     END IF;
+
+*/
 
 --    Update class
     IF p_element_type = 'connec' THEN
@@ -186,33 +193,66 @@ BEGIN
         INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, mincut_id);
     END IF;
 
---    SPECIFIC TASKS
+--    specific tasks
     IF mincut_id_arg ISNULL THEN
-        IF p_element_type = 'connec' THEN
+    
+        IF v_mincut_class = 2 THEN
             INSERT INTO anl_mincut_result_connec(result_id, connec_id, the_geom) VALUES (mincut_id, id_arg, point_geom);
-        ELSIF p_element_type = 'hydrometer' THEN
+        ELSIF v_mincut_class = 3 THEN
             INSERT INTO anl_mincut_result_hydrometer(result_id, hydrometer_id) VALUES (mincut_id, id_arg);
         ELSE
             RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, mincut_id, current_user_var;
             conflict_text := gw_fct_mincut(id_arg, p_element_type, mincut_id, current_user_var);
             RAISE NOTICE 'MinCut: %', conflict_text;
         END IF;
+
+        v_message := 'El poligon de tall ha estat executat correctament' ;
+        
+    ELSE 
+    /*
+        v_old_planified_interval:=
+        v_new_planified_interval:=
+    */
+        IF conflict_text = '' or conflict_text is null THEN
+            v_message := 'El poligon de tall ha estat actualitzat correctament' ;
+        ELSE     
+            v_message := 'AVIS IMPORTANT: Hi ha conflictes amb altres poligons de tall';
+        END IF;
+    
     END IF;
+
+--      Check if there is possible conflict with planified data
+    
+/*
+    IF mincut_id_arg IS NOT NULL AND v_mincut_class = 1 AND old_planified_interval != new_planified_interval THEN
+            RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, mincut_id, current_user_var;
+            conflict_text := gw_fct_mincut(id_arg, p_element_type, mincut_id, current_user_var);
+            RAISE NOTICE 'MinCut: %', conflict_text;
+    END IF;
+    
+*/
+
+raise notice 'v_message %' , v_message;
+    
 
 
 --    Control NULL's
---    mincut_id := COALESCE(mincut_id, '');
+    v_message := COALESCE(v_message, '{}');
+    api_version := COALESCE(api_version, '{}');
+    
+
 
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
+        ', "infoMessage":"' || v_message ||'"'||
         ', "mincut_id":' || mincut_id ||
         '}')::json;
 
 --    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
---    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

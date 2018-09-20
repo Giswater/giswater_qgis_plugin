@@ -5,12 +5,10 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getfilters"(device int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getfilters"(p_istilemap bool, device int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
---    id_json json;    
---    value_json json;
     selected_json json;    
     form_json json;
     formTabs_explotations json;
@@ -41,14 +39,25 @@ BEGIN
     IF rec_tab IS NOT NULL THEN
 
         -- Get exploitations, selected and unselected
-        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-        SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-        FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ')
-        UNION
-        SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-        FROM exploitation WHERE expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label) a'
-        INTO formTabs_explotations;
+        IF p_istilemap THEN    
+            EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+            SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , true AS disabled
+            FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ')
+            UNION
+            SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , true AS disabled
+            FROM exploitation WHERE expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ') ORDER BY label) a'
+            INTO formTabs_explotations;
 
+        ELSE
+            EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+            SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , false AS disabled
+            FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ')
+            UNION
+            SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , false AS disabled
+            FROM exploitation WHERE expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label) a'
+            INTO formTabs_explotations;
+
+        END IF;    
         -- Add tab name to json
         formTabs_explotations := ('{"fields":' || formTabs_explotations || '}')::json;
         formTabs_explotations := gw_fct_json_object_set_key(formTabs_explotations, 'tabName', 'selector_expl'::TEXT);
@@ -72,14 +81,23 @@ BEGIN
     IF rec_tab IS NOT NULL THEN
     
         -- Get states, selected and unselected
-        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-        SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" 
-        FROM value_state WHERE id IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal(current_user) || ')
-        UNION
-        SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" 
-        FROM value_state WHERE id NOT IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY name) a'
-        INTO formTabs_networkStates;    
-    
+        IF p_istilemap THEN
+            EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+            SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , true AS disabled
+            FROM value_state WHERE id IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal('qgisserver') || ')
+            UNION
+            SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , true AS disabled
+            FROM value_state WHERE id NOT IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal('qgisserver') || ') ORDER BY name) a'
+            INTO formTabs_networkStates;    
+        ELSE
+            EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+            SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , false AS disabled
+            FROM value_state WHERE id IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal(current_user) || ')
+            UNION
+            SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , false AS disabled
+            FROM value_state WHERE id NOT IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY name) a'
+            INTO formTabs_networkStates;    
+        END IF;    
         -- Add tab name to json
         formTabs_networkStates := ('{"fields":' || formTabs_networkStates || '}')::json;
         formTabs_networkStates := gw_fct_json_object_set_key(formTabs_networkStates, 'tabName', 'selector_state'::TEXT);
@@ -104,12 +122,13 @@ BEGIN
     
         -- Get hydrometer states, selected and unselected
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-        SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" 
+        SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , false AS disabled
         FROM ext_rtc_hydrometer_state WHERE id IN (SELECT state_id FROM selector_hydrometer WHERE cur_user=' || quote_literal(current_user) || ')
         UNION
-        SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" 
+        SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , false AS disabled
         FROM ext_rtc_hydrometer_state WHERE id NOT IN (SELECT state_id FROM selector_hydrometer WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY name) a'
-        INTO formTabs_hydroStates;    
+        INTO formTabs_hydroStates;
+
     
         -- Add tab name to json
         formTabs_hydroStates := ('{"fields":' || formTabs_hydroStates || '}')::json;
