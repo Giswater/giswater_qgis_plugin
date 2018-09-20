@@ -109,3 +109,31 @@ CONSTRAINT config_client_forms_web_pkey PRIMARY KEY (id)
 );
 
 
+
+CREATE TABLE config_web_composer_scale(
+  id integer NOT NULL,
+  idval text,
+  descript text,
+  orderby integer,
+  CONSTRAINT config_web_composer_scale_pkey PRIMARY KEY (id));
+
+  
+  
+CREATE TABLE selector_composer(
+  field_id text NOT NULL,
+  field_value text,
+  user_name text NOT NULL,
+  CONSTRAINT selector_composer_pkey PRIMARY KEY (field_id, user_name));
+ 
+
+ CREATE OR REPLACE VIEW v_web_composer AS 
+ SELECT ct.user_name,
+    ct.composer,
+    ct.scale,
+    ct.title,
+    ct.date,
+    ct.descript
+   FROM crosstab('SELECT user_name, field_id, field_value FROM selector_composer where user_name=''qgisserver''
+			ORDER  BY 1,2'::text, ' VALUES (''composer''),(''scale''),(''title''),(''date''),(''descript'')'::text) ct(user_name text, composer text, scale numeric, title text, date date, descript text);
+
+ 

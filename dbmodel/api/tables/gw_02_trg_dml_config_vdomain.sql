@@ -9,12 +9,18 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+INSERT INTO audit_cat_table VALUES ('config_web_composer_scale', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_web_composer', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('selector_composer', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
+
+
 
 INSERT INTO config_web_fields_cat_type VALUES ('text');
 INSERT INTO config_web_fields_cat_type VALUES ('combo');
 INSERT INTO config_web_fields_cat_type VALUES ('textarea');
 INSERT INTO config_web_fields_cat_type VALUES ('checkbox');
-INSERT INTO config_web_fields_cat_type VALUES ('date');
+INSERT INTO config_web_fields_cat_type VALUES ('datepickertime');
+INSERT INTO config_web_fields_cat_type VALUES ('formDivider');
 
 
 INSERT INTO config_web_fields_cat_datatype VALUES ('string');
@@ -65,18 +71,27 @@ INSERT INTO config_web_layer_cat_form VALUES ('F45', 'MINCUT_MANAGEMENT');
 
 
 
+INSERT INTO config_web_composer_scale VALUES (100, '1:100', NULL, 1);
+INSERT INTO config_web_composer_scale VALUES (200, '1:200', NULL, 2);
+INSERT INTO config_web_composer_scale VALUES (500, '1:500', NULL, 3);
+INSERT INTO config_web_composer_scale VALUES (1000, '1:1000', NULL, 4);
+INSERT INTO config_web_composer_scale VALUES (2000, '1:2000', NULL, 5);
+INSERT INTO config_web_composer_scale VALUES (10000, '1:10000', NULL, 6);
+INSERT INTO config_web_composer_scale VALUES (50000, '1:50000', NULL, 7);
+INSERT INTO config_web_composer_scale VALUES (5000, '1:5000', NULL, NULL);
+
+
+
 
 INSERT INTO config_web_fields VALUES (1, 'F22', 'parameter_id', NULL, 'string', 30, NULL, 'parameter', 'parameter_id', 'text', NULL, NULL, NULL, NULL, true, 1);
 INSERT INTO config_web_fields VALUES (2, 'F22', 'value', NULL, 'string', NULL, NULL, '0.00', 'value', 'text', NULL, NULL, NULL, NULL, true, 2);
 INSERT INTO config_web_fields VALUES (3, 'F22', 'text', NULL, 'string', NULL, NULL, '', 'text', 'text', NULL, NULL, NULL, NULL, true, 3);
-
 
 INSERT INTO config_web_fields VALUES (4, 'F23', 'parameter_id', NULL, 'string', NULL, NULL, 'parameter', 'parameter_id', 'text', NULL, NULL, NULL, NULL, true, 1);
 INSERT INTO config_web_fields VALUES (5, 'F23', 'position_id', NULL, 'string', NULL, NULL, '', 'position_id', 'text', NULL, NULL, NULL, NULL, true, 2);
 INSERT INTO config_web_fields VALUES (6, 'F23', 'position_value', NULL, 'string', NULL, NULL, '', 'position_value', 'text', NULL, NULL, NULL, NULL, true, 3);
 INSERT INTO config_web_fields VALUES (7, 'F23', 'value', NULL, 'string', NULL, NULL, '0.00', 'value', 'text', NULL, NULL, NULL, NULL, true, 4);
 INSERT INTO config_web_fields VALUES (8, 'F23', 'text', NULL, 'string', NULL, NULL, '', 'text', 'text', NULL, NULL, NULL, NULL, true, 5);
-
 
 INSERT INTO config_web_fields VALUES (10, 'F24', 'parameter_id', NULL, 'string', 30, NULL, 'parameter', 'id', 'text', NULL, NULL, NULL, NULL, false, 1);
 INSERT INTO config_web_fields VALUES (11, 'F24', 'position_id', NULL, 'string', 30, NULL, '', 'position_id', 'text', NULL, NULL, NULL, NULL, true, 3);
@@ -87,7 +102,6 @@ INSERT INTO config_web_fields VALUES (15, 'F24', 'geom1', NULL, 'string', NULL, 
 INSERT INTO config_web_fields VALUES (16, 'F24', 'geom2', NULL, 'string', NULL, NULL, '0.00', 'geom2', 'text', NULL, NULL, NULL, NULL, true, 9);
 INSERT INTO config_web_fields VALUES (17, 'F24', 'geom3', NULL, 'string', NULL, NULL, '0.00', 'geom3', 'text', NULL, NULL, NULL, NULL, true, 10);
 INSERT INTO config_web_fields VALUES (18, 'F24', 'value', NULL, 'string', 12, NULL, '0.00', 'value', 'text', NULL, NULL, NULL, NULL, true, 5);
-
 
 INSERT INTO config_web_fields VALUES (24, 'F31', 'hydro_expl', NULL, NULL, NULL, NULL, NULL, 'Explotació:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (25, 'F31', 'hydro_search', NULL, NULL, NULL, NULL, NULL, 'Abonat:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -102,8 +116,6 @@ INSERT INTO config_web_fields VALUES (33, 'F31', 'add_muni', NULL, NULL, NULL, N
 INSERT INTO config_web_fields VALUES (34, 'F31', 'add_street', NULL, NULL, NULL, NULL, NULL, 'Carrer:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (38, 'F31', 'visit_search', NULL, NULL, NULL, NULL, NULL, 'Visita:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-
-
 INSERT INTO config_web_fields VALUES (280, 'v_anl_mincut_result_valve', 'id', false, 'string', NULL, NULL, NULL, 'Id:', 'text', NULL, NULL, NULL, NULL, false, 1);
 INSERT INTO config_web_fields VALUES (281, 'v_anl_mincut_result_valve', 'result_id', false, 'double', 32, 0, NULL, 'Result id:', 'text', NULL, NULL, NULL, NULL, false, 2);
 INSERT INTO config_web_fields VALUES (282, 'v_anl_mincut_result_valve', 'work_order', false, 'string', NULL, NULL, NULL, 'Work order:', 'text', NULL, NULL, NULL, NULL, true, 3);
@@ -112,9 +124,17 @@ INSERT INTO config_web_fields VALUES (284, 'v_anl_mincut_result_valve', 'closed'
 INSERT INTO config_web_fields VALUES (285, 'v_anl_mincut_result_valve', 'broken', false, 'boolean', NULL, NULL, NULL, 'Broken:', 'text', NULL, NULL, NULL, NULL, false, 6);
 INSERT INTO config_web_fields VALUES (286, 'v_anl_mincut_result_valve', 'unaccess', false, 'boolean', NULL, NULL, NULL, 'Unaccess:', 'check', NULL, NULL, NULL, NULL, true, 8);
 INSERT INTO config_web_fields VALUES (287, 'v_anl_mincut_result_valve', 'proposed', false, 'boolean', NULL, NULL, NULL, 'Proposed:', 'text', NULL, NULL, NULL, NULL, false, 7);
+
 INSERT INTO config_web_fields VALUES (290, 'F45', 'mincut_muni', NULL, NULL, NULL, NULL, NULL, 'Municipi:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (291, 'F45', 'mincut_class', NULL, NULL, NULL, NULL, NULL, 'Classe:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (292, 'F45', 'mincut_workorder', NULL, NULL, NULL, NULL, NULL, 'Expedient:', NULL, NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO config_web_fields VALUES (297, 'F32', 'composer', true, 'string', NULL, NULL, NULL, 'Composer:', 'combo', 'config_web_composer', 'id', 'id', NULL, true, 1);
+INSERT INTO config_web_fields VALUES (295, 'F32', 'descript', true, 'string', NULL, NULL, 'descript', 'Descripcio:', 'textarea', NULL, NULL, NULL, NULL, true, 5);
+INSERT INTO config_web_fields VALUES (300, 'F32', 'scale', true, 'string', NULL, NULL, NULL, 'Escala:', 'combo', 'config_web_composer_scale', 'id', 'idval', NULL, true, 2);
+INSERT INTO config_web_fields VALUES (294, 'F32', 'title', true, 'string', NULL, NULL, 'title', 'Titol:', 'text', NULL, NULL, NULL, NULL, true, 4);
+INSERT INTO config_web_fields VALUES (296, 'F32_', 'date', true, 'date', NULL, NULL, NULL, 'Data:', 'datepikertime', NULL, NULL, NULL, NULL, true, 6);
+INSERT INTO config_web_fields VALUES (304, 'F32', 'divider', false, 'string', NULL, NULL, NULL, NULL, 'formDivider', NULL, NULL, NULL, NULL, true, 3);
 
 
 
