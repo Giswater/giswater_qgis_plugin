@@ -28,9 +28,6 @@ ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_feature_type_fkey
 ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_state_fkey";
 ALTER TABLE "dimensions" DROP CONSTRAINT IF EXISTS "dimensions_exploitation_id_fkey";
 
-ALTER TABLE "audit_cat_table_x_column" DROP CONSTRAINT IF EXISTS "table_id_column_id_unique";
-ALTER TABLE "audit_cat_table_x_column" DROP CONSTRAINT IF EXISTS "audit_cat_table_x_column_table_id_fkey";
-ALTER TABLE "audit_cat_table_x_column" DROP CONSTRAINT IF EXISTS "audit_cat_table_x_column_sys_role_id_fkey" ;
 
 ALTER TABLE "audit_cat_table" DROP CONSTRAINT IF EXISTS "audit_cat_table_sys_role_id_fkey" ;
 ALTER TABLE "audit_cat_table" DROP CONSTRAINT IF EXISTS "audit_cat_table_qgis_role_id_fkey";
@@ -67,9 +64,6 @@ ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_feature_type_fkey" FOREIGN K
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_state_fkey" FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "dimensions" ADD CONSTRAINT "dimensions_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "audit_cat_table_x_column" ADD CONSTRAINT "table_id_column_id_unique" UNIQUE("table_id","column_id");
-ALTER TABLE "audit_cat_table_x_column" ADD CONSTRAINT "audit_cat_table_x_column_table_id_fkey" FOREIGN KEY ("table_id")  REFERENCES "audit_cat_table" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "audit_cat_table_x_column" ADD CONSTRAINT "audit_cat_table_x_column_sys_role_id_fkey" FOREIGN KEY ("sys_role_id")  REFERENCES "sys_role" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE "audit_cat_table" ADD CONSTRAINT "audit_cat_table_sys_role_id_fkey" FOREIGN KEY ("sys_role_id")  REFERENCES "sys_role" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE "audit_cat_table" ADD CONSTRAINT "audit_cat_table_qgis_role_id_fkey" FOREIGN KEY ("qgis_role_id")  REFERENCES "sys_role" ("id") ON UPDATE CASCADE ON DELETE RESTRICT;

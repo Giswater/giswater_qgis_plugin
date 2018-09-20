@@ -226,7 +226,7 @@ BEGIN
 	RETURN NEW;
 
     END IF;
-    
+    RETURN NEW;
 END; 
 $BODY$
   LANGUAGE plpgsql VOLATILE
