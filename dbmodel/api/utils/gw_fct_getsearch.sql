@@ -1,11 +1,4 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getsearch"(device int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getsearch"(device int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -28,7 +21,7 @@ DECLARE
     formAddress json;
     formVisit json;
     rec_tab record;
-    v_firsttab boolean;
+    v_firsttab boolean := FALSE;
     v_active boolean;
     rec_fields record;
 
@@ -89,9 +82,12 @@ BEGIN
         fieldsJson := COALESCE(fieldsJson, '[]');
         
         -- Create network tab form
-        formNetwork := json_build_object('tabName','network','tabLabel',rec_tab.tablabel, 'active' , true);
+        IF v_firsttab THEN
+        formNetwork := json_build_object('tabName','network','tabLabel',rec_tab.tablabel, 'active' , v_active);
+        ELSE
+            formNetwork := json_build_object('tabName','network','tabLabel',rec_tab.tablabel, 'active' , true);
         formNetwork := gw_fct_json_object_set_key(formNetwork, 'fields', fieldsJson);
-
+    END IF;
         -- Create tabs array
         formTabs := formTabs || formNetwork::text;
 
@@ -116,12 +112,14 @@ BEGIN
         fieldsJson := COALESCE(fieldsJson, '[]');
 
         -- Create search tab form
-        formSearch := json_build_object('tabName','search','tabLabel',rec_tab.tablabel, 'active', v_active );
-        formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
-
+    
         IF v_firsttab THEN 
+            formSearch := json_build_object('tabName','search','tabLabel',rec_tab.tablabel, 'active', v_active );
+            formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
             formTabs := formTabs || ',' || formSearch::text;
         ELSE 
+            formSearch := json_build_object('tabName','search','tabLabel',rec_tab.tablabel, 'active', true );
+            formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
             formTabs := formTabs || formSearch::text;
         END IF;
 
@@ -185,15 +183,17 @@ BEGIN
         -- Create array with network fields
         fieldsJson := '[' || comboType || ',' || editCode1 || ',' || editCode2 || ']';
         fieldsJson := COALESCE(fieldsJson, '[]');
-
-        --    Create network tab form
-        formAddress := json_build_object('tabName','address','tabLabel',rec_tab.tablabel, 'active', v_active );
-        formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
-
+        
         -- Create tabs array
         IF v_firsttab THEN 
+            formAddress := json_build_object('tabName','address','tabLabel',rec_tab.tablabel, 'active', v_active );
+            formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
+
             formTabs := formTabs || ',' || formAddress::text;
         ELSE 
+            formAddress := json_build_object('tabName','address','tabLabel',rec_tab.tablabel, 'active', true );
+            formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
+
             formTabs := formTabs || formAddress::text;
         END IF;
 
@@ -248,15 +248,15 @@ BEGIN
         -- Create array with hydro fields
         fieldsJson := '[' || comboType || ',' || editCode || ']';
         fieldsJson := COALESCE(fieldsJson, '[]');
-    
-        -- Create hydro tab form
-        formHydro := json_build_object('tabName','hydro','tabLabel',rec_tab.tablabel, 'active', v_active );
-        formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
-
+        
         -- Create tabs array
         IF v_firsttab THEN 
+            formHydro := json_build_object('tabName','hydro','tabLabel',rec_tab.tablabel, 'active', v_active );
+            formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
             formTabs := formTabs || ',' || formHydro::text;
         ELSE 
+            formHydro := json_build_object('tabName','hydro','tabLabel',rec_tab.tablabel, 'active', true );
+            formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
             formTabs := formTabs || formHydro::text;
         END IF;
 
@@ -277,16 +277,16 @@ BEGIN
 
         -- Create array with workcat fields
         fieldsJson := '[' || editCode || ']';
-        fieldsJson := COALESCE(fieldsJson, '[]');
-
-        -- Create workcat tab form
-        formWorkcat := json_build_object('tabName','workcat','tabLabel',rec_tab.tablabel, 'active', v_active );
-        formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
+        fieldsJson := COALESCE(fieldsJson, '[]');    
 
         -- Create tabs array
         IF v_firsttab THEN 
+            formWorkcat := json_build_object('tabName','workcat','tabLabel',rec_tab.tablabel, 'active', v_active );
+            formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
             formTabs := formTabs || ',' || formWorkcat::text;
         ELSE 
+            formWorkcat := json_build_object('tabName','workcat','tabLabel',rec_tab.tablabel, 'active', true );
+            formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
             formTabs := formTabs || formWorkcat::text;
         END IF;
 
@@ -341,15 +341,15 @@ BEGIN
         -- Create array with hydro fields
         fieldsJson := '[' || comboType || ',' || editCode || ']';
         fieldsJson := COALESCE(fieldsJson, '[]');
-    
-        -- Create hydro tab form
-        formPsector := json_build_object('tabName','psector','tabLabel',rec_tab.tablabel, 'active', v_active );
-        formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
-
+   
         -- Create tabs array
         IF v_firsttab THEN 
+            formPsector := json_build_object('tabName','psector','tabLabel',rec_tab.tablabel, 'active', v_active );
+            formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
             formTabs := formTabs || ',' || formPsector::text;
         ELSE 
+            formPsector := json_build_object('tabName','psector','tabLabel',rec_tab.tablabel, 'active', true );
+            formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
             formTabs := formTabs || formPsector::text;
         END IF;
 
@@ -369,14 +369,15 @@ BEGIN
         fieldsJson := '[' || editCode || ']';
         fieldsJson := COALESCE(fieldsJson, '[]');
 
-        -- Create workcat tab form
-        formVisit := json_build_object('tabName','visit','tabLabel','Visita', 'active', v_active );
-        formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
 
         -- Create tabs array
         IF v_firsttab THEN 
+            formVisit := json_build_object('tabName','visit','tabLabel','Visita', 'active', v_active );
+            formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
             formTabs := formTabs || ',' || formVisit::text;
         ELSE 
+            formVisit := json_build_object('tabName','visit','tabLabel','Visita', 'active', true );
+            formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
             formTabs := formTabs || formVisit::text;
         END IF;
 

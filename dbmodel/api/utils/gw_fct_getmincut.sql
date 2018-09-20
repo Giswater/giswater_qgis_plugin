@@ -48,6 +48,8 @@ DECLARE
     v_exec_geom public.geometry;
     v_anl_geom public.geometry;
 
+    v_mincut_street_none text;
+
     
 
 BEGIN
@@ -232,7 +234,9 @@ BEGIN
         SELECT ((value::json)->>'mincut_type') INTO v_mincut_new_type FROM config_param_system WHERE parameter='api_mincut_new_vdef';
         SELECT ((value::json)->>'anl_cause') INTO v_mincut_new_cause FROM config_param_system WHERE parameter='api_mincut_new_vdef';
         SELECT ((value::json)->>'assigned_to') INTO v_mincut_new_assigned FROM config_param_system WHERE parameter='api_mincut_new_vdef';
+        SELECT ((value::json)->>'street_none') INTO v_mincut_street_none FROM config_param_system WHERE parameter='api_mincut_new_vdef';
 
+        v_mincut_street_none='1-9110C';
 
 --        Return defaults
         json_array[0] := gw_fct_createwidgetjson('mincut_id', 'mincut_id', 'text', 'string', '', TRUE, '');
@@ -260,10 +264,17 @@ BEGIN
         json_array[21] := gw_fct_createwidgetjson('Data Final', 'exec_end', 'datepickertime', 'date', '', v_state1, NULL);
         json_array[22] := gw_fct_createwidgetjson('Finalitzar procediment de tall', 'gw_fct_setmincut_end', 'button', 'string', '', v_state1,'');
 
+
 --        Get location combos searching the address
-        EXECUTE 'SELECT array_agg(row.id) FROM (SELECT id FROM ext_address WHERE ST_DWithin(the_geom, $1, 300) ORDER BY ST_distance (the_geom,$1) ASC LIMIT 5) row'
+        EXECUTE 'SELECT array_agg(row.id) FROM (SELECT id FROM ext_address WHERE ST_DWithin(the_geom, $1, 200) ORDER BY ST_distance (the_geom,$1) ASC LIMIT 5) row'
         INTO address_array
         USING point_geom;
+
+        IF address_array IS NULL THEN
+            EXECUTE 'SELECT array_agg(row.id) FROM (SELECT id FROM ext_address) row'
+                INTO address_array
+                USING point_geom;
+        END IF;
 
 --        Get municipality
         EXECUTE 'SELECT array_agg(row.name) FROM (SELECT DISTINCT ext_municipality.name FROM ext_address JOIN ext_municipality USING (muni_id) WHERE id = ANY($1)) row'
@@ -278,8 +289,11 @@ BEGIN
                         'disabled', FALSE, 'tab', 'location', 
                         'comboNames', array_to_json(aux_combo_name),
                         'comboIds', array_to_json(aux_combo_id), 
-                        'selectedId', aux_combo_id[1]::TEXT
-                        );
+                        'selectedId', aux_combo_id[1]::TEXT);
+
+        json_array[26] := gw_fct_createwidgetjson('Postcode', 'postcode', 'text', 'string', '', FALSE, '');
+        json_array[27] := gw_fct_createwidgetjson('Street axis', 'streetaxis_id', 'text', 'string', '', FALSE, '');
+
 
 --        Get postcode
         EXECUTE 'SELECT array_agg(row.postcode) FROM (SELECT DISTINCT postcode FROM ext_address WHERE id = ANY($1)) row'
@@ -292,6 +306,23 @@ BEGIN
                         'comboNames', array_to_json(aux_combo_name),
                         'comboIds', array_to_json(aux_combo_name), 
                         'selectedId', aux_combo_name[1]::TEXT
+                        );                        
+--        Get street
+        EXECUTE 'SELECT array_agg(row.streetaxis_id) FROM (SELECT $2::text AS streetaxis_id UNION SELECT DISTINCT streetaxis_id FROM ext_address WHERE id = ANY($1)) row'
+            INTO aux_combo_id
+            USING address_array, v_mincut_street_none;        
+
+        EXECUTE 'SELECT array_agg(row.name) FROM (SELECT DISTINCT ext_streetaxis.name FROM ext_address JOIN ext_streetaxis ON 
+            (streetaxis_id = ext_streetaxis.id) WHERE ext_address.id = ANY($1)) row'
+            INTO aux_combo_name
+            USING address_array;
+
+--        Construc the JSON
+        json_array[27] := json_build_object('label', 'Street_axis', 'name', 'streetaxis_id', 'type', 'combo', 'dataType', 'string', 
+                        'disabled', FALSE, 'tab', 'location', 
+                        'comboNames', array_to_json(aux_combo_name),
+                        'comboIds', array_to_json(aux_combo_id), 
+                        'selectedId', aux_combo_id[1]
                         );
 
 --        Get postnumber
@@ -299,30 +330,9 @@ BEGIN
         INTO aux_combo_name
         USING address_array;
 
---        Construc the JSON
-        json_array[27] := json_build_object('label', 'Number', 'name', 'postnumber', 'type', 'combo', 'dataType', 'string', 
-                        'disabled', FALSE, 'tab', 'location', 
-                        'comboNames', array_to_json(aux_combo_name),
-                        'comboIds', array_to_json(address_array), 
-                        'selectedId', address_array[1]::TEXT
-                        );                                                
+        json_array[28] := gw_fct_createwidgetjson('Postnumber', 'postnumber', 'text', 'string', '', FALSE, '');
 
---        Get street
-        EXECUTE 'SELECT array_agg(row.name) FROM (SELECT DISTINCT ext_streetaxis.name FROM ext_address JOIN ext_streetaxis ON (streetaxis_id = ext_streetaxis.id) WHERE ext_address.id = ANY($1)) row'
-        INTO aux_combo_name
-        USING address_array;
-        EXECUTE 'SELECT array_agg(row.streetaxis_id) FROM (SELECT DISTINCT streetaxis_id FROM ext_address WHERE id = ANY($1)) row'
-        INTO aux_combo_id
-        USING address_array;        
 
---        Construc the JSON
-        json_array[28] := json_build_object('label', 'Street_axis', 'name', 'streetaxis_id', 'type', 'combo', 'dataType', 'string', 
-                        'disabled', FALSE, 'tab', 'location', 
-                        'comboNames', array_to_json(aux_combo_name),
-                        'comboIds', array_to_json(aux_combo_id), 
-                        'selectedId', aux_combo_id[1]
-                        );
-        raise notice '3';
 
     END IF;
     

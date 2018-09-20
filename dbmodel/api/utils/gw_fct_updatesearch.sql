@@ -170,8 +170,6 @@ IF tab_arg = 'network' THEN
     edit1 := search_data->>'net_code';
     text_arg := concat('%',edit1->>'text' ,'%');
 
-    raise notice'text_arg %', text_arg;
-
 
    IF p_network_layer_arc IS NOT NULL THEN
     query_text=concat ('SELECT ',p_network_search_field_arc_id,' AS sys_id, ',
@@ -188,7 +186,6 @@ IF tab_arg = 'network' THEN
                  p_network_search_field_node_cat,' AS cat_id, ',
                  p_network_search_field_node_id, ' AS sys_idname, ',
                 quote_literal(p_network_layer_node), '::text AS sys_table_id FROM ', p_network_layer_node);
-
    END IF;
    IF p_network_layer_connec IS NOT NULL THEN
            IF query_text IS NOT NULL THEN query_text=concat(query_text,' UNION '); END IF;
@@ -231,21 +228,20 @@ IF tab_arg = 'network' THEN
     IF id_arg = '' THEN 
         -- Get Ids for type combo
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (sys_id, '' : '', cat_id) AS display_name, sys_idname FROM ('||query_text||')b
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ('||query_text||')b
                     WHERE search_field::text ILIKE ' || quote_literal(text_arg) || ' 
                     ORDER BY search_field LIMIT 10) a'
                     INTO response_json;
     ELSE 
         -- Get Ids for type combo
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (sys_id, '' : '', cat_id) AS display_name, sys_idname FROM ('||query_text||')b
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ('||query_text||')b
                     WHERE search_field::text ILIKE ' || quote_literal(text_arg) || ' AND sys_table_id = '||quote_literal(id_arg)||'
                     ORDER BY search_field LIMIT 10) a'
                     INTO response_json;
     END IF;
 
-    raise notice'response_json %', response_json;
-
+    
     
 -- address
 ---------
@@ -271,9 +267,6 @@ ELSIF tab_arg = 'address' THEN
     edit1 := search_data->>'add_street';
     text_arg := concat('%', edit1->>'text' ,'%');
 
-    raise notice'text_arg %', text_arg;
-
-
     -- Fix municipality vdefault
     DELETE FROM config_param_user WHERE parameter='search_municipality_vdefault' AND cur_user=current_user;
     INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_municipality_vdefault',id_arg, current_user);
@@ -287,7 +280,7 @@ ELSIF tab_arg = 'address' THEN
         WHERE '||v_muni_layer||'.'||v_muni_display_field||' = '||quote_literal(name_arg)||'
         AND '||v_street_layer||'.'||v_street_display_field||' ILIKE '''||text_arg||''' LIMIT 10 )a'
         INTO response_json;
-    raise notice'response %', response_json;
+    
 
 -- Hydro tab
 ------------
@@ -341,13 +334,15 @@ ELSIF tab_arg = 'address' THEN
     edit1 := search_data->>'workcat_search';
     text_arg := concat('%', edit1->>'text' ,'%');
 
+
     --  Search in the workcat
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
         FROM (SELECT '||v_workcat_display_field||' as display_name, '||quote_literal(v_workcat_layer)||' AS sys_table_id , 
         '||(v_workcat_id_field)||' AS sys_id, '||quote_literal(v_workcat_layer)||' 
-        AS sys_idname FROM '||v_workcat_layer|| '
-        WHERE '||v_workcat_display_field||'::text ILIKE '''||text_arg||''' LIMIT 10 )a'
+        AS sys_idname FROM '||quote_ident(v_workcat_layer) ||' 
+        WHERE '||v_workcat_display_field||'::text ILIKE'''||text_arg||'''LIMIT 10 )a'
         INTO response_json;
+
 
 -- Visit tab
 --------------

@@ -1,11 +1,4 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, p_id varchar, formtodisplay text) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, p_id varchar, formtodisplay text) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -14,6 +7,7 @@ DECLARE
     position json;
     fields json;
     fields_array json[];
+    values_array json;
     position_row integer;
     combo_rows json[];
     aux_json json;    
@@ -26,6 +20,7 @@ DECLARE
     field_value character varying;
     class_id_var text;
     api_version json;
+    rec_value record;
 
 
 
@@ -93,31 +88,29 @@ ORDER BY a.attnum'
         USING schemas_array[1], table_id, table_pkey
         INTO column_type;
         
-raise notice 'Layer pkey: % ; Column_type %', table_pkey, column_type;
+--getting values
+EXECUTE 'SELECT (row_to_json(a)) FROM 
+    (SELECT * FROM '||table_id||' WHERE '||table_pkey||' = CAST($1 AS '||column_type||'))a'
+        INTO values_array
+        USING p_id;
 
 
 --    Fill every value
     FOREACH aux_json IN ARRAY fields_array
     LOOP
---        Index
+--      Index
         array_index := array_index + 1;
 
---        Get field values
-        EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || (table_id) || ' WHERE "' || (table_pkey) || '" = CAST(' || quote_literal(p_id) || ' AS ' || column_type || ')'  
-       INTO field_value; 
+    field_value := (values_array->>(aux_json->>'name'));
           
         field_value := COALESCE(field_value, '');
         
---        Update array
-          fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
-
-            
+--      Update array
+        fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
+           
     END LOOP;
 
-
-raise notice '5';
-
-    
+   
 --    Convert to json
     fields := array_to_json(fields_array);
 
