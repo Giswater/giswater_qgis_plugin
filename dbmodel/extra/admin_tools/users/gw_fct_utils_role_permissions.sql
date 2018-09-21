@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_role_permissions(text, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_role_permissions(db_name_aux text, schema_name_aux text) RETURNS void AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_role_permissions(text, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_role_permissions(db_name_aux text, SCHEMA_NAME_aux text) RETURNS void AS
 $BODY$
 
 DECLARE 
@@ -15,6 +15,7 @@ table_record record;
 project_type_aux text;
 query_text text;
 function_name_aux text;
+v_api_publish_user text;
 
 BEGIN 
 
@@ -25,22 +26,36 @@ BEGIN
 	-- Looking for project type
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
+	-- Looking for publish user
+	SELECT value INTO v_api_publish_user FROM config_param_system WHERE parameter='api_publish_user' LIMIT 1;
+	
+	IF v_api_publish_user is not null THEN
+	
+		-- Grant generic permissions
+		-- We don't need acces on database and schema because first time it have been defined using the API side.
+		query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||SCHEMA_NAME_aux||' TO ' ||v_api_publish_user;
+		EXECUTE query_text;
+
+		query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||SCHEMA_NAME_aux||' TO ' ||v_api_publish_user; 
+		EXECUTE query_text;
+		
+	END IF;
 	
 	-- Grant generic permissions
 	query_text:= 'GRANT ALL ON DATABASE '||db_name_aux||' TO "role_basic";';
 	EXECUTE query_text;	
 
-	query_text:= 'GRANT ALL ON SCHEMA '||schema_name_aux||' TO "role_basic";';
+	query_text:= 'GRANT ALL ON SCHEMA '||SCHEMA_NAME_aux||' TO "role_basic";';
 	EXECUTE query_text;
 
-	query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||schema_name_aux||' TO "role_basic";';
+	query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||SCHEMA_NAME_aux||' TO "role_basic";';
 	EXECUTE query_text;
 
-	query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||schema_name_aux||' TO "role_basic";'; 
+	query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||SCHEMA_NAME_aux||' TO "role_basic";'; 
 	EXECUTE query_text;
 	
 	-- Grant all in order to ensure the functionality. We need to review the catalog function before downgrade ALL to SELECT
-	query_text:= 'GRANT ALL ON ALL FUNCTIONS IN SCHEMA '||schema_name_aux||' TO role_basic'; 
+	query_text:= 'GRANT ALL ON ALL FUNCTIONS IN SCHEMA '||SCHEMA_NAME_aux||' TO role_basic'; 
 		EXECUTE query_text;
 	
 
