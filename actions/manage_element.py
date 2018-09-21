@@ -366,8 +366,8 @@ class ManageElement(ParentManage):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
         
         sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_element"
-               " WHERE elementtype_id = '" + utils_giswater.getWidgetText(self.dlg_add_element, "element_type") + "'")
-                " ORDER BY id")
+               " WHERE elementtype_id = '" + utils_giswater.getWidgetText(self.dlg_add_element, "element_type") + "'"
+               " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_add_element, "elementcat_id", rows, False)
 
