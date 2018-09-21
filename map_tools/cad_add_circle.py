@@ -18,8 +18,7 @@ else:
     from qgis.PyQt.QtCore import QPoint, Qt
     from qgis.PyQt.QtGui import QDoubleValidator
     
-from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2
-from qgis.core import QgsProject, QgsSingleSymbolRendererV2
+from qgis.core import QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
 import utils_giswater

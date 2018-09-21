@@ -16,10 +16,9 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QDoubleValidator
 else:
     from qgis.PyQt.QtCore import QPoint, Qt
-    from qgis.PyQt.QtGui import QDoubleValidator
+    from qgis.PyQt.QtGui import QDoubleValidator  
 
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint
-from qgis.core import QgsProject, QgsSingleSymbolRendererV2, QgsMarkerSymbolV2, QgsMapToPixel
+from qgis.core import QgsPoint, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
 import utils_giswater

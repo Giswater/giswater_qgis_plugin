@@ -1,10 +1,21 @@
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
+    from PyQt4 import uic
+    from PyQt4.QtCore import QObject, QPyNullVariant, Qt
+    from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
+    from PyQt4.QtSql import QSqlTableModel
+else:
+    from qgis.PyQt import uic
+    from qgis.PyQt.QtCore import QObject, Qt, QSortFilterProxyModel, QStringListModel
+    from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
+    from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
-from PyQt4 import uic
-from PyQt4.QtCore import QObject, QPyNullVariant, Qt
-from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 
 from functools import partial
 import operator
@@ -1070,11 +1081,17 @@ class SearchPlus(QObject):
             attrs = feature.attributes()                
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
-            if not type(value_code) is QPyNullVariant and geom is not None:
-                elem = [value_code, value_name, geom.exportToWkt()]
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                if not type(value_code) is QPyNullVariant and geom is not None:
+                    elem = [value_code, value_name, geom.exportToWkt()]
+                else:
+                    elem = [value_code, value_name, None]
+            # TODO: 3.x
             else:
-                elem = [value_code, value_name, None]
-            records.append(elem)
+                if value_code is not None and geom is not None:
+                    elem = [value_code, value_name, geom.exportToWkt()]
+                else:
+                    elem = [value_code, value_name, None]
 
         # Fill combo     
         combo.blockSignals(True)

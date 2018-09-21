@@ -19,9 +19,9 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtSql import QSqlTableModel
 else:
     from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QDate, QDateTime, QStringListModel
-    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator 
+    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor 
     from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QCompleter
-    from qgis.PyQt.QtWidgets import QCheckBox, QColor, QFormLayout, QIcon, QWidget, QDialog, QTextEdit, QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox
+    from qgis.PyQt.QtWidgets import QCheckBox, QFormLayout, QIcon, QWidget, QDialog, QTextEdit, QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox
     from qgis.PyQt.QtSql import QSqlTableModel
     
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
@@ -1632,7 +1632,7 @@ class ParentDialog(QDialog):
         """ Manage layers """
 
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         if len(layers) == 0:
             return
 

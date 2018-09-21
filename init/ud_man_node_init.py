@@ -16,7 +16,8 @@ if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
 else:
     from qgis.PyQt.QtCore import QPoint, Qt
-    from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
+    from qgis.PyQt.QtGui import QColor    
+    from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
     
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker

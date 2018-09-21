@@ -22,8 +22,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     if 'nt' in sys.builtin_module_names:
         import winreg as winreg  
 else:
-    from qgis.PyQt.Qt import QDate, QDateTime
-    from qgis.PyQt.QtCore import QTime, QSortFilterProxyModel, QStringListModel
+    from qgis.PyQt.QtCore import QDate, QDateTime, QTime, QSortFilterProxyModel, QStringListModel
     from qgis.PyQt.QtGui import QDoubleValidator, QPixmap
     from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QCompleter, QDateTimeEdit
     from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
