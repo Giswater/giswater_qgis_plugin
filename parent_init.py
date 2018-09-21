@@ -1952,7 +1952,7 @@ class ParentDialog(QDialog):
             return None
             
         # Iterate over all dictionary
-        for feature_cat in self.feature_cat.itervalues():           
+        for feature_cat in self.controller.get_values_from_dictionary(self.feature_cat):           
             if sys_feature_cat_id == feature_cat.id:
                 layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 return layer

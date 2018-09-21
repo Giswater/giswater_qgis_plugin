@@ -211,21 +211,22 @@ class Giswater(QObject):
         menu = QMenu()
 
         # List of nodes from node_type_cat_type - nodes which we are using
-        for feature_cat in self.feature_cat.itervalues():
+        list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
+        for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.type == 'NODE') or (index_action == '02' and feature_cat.type == 'ARC'):
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
         menu.addSeparator()
-        for feature_cat in self.feature_cat.itervalues():
+        for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.type == 'CONNEC'):
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
         menu.addSeparator()
-        for feature_cat in self.feature_cat.itervalues():
+        for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.type == 'GULLY' and self.wsoftware == 'ud'):
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
@@ -342,7 +343,7 @@ class Giswater(QObject):
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()           
-        for plugin_toolbar in self.plugin_toolbars.itervalues():
+        for plugin_toolbar in self.controller.get_values_from_dictionary(self.plugin_toolbars):
             ag = QActionGroup(parent)
             for index_action in plugin_toolbar.list_actions:
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)                                                                            
@@ -452,11 +453,11 @@ class Giswater(QObject):
         """ Removes the plugin menu item and icon from QGIS GUI """
         
         try:
-            for action in self.actions.itervalues():
+            for action in self.controller.get_values_from_dictionary(self.actions):
                 self.iface.removePluginMenu(self.plugin_name, action)
                 self.iface.removeToolBarIcon(action)
                 
-            for plugin_toolbar in self.plugin_toolbars.itervalues():
+            for plugin_toolbar in self.controller.get_values_from_dictionary(self.plugin_toolbars):
                 if plugin_toolbar.enabled:
                     plugin_toolbar.toolbar.setVisible(False)                
                     del plugin_toolbar.toolbar
@@ -499,7 +500,7 @@ class Giswater(QObject):
         self.enable_actions(visible)
         
         try:
-            for plugin_toolbar in self.plugin_toolbars.itervalues():
+            for plugin_toolbar in self.plugin_toolbars.values():
                 if plugin_toolbar.enabled:                
                     plugin_toolbar.toolbar.setVisible(visible)
         except AttributeError:

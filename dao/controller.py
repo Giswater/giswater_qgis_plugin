@@ -1103,3 +1103,16 @@ class DaoController():
             
         return layers        
         
+
+    def get_values_from_dictionary(self, dictionary):
+        """ Return values from @dictionary """
+        
+        list_values = None
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            list_values = dictionary.itervalues()
+        else:
+            list_values = iter(dictionary.values())
+            
+        return list_values   
+    
+    

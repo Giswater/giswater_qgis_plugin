@@ -431,7 +431,7 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        for value in self.feature_cat.itervalues():
+        for value in self.controller.get_values_from_dictionary(self.feature_cat):
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
@@ -1029,7 +1029,7 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        for value in self.feature_cat.itervalues():
+        for value in self.controller.get_values_from_dictionary(self.feature_cat):
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
