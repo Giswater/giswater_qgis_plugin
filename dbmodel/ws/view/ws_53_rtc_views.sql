@@ -58,7 +58,7 @@ JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id = rtc_scada_node.sc
 
 	 
 	 
-	 
+DROP VIEW IF EXISTS v_rtc_hydrometer_period CASCADE;	 
 CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
  SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     ext_cat_period.id AS period_id,

@@ -76,7 +76,7 @@ BEGIN
 	-- To do (enhance link buffer using the same strategy of arcs, moving the endpoint of the link to the node candidate)
 	-- Meanwhile, v_link_searchbuffer is forced to 0.001
 	-- SELECT ??? into v_link_searchbuffer FROM config_param_system;
-	v_link_searchbuffer=0.001
+	v_link_searchbuffer=0.001;
 
     -- control of project type
     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
