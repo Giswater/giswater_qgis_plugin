@@ -16,8 +16,7 @@ class PgDao():
             self.conn = psycopg2.connect(self.conn_string)
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
-        except psycopg2.DatabaseError, e:
-            print '{pg_dao} Error %s' % e
+        except psycopg2.DatabaseError as e:
             self.last_error = e            
             status = False
         return status
@@ -80,7 +79,7 @@ class PgDao():
         try:
             name = self.cursor.description[index][0]
         except Exception as e:
-            print "get_column_name: {0}".format(e)        
+            print("get_column_name: {0}".format(e))        
         finally:
             return name
         
@@ -92,7 +91,7 @@ class PgDao():
         try:
             total = len(self.cursor.description)
         except Exception as e:
-            print "get_columns_length: {0}".format(e)        
+            print("get_columns_length: {0}".format(e))        
         finally:
             return total
 
