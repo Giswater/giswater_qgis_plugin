@@ -80,7 +80,10 @@ class Giswater(QObject):
 
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
-        QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)   
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)
+        else:
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
             
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
@@ -101,8 +104,12 @@ class Giswater(QObject):
         self.set_signals()
         
         # Set default encoding 
-        reload(sys)
-        sys.setdefaultencoding('utf-8')   #@UndefinedVariable
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            reload(sys)
+            sys.setdefaultencoding('utf-8')   #@UndefinedVariable
+        # TODO: 3.x
+        else:
+            pass
        
                
     def set_signals(self): 
