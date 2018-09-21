@@ -23,8 +23,8 @@ import operator
 from functools import partial
 
 import utils_giswater
-from api_parent import ApiParent
-from ui_manager import ApiSearchUi
+from giswater.actions.api_parent import ApiParent
+from giswater.ui_manager import ApiSearchUi
 
 
 class ApiSearch(ApiParent):

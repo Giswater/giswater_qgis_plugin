@@ -22,10 +22,10 @@ import os
 from functools import partial
 
 import utils_giswater
-from ui_manager import Multirow_selector
-from ui_manager import WScatalog
-from ui_manager import UDcatalog
-from parent import ParentAction
+from giswater.ui_manager import Multirow_selector
+from giswater.ui_manager import WScatalog
+from giswater.ui_manager import UDcatalog
+from giswater.actions.parent import ParentAction
 
 
 class Catalog(ParentAction):

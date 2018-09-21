@@ -17,7 +17,9 @@ if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtSql import QSqlQueryModel
 else:
     from qgis.PyQt.QtCore import QObject, QSettings, Qt
+    from qgis.PyQt.QtGui import QIcon
     from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView
+    from qgis.core import QgsProject
     
 from qgis.core import QgsExpressionContextUtils, QgsProject
 
@@ -25,8 +27,8 @@ import os.path
 import sys  
 from functools import partial
 
-# from actions.api_cf import ApiCF
-# from actions.api_search import ApiSearch
+from actions.api_cf import ApiCF
+from actions.api_search import ApiSearch
 from actions.go2epa import Go2Epa
 from actions.basic import Basic
 from actions.edit import Edit

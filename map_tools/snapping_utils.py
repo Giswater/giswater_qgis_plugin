@@ -17,8 +17,15 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject
-from qgis.gui import QgsMapCanvasSnapper
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.gui import QgsMapCanvasSnapper
+else:
+    from qgis.gui import QgsMapCanvas
 
 
 class SnappingConfigManager():

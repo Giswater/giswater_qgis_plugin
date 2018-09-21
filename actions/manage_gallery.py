@@ -24,9 +24,9 @@ import urlparse
 import ExtendedQLabel
 from functools import partial
 
-from ui_manager import Gallery
-from ui_manager import GalleryZoom
-from actions.parent_manage import ParentManage
+from giswater.ui_manager import Gallery
+from giswater.ui_manager import GalleryZoom
+from giswater.actions.parent_manage import ParentManage
 
 
 class ManageGallery(ParentManage):

@@ -25,8 +25,8 @@ import operator
 from functools import partial
 
 import utils_giswater
-from actions.api_parent import ApiParent
-from ui_manager import ApiConfigUi
+from giswater.actions.api_parent import ApiParent
+from giswater.ui_manager import ApiConfigUi
 
 
 class ApiConfig(ApiParent):

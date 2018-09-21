@@ -26,17 +26,19 @@ except:
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import Qt, QPoint
     from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
+    from qgis.gui import QgsMapCanvasSnapper
 else:
     from qgis.PyQt.QtCore import Qt, QPoint
     from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
+    from qgis.gui import QgsMapCanvas
     
 from qgis.core import QgsPoint, QgsExpression
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
+from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 
 import os
 import sys
 
-from snapping_utils import SnappingConfigManager
+from giswater.map_tools.snapping_utils import SnappingConfigManager
 
 
 class ParentMapTool(QgsMapTool):

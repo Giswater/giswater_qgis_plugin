@@ -14,7 +14,7 @@ if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import QObject, QTimer, QPoint, SIGNAL
     from PyQt4.QtGui import QPushButton, QLineEdit, QColor
 else:
-    from qgis.PyQt.QtCore import QObject, QTimer, QPoint, SIGNAL
+    from qgis.PyQt.QtCore import QObject, QTimer, QPoint
     from qgis.PyQt.QtGui import QColor    
     from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
 

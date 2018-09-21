@@ -19,14 +19,16 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import QPoint, Qt, SIGNAL
     from PyQt4.QtGui import QListWidget, QListWidgetItem, QLineEdit
     from PyQt4.QtXml import QDomDocument
-    from qgis.core import QgsComposition    
+    from qgis.core import QgsComposition
+    from qgis.gui import QgsMapCanvasSnapper    
 else:
-    from qgis.PyQt.QtCore import QPoint, Qt, SIGNAL
+    from qgis.PyQt.QtCore import QPoint, Qt
     from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
     from qgis.PyQt.QtXml import QDomDocument
+    from qgis.gui import QgsMapCanvas    
     
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsVectorLayer
-from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
+from qgis.gui import  QgsMapToolEmitPoint, QgsVertexMarker
 
 from functools import partial
 from decimal import Decimal
