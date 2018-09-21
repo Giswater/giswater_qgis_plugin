@@ -80,17 +80,17 @@ class ApiSearch(ApiParent):
         self.dlg_search.show()
 
 
-    def add_lineedit(self, field):
+    def add_lineedit(self,  field):
         """ Add widgets QLineEdit type """
         widget = QLineEdit()
         widget.setObjectName(field['name'])
         if 'value' in field:
             widget.setText(field['value'])
-        if 'iseditable' in field:
-            widget.setReadOnly(not field['disable'])
-            if not field['iseditable']:
-                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
-                                     " color: rgb(100, 100, 100)}")
+
+        if 'disabled' in field:
+            widget.setReadOnly(field['disabled'])
+            if field['disabled']:
+                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
         model = QStringListModel()
         completer = QCompleter()
         completer.highlighted.connect(partial(self.zoom_to_object, completer))
@@ -102,6 +102,11 @@ class ApiSearch(ApiParent):
 
 
     def zoom_to_object(self, completer):
+        index = self.dlg_search.main_tab.currentIndex()
+        line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
+        for line_edit in line_list:
+            line_edit.setReadOnly(False)
+            line_edit.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
         # Get text from selected row
         row = completer.popup().currentIndex().row()
         _key = completer.completionModel().index(row, 0).data()
@@ -152,6 +157,7 @@ class ApiSearch(ApiParent):
         """ Create a list of ids and populate widget (QLineEdit)"""
         # # Set SQL
         json_search = {}
+        row = None
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
@@ -165,32 +171,45 @@ class ApiSearch(ApiParent):
             _json['id'] = id
             _json['name'] = name
             json_search[combo.objectName()] = _json
-
+        self.controller.log_info(str(len(line_list)))
         if line_list:
-            line = line_list[0]
-            value = utils_giswater.getWidgetText(self.dlg_search, line)
-            json_search[line.objectName()] = {}
+            line_edit = line_list[0]
             _json = {}
+            value = utils_giswater.getWidgetText(self.dlg_search, line_edit)
+
+            json_search[line_edit.objectName()] = {}
             _json['text'] = value
-            json_search[line.objectName()] = _json
+            json_search[line_edit.objectName()] = _json
 
-        json_search = json.dumps(json_search)
-        self.controller.log_info(str(json_search))
-        sql = ("SELECT " + self.schema_name + ".gw_fct_updatesearch($$" +json_search + "$$)")
-        row = self.controller.get_row(sql, log_sql=True)
-        self.result_data = row[0]
+            json_search = json.dumps(json_search)
+            self.controller.log_info(str(json_search))
+            sql = ("SELECT " + self.schema_name + ".gw_fct_updatesearch($$" +json_search + "$$)")
+            row = self.controller.get_row(sql, log_sql=True)
+            self.result_data = row[0]
 
-        if self.result_data['data'] == {} and self.lbl_visible:
-            self.dlg_search.lbl_msg.setVisible(True)
-        else:
-            self.lbl_visible = True
-            self.dlg_search.lbl_msg.setVisible(False)
+        if len(line_list) == 2:
+            line_edit1 = line_list[0]
+            value = utils_giswater.getWidgetText(self.dlg_search, line_edit1)
+            self.controller.log_info(str(value))
+            
+        if row is not None:
 
-        # Get list of items from returned json from data base and make a list for completer
-        display_list = []
-        for data in self.result_data['data']:
-            display_list.append(data['display_name'])
-        self.set_completer_object(completer, model, widget, display_list)
+            if self.result_data['data'] == {} and self.lbl_visible:
+                self.dlg_search.lbl_msg.setVisible(True)
+                if len(line_list) == 2:
+                    widget = line_list[1]
+                    widget.setReadOnly(True)
+                    widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+            else:
+                self.lbl_visible = True
+                self.dlg_search.lbl_msg.setVisible(False)
+
+
+            # Get list of items from returned json from data base and make a list for completer
+            display_list = []
+            for data in self.result_data['data']:
+                display_list.append(data['display_name'])
+            self.set_completer_object(completer, model, widget, display_list)
 
 
 
