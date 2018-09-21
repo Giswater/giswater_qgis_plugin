@@ -16,13 +16,12 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence, QCompleter
     from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel, QStringListModel
     from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
+    from qgis.core import QgsComposition
 else:
     from qgis.PyQt.QtCore import Qt, QStringListModel
-    from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator 
-    from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel, QKeySequence, QCompleter
+    from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel, QCompleter
     from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
-
-from qgis.core import QgsComposition
 
 import os
 import sys
@@ -457,23 +456,27 @@ class ManageNewPsector(ParentManage):
 
     def generate_composer(self, path):
 
-        index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
-        comp_view = self.iface.activeComposers()[index]
-        my_comp = comp_view.composition()
-        if my_comp is not None:
-            my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
-            try:
-                result = my_comp.exportAsPDF(path)
-                if result:
-                    message = "Document PDF created in"
-                    self.controller.show_info(message, parameter=path)
-                    os.startfile(path)
-                else:
-                    message = "Cannot create file, check if its open"
-                    self.controller.show_warning(message, parameter=path)
-            except:
-                msg = "Cannot create file, check if selected composer is the correct composer"
-                self.controller.show_warning(msg, parameter=path)
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
+            comp_view = self.iface.activeComposers()[index]
+            my_comp = comp_view.composition()
+            if my_comp is not None:
+                my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
+                try:
+                    result = my_comp.exportAsPDF(path)
+                    if result:
+                        message = "Document PDF created in"
+                        self.controller.show_info(message, parameter=path)
+                        os.startfile(path)
+                    else:
+                        message = "Cannot create file, check if its open"
+                        self.controller.show_warning(message, parameter=path)
+                except:
+                    msg = "Cannot create file, check if selected composer is the correct composer"
+                    self.controller.show_warning(msg, parameter=path)
+        # TODO: 3.x
+        else:
+            pass
 
 
     def generate_csv(self, path, viewname):

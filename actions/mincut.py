@@ -16,15 +16,17 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor, QAbstractItemView
     from PyQt4.QtSql import QSqlTableModel
     from PyQt4.QtXml import QDomDocument
+    from qgis.core import QgsComposition    
     from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 else:
-    from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant, QStringListModel
-    from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QColor, QAbstractItemView
+    from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime, QStringListModel
+    from qgis.PyQt.QtGui import QColor
+    from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
     from qgis.PyQt.QtSql import QSqlTableModel
     from qgis.PyQt.QtXml import QDomDocument
     from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvas, QgsVertexMarker
 
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsVectorLayer
 
 import os
 import operator
@@ -1990,10 +1992,17 @@ class MincutParent(ParentAction, MultipleSelection):
             attrs = feature.attributes()
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
-            if not type(value_code) is QPyNullVariant and geom is not None:
-                elem = [value_code, value_name, geom.exportToWkt()]
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                if not type(value_code) is QPyNullVariant and geom is not None:
+                    elem = [value_code, value_name, geom.exportToWkt()]
+                else:
+                    elem = [value_code, value_name, None]
+            # TODO: 3.x
             else:
-                elem = [value_code, value_name, None]
+                if value_code is not None and geom is not None:
+                    elem = [value_code, value_name, geom.exportToWkt()]
+                else:
+                    elem = [value_code, value_name, None]
             records.append(elem)
 
         # Fill combo
@@ -2302,12 +2311,15 @@ class MincutParent(ParentAction, MultipleSelection):
         profile_title = composition.getComposerItemById('title')
         profile_title.setText(str(title))
 
-        composition.setAtlasMode(QgsComposition.PreviewAtlas)
-        rotation = float(self.dlg_comp.rotation.text())
-        map_item.setMapRotation(rotation)
-
-        composition.refreshItems()
-        composition.update()
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            composition.setAtlasMode(QgsComposition.PreviewAtlas)
+            rotation = float(self.dlg_comp.rotation.text())
+            map_item.setMapRotation(rotation)
+            composition.refreshItems()
+            composition.update()
+        # TODO: 3.x
+        else:
+            pass
 
         
     def enable_widgets(self, state):
