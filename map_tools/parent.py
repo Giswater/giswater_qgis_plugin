@@ -18,15 +18,25 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis, QgsPoint, QgsExpression
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
-from PyQt4.QtCore import Qt, QPoint
-from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
 
-from snapping_utils import SnappingConfigManager
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import Qt, QPoint
+    from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
+else:
+    from qgis.PyQt.QtCore import Qt, QPoint
+    from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
+    
+from qgis.core import QgsPoint, QgsExpression
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
 
 import os
 import sys
+
+from snapping_utils import SnappingConfigManager
 
 
 class ParentMapTool(QgsMapTool):

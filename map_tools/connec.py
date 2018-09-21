@@ -18,9 +18,19 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QGis
-from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QPoint, QRect, Qt
+    from PyQt4.QtGui import QApplication
+else:
+    from qgis.PyQt.QtCore import QPoint, QRect, Qt
+    from qgis.PyQt.QtWidgets import QApplication
+    
+from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle
 
 from map_tools.parent import ParentMapTool
 

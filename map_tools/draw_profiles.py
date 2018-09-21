@@ -10,11 +10,23 @@
 """
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QPoint, Qt, SIGNAL
+    from PyQt4.QtGui import QListWidget, QListWidgetItem, QLineEdit
+    from PyQt4.QtXml import QDomDocument
+else:
+    from qgis.PyQt.QtCore import QPoint, Qt, SIGNAL
+    from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
+    from qgis.PyQt.QtXml import QDomDocument
+    
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition, QgsVectorLayer
 from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt, SIGNAL
-from PyQt4.QtGui import QListWidget, QListWidgetItem, QLineEdit
-from PyQt4.QtXml import QDomDocument
+
 
 from functools import partial
 from decimal import Decimal

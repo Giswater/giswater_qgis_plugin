@@ -18,8 +18,17 @@
 """
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QPoint, Qt
+else:
+    from qgis.PyQt.QtCore import QPoint, Qt
+    
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
-from PyQt4.QtCore import QPoint, Qt 
 
 from map_tools.parent import ParentMapTool
 

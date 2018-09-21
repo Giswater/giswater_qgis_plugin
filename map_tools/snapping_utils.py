@@ -71,7 +71,7 @@ class SnappingConfigManager():
         """ Removing snap """
 
         QgsProject.instance().blockSignals(True)
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         # Loop through all the layers in the project
         for layer in layers:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, snapping_mode, 0, 1, False)
