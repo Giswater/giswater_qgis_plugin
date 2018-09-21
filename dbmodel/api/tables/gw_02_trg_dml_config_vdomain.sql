@@ -8,10 +8,19 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_datatype', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_layer_cat_formtab', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_layer_cat_form', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_type', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_layer', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_tabs', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_tableinfo_x_inforole', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_fields', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_forms', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('config_web_composer_scale', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 
-INSERT INTO audit_cat_table VALUES ('config_web_composer_scale', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('v_web_composer', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('selector_composer', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_web_composer', 'web', '', '', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('selector_composer', 'web', '', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
 

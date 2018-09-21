@@ -15,31 +15,15 @@ table_record record;
 project_type_aux text;
 query_text text;
 function_name_aux text;
-v_api_publish_user text;
+
 
 BEGIN 
-
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	
 	-- Looking for project type
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
-	
-	-- Looking for publish user
-	SELECT value INTO v_api_publish_user FROM config_param_system WHERE parameter='api_publish_user' LIMIT 1;
-	
-	IF v_api_publish_user is not null THEN
-	
-		-- Grant generic permissions
-		-- We don't need acces on database and schema because first time it have been defined using the API side.
-		query_text:= 'GRANT SELECT ON ALL TABLES IN SCHEMA '||SCHEMA_NAME_aux||' TO ' ||v_api_publish_user;
-		EXECUTE query_text;
-
-		query_text:= 'GRANT ALL ON ALL SEQUENCES IN SCHEMA  '||SCHEMA_NAME_aux||' TO ' ||v_api_publish_user; 
-		EXECUTE query_text;
-		
-	END IF;
 	
 	-- Grant generic permissions
 	query_text:= 'GRANT ALL ON DATABASE '||db_name_aux||' TO "role_basic";';

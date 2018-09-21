@@ -6,35 +6,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
---qgisserver
-GRANT ALL ON DATABASE "gis" TO "qgisserver" ;
-
-GRANT ALL ON SCHEMA "ws" TO "qgisserver";
-GRANT SELECT ON ALL TABLES IN SCHEMA "ws" TO "qgisserver";
-GRANT ALL ON ALL SEQUENCES IN SCHEMA "ws" TO "qgisserver";
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ws" TO "qgisserver";
-
-GRANT ALL ON SCHEMA "ud" TO "qgisserver";
-GRANT SELECT ON ALL TABLES IN SCHEMA "ud" TO "qgisserver";
-GRANT ALL ON ALL SEQUENCES IN SCHEMA "ud" TO "qgisserver";
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ud" TO "qgisserver";
+GRANT role_edit TO "qgisserver";
+GRANT role_edit TO "test";
 
 
---test
-GRANT ALL ON DATABASE "gis" TO "test" ;
-
-GRANT ALL ON SCHEMA "ws" TO "qgisserver";
-GRANT SELECT ON ALL TABLES IN SCHEMA "ws" TO "test";
-GRANT ALL ON ALL SEQUENCES IN SCHEMA "ws" TO "test";
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ws" TO "test";
-
-GRANT ALL ON SCHEMA "ud" TO "test";
-GRANT SELECT ON ALL TABLES IN SCHEMA "ud" TO "test";
-GRANT ALL ON ALL SEQUENCES IN SCHEMA "ud" TO "test";
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA "ud" TO "test";
-
-
---role_basic (ampliación de permisos con las nuevas tablas y vistas de la API
-GRANT ALL ON ALL TABLES IN SCHEMA "ud" TO "role_basic";
-GRANT ALL ON ALL TABLES IN SCHEMA "ws" TO "role_basic";
-
+SELECT gw_fct_utils_role_permissions('DB_NAME', 'SCHEMA_NAME';
