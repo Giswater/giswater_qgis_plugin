@@ -6,21 +6,20 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+
 from functools import partial
 
 import operator
+import json
+import utils_giswater
+
+from qgis.core import QgsRectangle
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter
 from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox
 
-import utils_giswater
-
-
-
-
 from api_parent import ApiParent
 from ui_manager import ApiSearchUi
-
 
 
 class ApiSearch(ApiParent):
@@ -28,11 +27,14 @@ class ApiSearch(ApiParent):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-
+        self.json_search = {}
+        self.lbl_visible = False
     def api_search(self):
         # Dialog
         self.dlg_search = ApiSearchUi()
         self.load_settings(self.dlg_search)
+        self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
+        self.dlg_search.lbl_msg.setVisible(False)
 
         sql = ("SELECT " + self.schema_name + ".gw_fct_getsearch(9,'es')")
         row = self.controller.get_row(sql, log_sql=True)
@@ -41,16 +43,13 @@ class ApiSearch(ApiParent):
             return
         result = row[0]
 
-        # self.tab_main = QtGui.QTabWidget(self.dlg_SeachPlus)
-        # self.tab_main.setGeometry(QtCore.QRect(10, 20, 329, 153))
-        # self.tab_main.setObjectName(str(my_json['formTabs']['formName']))
-
-
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
-        self.controller.log_info(str(result))
-        for tab in result["formTabs"]:
-            self.controller.log_info(str("-----------"))
+        first_tab = None
 
+        for tab in result["formTabs"]:
+            self.controller.log_info(str(tab['tabName']))
+            if first_tab is None:
+                first_tab = tab['tabName']
 
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(tab['tabName'])
@@ -66,30 +65,23 @@ class ApiSearch(ApiParent):
                     widget = self.add_lineedit(field)
                 elif field['type'] == 'combo':
                     widget = self.add_combobox(field)
-                # elif field['widgettype'] == 3:
-                #     widget = self.add_checkbox(field)
-                # elif field['widgettype'] == 4:
-                #     widget = self.add_calendar(field)
-                # elif field['widgettype'] == 6:
-                #     pass
-                # elif field['widgettype'] == 8:
-                #     widget = self.add_button(field)
-
 
                 gridlayout.addWidget(label, x, 0)
                 gridlayout.addWidget(widget, x, 1)
 
-                x =x+1
+                x += 1
 
-            verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-            gridlayout.addItem(verticalSpacer1)
-        self.dlg_search.btn_close.clicked.connect(partial(self.close_dialog,self.dlg_search))
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            gridlayout.addItem(vertical_spacer1)
+
+        self.dlg_search.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_search))
         # Open dialog
         self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_search.show()
 
-    def add_lineedit(self, field):
 
+    def add_lineedit(self, field):
+        """ Add widgets QLineEdit type """
         widget = QLineEdit()
         widget.setObjectName(field['name'])
         if 'value' in field:
@@ -99,54 +91,108 @@ class ApiSearch(ApiParent):
             if not field['iseditable']:
                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
                                      " color: rgb(100, 100, 100)}")
-
-          # if str(table_name) == '-1':
-        #     return widget
-
-        completer = QCompleter()
         model = QStringListModel()
+        completer = QCompleter()
+        completer.highlighted.connect(partial(self.zoom_to_object, completer))
 
+        self.make_list(completer, model, widget)
         widget.textChanged.connect(partial(self.make_list, completer, model, widget))
 
         return widget
 
 
+    def zoom_to_object(self, completer):
+        # Get text from selected row
+        row = completer.popup().currentIndex().row()
+        _key = completer.completionModel().index(row, 0).data()
+
+        # Search text into self.result_data
+        # (this variable contains all the matching objects in the function "make_list())"
+        item = None
+        for data in self.result_data['data']:
+            if _key == data['display_name']:
+                item = data
+                break
+
+        # if item is None:
+        #     print(__name__)
+        #     print(self.__class__.__name__)
+        #
+        #     return
+
+        if 'sys_id' in item:
+            layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
+            if layer is None:
+                msg = "Layer not found"
+                self.controller.show_message(msg, message_level=2, duration=3)
+                return
+            self.iface.setActiveLayer(layer)
+            expr_filter = str(item['sys_idname']) + " = " + str(item['sys_id'])
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            if not is_valid:
+                print("INVALID EXPRESSION at: " + __name__)
+                return
+            self.select_features_by_expr(layer, expr)
+            self.iface.actionZoomToSelected().trigger()
+        elif 'id' in item and 'sys_id' not in item:
+            polygon = item['st_astext']
+            polygon = polygon[9:len(polygon)-2]
+            polygon = polygon.split(',')
+            x1, y1 = polygon[0].split(' ')
+            x3, y3 = polygon[2].split(' ')
+            rect = QgsRectangle(float(x1), float(y1), float(x3), float(y3))
+            self.canvas.setExtent(rect)
+            self.canvas.refresh()
+
+        self.lbl_visible = False
+        self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
+
+
     def make_list(self, completer, model, widget):
         """ Create a list of ids and populate widget (QLineEdit)"""
         # # Set SQL
-        # my_json = {}
-        # index = self.dlg_search.main_tab.currentIndex()
-        # my_json['tabName'] = self.dlg_search.main_tab.widget(index).objectName()
-        # self.controller.log_info(str(my_json))
-
-        # if 'dv_table' in field:
-
+        json_search = {}
         index = self.dlg_search.main_tab.currentIndex()
-        _list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
-        combo = _list[0]
-        self.controller.log_info(str(combo.objectName()))
-        #combo = self.dlg_search.findChild(QComboBox, 'dv_parent_id')
-        self.table_name = ""
-        if combo:
-            self.table_name = utils_giswater.get_item_data(combo, 0)
-            self.id_type = utils_giswater.get_item_data(combo, 1) + "_id"
-            self.controller.log_info(str("wwwww")+str(self.table_name))
-            if not self.table_name:
-                return
+        combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
+        line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
+        json_search['tabName'] = self.dlg_search.main_tab.widget(index).objectName()
+        if combo_list:
+            combo = combo_list[0]
+            id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
+            name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
+            json_search[combo.objectName()] = {}
+            _json = {}
+            _json['id'] = id
+            _json['name'] = name
+            json_search[combo.objectName()] = _json
 
+        if line_list:
+            line = line_list[0]
+            value = utils_giswater.getWidgetText(self.dlg_search, line)
+            json_search[line.objectName()] = {}
+            _json = {}
+            _json['text'] = value
+            json_search[line.objectName()] = _json
+
+        json_search = json.dumps(json_search)
+        self.controller.log_info(str(json_search))
+        sql = ("SELECT " + self.schema_name + ".gw_fct_updatesearch($$" +json_search + "$$)")
+        row = self.controller.get_row(sql, log_sql=True)
+        self.result_data = row[0]
+
+        if self.result_data['data'] == {} and self.lbl_visible:
+            self.dlg_search.lbl_msg.setVisible(True)
         else:
-            self.table_name = self.dlg_search.main_tab.widget(index).objectName()
+            self.lbl_visible = True
+            self.dlg_search.lbl_msg.setVisible(False)
+
+        # Get list of items from returned json from data base and make a list for completer
+        display_list = []
+        for data in self.result_data['data']:
+            display_list.append(data['display_name'])
+        self.set_completer_object(completer, model, widget, display_list)
 
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_rowslineedit('" + str(self.table_name) + "', '" +
-               "" + str(self.id_type) + "', '" + str(utils_giswater.getWidgetText(widget)) + "')")
-        row = self.controller.get_rows(sql, log_sql=True)
-        result = row[0][0]['data']
-        self.controller.log_info(str(result))
-        self.list_items = []
-        for _id in result:
-            self.list_items.append(_id[str(self.id_type)])
-        self.set_completer_object(completer, model, widget, self.list_items)
 
     def add_combobox(self, field):
         widget = QComboBox()
@@ -154,8 +200,6 @@ class ApiSearch(ApiParent):
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
-        #widget.currentIndexChanged.connect(partial(self.get_params, widget))
-        #widget.removeItem(0)
         return widget
 
     def get_params(self, widget):
