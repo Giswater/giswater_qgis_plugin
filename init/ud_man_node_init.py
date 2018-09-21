@@ -6,8 +6,18 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
-from PyQt4.QtCore import QPoint, Qt, SIGNAL
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QPoint, Qt
+    from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
+else:
+    from qgis.PyQt.QtCore import QPoint, Qt
+    from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
+    
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 
@@ -197,7 +207,7 @@ class ManNodeDialog(ParentDialog):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+        self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
 

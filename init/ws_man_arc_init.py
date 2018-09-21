@@ -6,7 +6,16 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
+else:
+    from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
+    
 from qgis.core import QgsExpression, QgsFeatureRequest
 
 from functools import partial
@@ -175,7 +184,7 @@ class ManArcDialog(ParentDialog):
             return
 
         # List of nodes from node_type_cat_type - nodes which we are using
-        for feature_cat in self.feature_cat.itervalues():
+        for feature_cat in self.feature_cat.values():
             if feature_cat.type == 'NODE':
                 layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 if layer:

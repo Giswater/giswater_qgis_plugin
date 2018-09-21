@@ -6,38 +6,51 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.Qt import QDate, QDateTime
+    from PyQt4.QtCore import QSettings, Qt, QPoint
+    from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+    from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
+    from PyQt4.QtSql import QSqlTableModel
+else:
+    from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QDate, QDateTime, QStringListModel
+    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator 
+    from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QCompleter
+    from qgis.PyQt.QtWidgets import QCheckBox, QColor, QFormLayout, QIcon, QWidget, QDialog, QTextEdit, QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox
+    from qgis.PyQt.QtSql import QSqlTableModel
+    
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
-from PyQt4.Qt import QDate, QDateTime
-from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
-from PyQt4.QtSql import QSqlTableModel
 
-from functools import partial
-from datetime import datetime
 import os
 import sys  
 import urlparse
 import webbrowser
 import subprocess
+from functools import partial
+from datetime import datetime
 
 import utils_giswater
+from actions.manage_document import ManageDocument
+from actions.manage_element import ManageElement
+from actions.manage_gallery import ManageGallery
+from actions.manage_visit import ManageVisit
 from dao.controller import DaoController
+from map_tools.snapping_utils import SnappingConfigManager
+from models.sys_feature_cat import SysFeatureCat
+from models.man_addfields_parameter import ManAddfieldsParameter
 from ui_manager import AddSum
 from ui_manager import CFWScatalog
 from ui_manager import CFUDcatalog
 from ui_manager import LoadDocuments
 from ui_manager import EventFull
 from ui_manager import AddPicture
-from actions.manage_document import ManageDocument
-from actions.manage_element import ManageElement
-from actions.manage_gallery import ManageGallery
-from models.sys_feature_cat import SysFeatureCat
-from models.man_addfields_parameter import ManAddfieldsParameter
-from map_tools.snapping_utils import SnappingConfigManager
-from actions.manage_visit import ManageVisit
 
 
 class ParentDialog(QDialog):

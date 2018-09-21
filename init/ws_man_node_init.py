@@ -6,8 +6,18 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QColor
-from PyQt4.QtCore import QObject, QEvent, pyqtSignal, QPoint, Qt
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QObject, QEvent, pyqtSignal, QPoint, Qt
+    from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QColor
+else:
+    from qgis.PyQt.QtCore import QObject, QEvent, pyqtSignal, QPoint, Qt
+    from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QColor
+
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.core import QgsPoint
 

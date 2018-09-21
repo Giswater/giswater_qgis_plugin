@@ -5,8 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QLineEdit, QColor
-from PyQt4.QtCore import QObject, QTimer, QPoint, SIGNAL
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import QObject, QTimer, QPoint, SIGNAL
+    from PyQt4.QtGui import QPushButton, QLineEdit, QColor
+else:
+    from qgis.PyQt.QtCore import QObject, QTimer, QPoint, SIGNAL
+    from qgis.PyQt.QtWidgets import QPushButton, QLineEdit, QColor   
+
 from qgis.core import QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapCanvasSnapper, QgsVertexMarker
 
