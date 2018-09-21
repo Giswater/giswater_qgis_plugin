@@ -117,9 +117,7 @@ class ManageElement(ParentManage):
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")
-        layer_is_visible = False
-        if layer_element:
-            layer_is_visible = self.iface.legendInterface().isLayerVisible(layer_element)
+        layer_is_visible = self.controller.is_layer_visible(layer_element)
 
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
@@ -143,8 +141,7 @@ class ManageElement(ParentManage):
         self.tab_feature_changed(self.dlg_add_element, table_object)
 
         # Force layer v_edit_element set active True
-        if layer_element:
-            self.iface.legendInterface().setLayerVisible(layer_element, True)
+        self.controller.set_layer_visible(layer_element)
 
         # If is a new element dont need set enddate
         if self.new_element_id is True:
@@ -160,7 +157,7 @@ class ManageElement(ParentManage):
 
     def set_layer_visible(self, layer, visible):
         """ Restore visible state when finish process """
-        self.iface.legendInterface().setLayerVisible(layer, visible)
+        self.controller.set_layer_visible(layer, visible)
 
 
     def fill_tbl_new_element(self, dialog, geom_type, feature_id):

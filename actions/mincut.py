@@ -1338,20 +1338,18 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Set visible mincut result layers """
         
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_valve") 
-        if layer:
-            self.iface.legendInterface().setLayerVisible(layer, True)
+        self.controller.set_layer_visible(layer)
                     
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc") 
-        if layer:
-            self.iface.legendInterface().setLayerVisible(layer, True)
+        self.controller.set_layer_visible(layer)
             
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_connec") 
-        if layer:            
-            self.iface.legendInterface().setLayerVisible(layer, True)
+        self.controller.set_layer_visible(layer)
 
         # Refresh extension of layer
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc")
         layer.updateExtents()
+        
         # Zoom to executed mincut
         self.iface.setActiveLayer(layer)
         self.iface.zoomToActiveLayer()
@@ -1517,7 +1515,7 @@ class MincutParent(ParentAction, MultipleSelection):
         layer = self.controller.get_layer_by_tablename(viewname, log_info=True)       
         if layer:
             self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.controller.set_layer_visible(layer)
             self.canvas.xyCoordinates.connect(self.mouse_move_valve)
             self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
 
@@ -2106,7 +2104,7 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Iterate over all layers to get the ones set in table 'config_param_system' """
 
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         if len(layers) == 0:
             return
 

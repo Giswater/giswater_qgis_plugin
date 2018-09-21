@@ -39,7 +39,7 @@ class Dimensioning(ParentMapTool):
         layer = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)        
         if layer:
             self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.controller.set_layer_visible(layer, True)
             layer.startEditing()
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()

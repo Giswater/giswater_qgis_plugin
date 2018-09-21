@@ -6,12 +6,27 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
-from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
-from PyQt4.QtSql import QSqlDatabase
-from PyQt4.Qt import QToolBox
-from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QgsDataSourceURI, QgsCredentials
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.Qt import QToolBox
+    from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
+    from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
+    from PyQt4.QtSql import QSqlDatabase
+    from qgis.core import QgsDataSourceURI as QgsDataSourceUri
+    from qgis.core import QgsMapLayerRegistry    
+else:   
+    from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
+    from qgis.PyQt.QtWidgets import QToolBox, QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
+    from qgis.PyQt.QtSql import QSqlDatabase
+    from qgis.core import QgsDataSourceUri
+    from qgis.core import QgsProject
+
+from qgis.core import QgsMessageLog, QgsCredentials
+    
 import os.path
 import subprocess
 from functools import partial
@@ -131,7 +146,7 @@ class DaoController():
         
         layer_source = self.get_layer_source(layer)    
         self.schema_name = layer_source['schema']
-        conn_info = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).connectionInfo()
+        conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
            
         attempts = 1           
         logged = self.connect_to_database(layer_source['host'], layer_source['port'], 
@@ -617,7 +632,10 @@ class DaoController():
     def get_layer_by_layername(self, layername, log_info=False):
         """ Get layer with selected @layername (the one specified in the TOC) """
         
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:        
+            layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        else:
+            layer = QgsProject.instance().mapLayersByName(layername)
         if layer:         
             layer = layer[0] 
         elif layer is None and log_info:
@@ -630,7 +648,7 @@ class DaoController():
         """ Iterate over all layers and get the one with selected @tablename """
         
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.get_layers()
         if len(layers) == 0:
             return None
 
@@ -1051,3 +1069,37 @@ class DaoController():
         """ Return log folder """
         return self.logger.log_folder
     
+    
+    def is_layer_visible(self, layer):
+        """ Is layer visible """
+        
+        visible = False
+        if layer:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                visible = self.iface.legendInterface().isLayerVisible(layer)
+            else:
+                visible = QgsProject.instance().layerTreeRoot().findLayer(layer.id()).itemVisibilityChecked()
+                
+        return visible
+                            
+            
+    def set_layer_visible(self, layer, visible=True):
+        """ Set layer visible """
+        
+        if layer:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                self.iface.legendInterface().setLayerVisible(layer, visible)
+            else:
+                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
+        
+        
+    def get_layers(self):
+        """ Return layers in the same order as listed in TOC """
+        
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            layers = self.iface.legendInterface().layers()
+        else:
+            layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
+            
+        return layers        
+        

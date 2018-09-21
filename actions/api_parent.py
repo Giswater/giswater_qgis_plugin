@@ -38,7 +38,7 @@ class ApiParent(ParentAction):
         
         visible_layer = '{'
         for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-            if self.iface.legendInterface().isLayerVisible(layer):
+            if self.controller.is_layer_visible(layer):
                 table_name = self.controller.get_layer_source_table_name(layer)
                 visible_layer += '"' + str(table_name) + '", '
         visible_layer = visible_layer[:-2] + "}"

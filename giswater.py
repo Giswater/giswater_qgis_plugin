@@ -435,7 +435,7 @@ class Giswater(QObject):
             return
         
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         if len(layers) == 0:
             return
 
@@ -617,7 +617,7 @@ class Giswater(QObject):
         """ Iterate over all layers to get the ones specified in 'db' config section """ 
         
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
             
         if len(layers) == 0:
             return False   
@@ -759,7 +759,7 @@ class Giswater(QObject):
 
         # Set arrow cursor
         QApplication.setOverrideCursor(Qt.ArrowCursor)       
-        layers = self.iface.legendInterface().layers()        
+        layers = self.controller.get_layers()       
         status = self.populate_audit_check_project(layers)
         QApplication.restoreOverrideCursor()      
         if not status:
