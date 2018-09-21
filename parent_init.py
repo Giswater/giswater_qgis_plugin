@@ -17,15 +17,17 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
     from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
     from PyQt4.QtSql import QSqlTableModel
+    from qgis.gui import QgsMapCanvasSnapper
 else:
     from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QDate, QDateTime, QStringListModel
     from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor, QIcon
     from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QCompleter
     from qgis.PyQt.QtWidgets import QCheckBox, QFormLayout, QWidget, QDialog, QTextEdit, QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox
     from qgis.PyQt.QtSql import QSqlTableModel
+    from qgis.gui import QgsMapCanvas
     
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
-from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
+from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
 
 import os

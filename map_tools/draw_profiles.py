@@ -20,12 +20,10 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QListWidget, QListWidgetItem, QLineEdit
     from PyQt4.QtXml import QDomDocument
     from qgis.core import QgsComposition
-    from qgis.gui import QgsMapCanvasSnapper    
 else:
     from qgis.PyQt.QtCore import QPoint, Qt
     from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
     from qgis.PyQt.QtXml import QDomDocument
-    from qgis.gui import QgsMapCanvas    
     
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsVectorLayer
 from qgis.gui import  QgsMapToolEmitPoint, QgsVertexMarker
@@ -37,9 +35,9 @@ import math
 import os
 
 import utils_giswater
-from parent import ParentMapTool
-from ui_manager import DrawProfile
-from ui_manager import LoadProfiles
+from giswater.map_tools.parent import ParentMapTool
+from giswater.ui_manager import DrawProfile
+from giswater.ui_manager import LoadProfiles
 
 
 class DrawProfiles(ParentMapTool):
@@ -345,7 +343,7 @@ class DrawProfiles(ParentMapTool):
     def activate_snapping(self, emit_point):
 
         self.canvas.setMapTool(emit_point)
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.snapper_manager.get_snapper()
 
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
@@ -356,7 +354,7 @@ class DrawProfiles(ParentMapTool):
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.snapper_manager.get_snapper()
 
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)

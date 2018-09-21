@@ -20,7 +20,7 @@ else:
     from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
     
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
 from functools import partial
 from giswater.init.thread import Thread
@@ -205,7 +205,7 @@ class ManNodeDialog(ParentDialog):
         self.node1 = None
         self.node2 = None
         self.canvas.setMapTool(emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.snapper_manager.get_snapper()
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self.mouse_move)
@@ -402,7 +402,7 @@ class ManNodeDialog(ParentDialog):
         # Set map tool emit point and signals    
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.snapper_manager.get_snapper()
         self.canvas.xyCoordinates.connect(self.action_rotation_mouse_move)
         self.emit_point.canvasClicked.connect(self.action_rotation_canvas_clicked)
         

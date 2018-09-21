@@ -16,16 +16,15 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor, QAbstractItemView
     from PyQt4.QtSql import QSqlTableModel
     from PyQt4.QtXml import QDomDocument
-    from qgis.core import QgsComposition    
-    from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
+    from qgis.core import QgsComposition
 else:
     from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime, QStringListModel
     from qgis.PyQt.QtGui import QColor
     from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
     from qgis.PyQt.QtSql import QSqlTableModel
     from qgis.PyQt.QtXml import QDomDocument
-    from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvas, QgsVertexMarker
 
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsVectorLayer
 
 import os
@@ -88,7 +87,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.connec_list = []
         self.hydro_list = []
         self.deleted_list = []
@@ -1301,7 +1300,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def auto_mincut_snapping(self, point, btn):  #@UnusedVariable
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
         
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1359,7 +1358,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
 
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1497,7 +1496,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # This is a safety measure
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
@@ -1581,7 +1580,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
         """ Custom mincut snapping function """
 
-        snapper = QgsMapCanvasSnapper(self.canvas)        
+        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()

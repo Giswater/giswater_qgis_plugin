@@ -71,7 +71,7 @@ class ParentMapTool(QgsMapTool):
 
         # Snapper
         self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.snapper_manager.get_snapper()
         
         # Change map tool cursor
         self.cursor = QCursor()
@@ -319,4 +319,4 @@ class ParentMapTool(QgsMapTool):
             point = QgsPoint(result[0].snappedVertex)
             self.vertex_marker.setCenter(point)
             self.vertex_marker.show()           
-                             
+                                 

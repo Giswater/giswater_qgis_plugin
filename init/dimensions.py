@@ -15,11 +15,11 @@ if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QPushButton, QLineEdit, QColor
 else:
     from qgis.PyQt.QtCore import QObject, QTimer, QPoint
-    from qgis.PyQt.QtGui import QColor    
+    from qgis.PyQt.QtGui import QColor
     from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
 
 from qgis.core import QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapCanvasSnapper, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 
 import utils_giswater
 from giswater.parent_init import ParentDialog
@@ -57,7 +57,7 @@ class Dimensions(ParentDialog):
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.snapper_manager.get_snapper()
 
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
@@ -139,7 +139,7 @@ class Dimensions(ParentDialog):
         self.iface.setActiveLayer(layer)
         layer.startEditing()
 
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.snapper_manager.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()

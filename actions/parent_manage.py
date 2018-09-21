@@ -17,14 +17,12 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
     from PyQt4.QtGui import QColor, QCompleter, QStringListModel, QAbstractItemView
     from PyQt4.QtSql import QSqlTableModel
-    from qgis.gui import QgsMapCanvasSnapper
 else:
     from qgis.PyQt.QtCore import Qt, QPoint, QStringListModel, QDate
     from qgis.PyQt.QtGui import QColor
     from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
     from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView
     from qgis.PyQt.QtSql import QSqlTableModel
-    from qgis.gui import QgsMapCanvas
 
 from qgis.core import QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
@@ -346,11 +344,7 @@ class ParentManage(ParentAction, object):
         self.vertex_marker.setPenWidth(3)
 
         # Snapper
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-            self.snapper = QgsMapCanvasSnapper(self.canvas)
-        else:
-            # TODO Snapping
-            self.snapper = QgsMapCanvas.snappingUtils()
+        self.snapper = self.get_snapper()
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.previous_map_tool = self.canvas.mapTool()

@@ -16,12 +16,14 @@ if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
     from PyQt4.QtGui import QStringListModel, QCompleter
     from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+    from qgis.gui import QgsMapCanvasSnapper
     import ConfigParser as configparser
 else:
     from qgis.PyQt.QtCore import Qt, QSettings, QStringListModel
     from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
     from qgis.PyQt.QtWidgets import QAbstractItemView, QApplication, QCompleter, QFileDialog, QTableView
     from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel 
+    from qgis.gui import QgsMapCanvas
     import configparser 
 
 #QStringListModel
@@ -799,6 +801,19 @@ class ParentAction(object):
 
         model = QStringListModel()
         model.setStringList(row)
-        
-        
         self.completer.setModel(model)
+        
+        
+    def get_snapper(self):
+        """ Return snapper """
+        
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            snapper = QgsMapCanvasSnapper(self.canvas)
+        else:
+            # TODO: 3.x
+            #snapper = QgsMapCanvas.snappingUtils()
+            snapper = None
+        
+        return snapper
+        
+        

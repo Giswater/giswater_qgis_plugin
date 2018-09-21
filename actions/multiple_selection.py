@@ -14,14 +14,13 @@ except:
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
     from PyQt4.QtCore import Qt, pyqtSignal, QPoint
     from PyQt4.QtGui import QApplication, QColor
-    from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand    
 else:
     from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
     from qgis.PyQt.QtGui import QColor
     from qgis.PyQt.QtWidgets import QApplication
-    from qgis.gui import QgsMapTool, QgsMapCanvas, QgsRubberBand    
 
 from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle
+from qgis.gui import QgsMapTool, QgsRubberBand
 
 
 class MultipleSelection(QgsMapTool):
@@ -50,11 +49,7 @@ class MultipleSelection(QgsMapTool):
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)
         self.reset()
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-            self.snapper = QgsMapCanvasSnapper(self.canvas)
-        else:
-            # TODO Snapping
-            self.snapper = QgsMapCanvas.snappingUtils()
+        self.snapper = self.get_snapper()
         self.selected_features = []
 
 

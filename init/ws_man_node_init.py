@@ -18,7 +18,7 @@ else:
     from qgis.PyQt.QtCore import QObject, QEvent, pyqtSignal, QPoint, Qt
     from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QColor
 
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.core import QgsPoint
 
 from functools import partial
