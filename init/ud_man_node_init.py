@@ -407,7 +407,7 @@ class ManNodeDialog(ParentDialog):
         self.emit_point.canvasClicked.connect(self.action_rotation_canvas_clicked)
         
         # Store user snapping configuration
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = SnappingConfigManager(self.iface, self.controller)
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping

@@ -181,7 +181,8 @@ class ManArcDialog(ParentDialog):
             return
 
         # List of nodes from node_type_cat_type - nodes which we are using
-        for feature_cat in self.feature_cat.values():
+        list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
+        for feature_cat in list_feature_cat:
             if feature_cat.type == 'NODE':
                 layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 if layer:

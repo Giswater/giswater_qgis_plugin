@@ -1979,7 +1979,7 @@ class ParentDialog(QDialog):
         self.geom_type = geom_type
         
         # Store user snapping configuration
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = SnappingConfigManager(self.iface, self.controller)
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping

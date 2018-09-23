@@ -314,7 +314,7 @@ class Giswater(QObject):
         toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
             list_actions = ['41', '48', '86', '32']
-        if self.controller.get_project_type() == 'ud':
+        elif self.controller.get_project_type() == 'ud':
             list_actions = ['41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)
 
@@ -509,7 +509,8 @@ class Giswater(QObject):
         self.enable_actions(visible)
         
         try:
-            for plugin_toolbar in self.plugin_toolbars.values():
+            list_plugin_toolbar = self.controller.get_values_from_dictionary(self.plugin_toolbars)
+            for plugin_toolbar in list_plugin_toolbar:
                 if plugin_toolbar.enabled:                
                     plugin_toolbar.toolbar.setVisible(visible)
         except AttributeError:

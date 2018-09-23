@@ -32,7 +32,7 @@ from qgis.core import QgsProject
 
 class SnappingConfigManager():
 
-    def __init__(self, iface):
+    def __init__(self, iface, controller):
         """ Class constructor """
 
         self.iface = iface
@@ -41,14 +41,18 @@ class SnappingConfigManager():
         self.layer_connec = None        
         self.layer_node = None 
         self.previous_snapping = None
-        self.controller = None
-            
-        # Snapper
-        self.snapper = self.get_snapper()
-        proj = QgsProject.instance()
-        proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+        self.controller = controller
 
         
+    def set_controller(self, controller):
+        self.controller = controller
+        self.schema_name = controller.schema_name
+        self.plugin_dir = self.controller.plugin_dir 
+        self.snapper_manager.controller = controller
+        proj = QgsProject.instance()
+        proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')        
+        
+                
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
@@ -161,12 +165,13 @@ class SnappingConfigManager():
         
     def get_snapper(self):
         """ Return snapper """
-        
+                
+        #snapper = QgsMapCanvasSnapper(self.canvas)
         if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
             snapper = QgsMapCanvasSnapper(self.canvas)
         else:
             # TODO: 3.x
-            #snapper = QgsMapCanvas.snappingUtils()
+            snapper = QgsMapCanvas.snappingUtils()
             snapper = None
         
         return snapper

@@ -71,7 +71,7 @@ class ParentMapTool(QgsMapTool):
         self.setAction(action)
 
         # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = SnappingConfigManager(self.iface, self.controller)
         self.snapper = self.snapper_manager.get_snapper()
         
         # Change map tool cursor
