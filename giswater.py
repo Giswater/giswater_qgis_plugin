@@ -1002,7 +1002,12 @@ class Giswater(QObject):
         """ Manage project variable 'expl_id' """
         
         # Get project variable 'expl_id'
-        expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')  
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
+        # TODO: 3.x
+        else:
+            expl_id = None
+            
         if expl_id is None:
             return
                     

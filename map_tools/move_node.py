@@ -27,6 +27,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import QPoint, Qt
 else:
     from qgis.PyQt.QtCore import QPoint, Qt
+    from qgis.core import QgsWkbTypes
     
 from qgis.core import QgsPoint, QgsMapToPixel, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
@@ -146,7 +147,10 @@ class MoveNodeMapTool(ParentMapTool):
             self.iface.setActiveLayer(self.active_layer)           
 
         try:
-            self.rubber_band.reset(Qgis.Line)
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                self.rubber_band.reset(Qgis.Line)
+            else:
+                self.rubber_band.reset(QgsWkbTypes.LineGeometry)
         except AttributeError:
             pass
 

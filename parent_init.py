@@ -72,9 +72,14 @@ class ParentDialog(QDialog):
         self.init_config()     
         self.set_signals()
         self.dlg_is_destroyed = None
+        
         # Set default encoding 
-        reload(sys)
-        sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            reload(sys)
+            sys.setdefaultencoding('utf-8')   #@UndefinedVariable
+        # TODO: 3.x
+        else:
+            pass
 
         super(ParentDialog, self).__init__()
 
