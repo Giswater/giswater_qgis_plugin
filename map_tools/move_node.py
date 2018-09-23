@@ -146,7 +146,7 @@ class MoveNodeMapTool(ParentMapTool):
             self.iface.setActiveLayer(self.active_layer)           
 
         try:
-            self.rubber_band.reset(QGis.Line)
+            self.rubber_band.reset(Qgis.Line)
         except AttributeError:
             pass
 

@@ -90,7 +90,7 @@ class ParentMapTool(QgsMapTool):
                  
         # Set default rubber band
         color_selection = QColor(254, 178, 76, 63)
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Polygon)   
+        self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)   
         self.rubber_band.setColor(color)
         self.rubber_band.setFillColor(color_selection)           
         self.rubber_band.setWidth(1)           
@@ -171,7 +171,7 @@ class ParentMapTool(QgsMapTool):
     def reset(self):
                 
         # Graphic elements
-        self.rubber_band.reset(QGis.Polygon)
+        self.rubber_band.reset(Qgis.Polygon)
 
         # Selection
         self.snapped_feat = None      

@@ -44,7 +44,7 @@ class MultipleSelection(QgsMapTool):
         QgsMapTool.__init__(self, self.canvas)
 
         self.controller = controller
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Polygon)
+        self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)
@@ -57,7 +57,7 @@ class MultipleSelection(QgsMapTool):
         
         self.start_point = self.end_point = None
         self.is_emitting_point = False
-        self.rubber_band.reset(QGis.Polygon)
+        self.rubber_band.reset(Qgis.Polygon)
 
 
     def canvasPressEvent(self, e):
@@ -140,7 +140,7 @@ class MultipleSelection(QgsMapTool):
 
     def show_rect(self, start_point, end_point):
         
-        self.rubber_band.reset(QGis.Polygon)
+        self.rubber_band.reset(Qgis.Polygon)
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
         point1 = QgsPoint(start_point.x(), start_point.y())

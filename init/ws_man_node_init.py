@@ -26,7 +26,6 @@ from functools import partial
 import utils_giswater
 from giswater.parent_init import ParentDialog
 from giswater.init.thread import Thread
-from giswater.map_tools.snapping_utils import SnappingConfigManager
 
 
 def formOpen(dialog, layer, feature):
