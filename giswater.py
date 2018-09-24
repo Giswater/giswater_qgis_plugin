@@ -906,15 +906,19 @@ class Giswater(QObject):
             fieldname_node = "ymax"
             fieldname_connec = "connec_depth"
             
-        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        if layer_node:
-            display_field = 'depth : [% "' + fieldname_node + '" %]'
-            layer_node.setDisplayField(display_field)
-        
-        layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
-        if layer_connec:
-            display_field = 'depth : [% "' + fieldname_connec + '" %]'
-            layer_connec.setDisplayField(display_field)
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:            
+            layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+            if layer_node:
+                display_field = 'depth : [% "' + fieldname_node + '" %]'
+                layer_node.setDisplayField(display_field)
+            
+            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+            if layer_connec:
+                display_field = 'depth : [% "' + fieldname_connec + '" %]'
+                layer_connec.setDisplayField(display_field)
+        # TODO 3.x
+        else:
+            pass
 
     
     def manage_map_tools(self):
