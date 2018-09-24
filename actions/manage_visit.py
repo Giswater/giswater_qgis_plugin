@@ -876,7 +876,7 @@ class ManageVisit(ParentManage, QObject):
             # set fixed values
             self.dlg_event.value.setText(_value)
             self.dlg_event.position_value.setText(str(position_value))
-            self.dlg_event.text.setPlainText(text)
+            utils_giswater.setWidgetText(self.dlg_event, text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
@@ -897,7 +897,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event.geom1.setText(str(geom1))
             self.dlg_event.geom2.setText(str(geom2))
             self.dlg_event.geom3.setText(str(geom3))
-            self.dlg_event.text.setPlainText(text)
+            utils_giswater.setWidgetText(self.dlg_event, text, text)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
@@ -908,7 +908,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
             self.dlg_event.value.setText(_value)
-            self.dlg_event.text.setPlainText(text)
+            utils_giswater.setWidgetText(self.dlg_event, text, text)
 
         # because of multiple view disable add picture and view gallery
         self.dlg_event.btn_add_picture.setEnabled(False)
@@ -924,7 +924,7 @@ class ManageVisit(ParentManage, QObject):
                 value = getattr(self.dlg_event, field_name).toPlainText()
             if type(getattr(self.dlg_event, field_name)) is QComboBox:
                 value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
-            if value:
+            if value and str(value) != 'NULL':
                 setattr(event, field_name, value)
 
         # set fixed values
@@ -942,7 +942,7 @@ class ManageVisit(ParentManage, QObject):
                     value = getattr(self.dlg_event, field_name).toPlainText()
                 if type(getattr(self.dlg_event, field_name)) is QComboBox:
                     value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
-                if value:
+                if value and str(value) != 'NULL':
                     setattr(event, field_name, value)
 
             # update the record
