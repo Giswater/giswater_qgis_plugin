@@ -7,13 +7,14 @@ or (at your option) any later version.
 """
 
 from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
-from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView, QStringListModel, QPushButton, QComboBox, QTabWidget
-
+from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView, QStringListModel
+from PyQt4.QtGui import QTextEdit, QPushButton, QComboBox, QTabWidget
 import os
 import sys
 import subprocess
 import webbrowser
 from functools import partial
+
 
 import utils_giswater
 from giswater.dao.om_visit_event import OmVisitEvent
@@ -805,8 +806,11 @@ class ManageVisit(ParentManage, QObject):
                     value = parameter_id
                 else:
                     value = getattr(self.dlg_event, field_name).text()
+            if type(getattr(self.dlg_event, field_name)) is QTextEdit:
+                value = getattr(self.dlg_event, field_name).toPlainText()
             if type(getattr(self.dlg_event, field_name)) is QComboBox:
                 value = utils_giswater.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
+
             if value:
                 setattr(event, field_name, value)
 
