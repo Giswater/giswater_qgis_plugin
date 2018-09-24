@@ -1336,16 +1336,25 @@ class DrawProfiles(ParentMapTool):
         profile_title = composition.getComposerItemById('title')
         profile_title.setText(str(title))
 
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-            composition.setAtlasMode(QgsComposition.PreviewAtlas)
-            rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
-            map_item.setMapRotation(rotation)
-            composition.refreshItems()
-            composition.update()
-        # TODO: 3.x
-        else:
-            pass
+        self.manage_composition(composition, map_item)
 
+
+    def manage_composition(self, composition, map_item):
+        """ Manage composition in QGIS 2.x and 3.x """
+        
+        try:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                composition.setAtlasMode(QgsComposition.PreviewAtlas)
+                rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
+                map_item.setMapRotation(rotation)
+                composition.refreshItems()
+                composition.update()
+            # TODO: 3.x
+            else:
+                pass
+        except:
+            pass
+                
 
     def set_template(self):
         template = self.dlg_draw_profile.cbx_template.currentText()

@@ -104,11 +104,14 @@ class Giswater(QObject):
         self.set_signals()
         
         # Set default encoding 
-        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
-            reload(sys)
-            sys.setdefaultencoding('utf-8')   #@UndefinedVariable
-        # TODO: 3.x
-        else:
+        try:
+            if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+                reload(sys)
+                sys.setdefaultencoding('utf-8')   #@UndefinedVariable
+            # TODO: 3.x
+            else:
+                pass
+        except:
             pass
        
                
@@ -482,7 +485,7 @@ class Giswater(QObject):
         except AttributeError:
             self.controller.log_info("unload - AttributeError")
             pass
-        except KeyError:
+        except:
             pass
     
     
@@ -782,33 +785,28 @@ class Giswater(QObject):
     def manage_snapping_layers(self):
         ''' Manage snapping of layers '''
         
-        layer = self.controller.get_layer_by_tablename('v_edit_man_pipe')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_arc')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_connec')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_node')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_gully')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_man_conduit')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)            
-#         layer = self.controller.get_layer_by_tablename('v_edit_man_varc')
-#         if layer:
-#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-#         layer = self.controller.get_layer_by_tablename('v_edit_man_siphon')
-#         if layer:
-#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-#         layer = self.controller.get_layer_by_tablename('v_edit_man_vaccel')
-#         if layer:
-#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+        # TODO 3.x
+        try:
+            layer = self.controller.get_layer_by_tablename('v_edit_man_pipe')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_arc')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_connec')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_node')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_gully')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_man_conduit')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)  
+        except:
+            pass  
             
                     
     def manage_custom_forms(self):
@@ -1003,11 +1001,14 @@ class Giswater(QObject):
         """ Manage project variable 'expl_id' """
         
         # Get project variable 'expl_id'
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-            expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
-        # TODO: 3.x
-        else:
-            expl_id = None
+        try:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
+            # TODO: 3.x
+            else:
+                expl_id = None
+        except:
+            pass
             
         if expl_id is None:
             return

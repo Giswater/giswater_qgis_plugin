@@ -181,9 +181,12 @@ class MultipleSelection(QgsMapTool):
 
     def reset_rubber_band(self):
 
-        # Graphic elements
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-            self.rubber_band.reset(Qgis.Polygon)
-        else:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
-
+        try:
+            # Graphic elements
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                self.rubber_band.reset(Qgis.Polygon)
+            else:
+                self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        except:
+            pass
+        
