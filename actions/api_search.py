@@ -11,10 +11,14 @@ from functools import partial
 
 import operator
 import json
+
+from PyQt4.QtCore import QTimer
+
 import utils_giswater
 from PyQt4 import uic
 
-from qgis.core import QgsRectangle
+from qgis.core import QgsRectangle, QgsPoint, QgsGeometry, QGis
+from qgis.gui import QgsVertexMarker, QgsRubberBand
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter
 from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox
@@ -31,6 +35,16 @@ class ApiSearch(ApiParent):
         self.iface = iface
         self.json_search = {}
         self.lbl_visible = False
+
+        if QGis.QGIS_VERSION_INT >= 10900:
+            self.rubberBand = QgsRubberBand(self.canvas, QGis.Point)
+            self.rubberBand.setColor(Qt.yellow)
+            # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
+            self.rubberBand.setIconSize(10)
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(10)
+
 
     def api_search(self):
         # Dialog
@@ -52,12 +66,10 @@ class ApiSearch(ApiParent):
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         first_tab = None
-
+        completer = QCompleter()
         for tab in result["formTabs"]:
-            self.controller.log_info(str(tab['tabName']))
             if first_tab is None:
                 first_tab = tab['tabName']
-
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(tab['tabName'])
             main_tab.addTab(tab_widget, tab['tabLabel'])
@@ -69,7 +81,7 @@ class ApiSearch(ApiParent):
                 label.setObjectName('lbl_' + field['label'])
                 label.setText(field['label'].capitalize())
                 if field['type'] == 'typeahead':
-                    widget = self.add_lineedit(field)
+                    widget = self.add_lineedit(field, completer)
                 elif field['type'] == 'combo':
                     widget = self.add_combobox(field)
 
@@ -88,7 +100,7 @@ class ApiSearch(ApiParent):
         self.dlg_search.show()
 
 
-    def add_lineedit(self,  field):
+    def add_lineedit(self,  field, completer):
         """ Add widgets QLineEdit type """
         widget = QLineEdit()
         widget.setObjectName(field['name'])
@@ -100,7 +112,6 @@ class ApiSearch(ApiParent):
             if field['disabled']:
                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
         model = QStringListModel()
-        completer = QCompleter()
         completer.highlighted.connect(partial(self.zoom_to_object, completer))
 
         self.make_list(completer, model, widget)
@@ -112,11 +123,15 @@ class ApiSearch(ApiParent):
     def zoom_to_object(self, completer):
         index = self.dlg_search.main_tab.currentIndex()
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
+
         for line_edit in line_list:
             line_edit.setReadOnly(False)
             line_edit.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
         # Get text from selected row
         row = completer.popup().currentIndex().row()
+        if row == -1:
+            return
+
         _key = completer.completionModel().index(row, 0).data()
 
         # Search text into self.result_data
@@ -127,18 +142,14 @@ class ApiSearch(ApiParent):
                 item = data
                 break
 
-        # if item is None:
-        #     print(__name__)
-        #     print(self.__class__.__name__)
-        #
-        #     return
-
+        # IF for zoom to tab network
         if 'sys_id' in item:
             layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
             if layer is None:
                 msg = "Layer not found"
                 self.controller.show_message(msg, message_level=2, duration=3)
                 return
+
             self.iface.setActiveLayer(layer)
             expr_filter = str(item['sys_idname']) + " = " + str(item['sys_id'])
             (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
@@ -147,6 +158,7 @@ class ApiSearch(ApiParent):
                 return
             self.select_features_by_expr(layer, expr)
             self.iface.actionZoomToSelected().trigger()
+        # IF for zoom to tab address (streets)
         elif 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
             polygon = polygon[9:len(polygon)-2]
@@ -156,52 +168,90 @@ class ApiSearch(ApiParent):
             rect = QgsRectangle(float(x1), float(y1), float(x3), float(y3))
             self.canvas.setExtent(rect)
             self.canvas.refresh()
+        # IF for zoom to tab address (postnumbers)
+        elif 'sys_x' in item and 'sys_y' in item:
+            x1 = item['sys_x']
+            y1 = item['sys_y']
+            rect = QgsRectangle(float(x1), float(y1), float(x1), float(y1))
+            self.canvas.setExtent(rect)
+            point = QgsPoint(float(x1), float(y1))
+            self.highlight(point, 2000)
+            self.canvas.refresh()
 
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 
 
+
+    def highlight(self, point, duration_time=None):
+        if QGis.QGIS_VERSION_INT >= 10900:
+            rb = self.rubberBand
+            rb.reset(QGis.Point)
+            rb.addPoint(point)
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(10)
+            self.vMarker.setCenter(point)
+            self.vMarker.show()
+
+        # wait to simulate a flashing effect
+        if duration_time:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+
+    def resetRubberbands(self):
+        canvas = self.canvas
+        if QGis.QGIS_VERSION_INT >= 10900:
+            self.rubberBand.reset()
+        else:
+            self.vMarker.hide()
+            canvas.scene().removeItem(self.vMarker)
+
+
     def make_list(self, completer, model, widget):
         """ Create a list of ids and populate widget (QLineEdit)"""
-        # # Set SQL
-        json_search = {}
+        # Create 2 json, one for first QLineEdit and other for second QLineEdit
+        json_updatesearch = {}
+        json_updatesearch_add = {}
         row = None
         index = self.dlg_search.main_tab.currentIndex()
         combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
-        json_search['tabName'] = self.dlg_search.main_tab.widget(index).objectName()
+        json_updatesearch['tabName'] = self.dlg_search.main_tab.widget(index).objectName()
+        json_updatesearch_add['tabName'] = self.dlg_search.main_tab.widget(index).objectName()
         if combo_list:
             combo = combo_list[0]
             id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
-            json_search[combo.objectName()] = {}
+            json_updatesearch[combo.objectName()] = {}
             _json = {}
             _json['id'] = id
             _json['name'] = name
-            json_search[combo.objectName()] = _json
-        self.controller.log_info(str(len(line_list)))
+            json_updatesearch[combo.objectName()] = _json
+            json_updatesearch_add[combo.objectName()] = _json
+
         if line_list:
-            line_edit = line_list[0]
+            # Prepare an aux json because 1 field of main json is another json
             _json = {}
+            line_edit = line_list[0]
+
+            # If current tab have more than one QLineEdit, clear second QLineEdit
+            if len(line_list) == 2:
+                line_edit.textChanged.connect(partial(self.clear_line_edit_add, line_list))
+
             value = utils_giswater.getWidgetText(self.dlg_search, line_edit)
-
-            json_search[line_edit.objectName()] = {}
+            json_updatesearch[line_edit.objectName()] = {}
+            json_updatesearch_add[line_edit.objectName()] = {}
             _json['text'] = value
-            json_search[line_edit.objectName()] = _json
+            json_updatesearch[line_edit.objectName()] = _json
+            json_updatesearch_add[line_edit.objectName()] = _json
+            json_updatesearch = json.dumps(json_updatesearch)
 
-            json_search = json.dumps(json_search)
-            self.controller.log_info(str(json_search))
-            sql = ("SELECT " + self.schema_name + ".gw_fct_updatesearch($$" +json_search + "$$)")
+            sql = ("SELECT " + self.schema_name + ".gw_fct_updatesearch($$" +json_updatesearch + "$$)")
             row = self.controller.get_row(sql, log_sql=True)
-            self.result_data = row[0]
-
-        if len(line_list) == 2:
-            line_edit1 = line_list[0]
-            value = utils_giswater.getWidgetText(self.dlg_search, line_edit1)
-            self.controller.log_info(str(value))
-            
+            if row:
+                self.result_data = row[0]
+        # Set label visible
         if row is not None:
-
             if self.result_data['data'] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
                 if len(line_list) == 2:
@@ -212,13 +262,39 @@ class ApiSearch(ApiParent):
                 self.lbl_visible = True
                 self.dlg_search.lbl_msg.setVisible(False)
 
-
             # Get list of items from returned json from data base and make a list for completer
             display_list = []
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
             self.set_completer_object(completer, model, widget, display_list)
+        print(len(line_list))
+        if len(line_list) == 2:
+            _json = {}
+            line_edit_add = line_list[1]
+            value = utils_giswater.getWidgetText(self.dlg_search, line_edit_add)
+            if str(value) == 'null':
+                return
 
+            json_updatesearch_add[line_edit_add.objectName()] = {}
+            _json['text'] = value
+            json_updatesearch_add[line_edit_add.objectName()] = _json
+            json_updatesearch_add = json.dumps(json_updatesearch_add)
+
+            sql = ("SELECT " + self.schema_name + ".gw_fct_updatesearch_add($$" + json_updatesearch_add + "$$)")
+            row = self.controller.get_row(sql, log_sql=True)
+            if row:
+                self.result_data = row[0]
+                if row is not None:
+                    display_list = []
+                    for data in self.result_data['data']:
+                        display_list.append(data['display_name'])
+                    self.set_completer_object(completer, model, line_edit_add, display_list)
+
+
+    def clear_line_edit_add(self, line_list):
+        """ Clear second line edit if exist"""
+        line_edit_add = line_list[1]
+        line_edit_add.setText('')
 
 
     def add_combobox(self, field):
@@ -229,9 +305,11 @@ class ApiSearch(ApiParent):
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
         return widget
 
+
     def get_params(self, widget):
         self.table_name = utils_giswater.get_item_data(widget, 0)
         self.id_type = utils_giswater.get_item_data(widget, 1) +"_id"
+
 
     def populate_combo(self, widget, field, allow_blank=True):
         # Generate list of items to add into combo
