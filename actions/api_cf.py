@@ -16,12 +16,14 @@ import operator
 
 from functools import partial
 
+from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
+from qgis.core import QgsFeatureRequest
+
 from PyQt4.QtCore import Qt, SIGNAL, SLOT
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
-from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
@@ -76,6 +78,7 @@ class ApiCF(ApiParent):
         """
         self.dlg_is_destroyed = False
         self.layer = None
+        self.feature = None
         self.my_json = {}
         # Get srid
         self.srid = self.controller.plugin_settings_value('srid')
@@ -94,7 +97,7 @@ class ApiCF(ApiParent):
         action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
         action_catalog = self.dlg_cf.findChild(QAction, "actionCatalog")
         action_workcat = self.dlg_cf.findChild(QAction, "actionWorkcat")
-        action_zoom = self.dlg_cf.findChild(QAction, "actionZoom")
+        action_zoom_in = self.dlg_cf.findChild(QAction, "actionZoom")
         action_zoom_out = self.dlg_cf.findChild(QAction, "actionZoomOut")
         action_centered = self.dlg_cf.findChild(QAction, "actionCentered")
         action_link = self.dlg_cf.findChild(QAction, "actionLink")
@@ -107,7 +110,7 @@ class ApiCF(ApiParent):
         self.set_icon(action_rotation, "107c")
         # self.set_icon(action_catalog, "107c")
         # self.set_icon(action_workcat, "107c")
-        self.set_icon(action_zoom, "103")
+        self.set_icon(action_zoom_in, "103")
         self.set_icon(action_zoom_out, "107")
         self.set_icon(action_centered, "104")
         self.set_icon(action_link, "173")
@@ -180,12 +183,11 @@ class ApiCF(ApiParent):
                 widget = self.add_checkbox(self.dlg_cf, field)
             elif field['widgettype'] == 4:
                 widget = self.add_calendar(self.dlg_cf, field)
-            elif field['widgettype'] == 6:
-                pass
             elif field['widgettype'] == 8:
                 widget = self.add_button(self.dlg_cf, field)
             elif field['widgettype'] == 9:
                 widget = self.add_hyperlink(self.dlg_cf, field)
+
             if field['layout_id'] == 0:
                 top_layout.addWidget(label, 0, field['layout_order'])
                 top_layout.addWidget(widget, 1, field['layout_order'])
@@ -218,6 +220,19 @@ class ApiCF(ApiParent):
                 widget = self.dlg_cf.findChild(QComboBox, field['column_id'])
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
+        # Set selected feature and zoomed
+        expr_filter = str(row[0]['idName']) + " = " + str(feature_id)
+        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+        if not is_valid:
+            print("INVALID EXPRESSION at: " + __name__)
+            return
+        self.select_features_by_expr(self.layer, expr)
+        self.iface.actionZoomToSelected().trigger()
+
+        # Get selected feature
+        self.feature = self.get_feature_by_id(self.layer)
+
+
         if self.layer.isEditable():
             self.enable_all(result)
         else:
@@ -238,6 +253,11 @@ class ApiCF(ApiParent):
         action_edit.triggered.connect(self.start_editing)
         action_catalog.triggered.connect(partial(self.open_catalog, self.dlg_cf, result))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, self.dlg_cf))
+
+        action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
+        action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
+        action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
+        action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
 
         # Buttons
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
@@ -650,7 +670,7 @@ class ApiCF(ApiParent):
 
 
     def open_url(self, dialog, widget, message_level=None):
-        path = utils_giswater.getWidgetText(dialog, widget)
+        path = widget.text()
         self.controller.log_info(str(path))
         # Check if file exist
         if os.path.exists(path):
