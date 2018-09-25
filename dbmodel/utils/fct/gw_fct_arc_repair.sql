@@ -6,33 +6,44 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2496
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_arc_repair (text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_repair (p_arc_id text) RETURNS varchar AS
+CREATE OR REPLACE FUNCTION gw_fct_arc_repair( p_arc_id text, counter bigint default 0, total bigint default 0)
+
+  RETURNS character varying AS
 
 $BODY$
-DECLARE 
 
+DECLARE
 
-BEGIN 
+BEGIN
 
-	SET search_path= 'SCHEMA_NAME','public';
+      -- Set config parameter
+      UPDATE config_param_system SET value = TRUE WHERE parameter = 'edit_topocontrol_dsbl_error' ;
+
+      -- execute
+      UPDATE arc SET the_geom = the_geom WHERE arc_id = p_arc_id;
+
+      -- raise notice
+      IF counter>0 AND total>0 THEN
+        RAISE NOTICE '[%/%] Arc id: %', counter, total, p_arc_id;
+      ELSIF counter>0 THEN
+        RAISE NOTICE '[%] Arc id: %', counter, p_arc_id;
+      ELSE
+        RAISE NOTICE 'Arc id: %', p_arc_id;
+      END IF;
+             
+
+      -- Set config parameter
+      UPDATE config_param_system SET value = FALSE WHERE parameter = 'edit_topocontrol_dsbl_error' ;
 
     
-	-- Set config parameter
-	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_dsbl_error' ;
-	
-	-- execute
-	UPDATE arc SET the_geom=the_geom WHERE arc_id=p_arc_id;
-
-	-- raise notice
-	RAISE NOTICE 'Arc id: %', p_arc_id;
-		
-	-- Set config parameter
-	UPDATE config_param_system SET value=FALSE WHERE parameter='edit_topocontrol_dsbl_error' ;
-	
 RETURN p_arc_id;
-    
-END;  
+
+   
+
+END; 
+
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+
+LANGUAGE plpgsql VOLATILE
+
+COST 100;
