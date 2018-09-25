@@ -252,7 +252,6 @@ class ApiCF(ApiParent):
             self.disable_all(result, False)
 
         # SIGNALS
-
         self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
         self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
         self.layer.editingStarted.connect(partial(self.enable_all, result))
@@ -267,10 +266,15 @@ class ApiCF(ApiParent):
         action_catalog.triggered.connect(partial(self.open_catalog, self.dlg_cf, result))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, self.dlg_cf))
 
-        action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
+        action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
+        #action_copy_paste.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
+        #action_rotation.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
+        action_help.triggered.connect(partial(self.api_action_help, 'ud', 'node'))
+
+
 
         # Buttons
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')

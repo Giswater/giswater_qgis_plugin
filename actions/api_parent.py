@@ -7,7 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 import os
-from PyQt4.QtCore import Qt
+
+from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QAction
 
 from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest
@@ -100,6 +101,14 @@ class ApiParent(ParentAction):
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
 
 
+    def get_feature_by_id(self, layer):
+        feature = None
+        selected_features = layer.selectedFeatures()
+        for f in selected_features:
+            feature = f
+            return feature
+
+
     def check_actions(self, action, enabled):
         if not self.dlg_is_destroyed:
             action.setChecked(enabled)
@@ -124,12 +133,36 @@ class ApiParent(ParentAction):
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
 
-    def get_feature_by_id(self, layer):
-        feature = None
-        selected_features = layer.selectedFeatures()
-        for f in selected_features:
-            feature = f
-            return feature
+
+    def api_action_help(self, wsoftware, geom_type):
+        """ Open PDF file with selected @wsoftware and @geom_type """
+        # Get locale of QGIS application
+        locale = QSettings().value('locale/userLocale').lower()
+        if locale == 'es_es':
+            locale = 'es'
+        elif locale == 'es_ca':
+            locale = 'ca'
+        elif locale == 'en_us':
+            locale = 'en'
+
+        # Get PDF file
+        pdf_folder = os.path.join(self.plugin_dir, 'png')
+        pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+
+        # Open PDF if exists. If not open Spanish version
+        if os.path.exists(pdf_path):
+            os.system(pdf_path)
+        else:
+            locale = "es"
+            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+            if os.path.exists(pdf_path):
+                os.system(pdf_path)
+            else:
+                message = "File not found"
+                self.controller.show_warning(message, parameter=pdf_path)
+
+
+
 
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:
