@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-INSERT INTO audit_cat_error VALUES (3006, 'There are one or more arc(s) with null nodes. Mincut is broken (arc_id=)','Please review your data',2, true, NULL);
+--INSERT INTO audit_cat_error VALUES (3006, 'There are one or more arc(s) with null nodes. Mincut is broken (arc_id=)','Please review your data',2, true, NULL);
 
 
 

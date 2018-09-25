@@ -205,7 +205,7 @@ INSERT INTO sys_fprocess_cat VALUES (32, 'Node proximity analysis', 'EDIT', 'Nod
 -----------------------
 DROP SEQUENCE IF EXISTS psector_psector_id_seq;
 
-INSERT INTO audit_cat_error values('3008','The values of addfields are different for both arcs.','Review your data to make them equal.',2,TRUE,'utils');
+--INSERT INTO audit_cat_error values('3008','The values of addfields are different for both arcs.','Review your data to make them equal.',2,TRUE,'utils');
 
 
 ----------------------

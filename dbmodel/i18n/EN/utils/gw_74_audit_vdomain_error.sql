@@ -132,4 +132,5 @@ INSERT INTO audit_cat_error VALUES (1110, 'There are no exploitations defined in
 INSERT INTO audit_cat_error VALUES (3002, 'The selected arc has state=0 (num. node,feature_id)=', 'Please, select another one In order to use mincut, we recommend to disable network state=0.', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (3004, 'The selected arc has state=0 (num. node,feature_id)=', 'Please, select another one In order to use mincut, we recommend to disable network state=0.', 2, true, NULL);
 INSERT INTO audit_cat_error VALUES (3006, 'There are one or more arc(s) with null nodes. Mincut is broken.','Please review your data',2, true, NULL);
+INSERT INTO audit_cat_error values (3008, 'The values of addfields are different for both arcs.','Review your data to make them equal.',2,TRUE,'utils');
 
