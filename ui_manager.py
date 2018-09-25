@@ -32,9 +32,10 @@ class ApiConfigUi(QtGui.QMainWindow, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('api_search.ui')
-class ApiSearchUi(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
+class ApiSearchUi(QtGui.QDockWidget, FORM_CLASS):
+    def __init__(self, parent=None):
+        super(ApiSearchUi, self).__init__(parent)
+        #QtGui.QDockWidget.__init__(self)
         self.setupUi(self)
 
 

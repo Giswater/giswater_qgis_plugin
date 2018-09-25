@@ -12,6 +12,7 @@ from functools import partial
 import operator
 import json
 import utils_giswater
+from PyQt4 import uic
 
 from qgis.core import QgsRectangle
 from PyQt4.QtCore import Qt
@@ -27,14 +28,20 @@ class ApiSearch(ApiParent):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        self.iface = iface
         self.json_search = {}
         self.lbl_visible = False
+
     def api_search(self):
         # Dialog
         self.dlg_search = ApiSearchUi()
         self.load_settings(self.dlg_search)
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
+
+        # Make it dockable in left dock widget area
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
+        self.dlg_search.setFixedHeight(162)
 
         sql = ("SELECT " + self.schema_name + ".gw_fct_getsearch(9,'es')")
         row = self.controller.get_row(sql, log_sql=True)
@@ -74,7 +81,8 @@ class ApiSearch(ApiParent):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
-        self.dlg_search.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_search))
+        # TODO: Save position when destroy dlg
+
         # Open dialog
         self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_search.show()
