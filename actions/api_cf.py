@@ -101,6 +101,8 @@ class ApiCF(ApiParent):
         action_zoom_out = self.dlg_cf.findChild(QAction, "actionZoomOut")
         action_centered = self.dlg_cf.findChild(QAction, "actionCentered")
         action_link = self.dlg_cf.findChild(QAction, "actionLink")
+        action_help = self.dlg_cf.findChild(QAction, "actionHelp")
+        action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
 
 
@@ -109,11 +111,13 @@ class ApiCF(ApiParent):
         self.set_icon(action_copy_paste, "107b")
         self.set_icon(action_rotation, "107c")
         # self.set_icon(action_catalog, "107c")
-        # self.set_icon(action_workcat, "107c")
+        self.set_icon(action_workcat, "193")
         self.set_icon(action_zoom_in, "103")
         self.set_icon(action_zoom_out, "107")
         self.set_icon(action_centered, "104")
         self.set_icon(action_link, "173")
+        self.set_icon(action_help, "73")
+        self.set_icon(action_interpolate, "194")
         # self.set_icon(action_switch_arc_id, "141")
 
         # Layouts
@@ -215,10 +219,19 @@ class ApiCF(ApiParent):
         verticalSpacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         tab1_layout2.addItem(verticalSpacer2)
 
+        # Find combo parents:
         for field in result["fields"]:
             if field['dv_isparent']:
                 widget = self.dlg_cf.findChild(QComboBox, field['column_id'])
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
+
+        # Find actions and set visibles
+        actions_to_show = row[0]['formActions']
+        for field in actions_to_show["actions"]:
+            action = None
+            action = self.dlg_cf.findChild(QAction, field)
+            if action is not None:
+                action.setVisible(True)
 
         # Set selected feature and zoomed
         expr_filter = str(row[0]['idName']) + " = " + str(feature_id)

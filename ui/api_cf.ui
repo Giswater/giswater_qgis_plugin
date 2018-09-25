@@ -543,10 +543,13 @@
    <addaction name="actionCatalog"/>
    <addaction name="actionWorkcat"/>
    <addaction name="separator"/>
+   <addaction name="actionInterpolate"/>
    <addaction name="actionZoom"/>
    <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
    <addaction name="actionLink"/>
+   <addaction name="separator"/>
+   <addaction name="actionHelp"/>
   </widget>
   <action name="actionZoom">
    <property name="icon">
@@ -559,6 +562,9 @@
    <property name="toolTip">
     <string>Zoom</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionCentered">
    <property name="icon">
@@ -567,6 +573,9 @@
    </property>
    <property name="text">
     <string>Centered</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -579,6 +588,9 @@
    </property>
    <property name="toolTip">
     <string>Zoom Out</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -595,6 +607,9 @@
    <property name="toolTip">
     <string>Copy&amp;Paste</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionRotation">
    <property name="icon">
@@ -603,6 +618,9 @@
    </property>
    <property name="text">
     <string>Rotation</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionLink">
@@ -615,6 +633,9 @@
    </property>
    <property name="toolTip">
     <string>Link</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionEdit">
@@ -631,33 +652,58 @@
    <property name="toolTip">
     <string>Edit</string>
    </property>
-  </action>
-  <action name="actionSwicthArcid">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/141.png</normaloff>../icons/141.png</iconset>
-   </property>
-   <property name="text">
-    <string>switch_arc_id</string>
-   </property>
-   <property name="toolTip">
-    <string>Switch Arc Id</string>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionWorkcat">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/193.png</normaloff>../icons/193.png</iconset>
+   </property>
    <property name="text">
     <string>Workcat</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionCatalog">
    <property name="text">
     <string>Catalog</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/73.png</normaloff>../icons/73.png</iconset>
+   </property>
+   <property name="text">
+    <string>Help</string>
+   </property>
+   <property name="toolTip">
+    <string>Help</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionInterpolate">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/194.png</normaloff>../icons/194.png</iconset>
+   </property>
+   <property name="text">
+    <string>Interpolate</string>
+   </property>
+   <property name="toolTip">
+    <string>Interpolate</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
  </widget>
