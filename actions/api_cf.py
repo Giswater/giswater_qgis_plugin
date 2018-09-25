@@ -151,7 +151,7 @@ class ApiCF(ApiParent):
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
-        complet_result = row
+        self.complet_result = row
         result = row[0]['editData']
         if 'fields' not in result:
             return
@@ -170,7 +170,7 @@ class ApiCF(ApiParent):
 
         # Get field id name
         field_id = str(row[0]['idName'])
-        feature_id = None
+        self.feature_id = None
 
         for field in result["fields"]:
             label = QLabel()
@@ -180,7 +180,7 @@ class ApiCF(ApiParent):
             if field['widgettype'] == 1 or field['widgettype'] == 10:
                 widget = self.add_lineedit(self.dlg_cf, field)
                 if widget.objectName() == field_id:
-                    feature_id = widget.text()
+                    self.feature_id = widget.text()
             elif field['widgettype'] == 2:
                 widget = self.add_combobox(self.dlg_cf, field)
             elif field['widgettype'] == 3:
@@ -234,7 +234,7 @@ class ApiCF(ApiParent):
                 action.setVisible(True)
 
         # Set selected feature and zoomed
-        expr_filter = str(row[0]['idName']) + " = " + str(feature_id)
+        expr_filter = str(row[0]['idName']) + " = " + str(self.feature_id)
         (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             print("INVALID EXPRESSION at: " + __name__)
@@ -280,7 +280,7 @@ class ApiCF(ApiParent):
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        btn_accept.clicked.connect(partial(self.accept, complet_result[0], feature_id))
+        btn_accept.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id))
         self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
 
         #QApplication.restoreOverrideCursor()
@@ -289,22 +289,24 @@ class ApiCF(ApiParent):
         self.dlg_cf.show()
 
 
-    def accept(self, complet_result, feature_id):
+    def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
 
-        if self.my_json == '':
+        if _json == '':
             self.close_dialog(self.dlg_cf)
             return
 
-        my_json = json.dumps(self.my_json)
+        my_json = json.dumps(_json)
         p_table_id = complet_result['tableName']
 
         sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertfields('"+str(p_table_id)+"', '"+str(feature_id)+""
                "',null, 9, 100, '"+str(my_json)+"')")
         row = self.controller.execute_returning(sql, log_sql=True)
-
+        if clear_json:
+            _json = {}
         if "Accepted" in str(row[0]):
             message = "Values has been updated"
             self.controller.show_info(message)
+        if close_dialog:
             self.close_dialog(self.dlg_cf)
 
 
@@ -367,7 +369,8 @@ class ApiCF(ApiParent):
         #dialog.actionSwicthArcid.setEnabled(enabled)
 
 
-    def get_values(self, dialog, widget, value=None):
+    def get_values(self, dialog, widget, _json=None):
+        value = None
         if type(widget) is QLineEdit and not widget.isReadOnly():
             value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox and widget.isEnabled():
@@ -380,11 +383,11 @@ class ApiCF(ApiParent):
         # Only get values if layer is editable
         if self.layer.isEditable():
             # If widget.isEditable(False) return None, here control it.
-            if str(value)=='':
-                self.my_json[str(widget.objectName())] = None
+            if str(value) == '':
+                _json[str(widget.objectName())] = None
             else:
-                self.my_json[str(widget.objectName())] = str(value)
-        self.controller.log_info(str(self.my_json))
+                _json[str(widget.objectName())] = str(value)
+        self.controller.log_info(str(_json))
 
     def add_lineedit(self, dialog, field):
 
@@ -398,7 +401,12 @@ class ApiCF(ApiParent):
                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
                                      " color: rgb(100, 100, 100)}")
 
-        widget.lostFocus.connect(partial(self.get_values, dialog, widget))
+        if field['isautoupdate']:
+            _json = {}
+            widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
+            widget.lostFocus.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+        else:
+            widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
 
         if 'datatype' in field:
             if field['datatype'] == 1:  # Integer
@@ -432,7 +440,7 @@ class ApiCF(ApiParent):
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
-        widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget))
+        widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
         return widget
 
@@ -474,7 +482,7 @@ class ApiCF(ApiParent):
         if 'value' in field:
             if field['value'] == "t":
                 widget.setChecked(True)
-        widget.stateChanged.connect(partial(self.get_values, dialog, widget))
+        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
 
