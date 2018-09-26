@@ -67,13 +67,13 @@ class ApiCF(ApiParent):
             self.emit_point.canvasClicked.disconnect()
 
 
-    def open_form(self, point=None, table_name=None, node_type=None, node_id=None):
+    def open_form(self, point=None, table_name=None, feature_type=None, feature_id=None):
 
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
-        :param node_type: (arc, node, connec...)
-        :param node_id: id of feature to do info
+        :param feature_type: (arc, node, connec...)
+        :param feature_id: id of feature to do info
         :return:
         """
         self.dlg_is_destroyed = False
@@ -87,7 +87,7 @@ class ApiCF(ApiParent):
         self.dlg_cf = ApiCfUi()
         self.load_settings(self.dlg_cf)
 
-        if node_id:
+        if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
                                     self.dlg_cf.height())
 
@@ -142,10 +142,10 @@ class ApiCF(ApiParent):
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
                    + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
                    + str(editable_layers)+"', "+str(scale_zoom)+", 9, 100)")
-        elif node_id:
-            sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(node_type)+"_id = '" + str(node_id) + "'")
+        elif feature_id:
+            sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+"_id = '" + str(feature_id) + "'")
             row = self.controller.get_row(sql, log_sql=True)
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(node_id)+"',"
+            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
                    " '" + str(row[0])+"', True, 9, 100)")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
@@ -160,8 +160,8 @@ class ApiCF(ApiParent):
         self.tablename = row[0]['tableName']
         pos_ini = row[0]['tableName'].rfind("_")
         pos_fi = len(str(row[0]['tableName']))
-        self.node_type = row[0]['tableName'][pos_ini+1:pos_fi]
-        self.dlg_cf.setWindowTitle(self.node_type.capitalize())
+        self.feature_type = row[0]['tableName'][pos_ini+1:pos_fi]
+        self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
         table_parent = str(row[0]['tableParent'])
@@ -178,7 +178,8 @@ class ApiCF(ApiParent):
             label.setText(field['form_label'].capitalize())
             label.setToolTip(field['tooltip'])
             if field['widgettype'] == 1 or field['widgettype'] == 10:
-                widget = self.add_lineedit(self.dlg_cf, field)
+                completer = QCompleter()
+                widget = self.add_lineedit(self.dlg_cf, field, completer)
                 if widget.objectName() == field_id:
                     self.feature_id = widget.text()
             elif field['widgettype'] == 2:
@@ -389,7 +390,7 @@ class ApiCF(ApiParent):
                 _json[str(widget.objectName())] = str(value)
         self.controller.log_info(str(_json))
 
-    def add_lineedit(self, dialog, field):
+    def add_lineedit(self, dialog, field, completer):
 
         widget = QLineEdit()
         widget.setObjectName(field['column_id'])
@@ -427,7 +428,6 @@ class ApiCF(ApiParent):
         if field['widgettype'] == 10:
             if 'dv_table' in field:
                 table_name = field['dv_table']
-                completer = QCompleter()
                 model = QStringListModel()
                 self.populate_lineedit(completer, model, table_name, dialog, widget, 'id')
                 widget.textChanged.connect(partial(self.populate_lineedit, completer, model, table_name, dialog, widget, 'id'))
@@ -550,7 +550,7 @@ class ApiCF(ApiParent):
 
         if widget:
             widget_name = widget.objectName()
-            self.catalog.catalog(dialog, widget_name, wsoftware, geom_type, self.node_type)
+            self.catalog.catalog(dialog, widget_name, wsoftware, geom_type, self.feature_type)
         else:
             msg = ("No function associated to this action, review column action_function "
                    "from table config_api_layer_field for " + str(self.tablename) + " ")
@@ -709,9 +709,9 @@ class ApiCF(ApiParent):
             webbrowser.open(path)
 
     def open_node(self, dialog, widget=None, message_level=None):
-        node_id = utils_giswater.getWidgetText(dialog, widget)
+        feature_id = utils_giswater.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.ApiCF.open_form(table_name='ve_node',  node_type='node', node_id=node_id)
+        self.ApiCF.open_form(table_name='ve_node',  feature_type='node', feature_id=feature_id)
 
 
 

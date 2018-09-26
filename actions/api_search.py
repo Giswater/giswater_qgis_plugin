@@ -23,6 +23,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter
 from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox
 
+from actions.api_cf import ApiCF
 from api_parent import ApiParent
 from ui_manager import ApiSearchUi
 
@@ -66,7 +67,7 @@ class ApiSearch(ApiParent):
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         first_tab = None
-        completer = QCompleter()
+
         for tab in result["formTabs"]:
             if first_tab is None:
                 first_tab = tab['tabName']
@@ -81,6 +82,7 @@ class ApiSearch(ApiParent):
                 label.setObjectName('lbl_' + field['label'])
                 label.setText(field['label'].capitalize())
                 if field['type'] == 'typeahead':
+                    completer = QCompleter()
                     widget = self.add_lineedit(field, completer)
                 elif field['type'] == 'combo':
                     widget = self.add_combobox(field)
@@ -121,6 +123,7 @@ class ApiSearch(ApiParent):
 
 
     def zoom_to_object(self, completer):
+        # We look for the index of current tan so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
 
@@ -143,7 +146,8 @@ class ApiSearch(ApiParent):
                 break
 
         # IF for zoom to tab network
-        if 'sys_id' in item:
+        if self.dlg_search.main_tab.widget(index).objectName() == 'network':
+        #if 'sys_id' in item:
             layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
             if layer is None:
                 msg = "Layer not found"
@@ -151,6 +155,7 @@ class ApiSearch(ApiParent):
                 return
 
             self.iface.setActiveLayer(layer)
+            # TODO revisar esta expresion y el mensage de error que genera en la pestana de postgis del qgis
             expr_filter = str(item['sys_idname']) + " = " + str(item['sys_id'])
             (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
@@ -158,8 +163,10 @@ class ApiSearch(ApiParent):
                 return
             self.select_features_by_expr(layer, expr)
             self.iface.actionZoomToSelected().trigger()
+            self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=item['feature_type'], feature_id=item['sys_id'])
         # IF for zoom to tab address (streets)
-        elif 'id' in item and 'sys_id' not in item:
+        elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
             polygon = polygon[9:len(polygon)-2]
             polygon = polygon.split(',')
@@ -169,7 +176,7 @@ class ApiSearch(ApiParent):
             self.canvas.setExtent(rect)
             self.canvas.refresh()
         # IF for zoom to tab address (postnumbers)
-        elif 'sys_x' in item and 'sys_y' in item:
+        elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
             y1 = item['sys_y']
             rect = QgsRectangle(float(x1), float(y1), float(x1), float(y1))
@@ -267,7 +274,7 @@ class ApiSearch(ApiParent):
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
             self.set_completer_object(completer, model, widget, display_list)
-        print(len(line_list))
+
         if len(line_list) == 2:
             _json = {}
             line_edit_add = line_list[1]
