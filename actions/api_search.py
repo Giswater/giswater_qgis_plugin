@@ -6,22 +6,27 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-
+import webbrowser
 from functools import partial
 
 import operator
 import json
 
 from PyQt4.QtCore import QTimer
+from PyQt4.uic.properties import QtGui
 
 import utils_giswater
 from PyQt4 import uic
-
-from qgis.core import QgsRectangle, QgsPoint, QgsGeometry, QGis
+# TODO  Es probable que la libreria QgsPoint en la version 3.x pase a llamarse QgsPointXY
+# TODO  Es probable que la libreria QgsMarkerSymbolV2 en la version 3.x pase a llamarse QgsMarkerSymbol
+from qgis.core import QgsRectangle, QgsPoint, QgsGeometry, QGis, QgsMarkerSymbolV2
 from qgis.gui import QgsVertexMarker, QgsRubberBand
+# TODO  Es probable que la libreria QgsTextAnnotationItem en la version 3.x pase a llamarse QgsTextAnnotation y ademas
+# TODO  pertenezca a qgis.core (esto segundo no es seguro)
+from qgis.gui import QgsTextAnnotationItem
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QPushButton
-from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter
+from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QTextDocument
 
 
 from actions.api_cf import ApiCF
@@ -39,7 +44,7 @@ class ApiSearch(ApiParent):
         self.iface = iface
         self.json_search = {}
         self.lbl_visible = False
-
+        self.load_config_data()
         if QGis.QGIS_VERSION_INT >= 10900:
             self.rubberBand = QgsRubberBand(self.canvas, QGis.Point)
             self.rubberBand.setColor(Qt.yellow)
@@ -48,6 +53,30 @@ class ApiSearch(ApiParent):
         else:
             self.vMarker = QgsVertexMarker(self.canvas)
             self.vMarker.setIconSize(10)
+
+
+    def load_config_data(self):
+        """ Load configuration data from tables """
+
+        self.params = {}
+        sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
+               " WHERE context = 'searchplus' ORDER BY parameter")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            message = "Parameters related with 'searchplus' not set in table 'config_param_system'"
+            self.controller.log_warning(message)
+            return False
+
+        for row in rows:
+            self.params[row['parameter']] = str(row['value'])
+
+            # Get scale zoom
+        if not 'scale_zoom' in self.params:
+            self.scale_zoom = 2500
+        else:
+            self.scale_zoom = self.params['scale_zoom']
+
+        return True
 
 
     def api_search(self):
@@ -126,31 +155,33 @@ class ApiSearch(ApiParent):
 
 
     def zoom_to_object(self, completer):
-        # We look for the index of current tan so we can search by name
+        # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
-        line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
 
+        # Get all QLineEdit for activate or we cant write when tab have more than 1 QLineEdit
+        line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         for line_edit in line_list:
             line_edit.setReadOnly(False)
             line_edit.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
-        # Get text from selected row
+
+        # Get selected row
         row = completer.popup().currentIndex().row()
         if row == -1:
             return
-
+        # Get text from selected row
         _key = completer.completionModel().index(row, 0).data()
-
+        print(_key)
         # Search text into self.result_data
         # (this variable contains all the matching objects in the function "make_list())"
         item = None
         for data in self.result_data['data']:
+            print(data)
             if _key == data['display_name']:
                 item = data
                 break
 
         # IF for zoom to tab network
         if self.dlg_search.main_tab.widget(index).objectName() == 'network':
-        #if 'sys_id' in item:
             layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
             if layer is None:
                 msg = "Layer not found"
@@ -177,30 +208,67 @@ class ApiSearch(ApiParent):
             polygon = polygon[9:len(polygon)-2]
             polygon = polygon.split(',')
             x1, y1 = polygon[0].split(' ')
-            x3, y3 = polygon[2].split(' ')
-            rect = QgsRectangle(float(x1), float(y1), float(x3), float(y3))
-            self.canvas.setExtent(rect)
-            self.canvas.refresh()
+            x2, y2 = polygon[2].split(' ')
+            self.zoom_to_rectangle(x1, y1, x2, y2)
         # IF for zoom to tab address (postnumbers)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
             y1 = item['sys_y']
-            rect = QgsRectangle(float(x1), float(y1), float(x1), float(y1))
-            self.canvas.setExtent(rect)
+            self.zoom_to_rectangle(x1, y1, x1, y1)
             point = QgsPoint(float(x1), float(y1))
             self.highlight(point, 2000)
+            textItem = QgsTextAnnotationItem(self.iface.mapCanvas())
+            document = QTextDocument()
+            #document.setHtml("<strong>" + str("TEST") + "</strong></br><p>hola<p/>")
+            document.setPlainText("HOLA")
+            textItem.setDocument(document)
+            # symbol = QgsMarkerSymbolV2()
+            # symbol.setSize(9)
+            # textItem.setMarkerSymbol(symbol)
+            textItem.setMapPosition(point)
+
+
+
             self.canvas.refresh()
         elif self.dlg_search.main_tab.widget(index).objectName() == 'hydro':
             # TODO
-            # self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
+            combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
+            if combo_list:
+                combo = combo_list[0]
+                expl_name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
+
+            #self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
+            hydrometer_customer_code = item['display_name'].split(' - ')[0]
+
+            row = item['display_name'].split(' - ', 2)
+
+            hydro_id = str(row[0])
+            connec_customer_code = str(row[1])
+            sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ", " + self.params['basic_search_hyd_hydro_field_1'] + ""
+                   " FROM " + self.schema_name + ".v_rtc_hydrometer "
+                   " WHERE " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '" + str(connec_customer_code) + "' "
+                   " AND " + self.params['basic_search_hyd_hydro_field_expl_name'] + " ILIKE '%" + str(expl_name) + "%' "
+                   " AND " + self.params['basic_search_hyd_hydro_field_1'] + " = '" + str(hydro_id) + "'")
+            row = self.controller.get_row(sql, log_sql=False)
+            if not row:
+                return
+            connec_id = row[0]
+            hydrometer_customer_code = row[1]
+
+            self.open_hydrometer_dialog(connec_id, hydrometer_customer_code, expl_name)
+            x1 = item['sys_x']
+            y1 = item['sys_y']
+            self.zoom_to_rectangle(x1, y1, x1, y1)
+            point = QgsPoint(float(x1), float(y1))
+            self.highlight(point, 2000)
+            self.canvas.refresh()
+
             return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
             # TODO mantenemos como la 3.1
             return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
-            # TODO anadir la columna enable_all(boolean) a la tabla plan_psector
             self.manage_new_psector.new_psector(item['sys_id'], 'plan')
-
             return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             # TODO
@@ -208,6 +276,10 @@ class ApiSearch(ApiParent):
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 
+    def zoom_to_rectangle(self, x1, y1, x2, y2):
+        rect = QgsRectangle(float(x1), float(y1), float(x2), float(y2))
+        self.canvas.setExtent(rect)
+        self.canvas.refresh()
 
 
     def highlight(self, point, duration_time=None):
@@ -333,11 +405,6 @@ class ApiSearch(ApiParent):
         return widget
 
 
-    def get_params(self, widget):
-        self.table_name = utils_giswater.get_item_data(widget, 0)
-        self.id_type = utils_giswater.get_item_data(widget, 1) +"_id"
-
-
     def populate_combo(self, widget, field, allow_blank=True):
         # Generate list of items to add into combo
         widget.blockSignals(True)
@@ -353,4 +420,67 @@ class ApiSearch(ApiParent):
         # Populate combo
         for record in records_sorted:
             widget.addItem(record[1], record)
+
+
+    def open_hydrometer_dialog(self, connec_id, hydrometer_customer_code, expl_name):
+
+        self.hydro_info_dlg = HydroInfo()
+        self.load_settings(self.hydro_info_dlg)
+
+        self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
+
+
+        if expl_name == 'null':
+            expl_name = ''
+        sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
+               " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
+               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
+               " AND " + self.params['basic_search_hyd_hydro_field_expl_name'] + " ILIKE '%" + str(expl_name) + "%'")
+        rows = self.controller.get_rows(sql, log_sql=True)
+        if rows:
+            row = rows[0]
+        else:
+            return
+
+        # Get columns name in order of the table
+        sql = ("SELECT column_name FROM information_schema.columns"
+               " WHERE table_name = '" + "v_rtc_hydrometer'"
+               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
+               " ORDER BY ordinal_position")
+        column_name = self.controller.get_rows(sql)
+
+        grid_layout = self.hydro_info_dlg.findChild(QGridLayout, 'gridLayout')
+        for x in range(0, len(row)):
+            label = QLabel()
+            label.setObjectName("lbl_" + column_name[x][0])
+            label.setText(str(column_name[x][0] + ": "))
+            grid_layout.addWidget(label, x, 0, 1, 1)
+            if column_name[x][0] != 'hydrometer_link':
+                lineedit = QLineEdit()
+                lineedit.setObjectName("txt_" + column_name[x][0])
+                lineedit.setText(str(row[x]))
+                lineedit.setReadOnly(True)
+                lineedit.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+                grid_layout.addWidget(lineedit, x, 1, 1, 1)
+            else:
+                button = QPushButton()
+                button.setObjectName("txt_" + column_name[x][0])
+                button.setText(str(row[x]))
+                button.setStyleSheet("Text-align:left")
+                button.setFlat(True)
+                grid_layout.addWidget(button, x, 1, 1, 1)
+                self.button_link = button
+
+        url = str(row['hydrometer_link'])
+        if url is not None or url != '':
+            self.button_link.clicked.connect(partial(self.open_url, url))
+
+        self.hydro_info_dlg.open()
+
+
+    def open_url(self, url):
+        """ Open URL """
+        if url:
+            webbrowser.open(url)
 
