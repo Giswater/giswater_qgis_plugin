@@ -20,12 +20,14 @@ from PyQt4 import uic
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry, QGis
 from qgis.gui import QgsVertexMarker, QgsRubberBand
 from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QPushButton
 from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox
+
 
 from actions.api_cf import ApiCF
+from actions.manage_new_psector import ManageNewPsector
 from api_parent import ApiParent
-from ui_manager import ApiSearchUi
+from ui_manager import ApiSearchUi, HydroInfo
 
 
 class ApiSearch(ApiParent):
@@ -33,6 +35,7 @@ class ApiSearch(ApiParent):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
+        self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.iface = iface
         self.json_search = {}
         self.lbl_visible = False
@@ -165,6 +168,9 @@ class ApiSearch(ApiParent):
             self.iface.actionZoomToSelected().trigger()
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
             self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=item['feature_type'], feature_id=item['sys_id'])
+        elif self.dlg_search.main_tab.widget(index).objectName() == 'search':
+            # TODO
+            return
         # IF for zoom to tab address (streets)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
@@ -184,7 +190,21 @@ class ApiSearch(ApiParent):
             point = QgsPoint(float(x1), float(y1))
             self.highlight(point, 2000)
             self.canvas.refresh()
+        elif self.dlg_search.main_tab.widget(index).objectName() == 'hydro':
+            # TODO
+            # self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
+            return
+        elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
+            # TODO mantenemos como la 3.1
+            return
+        elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
+            # TODO anadir la columna enable_all(boolean) a la tabla plan_psector
+            self.manage_new_psector.new_psector(item['sys_id'], 'plan')
 
+            return
+        elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
+            # TODO
+            return
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 

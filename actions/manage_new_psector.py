@@ -230,6 +230,10 @@ class ManageNewPsector(ParentManage):
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
 
             layer = self.controller.get_layer_by_tablename('v_edit_'+self.plan_om+'_psector')
+            if not layer:
+                message = "Layer not found"
+                self.controller.show_message(message, message_level=2, parameter='v_edit_'+self.plan_om+'_psector')
+                return
             expr_filter = "psector_id = '" + str(psector_id) + "'"
             (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
