@@ -200,6 +200,13 @@ class GalleryZoom(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('hydro_info.ui')
+class HydroInfo(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('hydrology_selector.ui')
 class HydrologySelector(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
