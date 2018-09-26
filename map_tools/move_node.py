@@ -47,11 +47,7 @@ class MoveNodeMapTool(ParentMapTool):
                " WHERE node_id = '" + node_id + "'")
         status = self.controller.execute_sql(sql) 
         if status:
-            # Show message before executing
-            message = ("The procedure will delete features on database." 
-                       " Please ensure that features has no undelete value on true."
-                       " On the other hand you must know that traceability table will storage precedent information.")
-            self.controller.show_info_box(message, "Info")
+
             
             # Execute SQL function and show result to the user
             function_name = "gw_fct_arc_divide"
@@ -255,7 +251,14 @@ class MoveNodeMapTool(ParentMapTool):
                     node_id = self.snapped_feat.attribute('node_id')
 
                     # Move selected node to the released point
-                    self.move_node(node_id, point)
+                    # Show message before executing
+                    message = ("The procedure will delete features on database."
+                               " Please ensure that features has no undelete value on true."
+                               " On the other hand you must know that traceability table will storage precedent information.")
+                    title = "Info"
+                    answer = self.controller.ask_question(message, title)
+                    if answer:
+                        self.move_node(node_id, point)
 
         
         elif event.button() == Qt.RightButton:
