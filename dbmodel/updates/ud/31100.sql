@@ -116,6 +116,9 @@ UPDATE audit_cat_param_user SET description = 'Default value for state type para
 UPDATE audit_cat_param_user SET description = 'Default value for verified parameter' WHERE id='verified_vdefault';
 UPDATE audit_cat_param_user SET description = 'Default value for visit parameter' WHERE id='visitcat_vdefault';
 UPDATE audit_cat_param_user SET description = 'Default value for workcat parameter' WHERE id='workcat_vdefault';
+UPDATE audit_cat_param_user SET description = 'If true, allows to force arcs downgrade although they have other connected elements' WHERE id='edit_arc_downgrade_force';
+UPDATE audit_cat_param_user SET description = 'If true, when a connec is downgraded, associated link and vnode are also downgraded' WHERE id='edit_connect_force_downgrade_linkvnode';
+UPDATE audit_cat_param_user SET description = 'If true, the automatic rotation calculation on the nodes is disabled. Used for an absolute manual update of rotation field ' WHERE id='edit_noderotation_update_dissbl';
 
 
 
