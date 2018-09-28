@@ -135,6 +135,8 @@ BEGIN
 			UPDATE doc_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
 			UPDATE om_visit_x_arc SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
 			UPDATE connec SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+			UPDATE node SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
+
 	
 			IF project_type_aux='UD' THEN
 				UPDATE gully SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;    

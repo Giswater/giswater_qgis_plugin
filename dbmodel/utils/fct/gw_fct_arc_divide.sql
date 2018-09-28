@@ -138,29 +138,33 @@ BEGIN
 			parameter_id,
 			value_param
 			FROM man_addfields_value WHERE feature_id=arc_id_aux;
+			
+			-- update arc_id of disconnected nodes linked to old arc
+			FOR rec_node IN SELECT node_id, the_geom FROM node WHERE arc_id=arc_id_aux
+			LOOP
+				UPDATE node SET arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(rec_node.the_geom, 
+				v_edit_arc.the_geom,0.001) AND arc_id != arc_id_aux LIMIT 1) 
+				AND node_id=rec_node.node_id;
+			END LOOP;
 
-			-- Redraw the link and vnode (only userdefined_geom false and directly connected to arc
+			-- Capture linked feature information to redraw (later on this function)
+			-- connec
 			FOR connec_id_aux IN SELECT connec_id FROM connec WHERE arc_id=arc_id_aux
 			LOOP
 				array_agg_connec:= array_append(array_agg_connec, connec_id_aux);
 			END LOOP;
-
 			UPDATE connec SET arc_id=NULL WHERE arc_id=arc_id_aux;	
 	
-			
+			-- gully
 			IF project_type_aux='UD' THEN
-
 
 				FOR gully_id_aux IN SELECT gully_id FROM gully WHERE arc_id=arc_id_aux
 				LOOP
 					array_agg_gully:= array_append(array_agg_gully, gully_id_aux);
 				END LOOP;
-
-				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;
-			
+				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;		
 			END IF;
-			
-		
+					
 			--INSERT DATA INTO OM_TRACEABILITY
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 			VALUES ('DIVIDE ARC',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
