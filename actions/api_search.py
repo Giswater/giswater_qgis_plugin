@@ -195,13 +195,13 @@ class ApiSearch(ApiParent):
 
             self.iface.setActiveLayer(layer)
             # TODO revisar esta expresion y el mensage de error que genera en la pestana de postgis del qgis
-            expr_filter = str(item['sys_idname']) + " = " + str(item['sys_id'])
-            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-            if not is_valid:
-                print("INVALID EXPRESSION at: " + __name__)
-                return
-            self.select_features_by_expr(layer, expr)
-            self.iface.actionZoomToSelected().trigger()
+            # expr_filter = str(item['sys_idname']) + " = " + str(item['sys_id'])
+            # (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            # if not is_valid:
+            #     print("INVALID EXPRESSION at: " + __name__)
+            #     return
+            # self.select_features_by_expr(layer, expr)
+            # self.iface.actionZoomToSelected().trigger()
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
             self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=item['feature_type'], feature_id=item['sys_id'])
         elif self.dlg_search.main_tab.widget(index).objectName() == 'search':

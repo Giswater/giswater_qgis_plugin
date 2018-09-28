@@ -172,7 +172,9 @@ class ApiCF(ApiParent):
         # Get tableParent and select layer
         table_parent = str(row[0]['tableParent'])
         self.layer = self.controller.get_layer_by_tablename(table_parent)
-        self.iface.setActiveLayer(self.layer)
+        print (self.layer)
+        if self.layer:
+            self.iface.setActiveLayer(self.layer)
 
         # Get field id name
         field_id = str(row[0]['idName'])
@@ -236,7 +238,7 @@ class ApiCF(ApiParent):
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
         # Find actions and set visibles
-        # TODO falta recibir en el json del search las actions a mostrar
+        # TODO falta recibir en el json del search(hydrometer) las actions a mostrar
         actions_to_show = row[0]['formActions']
         if 'actions' in actions_to_show:
             for field in actions_to_show["actions"]:
@@ -244,24 +246,25 @@ class ApiCF(ApiParent):
                 action = self.dlg_cf.findChild(QAction, field)
                 if action is not None:
                     action.setVisible(True)
-        self.controller.log_info(str(self.feature_id))
+
         # Set selected feature and zoomed
-        expr_filter = str(row[0]['idName']) + " = " + str(self.feature_id)
-        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-        if not is_valid:
-            print("INVALID EXPRESSION at: " + __name__)
-            return
-        self.select_features_by_expr(self.layer, expr)
-        self.iface.actionZoomToSelected().trigger()
+        if not(feature_id and feature_type is None):
+            expr_filter = str(row[0]['idName']) + " = " + str(self.feature_id)
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            if not is_valid:
+                print("INVALID EXPRESSION at: " + __name__)
+                return
+            self.select_features_by_expr(self.layer, expr)
+            self.iface.actionZoomToSelected().trigger()
 
-        # Get selected feature
-        self.feature = self.get_feature_by_id(self.layer)
+            # Get selected feature
+            self.feature = self.get_feature_by_id(self.layer)
 
-
-        if self.layer.isEditable():
-            self.enable_all(result)
-        else:
-            self.disable_all(result, False)
+        if self.layer:
+            if self.layer.isEditable():
+                self.enable_all(result)
+            else:
+                self.disable_all(result, False)
 
         # SIGNALS
         self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
