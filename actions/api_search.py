@@ -6,12 +6,16 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+import os
 import webbrowser
 from functools import partial
 
 import operator
 import json
 
+import subprocess
+
+import sys
 from PyQt4.QtCore import QTimer
 from PyQt4.uic.properties import QtGui
 
@@ -28,7 +32,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QPushButton
 from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QTextDocument
 
-
+from actions.HyperLinkLabel import HyperLinkLabel
 from actions.api_cf import ApiCF
 from actions.manage_new_psector import ManageNewPsector
 from api_parent import ApiParent
@@ -134,22 +138,23 @@ class ApiSearch(ApiParent):
         self.dlg_search.show()
 
 
-    def add_lineedit(self,  field, completer):
+    def add_lineedit(self,  field, completer=None):
         """ Add widgets QLineEdit type """
         widget = QLineEdit()
-        widget.setObjectName(field['name'])
+        widget.setObjectName(field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
 
-        if 'disabled' in field:
-            widget.setReadOnly(field['disabled'])
-            if field['disabled']:
+        if 'iseditable' in field:
+            widget.setReadOnly(not field['iseditable'])
+            if not field['iseditable']:
                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-        model = QStringListModel()
-        completer.highlighted.connect(partial(self.zoom_to_object, completer))
+        if completer:
+            model = QStringListModel()
+            completer.highlighted.connect(partial(self.zoom_to_object, completer))
 
-        self.make_list(completer, model, widget)
-        widget.textChanged.connect(partial(self.make_list, completer, model, widget))
+            self.make_list(completer, model, widget)
+            widget.textChanged.connect(partial(self.make_list, completer, model, widget))
 
         return widget
 
@@ -246,12 +251,8 @@ class ApiSearch(ApiParent):
             point = QgsPoint(float(x1), float(y1))
             self.highlight(point, 2000)
             self.canvas.refresh()
+            self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_type=None, feature_id=item['sys_id'])
 
-            self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=None, feature_id=item['sys_id'])
-
-
-            return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
             # TODO mantenemos como la 3.1
             return
@@ -386,7 +387,7 @@ class ApiSearch(ApiParent):
 
     def add_combobox(self, field):
         widget = QComboBox()
-        widget.setObjectName(field['name'])
+        widget.setObjectName(field['column_id'])
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
@@ -410,7 +411,7 @@ class ApiSearch(ApiParent):
             widget.addItem(record[1], record)
 
 
-    def open_hydrometer_dialog(self, connec_id, hydrometer_customer_code, expl_name):
+    def open_hydrometer_dialog(self, table_name=None, feature_type=None, feature_id=None):
 
         self.hydro_info_dlg = HydroInfo()
         self.load_settings(self.hydro_info_dlg)
@@ -418,57 +419,81 @@ class ApiSearch(ApiParent):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
 
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
+               " null, True, 9, 100)")
+        row = self.controller.get_row(sql, log_sql=True)
 
-        if expl_name == 'null':
-            expl_name = ''
-        sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
-               " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
-               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
-               " AND " + self.params['basic_search_hyd_hydro_field_expl_name'] + " ILIKE '%" + str(expl_name) + "%'")
-        rows = self.controller.get_rows(sql, log_sql=True)
-        if rows:
-            row = rows[0]
-        else:
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
+        result = row[0]['editData']
+        if 'fields' not in result:
+            return
+        self.controller.log_info(str(result))
+        # Get field id name
+        field_id = str(row[0]['idName'])
 
-        # Get columns name in order of the table
-        sql = ("SELECT column_name FROM information_schema.columns"
-               " WHERE table_name = '" + "v_rtc_hydrometer'"
-               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
-               " ORDER BY ordinal_position")
-        column_name = self.controller.get_rows(sql)
 
         grid_layout = self.hydro_info_dlg.findChild(QGridLayout, 'gridLayout')
-        for x in range(0, len(row)):
+        for field in result["fields"]:
             label = QLabel()
-            label.setObjectName("lbl_" + column_name[x][0])
-            label.setText(str(column_name[x][0] + ": "))
-            grid_layout.addWidget(label, x, 0, 1, 1)
-            if column_name[x][0] != 'hydrometer_link':
-                lineedit = QLineEdit()
-                lineedit.setObjectName("txt_" + column_name[x][0])
-                lineedit.setText(str(row[x]))
-                lineedit.setReadOnly(True)
-                lineedit.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-                grid_layout.addWidget(lineedit, x, 1, 1, 1)
-            else:
-                button = QPushButton()
-                button.setObjectName("txt_" + column_name[x][0])
-                button.setText(str(row[x]))
-                button.setStyleSheet("Text-align:left")
-                button.setFlat(True)
-                grid_layout.addWidget(button, x, 1, 1, 1)
-                self.button_link = button
+            label.setObjectName('lbl_' + field['form_label'])
+            label.setText(field['form_label'].capitalize())
 
-        url = str(row['hydrometer_link'])
-        if url is not None or url != '':
-            self.button_link.clicked.connect(partial(self.open_url, url))
+            if 'tooltip' in field:
+                label.setToolTip(field['tooltip'])
+            else:
+                label.setToolTip(field['form_label'].capitalize())
+
+            if field['widgettype'] == 1 or field['widgettype'] == 10:
+                widget = self.add_lineedit(field)
+                if widget.objectName() == field_id:
+                    self.feature_id = widget.text()
+            elif field['widgettype'] == 9:
+                widget = self.add_hyperlink(self.hydro_info_dlg, field)
+
+            grid_layout.addWidget(label,  field['layout_order'], 0)
+            grid_layout.addWidget(widget, field['layout_order'], 1)
+
+        verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        grid_layout.addItem(verticalSpacer1)
 
         self.hydro_info_dlg.open()
 
 
-    def open_url(self, url):
-        """ Open URL """
-        if url:
-            webbrowser.open(url)
+    def add_hyperlink(self, dialog, field):
+        widget = HyperLinkLabel()
+        widget.setObjectName(field['column_id'])
+        widget.setText(field['value'])
+        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+        function_name = 'no_function_asociated'
+
+        if 'button_function' in field:
+            if field['button_function'] is not None:
+                function_name = field['button_function']
+            else:
+                msg = ("parameter button_function is null for button " + widget.objectName())
+                self.controller.show_message(msg, 2)
+        else:
+            msg = "parameter button_function not found"
+            self.controller.show_message(msg, 2)
+
+        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
+        return widget
+
+
+    def open_url(self, dialog, widget, message_level=None):
+        path = widget.text()
+
+        # Check if file exist
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
+        else:
+            webbrowser.open(path)
 
