@@ -26,9 +26,11 @@ BEGIN
 			IF v_link.feature_type='CONNEC' THEN
 			
 				UPDATE v_edit_connec SET arc_id=NEW.arc_id WHERE connec_id=v_link.feature_id;
-			ELSE 
-		
+			
+			ELSIF v_link.feature_type='GULLY' THEN
+ 		
 				UPDATE v_edit_gully SET arc_id=NEW.arc_id WHERE gully_id=v_link.feature_id;
+				
 			END IF;
 		END LOOP;
 	
@@ -38,7 +40,8 @@ BEGIN
 			IF v_link.feature_type='CONNEC' THEN
 			
 				UPDATE v_edit_connec SET arc_id=NEW.arc_id WHERE connec_id=v_link.feature_id;
-			ELSE 
+			
+			ELSIF v_link.feature_type='GULLY' THEN
 		
 				UPDATE v_edit_gully SET arc_id=NEW.arc_id WHERE gully_id=v_link.feature_id;
 			END IF;
