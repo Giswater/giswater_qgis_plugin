@@ -302,8 +302,8 @@ class ApiCF(ApiParent):
 
 
     def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
-
-        if _json == '':
+        print (_json)
+        if _json == '' or str(_json) == '{}':
             self.close_dialog(self.dlg_cf)
             return
 
