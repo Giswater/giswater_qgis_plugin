@@ -165,10 +165,8 @@ BEGIN
 --    Update reception date
     insert_data := gw_fct_json_object_set_key(insert_data, 'received_date',(insert_data->>'anl_tstamp')::timestamp::date);
 
-
 --    Get columns names
     SELECT string_agg(quote_ident(key),',') INTO inputstring FROM json_object_keys(insert_data) AS X (key);
-
 
 --    Perform UPDATE (<9.5)
     FOR column_name_var, column_type_var IN SELECT column_name, data_type FROM information_schema.Columns WHERE table_schema = schemas_array[1]::TEXT AND table_name = 'anl_mincut_result_cat' LOOP
@@ -178,20 +176,6 @@ BEGIN
         END IF;
     END LOOP;
 
---    Update the selector
-    IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = current_user_var) > 0 THEN
-        UPDATE anl_mincut_result_selector SET result_id = mincut_id WHERE cur_user = current_user_var;
-    ELSE
-        INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user_var, mincut_id);
-    END IF;
-
---    Update the selector for publish_user
-    -- Get publish user
-    SELECT value FROM config_param_system WHERE parameter='api_publish_user' 
-        INTO v_publish_user;
-    IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = v_publish_user AND result_id=mincut_id) = 0 THEN
-        INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, mincut_id);
-    END IF;
 
 --    specific tasks
     IF mincut_id_arg ISNULL THEN
@@ -232,16 +216,9 @@ BEGIN
     
 */
 
-raise notice 'v_message %' , v_message;
-    
-
-
 --    Control NULL's
     v_message := COALESCE(v_message, '{}');
     api_version := COALESCE(api_version, '{}');
-    
-
-
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
