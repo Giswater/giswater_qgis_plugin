@@ -5,6 +5,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
+
 -- ----------------------------
 -- MINCUT CATALOG
 -- ----------------------------
@@ -35,8 +37,10 @@ mincut_type,
 received_date,
 anl_mincut_result_cat.expl_id,
 exploitation.name AS expl_name,
+macroexploitation.name AS macroexpl_name,
 anl_mincut_result_cat.macroexpl_id,
 anl_mincut_result_cat.muni_id,
+ext_municipality.name AS muni_name,
 postcode,
 streetaxis_id,
 ext_streetaxis.name AS street_name,
@@ -62,8 +66,10 @@ exec_appropiate
 FROM anl_mincut_result_selector, anl_mincut_result_cat
 LEFT JOIN anl_mincut_cat_class ON anl_mincut_cat_class.id = mincut_class
 LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state
-LEFT JOIN SCHEMA_NAME.exploitation ON anl_mincut_result_cat.expl_id = exploitation.expl_id
-LEFT JOIN SCHEMA_NAME.ext_streetaxis ON anl_mincut_result_cat.streetaxis_id::text = ext_streetaxis.id::text
+LEFT JOIN exploitation ON anl_mincut_result_cat.expl_id = exploitation.expl_id
+LEFT JOIN ext_streetaxis ON anl_mincut_result_cat.streetaxis_id::text = ext_streetaxis.id::text
+LEFT JOIN macroexploitation ON anl_mincut_result_cat.macroexpl_id = macroexploitation.macroexpl_id
+LEFT JOIN ext_municipality ON anl_mincut_result_cat.muni_id = ext_streetaxis.muni_id
 	WHERE anl_mincut_result_selector.result_id = anl_mincut_result_cat.id AND anl_mincut_result_selector.cur_user = "current_user"()::text;
 
 
@@ -336,4 +342,48 @@ JOIN anl_mincut_result_cat ON anl_mincut_result_cat.id=result_id WHERE mincut_st
 DROP VIEW IF EXISTS "v_anl_mincut_planified_valve" CASCADE; 
 CREATE VIEW v_anl_mincut_planified_valve AS
 SELECT anl_mincut_result_valve.id, result_id, node_id, closed, unaccess, proposed, forecast_start, forecast_end, the_geom FROM anl_mincut_result_valve
-JOIN anl_mincut_result_cat ON anl_mincut_result_cat.id=result_id WHERE mincut_state<2 and proposed=true
+JOIN anl_mincut_result_cat ON anl_mincut_result_cat.id=result_id WHERE mincut_state<2 and proposed=true;
+
+
+
+DROP VIEW IF EXISTS "v_anl_mincut_init_point" CASCADE; 
+CREATE OR REPLACE VIEW v_anl_mincut_init_point AS
+SELECT
+ anl_mincut_result_cat.id AS result_id,
+    anl_mincut_result_cat.work_order,
+    anl_mincut_cat_state.name AS mincut_state,
+    anl_mincut_cat_class.name AS mincut_class,
+    anl_mincut_result_cat.mincut_type,
+    anl_mincut_result_cat.received_date,
+    exploitation.name AS expl_name,
+    macroexploitation.name AS macroexpl_name,
+    ext_municipality.name AS muni_name,
+    anl_mincut_result_cat.postcode,
+    ext_streetaxis.name AS street_name,
+    anl_mincut_result_cat.postnumber,
+    anl_mincut_result_cat.anl_cause,
+    anl_mincut_result_cat.anl_tstamp,
+    anl_mincut_result_cat.anl_user,
+    anl_mincut_result_cat.anl_descript,
+    anl_mincut_result_cat.anl_feature_id,
+    anl_mincut_result_cat.anl_feature_type,
+    anl_mincut_result_cat.anl_the_geom,
+    anl_mincut_result_cat.forecast_start,
+    anl_mincut_result_cat.forecast_end,
+    anl_mincut_result_cat.assigned_to,
+    anl_mincut_result_cat.exec_start,
+    anl_mincut_result_cat.exec_end,
+    anl_mincut_result_cat.exec_user,
+    anl_mincut_result_cat.exec_descript,
+    anl_mincut_result_cat.exec_from_plot,
+    anl_mincut_result_cat.exec_depth,
+    anl_mincut_result_cat.exec_appropiate
+   FROM anl_mincut_result_selector,
+    anl_mincut_result_cat
+     LEFT JOIN anl_mincut_cat_class ON anl_mincut_cat_class.id = anl_mincut_result_cat.mincut_class
+     LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = anl_mincut_result_cat.mincut_state
+     LEFT JOIN exploitation ON anl_mincut_result_cat.expl_id = exploitation.expl_id
+     LEFT JOIN macroexploitation ON anl_mincut_result_cat.macroexpl_id = macroexploitation.macroexpl_id
+     LEFT JOIN ext_streetaxis ON anl_mincut_result_cat.streetaxis_id::text = ext_streetaxis.id::text
+	 LEFT JOIN ext_municipality ON anl_mincut_result_cat.muni_id = ext_streetaxis.muni_id
+  WHERE anl_mincut_result_selector.result_id = anl_mincut_result_cat.id AND anl_mincut_result_selector.cur_user = "current_user"()::text;
