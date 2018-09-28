@@ -138,15 +138,21 @@ class ApiCF(ApiParent):
         # editable_layers = self.get_editable_layers()
         editable_layers = ''
         scale_zoom = self.iface.mapCanvas().scale()
+        # IF click over canvas
         if point:
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
                    + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
                    + str(editable_layers)+"', "+str(scale_zoom)+", 9, 100)")
-        elif feature_id:
+        # IF come from QPushButtons node1 or node2 from custom form
+        elif feature_id and feature_type:
             sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+"_id = '" + str(feature_id) + "'")
             row = self.controller.get_row(sql, log_sql=True)
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
                    " '" + str(row[0])+"', True, 9, 100)")
+        # IF come from search (tab hydrometer)
+        elif feature_id and feature_type is None:
+            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
+                   " null, True, 9, 100)")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -176,7 +182,10 @@ class ApiCF(ApiParent):
             label = QLabel()
             label.setObjectName('lbl_' + field['form_label'])
             label.setText(field['form_label'].capitalize())
-            label.setToolTip(field['tooltip'])
+            if 'tooltip' in field:
+                label.setToolTip(field['tooltip'])
+            else:
+                label.setToolTip(field['form_label'].capitalize())
             if field['widgettype'] == 1 or field['widgettype'] == 10:
                 completer = QCompleter()
                 widget = self.add_lineedit(self.dlg_cf, field, completer)
@@ -227,13 +236,15 @@ class ApiCF(ApiParent):
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
         # Find actions and set visibles
+        # TODO falta recibir en el json del search las actions a mostrar
         actions_to_show = row[0]['formActions']
-        for field in actions_to_show["actions"]:
-            action = None
-            action = self.dlg_cf.findChild(QAction, field)
-            if action is not None:
-                action.setVisible(True)
-
+        if 'actions' in actions_to_show:
+            for field in actions_to_show["actions"]:
+                action = None
+                action = self.dlg_cf.findChild(QAction, field)
+                if action is not None:
+                    action.setVisible(True)
+        self.controller.log_info(str(self.feature_id))
         # Set selected feature and zoomed
         expr_filter = str(row[0]['idName']) + " = " + str(self.feature_id)
         (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
@@ -281,7 +292,7 @@ class ApiCF(ApiParent):
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        btn_accept.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id))
+        btn_accept.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, self.my_json))
         self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
 
         #QApplication.restoreOverrideCursor()
@@ -298,10 +309,15 @@ class ApiCF(ApiParent):
 
         my_json = json.dumps(_json)
         p_table_id = complet_result['tableName']
-
+        print (my_json)
         sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertfields('"+str(p_table_id)+"', '"+str(feature_id)+""
                "',null, 9, 100, '"+str(my_json)+"')")
         row = self.controller.execute_returning(sql, log_sql=True)
+        if not row:
+            msg = "Fail in: {0}".format(sql)
+            self.controller.show_message(msg, message_level=2)
+            self.controller.log_info(str("FAIL IN: ")+str(sql))
+            return
         if clear_json:
             _json = {}
         if "Accepted" in str(row[0]):

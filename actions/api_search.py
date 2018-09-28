@@ -237,31 +237,19 @@ class ApiSearch(ApiParent):
                 combo = combo_list[0]
                 expl_name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
 
-            #self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
-            hydrometer_customer_code = item['display_name'].split(' - ')[0]
-
-            row = item['display_name'].split(' - ', 2)
-
-            hydro_id = str(row[0])
-            connec_customer_code = str(row[1])
-            sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ", " + self.params['basic_search_hyd_hydro_field_1'] + ""
-                   " FROM " + self.schema_name + ".v_rtc_hydrometer "
-                   " WHERE " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '" + str(connec_customer_code) + "' "
-                   " AND " + self.params['basic_search_hyd_hydro_field_expl_name'] + " ILIKE '%" + str(expl_name) + "%' "
-                   " AND " + self.params['basic_search_hyd_hydro_field_1'] + " = '" + str(hydro_id) + "'")
-            row = self.controller.get_row(sql, log_sql=False)
-            if not row:
-                return
-            connec_id = row[0]
-            hydrometer_customer_code = row[1]
-
-            self.open_hydrometer_dialog(connec_id, hydrometer_customer_code, expl_name)
+            #row = item['display_name'].split(' - ', 2)
+            print (item)
             x1 = item['sys_x']
             y1 = item['sys_y']
+            print (item)
             self.zoom_to_rectangle(x1, y1, x1, y1)
             point = QgsPoint(float(x1), float(y1))
             self.highlight(point, 2000)
             self.canvas.refresh()
+
+            self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=None, feature_id=item['sys_id'])
+
 
             return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
