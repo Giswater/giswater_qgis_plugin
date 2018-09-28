@@ -30,10 +30,12 @@ DECLARE
     conflict_text	text;
     cont1 		integer default 0;
     v_om_mincut_areas	boolean;
+    v_publish_user 	text;
+    v_muni_id 		integer;
 
 BEGIN
     -- Search path
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = ws, public;
     	
     -- get values
     select value::boolean INTO v_om_mincut_areas from config_param_user where parameter='om_mincut_areas' AND cur_user=current_user;
@@ -48,15 +50,20 @@ BEGIN
     DELETE FROM "audit_log_data" where user_name=current_user AND fprocesscat_id=29;
 
 
-    RAISE NOTICE '2-Identification of exploitation and macroexploitation';
+    RAISE NOTICE '2-Identification exploitation, macroexploitation and municipality';
     IF type_element_arg='node' OR type_element_arg='NODE' THEN
 		SELECT expl_id INTO expl_id_arg FROM node WHERE node_id=element_id_arg;
+		SELECT muni_id INTO v_muni_id FROM node WHERE node_id=element_id_arg;
     ELSE
 		SELECT expl_id INTO expl_id_arg FROM arc WHERE arc_id=element_id_arg;
+		SELECT muni_id INTO v_muni_id FROM arc WHERE arc_id=element_id_arg;
     END IF;
     
     SELECT macroexpl_id INTO macroexpl_id_arg FROM exploitation WHERE expl_id=expl_id_arg;
 
+    UPDATE anl_mincut_result_cat SET muni_id=v_muni_id WHERE id=result_id_arg;
+    
+    
     RAISE NOTICE '3-Update exploitation selector (of user) according the macroexploitation system';
     INSERT INTO selector_expl (expl_id, cur_user)
     SELECT expl_id, current_user from exploitation 
@@ -213,9 +220,20 @@ BEGIN
 		END IF;
 		
 		RAISE NOTICE '10-Update mincut selector';
-		DELETE FROM anl_mincut_result_selector WHERE cur_user=current_user;
-		INSERT INTO "anl_mincut_result_selector" (result_id, cur_user) VALUES (result_id_arg, current_user);
-
+		--    Update the selector
+		IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = current_user) > 0 THEN
+			UPDATE anl_mincut_result_selector SET result_id = result_id_arg WHERE cur_user = current_user;
+		ELSE
+			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user, result_id_arg);
+		END IF;
+		--    Update the selector for publish_user
+		-- Get publish user
+		SELECT value FROM config_param_system WHERE parameter='api_publish_user' 
+			INTO v_publish_user;
+		IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = v_publish_user AND result_id=result_id_arg) = 0 THEN
+			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
+		END IF;
+		
 		RAISE NOTICE '11-Insert into anl_mincut_result_connec table ';
 		INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
 		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
