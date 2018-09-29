@@ -1084,8 +1084,8 @@ inp_conduit.flap,
 inp_conduit.seepage
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_conduit ON rpt_inp_arc.arc_id = inp_conduit.arc_id
-	WHERE inp_conduit.kentry > (0)::numeric OR (inp_conduit.kexit > (0)::numeric) OR (inp_conduit.kavg > (0)::numeric) OR inp_conduit.flap='YES'
-	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	WHERE (inp_conduit.kentry > (0)::numeric OR (inp_conduit.kexit > (0)::numeric) OR (inp_conduit.kavg > (0)::numeric) OR inp_conduit.flap='YES')
+	AND (rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"());
 
 
 
