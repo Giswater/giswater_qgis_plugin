@@ -6,20 +6,23 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+import csv
+import json
+import operator
 import os
+import subprocess
+import sys
 import webbrowser
 from functools import partial
+import utils_giswater
 
-import operator
-import json
 
-import subprocess
 
-import sys
+
 from PyQt4.QtCore import QTimer
 from PyQt4.uic.properties import QtGui
 
-import utils_giswater
+
 from PyQt4 import uic
 # TODO  Es probable que la libreria QgsPoint en la version 3.x pase a llamarse QgsPointXY
 # TODO  Es probable que la libreria QgsMarkerSymbolV2 en la version 3.x pase a llamarse QgsMarkerSymbol
@@ -29,14 +32,14 @@ from qgis.gui import QgsVertexMarker, QgsRubberBand
 # TODO  pertenezca a qgis.core (esto segundo no es seguro)
 from qgis.gui import QgsTextAnnotationItem
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QPushButton
-from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QTextDocument
-
+from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QTableView, QFileDialog
+from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QTextDocument, QAbstractItemView
+from PyQt4.QtSql import QSqlTableModel
 from actions.HyperLinkLabel import HyperLinkLabel
 from actions.api_cf import ApiCF
 from actions.manage_new_psector import ManageNewPsector
 from api_parent import ApiParent
-from ui_manager import ApiSearchUi, HydroInfo
+from ui_manager import ApiSearchUi, HydroInfo, ListItems
 
 
 class ApiSearch(ApiParent):
@@ -48,7 +51,7 @@ class ApiSearch(ApiParent):
         self.iface = iface
         self.json_search = {}
         self.lbl_visible = False
-        self.load_config_data()
+
         if QGis.QGIS_VERSION_INT >= 10900:
             self.rubberBand = QgsRubberBand(self.canvas, QGis.Point)
             self.rubberBand.setColor(Qt.yellow)
@@ -59,28 +62,7 @@ class ApiSearch(ApiParent):
             self.vMarker.setIconSize(10)
 
 
-    def load_config_data(self):
-        """ Load configuration data from tables """
 
-        self.params = {}
-        sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
-               " WHERE context = 'searchplus' ORDER BY parameter")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            message = "Parameters related with 'searchplus' not set in table 'config_param_system'"
-            self.controller.log_warning(message)
-            return False
-
-        for row in rows:
-            self.params[row['parameter']] = str(row['value'])
-
-            # Get scale zoom
-        if not 'scale_zoom' in self.params:
-            self.scale_zoom = 2500
-        else:
-            self.scale_zoom = self.params['scale_zoom']
-
-        return True
 
 
     def api_search(self):
@@ -175,12 +157,11 @@ class ApiSearch(ApiParent):
             return
         # Get text from selected row
         _key = completer.completionModel().index(row, 0).data()
-        print(_key)
+
         # Search text into self.result_data
         # (this variable contains all the matching objects in the function "make_list())"
         item = None
         for data in self.result_data['data']:
-            print(data)
             if _key == data['display_name']:
                 item = data
                 break
@@ -194,16 +175,9 @@ class ApiSearch(ApiParent):
                 return
 
             self.iface.setActiveLayer(layer)
-            # TODO revisar esta expresion y el mensage de error que genera en la pestana de postgis del qgis
-            # expr_filter = str(item['sys_idname']) + " = " + str(item['sys_id'])
-            # (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-            # if not is_valid:
-            #     print("INVALID EXPRESSION at: " + __name__)
-            #     return
-            # self.select_features_by_expr(layer, expr)
-            # self.iface.actionZoomToSelected().trigger()
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
             self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=item['feature_type'], feature_id=item['sys_id'])
+
         elif self.dlg_search.main_tab.widget(index).objectName() == 'search':
             # TODO
             return
@@ -219,9 +193,10 @@ class ApiSearch(ApiParent):
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
             y1 = item['sys_y']
-            self.zoom_to_rectangle(x1, y1, x1, y1)
             point = QgsPoint(float(x1), float(y1))
             self.highlight(point, 2000)
+            self.zoom_to_rectangle(x1, y1, x1, y1)
+
             textItem = QgsTextAnnotationItem(self.iface.mapCanvas())
             document = QTextDocument()
             #document.setHtml("<strong>" + str("TEST") + "</strong></br><p>hola<p/>")
@@ -232,33 +207,25 @@ class ApiSearch(ApiParent):
             # textItem.setMarkerSymbol(symbol)
             textItem.setMapPosition(point)
 
-
-
             self.canvas.refresh()
         elif self.dlg_search.main_tab.widget(index).objectName() == 'hydro':
-            # TODO
-            combo_list = self.dlg_search.main_tab.widget(index).findChildren(QComboBox)
-            if combo_list:
-                combo = combo_list[0]
-                expl_name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
-
-            #row = item['display_name'].split(' - ', 2)
-            print (item)
             x1 = item['sys_x']
             y1 = item['sys_y']
-            print (item)
-            self.zoom_to_rectangle(x1, y1, x1, y1)
             point = QgsPoint(float(x1), float(y1))
             self.highlight(point, 2000)
-            self.canvas.refresh()
+            self.zoom_to_rectangle(x1, y1, x1, y1)
+
+
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_type=None, feature_id=item['sys_id'])
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
             # TODO mantenemos como la 3.1
+
+            self.workcat_open_table_items(item)
             return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
-            self.manage_new_psector.new_psector(item['sys_id'], 'plan')
-            return
+            #TODO de donde sacamos el campo id?
+            self.manage_new_psector.new_psector(item['sys_id'], item['sys_table_id'], 'workcat_id')
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             # TODO
             return
@@ -326,7 +293,9 @@ class ApiSearch(ApiParent):
             if len(line_list) == 2:
                 line_edit.textChanged.connect(partial(self.clear_line_edit_add, line_list))
 
-            value = utils_giswater.getWidgetText(self.dlg_search, line_edit)
+            value = utils_giswater.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
+            if str(value) == '':
+                return
             json_updatesearch[line_edit.objectName()] = {}
             json_updatesearch_add[line_edit.objectName()] = {}
             _json['text'] = value
@@ -459,6 +428,383 @@ class ApiSearch(ApiParent):
         grid_layout.addItem(verticalSpacer1)
 
         self.hydro_info_dlg.open()
+
+    def workcat_open_table_items(self, item):
+        print(item)
+        """ Create the view and open the dialog with his content """
+        workcat_id = item['sys_id']
+        layer_name= item['sys_table_id']
+        field_id = item['filter_text']
+
+        if workcat_id is None:
+            return False
+
+        self.update_selector_workcat(workcat_id)
+        self.force_expl(workcat_id)
+
+        #self.zoom_to_polygon(workcat_id, layer_name, field_id)
+
+        self.items_dialog = ListItems()
+        self.load_settings(self.items_dialog)
+        self.items_dialog.btn_state1.setEnabled(False)
+        self.items_dialog.btn_state0.setEnabled(False)
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.txt_path, self.controller.plugin_settings_value('search_csv_path'))
+
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_init, "Filter by: "+str(field_id))
+        utils_giswater.setWidgetText(self.items_dialog, self.items_dialog.label_end, "Filter by: "+str(field_id))
+        #
+        self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.items_dialog.tbl_psm_end.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.disable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
+        self.disable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
+
+        table_name = "v_ui_workcat_x_feature"
+        table_name_end = "v_ui_workcat_x_feature_end"
+        self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
+        self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
+        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
+        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+        self.items_dialog.export_to_csv.clicked.connect(
+            partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
+                    self.items_dialog.txt_path))
+
+        self.items_dialog.txt_name.textChanged.connect(partial
+            (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id, field_id))
+        self.items_dialog.txt_name_end.textChanged.connect(partial
+            (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
+        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm))
+        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm_end))
+
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm, table_name)
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
+        #
+        # Add data to workcat search form
+        table_name = "v_ui_workcat_x_feature"
+        table_name_end = "v_ui_workcat_x_feature_end"
+        extension = '_end'
+        self.fill_label_data(workcat_id, table_name)
+        self.fill_label_data(workcat_id, table_name_end, extension)
+
+        self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
+        self.items_dialog.open()
+
+
+    def force_expl(self,  workcat_id):
+        """ Active exploitations are compared with workcat farms.
+            If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
+
+        sql = ("SELECT a.expl_id, a.expl_name FROM "
+               "  (SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature "
+               "   WHERE workcat_id='" + str(workcat_id) + "' "
+               "   UNION SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature_end "
+               "   WHERE workcat_id='" + str(workcat_id) + "'"
+               "   ) AS a "
+               " WHERE expl_id NOT IN "
+               "  (SELECT expl_id FROM " + self.schema_name + ".selector_expl "
+               "   WHERE cur_user=current_user)")
+        rows = self.controller.get_rows(sql)
+
+        if len(rows) > 0:
+            for row in rows:
+                sql = ("INSERT INTO " + self.schema_name + ".selector_expl(expl_id, cur_user) "
+                       " VALUES('" + str(row[0]) + "', current_user)")
+                self.controller.execute_sql(sql)
+            msg = "Your exploitation selector has been updated"
+            self.controller.show_warning(msg)
+
+    def update_selector_workcat(self, workcat_id):
+        """  Update table selector_workcat """
+
+        sql = ("DELETE FROM " + self.schema_name + ".selector_workcat "
+               " WHERE cur_user = current_user;\n")
+        sql += ("INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
+                " VALUES('" + workcat_id + "', current_user);\n")
+        self.controller.execute_sql(sql)
+
+    def disable_qatable_by_state(self, qtable, _id, qbutton):
+
+        sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
+               " WHERE cur_user = current_user AND state_id ='" + str(_id) + "'")
+        row = self.controller.get_row(sql)
+        if row is None:
+            qtable.setEnabled(False)
+            qbutton.setEnabled(True)
+
+
+    def get_folder_dialog(self, dialog, widget):
+        """ Get folder dialog """
+        if 'nt' in sys.builtin_module_names:
+            folder_path = os.path.expanduser("~\Documents")
+        else:
+            folder_path = os.path.expanduser("~")
+
+        # Open dialog to select folder
+        os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)
+
+        msg = "Save as"
+        folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
+        if folder_path:
+            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+
+
+    def force_state(self, qbutton, state, qtable):
+        """ Force selected state and set qtable enabled = True """
+        sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
+               " WHERE cur_user=current_user AND state_id ='" + str(state) + "'")
+        row = self.controller.get_row(sql)
+        if row is not None:
+            return
+        sql = ("INSERT INTO " + self.schema_name + ".selector_state(state_id, cur_user) "
+               " VALUES('" + str(state) + "', current_user)")
+        self.controller.execute_sql(sql)
+        qtable.setEnabled(True)
+        qbutton.setEnabled(False)
+        self.refresh_map_canvas()
+
+
+    def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
+
+        folder_path = utils_giswater.getWidgetText(dialog, path)
+        if folder_path is None or folder_path == 'null':
+            return
+        if folder_path.find('.csv') == -1:
+            folder_path += '.csv'
+        if qtable_1:
+            model_1 = qtable_1.model()
+        else:
+            return
+        if qtable_2:
+            model_2 = qtable_2.model()
+
+        # Convert qtable values into list
+        all_rows = []
+        headers = []
+        for i in range(0, model_1.columnCount()):
+            headers.append(str(model_1.headerData(i, Qt.Horizontal)))
+        all_rows.append(headers)
+        for rows in range(0, model_1.rowCount()):
+            row = []
+            for col in range(0, model_1.columnCount()):
+                row.append(str(model_1.data(model_1.index(rows, col))))
+            all_rows.append(row)
+        if qtable_2 is not None:
+            headers = []
+            for i in range(0, model_2.columnCount()):
+                headers.append(str(model_2.headerData(i, Qt.Horizontal)))
+            all_rows.append(headers)
+            for rows in range(0, model_2.rowCount()):
+                row = []
+                for col in range(0, model_2.columnCount()):
+                    row.append(str(model_2.data(model_2.index(rows, col))))
+                all_rows.append(row)
+        # Write list into csv file
+        try:
+            if os.path.exists(folder_path):
+                msg = "Are you sure you want to overwrite this file?"
+                answer = self.controller.ask_question(msg, "Overwrite")
+                if answer:
+                    self.write_csv(dialog, folder_path, all_rows)
+            else:
+                self.write_csv(dialog, folder_path, all_rows)
+        except:
+            msg = "File path doesn't exist or you dont have permission or file is opened"
+            self.controller.show_warning(msg)
+            pass
+
+
+    def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
+
+        result_select = utils_giswater.getWidgetText(dialog, widget_txt)
+        if result_select != 'null':
+            expr = ("workcat_id = '" + str(workcat_id) + "'"
+                    " and " + str(field_id) + " ILIKE '%" + str(result_select) + "%'")
+        else:
+            expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(qtable, table_name, expr=expr)
+        self.set_table_columns(dialog, qtable, table_name)
+
+
+    def workcat_fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+        """ Fill table @widget filtering query by @workcat_id
+        Set a model with selected filter.
+        Attach that model to selected table
+        @setEditStrategy:
+            0: OnFieldChange
+            1: OnRowChange
+            2: OnManualSubmit
+        """
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(self.schema_name+"."+table_name)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        model.setSort(0, 0)
+        model.select()
+
+        widget.setEditTriggers(set_edit_triggers)
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+        # Attach model to table view
+        if expr:
+            widget.setModel(model)
+            widget.model().setFilter(expr)
+        else:
+            widget.setModel(model)
+
+        if hidde:
+            self.refresh_table(widget)
+
+
+    def workcat_zoom(self, qtable):
+        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
+
+        # Get selected code from combo
+        element = qtable.selectionModel().selectedRows()
+        if len(element) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = element[0].row()
+        feature_id = qtable.model().record(row).value('feature_id')
+
+        # Get selected layer
+        geom_type = qtable.model().record(row).value('feature_type').lower()
+        fieldname = geom_type + "_id"
+
+        # Check if the expression is valid
+        expr_filter = fieldname + " = '" + str(feature_id) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+
+        for value in self.feature_cat.itervalues():
+            if value.type.lower() == geom_type:
+                layer = self.controller.get_layer_by_layername(value.layername)
+                if layer:
+                    # Select features of @layer applying @expr
+                    self.select_features_by_expr(layer, expr)
+                    # If any feature found, zoom it and exit function
+                    if layer.selectedFeatureCount() > 0:
+                        self.iface.setActiveLayer(layer)
+                        self.iface.legendInterface().setLayerVisible(layer, True)
+                        self.open_custom_form(layer, expr)
+                        self.zoom_to_selected_features(layer, geom_type)
+                        return
+
+        # If the feature is not in views because the selectors are "disabled"...
+        message = "Modify values of selectors to see the feature"
+        self.controller.show_warning(message)
+
+
+    def fill_label_data(self, workcat_id, table_name, extension=None):
+
+        if workcat_id == "null":
+            return
+
+        features = ['NODE', 'CONNEC', 'GULLY', 'ELEMENT', 'ARC']
+        for feature in features:
+            sql = ("SELECT feature_id "
+                   " FROM " + self.schema_name + "." + str(table_name) + "")
+            sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            rows = self.controller.get_rows(sql)
+            if not rows:
+                pass
+
+            if extension is not None:
+                widget_name = "lbl_total_" + str(feature.lower()) + str(extension)
+            else:
+                widget_name = "lbl_total_" + str(feature.lower())
+
+            widget = self.items_dialog.findChild(QLabel, str(widget_name))
+
+            if self.project_type == 'ws' and feature == 'GULLY':
+                widget.hide()
+            total = len(rows)
+            # Add data to workcat search form
+            widget.setText(str(feature.lower().title()) + "s: " + str(total))
+            # TODO 1 DESCOMENTAR ESTO Y COMPROBAR, FALLA EL gis_length de la capa arc
+            length = 0
+            if feature == 'ARC':
+                for row in rows:
+                    arc_id = str(row[0])
+                    sql = ("SELECT st_length2d(the_geom)::numeric(12,2) "
+                           " FROM " + self.schema_name + ".arc"
+                           " WHERE arc_id = '" + arc_id + "'")
+                    row = self.controller.get_row(sql)
+                    if row:
+                        length = length + row[0]
+                    else:
+                        message = "Some data is missing. Check gis_length for arc"
+                        self.controller.show_warning(message, parameter = arc_id)
+                        return
+                if extension != None:
+                    widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
+                else:
+                    widget = self.items_dialog.findChild(QLabel, "lbl_length")
+
+                # Add data to workcat search form
+                widget.setText("Total arcs length: " + str(length))
+            # TODO END
+
+
+
+    def zoom_to_polygon(self, workcat_id, layer_name, field_id):
+
+
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if not layer:
+            msg = "Layer not found"
+            self.controller.show_message(msg, message_level=2, duration=3)
+            return
+
+        # Check if the expression is valid
+        expr_filter = str(field_id) + " LIKE '%" + str(workcat_id) + "%'"
+        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        if not is_valid:
+            return
+        if workcat_id is not None:
+            sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
+                   " WHERE "+str(field_id)+"='"+str(workcat_id) + "'")
+            row = self.controller.get_row(sql)
+            if row[0] is None or row[0] == 'null':
+                msg = "Cant zoom to selection because has no geometry: "
+                self.controller.show_warning(msg, parameter=workcat_id)
+                self.iface.legendInterface().setLayerVisible(layer, False)
+                return
+
+        # Select features of @layer applying @expr
+        self.select_features_by_expr(layer, expr)
+
+        # If any feature found, zoom it and exit function
+        if layer.selectedFeatureCount() > 0:
+            self.iface.setActiveLayer(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.iface.actionZoomToSelected().trigger()
+            layer.removeSelection()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     def add_hyperlink(self, dialog, field):

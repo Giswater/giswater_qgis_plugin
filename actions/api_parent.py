@@ -162,7 +162,40 @@ class ApiParent(ParentAction):
                 self.controller.show_warning(message, parameter=pdf_path)
 
 
+    def set_table_columns(self, dialog, widget, table_name):
+        """ Configuration of tables. Set visibility and width of columns """
 
+        widget = utils_giswater.getWidget(dialog, widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False)
+        if not rows:
+            return
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        # widget.model().setSort(0, Qt.AscendingOrder)
+        widget.model().select()
+
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
 
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:
