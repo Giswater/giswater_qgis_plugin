@@ -221,6 +221,13 @@ class InfoShowInfo(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('list_items.ui')
+class ListItems(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('load_documents.ui')
 class LoadDocuments(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
