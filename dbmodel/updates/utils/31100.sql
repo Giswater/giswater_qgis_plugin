@@ -320,6 +320,6 @@ UPDATE config_param_system SET descript = 'Buffer which links use to search an a
 UPDATE config_param_system SET descript = 'deprecated' WHERE parameter = 'edit_arc_divide_automatic_control';
 UPDATE config_param_system SET descript = 'If true, user can manually update node_1 and node_2. Used in migrations with trustly data for not execute arc_searchnodes trigger' WHERE parameter = 'edit_enable_arc_nodes_update';
 UPDATE config_param_system SET descript = 'The hyperlink in the hydrometer info to an url or a file is made up of two parts. A common part to all hydrometers, and a specific part for each hydrometer. The common part to all is the value of this variable' WHERE parameter = 'hydrometer_link_absolute_path';
-UPDATE config_param_system SET descript = 'System parameter which identifies existing schema in the database with common information for those organizations which share cartography in more than on production schema(ws/ud). In this case, information is propagated to both schemas using views' WHERE parameter = 'exit_utils_schema';
+UPDATE config_param_system SET descript = 'System parameter which identifies existing schema in the database with common information for those organizations which share cartography in more than on production schema(ws/ud). In this case, information is propagated to both schemas using views' WHERE parameter = 'ext_utils_schema';
 
 

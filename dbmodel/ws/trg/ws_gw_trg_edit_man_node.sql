@@ -237,7 +237,12 @@ BEGIN
 			EXECUTE query_text INTO node_id_aux;
 			NEW.parent_id=node_id_aux;
 		END IF;
-
+		
+		
+		--Arc id (in case of dissable arc divide on node insert)
+		IF (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND "cur_user"="current_user"() LIMIT 1)::boolean=TRUE THEN
+			NEW.arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom,0.001) LIMIT 1);
+		END IF;
 			
 			
 		-- FEATURE INSERT      
@@ -453,6 +458,12 @@ BEGIN
 		IF (NEW.hemisphere != OLD.hemisphere) THEN
 			   UPDATE node SET hemisphere=NEW.hemisphere WHERE node_id = OLD.node_id;
 		END IF;	
+		
+		--Arc id
+		IF (SELECT node_1 FROM arc WHERE node_1=NEW.node_id UNION SELECT node_2 FROM arc WHERE node_2=NEW.node_id) IS NULL THEN
+			NEW.arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom,0.001) LIMIT 1);
+		END IF;
+
 		
 		UPDATE node 
 		SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, arc_id=NEW.arc_id, parent_id=NEW.parent_id,
