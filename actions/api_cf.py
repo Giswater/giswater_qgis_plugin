@@ -190,7 +190,10 @@ class ApiCF(ApiParent):
                 label.setToolTip(field['form_label'].capitalize())
             if field['widgettype'] == 1 or field['widgettype'] == 10:
                 completer = QCompleter()
-                widget = self.add_lineedit(self.dlg_cf, field, completer)
+                widget = self.add_lineedit(field)
+                widget = self.set_auto_update(field, self.dlg_cf, widget)
+                widget = self.set_data_type(field, widget)
+                widget = self.set_widget_type(field, self.dlg_cf, widget, completer)
                 if widget.objectName() == field_id:
                     self.feature_id = widget.text()
             elif field['widgettype'] == 2:
@@ -409,7 +412,7 @@ class ApiCF(ApiParent):
                 _json[str(widget.objectName())] = str(value)
         self.controller.log_info(str(_json))
 
-    def add_lineedit(self, dialog, field, completer):
+    def add_lineedit(self, field):
 
         widget = QLineEdit()
         widget.setObjectName(field['column_id'])
@@ -420,14 +423,16 @@ class ApiCF(ApiParent):
             if not field['iseditable']:
                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
                                      " color: rgb(100, 100, 100)}")
-
+        return widget
+    def set_auto_update(self, field, dialog, widget):
         if field['isautoupdate']:
             _json = {}
             widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
             widget.lostFocus.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
         else:
             widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
-
+        return widget
+    def set_data_type(self, field, widget):
         if 'datatype' in field:
             if field['datatype'] == 1:  # Integer
                 widget.setValidator(QIntValidator())
@@ -443,7 +448,8 @@ class ApiCF(ApiParent):
                 validator.setRange(-9999999.0, 9999999.0, 3)
                 validator.setNotation(QDoubleValidator().StandardNotation)
                 widget.setValidator(validator)
-
+        return widget
+    def set_widget_type(self, field, dialog, widget, completer):
         if field['widgettype'] == 10:
             if 'dv_table' in field:
                 table_name = field['dv_table']
