@@ -150,9 +150,9 @@ class ApiCF(ApiParent):
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
                    " '" + str(row[0])+"', True, 9, 100)")
         # IF come from search (tab hydrometer)
-        elif feature_id and feature_type is None:
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
-                   " null, True, 9, 100)")
+        # elif feature_id and feature_type is None:
+        #     sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
+        #            " null, True, 9, 100)")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -246,19 +246,19 @@ class ApiCF(ApiParent):
                 action = self.dlg_cf.findChild(QAction, field)
                 if action is not None:
                     action.setVisible(True)
-
+        #TODO RESOLVER ESTO CON ZOOM A LA GEOMETRIA QUE VENGA DE LA API  EN VEZ DE CON EXPRESION Y SACARLO DE LA FUNCION
         # Set selected feature and zoomed
-        if not(feature_id and feature_type is None):
-            expr_filter = str(row[0]['idName']) + " = " + str(self.feature_id)
-            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-            if not is_valid:
-                print("INVALID EXPRESSION at: " + __name__)
-                return
-            self.select_features_by_expr(self.layer, expr)
-            self.iface.actionZoomToSelected().trigger()
+        # if not(feature_id and feature_type is None):
+        #     expr_filter = str(row[0]['idName']) + " = " + str(self.feature_id)
+        #     (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+        #     if not is_valid:
+        #         print("INVALID EXPRESSION at: " + __name__)
+        #         return
+        #     self.select_features_by_expr(self.layer, expr)
+        #     self.iface.actionZoomToSelected().trigger()
 
             # Get selected feature
-            self.feature = self.get_feature_by_id(self.layer)
+        self.feature = self.get_feature_by_id(self.layer)
 
         if self.layer:
             if self.layer.isEditable():
