@@ -276,7 +276,7 @@
             <item>
              <widget class="QLineEdit" name="num_elements">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="frame">
                <bool>true</bool>
