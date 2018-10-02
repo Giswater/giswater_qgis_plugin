@@ -666,31 +666,37 @@ class ApiSearch(ApiParent):
             return
 
         row = element[0].row()
-        feature_id = qtable.model().record(row).value('feature_id')
 
-        # Get selected layer
         geom_type = qtable.model().record(row).value('feature_type').lower()
-        fieldname = geom_type + "_id"
+        table_name = "ve_" + geom_type
+        feature_type = qtable.model().record(row).value('feature_type').lower()
+        feature_id = qtable.model().record(row).value('feature_id')
+        # # Get selected layer
+        # fieldname = geom_type + "_id"
+        #
+        #
+        # # Check if the expression is valid
+        # expr_filter = fieldname + " = '" + str(feature_id) + "'"
+        # (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        # if not is_valid:
+        #     return
 
-        # Check if the expression is valid
-        expr_filter = fieldname + " = '" + str(feature_id) + "'"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return
-
-        for value in self.feature_cat.itervalues():
-            if value.type.lower() == geom_type:
-                layer = self.controller.get_layer_by_layername(value.layername)
-                if layer:
-                    # Select features of @layer applying @expr
-                    self.select_features_by_expr(layer, expr)
-                    # If any feature found, zoom it and exit function
-                    if layer.selectedFeatureCount() > 0:
-                        self.iface.setActiveLayer(layer)
-                        self.iface.legendInterface().setLayerVisible(layer, True)
-                        self.open_custom_form(layer, expr)
-                        self.zoom_to_selected_features(layer, geom_type)
-                        return
+        self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.ApiCF.open_form(table_name=table_name,  feature_type=feature_type, feature_id=feature_id)
+        # TODO ZOOM
+        # for value in self.feature_cat.itervalues():
+        #     if value.type.lower() == geom_type:
+        #         layer = self.controller.get_layer_by_layername(value.layername)
+        #         if layer:
+        #             # Select features of @layer applying @expr
+        #             self.select_features_by_expr(layer, expr)
+        #             # If any feature found, zoom it and exit function
+        #             if layer.selectedFeatureCount() > 0:
+        #                 self.iface.setActiveLayer(layer)
+        #                 self.iface.legendInterface().setLayerVisible(layer, True)
+        #                 self.open_custom_form(layer, expr)
+        #                 self.zoom_to_selected_features(layer, geom_type)
+        #                 return
 
         # If the feature is not in views because the selectors are "disabled"...
         message = "Modify values of selectors to see the feature"
@@ -795,6 +801,8 @@ class ApiSearch(ApiParent):
 
 
 
+    def zoom_to_poligon(self):
+        point = QgsPoint(float(x1), float(y1))
 
 
 
