@@ -26,6 +26,8 @@ class ApiParent(ParentAction):
     def get_editable_project(self):
         """ Get variable 'editable_project' from qgis project variables"""
         editable_project = QgsExpressionContextUtils.projectScope().variable('editable_project')
+        if editable_project is None:
+            return False
         return editable_project
 
     def get_visible_layers(self):
