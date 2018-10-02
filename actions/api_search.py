@@ -14,8 +14,11 @@ import subprocess
 import sys
 import webbrowser
 from functools import partial
-import utils_giswater
 
+from PyQt4.QtCore import QPointF
+
+import utils_giswater
+import re
 
 
 
@@ -57,6 +60,9 @@ class ApiSearch(ApiParent):
             self.rubberBand.setColor(Qt.yellow)
             # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
             self.rubberBand.setIconSize(10)
+            self.rubber_polygon = QgsRubberBand(self.canvas)
+            self.rubber_polygon.setColor(Qt.darkRed)
+            self.rubber_polygon.setIconSize(20)
         else:
             self.vMarker = QgsVertexMarker(self.canvas)
             self.vMarker.setIconSize(10)
@@ -175,6 +181,7 @@ class ApiSearch(ApiParent):
             return
         # IF for zoom to tab address (streets)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
+            print(item)
             polygon = item['st_astext']
             polygon = polygon[9:len(polygon)-2]
             polygon = polygon.split(',')
@@ -186,25 +193,25 @@ class ApiSearch(ApiParent):
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPoint(float(x1), float(y1))
-            self.highlight(point, 2000)
+            self.highlight_point(point, 2000)
             self.zoom_to_rectangle(x1, y1, x1, y1)
 
-            textItem = QgsTextAnnotationItem(self.iface.mapCanvas())
-            document = QTextDocument()
-            #document.setHtml("<strong>" + str("TEST") + "</strong></br><p>hola<p/>")
-            document.setPlainText("HOLA")
-            textItem.setDocument(document)
-            # symbol = QgsMarkerSymbolV2()
-            # symbol.setSize(9)
-            # textItem.setMarkerSymbol(symbol)
-            textItem.setMapPosition(point)
+            # textItem = QgsTextAnnotationItem(self.iface.mapCanvas())
+            # document = QTextDocument()
+            # #document.setHtml("<strong>" + str("TEST") + "</strong></br><p>hola<p/>")
+            # document.setPlainText("HOLA")
+            # textItem.setDocument(document)
+            # # symbol = QgsMarkerSymbolV2()
+            # # symbol.setSize(9)
+            # # textItem.setMarkerSymbol(symbol)
+            # textItem.setMapPosition(point)
 
             self.canvas.refresh()
         elif self.dlg_search.main_tab.widget(index).objectName() == 'hydro':
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPoint(float(x1), float(y1))
-            self.highlight(point, 2000)
+            self.highlight_point(point, 2000)
             self.zoom_to_rectangle(x1, y1, x1, y1)
 
 
@@ -230,11 +237,13 @@ class ApiSearch(ApiParent):
         self.canvas.refresh()
 
 
-    def highlight(self, point, duration_time=None):
+    def highlight_point(self, point, duration_time=None):
         if QGis.QGIS_VERSION_INT >= 10900:
             rb = self.rubberBand
             rb.reset(QGis.Point)
+            self.controller.log_info(str(point))
             rb.addPoint(point)
+            self.controller.log_info(str("TEST"))
         else:
             self.vMarker = QgsVertexMarker(self.canvas)
             self.vMarker.setIconSize(10)
@@ -249,6 +258,7 @@ class ApiSearch(ApiParent):
         canvas = self.canvas
         if QGis.QGIS_VERSION_INT >= 10900:
             self.rubberBand.reset()
+            self.rubber_polygon.reset()
         else:
             self.vMarker.hide()
             canvas.scene().removeItem(self.vMarker)
@@ -433,7 +443,7 @@ class ApiSearch(ApiParent):
 
         self.update_selector_workcat(workcat_id)
         self.force_expl(workcat_id)
-
+        # TODO ZOOM TO SELECTED WORKCAT
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = ListItems()
@@ -465,8 +475,8 @@ class ApiSearch(ApiParent):
             (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id, field_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial
             (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
-        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm))
-        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm_end))
+        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.open_feature_form, self.items_dialog.tbl_psm))
+        self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.open_feature_form, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
@@ -655,7 +665,7 @@ class ApiSearch(ApiParent):
             self.refresh_table(widget)
 
 
-    def workcat_zoom(self, qtable):
+    def open_feature_form(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
 
         # Get selected code from combo
@@ -682,7 +692,13 @@ class ApiSearch(ApiParent):
         #     return
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.ApiCF.open_form(table_name=table_name,  feature_type=feature_type, feature_id=feature_id)
+        complet_result = self.ApiCF.open_form(table_name=table_name,  feature_type=feature_type, feature_id=feature_id)
+
+        # print (complet_result[0]['geometry'])
+        # print('---------------------------')
+        self.zoom_to_polygon(complet_result[0]['geometry']['st_astext'])
+        coords = "(418611.0322 4578063.607,418619.803 4578056.078,418627.405 4578044.967,418630.6218 4578027.644)"
+        #self.zoom_to_polygon(coords)
         # TODO ZOOM
         # for value in self.feature_cat.itervalues():
         #     if value.type.lower() == geom_type:
@@ -755,42 +771,81 @@ class ApiSearch(ApiParent):
 
 
 
-    def zoom_to_polygon(self, workcat_id, layer_name, field_id):
+    def zoom_to_polygon(self, geometry=None):
+        result = re.search('\((.*)\)', str(geometry))
+        coords = result.group(1)
+        polygon = coords.split(',')
+        points = []
 
+        for x in range(0, len(polygon)):
+            x, y = polygon[0].split(' ')
+            point = QgsPoint(float(x), float(y))
+            points.append(point)
 
-        layer = self.controller.get_layer_by_tablename(layer_name)
-        if not layer:
-            msg = "Layer not found"
-            self.controller.show_message(msg, message_level=2, duration=3)
-            return
-
-        # Check if the expression is valid
-        expr_filter = str(field_id) + " LIKE '%" + str(workcat_id) + "%'"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return
-        if workcat_id is not None:
-            sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
-                   " WHERE "+str(field_id)+"='"+str(workcat_id) + "'")
-            row = self.controller.get_row(sql)
-            if row[0] is None or row[0] == 'null':
-                msg = "Cant zoom to selection because has no geometry: "
-                self.controller.show_warning(msg, parameter=workcat_id)
-                self.iface.legendInterface().setLayerVisible(layer, False)
-                return
-
-        # Select features of @layer applying @expr
-        self.select_features_by_expr(layer, expr)
-
-        # If any feature found, zoom it and exit function
-        if layer.selectedFeatureCount() > 0:
-            self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)
-            self.iface.actionZoomToSelected().trigger()
-            layer.removeSelection()
+        self.controller.log_info(str(points))
+        # print(gPolygon)
+        # rect = QgsRectangle(points)
+        # self.canvas.setExtent(rect)
+        # self.canvas.refresh()
+        # pass
 
 
 
+        self.highlight_poligon(points)
+        self.canvas.refresh()
+
+    def highlight_poligon(self, points, duration_time=None):
+        if QGis.QGIS_VERSION_INT >= 10900:
+            rb = QgsRubberBand(self.canvas, False)
+            #rb.addGeometry(QgsGeometry.fromPolygon([points]), None)
+            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+            rb.setColor(Qt.darkGreen)
+
+            rb.setWidth(10)
+            rb.show()
+            # polygon.setFillColor(QColor(255, 255, 0))
+            # polygon.setWidth(3)
+            self.controller.log_info(str("TEST 10"))
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(10)
+            self.vMarker.setCenter(points)
+            self.vMarker.show()
+
+        # wait to simulate a flashing effect
+        if duration_time:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+
+                # layer = self.controller.get_layer_by_tablename(layer_name)
+        # if not layer:
+        #     msg = "Layer not found"
+        #     self.controller.show_message(msg, message_level=2, duration=3)
+        #     return
+        #
+        # # Check if the expression is valid
+        # expr_filter = str(field_id) + " LIKE '%" + str(workcat_id) + "%'"
+        # (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
+        # if not is_valid:
+        #     return
+        # if workcat_id is not None:
+        #     sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
+        #            " WHERE "+str(field_id)+"='"+str(workcat_id) + "'")
+        #     row = self.controller.get_row(sql)
+        #     if row[0] is None or row[0] == 'null':
+        #         msg = "Cant zoom to selection because has no geometry: "
+        #         self.controller.show_warning(msg, parameter=workcat_id)
+        #         self.iface.legendInterface().setLayerVisible(layer, False)
+        #         return
+        #
+        # # Select features of @layer applying @expr
+        # self.select_features_by_expr(layer, expr)
+        #
+        # # If any feature found, zoom it and exit function
+        # if layer.selectedFeatureCount() > 0:
+        #     self.iface.setActiveLayer(layer)
+        #     self.iface.legendInterface().setLayerVisible(layer, True)
+        #     self.iface.actionZoomToSelected().trigger()
+        #     layer.removeSelection()
 
 
 
@@ -801,8 +856,11 @@ class ApiSearch(ApiParent):
 
 
 
-    def zoom_to_poligon(self):
-        point = QgsPoint(float(x1), float(y1))
+
+
+
+    # def zoom_to_poligon(self, ):
+    #     point = QgsPoint(float(x1), float(y1))
 
 
 
