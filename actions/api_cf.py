@@ -136,23 +136,22 @@ class ApiCF(ApiParent):
         visible_layers = self.get_visible_layers()
         # TODO editables han de ser null
         # editable_layers = self.get_editable_layers()
-        editable_layers = ''
+
         scale_zoom = self.iface.mapCanvas().scale()
+
+        is_project_editable=self.get_editable_project()
         # IF click over canvas
         if point:
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
                    + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
-                   + str(editable_layers)+"', "+str(scale_zoom)+", 9, 100)")
+                   + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
         # IF come from QPushButtons node1 or node2 from custom form
         elif feature_id and feature_type:
             sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+"_id = '" + str(feature_id) + "'")
             row = self.controller.get_row(sql, log_sql=True)
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
-                   " '" + str(row[0])+"', True, 9, 100)")
-        # IF come from search (tab hydrometer)
-        # elif feature_id and feature_type is None:
-        #     sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
-        #            " null, True, 9, 100)")
+                   " '" + str(row[0])+"', " + str(is_project_editable) + ", 9, 100)")
+
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -412,18 +411,7 @@ class ApiCF(ApiParent):
                 _json[str(widget.objectName())] = str(value)
         self.controller.log_info(str(_json))
 
-    def add_lineedit(self, field):
 
-        widget = QLineEdit()
-        widget.setObjectName(field['column_id'])
-        if 'value' in field:
-            widget.setText(field['value'])
-        if 'iseditable' in field:
-            widget.setReadOnly(not field['iseditable'])
-            if not field['iseditable']:
-                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
-                                     " color: rgb(100, 100, 100)}")
-        return widget
     def set_auto_update(self, field, dialog, widget):
         if field['isautoupdate']:
             _json = {}
@@ -541,26 +529,7 @@ class ApiCF(ApiParent):
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
-    def add_hyperlink(self, dialog, field):
-        widget = HyperLinkLabel()
-        widget.setObjectName(field['column_id'])
-        widget.setText(field['value'])
-        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
-        function_name = 'no_function_asociated'
 
-        if 'button_function' in field:
-            if field['button_function'] is not None:
-                function_name = field['button_function']
-            else:
-                msg = ("parameter button_function is null for button " + widget.objectName())
-                self.controller.show_message(msg, 2)
-        else:
-            msg = "parameter button_function not found"
-            self.controller.show_message(msg, 2)
-
-        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
-        return widget
 
     def open_catalog(self, dialog, result, message_level=None):
         self.catalog = Catalog(self.iface, self.settings, self.controller, self.plugin_dir)

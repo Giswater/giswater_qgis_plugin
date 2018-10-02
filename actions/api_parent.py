@@ -7,30 +7,36 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 import os
+from functools import partial
 
 from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QAction
+from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy
 
-from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest
+from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
 import utils_giswater
 
 from giswater.actions.parent import ParentAction
-
+from giswater.actions.HyperLinkLabel import HyperLinkLabel
 class ApiParent(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
 
+    def get_editable_project(self):
+        """ Get variable 'editable_project' from qgis project variables"""
+        editable_project = QgsExpressionContextUtils.projectScope().variable('editable_project')
+        return editable_project
+
     def get_visible_layers(self):
-        """ Return string as {...} with name of table in DB of all visible layer in TOC """
-        visible_layer = '{'
-        for layer in QgsMapLayerRegistry.instance().mapLayers().values():
-            if self.iface.legendInterface().isLayerVisible(layer):
-                table_name = self.controller.get_layer_source_table_name(layer)
-                visible_layer += '"' + str(table_name) + '", '
-        visible_layer = visible_layer[:-2] + "}"
-        return visible_layer
+            """ Return string as {...} with name of table in DB of all visible layer in TOC """
+            visible_layer = '{'
+            for layer in QgsMapLayerRegistry.instance().mapLayers().values():
+                if self.iface.legendInterface().isLayerVisible(layer):
+                    table_name = self.controller.get_layer_source_table_name(layer)
+                    visible_layer += '"' + str(table_name) + '", '
+            visible_layer = visible_layer[:-2] + "}"
+            return visible_layer
 
 
     def get_editable_layers(self):
@@ -196,6 +202,41 @@ class ApiParent(ParentAction):
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)
+
+
+    def add_lineedit(self, field):
+        """ Add widgets QLineEdit type """
+        widget = QLineEdit()
+        widget.setObjectName(field['column_id'])
+        if 'value' in field:
+            widget.setText(field['value'])
+        if 'iseditable' in field:
+            widget.setReadOnly(not field['iseditable'])
+            if not field['iseditable']:
+                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
+                                     " color: rgb(100, 100, 100)}")
+        return widget
+
+    def add_hyperlink(self, dialog, field):
+        widget = HyperLinkLabel()
+        widget.setObjectName(field['column_id'])
+        widget.setText(field['value'])
+        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+        function_name = 'no_function_asociated'
+
+        if 'button_function' in field:
+            if field['button_function'] is not None:
+                function_name = field['button_function']
+            else:
+                msg = ("parameter button_function is null for button " + widget.objectName())
+                self.controller.show_message(msg, 2)
+        else:
+            msg = "parameter button_function not found"
+            self.controller.show_message(msg, 2)
+
+        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
+        return widget
 
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:

@@ -101,7 +101,8 @@ class ApiSearch(ApiParent):
                 label.setText(field['label'].capitalize())
                 if field['type'] == 'typeahead':
                     completer = QCompleter()
-                    widget = self.add_lineedit(field, completer)
+                    widget = self.add_lineedit(field)
+                    widget = self.set_completer(widget, completer)
                 elif field['type'] == 'combo':
                     widget = self.add_combobox(field)
 
@@ -120,17 +121,8 @@ class ApiSearch(ApiParent):
         self.dlg_search.show()
 
 
-    def add_lineedit(self,  field, completer=None):
-        """ Add widgets QLineEdit type """
-        widget = QLineEdit()
-        widget.setObjectName(field['column_id'])
-        if 'value' in field:
-            widget.setText(field['value'])
-
-        if 'iseditable' in field:
-            widget.setReadOnly(not field['iseditable'])
-            if not field['iseditable']:
-                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+    def set_completer(self, widget, completer=None):
+        """ Set completer and add listeners"""
         if completer:
             model = QStringListModel()
             completer.highlighted.connect(partial(self.zoom_to_object, completer))
@@ -433,7 +425,7 @@ class ApiSearch(ApiParent):
         print(item)
         """ Create the view and open the dialog with his content """
         workcat_id = item['sys_id']
-        layer_name= item['sys_table_id']
+        layer_name = item['sys_table_id']
         field_id = item['filter_text']
 
         if workcat_id is None:
@@ -805,28 +797,6 @@ class ApiSearch(ApiParent):
 
 
 
-
-
-    def add_hyperlink(self, dialog, field):
-        widget = HyperLinkLabel()
-        widget.setObjectName(field['column_id'])
-        widget.setText(field['value'])
-        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
-        function_name = 'no_function_asociated'
-
-        if 'button_function' in field:
-            if field['button_function'] is not None:
-                function_name = field['button_function']
-            else:
-                msg = ("parameter button_function is null for button " + widget.objectName())
-                self.controller.show_message(msg, 2)
-        else:
-            msg = "parameter button_function not found"
-            self.controller.show_message(msg, 2)
-
-        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
-        return widget
 
 
     def open_url(self, dialog, widget, message_level=None):
