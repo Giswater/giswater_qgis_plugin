@@ -304,7 +304,7 @@ class ApiCF(ApiParent):
         # Open dialog
         self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_cf.show()
-
+        return self.complet_result
 
     def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
         print (_json)
