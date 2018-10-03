@@ -770,42 +770,34 @@ class ApiSearch(ApiParent):
             # TODO END
 
 
-
     def zoom_to_polygon(self, geometry=None):
+        
         result = re.search('\((.*)\)', str(geometry))
         coords = result.group(1)
         polygon = coords.split(',')
         points = []
 
-        for x in range(0, len(polygon)):
-            x, y = polygon[0].split(' ')
+        for i in range(0, len(polygon)):
+            x, y = polygon[i].split(' ')
             point = QgsPoint(float(x), float(y))
             points.append(point)
 
-        self.controller.log_info(str(points))
-        # print(gPolygon)
-        # rect = QgsRectangle(points)
-        # self.canvas.setExtent(rect)
-        # self.canvas.refresh()
-        # pass
-
-
-
         self.highlight_poligon(points)
+        
+        # TODO: Get extent
+#         rect = QgsRectangle(points)
+#         self.canvas.setExtent(rect)
         self.canvas.refresh()
 
+
     def highlight_poligon(self, points, duration_time=None):
+        
         if QGis.QGIS_VERSION_INT >= 10900:
             rb = QgsRubberBand(self.canvas, False)
-            #rb.addGeometry(QgsGeometry.fromPolygon([points]), None)
             rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
             rb.setColor(Qt.darkGreen)
-
             rb.setWidth(10)
             rb.show()
-            # polygon.setFillColor(QColor(255, 255, 0))
-            # polygon.setWidth(3)
-            self.controller.log_info(str("TEST 10"))
         else:
             self.vMarker = QgsVertexMarker(self.canvas)
             self.vMarker.setIconSize(10)
