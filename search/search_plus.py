@@ -61,7 +61,7 @@ class SearchPlus(QObject):
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
             (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-            (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'name'))
+            (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
         
         # self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
         #     (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
@@ -117,22 +117,26 @@ class SearchPlus(QObject):
         self.controller.execute_sql(sql)
 
 
-    def zoom_to_polygon(self, widget, layer_name, field_id):
+    def zoom_to_polygon(self, widget, table_name, field_id, field_name):
 
-        layer = self.controller.get_layer_by_tablename(layer_name)
+        layer = self.controller.get_layer_by_tablename(table_name)
         if not layer:
             return
 
         polygon_name = utils_giswater.getWidgetText(self.dlg_search, widget)
+        sql = ("SELECT " + str(field_id) + " FROM " + self.schema_name + "." + str(table_name) + " "
+               " WHERE " + str(field_name) + "=$$" + str(polygon_name) + "$$")
+        row = self.controller.get_row(sql, log_sql=True)
+
         # Check if the expression is valid
-        expr_filter = str(field_id) + " LIKE '%" + str(polygon_name) + "%'"
+        expr_filter = str(field_id) + " = '" + str(row[0]) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
         if polygon_name is not None:
-            sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(layer_name) + " "
-                   " WHERE "+str(field_id)+"='"+str(polygon_name) + "'")
-            row = self.controller.get_row(sql)
+            sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(table_name) + " "
+                   " WHERE "+str(field_id)+"=$$"+str(row[0]) + "$$")
+            row = self.controller.get_row(sql, log_sql=True)
             if row[0] is None or row[0] == 'null':
                 msg = "Cant zoom to selection because has no geometry: "
                 self.controller.show_warning(msg, parameter=polygon_name)
@@ -160,7 +164,7 @@ class SearchPlus(QObject):
         self.update_selector_workcat(workcat_id)
         self.force_expl(workcat_id)
 
-        self.zoom_to_polygon(self.dlg_search.workcat_id, 'v_ui_workcat_polygon', 'workcat_id')
+        self.zoom_to_polygon(self.dlg_search.workcat_id, 'v_ui_workcat_polygon', 'workcat_id', 'workcat_id')
 
         self.items_dialog = ListItems()
         self.load_settings(self.items_dialog)
@@ -880,7 +884,7 @@ class SearchPlus(QObject):
 
 
     def expl_name_changed(self):
-        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'name')
+        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id','name')
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
 
         if expl_name == "null" or expl_name is None or expl_name == "None":
@@ -1287,18 +1291,22 @@ class SearchPlus(QObject):
         row = self.controller.get_row(sql)
         psector_id = row[0]
         self.manage_new_psector.new_psector(psector_id, 'plan')
-        self.zoom_to_psector(self.dlg_search, self.dlg_search.psector_id, 'v_edit_plan_psector', 'name')
+        self.zoom_to_psector(self.dlg_search, self.dlg_search.psector_id, 'v_edit_plan_psector', 'psector_id', 'name')
 
 
-    def zoom_to_psector(self, dialog, widget, layer_name, field_id):
+    def zoom_to_psector(self, dialog, widget, table_name, field_id, field_name):
 
         polygon_name = utils_giswater.getWidgetText(dialog, widget)
-        layer = self.controller.get_layer_by_tablename(layer_name)
+        sql = ("SELECT " + str(field_id) + " FROM " + self.schema_name + "." + str(table_name) + " "
+               " WHERE " + str(field_name) + "=$$" + str(polygon_name) + "$$")
+        row = self.controller.get_row(sql, log_sql=True)
+
+        layer = self.controller.get_layer_by_tablename(table_name)
         if not layer:
             return
 
         # Check if the expression is valid
-        expr_filter = str(field_id) +" LIKE '%" + str(polygon_name) + "%'"
+        expr_filter = str(field_id) + " = '" + str(row[0]) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
