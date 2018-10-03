@@ -35,7 +35,7 @@ DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = ws, public;
+    SET search_path = SCHEMA_NAME, public;
     	
     -- get values
     select value::boolean INTO v_om_mincut_areas from config_param_user where parameter='om_mincut_areas' AND cur_user=current_user;
@@ -229,11 +229,13 @@ BEGIN
 		--    Update the selector for publish_user
 		-- Get publish user
 		SELECT value FROM config_param_system WHERE parameter='api_publish_user' 
-			INTO v_publish_user;
-		IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = v_publish_user AND result_id=result_id_arg) = 0 THEN
-			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
-		END IF;
-		
+		INTO v_publish_user;
+		IF v_publish_user IS NOT NULL THEN
+			IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = v_publish_user AND result_id=result_id_arg) = 0 THEN
+				INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
+			END IF;
+		END IF;	
+					
 		RAISE NOTICE '11-Insert into anl_mincut_result_connec table ';
 		INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
 		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
