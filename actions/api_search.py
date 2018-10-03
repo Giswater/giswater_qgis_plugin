@@ -15,21 +15,15 @@ import sys
 import webbrowser
 from functools import partial
 
-from PyQt4.QtCore import QPointF
 
 import utils_giswater
 import re
 
-
-
 from PyQt4.QtCore import QTimer
-from PyQt4.uic.properties import QtGui
 
-
-from PyQt4 import uic
 # TODO  Es probable que la libreria QgsPoint en la version 3.x pase a llamarse QgsPointXY
 # TODO  Es probable que la libreria QgsMarkerSymbolV2 en la version 3.x pase a llamarse QgsMarkerSymbol
-from qgis.core import QgsRectangle, QgsPoint, QgsGeometry, QGis, QgsMarkerSymbolV2
+from qgis.core import QgsPoint, QGis, QgsMarkerSymbolV2
 from qgis.gui import QgsVertexMarker, QgsRubberBand
 # TODO  Es probable que la libreria QgsTextAnnotationItem en la version 3.x pase a llamarse QgsTextAnnotation y ademas
 # TODO  pertenezca a qgis.core (esto segundo no es seguro)
@@ -213,8 +207,6 @@ class ApiSearch(ApiParent):
             point = QgsPoint(float(x1), float(y1))
             self.highlight_point(point, 2000)
             self.zoom_to_rectangle(x1, y1, x1, y1)
-
-
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_type=None, feature_id=item['sys_id'])
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
@@ -231,10 +223,7 @@ class ApiSearch(ApiParent):
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 
-    def zoom_to_rectangle(self, x1, y1, x2, y2):
-        rect = QgsRectangle(float(x1), float(y1), float(x2), float(y2))
-        self.canvas.setExtent(rect)
-        self.canvas.refresh()
+
 
 
     def highlight_point(self, point, duration_time=None):
@@ -681,42 +670,18 @@ class ApiSearch(ApiParent):
         table_name = "ve_" + geom_type
         feature_type = qtable.model().record(row).value('feature_type').lower()
         feature_id = qtable.model().record(row).value('feature_id')
-        # # Get selected layer
-        # fieldname = geom_type + "_id"
-        #
-        #
-        # # Check if the expression is valid
-        # expr_filter = fieldname + " = '" + str(feature_id) + "'"
-        # (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        # if not is_valid:
-        #     return
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
         complet_result = self.ApiCF.open_form(table_name=table_name,  feature_type=feature_type, feature_id=feature_id)
+        # Get list of all coords in field geometry
+        list_coord = re.search('\((.*)\)', str(complet_result[0]['geometry']['st_astext']))
 
-        # print (complet_result[0]['geometry'])
-        # print('---------------------------')
-        self.zoom_to_polygon(complet_result[0]['geometry']['st_astext'])
-        coords = "(418611.0322 4578063.607,418619.803 4578056.078,418627.405 4578044.967,418630.6218 4578027.644)"
-        #self.zoom_to_polygon(coords)
-        # TODO ZOOM
-        # for value in self.feature_cat.itervalues():
-        #     if value.type.lower() == geom_type:
-        #         layer = self.controller.get_layer_by_layername(value.layername)
-        #         if layer:
-        #             # Select features of @layer applying @expr
-        #             self.select_features_by_expr(layer, expr)
-        #             # If any feature found, zoom it and exit function
-        #             if layer.selectedFeatureCount() > 0:
-        #                 self.iface.setActiveLayer(layer)
-        #                 self.iface.legendInterface().setLayerVisible(layer, True)
-        #                 self.open_custom_form(layer, expr)
-        #                 self.zoom_to_selected_features(layer, geom_type)
-        #                 return
+        points = self.get_points(list_coord)
+        self.draw_polygon(points)
 
-        # If the feature is not in views because the selectors are "disabled"...
-        message = "Modify values of selectors to see the feature"
-        self.controller.show_warning(message)
+        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+        self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+
 
 
     def fill_label_data(self, workcat_id, table_name, extension=None):
@@ -770,43 +735,11 @@ class ApiSearch(ApiParent):
             # TODO END
 
 
-    def zoom_to_polygon(self, geometry=None):
-        
-        result = re.search('\((.*)\)', str(geometry))
-        coords = result.group(1)
-        polygon = coords.split(',')
-        points = []
-
-        for i in range(0, len(polygon)):
-            x, y = polygon[i].split(' ')
-            point = QgsPoint(float(x), float(y))
-            points.append(point)
-
-        self.highlight_poligon(points)
-        
-        # TODO: Get extent
-#         rect = QgsRectangle(points)
-#         self.canvas.setExtent(rect)
-        self.canvas.refresh()
 
 
-    def highlight_poligon(self, points, duration_time=None):
-        
-        if QGis.QGIS_VERSION_INT >= 10900:
-            rb = QgsRubberBand(self.canvas, False)
-            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
-            rb.setColor(Qt.darkGreen)
-            rb.setWidth(10)
-            rb.show()
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(10)
-            self.vMarker.setCenter(points)
-            self.vMarker.show()
 
-        # wait to simulate a flashing effect
-        if duration_time:
-            QTimer.singleShot(duration_time, self.resetRubberbands)
+
+
 
                 # layer = self.controller.get_layer_by_tablename(layer_name)
         # if not layer:
@@ -850,9 +783,6 @@ class ApiSearch(ApiParent):
 
 
 
-
-    # def zoom_to_poligon(self, ):
-    #     point = QgsPoint(float(x1), float(y1))
 
 
 

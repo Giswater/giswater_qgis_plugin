@@ -9,25 +9,28 @@ or (at your option) any later version.
 import json
 import operator
 import os
+import re
 import subprocess
 import sys
 import webbrowser
-import operator
 
 from functools import partial
 
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
-from qgis.core import QgsFeatureRequest
+
 
 from PyQt4.QtCore import Qt, SIGNAL, SLOT
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-from giswater.actions.HyperLinkLabel import HyperLinkLabel
+
 
 import utils_giswater
+
 from giswater.actions.api_parent import ApiParent
 from giswater.actions.catalog import Catalog
+from giswater.actions.HyperLinkLabel import HyperLinkLabel
+
 from giswater.ui_manager import ApiCfUi
 from giswater.ui_manager import NewWorkcat
 
@@ -252,7 +255,6 @@ class ApiCF(ApiParent):
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
         # Find actions and set visibles
-        # TODO falta recibir en el json del search(hydrometer) las actions a mostrar
         actions_to_show = row[0]['formActions']
         if 'actions' in actions_to_show:
             for field in actions_to_show["actions"]:
@@ -261,17 +263,14 @@ class ApiCF(ApiParent):
                 if action is not None:
                     action.setVisible(True)
         #TODO RESOLVER ESTO CON ZOOM A LA GEOMETRIA QUE VENGA DE LA API  EN VEZ DE CON EXPRESION Y SACARLO DE LA FUNCION
-        # Set selected feature and zoomed
-        # if not(feature_id and feature_type is None):
-        #     expr_filter = str(row[0]['idName']) + " = " + str(self.feature_id)
-        #     (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-        #     if not is_valid:
-        #         print("INVALID EXPRESSION at: " + __name__)
-        #         return
-        #     self.select_features_by_expr(self.layer, expr)
-        #     self.iface.actionZoomToSelected().trigger()
+        list_coord = re.search('\((.*)\)', str(self.complet_result[0]['geometry']['st_astext']))
+        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+        self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+        points = self.get_points(list_coord)
+        self.draw_polygon(points)
 
-            # Get selected feature
+
+        # Get selected feature
         self.feature = self.get_feature_by_id(self.layer)
 
         if self.layer:

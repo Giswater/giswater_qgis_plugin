@@ -9,17 +9,19 @@ or (at your option) any later version.
 import os
 from functools import partial
 
-from PyQt4.QtCore import Qt, QSettings, QPoint
+from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer
 from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox
 
-from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QgsPoint
-from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint
-
+from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QGis
+from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
+from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
 
 import utils_giswater
 from map_tools.snapping_utils import SnappingConfigManager
 from giswater.actions.parent import ParentAction
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
+
+
 class ApiParent(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -401,6 +403,7 @@ class ApiParent(ParentAction):
                                      " color: rgb(100, 100, 100)}")
         return widget
 
+
     def add_hyperlink(self, dialog, field):
         widget = HyperLinkLabel()
         widget.setObjectName(field['column_id'])
@@ -421,6 +424,75 @@ class ApiParent(ParentAction):
 
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
+
+
+    def get_points(self, list_coord=None):
+        """ Return list of QgsPoints taken from geometry
+        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+        """
+
+        coords = list_coord.group(1)
+        polygon = coords.split(',')
+        points = []
+
+        for i in range(0, len(polygon)):
+            x, y = polygon[i].split(' ')
+            point = QgsPoint(float(x), float(y))
+            points.append(point)
+        return points
+
+
+    def get_max_rectangle_from_coords(self, list_coord):
+        """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
+        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+        """
+        coords = list_coord.group(1)
+        polygon = coords.split(',')
+
+        x, y = polygon[0].split(' ')
+        min_x = x  # start with something much higher than expected min
+        min_y = y
+        max_x = x  # start with something much lower than expected max
+        max_y = y
+        for i in range(0, len(polygon)):
+            x, y = polygon[i].split(' ')
+            if x < min_x:
+                min_x = x
+            if x > max_x:
+                max_x = x
+            if y < min_y:
+                min_y = y
+            if y > max_y:
+                max_y = y
+
+        return max_x, max_y, min_x, min_y
+
+
+    def zoom_to_rectangle(self, x1, y1, x2, y2):
+        rect = QgsRectangle(float(x1), float(y1), float(x2), float(y2))
+        self.canvas.setExtent(rect)
+        self.canvas.refresh()
+
+
+    def draw_polygon(self, points, color=Qt.red, width=3, duration_time=None):
+        """ Draw 'line' over canvas following list of points """
+        print(points)
+        if QGis.QGIS_VERSION_INT >= 10900:
+            rb = QgsRubberBand(self.canvas, False)
+            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+            rb.setColor(color)
+            rb.setWidth(width)
+            rb.show()
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(width)
+            self.vMarker.setCenter(points)
+            self.vMarker.show()
+
+        # wait to simulate a flashing effect
+        if duration_time:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+
 
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:
