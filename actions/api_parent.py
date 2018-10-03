@@ -9,12 +9,15 @@ or (at your option) any later version.
 import os
 from functools import partial
 
-from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy
+from PyQt4.QtCore import Qt, QSettings, QPoint
+from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox
 
-from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
+from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QgsPoint
+from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint
+
+
 import utils_giswater
-
+from map_tools.snapping_utils import SnappingConfigManager
 from giswater.actions.parent import ParentAction
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
 class ApiParent(ParentAction):
@@ -137,6 +140,7 @@ class ApiParent(ParentAction):
 
     def api_action_zoom_out(self, feature, canvas, layer):
         """ Zoom out """
+        self.controller.log_info(str(feature))
         layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
@@ -169,6 +173,184 @@ class ApiParent(ParentAction):
                 message = "File not found"
                 self.controller.show_warning(message, parameter=pdf_path)
 
+    def api_action_copy_paste(self, dialog, geom_type):
+        """ Copy some fields from snapped feature to current feature """
+
+        # Set map tool emit point and signals
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
+        self.emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog))
+        self.geom_type = geom_type
+
+        # Store user snapping configuration
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.store_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.clear_snapping()
+
+        # Set snapping
+        layer = self.iface.activeLayer()
+        self.snapper_manager.snap_to_layer(layer)
+
+        # Set marker
+        color = QColor(255, 100, 255)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        if geom_type == 'node':
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        elif geom_type == 'arc':
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)
+
+    def api_action_copy_paste_mouse_move(self, point):
+        """ Slot function when mouse is moved in the canvas.
+            Add marker if any feature is snapped
+        """
+
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+
+        if not result:
+            return
+
+        # Check snapped features
+        for snapped_point in result:
+            point = QgsPoint(snapped_point.snappedVertex)
+            self.vertex_marker.setCenter(point)
+            self.vertex_marker.show()
+            break
+
+    def api_action_copy_paste_canvas_clicked(self, dialog, point, btn):
+        """ Slot function when canvas is clicked """
+
+        if btn == Qt.RightButton:
+            self.api_disable_copy_paste(dialog)
+            return
+
+            # Get clicked point
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        event_point = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+
+        # That's the snapped point
+        if not result:
+            self.api_disable_copy_paste(dialog)
+            return
+
+        layer = self.iface.activeLayer()
+        layername = layer.name()
+        is_valid = False
+        for snapped_point in result:
+            # Get only one feature
+            point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
+            snapped_feature = next(
+                snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+            snapped_feature_attr = snapped_feature.attributes()
+            # Leave selection
+            snapped_point.layer.select([snapped_point.snappedAtGeometry])
+            is_valid = True
+            break
+
+        if not is_valid:
+            message = "Any of the snapped features belong to selected layer"
+            self.controller.show_info(message, parameter=self.iface.activeLayer().name(), duration=10)
+            self.api_disable_copy_paste(dialog)
+            return
+
+        aux = "\"" + str(self.geom_type) + "_id\" = "
+        aux += "'" + str(self.feature_id) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error"
+            self.controller.show_warning(message, parameter=expr.parserErrorString())
+            self.api_disable_copy_paste(dialog)
+            return
+
+        fields = layer.dataProvider().fields()
+        layer.startEditing()
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        feature_list = [i for i in it]
+        if not feature_list:
+            self.api_disable_copy_paste(dialog)
+            return
+
+        # Select only first element of the feature list
+        feature = feature_list[0]
+        feature_id = feature.attribute(str(self.geom_type) + '_id')
+        message = ("Selected snapped feature_id to copy values from: " + str(snapped_feature_attr[0]) + "\n"
+                   "Do you want to copy its values to the current node?\n\n")
+        # Replace id because we don't have to copy it!
+        snapped_feature_attr[0] = feature_id
+        snapped_feature_attr_aux = []
+        fields_aux = []
+
+        # Iterate over all fields and copy only specific ones
+        for i in range(0, len(fields)):
+            if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
+                    or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
+                    or fields[i].name() == layername + '_workcat_id' or fields[i].name() == layername + '_builtdate' \
+                    or fields[i].name() == 'verified' or fields[i].name() == str(self.geom_type) + 'cat_id':
+                snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                fields_aux.append(fields[i].name())
+            if self.project_type == 'ud':
+                if fields[i].name() == str(self.geom_type) + '_type':
+                    snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                    fields_aux.append(fields[i].name())
+
+        for i in range(0, len(fields_aux)):
+            message += str(fields_aux[i]) + ": " + str(snapped_feature_attr_aux[i]) + "\n"
+
+        # Ask confirmation question showing fields that will be copied
+        answer = self.controller.ask_question(message, "Update records", None)
+        if answer:
+            for i in range(0, len(fields)):
+                for x in range(0, len(fields_aux)):
+                    if fields[i].name() == fields_aux[x]:
+                        layer.changeAttributeValue(feature.id(), i, snapped_feature_attr_aux[x])
+
+            layer.commitChanges()
+            #TODO: REVISAR
+            # dialog.refreshFeature()
+            for i in range(0, len(fields_aux)):
+                widget = dialog.findChild(QWidget, fields_aux[i])
+                if utils_giswater.getWidgetType(dialog, widget) is QLineEdit:
+                    utils_giswater.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
+                elif utils_giswater.getWidgetType(dialog, widget) is QComboBox:
+                    utils_giswater.set_combo_itemData(widget, snapped_feature_attr_aux[i], 1)
+
+
+        self.api_disable_copy_paste(dialog)
+
+    def api_disable_copy_paste(self, dialog):
+        """ Disable actionCopyPaste and set action 'Identify' """
+
+        action_widget = dialog.findChild(QAction, "actionCopyPaste")
+        if action_widget:
+            action_widget.setChecked(False)
+
+        try:
+            self.snapper_manager.recover_snapping_options()
+            self.vertex_marker.hide()
+            self.set_action_identify()
+            self.canvas.xyCoordinates.disconnect()
+            self.emit_point.canvasClicked.disconnect()
+        except:
+            pass
 
     def set_table_columns(self, dialog, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """

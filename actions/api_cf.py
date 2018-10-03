@@ -175,6 +175,14 @@ class ApiCF(ApiParent):
         if self.layer:
             self.iface.setActiveLayer(self.layer)
 
+        # Get selected feature
+        self.feature = self.get_feature_by_id(self.layer)
+
+        # TODO: Xavi Is correct get fornName as geom_type?
+        self.geom_type = str(row[0]['formTabs']['formName'])
+        self.controller.log_info(str(self.geom_type).lower())
+        self.geom_type = self.geom_type.lower()
+
         # Get field id name
         field_id = str(row[0]['idName'])
         self.feature_id = None
@@ -272,6 +280,7 @@ class ApiCF(ApiParent):
             else:
                 self.disable_all(result, False)
 
+
         # SIGNALS
         self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
         self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
@@ -290,7 +299,7 @@ class ApiCF(ApiParent):
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
-        #action_copy_paste.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
+        action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type))
         #action_rotation.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_help.triggered.connect(partial(self.api_action_help, 'ud', 'node'))
