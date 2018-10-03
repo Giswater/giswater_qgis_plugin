@@ -190,21 +190,25 @@ class ApiCF(ApiParent):
             if field['widgettype'] == 1 or field['widgettype'] == 10:
                 completer = QCompleter()
                 widget = self.add_lineedit(field)
-                widget = self.set_auto_update(field, self.dlg_cf, widget)
+                widget = self.set_auto_update_lineedit(field, self.dlg_cf, widget)
                 widget = self.set_data_type(field, widget)
                 widget = self.set_widget_type(field, self.dlg_cf, widget, completer)
                 if widget.objectName() == field_id:
                     self.feature_id = widget.text()
             elif field['widgettype'] == 2:
                 widget = self.add_combobox(self.dlg_cf, field)
+                widget = self.set_auto_update_combobox(field, self.dlg_cf, widget)
             elif field['widgettype'] == 3:
                 widget = self.add_checkbox(self.dlg_cf, field)
+                widget = self.set_auto_update_checkbox(field, self.dlg_cf, widget)
             elif field['widgettype'] == 4:
                 widget = self.add_calendar(self.dlg_cf, field)
+                widget = self.set_auto_update_dateedit(field, self.dlg_cf, widget)
             elif field['widgettype'] == 8:
                 widget = self.add_button(self.dlg_cf, field)
             elif field['widgettype'] == 9:
                 widget = self.add_hyperlink(self.dlg_cf, field)
+
 
             if field['layout_id'] == 0:
                 top_layout.addWidget(label, 0, field['layout_order'])
@@ -412,7 +416,7 @@ class ApiCF(ApiParent):
         self.controller.log_info(str(_json))
 
 
-    def set_auto_update(self, field, dialog, widget):
+    def set_auto_update_lineedit(self, field, dialog, widget):
         if field['isautoupdate']:
             _json = {}
             widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
@@ -420,6 +424,44 @@ class ApiCF(ApiParent):
         else:
             widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
+
+    def set_auto_update_combobox(self, field, dialog, widget):
+        if field['isautoupdate']:
+            _json = {}
+            widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
+            widget.currentIndexChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+        else:
+            widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return widget
+
+    def set_auto_update_dateedit(self, field, dialog, widget):
+        if field['isautoupdate']:
+            _json = {}
+            widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
+            widget.dateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+        else:
+            widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return widget
+
+    def set_auto_update_spinbox(self, field, dialog, widget):
+        if field['isautoupdate']:
+            _json = {}
+            widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
+            widget.valueChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+        else:
+            widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return widget
+
+    def set_auto_update_checkbox(self, field, dialog, widget):
+        if field['isautoupdate']:
+            _json = {}
+            widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
+            widget.stateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+        else:
+            widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return widget
+
+
     def set_data_type(self, field, widget):
         if 'datatype' in field:
             if field['datatype'] == 1:  # Integer
