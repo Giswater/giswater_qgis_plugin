@@ -33,10 +33,11 @@ from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QCo
 from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QTextDocument, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 from actions.HyperLinkLabel import HyperLinkLabel
-from actions.api_cf import ApiCF
-from actions.manage_new_psector import ManageNewPsector
-from api_parent import ApiParent
-from ui_manager import ApiSearchUi, HydroInfo, ListItems
+from giswater.actions.api_cf import ApiCF
+from giswater.actions.manage_new_psector import ManageNewPsector
+from giswater.actions.manage_visit import ManageVisit
+from giswater.actions.api_parent import ApiParent
+from giswater.ui_manager import ApiSearchUi, HydroInfo, ListItems
 
 
 class ApiSearch(ApiParent):
@@ -45,6 +46,7 @@ class ApiSearch(ApiParent):
         """ Class constructor """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
+        self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.iface = iface
         self.json_search = {}
         self.lbl_visible = False
@@ -125,7 +127,7 @@ class ApiSearch(ApiParent):
         """ Set completer and add listeners"""
         if completer:
             model = QStringListModel()
-            completer.highlighted.connect(partial(self.zoom_to_object, completer))
+            completer.highlighted.connect(partial(self.check_tab, completer))
 
             self.make_list(completer, model, widget)
             widget.textChanged.connect(partial(self.make_list, completer, model, widget))
@@ -133,7 +135,7 @@ class ApiSearch(ApiParent):
         return widget
 
 
-    def zoom_to_object(self, completer):
+    def check_tab(self, completer):
         # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
 
@@ -175,7 +177,6 @@ class ApiSearch(ApiParent):
             return
         # IF for zoom to tab address (streets)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
-            print(item)
             polygon = item['st_astext']
             polygon = polygon[9:len(polygon)-2]
             polygon = polygon.split(',')
@@ -215,10 +216,14 @@ class ApiSearch(ApiParent):
             self.workcat_open_table_items(item)
             return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
-            #TODO de donde sacamos el campo id?
-            self.manage_new_psector.new_psector(item['sys_id'], item['sys_table_id'], 'workcat_id')
+            #TODO ojo con plan hardcoded comentar a xavi!!!!
+            self.manage_new_psector.new_psector(item['sys_id'], 'plan')
+            #self.manage_new_psector.new_psector(item['sys_id'], item['sys_table_id'], 'workcat_id')
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             # TODO
+            print(item)
+
+            self.manage_visit.manage_visit(visit_id=item['sys_id'])
             return
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
@@ -421,7 +426,6 @@ class ApiSearch(ApiParent):
         self.hydro_info_dlg.open()
 
     def workcat_open_table_items(self, item):
-        print(item)
         """ Create the view and open the dialog with his content """
         workcat_id = item['sys_id']
         layer_name = item['sys_table_id']
