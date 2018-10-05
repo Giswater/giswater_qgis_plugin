@@ -144,7 +144,7 @@ class ApiCF(ApiParent):
         self.set_icon(action_edit, "101")
         self.set_icon(action_copy_paste, "107b")
         self.set_icon(action_rotation, "107c")
-        # self.set_icon(action_catalog, "107c")
+        self.set_icon(action_catalog, "195")
         self.set_icon(action_workcat, "193")
         self.set_icon(action_zoom_in, "103")
         self.set_icon(action_zoom_out, "107")
