@@ -259,10 +259,15 @@ raise notice 'Form number: %', form_info;
     IF v_idname = 'arc_id'::text OR v_idname = 'node_id'::text OR v_idname = 'connec_id'::text OR v_idname = 'gully_id'::text OR v_idname = 'sys_hydrometer_id'::text THEN
         mincut_act = TRUE;
     ELSE
-        mincut_act = FALSE;    
+        mincut_act = FALSE;	
     END IF;
 
-   
+    IF v_formheader IS NULL THEN
+	v_formheader = (SELECT formname FROM config_web_layer WHERE layer_id=table_id_arg);
+    END IF;
+
+    raise notice' v_formheader %', v_formheader;
+       
 --    Check generic
 -------------------
     IF form_info ISNULL THEN
