@@ -293,9 +293,9 @@ class Giswater(QObject):
                         
         toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
-            list_actions = ['41', '48', '86', '32']
+            list_actions = ['37', '41', '48', '86', '32', '332']
         if self.controller.get_project_type() == 'ud':
-            list_actions = ['41', '48', '32']
+            list_actions = ['37', '41', '48', '32', '332']
         self.manage_toolbar(toolbar_id, list_actions)
 
         toolbar_id = "om_ws"
@@ -327,7 +327,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)                                      
             
         toolbar_id = "info"
-        list_actions = ['36', '37', '332']
+        list_actions = ['36']
         self.manage_toolbar(toolbar_id, list_actions)                                      
 
         # Manage action group of every toolbar
