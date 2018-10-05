@@ -10,3 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- 2018/09/28
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_init_point', 'Mincut', 'Catalog of mincut results', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
+
+
+-- 2018/10/05
+UPDATE audit_cat_table SET sys_role_id='role_om' WHERE table_id='v_anl_mincut_result_cat';
