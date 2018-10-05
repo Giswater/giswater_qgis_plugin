@@ -263,7 +263,7 @@ raise notice 'Form number: %', form_info;
     END IF;
 
     IF v_formheader IS NULL THEN
-	v_formheader = (SELECT formname FROM config_web_layer WHERE layer_id=table_id_arg);
+	v_formheader = (SELECT formname FROM config_web_layer WHERE tableinfo_id=table_id_arg);
     END IF;
 
     raise notice' v_formheader %', v_formheader;
