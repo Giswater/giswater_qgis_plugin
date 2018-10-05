@@ -18,9 +18,8 @@ from functools import partial
 
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
-
 from PyQt4.QtCore import Qt, SIGNAL, SLOT
-from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
+from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator, QToolButton
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
 
@@ -60,18 +59,21 @@ class ApiCF(ApiParent):
     def get_point(self, point, button_clicked):
         if button_clicked == Qt.LeftButton:
             self.open_form(point)
+            list_coord = re.search('\((.*)\)', str(self.complet_result[0]['geometry']['st_astext']))
+            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            points = self.get_points(list_coord)
+            self.draw_polygon(points)
         elif button_clicked == Qt.RightButton:
             QApplication.restoreOverrideCursor()
             # TODO buscar la QAction concreta y deschequearla
             actions = self.iface.mainWindow().findChildren(QAction)
             for a in actions:
                 a.setChecked(False)
-
             self.emit_point.canvasClicked.disconnect()
 
 
     def open_form(self, point=None, table_name=None, feature_type=None, feature_id=None):
-
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -85,6 +87,36 @@ class ApiCF(ApiParent):
         self.my_json = {}
         # Get srid
         self.srid = self.controller.plugin_settings_value('srid')
+
+        if self.iface.activeLayer() is None:
+            active_layer = ""
+        else:
+            active_layer = self.controller.get_layer_source_table_name(self.iface.activeLayer())
+
+        visible_layers = self.get_visible_layers()
+        scale_zoom = self.iface.mapCanvas().scale()
+        is_project_editable = self.get_editable_project()
+
+        # IF click over canvas
+        if point:
+            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
+                   + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
+                   + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
+        # IF come from QPushButtons node1 or node2 from custom form
+        elif feature_id and feature_type:
+            sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+"_id = '" + str(feature_id) + "'")
+            row = self.controller.get_row(sql, log_sql=True)
+            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
+                   " '" + str(row[0])+"', " + str(is_project_editable) + ", 9, 100)")
+
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return
+        self.complet_result = row
+        result = row[0]['editData']
+        if 'fields' not in result:
+            return
 
         # Dialog
         self.dlg_cf = ApiCfUi()
@@ -108,7 +140,6 @@ class ApiCF(ApiParent):
         action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
 
-
         # Set actions icon
         self.set_icon(action_edit, "101")
         self.set_icon(action_copy_paste, "107b")
@@ -130,39 +161,6 @@ class ApiCF(ApiParent):
         tab1_layout3 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout3')
         bot_layout_1 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_1')
         bot_layout_2 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_2')
-
-        if self.iface.activeLayer() is None:
-            active_layer = ""
-        else:
-            active_layer = self.controller.get_layer_source_table_name(self.iface.activeLayer())
-
-        visible_layers = self.get_visible_layers()
-        # TODO editables han de ser null
-        # editable_layers = self.get_editable_layers()
-
-        scale_zoom = self.iface.mapCanvas().scale()
-
-        is_project_editable=self.get_editable_project()
-        # IF click over canvas
-        if point:
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
-                   + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
-                   + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
-        # IF come from QPushButtons node1 or node2 from custom form
-        elif feature_id and feature_type:
-            sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+"_id = '" + str(feature_id) + "'")
-            row = self.controller.get_row(sql, log_sql=True)
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
-                   " '" + str(row[0])+"', " + str(is_project_editable) + ", 9, 100)")
-
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return
-        self.complet_result = row
-        result = row[0]['editData']
-        if 'fields' not in result:
-            return
 
         # Get table name for use as title
         self.tablename = row[0]['tableName']
@@ -220,7 +218,7 @@ class ApiCF(ApiParent):
             elif field['widgettype'] == 9:
                 widget = self.add_hyperlink(self.dlg_cf, field)
 
-
+            # Prepare layouts
             if field['layout_id'] == 0:
                 top_layout.addWidget(label, 0, field['layout_order'])
                 top_layout.addWidget(widget, 1, field['layout_order'])
@@ -262,13 +260,6 @@ class ApiCF(ApiParent):
                 action = self.dlg_cf.findChild(QAction, field)
                 if action is not None:
                     action.setVisible(True)
-        #TODO RESOLVER ESTO CON ZOOM A LA GEOMETRIA QUE VENGA DE LA API  EN VEZ DE CON EXPRESION Y SACARLO DE LA FUNCION
-        list_coord = re.search('\((.*)\)', str(self.complet_result[0]['geometry']['st_astext']))
-        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-        self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
-        points = self.get_points(list_coord)
-        self.draw_polygon(points)
-
 
         # Get selected feature
         self.feature = self.get_feature_by_id(self.layer)
@@ -303,8 +294,6 @@ class ApiCF(ApiParent):
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_help.triggered.connect(partial(self.api_action_help, 'ud', 'node'))
 
-
-
         # Buttons
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
@@ -317,6 +306,7 @@ class ApiCF(ApiParent):
         self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_cf.show()
         return self.complet_result
+
 
     def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
         print (_json)
@@ -487,6 +477,8 @@ class ApiCF(ApiParent):
                 validator.setNotation(QDoubleValidator().StandardNotation)
                 widget.setValidator(validator)
         return widget
+
+
     def set_widget_type(self, field, dialog, widget, completer):
         if field['widgettype'] == 10:
             if 'dv_table' in field:
@@ -504,7 +496,6 @@ class ApiCF(ApiParent):
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
         widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
-
         return widget
 
     def populate_combo(self, widget, field):
@@ -539,6 +530,7 @@ class ApiCF(ApiParent):
         if child:
             self.populate_combo(child, combo_child)
 
+
     def add_checkbox(self, dialog, field):
         widget = QCheckBox()
         widget.setObjectName(field['column_id'])
@@ -552,7 +544,12 @@ class ApiCF(ApiParent):
     def add_calendar(self, dialog, field):
         widget = QgsDateTimeEdit()
         widget.setObjectName(field['column_id'])
+        widget.setAllowNull(True)
         widget.setCalendarPopup(True)
+        widget.setDisplayFormat('yyyy/MM/dd')
+        btn_calendar = widget.findChild(QToolButton)
+        btn_calendar.clicked.connect(partial(self.get_values, widget, ""))
+        widget.dateChanged.connect(partial(self.get_values, widget))
         return widget
 
 
@@ -580,7 +577,6 @@ class ApiCF(ApiParent):
         return widget
 
 
-
     def open_catalog(self, dialog, result, message_level=None):
         self.catalog = Catalog(self.iface, self.settings, self.controller, self.plugin_dir)
         wsoftware = self.controller.get_project_type()
@@ -599,6 +595,7 @@ class ApiCF(ApiParent):
             msg = ("No function associated to this action, review column action_function "
                    "from table config_api_layer_field for " + str(self.tablename) + " ")
             self.controller.show_message(msg, 2)
+
 
     def populate_lineedit(self, completer, model, tablename, dialog, widget, field_id):
         """ Set autocomplete of widget @table_object + "_id"
@@ -640,9 +637,9 @@ class ApiCF(ApiParent):
         # Open dialog
         self.cf_open_dialog(self.dlg_new_workcat)
 
+
     def cf_manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
-
         # Get values from dialog
         values = ""
         fields = ""
@@ -702,7 +699,6 @@ class ApiCF(ApiParent):
 
     def cf_open_dialog(self, dlg=None, dlg_name=None, maximize_button=True, stay_on_top=True):
         """ Open dialog """
-
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
 
@@ -725,6 +721,7 @@ class ApiCF(ApiParent):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
     def no_function_asociated(self, widget=None, message_level=1):
         self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)
+
 
     def action_open_url(self, dialog, result, message_level=None):
         widget = None
@@ -751,6 +748,7 @@ class ApiCF(ApiParent):
                 subprocess.call([opener, path])
         else:
             webbrowser.open(path)
+
 
     def open_node(self, dialog, widget=None, message_level=None):
         feature_id = utils_giswater.getWidgetText(dialog, widget)

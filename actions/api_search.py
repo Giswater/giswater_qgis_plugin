@@ -64,9 +64,6 @@ class ApiSearch(ApiParent):
             self.vMarker.setIconSize(10)
 
 
-
-
-
     def api_search(self):
         # Dialog
         self.dlg_search = ApiSearchUi()
@@ -110,7 +107,6 @@ class ApiSearch(ApiParent):
 
                 gridlayout.addWidget(label, x, 0)
                 gridlayout.addWidget(widget, x, 1)
-
                 x += 1
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -128,17 +124,14 @@ class ApiSearch(ApiParent):
         if completer:
             model = QStringListModel()
             completer.highlighted.connect(partial(self.check_tab, completer))
-
             self.make_list(completer, model, widget)
             widget.textChanged.connect(partial(self.make_list, completer, model, widget))
-
         return widget
 
 
     def check_tab(self, completer):
         # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
-
         # Get all QLineEdit for activate or we cant write when tab have more than 1 QLineEdit
         line_list = self.dlg_search.main_tab.widget(index).findChildren(QLineEdit)
         for line_edit in line_list:
@@ -151,7 +144,6 @@ class ApiSearch(ApiParent):
             return
         # Get text from selected row
         _key = completer.completionModel().index(row, 0).data()
-
         # Search text into self.result_data
         # (this variable contains all the matching objects in the function "make_list())"
         item = None
@@ -208,27 +200,19 @@ class ApiSearch(ApiParent):
             point = QgsPoint(float(x1), float(y1))
             self.highlight_point(point, 2000)
             self.zoom_to_rectangle(x1, y1, x1, y1)
-            self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_type=None, feature_id=item['sys_id'])
+            self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
-            # TODO mantenemos como la 3.1
-
             self.workcat_open_table_items(item)
             return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
-            #TODO ojo con plan hardcoded comentar a xavi!!!!
             self.manage_new_psector.new_psector(item['sys_id'], 'plan')
             #self.manage_new_psector.new_psector(item['sys_id'], item['sys_table_id'], 'workcat_id')
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
-            # TODO
-            print(item)
-
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             return
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
-
-
 
 
     def highlight_point(self, point, duration_time=None):
@@ -247,6 +231,7 @@ class ApiSearch(ApiParent):
         # wait to simulate a flashing effect
         if duration_time:
             QTimer.singleShot(duration_time, self.resetRubberbands)
+
 
     def resetRubberbands(self):
         canvas = self.canvas
@@ -369,20 +354,14 @@ class ApiSearch(ApiParent):
             for i in range(0, len(field['comboIds'])):
                 elem = [field['comboIds'][i], field['comboNames'][i]]
                 combolist.append(elem)
-
         records_sorted = sorted(combolist, key=operator.itemgetter(1))
         # Populate combo
         for record in records_sorted:
             widget.addItem(record[1], record)
 
 
-    def open_hydrometer_dialog(self, table_name=None, feature_type=None, feature_id=None):
+    def open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
-        self.hydro_info_dlg = HydroInfo()
-        self.load_settings(self.hydro_info_dlg)
-
-        self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
 
         sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
                " null, True, 9, 100)")
@@ -394,7 +373,13 @@ class ApiSearch(ApiParent):
         result = row[0]['editData']
         if 'fields' not in result:
             return
-        self.controller.log_info(str(result))
+
+        self.hydro_info_dlg = HydroInfo()
+        self.load_settings(self.hydro_info_dlg)
+
+        self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
+
         # Get field id name
         field_id = str(row[0]['idName'])
 
@@ -512,6 +497,7 @@ class ApiSearch(ApiParent):
             msg = "Your exploitation selector has been updated"
             self.controller.show_warning(msg)
 
+
     def update_selector_workcat(self, workcat_id):
         """  Update table selector_workcat """
 
@@ -520,6 +506,7 @@ class ApiSearch(ApiParent):
         sql += ("INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
                 " VALUES('" + workcat_id + "', current_user);\n")
         self.controller.execute_sql(sql)
+
 
     def disable_qatable_by_state(self, qtable, _id, qbutton):
 
@@ -615,7 +602,7 @@ class ApiSearch(ApiParent):
 
 
     def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
-
+        """ Filter list of workcats by workcat_id and field_id"""
         result_select = utils_giswater.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
             expr = ("workcat_id = '" + str(workcat_id) + "'"
