@@ -125,15 +125,3 @@ CREATE TABLE selector_composer(
   user_name text NOT NULL,
   CONSTRAINT selector_composer_pkey PRIMARY KEY (field_id, user_name));
  
-
- CREATE OR REPLACE VIEW v_web_composer AS 
- SELECT ct.user_name,
-    ct.composer,
-    ct.scale,
-    ct.title,
-    ct.date,
-    ct.descript
-   FROM crosstab('SELECT user_name, field_id, field_value FROM selector_composer where user_name=''qgisserver''
-			ORDER  BY 1,2'::text, ' VALUES (''composer''),(''scale''),(''title''),(''date''),(''descript'')'::text) ct(user_name text, composer text, scale numeric, title text, date date, descript text);
-
- 

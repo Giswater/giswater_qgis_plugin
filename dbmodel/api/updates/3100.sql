@@ -1,28 +1,13 @@
-﻿SET search_path='SCHEMA_NAME', 'public';
-
-
-/*
-taules
-UPDATEJAR VALORS A MA DE
-- config_web_layer
-
-
-AUTOMATIC
-config_web_composer
-- config_web_composer_scale
-- config_web_fields
-selector_composer
-config_param_system
-
-
-funcions
--getprint
--updateprint
--upsertmincut
--getinfofromcoordinates
--getfilters
--upserfeature
+﻿This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
 */
+
+
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
 
 
 ALTER TABLE config_web_layer ADD COLUMN is_tiled boolean;
@@ -43,17 +28,6 @@ CREATE TABLE selector_composer(
   CONSTRAINT selector_composer_pkey PRIMARY KEY (field_id, user_name));
   
   
- 
-CREATE OR REPLACE VIEW v_web_composer AS 
- SELECT ct.user_name,
-    ct.composer,
-    ct.scale,
-    ct.title,
-    ct.date,
-    ct.descript
-   FROM crosstab('SELECT user_name, field_id, field_value FROM selector_composer where user_name=''qgisserver''
-			ORDER  BY 1,2'::text, ' VALUES (''composer''),(''scale''),(''title''),(''date''),(''descript'')'::text) ct(user_name text, composer text, scale numeric, title text, date date, descript text);
-
 
 UPDATE config_web_fields_cat_type SET id='datepikertime' WHERE id='date';
 
@@ -83,8 +57,3 @@ INSERT INTO config_web_fields VALUES (304, 'F32', 'divider', false, 'string', NU
 INSERT INTO audit_cat_table VALUES ('config_web_composer_scale', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_web_composer', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('selector_composer', 'web', '', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);
-
-
-SELECT gw_fct_role_permissions('gis', 'SCHEMA_NAME');
-
-
