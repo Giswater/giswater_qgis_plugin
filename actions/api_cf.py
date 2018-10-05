@@ -754,9 +754,11 @@ class ApiCF(ApiParent):
     def open_node(self, dialog, widget=None, message_level=None):
         feature_id = utils_giswater.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.ApiCF.open_form(table_name='ve_node',  feature_type='node', feature_id=feature_id)
-
-
+        complet_result = self.ApiCF.open_form(table_name='ve_node',  feature_type='node', feature_id=feature_id)
+        if not complet_result:
+            print("FAIL")
+            return
+        self.draw(complet_result)
 
     # def disconnect_snapping(self, refresh_canvas=True):
     #     """ Select 'refreshAllLayers' as current map tool and disconnect snapping """

@@ -502,9 +502,9 @@ class ApiParent(ParentAction):
             self.draw_polygon(points)
         self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
-    def draw_point(self, point, color=Qt.red, width=10, duration_time=None):
+    def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
+
         if QGis.QGIS_VERSION_INT >= 10900:
-            self.controller.log_info(str("TEST 20"))
             rb = self.rubber_point
             rb.setColor(color)
             rb.setWidth(width)
@@ -520,10 +520,10 @@ class ApiParent(ParentAction):
             QTimer.singleShot(duration_time, self.resetRubberbands)
 
 
-    def draw_polygon(self, points, color=Qt.red, width=10, duration_time=None):
+    def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
-        if QGis.QGIS_VERSION_INT >= 10900:
 
+        if QGis.QGIS_VERSION_INT >= 10900:
             rb = self.rubber_polygon
             rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
             rb.setColor(color)
