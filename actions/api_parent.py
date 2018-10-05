@@ -7,6 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 import os
+import re
 from functools import partial
 
 from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer
@@ -27,6 +28,19 @@ class ApiParent(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
+
+        if QGis.QGIS_VERSION_INT >= 10900:
+            self.rubber_point = QgsRubberBand(self.canvas, QGis.Point)
+            self.rubber_point.setColor(Qt.yellow)
+            # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
+            self.rubber_point.setIconSize(10)
+            self.rubber_polygon = QgsRubberBand(self.canvas)
+            self.rubber_polygon.setColor(Qt.darkRed)
+            self.rubber_polygon.setIconSize(20)
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(10)
+
 
     def get_editable_project(self):
         """ Get variable 'editable_project' from qgis project variables"""
@@ -439,6 +453,7 @@ class ApiParent(ParentAction):
             x, y = polygon[i].split(' ')
             point = QgsPoint(float(x), float(y))
             points.append(point)
+            print(i, x, y)
         return points
 
 
@@ -474,11 +489,42 @@ class ApiParent(ParentAction):
         self.canvas.refresh()
 
 
-    def draw_polygon(self, points, color=Qt.red, width=3, duration_time=None):
-        """ Draw 'line' over canvas following list of points """
-        print(points)
+    def draw(self, complet_result):
+        list_coord = re.search('\((.*)\)', str(complet_result[0]['geometry']['st_astext']))
+        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+
+        self.resetRubberbands()
+        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
+            point = QgsPoint(float(max_x), float(max_y))
+            self.draw_point(point)
+        else:
+            points = self.get_points(list_coord)
+            self.draw_polygon(points)
+        self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+
+    def draw_point(self, point, color=Qt.red, width=10, duration_time=None):
         if QGis.QGIS_VERSION_INT >= 10900:
-            rb = QgsRubberBand(self.canvas, False)
+            self.controller.log_info(str("TEST 20"))
+            rb = self.rubber_point
+            rb.setColor(color)
+            rb.setWidth(width)
+            rb.addPoint(point)
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(10)
+            self.vMarker.setCenter(point)
+            self.vMarker.show()
+
+        # wait to simulate a flashing effect
+        if duration_time is not None:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+
+
+    def draw_polygon(self, points, color=Qt.red, width=10, duration_time=None):
+        """ Draw 'line' over canvas following list of points """
+        if QGis.QGIS_VERSION_INT >= 10900:
+
+            rb = self.rubber_polygon
             rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
             rb.setColor(color)
             rb.setWidth(width)
@@ -490,8 +536,18 @@ class ApiParent(ParentAction):
             self.vMarker.show()
 
         # wait to simulate a flashing effect
-        if duration_time:
+        if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
+
+
+    def resetRubberbands(self):
+        canvas = self.canvas
+        if QGis.QGIS_VERSION_INT >= 10900:
+            self.rubber_point.reset(QGis.Point)
+            self.rubber_polygon.reset()
+        else:
+            self.vMarker.hide()
+            canvas.scene().removeItem(self.vMarker)
 
 
     def test(self, widget=None):

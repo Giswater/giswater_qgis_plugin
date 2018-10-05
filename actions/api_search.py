@@ -51,17 +51,7 @@ class ApiSearch(ApiParent):
         self.json_search = {}
         self.lbl_visible = False
 
-        if QGis.QGIS_VERSION_INT >= 10900:
-            self.rubberBand = QgsRubberBand(self.canvas, QGis.Point)
-            self.rubberBand.setColor(Qt.yellow)
-            # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
-            self.rubberBand.setIconSize(10)
-            self.rubber_polygon = QgsRubberBand(self.canvas)
-            self.rubber_polygon.setColor(Qt.darkRed)
-            self.rubber_polygon.setIconSize(20)
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(10)
+
 
 
     def api_search(self):
@@ -151,7 +141,6 @@ class ApiSearch(ApiParent):
             if _key == data['display_name']:
                 item = data
                 break
-
         # IF for zoom to tab network
         if self.dlg_search.main_tab.widget(index).objectName() == 'network':
             layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
@@ -162,8 +151,12 @@ class ApiSearch(ApiParent):
 
             self.iface.setActiveLayer(layer)
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=item['feature_type'], feature_id=item['sys_id'])
+            complet_result = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=item['feature_type'], feature_id=item['sys_id'])
 
+            if not complet_result:
+                print("FAIL")
+                return
+            self.draw(complet_result)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'search':
             # TODO
             return
@@ -180,7 +173,8 @@ class ApiSearch(ApiParent):
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPoint(float(x1), float(y1))
-            self.highlight_point(point, 2000)
+
+            self.draw_point(point)
             self.zoom_to_rectangle(x1, y1, x1, y1)
 
             # textItem = QgsTextAnnotationItem(self.iface.mapCanvas())
@@ -198,7 +192,7 @@ class ApiSearch(ApiParent):
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPoint(float(x1), float(y1))
-            self.highlight_point(point, 2000)
+            self.draw_point(point)
             self.zoom_to_rectangle(x1, y1, x1, y1)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
@@ -215,32 +209,8 @@ class ApiSearch(ApiParent):
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 
 
-    def highlight_point(self, point, duration_time=None):
-        if QGis.QGIS_VERSION_INT >= 10900:
-            rb = self.rubberBand
-            rb.reset(QGis.Point)
-            self.controller.log_info(str(point))
-            rb.addPoint(point)
-            self.controller.log_info(str("TEST"))
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(10)
-            self.vMarker.setCenter(point)
-            self.vMarker.show()
-
-        # wait to simulate a flashing effect
-        if duration_time:
-            QTimer.singleShot(duration_time, self.resetRubberbands)
 
 
-    def resetRubberbands(self):
-        canvas = self.canvas
-        if QGis.QGIS_VERSION_INT >= 10900:
-            self.rubberBand.reset()
-            self.rubber_polygon.reset()
-        else:
-            self.vMarker.hide()
-            canvas.scene().removeItem(self.vMarker)
 
 
     def make_list(self, completer, model, widget):
@@ -373,6 +343,9 @@ class ApiSearch(ApiParent):
         result = row[0]['editData']
         if 'fields' not in result:
             return
+        form_type = str(row[0]['formTabs']['form_type'])
+        print(form_type)
+
 
         self.hydro_info_dlg = HydroInfo()
         self.load_settings(self.hydro_info_dlg)
@@ -382,7 +355,6 @@ class ApiSearch(ApiParent):
 
         # Get field id name
         field_id = str(row[0]['idName'])
-
 
         grid_layout = self.hydro_info_dlg.findChild(QGridLayout, 'gridLayout')
         for field in result["fields"]:
@@ -668,6 +640,7 @@ class ApiSearch(ApiParent):
         list_coord = re.search('\((.*)\)', str(complet_result[0]['geometry']['st_astext']))
 
         points = self.get_points(list_coord)
+        self.rubber_polygon.reset()
         self.draw_polygon(points)
 
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)

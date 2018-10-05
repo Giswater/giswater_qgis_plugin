@@ -15,7 +15,7 @@ import sys
 import webbrowser
 
 from functools import partial
-
+from qgis.core import QgsPoint, QGis
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 from PyQt4.QtCore import Qt, SIGNAL, SLOT
@@ -58,12 +58,13 @@ class ApiCF(ApiParent):
 
     def get_point(self, point, button_clicked):
         if button_clicked == Qt.LeftButton:
-            self.open_form(point)
-            list_coord = re.search('\((.*)\)', str(self.complet_result[0]['geometry']['st_astext']))
-            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
-            points = self.get_points(list_coord)
-            self.draw_polygon(points)
+            complet_result = self.open_form(point)
+
+            if not complet_result:
+                print("FAIL")
+                return
+            self.draw(complet_result)
+
         elif button_clicked == Qt.RightButton:
             QApplication.restoreOverrideCursor()
             # TODO buscar la QAction concreta y deschequearla
@@ -112,11 +113,11 @@ class ApiCF(ApiParent):
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return
+            return False
         self.complet_result = row
         result = row[0]['editData']
         if 'fields' not in result:
-            return
+            return False
 
         # Dialog
         self.dlg_cf = ApiCfUi()
