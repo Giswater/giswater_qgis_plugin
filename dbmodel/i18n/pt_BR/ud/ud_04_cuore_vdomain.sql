@@ -5,16 +5,25 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- Records of value_state
 -- ----------------------------
-INSERT INTO "value_state" VALUES ('OBSOLETE');
-INSERT INTO "value_state" VALUES ('ON_SERVICE');
-INSERT INTO "value_state" VALUES ('RECONSTRUCT');
-INSERT INTO "value_state" VALUES ('REPLACE');
-INSERT INTO "value_state" VALUES ('PLANIFIED');
+INSERT INTO "value_state" VALUES (0,'OBSOLETE');
+INSERT INTO "value_state" VALUES (1,'ON_SERVICE');
+INSERT INTO "value_state" VALUES (2,'PLANIFIED');
+
+-- ----------------------------
+-- Records of value_state_type
+-- ----------------------------
+INSERT INTO value_state_type VALUES (1, 0, 'OBSOLETE', false, false);
+INSERT INTO value_state_type VALUES (2, 1, 'ON SERVICE', true, true);
+INSERT INTO value_state_type VALUES (3, 2, 'PLANIFIED', true, true);
+INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUCT', true, false);
+INSERT INTO value_state_type VALUES (5, 1, 'PROVISIONAL', false, true);
+
 
 
 -- ----------------------------
@@ -31,27 +40,3 @@ INSERT INTO "value_yesno" VALUES ('NO');
 INSERT INTO "value_yesno" VALUES ('YES');
 
 
--- ----------------------------
--- Records of connec_type
--- ----------------------------
-INSERT INTO connec_type VALUES ('DOMESTIC', NULL);
-INSERT INTO connec_type VALUES ('TRADE', NULL);
-INSERT INTO connec_type VALUES ('INDUSTRIAL', NULL);
-
-
--- ----------------------------
--- Records of man_type_category
--- ----------------------------
-INSERT INTO "man_type_category" VALUES ('NO CATEGORY DATA', null);
-
-
--- ----------------------------
--- Records of man_type_fluid
--- ----------------------------
-INSERT INTO "man_type_fluid" VALUES ('NO FLUID DATA', null);
-
-
--- ----------------------------
--- Records of man_type_location
--- ----------------------------
-INSERT INTO "man_type_location" VALUES ('NO LOCATION DATA', null);

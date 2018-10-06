@@ -6,11 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+/*
 -- ----------------------------
 -- Default values of state selection
 -- ----------------------------
-INSERT INTO "inp_selector_state" VALUES ('ON_SERVICE');
+INSERT INTO inp_selector_state VALUES (0);
+INSERT INTO inp_selector_state VALUES (1);
+INSERT INTO inp_selector_state VALUES (2);
 
 
 -- ----------------------------
@@ -40,3 +42,4 @@ INSERT INTO "man_selector_state" VALUES ('ON_SERVICE');
 -- Records of anl_selector_state
 -- ----------------------------
 INSERT INTO "anl_selector_state" VALUES ('ON_SERVICE');
+*/
