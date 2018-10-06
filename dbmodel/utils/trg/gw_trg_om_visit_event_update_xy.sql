@@ -60,9 +60,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_trg_topocontrol_node()
-  OWNER TO postgres;
-
 
 
 --CREATE TRIGGER gw_trg_visit_event_update_xy AFTER INSERT OR UPDATE OF position_id, position_value  ON SCHEMA_NAME.om_visit_event  
