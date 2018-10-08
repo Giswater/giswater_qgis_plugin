@@ -299,6 +299,7 @@ class ApiCF(ApiParent):
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         btn_accept.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, self.my_json))
         self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
+        self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
 
         #QApplication.restoreOverrideCursor()
         # Open dialog
