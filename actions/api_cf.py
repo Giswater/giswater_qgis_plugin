@@ -9,20 +9,18 @@ or (at your option) any later version.
 import json
 import operator
 import os
-import re
 import subprocess
 import sys
 import webbrowser
 
 from functools import partial
-from qgis.core import QgsPoint, QGis
+
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
-from PyQt4.QtCore import Qt, SIGNAL, SLOT
+from PyQt4.QtCore import Qt, QDate, SIGNAL, SLOT
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator, QToolButton
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-
 
 import utils_giswater
 
@@ -173,7 +171,7 @@ class ApiCF(ApiParent):
         # Get tableParent and select layer
         table_parent = str(row[0]['tableParent'])
         self.layer = self.controller.get_layer_by_tablename(table_parent)
-        print (self.layer)
+
         if self.layer:
             self.iface.setActiveLayer(self.layer)
 
@@ -310,7 +308,6 @@ class ApiCF(ApiParent):
 
 
     def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
-        print (_json)
         if _json == '' or str(_json) == '{}':
             self.close_dialog(self.dlg_cf)
             return
@@ -548,9 +545,20 @@ class ApiCF(ApiParent):
         widget.setAllowNull(True)
         widget.setCalendarPopup(True)
         widget.setDisplayFormat('yyyy/MM/dd')
+        if 'value' in field:
+            date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+            utils_giswater.setCalendarDate(dialog, widget, date)
+        else:
+            widget.setEmpty()
         btn_calendar = widget.findChild(QToolButton)
-        btn_calendar.clicked.connect(partial(self.get_values, widget, ""))
-        widget.dateChanged.connect(partial(self.get_values, widget))
+
+        if field['isautoupdate']:
+            _json = {}
+            btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
+            btn_calendar.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+        else:
+            btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
+        btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
         return widget
 
 

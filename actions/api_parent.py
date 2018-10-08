@@ -417,6 +417,9 @@ class ApiParent(ParentAction):
                                      " color: rgb(100, 100, 100)}")
         return widget
 
+    def set_calendar_empty(self, widget):
+        """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
+        widget.setEmpty()
 
     def add_hyperlink(self, dialog, field):
         widget = HyperLinkLabel()
