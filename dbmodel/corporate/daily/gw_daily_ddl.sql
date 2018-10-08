@@ -6,10 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
-
-CREATE TABLE audit_log
+CREATE TABLE utils.audit_log
 (
   id serial NOT NULL,
   fprocesscat_id smallint,
@@ -17,7 +14,20 @@ CREATE TABLE audit_log
   tstamp timestamp without time zone DEFAULT now(),
   user_name text DEFAULT "current_user"(),
   CONSTRAINT audit_log_project_pkey PRIMARY KEY (id)
-)
 );
 
 
+
+CREATE TABLE utils.config_param_system
+(
+  id serial NOT NULL,
+  parameter character varying(50) NOT NULL,
+  value text,
+  data_type character varying(20),
+  context character varying(50),
+  descript text,
+  CONSTRAINT config_param_system_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
