@@ -181,6 +181,11 @@ BEGIN
 			IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
 				NEW.code=NEW.node_id;
 			END IF;
+			
+	    -- LINK
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+	       NEW.link=NEW.node_id;
+	    END IF;
 		
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 				dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id,

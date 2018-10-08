@@ -167,6 +167,12 @@ This version of Giswater is provided by Giswater Association
 			IF (NEW.builtdate IS NULL) THEN
 				NEW.builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
+			
+			-- LINK
+			IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+				NEW.link=NEW.arc_id;
+			END IF;
+		
 		
 			-- FEATURE INSERT
 			INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,

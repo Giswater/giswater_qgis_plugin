@@ -154,6 +154,12 @@ BEGIN
 		IF (NEW.inventory IS NULL) THEN
 			NEW.inventory :='TRUE';
 		END IF; 
+		
+	    -- LINK
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean= TRUE THEN
+	       NEW.link=NEW.connec_id;
+	    END IF;
+		
 
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation, "observ",
@@ -187,7 +193,7 @@ BEGIN
         END IF;
 		
 		-- Reconnect arc_id
-		IF NEW.arc_id != OLD.arc_id THEN
+		IF NEW.arc_id != OLD.arc_id OR OLD.arc_id IS NULL THEN
 			UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.connec_id AND exit_type='VNODE' LIMIT 1)::int8;

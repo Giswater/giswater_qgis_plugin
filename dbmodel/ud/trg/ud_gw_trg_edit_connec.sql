@@ -139,6 +139,11 @@ BEGIN
 				END IF;	
 			END IF;
 		END IF;
+		
+	    -- LINK
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+	       NEW.link=NEW.connec_id;
+	    END IF;
 	
 
         -- FEATURE INSERT

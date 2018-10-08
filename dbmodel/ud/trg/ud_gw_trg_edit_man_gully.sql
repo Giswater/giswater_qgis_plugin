@@ -175,6 +175,11 @@ BEGIN
 		IF (NEW.inventory IS NULL) THEN
 			NEW.inventory :='TRUE';
 		END IF; 
+		
+	    -- LINK
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+	       NEW.link=NEW.gully_id;
+	    END IF;
 	
         -- FEATURE INSERT
 	IF gully_geometry = 'gully' THEN
@@ -222,7 +227,7 @@ BEGIN
         END IF;
 		
 		-- Reconnect arc_id
-		IF NEW.arc_id != OLD.arc_id THEN
+		IF NEW.arc_id != OLD.arc_id OR OLD.arc_id IS NULL THEN
 			UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='GULLY' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.gully_id AND exit_type='VNODE' LIMIT 1)::int8;

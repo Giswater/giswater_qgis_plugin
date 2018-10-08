@@ -196,15 +196,20 @@ BEGIN
 		IF (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND "cur_user"="current_user"() LIMIT 1)::boolean=TRUE THEN
 			NEW.arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom,0.001) LIMIT 1);
 		END IF;
+		
+	    -- LINK
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link'):.boolean=TRUE THEN
+	       NEW.link=NEW.node_id;
+	    END IF;
         
 		
         -- FEATURE INSERT      
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
-			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, descript, rotation, verified, the_geom, undelete, 
+			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, streetaxis2_id, postnumber, postnumber2, descript, link, rotation, verified, the_geom, undelete, 
 			postcomplement, postcomplement2, label_x, label_y, label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
 			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type,NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
-			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,
+			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,
 			NEW.postcomplement, NEW.postcomplement2, NEW.label_x, NEW.label_y,NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.hemisphere, NEW.num_value);
 
         -- EPA INSERT

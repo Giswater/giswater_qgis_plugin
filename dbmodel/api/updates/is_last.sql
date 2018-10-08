@@ -15,5 +15,6 @@ INSERT INTO config_param_system VALUES (214, 'sys_crm_schema', 'FALSE', 'Boolean
 INSERT INTO config_param_system VALUES (216, 'sys_utils_schema', 'FALSE', 'Boolean', 'System', 'Utils');
 INSERT INTO config_param_system VALUES (218, 'sys_api_service', 'FALSE', 'Boolean', 'System', 'Utils');
 
-INSERT INTO config_param_system VALUES (220, 'edit_automatic_insert_link', 'FALSE', 'Boolean', 'System', 'Utils');
+INSERT INTO config_param_system VALUES (220, 'edit_automatic_insert_link', 'FALSE', 'Boolean', 'System', 'If true, link parameter will be the same as element id');
+
 
