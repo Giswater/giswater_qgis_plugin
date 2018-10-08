@@ -63,7 +63,7 @@ class ApiSearch(ApiParent):
 
         # Make it dockable in left dock widget area
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
-        self.dlg_search.setFixedHeight(162)
+        #self.dlg_search.setFixedHeight(180)
 
         sql = ("SELECT " + self.schema_name + ".gw_fct_getsearch(9,'es')")
         row = self.controller.get_row(sql, log_sql=True)
