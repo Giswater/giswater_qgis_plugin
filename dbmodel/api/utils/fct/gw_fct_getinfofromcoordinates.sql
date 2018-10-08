@@ -5,7 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromcoordinates"(p_x float8, p_y float8, p_epsg int4, p_active_layer text, p_visible_layer text, p_editable_layer text, p_istilemap bool, p_zoom_ratio float8, p_device int4, p_info_type int4, p_lang varchar) RETURNS pg_catalog.json AS $BODY$
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromcoordinates"(p_x float8, p_y float8, p_epsg int4, p_active_layer text, p_visible_layer text, p_editable_layer text, p_istilemap bool, p_zoom_ratio float8, p_device int4, p_info_type int4, p_lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -118,6 +119,7 @@ BEGIN
         END IF;
 
         IF v_id IS NOT NULL THEN 
+	    RAISE NOTICE 'Founded (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
             exit;
         ELSE 
             RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
@@ -125,12 +127,9 @@ BEGIN
 
     END LOOP;
 
-    RAISE NOTICE 'Founded (loop number: %):  Layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;
-
---    Control NULL's
+    --    Control NULL's
     IF v_id IS NULL THEN
      RETURN ('{"status":"Accepted", "apiVersion":'|| api_version || ', "results":0' ||', "formTabs":[] , "tableName":"", "idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
-
 
     END IF;
 
