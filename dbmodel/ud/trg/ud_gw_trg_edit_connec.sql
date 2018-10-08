@@ -173,7 +173,7 @@ BEGIN
         END IF;
 
 		-- Reconnect arc_id
-		IF NEW.arc_id != OLD.arc_id THEN
+		IF NEW.arc_id != OLD.arc_id OR OLD.arc_id IS NULL THEN
 			UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 			IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
 				UPDATE vnode SET vnode_type='AUTO' WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=NEW.connec_id AND exit_type='VNODE' LIMIT 1)::int8;
