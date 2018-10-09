@@ -367,20 +367,29 @@ class ApiCF(ApiParent):
                         if type(widget) is QLineEdit:
                             widget.setReadOnly(not field['iseditable'])
                             if not field['iseditable']:
+                                widget.setFocusPolicy(Qt.NoFocus)
                                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
                                                      " color: rgb(100, 100, 100)}")
                             else:
+                                widget.setFocusPolicy(Qt.StrongFocus)
                                 widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255);"
                                                      " color: rgb(0, 0, 0)}")
-
                         elif type(widget) is QComboBox:
                             widget.setEnabled(field['iseditable'])
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
                         elif type(widget) is QCheckBox:
                             widget.setEnabled(field['iseditable'])
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
                         elif type(widget) is QPushButton:
                             widget.setEnabled(field['iseditable'])
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
                         elif type(widget) is QgsDateTimeEdit:
                             widget.setEnabled(field['iseditable'])
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
 
 
     def enable_actions(self, dialog, enabled):
