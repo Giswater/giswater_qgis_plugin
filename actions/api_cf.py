@@ -24,7 +24,7 @@ from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QCombo
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
 
 import utils_giswater
-
+from actions.api_catalog import ApiCatalog
 from giswater.actions.api_parent import ApiParent
 from giswater.actions.catalog import Catalog
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
@@ -618,25 +618,9 @@ class ApiCF(ApiParent):
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
-
     def open_catalog(self, dialog, result, message_level=None):
-        self.catalog = Catalog(self.iface, self.settings, self.controller, self.plugin_dir)
-        wsoftware = self.controller.get_project_type()
-        geom_type = "node"
-        widget = None
-
-        for field in result["fields"]:
-            if field['action_function'] == 'action_catalog':
-                widget = dialog.findChild(QLineEdit, field['column_id'])
-                break
-
-        if widget:
-            widget_name = widget.objectName()
-            self.catalog.catalog(dialog, widget_name, wsoftware, geom_type, self.feature_type)
-        else:
-            msg = ("No function associated to this action, review column action_function "
-                   "from table config_api_layer_field for " + str(self.tablename) + " ")
-            self.controller.show_message(msg, 2)
+        self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.catalog.api_catalog()
 
 
     def populate_lineedit(self, completer, model, tablename, dialog, widget, field_id):
