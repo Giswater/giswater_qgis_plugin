@@ -15,7 +15,7 @@ INSERT INTO audit_cat_table VALUES ('v_anl_mincut_init_point', 'Mincut', 'Catalo
 -- 2018/10/05
 UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='v_anl_mincut_result_cat';
 
-INSERT INTO audit_cat_table VALUES ('v_edit_field_valve', 'System', 'Selector of hydrometers', 'role_basic', 0, NULL, NULL, 0, NULL,'selector_hydrometer_id_seq', 'id');
+INSERT INTO audit_cat_table VALUES ('v_edit_field_valve', 'System', 'Selector of hydrometers', 'role_basic', 0, NULL, NULL, 0, NULL,'selector_hydrometer_id_seq', 'node_id');
 
 INSERT INTO audit_cat_error values('3012','The position value is bigger than the full length of the arc. ', 'Please review your data.',2,TRUE,'utils');
 INSERT INTO audit_cat_error values('3014','The position id is not node_1 or node_2 of selected arc.', 'Please review your data.',2,TRUE,'utils');
