@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1234
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_node_update()
   RETURNS trigger AS
 $BODY$
 DECLARE 

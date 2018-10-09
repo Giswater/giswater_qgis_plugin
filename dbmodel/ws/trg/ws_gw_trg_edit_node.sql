@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION NODE: 1320
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_node() RETURNS trigger AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node() RETURNS trigger AS 
 $BODY$
 DECLARE 
     inp_table varchar;
@@ -198,7 +198,7 @@ BEGIN
 		END IF;
 		
 	    -- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link'):.boolean=TRUE THEN
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
 	       NEW.link=NEW.node_id;
 	    END IF;
         

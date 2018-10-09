@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2218
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_flow_trace(node_id_arg character varying)  RETURNS smallint AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_flow_trace(node_id_arg character varying)  RETURNS smallint AS $BODY$
  
 BEGIN
 

@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1202
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_arc() RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_arc() RETURNS trigger AS
 $BODY$
 DECLARE 
     inp_table varchar;

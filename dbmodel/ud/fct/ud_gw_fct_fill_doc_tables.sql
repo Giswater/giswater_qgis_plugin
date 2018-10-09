@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_fill_doc_tables()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_fill_doc_tables()
   RETURNS void AS
 $BODY$DECLARE
 

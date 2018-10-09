@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2212
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_anl_node_topological_consistency();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_topological_consistency() RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_topological_consistency();
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_topological_consistency() RETURNS integer AS $BODY$
 DECLARE
     rec_node record;
     rec record;
