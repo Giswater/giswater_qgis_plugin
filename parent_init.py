@@ -146,7 +146,7 @@ class ParentDialog(QDialog):
                 utils_giswater.setWidgetText(self.dialog, 'dma_id', values['dma_id']['name'])
        
        
-    def load_default(self, dialog):
+    def load_default(self, dialog, feature_type=None):
         """ Load default user values from table 'config_param_user' """
         
         # Builddate
@@ -179,7 +179,14 @@ class ParentDialog(QDialog):
         self.set_vdefault(dialog, 'verified_vdefault', 'verified')
         self.set_vdefault(dialog, 'workcat_vdefault', 'workcat_id')
         self.set_vdefault(dialog, 'soilcat_vdefault', 'soilcat_id')
-
+        if feature_type:
+            # Feature type
+            sql = ("SELECT id FROM " + self.schema_name + "."+str(feature_type)+"_type WHERE id::text ="
+                   " (SELECT value FROM " + self.schema_name + ".config_param_user"
+                   " WHERE cur_user = current_user AND  parameter = '" + str(feature_type) + "type_vdefault')::text")
+            row = self.controller.get_row(sql)
+            if row:
+                utils_giswater.setWidgetText(dialog, feature_type + "_type", row[0])
 
     def set_vdefault(self, dialog, parameter, widget):
         """ Set default values from default values when insert new feature """

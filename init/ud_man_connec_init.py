@@ -105,7 +105,7 @@ class ManConnecDialog(ParentDialog):
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'connec_id')
         if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
-            self.load_default(self.dialog)
+            self.load_default(self.dialog, "connec")
             self.load_type_default(self.dialog, "connecat_id", "connecat_vdefault")
 
         self.load_state_type(self.dialog, state_type, self.geom_type)

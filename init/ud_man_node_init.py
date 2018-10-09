@@ -175,7 +175,7 @@ class ManNodeDialog(ParentDialog):
         # Load default settings
         widget_id = self.dialog.findChild(QLineEdit, 'node_id')
         if utils_giswater.getWidgetText(self.dialog, widget_id).lower() == 'null':
-            self.load_default(self.dialog)
+            self.load_default(self.dialog, "node")
             self.load_type_default(self.dialog, "nodecat_id", "nodecat_vdefault")
 
         self.load_state_type(self.dialog, state_type, self.geom_type)
