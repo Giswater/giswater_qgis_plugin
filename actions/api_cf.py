@@ -15,6 +15,7 @@ import webbrowser
 
 from functools import partial
 
+from PyQt4.QtGui import QSplitter
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 from PyQt4.QtCore import Qt, QDate, SIGNAL, SLOT
@@ -138,6 +139,23 @@ class ApiCF(ApiParent):
         action_help = self.dlg_cf.findChild(QAction, "actionHelp")
         action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
+        actions_list = self.dlg_cf.findChildren(QAction)
+
+        for action in actions_list:
+            action.setEnabled(False)
+
+
+        # TODO action_edit.setVisible(lo que venga del json segun permisos)
+        action_edit.setVisible(True)
+
+
+        action_zoom_in.setEnabled(True)
+        action_zoom_out.setEnabled(True)
+        action_centered.setEnabled(True)
+        action_link.setEnabled(True)
+        action_help.setEnabled(True)
+        # TODO action_edit.setEnabled(lo que venga del json segun permisos)
+        action_edit.setEnabled(True)
 
         # Set actions icon
         self.set_icon(action_edit, "101")
@@ -154,6 +172,7 @@ class ApiCF(ApiParent):
         # self.set_icon(action_switch_arc_id, "141")
 
         # Layouts
+
         top_layout = self.dlg_cf.findChild(QGridLayout, 'top_layout')
         tab1_layout1 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout1')
         tab1_layout2 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout2')
@@ -244,7 +263,9 @@ class ApiCF(ApiParent):
         tab1_layout1.addItem(verticalSpacer1)
         verticalSpacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         tab1_layout2.addItem(verticalSpacer2)
-
+        # splitter = QSplitter(Qt.Horizontal)
+        # splitter.addWidget(tab1_layout1)
+        # splitter.addWidget(tab1_layout2)
         # Find combo parents:
         for field in result["fields"]:
             if field['dv_isparent']:
@@ -268,18 +289,18 @@ class ApiCF(ApiParent):
                 self.enable_all(result)
             else:
                 self.disable_all(result, False)
+        #action_edit.setVisible(False)
+        if action_edit.isVisible():
+            # SIGNALS
+            self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
+            self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
+            self.layer.editingStarted.connect(partial(self.enable_all, result))
+            self.layer.editingStopped.connect(partial(self.disable_all, result, False))
+            # Actions
+            self.enable_actions(self.dlg_cf, self.layer.isEditable())
+            self.layer.editingStarted.connect(partial(self.enable_actions, self.dlg_cf, True))
+            self.layer.editingStopped.connect(partial(self.enable_actions, self.dlg_cf, False))
 
-
-        # SIGNALS
-        self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
-        self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
-        self.layer.editingStarted.connect(partial(self.enable_all, result))
-        self.layer.editingStopped.connect(partial(self.disable_all, result, False))
-
-        # Actions
-        self.enable_actions(self.dlg_cf, self.layer.isEditable())
-        self.layer.editingStarted.connect(partial(self.enable_actions, self.dlg_cf, True))
-        self.layer.editingStopped.connect(partial(self.enable_actions, self.dlg_cf, False))
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(self.start_editing)
         action_catalog.triggered.connect(partial(self.open_catalog, self.dlg_cf, result))
@@ -394,6 +415,7 @@ class ApiCF(ApiParent):
 
     def enable_actions(self, dialog, enabled):
         """ Enable actions according if layer is editable or not"""
+        # if dialog.actionEdit.isVisible():
         dialog.actionCopyPaste.setEnabled(enabled)
         dialog.actionRotation.setEnabled(enabled)
         dialog.actionCatalog.setEnabled(enabled)
