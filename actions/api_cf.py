@@ -394,7 +394,8 @@ class ApiCF(ApiParent):
 
     def get_values(self, dialog, widget, _json=None):
         value = None
-        if type(widget) is QLineEdit and not widget.isReadOnly():
+
+        if type(widget) is QLineEdit and widget.isReadOnly() is False:
             value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox and widget.isEnabled():
             value = utils_giswater.get_item_data(dialog, widget, 0)
@@ -406,7 +407,7 @@ class ApiCF(ApiParent):
         # Only get values if layer is editable
         if self.layer.isEditable():
             # If widget.isEditable(False) return None, here control it.
-            if str(value) == '':
+            if str(value) == '' or value is None:
                 _json[str(widget.objectName())] = None
             else:
                 _json[str(widget.objectName())] = str(value)
