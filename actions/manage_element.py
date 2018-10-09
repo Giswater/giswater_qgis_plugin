@@ -277,6 +277,7 @@ class ManageElement(ParentManage):
                 sql_values += ", null"
             if str(self.x) != "":
                 sql_values += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
+                self.x = ""
             else:
                 sql_values += ", null"
 
