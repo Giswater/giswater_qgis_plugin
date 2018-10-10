@@ -38,7 +38,6 @@ from map_tools.move_node import MoveNodeMapTool
 from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
-from search.search_plus import SearchPlus
 from ui_manager import AuditCheckProjectResult
 
 
@@ -149,12 +148,6 @@ class Giswater(QObject):
             elif int(index_action) == 37:
                 callback_function = getattr(self.api_cf, function_name)
                 action.triggered.connect(callback_function)
-            elif int(index_action) == 332:
-                callback_function = getattr(self.api_search, function_name)
-                action.triggered.connect(callback_function)
-            elif int(index_action) == 100:
-                callback_function = getattr(self.search_plus_api, function_name)
-                action.triggered.connect(callback_function)
             # Generic function
             else:        
                 callback_function = getattr(self, 'action_triggered')  
@@ -241,8 +234,8 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99, 100, 332):
+        if int(index_action) in (19, 23, 25, 26, 27, 29, 32, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
+                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -293,9 +286,9 @@ class Giswater(QObject):
                         
         toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
-            list_actions = ['37', '41', '48', '86', '32', '332']
+            list_actions = ['37', '41', '48', '86', '32']
         if self.controller.get_project_type() == 'ud':
-            list_actions = ['37', '41', '48', '32', '332']
+            list_actions = ['37', '41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)
 
         toolbar_id = "om_ws"
@@ -583,9 +576,6 @@ class Giswater(QObject):
         # Set objects for map tools classes
         self.manage_map_tools()
 
-        # Set SearchPlus object
-        self.set_search_plus()
-         
         # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
         self.manage_custom_forms()
         
@@ -926,23 +916,6 @@ class Giswater(QObject):
                 map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud, self.layer_gully_man_ud)
                 map_tool.set_controller(self.controller)
 
-       
-    def set_search_plus(self):
-        """ Set SearchPlus object """
-
-        try:         
-            self.search_plus = SearchPlus(self.iface, self.srid, self.controller, self.settings, self.plugin_dir)
-            self.basic.search_plus = self.search_plus
-            status = self.search_plus.init_config()
-            self.actions['32'].setVisible(status) 
-            self.actions['32'].setEnabled(status) 
-            self.actions['32'].setCheckable(False)
-            self.search_plus.feature_cat = self.feature_cat
-        except KeyError as e:
-            self.controller.show_warning("Error setting searchplus button: " + str(e))                   
-        except RuntimeError as e:
-            self.controller.show_warning("Error setting searchplus button: " + str(e))     
-               
         
     def manage_actions_linux(self):
         """ Disable for Linux 'go2epa' actions """
