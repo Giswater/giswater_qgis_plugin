@@ -114,8 +114,14 @@ class Giswater(QObject):
             action = self.actions[index_action]                
 
             # Basic toolbar actions
-            if int(index_action) in (41, 48, 86, 32):
+            if int(index_action) in (32, 41, 48, 86):
                 callback_function = getattr(self.basic, function_name)  
+                action.triggered.connect(callback_function)
+            # elif int(index_action) == 32:
+            #     callback_function = getattr(self.api_search, function_name)
+            #     action.triggered.connect(callback_function)
+            elif int(index_action) == 37:
+                callback_function = getattr(self.api_cf, function_name)
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
             elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
@@ -145,9 +151,7 @@ class Giswater(QObject):
             elif int(index_action) == 36:
                 callback_function = getattr(self.info, function_name)
                 action.triggered.connect(callback_function)
-            elif int(index_action) == 37:
-                callback_function = getattr(self.api_cf, function_name)
-                action.triggered.connect(callback_function)
+
             # Generic function
             else:        
                 callback_function = getattr(self, 'action_triggered')  
