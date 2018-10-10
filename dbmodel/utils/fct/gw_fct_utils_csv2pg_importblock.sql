@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_csv2pg_importdxfbloc(
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_csv2pg_importdxfblock(
     csv2pgcat_id_aux integer)
   RETURNS integer AS
 $BODY$
