@@ -404,6 +404,39 @@ class ApiParent(ParentAction):
             widget.hideColumn(column)
 
 
+    def set_table_columns_for_query(self, dialog, widget, table_name):
+        widget = utils_giswater.getWidget(dialog, widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_show = ""
+        sql = ("SELECT column_index, width, column_id, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_sql=False)
+        if not rows:
+            return
+        for row in rows:
+            if row['status']:
+                if row['column_id'] is not None:
+                    columns_to_show += str(row['column_id'])
+                    if row['alias'] is not None:
+                        columns_to_show += " AS " + str(row['alias'])
+                    columns_to_show += ", "
+                    width = row['width']
+                    if width is None:
+                        width = 100
+                    widget.setColumnWidth(row['column_index'] - 1, width)
+
+        if len(columns_to_show) > 1:
+            columns_to_show = columns_to_show[:-2]
+        else:
+            columns_to_show = "*"
+        return columns_to_show
+
+
     def add_lineedit(self, field):
         """ Add widgets QLineEdit type """
         widget = QLineEdit()
