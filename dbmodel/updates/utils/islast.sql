@@ -30,3 +30,12 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 			VALUES ('edit_automatic_insert_link', 'FALSE', 'Boolean', 'System', 'If true, link parameter will be the same as element id');
 
+
+INSERT INTO sys_csv2pg_cat VALUES (8, 'Import dxf blocks', 'Import dxf blocks', 'The CSV file must contain only one column and need to be generated as R12 ASCII file', 'role_edit');
+
+
+INSERT INTO audit_cat_function VALUES (2498, 'gw_trg_visit_event_update_xy', 'om', NULL, 'p_event_id', 'Enables the posibility to update the xcoord, ,ycoord columns using position_id and position_value.', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2500, 'gw_trg_edit_field_node', 'edit', NULL, 'p_node_id', 'To update data on field', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2502, 'gw_fct_utils_role_permisions', 'amin', NULL, '', 'To role permissionf of the schema', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2504, 'gw_fct_utils_csv2pg_importblock', 'edit', NULL, '', '', Enables the possibility to import dxf blocks, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2506, 'gw_fct_create_utils_trigger', 'edit', NULL, '', '', , NULL, NULL);
