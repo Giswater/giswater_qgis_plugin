@@ -117,7 +117,7 @@ INSERT INTO audit_cat_table VALUES ('man_storage', 'Additional info of GIS featu
 INSERT INTO audit_cat_table VALUES ('config', 'System', 'Table to define diferent configuration parameters related to the GIS USER interface.', 'role_edit', 3, '=1', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_error', 'System', 'Catalog of errors', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('audit_cat_function', 'System', 'Catalog of functions', 'role_admin', 2, '=9999', NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('audit_cat_table_x_column', 'System', 'Table with the information of columns of the project', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+--INSERT INTO audit_cat_table VALUES ('audit_cat_table_x_column', 'System', 'Table with the information of columns of the project', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('inp_arc_type', 'Hydraulic input data', 'Domain data with arc''s geometry', 'role_admin', 3, '=6', 'role_admin', 1, 'Custom forms values', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_element_x_arc', 'User interface view', 'Contains the elements related to arc. User Interface view.', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_om_visit_x_node', 'User interface view', 'Shows the visits related to node elements. User Interface view.', 'role_basic', 0, NULL, NULL, 0, NULL, NULL, NULL);

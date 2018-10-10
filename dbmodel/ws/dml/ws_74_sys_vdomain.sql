@@ -154,7 +154,7 @@ INSERT INTO audit_cat_table VALUES ('v_price_x_catconnec1', 'masterplan', 'View 
 INSERT INTO audit_cat_table VALUES ('v_price_x_catnode', 'masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_price_x_catpavement', 'masterplan', 'View for code', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_anl_mincut_result_node', 'Mincut', 'View with aggregated information of the results of mincut analysis (node)', 'role_om', 0, NULL, 'role_om', 2, 'Mincut button', NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('audit_cat_table_x_column', 'System', 'Table with the information of columns of the project', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
+--INSERT INTO audit_cat_table VALUES ('audit_cat_table_x_column', 'System', 'Table with the information of columns of the project', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_man_manhole', 'GIS feature', 'Shows editable information about manhole', 'role_basic', 0, NULL, 'role_basic', 2, 'Basic operation', NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('review_node', 'web review', 'Table for O&M to report about nodes', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('rtc_hydrometer_x_connec', 'Real time control', 'Contains the information to link connec with hydrometer', 'role_edit', 0, NULL, NULL, NULL, NULL, NULL, NULL);
