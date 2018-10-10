@@ -20,9 +20,6 @@ BEGIN
 -- DROP VIEWS
 	DROP VIEW IF EXISTS "v_audit_schema_column" CASCADE;
 	DROP VIEW IF EXISTS "v_audit_schema_table" CASCADE;
-	DROP VIEW IF EXISTS "v_audit_schema_catalog_column" CASCADE;
-	DROP VIEW IF EXISTS "v_audit_schema_catalog_compare_table" CASCADE;
-	DROP VIEW IF EXISTS "v_audit_schema_catalog_compare_column" CASCADE;
    	DROP VIEW IF EXISTS "v_audit_schema_foreign_table" CASCADE;
 	DROP VIEW IF EXISTS "v_audit_schema_foreign_column" CASCADE;
 	DROP VIEW IF EXISTS "v_audit_schema_foreign_column_aux" CASCADE;
@@ -50,57 +47,6 @@ BEGIN
 	table_name
 	FROM information_schema.columns
 	where table_schema='SCHEMA_NAME';
-
-
-	CREATE OR REPLACE VIEW v_audit_schema_catalog_column AS 
-	 SELECT (audit_cat_table.id || '_'::text) || audit_cat_table_x_column.column_id AS id, 
-		audit_cat_table.id AS table_name, 
-		audit_cat_table_x_column.column_id as column_name,
-		audit_cat_table_x_column.column_type, 
-		audit_cat_table_x_column.description
-	   FROM audit_cat_table_x_column
-	   JOIN audit_cat_table ON audit_cat_table_x_column.id = audit_cat_table.id;
-
-
-
--- COMPARE WITH CATALOG
-
-	CREATE OR REPLACE VIEW "v_audit_schema_catalog_compare_table" AS 
-	SELECT
-		table_name as schema_table_name,
-		audit_cat_table.id as catalog_table_name
-		FROM information_schema.columns
-		LEFT JOIN audit_cat_table ON audit_cat_table.id=table_name
-		WHERE columns.table_schema::text = 'SCHEMA_NAME'::text and audit_cat_table.id is null
-	UNION
-		SELECT
-		table_name as schema_table_name,
-		audit_cat_table.id as catalog_table_name
-		FROM information_schema.columns
-		RIGHT JOIN audit_cat_table ON audit_cat_table.id=table_name
-		WHERE columns.table_schema::text = 'SCHEMA_NAME'::text and columns.table_name is null
-		ORDER BY 1,2;
-
-
-	CREATE VIEW v_audit_schema_catalog_compare_column AS
-	SELECT
-		v_audit_schema_column.table_name as audit_table,
-		v_audit_schema_column.column_name as audit_column,
-		v_audit_schema_catalog_column.table_name as cat_table,
-		v_audit_schema_catalog_column.column_name cat_column
-		from v_audit_schema_column
-		left join v_audit_schema_catalog_column on v_audit_schema_catalog_column.id=v_audit_schema_column.id
-		where v_audit_schema_catalog_column.column_name is null
-	UNION
-		select
-		v_audit_schema_column.table_name as audit_table,
-		v_audit_schema_column.column_name as audit_column,
-		v_audit_schema_catalog_column.table_name as cat_table,
-		v_audit_schema_catalog_column.column_name cat_column
-		from v_audit_schema_column
-		right join v_audit_schema_catalog_column on v_audit_schema_catalog_column.id=v_audit_schema_column.id
-		where v_audit_schema_column.column_name is null
-		ORDER BY 1;
 
 
 

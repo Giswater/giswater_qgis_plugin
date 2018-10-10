@@ -31,7 +31,7 @@ BEGIN
 	-- Looking for project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	
-	v_dbnname =  SELECT current_database();
+	v_dbnname =  (SELECT current_database());
 	v_schema_array := current_schemas(FALSE);
 	v_schemaname :=v_schema_array[1];
 	

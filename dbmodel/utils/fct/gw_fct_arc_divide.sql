@@ -38,6 +38,8 @@ DECLARE
 	array_agg_connec varchar [];
 	array_agg_gully varchar [];
 	v_arcsearch_nodes float;
+    rec_node record;
+
 
 
 	

@@ -35,9 +35,6 @@ $BODY$
   COST 100;
 
 
-
-CREATE TRIGGER gw_trg_edit_field_valve
-  INSTEAD OF UPDATE
-  ON v_edit_field_valve
-  FOR EACH ROW
+DROP TRIGGER IF EXISTS gw_trg_edit_field_valve ON "SCHEMA_NAME".v_edit_field_valve;
+CREATE TRIGGER gw_trg_edit_field_valve  INSTEAD OF UPDATE  ON v_edit_field_valve  FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_field_node('field_valve');

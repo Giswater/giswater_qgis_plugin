@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -----------------------
--- anl_node
+-- 2018/10/05
 -----------------------
 
 ALTER TABLE anl_node ADD COLUMN arc_distance numeric(12,3);
