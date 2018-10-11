@@ -15,13 +15,16 @@ import webbrowser
 
 from functools import partial
 
-from PyQt4.QtGui import QSplitter
+from qgis.core import QgsFeatureRequest
+
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 from PyQt4.QtCore import Qt, QDate, SIGNAL, SLOT
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator, QToolButton
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
+from PyQt4.QtGui import QAbstractItemView, QTabWidget, QTableView
+from PyQt4.QtSql import QSqlTableModel
 
 import utils_giswater
 from actions.api_catalog import ApiCatalog
@@ -31,6 +34,8 @@ from giswater.actions.HyperLinkLabel import HyperLinkLabel
 
 from giswater.ui_manager import ApiCfUi
 from giswater.ui_manager import NewWorkcat
+
+from actions.manage_element import ManageElement
 
 
 class ApiCF(ApiParent):
@@ -62,16 +67,39 @@ class ApiCF(ApiParent):
             if not complet_result:
                 print("FAIL")
                 return
+            self.restore()
             self.draw(complet_result)
 
-        elif button_clicked == Qt.RightButton:
-            QApplication.restoreOverrideCursor()
-            # TODO buscar la QAction concreta y deschequearla
-            actions = self.iface.mainWindow().findChildren(QAction)
-            for a in actions:
-                a.setChecked(False)
-            self.emit_point.canvasClicked.disconnect()
+            #Set variables
+            self.field_id = str(self.geom_type) + "_id"
 
+            # Manage tab signal
+            self.tab_element_loaded = False
+            self.tab_relations_loaded = False
+            self.tab_conections_loaded = False
+            self.tab_hydrometer_loaded = False
+            self.tab_om_loaded = False
+            self.tab_document_loaded = False
+            self.tab_cost_loaded = False
+
+            self.filter = str(complet_result[0]['idName']) + " = '" + str(self.feature_id) + "'"
+            self.tab_main.currentChanged.connect(self.tab_activation)
+
+            # Manage tab 'Relations'
+            self.manage_tab_relations("v_ui_"+str(self.geom_type)+"_x_relations", str(self.field_id))
+            # TODO
+            # Manage 'image'
+            #self.set_image(self.dlg_cf, "label_image_ws_shape")
+        elif button_clicked == Qt.RightButton:
+            self.restore()
+
+    def restore(self):
+        QApplication.restoreOverrideCursor()
+        # TODO buscar la QAction concreta y deschequearla
+        actions = self.iface.mainWindow().findChildren(QAction)
+        for a in actions:
+            a.setChecked(False)
+        self.emit_point.canvasClicked.disconnect()
 
     def open_form(self, point=None, table_name=None, feature_type=None, feature_id=None):
         """
@@ -126,6 +154,17 @@ class ApiCF(ApiParent):
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
                                     self.dlg_cf.height())
 
+
+        # Get widget controls
+        self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
+        self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
+        self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
+        # self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
+        # self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
+        self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
+
+
+
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
         action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
@@ -171,8 +210,14 @@ class ApiCF(ApiParent):
         self.set_icon(action_interpolate, "194")
         # self.set_icon(action_switch_arc_id, "141")
 
-        # Layouts
+        # Set buttons icon
+        self.set_icon(self.dlg_cf.btn_insert, "111b")
+        self.set_icon(self.dlg_cf.btn_delete, "112b")
+        self.set_icon(self.dlg_cf.new_element, "131b")
+        self.set_icon(self.dlg_cf.open_element, "134b")
 
+
+        # Layouts
         top_layout = self.dlg_cf.findChild(QGridLayout, 'top_layout')
         tab1_layout1 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout1')
         tab1_layout2 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout2')
@@ -189,21 +234,21 @@ class ApiCF(ApiParent):
 
         # Get tableParent and select layer
         table_parent = str(row[0]['tableParent'])
+
         self.layer = self.controller.get_layer_by_tablename(table_parent)
 
         if self.layer:
             self.iface.setActiveLayer(self.layer)
 
-        # Get selected feature
-        self.feature = self.get_feature_by_id(self.layer)
 
-        # TODO: Xavi Is correct get fornName as geom_type?
+
+        # TODO: Xavi Is correct get fornName as geom_type? (node, arc, connec, gully)
         self.geom_type = str(row[0]['formTabs']['formName'])
         self.controller.log_info(str(self.geom_type).lower())
         self.geom_type = self.geom_type.lower()
 
         # Get field id name
-        field_id = str(row[0]['idName'])
+        self.field_id = str(row[0]['idName'])
         self.feature_id = None
 
         for field in result["fields"]:
@@ -220,8 +265,10 @@ class ApiCF(ApiParent):
                 widget = self.set_auto_update_lineedit(field, self.dlg_cf, widget)
                 widget = self.set_data_type(field, widget)
                 widget = self.set_widget_type(field, self.dlg_cf, widget, completer)
-                if widget.objectName() == field_id:
+                if widget.objectName() == self.field_id:
                     self.feature_id = widget.text()
+                    # Get selected feature
+                    self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
             elif field['widgettype'] == 2:
                 widget = self.add_combobox(self.dlg_cf, field)
                 widget = self.set_auto_update_combobox(field, self.dlg_cf, widget)
@@ -281,9 +328,6 @@ class ApiCF(ApiParent):
                 if action is not None:
                     action.setVisible(True)
 
-        # Get selected feature
-        self.feature = self.get_feature_by_id(self.layer)
-
         if self.layer:
             if self.layer.isEditable():
                 self.enable_all(result)
@@ -336,7 +380,7 @@ class ApiCF(ApiParent):
 
         my_json = json.dumps(_json)
         p_table_id = complet_result['tableName']
-        print (my_json)
+
         sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertfields('"+str(p_table_id)+"', '"+str(feature_id)+""
                "',null, 9, 100, '"+str(my_json)+"')")
         row = self.controller.execute_returning(sql, log_sql=True)
@@ -640,7 +684,282 @@ class ApiCF(ApiParent):
         list_items = []
         for _id in result:
             list_items.append(_id['id'])
-        self.set_completer_object(completer, model, widget, list_items)
+        self.set_completer_object_api(completer, model, widget, list_items)
+
+    """ MANAGE TABS """
+    def tab_activation(self):
+        """ Call functions depend on tab selection """
+
+        # Get index of selected tab
+        index_tab = self.tab_main.currentIndex()
+        # Tab 'Element'
+        if self.tab_main.widget(index_tab).objectName() == 'elements' and not self.tab_element_loaded:
+            self.fill_tab_element()
+            self.tab_element_loaded = True
+
+        # Tab 'Relations'
+        elif self.tab_main.widget(index_tab).objectName() == 'relations' and not self.tab_relations_loaded:
+            self.fill_tab_relations()
+            self.tab_relations_loaded = True
+
+        # Tab 'O&M'
+        elif self.tab_main.widget(index_tab).objectName() == 'om' and not self.tab_om_loaded:
+            self.fill_tab_om()
+            self.tab_om_loaded = True
+        # Tab 'Document'
+        elif self.tab_main.widget(index_tab).objectName() == 'document' and not self.tab_document_loaded:
+            self.fill_tab_document()
+            self.tab_document_loaded = True
+        #     # Tab 'Scada'
+        # elif index_tab == (6 - self.tabs_removed - self.tab_scada_removed) and not self.tab_scada_loaded:
+        #     self.fill_tab_scada()
+        #     self.tab_scada_loaded = True
+
+        # Tab 'Cost'
+        elif (self.tab_main.widget(index_tab).objectName() == 'node_cost' or
+              self.tab_main.widget(index_tab).objectName() == 'arc_cost') and not self.tab_om_loaded:
+            self.fill_tab_cost()
+            self.tab_cost_loaded = True
+
+
+    """ FUNCTIONS RELATED TAB ELEMENT"""
+    def fill_tab_element(self):
+        """ Fill tab 'Element' """
+
+        table_element = "v_ui_element_x_" + self.geom_type
+        self.fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
+        self.set_configuration(self.tbl_element, table_element)
+
+    def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
+        """ Fill the table control to show elements """
+
+        # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.element_id = self.dlg_cf.findChild(QLineEdit, "element_id")
+        open_element = self.dlg_cf.findChild(QPushButton, "open_element")
+        btn_delete = self.dlg_cf.findChild(QPushButton, "btn_delete")
+        btn_insert = self.dlg_cf.findChild(QPushButton, "btn_insert")
+        new_element = self.dlg_cf.findChild(QPushButton, "new_element")
+
+        # Set signals
+        self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, dialog, widget))
+        open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
+        btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))
+        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
+        new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
+
+        # Set model of selected widget
+        table_name = self.schema_name + "." + table_name
+        self.set_model_to_table(widget, table_name, expr_filter)
+
+        # Adding auto-completion to a QLineEdit
+        self.table_object = "element"
+        self.set_completer_object(dialog, self.table_object)
+
+    def open_selected_element(self, dialog, widget):
+        """ Open form of selected element of the @widget?? """
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            element_id = widget.model().record(row).value("element_id")
+            break
+
+        # Open selected element
+
+        self.manage_element(dialog, element_id)
+
+    def add_object(self, widget, table_object, view_object):
+        """ Add object (doc or element) to selected feature """
+
+        # Get values from dialog
+        object_id = utils_giswater.getWidgetText(self.dlg_cf, table_object + "_id")
+        if object_id == 'null':
+            message = "You need to insert data"
+            self.controller.show_warning(message, parameter=table_object + "_id")
+            return
+
+        # Check if this object exists
+        field_object_id = "id"
+        sql = ("SELECT * FROM " + self.schema_name + "." + view_object + ""
+               " WHERE " + field_object_id + " = '" + object_id + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            self.controller.show_warning("Object id not found", parameter=object_id)
+            return
+
+        # Check if this object is already associated to current feature
+        field_object_id = table_object + "_id"
+        tablename = table_object + "_x_" + self.geom_type
+        sql = ("SELECT *"
+               " FROM " + self.schema_name + "." + str(tablename) + ""
+               " WHERE " + str(self.field_id) + " = '" + str(self.feature_id) + "'"
+               " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
+        row = self.controller.get_row(sql, log_info=False, log_sql=True)
+
+        # If object already exist show warning message
+        if row:
+            message = "Object already associated with this feature"
+            self.controller.show_warning(message)
+
+        # If object not exist perform an INSERT
+        else:
+            sql = ("INSERT INTO " + self.schema_name + "." + tablename + ""
+                   "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
+                   " VALUES ('" + str(object_id) + "', '" + str(self.feature_id) + "');")
+            self.controller.execute_sql(sql, log_sql=True)
+            widget.model().select()
+
+    def delete_records(self, widget, table_name):
+        """ Delete selected objects (elements or documents) of the @widget """
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        inf_text = ""
+        list_object_id = ""
+        row_index = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            object_id = widget.model().record(row).value("doc_id")
+            id_ = widget.model().record(row).value("id")
+            if object_id is None:
+                object_id = widget.model().record(row).value("element_id")
+            inf_text += str(object_id) + ", "
+            list_id += str(id_) + ", "
+            list_object_id = list_object_id + str(object_id) + ", "
+            row_index += str(row + 1) + ", "
+
+        row_index = row_index[:-2]
+        inf_text = inf_text[:-2]
+        list_object_id = list_object_id[:-2]
+        list_id = list_id[:-2]
+
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", list_object_id)
+        if answer:
+            sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
+                   " WHERE id::integer IN (" + list_id + ")")
+            self.controller.execute_sql(sql)
+            widget.model().select()
+
+
+    def manage_element(self, dialog, element_id=None, feature=None):
+        """ Execute action of button 33 """
+        elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)
+        elem.manage_element(True, feature, self.geom_type)
+        elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
+        elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
+
+        # Set completer
+        self.set_completer_object(dialog, self.table_object)
+
+        if element_id:
+            utils_giswater.setWidgetText(elem.dlg_add_element, "element_id", element_id)
+
+        # Open dialog
+        elem.open_dialog(elem.dlg_add_element)
+
+
+    def manage_element_new(self, dialog, elem):
+        """ Get inserted element_id and add it to current feature """
+        if elem.element_id is None:
+            return
+
+        utils_giswater.setWidgetText(dialog, "element_id", elem.element_id)
+        self.add_object(self.tbl_element, "element", "v_ui_element")
+
+        self.tbl_element.model().select()
+
+    def set_model_to_table(self, widget, table_name, expr_filter):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        if widget:
+            widget.setModel(model)
+        else:
+            self.controller.log_info("set_model_to_table: widget not found")
+
+    """ FUNCTIONS RELATED TAB RELATIONS"""
+    def manage_tab_relations(self, viewname, field_id):
+        """ Hide tab 'relations' if no data in the view """
+
+        # Check if data in the view
+        sql = ("SELECT * FROM " + self.schema_name + "." + viewname + ""
+               " WHERE " + str(field_id) + " = '" + str(self.feature_id) + "';")
+        row = self.controller.get_row(sql, log_info=True, log_sql=True)
+
+        if not row:
+            # Hide tab 'relations'
+            utils_giswater.remove_tab_by_tabName(self.tab_main, "relations")
+
+        else:
+            # Manage signal 'doubleClicked'
+            self.tbl_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))
+
+
+    def open_relation(self, field_id):
+        """ Open feature form of selected element """
+
+        selected_list = self.tbl_relations.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        field_object_id = "parent_id"
+        if field_id == "arc_id":
+            field_object_id = "feature_id"
+        selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)
+        sys_type = self.tbl_relations.model().record(row).value("sys_type")
+        tablename = "v_edit_man_" + sys_type.lower()
+        layer = self.controller.get_layer_by_tablename(tablename, log_info=True, log_sql=True)
+        if not layer:
+            return
+
+        # Get field_id from model 'sys_feature_cat'
+        if tablename not in self.feature_cat.keys():
+            return
+
+        field_id = self.feature_cat[tablename].type.lower() + "_id"
+        expr_filter = "\"" + field_id + "\" = "
+        expr_filter += "'" + str(selected_object_id) + "'"
+        (is_valid, expr) = self.check_expression(expr_filter)
+        if not is_valid:
+            return
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        features = [i for i in it]
+        if features != []:
+            self.iface.openFeatureForm(layer, features[0])
+    """ **************************** """
 
 
     """ NEW WORKCAT"""
@@ -784,6 +1103,47 @@ class ApiCF(ApiParent):
             print("FAIL")
             return
         self.draw(complet_result)
+
+
+    """ OTHER FUNCTIONS """
+    def set_configuration(self, widget, table_name):
+        """ Configuration of tables. Set visibility and width of columns """
+
+        widget = utils_giswater.getWidget(self.dlg_cf, widget)
+        if not widget:
+            return
+
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False)
+        if not rows:
+            return
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        widget.model().setSort(0, Qt.AscendingOrder)
+        widget.model().select()
+
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
+
+    def set_image(self, dialog, widget):
+        utils_giswater.setImage(dialog, widget, "ws_shape.png")
+
 
     # def disconnect_snapping(self, refresh_canvas=True):
     #     """ Select 'refreshAllLayers' as current map tool and disconnect snapping """

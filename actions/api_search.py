@@ -274,7 +274,7 @@ class ApiSearch(ApiParent):
             display_list = []
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
-            self.set_completer_object(completer, model, widget, display_list)
+            self.set_completer_object_api(completer, model, widget, display_list)
 
         if len(line_list) == 2:
             _json = {}
@@ -296,7 +296,7 @@ class ApiSearch(ApiParent):
                     display_list = []
                     for data in self.result_data['data']:
                         display_list.append(data['display_name'])
-                    self.set_completer_object(completer, model, line_edit_add, display_list)
+                    self.set_completer_object_api(completer, model, line_edit_add, display_list)
 
 
     def clear_line_edit_add(self, line_list):
@@ -344,8 +344,6 @@ class ApiSearch(ApiParent):
         if 'fields' not in result:
             return
         form_type = str(row[0]['formTabs']['form_type'])
-        print(form_type)
-
 
         self.hydro_info_dlg = HydroInfo()
         self.load_settings(self.hydro_info_dlg)

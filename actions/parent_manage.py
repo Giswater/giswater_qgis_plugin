@@ -753,8 +753,7 @@ class ParentManage(ParentAction, object):
 
     def selection_init(self, dialog, table_object, query=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
-        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type], 
+        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
                                              parent_manage=self, table_object=table_object, dialog=dialog)
         self.previous_map_tool = self.canvas.mapTool()        
         self.canvas.setMapTool(multiple_selection)              

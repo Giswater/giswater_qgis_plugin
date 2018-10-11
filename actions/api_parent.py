@@ -12,7 +12,7 @@ from functools import partial
 
 from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer
 from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox
-
+from PyQt4.QtGui import QCompleter, QStringListModel
 from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QGis
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
@@ -28,7 +28,7 @@ class ApiParent(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
-
+        self.tabs_removed = 0
         if QGis.QGIS_VERSION_INT >= 10900:
             self.rubber_point = QgsRubberBand(self.canvas, QGis.Point)
             self.rubber_point.setColor(Qt.yellow)
@@ -71,7 +71,7 @@ class ApiParent(ParentAction):
         return editable_layer
 
 
-    def set_completer_object(self, completer, model, widget, list_items):
+    def set_completer_object_api(self, completer, model, widget, list_items):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object.
             WARNING: Each QlineEdit needs their own QCompleter and their own QStringListModel!!!
@@ -84,6 +84,37 @@ class ApiParent(ParentAction):
         completer.setCompletionMode(1)
         model.setStringList(list_items)
         completer.setModel(model)
+
+    def set_completer_object(self, dialog, table_object):
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object
+        """
+
+        widget = utils_giswater.getWidget(dialog, table_object + "_id")
+        if not widget:
+            return
+
+        # Set SQL
+        field_object_id = "id"
+        if table_object == "element":
+            field_object_id = table_object + "_id"
+        sql = ("SELECT DISTINCT(" + field_object_id + ")"
+               " FROM " + self.schema_name + "." + table_object)
+
+        rows = self.controller.get_rows(sql, log_sql=True)
+
+        for i in range(0, len(rows)):
+            aux = rows[i]
+            rows[i] = str(aux[0])
+
+        # Set completer and model: add autocomplete in the widget
+        self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        widget.setCompleter(self.completer)
+        model = QStringListModel()
+        model.setStringList(rows)
+        self.completer.setModel(model)
+
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
@@ -128,12 +159,12 @@ class ApiParent(ParentAction):
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
 
 
-    def get_feature_by_id(self, layer):
-        feature = None
-        selected_features = layer.selectedFeatures()
-        for f in selected_features:
-            feature = f
-            return feature
+    def get_feature_by_id(self, layer, id, field_id):
+        iter = layer.getFeatures()
+        for feature in iter:
+            if feature[field_id] == id:
+                return feature
+        return False
 
 
     def check_actions(self, action, enabled):
@@ -489,7 +520,6 @@ class ApiParent(ParentAction):
             x, y = polygon[i].split(' ')
             point = QgsPoint(float(x), float(y))
             points.append(point)
-            print(i, x, y)
         return points
 
 
