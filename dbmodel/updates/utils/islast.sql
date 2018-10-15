@@ -39,3 +39,7 @@ INSERT INTO audit_cat_function VALUES (2500, 'gw_trg_edit_field_node', 'edit', N
 INSERT INTO audit_cat_function VALUES (2502, 'gw_fct_utils_role_permisions', 'amin', NULL, '', 'To role permissionf of the schema', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2504, 'gw_fct_utils_csv2pg_importblock', 'edit', NULL, '', '', 'Enables the possibility to import dxf blocks', NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2506, 'gw_fct_create_utils_trigger', 'edit', NULL, '', '', NULL, NULL, NULL);
+
+
+--2018/10/15
+INSERT INTO audit_cat_table VALUES ('v_plan_aux_arc_pavement', 'Auxiliar layer', 'Layer to relate pavements againts arc', 'role_master', 0, NULL, 'role_master', 0, NULL, NULL, NULL);

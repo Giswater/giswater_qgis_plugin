@@ -144,6 +144,24 @@ JOIN v_price_compost ON v_price_compost.id::text = cat_node.cost::text;
 
 
 
+DROP VIEW IF EXISTS "v_plan_aux_arc_pavement" CASCADE;
+CREATE VIEW "v_plan_aux_arc_pavement" AS 
+SELECT
+arc_id, 
+CASE
+   WHEN sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2)
+   ELSE sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent)::numeric(12,2)
+END AS thickness,
+   CASE
+   WHEN sum(v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2)
+   ELSE sum(v_price_x_catpavement.m2pav_cost::numeric(12,2) * plan_arc_x_pavement.percent)
+END AS m2pav_cost
+FROM plan_arc_x_pavement
+	LEFT JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id) = (plan_arc_x_pavement.pavcat_id))))
+        GROUP by arc_id;
+
+
+
 -- ----------------------------
 -- View structure for v_plan_aux_arc_ml
 -- ----------------------------
@@ -173,10 +191,8 @@ v_price_x_catsoil.trenchlining,
 (v_price_x_catsoil.m3fill_cost)::numeric(12,2) AS m3fill_cost,
 (v_price_x_catsoil.m3excess_cost)::numeric(12,2)AS m3excess_cost,
 (v_price_x_catsoil.m2trenchl_cost)::numeric(12,2) AS m2trenchl_cost,
-(CASE WHEN sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2) ELSE
-sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) END) AS thickness,
-(CASE WHEN sum (v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2) ELSE
-sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) END) AS m2pav_cost,
+ thickness,
+ m2pav_cost,
 v_edit_arc.state,
 v_edit_arc.the_geom,
 v_edit_arc.expl_id
@@ -184,12 +200,7 @@ FROM v_edit_arc
 	LEFT JOIN v_price_x_catarc ON ((((v_edit_arc.arccat_id) = (v_price_x_catarc.id))))
 	LEFT JOIN v_price_x_catsoil ON ((((v_edit_arc.soilcat_id) = (v_price_x_catsoil.id))))
 	LEFT JOIN plan_arc_x_pavement ON ((((plan_arc_x_pavement.arc_id) = (v_edit_arc.arc_id))))
-	LEFT JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id) = (plan_arc_x_pavement.pavcat_id))))
-	GROUP BY v_edit_arc.arc_id, v_edit_arc.y1, v_edit_arc.y2, mean_y,v_edit_arc.arccat_id, 
-	v_price_x_catarc.geom1,v_price_x_catarc.z1,v_price_x_catarc.z2,v_price_x_catarc.area,
-	v_price_x_catarc.width,v_price_x_catarc.bulk, cost_unit, arc_cost, m2bottom_cost, 
-	m3protec_cost, v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, 
-	m3excess_cost, m2trenchl_cost,v_edit_arc.state, v_edit_arc.the_geom, v_edit_arc.expl_id;
+	LEFT JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id) = (plan_arc_x_pavement.pavcat_id))));
 	
 
 -- ----------------------------
