@@ -79,7 +79,7 @@ BEGIN
 	-- role permissions for api
 	IF v_apiservice THEN
 	
-	    v_apipublishuser = (SELECT value::boolean FROM config_param_system WHERE parameter='api_publish_user');
+	    v_apipublishuser = (SELECT value FROM config_param_system WHERE parameter='api_publish_user');
 	
 		-- Grant generic permissions
 		v_query_text:= 'GRANT ALL ON DATABASE '||v_dbnname||' TO '||v_apipublishuser;
