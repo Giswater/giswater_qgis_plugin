@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_csv2pg_importdxfblock(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_importdxfblock(
     csv2pgcat_id_aux integer)
   RETURNS integer AS
 $BODY$
@@ -26,7 +26,7 @@ v_percent integer;
 BEGIN
 
 --  Search path
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	
 	SELECT count(*)  INTO v_total FROM temp_csv2pg WHERE user_name=current_user;
@@ -106,8 +106,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_fct_utils_csv2pg(integer, text)
-  OWNER TO postgres;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_utils_csv2pg(integer, text) TO public;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_utils_csv2pg(integer, text) TO postgres;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_utils_csv2pg(integer, text) TO role_basic;

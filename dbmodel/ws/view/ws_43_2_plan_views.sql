@@ -138,8 +138,7 @@ SELECT
 v_arc.arc_id,
 v_arc.depth1,
 v_arc.depth2,
-(CASE WHEN (v_arc.depth1*v_arc.depth2) =0::numeric OR (v_arc.depth1*v_arc.depth2) IS NULL THEN v_price_x_catarc.estimated_depth::numeric(12,2) 
- ELSE ((v_arc.depth1+v_arc.depth2)/2)::numeric(12,2) END) AS mean_depth,
+(CASE WHEN (v_arc.depth1*v_arc.depth2) =0::numeric OR (v_arc.depth1*v_arc.depth2) IS NULL THEN v_price_x_catarc.estimated_depth::numeric(12,2) ELSE ((v_arc.depth1+v_arc.depth2)/2)::numeric(12,2) END) AS mean_depth,
 v_arc.arccat_id,
 (v_price_x_catarc.dint/1000)::numeric(12,4) AS dint,
 v_price_x_catarc.z1,
@@ -159,8 +158,10 @@ v_price_x_catsoil.trenchlining,
 (v_price_x_catsoil.m3fill_cost)::numeric(12,2) AS m3fill_cost,
 (v_price_x_catsoil.m3excess_cost)::numeric(12,2) AS m3excess_cost,
 (v_price_x_catsoil.m2trenchl_cost)::numeric(12,2) AS m2trenchl_cost,
-quote_nullable(sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent))::numeric(12,3) AS thickness,
-quote_nullable(sum (v_price_x_catpavement.m2pav_cost))::numeric(12,2) AS m2pav_cost,
+(CASE WHEN sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2) ELSE
+sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) END) AS thickness,
+(CASE WHEN sum (v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2) ELSE
+sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) END) AS m2pav_cost,
 v_arc.state,
 v_arc.the_geom,
 v_arc.expl_id
@@ -243,7 +244,7 @@ SELECT
 v_plan_aux_arc_cost.arc_id,
 node_1,
 node_2,
-cat_arctype_id as arc_type,
+v_plan_aux_arc_cost.arccat_id as arc_type,
 v_plan_aux_arc_cost.arccat_id,
 epa_type,
 sector_id,
@@ -335,12 +336,9 @@ CASE
 
 v_plan_aux_arc_cost.the_geom,
 v_plan_aux_arc_cost.expl_id
-FROM selector_expl, v_plan_aux_arc_cost
-	JOIN v_edit_arc ON v_edit_arc.arc_id=v_plan_aux_arc_cost.arc_id
-    LEFT JOIN v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id = v_plan_aux_arc_cost.arc_id
-	WHERE v_plan_aux_arc_cost.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"() ;
-
+FROM v_plan_aux_arc_cost
+	JOIN arc ON arc.arc_id=v_plan_aux_arc_cost.arc_id
+    LEFT JOIN v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id = v_plan_aux_arc_cost.arc_id;
 
 	
 

@@ -173,8 +173,10 @@ v_price_x_catsoil.trenchlining,
 (v_price_x_catsoil.m3fill_cost)::numeric(12,2) AS m3fill_cost,
 (v_price_x_catsoil.m3excess_cost)::numeric(12,2)AS m3excess_cost,
 (v_price_x_catsoil.m2trenchl_cost)::numeric(12,2) AS m2trenchl_cost,
-quote_nullable(sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent))::numeric(12,3) AS thickness,
-quote_nullable(sum (v_price_x_catpavement.m2pav_cost))::numeric(12,2) AS m2pav_cost,
+(CASE WHEN sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent) IS NULL THEN 0::numeric(12,2) ELSE
+sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) END) AS thickness,
+(CASE WHEN sum (v_price_x_catpavement.m2pav_cost) IS NULL THEN 0::numeric(12,2) ELSE
+sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) END) AS m2pav_cost,
 v_edit_arc.state,
 v_edit_arc.the_geom,
 v_edit_arc.expl_id
@@ -362,12 +364,10 @@ CASE
 v_plan_aux_arc_cost.the_geom,
 v_plan_aux_arc_cost.expl_id
 
-FROM selector_expl, v_plan_aux_arc_cost
-	JOIN v_edit_arc ON v_plan_aux_arc_cost.arc_id=v_edit_arc.arc_id
+FROM v_plan_aux_arc_cost
+	JOIN arc ON v_plan_aux_arc_cost.arc_id=arc.arc_id
 	LEFT JOIN v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id = v_plan_aux_arc_cost.arc_id
-	LEFT JOIN v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id = v_plan_aux_arc_cost.arc_id
-	WHERE v_plan_aux_arc_cost.expl_id=selector_expl.expl_id
-	AND selector_expl.cur_user="current_user"() ;
+	LEFT JOIN v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id = v_plan_aux_arc_cost.arc_id;
 
 
 
