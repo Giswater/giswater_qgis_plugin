@@ -65,7 +65,7 @@ class ApiSearch(ApiParent):
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         #self.dlg_search.setFixedHeight(180)
 
-        sql = ("SELECT " + self.schema_name + ".gw_fct_getsearch(9,'es')")
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_search(9,'es')")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -254,7 +254,7 @@ class ApiSearch(ApiParent):
             json_updatesearch_add[line_edit.objectName()] = _json
             json_updatesearch = json.dumps(json_updatesearch)
 
-            sql = ("SELECT " + self.schema_name + ".gw_fct_updatesearch($$" +json_updatesearch + "$$)")
+            sql = ("SELECT " + self.schema_name + ".gw_api_updatesearch($$" +json_updatesearch + "$$)")
             row = self.controller.get_row(sql, log_sql=True)
             if row:
                 self.result_data = row[0]
@@ -288,7 +288,7 @@ class ApiSearch(ApiParent):
             json_updatesearch_add[line_edit_add.objectName()] = _json
             json_updatesearch_add = json.dumps(json_updatesearch_add)
 
-            sql = ("SELECT " + self.schema_name + ".gw_fct_updatesearch_add($$" + json_updatesearch_add + "$$)")
+            sql = ("SELECT " + self.schema_name + ".gw_api_updatesearch_add($$" + json_updatesearch_add + "$$)")
             row = self.controller.get_row(sql, log_sql=True)
             if row:
                 self.result_data = row[0]
