@@ -845,7 +845,7 @@ class DaoController():
         
         project_type = None
         sql = ("SELECT lower(wsoftware)"
-               " FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1")
+               " FROM " + self.schema_name + ".version ORDER BY id ASC LIMIT 1")
         row = self.get_row(sql)
         if row:
             project_type = row[0]

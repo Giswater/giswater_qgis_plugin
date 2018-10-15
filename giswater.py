@@ -279,10 +279,11 @@ class Giswater(QObject):
     def manage_toolbars(self):
         """ Manage actions of the different plugin toolbars """           
                         
+        list_actions = None        
         toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
             list_actions = ['41', '48', '86', '32']
-        if self.controller.get_project_type() == 'ud':
+        elif self.controller.get_project_type() == 'ud':
             list_actions = ['41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)
 
@@ -353,6 +354,9 @@ class Giswater(QObject):
     def manage_toolbar(self, toolbar_id, list_actions): 
         """ Manage action of selected plugin toolbar """
                 
+        if list_actions is None:
+            return
+            
         toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')        
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
         plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
