@@ -68,7 +68,7 @@ class ApiCF(ApiParent):
                 print("FAIL")
                 return
             self.restore()
-            self.draw(complet_result)
+            self.draw(complet_result, zoom=False)
 
             #Set variables
             self.field_id = str(self.geom_type) + "_id"
@@ -76,6 +76,7 @@ class ApiCF(ApiParent):
             # Manage tab signal
             self.tab_element_loaded = False
             self.tab_relations_loaded = False
+            self.tab_connections_loaded = False
             self.tab_conections_loaded = False
             self.tab_hydrometer_loaded = False
             self.tab_om_loaded = False
@@ -85,8 +86,17 @@ class ApiCF(ApiParent):
             self.filter = str(complet_result[0]['idName']) + " = '" + str(self.feature_id) + "'"
             self.tab_main.currentChanged.connect(self.tab_activation)
 
+
+
+            # Manage tabs for UD'
+            if self.controller.get_project_type() != 'ud':
+                pass
+                #utils_giswater.remove_tab_by_tabName(self.tab_main, "relations")
+                #utils_giswater.remove_tab_by_tabName(self.tab_main, "conections")
             # Manage tab 'Relations'
-            self.manage_tab_relations("v_ui_"+str(self.geom_type)+"_x_relations", str(self.field_id))
+            if self.controller.get_project_type() == 'ud':
+                pass
+            self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
             # TODO
             # Manage 'image'
             #self.set_image(self.dlg_cf, "label_image_ws_shape")
@@ -132,10 +142,13 @@ class ApiCF(ApiParent):
                    + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
         # IF come from QPushButtons node1 or node2 from custom form
         elif feature_id and feature_type:
-            sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+"_id = '" + str(feature_id) + "'")
+            sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+" = '" + str(feature_id) + "'")
             row = self.controller.get_row(sql, log_sql=True)
+            the_geom = 'null'
+            if row:
+                the_geom = "'" + str(row[0]) + "'"
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
-                   " '" + str(row[0])+"', " + str(is_project_editable) + ", 9, 100)")
+                   " " + str(the_geom)+", " + str(is_project_editable) + ", 9, 100)")
 
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
@@ -159,10 +172,10 @@ class ApiCF(ApiParent):
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
-        # self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
-        # self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
+        self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
+        self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
+        self.tbl_scada = self.dlg_cf.findChild(QTableView, "tbl_scada")
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-
 
 
         # Actions
@@ -701,7 +714,10 @@ class ApiCF(ApiParent):
         elif self.tab_main.widget(index_tab).objectName() == 'relations' and not self.tab_relations_loaded:
             self.fill_tab_relations()
             self.tab_relations_loaded = True
-
+        # Tab 'Conections'
+        elif self.tab_main.widget(index_tab).objectName() == 'conections' and not self.tab_connections_loaded:
+            self.fill_tab_connections()
+            self.tab_connections_loaded = True
         # Tab 'O&M'
         elif self.tab_main.widget(index_tab).objectName() == 'om' and not self.tab_om_loaded:
             self.fill_tab_om()
@@ -710,10 +726,10 @@ class ApiCF(ApiParent):
         elif self.tab_main.widget(index_tab).objectName() == 'document' and not self.tab_document_loaded:
             self.fill_tab_document()
             self.tab_document_loaded = True
-        #     # Tab 'Scada'
-        # elif index_tab == (6 - self.tabs_removed - self.tab_scada_removed) and not self.tab_scada_loaded:
-        #     self.fill_tab_scada()
-        #     self.tab_scada_loaded = True
+        # Tab 'Scada'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_scada' and not self.tab_scada_loaded:
+            self.fill_tab_scada()
+            self.tab_scada_loaded = True
 
         # Tab 'Cost'
         elif (self.tab_main.widget(index_tab).objectName() == 'node_cost' or
@@ -903,7 +919,7 @@ class ApiCF(ApiParent):
         else:
             self.controller.log_info("set_model_to_table: widget not found")
 
-    """ FUNCTIONS RELATED TAB RELATIONS"""
+    """ FUNCTIONS RELATED WITH TAB RELATIONS"""
     def manage_tab_relations(self, viewname, field_id):
         """ Hide tab 'relations' if no data in the view """
 
@@ -921,10 +937,16 @@ class ApiCF(ApiParent):
             self.tbl_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))
 
+    def fill_tab_relations(self):
+        """ Fill tab 'Relations' """
+
+        table_relations = "v_ui_"+self.geom_type+"_x_relations"
+        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
+        self.set_configuration(self.tbl_relations, table_relations)
+
 
     def open_relation(self, field_id):
         """ Open feature form of selected element """
-
         selected_list = self.tbl_relations.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -939,29 +961,96 @@ class ApiCF(ApiParent):
             field_object_id = "feature_id"
         selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)
         sys_type = self.tbl_relations.model().record(row).value("sys_type")
-        tablename = "v_edit_man_" + sys_type.lower()
-        layer = self.controller.get_layer_by_tablename(tablename, log_info=True, log_sql=True)
+
+
+
+        table_name = self.tbl_relations.model().record(row).value("sys_table_id")
+        sys_id_name = self.tbl_relations.model().record(row).value("sys_id_name")
+        feature_id = self.tbl_relations.model().record(row).value("sys_id")
+        layer = self.controller.get_layer_by_tablename(table_name, log_info=True)
         if not layer:
+            message = "Layer not found"
+            self.controller.show_message(message, parameter=table_name)
             return
 
-        # Get field_id from model 'sys_feature_cat'
-        if tablename not in self.feature_cat.keys():
+        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
+        if not complet_result:
+            print("FAIL")
+            return
+        self.draw(complet_result)
+
+
+    """ FUNCTIONS RELATED WITH TAB RELATIONS"""
+    def fill_tab_connections(self):
+        """ Fill tab 'Connections' """
+        self.dlg_cf.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_cf.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        self.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream")
+        self.set_configuration(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
+
+        self.fill_table(self.dlg_cf.tbl_downstream, self.schema_name + ".v_ui_node_x_connection_downstream")
+        self.set_configuration(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
+
+        self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
+        self.dlg_cf.tbl_downstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
+
+    def open_up_down_stream(self, qtable):
+        """ Open selected node from @qtable """
+
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
             return
 
-        field_id = self.feature_cat[tablename].type.lower() + "_id"
-        expr_filter = "\"" + field_id + "\" = "
-        expr_filter += "'" + str(selected_object_id) + "'"
-        (is_valid, expr) = self.check_expression(expr_filter)
-        if not is_valid:
+        row = selected_list[0].row()
+        table_name = qtable.model().record(row).value("sys_table_id")
+        sys_id_name = qtable.model().record(row).value("sys_id_name")
+        feature_id = qtable.model().record(row).value("sys_id")
+        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
+        if not complet_result:
+            print("FAIL")
             return
-
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        features = [i for i in it]
-        if features != []:
-            self.iface.openFeatureForm(layer, features[0])
-    """ **************************** """
+        self.draw(complet_result)
 
 
+    """ FUNCTIONS RELATED WITH TAB SCADA"""
+    def fill_tab_scada(self):
+        """ Fill tab 'Scada' (Hydrometer) """
+
+        table_scada = "v_ui_scada_x_node"
+        table_scada_value = "v_ui_scada_x_node_values"
+        self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name + "." + table_scada, self.filter)
+        self.set_configuration(self.tbl_scada, table_scada)
+        self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name + "." + table_scada_value, self.filter)
+        self.set_configuration(self.tbl_scada_value, table_scada_value)
+
+
+    def fill_tbl_hydrometer(self, widget, table_name, filter_):
+        """ Fill the table control to show documents"""
+
+        # Get widgets
+        self.cat_period_id_filter = self.dialog.findChild(QComboBox, "cat_period_id_filter")
+
+        # Populate combo filter hydrometer value
+        sql = ("SELECT distinct(cat_period_id) "
+               " FROM " + self.schema_name + ".v_edit_rtc_hydro_data_x_connec ORDER BY cat_period_id")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dialog, self.cat_period_id_filter, rows)
+        self.controller.log_info(str(sql))
+
+        # Set signals
+        if widget == self.tbl_hydrometer_value:
+            self.cat_period_id_filter.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, widget))
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, table_name, filter_)
+    """ ****************************  **************************** """
+    """ ****************************  **************************** """
+    """ ****************************  **************************** """
     """ NEW WORKCAT"""
     def cf_new_workcat(self, dialog):
 
@@ -1098,7 +1187,7 @@ class ApiCF(ApiParent):
     def open_node(self, dialog, widget=None, message_level=None):
         feature_id = utils_giswater.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = self.ApiCF.open_form(table_name='ve_node',  feature_type='node', feature_id=feature_id)
+        complet_result = self.ApiCF.open_form(table_name='ve_node',  feature_type='node_id', feature_id=feature_id)
         if not complet_result:
             print("FAIL")
             return

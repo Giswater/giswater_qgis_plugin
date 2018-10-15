@@ -13,6 +13,7 @@ from functools import partial
 from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer
 from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox
 from PyQt4.QtGui import QCompleter, QStringListModel
+from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QGis
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
@@ -555,7 +556,7 @@ class ApiParent(ParentAction):
         self.canvas.refresh()
 
 
-    def draw(self, complet_result):
+    def draw(self, complet_result, zoom=True):
         list_coord = re.search('\((.*)\)', str(complet_result[0]['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
 
@@ -566,7 +567,8 @@ class ApiParent(ParentAction):
         else:
             points = self.get_points(list_coord)
             self.draw_polygon(points)
-        self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+        if zoom:
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
     def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
 
@@ -615,6 +617,25 @@ class ApiParent(ParentAction):
             self.vMarker.hide()
             canvas.scene().removeItem(self.vMarker)
 
+    def fill_table(self, widget, table_name, filter_=None):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setSort(0, 0)
+        if filter_:
+            model.setFilter(filter_)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
 
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:
