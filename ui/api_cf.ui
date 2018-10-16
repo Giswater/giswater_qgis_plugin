@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>695</width>
+    <width>676</width>
     <height>601</height>
    </rect>
   </property>
@@ -34,9 +34,9 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>7</number>
       </property>
-      <widget class="QWidget" name="data">
+      <widget class="QWidget" name="tab_data">
        <attribute name="title">
         <string>Data</string>
        </attribute>
@@ -51,7 +51,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>653</width>
+             <width>634</width>
              <height>398</height>
             </rect>
            </property>
@@ -72,7 +72,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>653</width>
+             <width>634</width>
              <height>398</height>
             </rect>
            </property>
@@ -89,7 +89,12 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="elements">
+      <widget class="QWidget" name="tab_inp">
+       <attribute name="title">
+        <string>Inp</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_element">
        <attribute name="title">
         <string>Elements</string>
        </attribute>
@@ -162,7 +167,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="new_element">
+           <widget class="QPushButton" name="btn_new_element">
             <property name="maximumSize">
              <size>
               <width>24</width>
@@ -198,7 +203,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="open_element">
+           <widget class="QPushButton" name="btn_open_element">
             <property name="maximumSize">
              <size>
               <width>24</width>
@@ -227,7 +232,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="relations">
+      <widget class="QWidget" name="tab_relations">
        <attribute name="title">
         <string>Relations</string>
        </attribute>
@@ -241,7 +246,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="conections">
+      <widget class="QWidget" name="tab_connections">
        <attribute name="title">
         <string>Conections</string>
        </attribute>
@@ -272,7 +277,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="hydrometer">
+      <widget class="QWidget" name="tab_hydrometer">
        <attribute name="title">
         <string>Hydrometer</string>
        </attribute>
@@ -280,14 +285,85 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tab_scada">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
-          <widget class="QWidget" name="page_event_node">
+          <widget class="QWidget" name="tab_page_event_node">
            <attribute name="title">
             <string>Hydrometer</string>
            </attribute>
+           <layout class="QGridLayout" name="gridLayout_13">
+            <item row="2" column="0">
+             <widget class="QTableView" name="tbl_hydrometer"/>
+            </item>
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <item>
+               <widget class="QLineEdit" name="txt_hydrometer_id">
+                <property name="maximumSize">
+                 <size>
+                  <width>250</width>
+                  <height>250</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_add_hydrometer">
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>24</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_delete_hydrometer">
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>24</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_link">
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>24</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
-          <widget class="QWidget" name="page_event_element_2">
+          <widget class="QWidget" name="tab_page_event_element_2">
            <attribute name="title">
             <string>Hydrometer values</string>
            </attribute>
@@ -305,7 +381,7 @@
             <item row="2" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_8">
               <item>
-               <widget class="QComboBox" name="cat_period_id_filter"/>
+               <widget class="QComboBox" name="cmb_cat_period_id_filter"/>
               </item>
               <item>
                <spacer name="horizontalSpacer_5">
@@ -328,12 +404,12 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="om">
+      <widget class="QWidget" name="tab_om">
        <attribute name="title">
         <string>O&amp;&amp;M</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="document">
+      <widget class="QWidget" name="tab_doc">
        <attribute name="title">
         <string>Document</string>
        </attribute>
@@ -391,6 +467,13 @@
           <property name="topMargin">
            <number>0</number>
           </property>
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Doc id:</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QLineEdit" name="doc_id">
             <property name="maximumSize">
@@ -520,9 +603,34 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="node_cost">
+      <widget class="QWidget" name="tab_rpt">
        <attribute name="title">
-        <string>Cost</string>
+        <string>Rpt</string>
+       </attribute>
+       <widget class="QLineEdit" name="lineEdit_2">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>40</y>
+          <width>113</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QTableView" name="tableView_2">
+        <property name="geometry">
+         <rect>
+          <x>55</x>
+          <y>125</y>
+          <width>256</width>
+          <height>192</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_plan">
+       <attribute name="title">
+        <string>Plan</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_11">
         <item row="3" column="1">

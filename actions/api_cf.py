@@ -15,6 +15,7 @@ import webbrowser
 
 from functools import partial
 
+from PyQt4.QtGui import QDateEdit
 from qgis.core import QgsFeatureRequest
 
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
@@ -35,7 +36,8 @@ from giswater.actions.HyperLinkLabel import HyperLinkLabel
 from giswater.ui_manager import ApiCfUi
 from giswater.ui_manager import NewWorkcat
 
-from actions.manage_element import ManageElement
+from giswater.actions.manage_document import ManageDocument
+from giswater.actions.manage_element import ManageElement
 
 
 class ApiCF(ApiParent):
@@ -67,7 +69,7 @@ class ApiCF(ApiParent):
             if not complet_result:
                 print("FAIL")
                 return
-            self.restore()
+            self.restore(restore_cursor=True)
             self.draw(complet_result, zoom=False)
 
             #Set variables
@@ -86,30 +88,31 @@ class ApiCF(ApiParent):
             self.filter = str(complet_result[0]['idName']) + " = '" + str(self.feature_id) + "'"
             self.tab_main.currentChanged.connect(self.tab_activation)
 
+            # Remove unused tabs
+            tabs_to_show = complet_result[0]['formTabs']['formTabs']
+            for x in range(self.tab_main.count()-1, 0, -1):
+                if self.tab_main.widget(x).objectName() not in tabs_to_show:
+                    utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
 
-
-            # Manage tabs for UD'
-            if self.controller.get_project_type() != 'ud':
-                pass
-                #utils_giswater.remove_tab_by_tabName(self.tab_main, "relations")
-                #utils_giswater.remove_tab_by_tabName(self.tab_main, "conections")
             # Manage tab 'Relations'
-            if self.controller.get_project_type() == 'ud':
-                pass
-            self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
+            if self.geom_type in ('arc', 'node'):
+                self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
             # TODO
             # Manage 'image'
             #self.set_image(self.dlg_cf, "label_image_ws_shape")
         elif button_clicked == Qt.RightButton:
             self.restore()
 
-    def restore(self):
-        QApplication.restoreOverrideCursor()
+
+    def restore(self, restore_cursor=True):
+        if restore_cursor:
+            QApplication.restoreOverrideCursor()
         # TODO buscar la QAction concreta y deschequearla
         actions = self.iface.mainWindow().findChildren(QAction)
         for a in actions:
             a.setChecked(False)
         self.emit_point.canvasClicked.disconnect()
+
 
     def open_form(self, point=None, table_name=None, feature_type=None, feature_id=None):
         """
@@ -174,9 +177,9 @@ class ApiCF(ApiParent):
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
         self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
         self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
-        self.tbl_scada = self.dlg_cf.findChild(QTableView, "tbl_scada")
+        self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
+        self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-
 
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
@@ -195,7 +198,6 @@ class ApiCF(ApiParent):
 
         for action in actions_list:
             action.setEnabled(False)
-
 
         # TODO action_edit.setVisible(lo que venga del json segun permisos)
         action_edit.setVisible(True)
@@ -223,12 +225,23 @@ class ApiCF(ApiParent):
         self.set_icon(action_interpolate, "194")
         # self.set_icon(action_switch_arc_id, "141")
 
+
         # Set buttons icon
+        # tab elements
         self.set_icon(self.dlg_cf.btn_insert, "111b")
         self.set_icon(self.dlg_cf.btn_delete, "112b")
-        self.set_icon(self.dlg_cf.new_element, "131b")
-        self.set_icon(self.dlg_cf.open_element, "134b")
+        self.set_icon(self.dlg_cf.btn_new_element, "131b")
+        self.set_icon(self.dlg_cf.btn_open_element, "134b")
+        # tab scada.hydrometer
+        self.set_icon(self.dlg_cf.btn_add_hydrometer, "111b")
+        self.set_icon(self.dlg_cf.btn_delete_hydrometer, "112b")
+        self.set_icon(self.dlg_cf.btn_link, "70b")
 
+        # tab doc
+        self.set_icon(self.dlg_cf.btn_doc_insert, "111b")
+        self.set_icon(self.dlg_cf.btn_doc_delete, "112b")
+        self.set_icon(self.dlg_cf.btn_doc_new, "131b")
+        self.set_icon(self.dlg_cf.btn_open_doc, "170b")
 
         # Layouts
         top_layout = self.dlg_cf.findChild(QGridLayout, 'top_layout')
@@ -252,7 +265,6 @@ class ApiCF(ApiParent):
 
         if self.layer:
             self.iface.setActiveLayer(self.layer)
-
 
 
         # TODO: Xavi Is correct get fornName as geom_type? (node, arc, connec, gully)
@@ -323,9 +335,7 @@ class ApiCF(ApiParent):
         tab1_layout1.addItem(verticalSpacer1)
         verticalSpacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         tab1_layout2.addItem(verticalSpacer2)
-        # splitter = QSplitter(Qt.Horizontal)
-        # splitter.addWidget(tab1_layout1)
-        # splitter.addWidget(tab1_layout2)
+
         # Find combo parents:
         for field in result["fields"]:
             if field['dv_isparent']:
@@ -379,7 +389,6 @@ class ApiCF(ApiParent):
         self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
 
-        #QApplication.restoreOverrideCursor()
         # Open dialog
         self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_cf.show()
@@ -706,34 +715,35 @@ class ApiCF(ApiParent):
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
         # Tab 'Element'
-        if self.tab_main.widget(index_tab).objectName() == 'elements' and not self.tab_element_loaded:
+        if self.tab_main.widget(index_tab).objectName() == 'tab_element' and not self.tab_element_loaded:
             self.fill_tab_element()
             self.tab_element_loaded = True
 
         # Tab 'Relations'
-        elif self.tab_main.widget(index_tab).objectName() == 'relations' and not self.tab_relations_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
             self.fill_tab_relations()
             self.tab_relations_loaded = True
         # Tab 'Conections'
-        elif self.tab_main.widget(index_tab).objectName() == 'conections' and not self.tab_connections_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
             self.fill_tab_connections()
             self.tab_connections_loaded = True
+        # Tab 'Hydrometer'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer' and not self.tab_hydrometer_loaded:
+            self.fill_tab_hydrometer()
+            self.tab_hydrometer_loaded = True
         # Tab 'O&M'
-        elif self.tab_main.widget(index_tab).objectName() == 'om' and not self.tab_om_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_om' and not self.tab_om_loaded:
             self.fill_tab_om()
             self.tab_om_loaded = True
         # Tab 'Document'
-        elif self.tab_main.widget(index_tab).objectName() == 'document' and not self.tab_document_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_doc' and not self.tab_document_loaded:
             self.fill_tab_document()
             self.tab_document_loaded = True
-        # Tab 'Scada'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_scada' and not self.tab_scada_loaded:
-            self.fill_tab_scada()
-            self.tab_scada_loaded = True
+
 
         # Tab 'Cost'
-        elif (self.tab_main.widget(index_tab).objectName() == 'node_cost' or
-              self.tab_main.widget(index_tab).objectName() == 'arc_cost') and not self.tab_om_loaded:
+        elif (self.tab_main.widget(index_tab).objectName() == 'tab_node_cost' or
+              self.tab_main.widget(index_tab).objectName() == 'tab_arc_cost') and not self.tab_om_loaded:
             self.fill_tab_cost()
             self.tab_cost_loaded = True
 
@@ -752,17 +762,17 @@ class ApiCF(ApiParent):
         # Get widgets
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.element_id = self.dlg_cf.findChild(QLineEdit, "element_id")
-        open_element = self.dlg_cf.findChild(QPushButton, "open_element")
+        btn_open_element = self.dlg_cf.findChild(QPushButton, "btn_open_element")
         btn_delete = self.dlg_cf.findChild(QPushButton, "btn_delete")
         btn_insert = self.dlg_cf.findChild(QPushButton, "btn_insert")
-        new_element = self.dlg_cf.findChild(QPushButton, "new_element")
+        btn_new_element = self.dlg_cf.findChild(QPushButton, "btn_new_element")
 
         # Set signals
         self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, dialog, widget))
-        open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
+        btn_open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))
         btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
-        new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
+        btn_new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
 
         # Set model of selected widget
         table_name = self.schema_name + "." + table_name
@@ -867,7 +877,7 @@ class ApiCF(ApiParent):
         if answer:
             sql = ("DELETE FROM " + self.schema_name + "." + table_name + ""
                    " WHERE id::integer IN (" + list_id + ")")
-            self.controller.execute_sql(sql)
+            self.controller.execute_sql(sql, log_sql=True)
             widget.model().select()
 
 
@@ -981,7 +991,7 @@ class ApiCF(ApiParent):
         self.draw(complet_result)
 
 
-    """ FUNCTIONS RELATED WITH TAB RELATIONS"""
+    """ FUNCTIONS RELATED WITH TAB CONECTIONS"""
     def fill_tab_connections(self):
         """ Fill tab 'Connections' """
         self.dlg_cf.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -1017,37 +1027,189 @@ class ApiCF(ApiParent):
         self.draw(complet_result)
 
 
-    """ FUNCTIONS RELATED WITH TAB SCADA"""
-    def fill_tab_scada(self):
-        """ Fill tab 'Scada' (Hydrometer) """
+    """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
+    def fill_tab_hydrometer(self):
+        """ Fill tab 'Hydrometer' """
 
-        table_scada = "v_ui_scada_x_node"
-        table_scada_value = "v_ui_scada_x_node_values"
-        self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name + "." + table_scada, self.filter)
-        self.set_configuration(self.tbl_scada, table_scada)
-        self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name + "." + table_scada_value, self.filter)
-        self.set_configuration(self.tbl_scada_value, table_scada_value)
+        table_hydro = "v_rtc_hydrometer"
+        table_hydro_value = "v_edit_rtc_hydro_data_x_connec"
+        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name + "." + table_hydro, self.filter)
+        self.set_configuration(self.tbl_hydrometer, table_hydro)
+        self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name + "." + table_hydro_value, self.filter)
+        self.set_configuration(self.tbl_hydrometer_value, table_hydro_value)
 
 
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
         """ Fill the table control to show documents"""
-
+        print (filter_)
         # Get widgets
-        self.cat_period_id_filter = self.dialog.findChild(QComboBox, "cat_period_id_filter")
+        self.cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
 
         # Populate combo filter hydrometer value
-        sql = ("SELECT distinct(cat_period_id) "
+        sql = ("SELECT DISTINCT cat_period_id, cat_period_id "
                " FROM " + self.schema_name + ".v_edit_rtc_hydro_data_x_connec ORDER BY cat_period_id")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dialog, self.cat_period_id_filter, rows)
-        self.controller.log_info(str(sql))
+        rows = self.controller.get_rows(sql, log_sql=True)
+        utils_giswater.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows)
+
 
         # Set signals
         if widget == self.tbl_hydrometer_value:
-            self.cat_period_id_filter.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, widget))
+            self.cmb_cat_period_id_filter.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, widget))
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
+
+
+    def set_filter_hydrometer_values(self, widget):
+        """ Get Filter for table hydrometer value with combo value"""
+
+        # Get combo value
+        cat_period_id_filter = utils_giswater.get_item_data(self.dlg_cf, self.cmb_cat_period_id_filter)
+
+        # Set filter
+        expr = self.field_id + " = '" + self.feature_id + "'"
+        expr += " AND cat_period_id = '" + cat_period_id_filter + "'"
+        print (expr)
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+    """ FUNCTIONS RELATED WITH TAB DOC"""
+    def fill_tab_document(self):
+        """ Fill tab 'Document' """
+
+        table_document = "v_ui_doc_x_"+self.geom_type
+        self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
+        self.set_configuration(self.tbl_document, table_document)
+
+
+    def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
+        """ Fill the table control to show documents """
+        print(widget.objectName())
+        # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # Set model of selected widget
+        self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
+
+        txt_doc_id = self.dlg_cf.findChild(QLineEdit, "txt_doc_id")
+        doc_type = self.dlg_cf.findChild(QComboBox, "doc_type")
+        self.date_document_to = self.dlg_cf.findChild(QDateEdit, "date_document_to")
+        self.date_document_from = self.dlg_cf.findChild(QDateEdit, "date_document_from")
+        btn_open_doc = self.dlg_cf.findChild(QPushButton, "btn_open_doc")
+        btn_doc_delete = self.dlg_cf.findChild(QPushButton, "btn_doc_delete")
+        btn_doc_insert = self.dlg_cf.findChild(QPushButton, "btn_doc_insert")
+        btn_doc_new = self.dlg_cf.findChild(QPushButton, "btn_doc_new")
+
+        # Set signals
+        doc_type.activated.connect(partial(self.set_filter_table_man, widget))
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
+        btn_open_doc.clicked.connect(partial(self.open_selected_document, widget))
+        btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))
+        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
+        btn_doc_new.clicked.connect(partial(self.manage_new_document, dialog, None, self.feature))
+
+        # Set dates
+        date = QDate.currentDate()
+        self.date_document_to.setDate(date)
+
+        # Fill ComboBox doc_type
+        sql = ("SELECT id, id FROM " + self.schema_name + ".doc_type ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        rows.append(['', ''])
+        utils_giswater.set_item_data(doc_type, rows)
+
+
+        # Adding auto-completion to a QLineEdit
+        self.table_object = "doc"
+        self.set_completer_object(dialog, self.table_object)
+
+
+    def set_filter_table_man(self, widget):
+        """ Get values selected by the user and sets a new filter for its table model """
+
+        # Get selected dates
+        date_from = self.date_document_from.date()
+        date_to = self.date_document_to.date()
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+        # Create interval dates
+        format_low = 'yyyy-MM-dd 00:00:00.000'
+        format_high = 'yyyy-MM-dd 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            date_from.toString(format_low), date_to.toString(format_high))
+
+        # Set filter
+        expr = self.field_id + " = '" + self.feature_id + "'"
+        expr += " AND(date BETWEEN {0}) AND (date BETWEEN {0})".format(interval)
+
+        # Get selected values in Comboboxes
+        doc_type_value = utils_giswater.getWidgetText(self.dlg_cf, "doc_type")
+        if doc_type_value != 'null' and doc_type_value is not None:
+            expr += " AND doc_type = '" + str(doc_type_value) + "'"
+
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+
+    def open_selected_document(self, widget):
+        """ Open selected document of the @widget """
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        elif len(selected_list) > 1:
+            message = "Select just one document"
+            self.controller.show_warning(message)
+            return
+
+        # Get document path (can be relative or absolute)
+        row = selected_list[0].row()
+        path = widget.model().record(row).value("path")
+
+        # Check if file exist
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
+        else:
+            webbrowser.open(path)
+
+    def manage_new_document(self, dialog, doc_id=None, feature=None):
+        """ Execute action of button 34 """
+        print(feature)
+        doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)
+        doc.manage_document(feature=feature)
+        doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
+        doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
+
+        # Set completer
+        self.set_completer_object(dialog, self.table_object)
+        if doc_id:
+            utils_giswater.setWidgetText(dialog, "doc_id", doc_id)
+
+        # # Open dialog
+        # doc.open_dialog(doc.dlg_add_doc)
+
+
+    def manage_document_new(self, dialog, doc):
+        """ Get inserted doc_id and add it to current feature """
+
+        if doc.doc_id is None:
+            return
+
+        utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
+        self.add_object(self.tbl_document, "doc", "v_ui_document")
     """ ****************************  **************************** """
     """ ****************************  **************************** """
     """ ****************************  **************************** """
