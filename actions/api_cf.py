@@ -11,11 +11,14 @@ import operator
 import os
 import subprocess
 import sys
+import urlparse
 import webbrowser
 
 from functools import partial
 
 from PyQt4.QtGui import QDateEdit
+from PyQt4.QtGui import QListWidget
+from PyQt4.QtGui import QListWidgetItem
 from qgis.core import QgsFeatureRequest
 
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
@@ -28,20 +31,18 @@ from PyQt4.QtGui import QAbstractItemView, QTabWidget, QTableView
 from PyQt4.QtSql import QSqlTableModel
 
 import utils_giswater
-from actions.api_catalog import ApiCatalog
+
 from giswater.actions.api_parent import ApiParent
-from giswater.actions.catalog import Catalog
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
-
-from giswater.ui_manager import ApiCfUi
-from giswater.ui_manager import NewWorkcat
-
 from giswater.actions.manage_document import ManageDocument
 from giswater.actions.manage_element import ManageElement
 from giswater.actions.manage_visit import ManageVisit
+from giswater.actions.manage_gallery import ManageGallery
+from actions.api_catalog import ApiCatalog
+from giswater.ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments
 
-from actions.manage_gallery import ManageGallery
-from ui_manager import EventFull
+
+
 
 
 class ApiCF(ApiParent):
@@ -93,7 +94,7 @@ class ApiCF(ApiParent):
             self.tab_main.currentChanged.connect(self.tab_activation)
 
             # Remove unused tabs
-            tabs_to_show = complet_result[0]['formTabs']['formTabs']
+            tabs_to_show = complet_result[0]['formTabs']['tabName']
             for x in range(self.tab_main.count()-1, 0, -1):
                 if self.tab_main.widget(x).objectName() not in tabs_to_show:
                     utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
@@ -1125,8 +1126,8 @@ class ApiCF(ApiParent):
         btn_open_visit.clicked.connect(self.open_visit)
         btn_new_visit.clicked.connect(self.new_visit)
         btn_open_gallery.clicked.connect(self.open_gallery)
-        # btn_open_visit_doc.clicked.connect(self.open_visit_doc)
-        # btn_open_visit_event.clicked.connect(self.open_visit_event)
+        btn_open_visit_doc.clicked.connect(self.open_visit_doc)
+        btn_open_visit_event.clicked.connect(self.open_visit_event)
 
         feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
@@ -1179,7 +1180,8 @@ class ApiCF(ApiParent):
 
         # Open dialog event_standard
         self.dlg_event_full = EventFull()
-
+        self.load_settings(self.dlg_event_full)
+        self.dlg_event_full.rejected.connect(partial(self.close_dialog, self.dlg_event_full))
         # Get all data for one visit
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event"
                " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
@@ -1371,8 +1373,96 @@ class ApiCF(ApiParent):
         gal.fill_gallery(self.visit_id, self.event_id)
 
 
+    def open_visit_doc(self):
+        """ Open document of selected record of the table """
 
+        # Get all documents for one visit
+        sql = ("SELECT doc_id FROM " + self.schema_name + ".doc_x_visit"
+               " WHERE visit_id = '" + str(self.visit_id) + "'")
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
 
+        num_doc = len(rows)
+
+        if num_doc == 1:
+            # If just one document is attached directly open
+
+            # Get path of selected document
+            sql = ("SELECT path"
+                   " FROM " + self.schema_name + ".v_ui_document"
+                   " WHERE id = '" + str(rows[0][0]) + "'")
+            row = self.controller.get_row(sql)
+            if not row:
+                return
+
+            path = str(row[0])
+
+            # Parse a URL into components
+            url = urlparse.urlsplit(path)
+
+            # Open selected document
+            # Check if path is URL
+            if url.scheme == "http" or url.scheme == "https":
+                # If path is URL open URL in browser
+                webbrowser.open(path)
+            else:
+                # If its not URL ,check if file exist
+                if not os.path.exists(path):
+                    message = "File not found"
+                    self.controller.show_warning(message, parameter=path)
+                else:
+                    # Open the document
+                    os.startfile(path)
+        else:
+            # If more then one document is attached open dialog with list of documents
+            self.dlg_load_doc = LoadDocuments()
+            self.load_settings(self.dlg_load_doc)
+            self.dlg_load_doc.rejected.connect(partial(self.close_dialog, self.dlg_load_doc))
+            btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
+            btn_open_doc.clicked.connect(self.open_selected_doc)
+
+            lbl_visit_id = self.dlg_load_doc.findChild(QLineEdit, "visit_id")
+            lbl_visit_id.setText(str(self.visit_id))
+
+            self.tbl_list_doc = self.dlg_load_doc.findChild(QListWidget, "tbl_list_doc")
+            self.tbl_list_doc.itemDoubleClicked.connect(partial(self.open_selected_doc))
+            for row in rows:
+                item_doc = QListWidgetItem(str(row[0]))
+                self.tbl_list_doc.addItem(item_doc)
+
+            self.dlg_load_doc.open()
+
+    def open_selected_doc(self):
+
+        # Selected item from list
+        selected_document = self.tbl_list_doc.currentItem().text()
+
+        # Get path of selected document
+        sql = ("SELECT path FROM " + self.schema_name + ".v_ui_document"
+               " WHERE id = '" + str(selected_document) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        path = str(row[0])
+
+        # Parse a URL into components
+        url = urlparse.urlsplit(path)
+
+        # Open selected document
+        # Check if path is URL
+        if url.scheme == "http" or url.scheme == "https":
+            # If path is URL open URL in browser
+            webbrowser.open(path)
+        else:
+            # If its not URL ,check if file exist
+            if not os.path.exists(path):
+                message = "File not found"
+                self.controller.show_warning(message, parameter=path)
+            else:
+                # Open the document
+                os.startfile(path)
 
 
     """ FUNCTIONS RELATED WITH TAB DOC"""
