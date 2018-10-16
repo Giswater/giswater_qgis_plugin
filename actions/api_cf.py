@@ -38,6 +38,10 @@ from giswater.ui_manager import NewWorkcat
 
 from giswater.actions.manage_document import ManageDocument
 from giswater.actions.manage_element import ManageElement
+from giswater.actions.manage_visit import ManageVisit
+
+from actions.manage_gallery import ManageGallery
+from ui_manager import EventFull
 
 
 class ApiCF(ApiParent):
@@ -72,7 +76,7 @@ class ApiCF(ApiParent):
             self.restore(restore_cursor=True)
             self.draw(complet_result, zoom=False)
 
-            #Set variables
+            # Set variables
             self.field_id = str(self.geom_type) + "_id"
 
             # Manage tab signal
@@ -99,7 +103,7 @@ class ApiCF(ApiParent):
                 self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
             # TODO
             # Manage 'image'
-            #self.set_image(self.dlg_cf, "label_image_ws_shape")
+            # self.set_image(self.dlg_cf, "label_image_ws_shape")
         elif button_clicked == Qt.RightButton:
             self.restore()
 
@@ -179,6 +183,7 @@ class ApiCF(ApiParent):
         self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
         self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
+        self.tbl_event = self.dlg_cf.findChild(QTableView, "tbl_event")
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
 
         # Actions
@@ -236,7 +241,12 @@ class ApiCF(ApiParent):
         self.set_icon(self.dlg_cf.btn_add_hydrometer, "111b")
         self.set_icon(self.dlg_cf.btn_delete_hydrometer, "112b")
         self.set_icon(self.dlg_cf.btn_link, "70b")
-
+        # tab om
+        self.set_icon(self.dlg_cf.btn_open_visit, "65b")
+        self.set_icon(self.dlg_cf.btn_new_visit, "64b")
+        self.set_icon(self.dlg_cf.btn_open_gallery, "136b")
+        self.set_icon(self.dlg_cf.btn_open_visit_doc, "170b")
+        self.set_icon(self.dlg_cf.btn_open_visit_event, "134b")
         # tab doc
         self.set_icon(self.dlg_cf.btn_doc_insert, "111b")
         self.set_icon(self.dlg_cf.btn_doc_delete, "112b")
@@ -331,10 +341,10 @@ class ApiCF(ApiParent):
                 bot_layout_2.addWidget(label, 0, field['layout_order'])
                 bot_layout_2.addWidget(widget, 1, field['layout_order'])
 
-        verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        tab1_layout1.addItem(verticalSpacer1)
-        verticalSpacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        tab1_layout2.addItem(verticalSpacer2)
+        vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        tab1_layout1.addItem(vertical_spacer1)
+        vertical_spacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        tab1_layout2.addItem(vertical_spacer2)
 
         # Find combo parents:
         for field in result["fields"]:
@@ -356,7 +366,7 @@ class ApiCF(ApiParent):
                 self.enable_all(result)
             else:
                 self.disable_all(result, False)
-        #action_edit.setVisible(False)
+
         if action_edit.isVisible():
             # SIGNALS
             self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
@@ -714,11 +724,10 @@ class ApiCF(ApiParent):
 
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
-        # Tab 'Element'
-        if self.tab_main.widget(index_tab).objectName() == 'tab_element' and not self.tab_element_loaded:
+        # Tab 'Elements'
+        if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
             self.fill_tab_element()
             self.tab_element_loaded = True
-
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
             self.fill_tab_relations()
@@ -733,10 +742,10 @@ class ApiCF(ApiParent):
             self.tab_hydrometer_loaded = True
         # Tab 'O&M'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_om' and not self.tab_om_loaded:
-            self.fill_tab_om()
+            self.fill_tab_om(self.geom_type)
             self.tab_om_loaded = True
-        # Tab 'Document'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_doc' and not self.tab_document_loaded:
+        # Tab 'Documents'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self.fill_tab_document()
             self.tab_document_loaded = True
 
@@ -1073,6 +1082,298 @@ class ApiCF(ApiParent):
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
+
+
+    """ FUNCTIONS RELATED WITH TAB OM"""
+    def fill_tab_om(self, geom_type):
+        """ Fill tab 'O&M' (event) """
+
+        table_event_geom = "v_ui_om_event_x_" + geom_type
+        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_visit_event)
+        self.set_configuration(self.tbl_event, table_event_geom)
+
+    def fill_tbl_event(self, widget, table_name, filter_):
+        """ Fill the table control to show documents """
+
+        # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        event_type = self.dlg_cf.findChild(QComboBox, "event_type")
+        event_id = self.dlg_cf.findChild(QComboBox, "event_id")
+        self.date_event_to = self.dlg_cf.findChild(QDateEdit, "date_event_to")
+        self.date_event_from = self.dlg_cf.findChild(QDateEdit, "date_event_from")
+        date = QDate.currentDate()
+        self.date_event_to.setDate(date)
+
+        btn_open_visit = self.dlg_cf.findChild(QPushButton, "btn_open_visit")
+        btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit")
+        btn_open_gallery = self.dlg_cf.findChild(QPushButton, "btn_open_gallery")
+        btn_open_visit_doc = self.dlg_cf.findChild(QPushButton, "btn_open_visit_doc")
+        btn_open_visit_event = self.dlg_cf.findChild(QPushButton, "btn_open_visit_event")
+
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
+        btn_open_visit_event.setEnabled(False)
+
+        # Set signals
+        widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
+        event_type.activated.connect(partial(self.set_filter_table_event, widget))
+        event_id.activated.connect(partial(self.set_filter_table_event2, widget))
+        self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
+        self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
+
+        btn_open_visit.clicked.connect(self.open_visit)
+        btn_new_visit.clicked.connect(self.new_visit)
+        btn_open_gallery.clicked.connect(self.open_gallery)
+        # btn_open_visit_doc.clicked.connect(self.open_visit_doc)
+        # btn_open_visit_event.clicked.connect(self.open_visit_event)
+
+        feature_key = self.controller.get_layer_primary_key()
+        if feature_key == 'node_id':
+            feature_type = 'NODE'
+        if feature_key == 'connec_id':
+            feature_type = 'CONNEC'
+        if feature_key == 'arc_id':
+            feature_type = 'ARC'
+        if feature_key == 'gully_id':
+            feature_type = 'GULLY'
+
+        table_name_event_id = "om_visit_parameter"
+
+        # Fill ComboBox event_id
+        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + "." + table_name_event_id + ""
+               " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
+               " ORDER BY id")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cf, "event_id", rows)
+
+        # Fill ComboBox event_type
+        sql = ("SELECT DISTINCT(parameter_type) FROM " + self.schema_name + "." + table_name_event_id + ""
+               " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
+               " ORDER BY parameter_type")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cf, "event_type", rows)
+
+        # Get selected dates
+        date_from = self.date_event_from.date()
+        date_to = self.date_event_to.date()
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+
+        format_low = 'yyyy-MM-dd 00:00:00.000'
+        format_high = 'yyyy-MM-dd 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            date_from.toString(format_low), date_to.toString(format_high))
+
+        # Set filter
+        filter_ += " AND(tstamp BETWEEN {0}) AND (tstamp BETWEEN {0})".format(interval)
+
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, table_name, filter_)
+
+    def open_visit_event(self):
+        """ Open event of selected record of the table """
+
+        # Open dialog event_standard
+        self.dlg_event_full = EventFull()
+
+        # Get all data for one visit
+        sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event"
+               " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.id, row['id'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value, row['value'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.text, row['text'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
+        utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
+
+        self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
+
+        self.dlg_event_full.open()
+
+    def tbl_event_clicked(self, table_name):
+
+        # Enable/Disable buttons
+        btn_open_gallery = self.dlg_cf.findChild(QPushButton, "btn_open_gallery")
+        btn_open_visit_doc = self.dlg_cf.findChild(QPushButton, "btn_open_visit_doc")
+        btn_open_visit_event = self.dlg_cf.findChild(QPushButton, "btn_open_visit_event")
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
+        btn_open_visit_event.setEnabled(True)
+
+        # Get selected row
+        selected_list = self.tbl_event.selectionModel().selectedRows()
+        selected_row = selected_list[0].row()
+        self.visit_id = self.tbl_event.model().record(selected_row).value("visit_id")
+        self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
+        self.parameter_id = self.tbl_event.model().record(selected_row).value("parameter_id")
+
+        sql = ("SELECT gallery, document FROM " + table_name + ""
+               " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            return
+
+        # If gallery 'True' or 'False'
+        if str(row[0]) == 'True':
+            btn_open_gallery.setEnabled(True)
+
+        # If document 'True' or 'False'
+        if str(row[1]) == 'True':
+            btn_open_visit_doc.setEnabled(True)
+
+    def set_filter_table_event(self, widget):
+        """ Get values selected by the user and sets a new filter for its table model """
+
+        # Get selected dates
+        date_from = self.date_event_from.date()
+        date_to = self.date_event_to.date()
+
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+
+        # Cascade filter
+        table_name_event_id = "om_visit_parameter"
+        event_type_value = utils_giswater.getWidgetText(self.dlg_cf, "event_type")
+
+        # Get type of feature
+        feature_key = self.controller.get_layer_primary_key()
+        if feature_key == 'node_id':
+            feature_type = 'NODE'
+        if feature_key == 'connec_id':
+            feature_type = 'CONNEC'
+        if feature_key == 'arc_id':
+            feature_type = 'ARC'
+        if feature_key == 'gully_id':
+            feature_type = 'GULLY'
+
+        # Fill ComboBox event_id
+        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + "." + table_name_event_id + ""
+               " WHERE (feature_type = '" + feature_type + "' OR feature_type = 'ALL')")
+        if event_type_value != 'null':
+            sql += " AND parameter_type = '" + event_type_value + "'"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cf, "event_id", rows)
+        # End cascading filter
+
+        format_low = 'yyyy-MM-dd 00:00:00.000'
+        format_high = 'yyyy-MM-dd 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            date_from.toString(format_low), date_to.toString(format_high))
+        # Set filter to model
+        expr = self.field_id + " = '" + self.feature_id + "'"
+        # Set filter
+        expr += " AND(tstamp BETWEEN {0}) AND (tstamp BETWEEN {0})".format(interval)
+
+        # Get selected values in Comboboxes
+        event_type_value = utils_giswater.getWidgetText(self.dlg_cf, "event_type")
+        if event_type_value != 'null':
+            expr += " AND parameter_type = '" + event_type_value + "'"
+        event_id = utils_giswater.getWidgetText(self.dlg_cf, "event_id")
+        if event_id != 'null':
+            expr += " AND parameter_id = '" + event_id + "'"
+
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+    def set_filter_table_event2(self, widget):
+        """ Get values selected by the user and sets a new filter for its table model """
+
+        # Get selected dates
+        date_from = self.date_event_from.date()
+        date_to = self.date_event_to.date()
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+
+        format_low = 'yyyy-MM-dd 00:00:00.000'
+        format_high = 'yyyy-MM-dd 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            date_from.toString(format_low), date_to.toString(format_high))
+        # Set filter to model
+        expr = self.field_id + " = '" + self.feature_id + "'"
+        # Set filter
+        expr += " AND(tstamp BETWEEN {0}) AND (tstamp BETWEEN {0})".format(interval)
+
+        # Get selected values in Comboboxes
+        event_type_value = utils_giswater.getWidgetText(self.dlg_cf, "event_type")
+        if event_type_value != 'null':
+            expr += " AND parameter_type = '" + event_type_value + "'"
+        event_id = utils_giswater.getWidgetText(self.dlg_cf, "event_id")
+        if event_id != 'null':
+            expr += " AND parameter_id = '" + event_id + "'"
+
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+    def open_visit(self):
+        """ Call button 65: om_visit_management """
+
+        manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit.visit_added.connect(self.update_visit_table)
+        manage_visit.edit_visit(self.geom_type, self.feature_id)
+
+    # creat the new visit GUI
+    def update_visit_table(self):
+        """Convenience fuction set as slot to update table after a Visit GUI close."""
+        self.tbl_event.model().select()
+
+
+    def new_visit(self):
+        """ Call button 64: om_add_visit """
+        # Get expl_id to save it on om_visit and show the geometry of visit
+        expl_id = utils_giswater.get_item_data(self.dlg_cf, 'expl_id', 0)
+        if expl_id == -1:
+            msg = "Widget expl_id not found"
+            self.controller.show_warning(msg)
+            return
+        manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit.visit_added.connect(self.update_visit_table)
+        # TODO: the following query fix a (for me) misterious bug
+        # the DB connection is not available during manage_visit.manage_visit first call
+        # so the workaroud is to do a unuseful query to have the dao controller active
+        sql = ("SELECT id FROM " + self.schema_name + ".om_visit LIMIT 1")
+        self.controller.get_rows(sql, commit=True)
+        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id)
+
+    def open_gallery(self):
+        """ Open gallery of selected record of the table """
+
+        # Open Gallery
+        gal = ManageGallery(self.iface, self.settings, self.controller, self.plugin_dir)
+        gal.manage_gallery()
+        gal.fill_gallery(self.visit_id, self.event_id)
+
+
+
+
+
 
     """ FUNCTIONS RELATED WITH TAB DOC"""
     def fill_tab_document(self):
