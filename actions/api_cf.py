@@ -673,7 +673,8 @@ class ApiCF(ApiParent):
     def add_button(self, dialog, field):
         widget = QPushButton()
         widget.setObjectName(field['column_id'])
-        widget.setText(field['value'])
+        if 'value' in field:
+            widget.setText(field['value'])
         # widget.setStyleSheet("Text-align:left; Text-decoration:underline")
         # widget.setFlat(True)
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)

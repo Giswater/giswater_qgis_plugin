@@ -489,7 +489,8 @@ class ApiParent(ParentAction):
     def add_hyperlink(self, dialog, field):
         widget = HyperLinkLabel()
         widget.setObjectName(field['column_id'])
-        widget.setText(field['value'])
+        if 'value' in field:
+            widget.setText(field['value'])
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
         function_name = 'no_function_asociated'
