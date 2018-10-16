@@ -1207,6 +1207,12 @@ class ApiCF(ApiParent):
         utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
         utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
 
+        # Set all QLineEdit readOnly(True)
+        widget_list = self.dlg_event_full.findChildren(QLineEdit)
+        for widget in widget_list:
+            widget.setReadOnly(True)
+            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
+                                 " color: rgb(100, 100, 100)}")
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
 
         self.dlg_event_full.open()
