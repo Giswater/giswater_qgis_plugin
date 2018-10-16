@@ -278,10 +278,8 @@ class ApiCF(ApiParent):
             self.iface.setActiveLayer(self.layer)
 
 
-        # TODO: Xavi Is correct get fornName as geom_type? (node, arc, connec, gully)
-        self.geom_type = str(row[0]['formTabs']['formName'])
-        self.controller.log_info(str(self.geom_type).lower())
-        self.geom_type = self.geom_type.lower()
+        # Get feature type as geom_type
+        self.geom_type = str(row[0]['featureType'])
 
         # Get field id name
         self.field_id = str(row[0]['idName'])
