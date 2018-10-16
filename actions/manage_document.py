@@ -48,10 +48,10 @@ class ManageDocument(ParentManage):
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')        
+        self.layers['arc'] = self.controller.api_get_group_layers('arc')
+        self.layers['node'] = self.controller.api_get_group_layers('node')
+        self.layers['connec'] = self.controller.api_get_group_layers('connec')
+        self.layers['element'] = self.controller.api_get_group_layers('element')
         
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
@@ -81,10 +81,9 @@ class ManageDocument(ParentManage):
         # Adding auto-completion to a QLineEdit
         table_object = "doc"        
         self.set_completer_object(self.dlg_add_doc, table_object)
-
+        geom_type = 'arc'
         # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "node"
-        viewname = "v_edit_" + geom_type
+        viewname = "ve_" + geom_type
         self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
 
         # Set signals
