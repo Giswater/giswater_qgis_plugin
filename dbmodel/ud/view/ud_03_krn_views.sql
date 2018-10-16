@@ -112,7 +112,8 @@ element.enddate
 FROM element_x_gully
 JOIN element ON element.element_id = element_x_gully.element_id
 LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
-WHERE state=1;
+JOIN selector_state ON element.state=selector_state.state_id
+AND selector_state.cur_user = "current_user"()::text;
 
 
 
