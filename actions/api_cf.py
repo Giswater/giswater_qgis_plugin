@@ -727,7 +727,8 @@ class ApiCF(ApiParent):
 
     def open_catalog(self, dialog, result, message_level=None):
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.catalog.api_catalog()
+        self.catalog.api_catalog(self.dlg_cf, self.geom_type+'cat_id', self.geom_type)
+
 
 
     def populate_lineedit(self, completer, model, tablename, dialog, widget, field_id):

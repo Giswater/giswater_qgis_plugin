@@ -15,7 +15,7 @@ from functools import partial
 import operator
 from PyQt4.QtCore import QDate
 from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QHBoxLayout, QFormLayout, \
-    QSpacerItem, QSizePolicy, QIntValidator, QDoubleValidator, QLineEdit
+    QSpacerItem, QSizePolicy, QIntValidator, QDoubleValidator, QLineEdit, QGraphicsLinearLayout
 from PyQt4.QtGui import QGridLayout, QCompleter
 from PyQt4.QtGui import QLabel
 from PyQt4.QtGui import QLineEdit
@@ -39,8 +39,8 @@ class ApiCatalog(ApiParent):
     def set_project_type(self, project_type):
         self.project_type = project_type
 
-    def api_catalog(self):
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_catalog('upsert_catalog','','','',9)")
+    def api_catalog(self, previous_dialog, widget_name, geom_type):
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_catalog('upsert_catalog_"+geom_type+"','','','',9)")
         row = self.controller.get_row(sql, log_sql=True)
         groupBox_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
@@ -49,26 +49,23 @@ class ApiCatalog(ApiParent):
         self.dlg_catalog = ApiCatalogUi()
         self.load_settings(self.dlg_catalog)
         self.dlg_catalog.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_catalog))
-        # self.dlg_catalog.btn_accept.clicked.connect(partial(self.update_values))
+        self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))
 
         main_layout = self.dlg_catalog.widget.findChild(QGridLayout, 'main_layout')
-        self.controller.log_info(str(row))
         result = row[0]['editData']
-        self.controller.log_info(str(result))
         # if 'fields' not in result:
         #     return
 
         for field in result['fields']:
+            label = QLabel()
+            label.setObjectName('lbl_' + field['form_label'])
+            label.setText(field['form_label'].capitalize())
             if field['widgettype'] == 2:
                 widget = self.add_combobox(self.dlg_catalog, field)
-                # widget = self.set_auto_update_combobox(field, self.dlg_catalog, widget)
-            # elif field['widgettype'] == 11:
-            #     widget = Line()
-            #     widget.setObjectName(field['column_id'])
-            #     widget.setOrientation(QtCore.Qt.Horizontal)
-            #     return widget
             if field['layout_id'] == 1:
-                self.filter_form.addWidget(widget, field['layout_order'],0)
+                self.filter_form.addWidget(label, field['layout_order'], 0)
+                self.filter_form.addWidget(widget, field['layout_order'], 1)
+
 
         groupBox_1.setLayout(self.filter_form)
         main_layout.addWidget(groupBox_1)
@@ -76,28 +73,54 @@ class ApiCatalog(ApiParent):
         main_layout.addItem(verticalSpacer1)
 
         # Event on change from combo parent
-        self.get_event_combo_parent('fields', result)
+        self.get_event_combo_parent('fields', result, geom_type)
+
+        # Filter combos on open form
+        widget = None
+        widget = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
+        if widget:
+            self.fill_child(widget, geom_type)
+        self.populate_catalog_id(geom_type)
 
         # Open form
         self.dlg_catalog.show()
 
-    def get_event_combo_parent(self, fields, row):
+
+    def get_event_combo_parent(self, fields, row, geom_type):
         if fields == 'fields':
             for field in row["fields"]:
                 if field['dv_isparent']:
                     widget = self.dlg_catalog.findChild(QComboBox, field['column_id'])
-                    widget.currentIndexChanged.connect(partial(self.fill_child, widget))
+                    widget.currentIndexChanged.connect(partial(self.fill_child, widget, geom_type))
+                    widget.currentIndexChanged.connect(partial(self.populate_catalog_id, geom_type))
 
-    def fill_child(self, widget):
+    def fill_child(self, widget, geom_type):
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_catalog, widget)
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('catalog" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "')")
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('catalog" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','"+str(geom_type)+"')")
         row = self.controller.get_row(sql, log_sql=True)
-
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child, row)
+
+
+    def populate_catalog_id(self, geom_type):
+
+        # Get widgets
+        widget_metcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
+        widget_pn = self.dlg_catalog.findChild(QComboBox, 'pn')
+        widget_dn = self.dlg_catalog.findChild(QComboBox, 'dn')
+        widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
+
+        # Get values from combo parents
+        metcat_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_metcat_id)
+        pn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_pn)
+        dn_value = utils_giswater.getWidgetText(self.dlg_catalog, widget_dn)
+
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_catalog_id('"+str(metcat_value)+"','"+str(pn_value)+"','"+str(dn_value)+"','"+str(geom_type)+"',9)")
+        row = self.controller.get_row(sql, log_sql=True)
+        self.populate_combo(widget_id, row[0]['catalog_id'][0])
 
     def populate_child(self, combo_child, result):
         child = self.dlg_catalog.findChild(QComboBox, str(combo_child['childName']))
@@ -117,10 +140,10 @@ class ApiCatalog(ApiParent):
     def add_combobox(self, dialog, field):
         widget = QComboBox()
         widget.setObjectName(field['column_id'])
+        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
-        # widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
     def populate_combo(self, widget, field):
@@ -136,27 +159,20 @@ class ApiCatalog(ApiParent):
             records_sorted = sorted(combolist, key=operator.itemgetter(1))
             # Populate combo
             for record in records_sorted:
-                widget.addItem(record[1], record)
+                widget.addItem(str(record[1]), record)
         if 'value' in field:
             if str(field['value']) != 'None':
                 utils_giswater.set_combo_itemData(widget, field['value'], 0)
 
-    def get_values(self, dialog, widget, _json=None):
-        value = None
-        if type(widget) is QLineEdit and not widget.isReadOnly():
-            value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
-        elif type(widget) is QComboBox and widget.isEnabled():
-            value = utils_giswater.get_item_data(dialog, widget, 0)
-        elif type(widget) is QCheckBox and widget.isEnabled():
-            value = utils_giswater.isChecked(dialog, widget)
-        elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
-            value = utils_giswater.getCalendarDate(dialog, widget)
+    def fill_geomcat_id(self, previous_dialog, widget_name):
 
-        # Only get values if layer is editable
-        if self.layer.isEditable():
-            # If widget.isEditable(False) return None, here control it.
-            if str(value) == '':
-                _json[str(widget.objectName())] = None
-            else:
-                _json[str(widget.objectName())] = str(value)
-        self.controller.log_info(str(_json))
+        widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
+        catalog_id = utils_giswater.getWidgetText(self.dlg_catalog, widget_id)
+        widget = previous_dialog.findChild(QLineEdit, widget_name)
+        if widget:
+            widget.setText(catalog_id)
+            widget.setFocus()
+        else:
+            msg = ("Widget not found: " + str(widget_name))
+            self.controller.show_message(msg, 2)
+        self.close_dialog(self.dlg_catalog)

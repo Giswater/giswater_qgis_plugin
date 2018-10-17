@@ -378,7 +378,7 @@ class ApiConfig(ApiParent):
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "')")
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','')")
         row = self.controller.get_row(sql, log_sql=True)
 
         for combo_child in row[0]['fields']:
