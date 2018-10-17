@@ -19,17 +19,23 @@ v_return integer;
 BEGIN 
 
 	
+BEGIN 
+
 	-- Daily updates
-	--SELECT crm.gw_fct_crm_2gis();
-	--SELECT ud.gw_fct_refresh_mat_view();
-	--SELECT ws.gw_fct_refresh_mat_view();
+	PERFORM crm.gw_fct_crm2gis();
+	PERFORM ud.gw_fct_refresh_mat_view();
+	PERFORM ws.gw_fct_refresh_mat_view();
+
+	-- Log
 	INSERT INTO utils.audit_log (fprocesscat_id, log_message) VALUES (999, 'Ok');
 
-	v_return = 0;
 	
+	RETURN 0;
 
-		
-RETURN v_return;
+--  Exception handling
+	EXCEPTION WHEN OTHERS THEN         
+	INSERT INTO utils.audit_log (fprocesscat_id, log_message) VALUES (999, 'Ko. The process has not been executed');
+	RETURN 1;
 
 END;
 $BODY$
