@@ -611,7 +611,7 @@ class ManageVisit(ParentManage, QObject):
         if table_object == "om_visit":
             expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
             if object_id != 'null':
-                expr_filter += " AND visitcat_id::TEXT ILIKE '%" + str(object_id) + "%'"
+                expr_filter += " AND ext_code::TEXT ILIKE '%" + str(object_id) + "%'"
         else:
             expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
             if object_id != 'null':
