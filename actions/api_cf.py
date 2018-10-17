@@ -13,7 +13,7 @@ import subprocess
 import sys
 import urlparse
 import webbrowser
-
+import datetime
 from functools import partial
 
 
@@ -68,6 +68,37 @@ class ApiCF(ApiParent):
         self.emit_point.canvasClicked.connect(self.get_point)
 
 
+    def set_vdefault_values(self, widget, values, parameter):
+        # Set dates from
+        if type(widget) is QDateEdit:
+            if parameter in values[0]:
+                date = QDate.fromString(values[0][parameter], 'yyyy/MM/dd')
+            else:
+                date = QDate.currentDate()
+            widget.setDate(date)
+        elif type(widget) is QComboBox:
+            if parameter in values[0]:
+                utils_giswater.set_combo_itemData(widget, values[0][parameter], 0)
+        # # self.dlg_cf.date_document_from.setDate(date)
+        # # Set dates to
+        # if 'to_date_vdefault' in values[0]:
+        #     date = QDate.fromString(values[0]['to_date_vdefault'], 'yyyy/MM/dd')
+        # else:
+        #     date = QDate.currentDate()
+        # self.dlg_cf.date_event_to.setDate(date)
+        # self.dlg_cf.date_document_to.setDate(date)
+        # # Set parameter
+        # if 'parameter_vdefault' in values:
+        #     utils_giswater.set_combo_itemData(self.dlg_cf.event_id, values[0]['parameter_vdefault'], 0)
+        #
+        # if 'om_param_type_vdefault' in values:
+        #     utils_giswater.set_combo_itemData(self.dlg_cf.event_type, values[0]['om_param_type_vdefault'], 0)
+        #
+        #
+        # if 'document_type_vdefault' in values:
+        #     utils_giswater.set_combo_itemData(self.dlg_cf.doc_type, values[0]['document_type_vdefault'], 1)
+        #
+
     def get_point(self, point, button_clicked):
         if button_clicked == Qt.LeftButton:
             complet_result = self.open_form(point)
@@ -105,7 +136,12 @@ class ApiCF(ApiParent):
             # Manage tab 'Relations'
             if self.geom_type in ('arc', 'node'):
                 self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
-            # Manage tab rpt
+            # Set default values
+            self.values = [{"from_date_vdefault": "2010/02/03",
+                       "to_date_vdefault": "2022/04/05",
+                       "parameter_vdefault": "Arc inspection type 1",
+                       "om_param_type_vdefault": "INSPECTION",
+                       "document_type_vdefault": "AS_BUILT"}]
 
             # TODO
             # Manage 'image'
@@ -301,7 +337,6 @@ class ApiCF(ApiParent):
         # Get field id name
         self.field_id = str(row[0]['idName'])
         self.feature_id = None
-
         for field in result["fields"]:
             label = QLabel()
             label.setObjectName('lbl_' + field['form_label'])
@@ -1101,12 +1136,11 @@ class ApiCF(ApiParent):
         """ Get Filter for table hydrometer value with combo value"""
 
         # Get combo value
-        cat_period_id_filter = utils_giswater.get_item_data(self.dlg_cf, self.cmb_cat_period_id_filter)
+        cat_period_id_filter = utils_giswater.get_item_data(self.dlg_cf, self.cmb_cat_period_id_filter, 0)
 
         # Set filter
         expr = self.field_id + " = '" + self.feature_id + "'"
         expr += " AND cat_period_id = '" + cat_period_id_filter + "'"
-        print (expr)
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
@@ -1115,11 +1149,17 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB OM"""
     def fill_tab_om(self, geom_type):
         """ Fill tab 'O&M' (event) """
+        self.set_vdefault_values(self.dlg_cf.date_event_to, self.values, 'to_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_event_from, self.values, 'from_date_vdefault')
 
         table_event_geom = "v_ui_om_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_geom)
+
+        self.set_vdefault_values(self.dlg_cf.event_type, self.values, 'om_param_type_vdefault')
+        self.set_vdefault_values(self.dlg_cf.event_id, self.values, 'parameter_vdefault')
+
 
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
@@ -1129,8 +1169,6 @@ class ApiCF(ApiParent):
         event_id = self.dlg_cf.findChild(QComboBox, "event_id")
         self.date_event_to = self.dlg_cf.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dlg_cf.findChild(QDateEdit, "date_event_from")
-        date = QDate.currentDate()
-        self.date_event_to.setDate(date)
 
         btn_open_visit = self.dlg_cf.findChild(QPushButton, "btn_open_visit")
         btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit")
@@ -1144,8 +1182,8 @@ class ApiCF(ApiParent):
 
         # Set signals
         widget.clicked.connect(partial(self.tbl_event_clicked, table_name))
-        event_type.activated.connect(partial(self.set_filter_table_event, widget))
-        event_id.activated.connect(partial(self.set_filter_table_event2, widget))
+        event_type.currentIndexChanged.connect(partial(self.set_filter_table_event, widget))
+        event_id.currentIndexChanged.connect(partial(self.set_filter_table_event2, widget))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
 
@@ -1168,18 +1206,20 @@ class ApiCF(ApiParent):
         table_name_event_id = "om_visit_parameter"
 
         # Fill ComboBox event_id
-        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + "." + table_name_event_id + ""
+        sql = ("SELECT DISTINCT(id), id FROM " + self.schema_name + "." + table_name_event_id + ""
                " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cf, "event_id", rows)
-
+        rows.append(['', ''])
+        utils_giswater.set_item_data(self.dlg_cf.event_id, rows)
         # Fill ComboBox event_type
-        sql = ("SELECT DISTINCT(parameter_type) FROM " + self.schema_name + "." + table_name_event_id + ""
+        sql = ("SELECT DISTINCT(parameter_type), parameter_type FROM " + self.schema_name + "." + table_name_event_id + ""
                " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
                " ORDER BY parameter_type")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cf, "event_type", rows)
+        rows.append(['', ''])
+        utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
+
 
         # Get selected dates
         date_from = self.date_event_from.date()
@@ -1290,7 +1330,7 @@ class ApiCF(ApiParent):
 
         # Cascade filter
         table_name_event_id = "om_visit_parameter"
-        event_type_value = utils_giswater.getWidgetText(self.dlg_cf, "event_type")
+        event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
 
         # Get type of feature
         feature_key = self.controller.get_layer_primary_key()
@@ -1304,15 +1344,19 @@ class ApiCF(ApiParent):
             feature_type = 'GULLY'
 
         # Fill ComboBox event_id
-        sql = ("SELECT DISTINCT(id) FROM " + self.schema_name + "." + table_name_event_id + ""
+        sql = ("SELECT DISTINCT(id), id FROM " + self.schema_name + "." + table_name_event_id + ""
                " WHERE (feature_type = '" + feature_type + "' OR feature_type = 'ALL')")
         if event_type_value != 'null':
-            sql += " AND parameter_type = '" + event_type_value + "'"
+            sql += " AND parameter_type ILIKE '%" + event_type_value + "%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cf, "event_id", rows)
-        # End cascading filter
+        rows = self.controller.get_rows(sql, log_sql=True)
+        rows.append(['', ''])
+        utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
 
+        # End cascading filter
+        # Get selected values in Comboboxes
+        event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_id = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
@@ -1322,13 +1366,11 @@ class ApiCF(ApiParent):
         # Set filter
         expr += " AND(tstamp BETWEEN {0}) AND (tstamp BETWEEN {0})".format(interval)
 
-        # Get selected values in Comboboxes
-        event_type_value = utils_giswater.getWidgetText(self.dlg_cf, "event_type")
         if event_type_value != 'null':
-            expr += " AND parameter_type = '" + event_type_value + "'"
-        event_id = utils_giswater.getWidgetText(self.dlg_cf, "event_id")
+            expr += " AND parameter_type ILIKE '%" + event_type_value + "%'"
+
         if event_id != 'null':
-            expr += " AND parameter_id = '" + event_id + "'"
+            expr += " AND parameter_id ILIKE '%" + event_id + "%'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -1355,12 +1397,12 @@ class ApiCF(ApiParent):
         expr += " AND(tstamp BETWEEN {0}) AND (tstamp BETWEEN {0})".format(interval)
 
         # Get selected values in Comboboxes
-        event_type_value = utils_giswater.getWidgetText(self.dlg_cf, "event_type")
+        event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
         if event_type_value != 'null':
-            expr += " AND parameter_type = '" + event_type_value + "'"
-        event_id = utils_giswater.getWidgetText(self.dlg_cf, "event_id")
+            expr += " AND parameter_type ILIKE '%" + event_type_value + "%'"
+        event_id = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
         if event_id != 'null':
-            expr += " AND parameter_id = '" + event_id + "'"
+            expr += " AND parameter_id ILIKE '%" + event_id + "%'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -1500,11 +1542,12 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB DOC"""
     def fill_tab_document(self):
         """ Fill tab 'Document' """
-
+        self.set_vdefault_values(self.dlg_cf.date_document_to, self.values, 'to_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_document_from, self.values, 'from_date_vdefault')
         table_document = "v_ui_doc_x_"+self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
-
+        self.set_vdefault_values(self.dlg_cf.doc_type, self.values, 'document_type_vdefault')
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
@@ -1522,7 +1565,7 @@ class ApiCF(ApiParent):
         btn_doc_new = self.dlg_cf.findChild(QPushButton, "btn_doc_new")
 
         # Set signals
-        doc_type.activated.connect(partial(self.set_filter_table_man, widget))
+        doc_type.currentIndexChanged.connect(partial(self.set_filter_table_man, widget))
         self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
         self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
@@ -1531,16 +1574,11 @@ class ApiCF(ApiParent):
         btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
         btn_doc_new.clicked.connect(partial(self.manage_new_document, dialog, None, self.feature))
 
-        # Set dates
-        date = QDate.currentDate()
-        self.date_document_to.setDate(date)
-
         # Fill ComboBox doc_type
         sql = ("SELECT id, id FROM " + self.schema_name + ".doc_type ORDER BY id")
         rows = self.controller.get_rows(sql)
         rows.append(['', ''])
         utils_giswater.set_item_data(doc_type, rows)
-
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"
@@ -1568,9 +1606,9 @@ class ApiCF(ApiParent):
         expr += " AND(date BETWEEN {0}) AND (date BETWEEN {0})".format(interval)
 
         # Get selected values in Comboboxes
-        doc_type_value = utils_giswater.getWidgetText(self.dlg_cf, "doc_type")
+        doc_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
         if doc_type_value != 'null' and doc_type_value is not None:
-            expr += " AND doc_type = '" + str(doc_type_value) + "'"
+            expr += " AND doc_type ILIKE '%" + str(doc_type_value) + "%'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -1608,7 +1646,6 @@ class ApiCF(ApiParent):
 
     def manage_new_document(self, dialog, doc_id=None, feature=None):
         """ Execute action of button 34 """
-        print(feature)
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)
         doc.manage_document(feature=feature)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
