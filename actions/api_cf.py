@@ -184,14 +184,21 @@ class ApiCF(ApiParent):
         # Get widget controls
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
+        utils_giswater.set_qtv_config(self.tbl_element)
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
+        utils_giswater.set_qtv_config(self.tbl_relations)
         self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
+        utils_giswater.set_qtv_config(self.tbl_upstream)
         self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
+        utils_giswater.set_qtv_config(self.tbl_downstream)
         self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
+        utils_giswater.set_qtv_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
+        utils_giswater.set_qtv_config(self.tbl_hydrometer_value)
         self.tbl_event = self.dlg_cf.findChild(QTableView, "tbl_event")
+        utils_giswater.set_qtv_config(self.tbl_event)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-
+        utils_giswater.set_qtv_config(self.tbl_document)
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
         action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
@@ -794,7 +801,6 @@ class ApiCF(ApiParent):
         """ Fill the table control to show elements """
 
         # Get widgets
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.element_id = self.dlg_cf.findChild(QLineEdit, "element_id")
         btn_open_element = self.dlg_cf.findChild(QPushButton, "btn_open_element")
         btn_delete = self.dlg_cf.findChild(QPushButton, "btn_delete")
@@ -978,7 +984,6 @@ class ApiCF(ApiParent):
 
         else:
             # Manage signal 'doubleClicked'
-            self.tbl_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))
 
     def fill_tab_relations(self):
@@ -1028,9 +1033,6 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB CONECTIONS"""
     def fill_tab_connections(self):
         """ Fill tab 'Connections' """
-        self.dlg_cf.tbl_upstream.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.dlg_cf.tbl_downstream.setSelectionBehavior(QAbstractItemView.SelectRows)
-
         self.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream")
         self.set_configuration(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
 
@@ -1075,7 +1077,7 @@ class ApiCF(ApiParent):
 
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
         """ Fill the table control to show documents"""
-        print (filter_)
+
         # Get widgets
         self.cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
 
@@ -1122,7 +1124,6 @@ class ApiCF(ApiParent):
         """ Fill the table control to show documents """
 
         # Get widgets
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         event_type = self.dlg_cf.findChild(QComboBox, "event_type")
         event_id = self.dlg_cf.findChild(QComboBox, "event_id")
         self.date_event_to = self.dlg_cf.findChild(QDateEdit, "date_event_to")
@@ -1506,12 +1507,10 @@ class ApiCF(ApiParent):
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
-        print(widget.objectName())
-        # Get widgets
-        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+
         # Set model of selected widget
         self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
-
+        # Get widgets
         txt_doc_id = self.dlg_cf.findChild(QLineEdit, "txt_doc_id")
         doc_type = self.dlg_cf.findChild(QComboBox, "doc_type")
         self.date_document_to = self.dlg_cf.findChild(QDateEdit, "date_document_to")

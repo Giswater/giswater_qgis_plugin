@@ -6,12 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QDoubleValidator
-
 """ Module with utility functions to interact with dialog and its widgets """
 from qgis.gui import QgsDateTimeEdit
 from PyQt4.QtGui import QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QLabel, QTextEdit, QDateEdit
-from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit
+from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit, QDoubleValidator, QTableView
 from PyQt4.QtGui import QPixmap, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime
@@ -487,3 +485,9 @@ def double_validator(widget, min=0, max=999999, decimals=3, notation=QDoubleVali
     validator = QDoubleValidator(min, max, decimals)
     validator.setNotation(notation)
     widget.setValidator(validator)
+
+
+def set_qtv_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
+    """ Set QTableView configurations """
+    widget.setSelectionBehavior(selection)
+    widget.setEditTriggers(edit_triggers)
