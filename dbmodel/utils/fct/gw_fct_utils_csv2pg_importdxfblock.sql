@@ -6,6 +6,23 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2504
 
+/*
+
+NOTES:
+------
+This function is a 0.1 version of import dxf files into giswater. 
+This function only solves the importation of blocks with attributes
+The file must be depurated before cleaning as much as possible of layers......
+Only blocks must be on the dxf file
+
+
+example to work with
+--------------------
+delete from SCHEMA_NAME.temp_csv2pg ;
+copy SCHEMA_NAME.temp_csv2pg (csv1) FROM 'c:\data\file.dxf';
+update SCHEMA_NAME.temp_csv2pg set csv2pgcat_id=8;
+select SCHEMA_NAME.gw_fct_utils_csv2pg_importdxfblock(8);
+*/
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_importdxfblock(
@@ -35,7 +52,7 @@ BEGIN
 	LOOP 
 		v_i=v_i+1;
 		-- massive refactor of source field (getting target)
-		IF v_record.csv1 LIKE 'ATTRIB' THEN
+		IF v_record.csv1 LIKE ' 66' THEN
 			v_target=v_record.id;
 		END IF;
 		UPDATE temp_csv2pg SET source=v_target WHERE v_record.id=temp_csv2pg.id;
@@ -59,14 +76,20 @@ BEGIN
 		IF v_record.csv1 = ' 10' AND v_record.source IS NOT NULL THEN
 			v_id=v_record.id+1;
 			SELECT csv1 INTO v_value FROM temp_csv2pg WHERE id=v_id;
-			UPDATE temp_csv2pg SET csv2=v_value WHERE temp_csv2pg.id=v_record.source::integer;
+			-- looking for the first xcoord value ( 10). Into the block there are two xcoord values. We are looking for the first one
+			IF (SELECT csv2 FROM temp_csv2pg WHERE id=v_record.source::integer) IS NULL THEN
+				UPDATE temp_csv2pg SET csv2=v_value WHERE temp_csv2pg.id=v_record.source::integer;	
+			END IF;
 		END IF;
 		
 		-- ycoord
 		IF v_record.csv1 = ' 20' AND v_record.source IS NOT NULL THEN
 			v_id=v_record.id+1;
 			SELECT csv1 INTO v_value FROM temp_csv2pg WHERE id=v_id;
-			UPDATE temp_csv2pg SET csv3=v_value WHERE temp_csv2pg.id=v_record.source::integer;
+			-- looking for the first xcoord value ( 10). Into the block there are two xcoord values. We are looking for the first one
+			IF (SELECT csv3 FROM temp_csv2pg WHERE id=v_record.source::integer) IS NULL THEN
+				UPDATE temp_csv2pg SET csv3=v_value WHERE temp_csv2pg.id=v_record.source::integer;
+			END IF;
 		END IF;
 
 		-- value
