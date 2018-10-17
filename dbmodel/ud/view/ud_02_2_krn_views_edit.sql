@@ -244,6 +244,79 @@ FROM connec
 	LEFT JOIN sector ON connec.sector_id = sector.sector_id
 	LEFT JOIN connec_type ON connec.connec_type=connec_type.id;
 
+	
+DROP VIEW IF EXISTS vu_connec CASCADE;
+CREATE OR REPLACE VIEW vu_connec AS
+SELECT connec.connec_id, 
+connec.code,
+connec.customer_code,
+connec.top_elev, 
+connec.y1,
+connec.y2,
+connec.connecat_id,
+connec.connec_type,
+connec_type.type as sys_type,
+connec.private_connecat_id,
+cat_connec.matcat_id AS "cat_matcat_id",
+connec.sector_id,
+sector.macrosector_id,
+connec.demand,
+connec."state", 
+connec.state_type,
+connec_depth,
+connec_length,
+connec.arc_id,
+connec.annotation, 
+connec.observ, 
+connec."comment",
+cat_connec.label,
+connec.dma_id,
+connec.soilcat_id,
+connec.function_type,
+connec.category_type,
+connec.fluid_type,
+connec.location_type,
+connec.workcat_id,
+connec.workcat_id_end,
+connec.buildercat_id,
+connec.builtdate,
+connec.enddate,
+connec.ownercat_id,
+connec.muni_id,
+connec.postcode,
+connec.streetaxis_id,
+connec.postnumber,
+connec.postcomplement,
+connec.streetaxis2_id,
+connec.postnumber2,
+connec.postcomplement2,
+connec.descript,
+cat_connec.svg AS "svg",
+connec.rotation,
+concat(connec_type.link_path,connec.link) as link,
+connec.verified,
+connec.the_geom,
+connec.undelete,
+connec.featurecat_id,
+connec.feature_id,
+connec.label_x,
+connec.label_y,
+connec.label_rotation,
+connec.accessibility,
+connec.diagonal,
+connec.publish,
+connec.inventory,
+connec.uncertain,
+dma.macrodma_id,
+connec.expl_id,
+connec.num_value
+FROM connec 
+	JOIN cat_connec ON connec.connecat_id = cat_connec.id
+	LEFT JOIN ext_streetaxis ON (((connec.streetaxis_id) = (ext_streetaxis.id)))
+	LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	LEFT JOIN sector ON connec.sector_id = sector.sector_id
+	LEFT JOIN connec_type ON connec.connec_type=connec_type.id;
+
 
 
 
@@ -315,6 +388,80 @@ gully.uncertain,
 gully.num_value
 FROM gully
 	JOIN v_state_gully ON gully.gully_id=v_state_gully.gully_id 
+	LEFT JOIN cat_grate ON (((gully.gratecat_id) = (cat_grate.id)))
+	LEFT JOIN ext_streetaxis ON gully.streetaxis_id = ext_streetaxis.id
+	LEFT JOIN dma ON gully.dma_id = dma.dma_id
+	LEFT JOIN sector ON gully.sector_id = sector.sector_id
+	LEFT JOIN gully_type ON gully.gully_type=gully_type.id;
+
+	
+DROP VIEW IF EXISTS vu_gully CASCADE;
+CREATE OR REPLACE VIEW vu_gully AS
+SELECT 
+gully.gully_id, 
+gully.code,
+gully.top_elev, 
+gully.ymax, 
+gully.sandbox,
+gully.matcat_id,
+gully.gully_type,
+gully_type.type as sys_type,
+gully.gratecat_id,
+cat_grate.matcat_id AS "cat_grate_matcat",
+gully.units,
+gully.groove,
+gully.siphon,
+gully.connec_arccat_id,
+gully.connec_length,
+gully.connec_depth,
+gully.arc_id,
+gully.sector_id, 
+sector.macrosector_id,
+gully."state", 
+gully.state_type,
+gully.annotation, 
+gully.observ, 
+gully."comment",
+cat_grate.label,
+gully.dma_id,
+gully.soilcat_id,
+gully.function_type,
+gully.category_type,
+gully.fluid_type,
+gully.location_type,
+gully.workcat_id,
+gully.workcat_id_end,
+gully.buildercat_id,
+gully.builtdate,
+gully.enddate,
+gully.ownercat_id,
+gully.muni_id,
+gully.postcode,
+gully.streetaxis_id,
+gully.postnumber,
+gully.postcomplement,
+gully.streetaxis2_id,
+gully.postnumber2,
+gully.postcomplement2,
+gully.descript,
+cat_grate.svg AS "svg",
+gully.rotation,
+concat(gully_type.link_path,gully.link) as link,
+gully.verified,
+gully.the_geom,
+gully.undelete,
+gully.featurecat_id,
+gully.feature_id,
+gully.label_x,
+gully.label_y,
+gully.label_rotation,
+gully.publish,
+gully.inventory,
+gully.expl_id,
+dma.macrodma_id,
+gully.uncertain,
+gully.num_value
+FROM gully
 	LEFT JOIN cat_grate ON (((gully.gratecat_id) = (cat_grate.id)))
 	LEFT JOIN ext_streetaxis ON gully.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN dma ON gully.dma_id = dma.dma_id

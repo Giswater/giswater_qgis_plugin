@@ -209,6 +209,74 @@ FROM  connec
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	LEFT JOIN sector ON connec.sector_id=sector.sector_id;
 	
+
+DROP VIEW IF EXISTS vu_connec CASCADE;
+CREATE OR REPLACE VIEW vu_connec AS 
+SELECT 
+connec.connec_id,
+connec.code,
+connec.elevation,
+connec.depth,
+cat_connec.connectype_id,
+connec_type.type as sys_type,
+connec.connecat_id,
+connec.sector_id,
+sector.macrosector_id,
+connec.customer_code,
+cat_connec.matcat_id AS cat_matcat_id,
+cat_connec.pnom AS cat_pnom,
+cat_connec.dnom AS cat_dnom,
+connec_length,
+connec.state,
+connec.state_type,
+connec.annotation,
+connec.observ,
+connec.comment,
+cat_connec.label,
+connec.dma_id,
+connec.presszonecat_id,
+connec.soilcat_id,
+connec.function_type,
+connec.category_type,
+connec.fluid_type,
+connec.location_type,
+connec.workcat_id,
+connec.workcat_id_end,
+connec.buildercat_id,
+connec.builtdate,
+connec.enddate,
+connec.ownercat_id,
+connec.muni_id ,
+connec.postcode,
+connec.streetaxis_id,
+connec.postnumber,
+connec.postcomplement,
+connec.streetaxis2_id,
+connec.postnumber2,
+connec.postcomplement2,
+connec.descript,
+connec.arc_id,
+cat_connec.svg AS svg,
+connec.rotation,
+concat(connec_type.link_path,connec.link) as link,
+connec.verified,
+connec.the_geom,
+connec.undelete,
+connec.label_x,
+connec.label_y,
+connec.label_rotation,
+connec.publish,
+connec.inventory,
+dma.macrodma_id,
+connec.expl_id,
+connec.num_value
+FROM  connec
+	JOIN cat_connec ON connec.connecat_id = cat_connec.id
+	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
+	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
+	LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	LEFT JOIN sector ON connec.sector_id=sector.sector_id;
+
 	
 	
    

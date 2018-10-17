@@ -186,6 +186,79 @@ FROM selector_expl,arc
 	JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	WHERE arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
+	
+DROP VIEW IF EXISTS vu_arc CASCADE;
+CREATE OR REPLACE VIEW vu_arc AS 
+SELECT 
+arc.arc_id, 
+arc.code,
+arc.node_1, 
+arc.node_2,
+y1,
+y2,
+custom_y1,
+custom_y2,
+elev1,
+elev2,
+custom_elev1,
+custom_elev2,
+sys_elev1,
+sys_elev2,
+sys_slope,												
+arc.arc_type,
+arc.arccat_id,
+cat_arc.matcat_id,																	
+cat_arc.shape,
+cat_arc.geom1,
+cat_arc.geom2,
+cat_arc.width,
+arc.epa_type,
+arc.sector_id, 
+arc.builtdate, 
+arc.state,
+arc.state_type,
+arc.annotation,
+st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+arc.observ, 
+arc."comment",
+arc.inverted_slope,
+arc.custom_length,
+arc.dma_id,
+arc.soilcat_id,
+arc.function_type,
+arc.category_type,
+arc.fluid_type,
+arc.location_type,
+arc.workcat_id,
+arc.workcat_id_end,
+arc.buildercat_id,
+arc.enddate,
+arc.ownercat_id,
+arc.muni_id,
+arc.postcode,
+arc.streetaxis_id,
+arc.postnumber,
+arc.postcomplement,
+arc.postcomplement2,
+arc.streetaxis2_id,
+arc.postnumber2,
+arc.descript,
+arc.link,
+arc.verified,
+arc.the_geom,
+arc.undelete,
+arc.label_x,
+arc.label_y,
+arc.label_rotation,
+arc.publish,
+arc.inventory,
+arc.uncertain,	
+arc.expl_id,
+arc.num_value
+FROM selector_expl,arc
+	JOIN cat_arc ON arc.arccat_id = cat_arc.id
+	WHERE arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
 
 
 DROP VIEW IF EXISTS v_node CASCADE;
@@ -260,6 +333,87 @@ FROM node
 	LEFT JOIN sector ON node.sector_id = sector.sector_id;
 
 
+DROP VIEW IF EXISTS vu_node CASCADE;
+CREATE OR REPLACE VIEW vu_node AS
+SELECT node.node_id,
+   node.code,
+   node.top_elev,
+   node.custom_top_elev,
+       CASE
+           WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
+           ELSE node.top_elev
+       END AS sys_top_elev,
+   node.ymax,
+   node.custom_ymax,
+       CASE
+           WHEN node.custom_ymax IS NOT NULL THEN node.custom_ymax
+           ELSE node.ymax
+       END AS sys_ymax,
+   node.elev,
+   node.custom_elev,
+       CASE
+           WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
+           WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
+           ELSE (node.top_elev - node.ymax)::numeric(12,3)
+       END AS sys_elev,
+   node.node_type,
+   node_type.type AS sys_type,
+   node.nodecat_id,
+   cat_node.matcat_id AS cat_matcat_id,
+   node.epa_type,
+   node.sector_id,
+   sector.macrosector_id,
+   node.state,
+   node.state_type,
+   node.annotation,
+   node.observ,
+   node.comment,
+   node.dma_id,
+   node.soilcat_id,
+   node.function_type,
+   node.category_type,
+   node.fluid_type,
+   node.location_type,
+   node.workcat_id,
+   node.workcat_id_end,
+   node.buildercat_id,
+   node.builtdate,
+   node.enddate,
+   node.ownercat_id,
+   node.muni_id,
+   node.postcode,
+   node.streetaxis_id,
+   node.postnumber,
+   node.postcomplement,
+   node.postcomplement2,
+   node.streetaxis2_id,
+   node.postnumber2,
+   node.descript,
+   cat_node.svg,
+   node.rotation,
+   concat(node_type.link_path, node.link) AS link,
+   node.verified,
+   node.the_geom,
+   node.undelete,
+   node.label_x,
+   node.label_y,
+   node.label_rotation,
+   node.publish,
+   node.inventory,
+   node.uncertain,
+   node.xyz_date,
+   node.unconnected,
+   dma.macrodma_id,
+   node.expl_id,
+   node.num_value
+  FROM node
+    LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+    LEFT JOIN node_type ON node_type.id::text = node.node_type::text
+    LEFT JOIN dma ON node.dma_id = dma.dma_id
+    LEFT JOIN sector ON node.sector_id = sector.sector_id;
+
+	
+	
 DROP VIEW IF EXISTS v_node_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_node_x_arc AS
 SELECT
@@ -352,7 +506,7 @@ FROM v_arc
 	JOIN sector ON sector.sector_id=v_arc.sector_id
 	JOIN arc_type ON arc_type=arc_type.id
 	JOIN dma ON v_arc.dma_id=dma.dma_id
-	LEFT JOIN v_node a ON a.node_id=node_1
-	LEFT JOIN v_node b ON b.node_id=node_2;
+	LEFT JOIN vu_node a ON a.node_id=node_1
+	LEFT JOIN vu_node b ON b.node_id=node_2;
 
 	

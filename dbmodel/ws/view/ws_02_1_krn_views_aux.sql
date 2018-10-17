@@ -168,6 +168,72 @@ FROM node
 	LEFT JOIN dma ON node.dma_id=dma.dma_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id;
 
+
+DROP VIEW IF EXISTS vu_node CASCADE;;
+CREATE VIEW vu_node AS SELECT
+node.node_id, 
+code,
+elevation, 
+depth, 
+nodetype_id,
+type as sys_type,
+nodecat_id,
+matcat_id as cat_matcat_id,
+pnom as cat_pnom,
+dnom as cat_dnom,
+epa_type,
+node.sector_id,
+sector.macrosector_id,
+arc_id,
+parent_id, 
+state, 
+state_type,
+annotation, 
+observ, 
+comment,
+node.dma_id,
+presszonecat_id,
+soilcat_id,
+function_type,
+category_type,
+fluid_type,
+location_type,
+workcat_id,
+buildercat_id,
+workcat_id_end,
+builtdate,
+enddate,
+ownercat_id,
+muni_id ,
+postcode,
+streetaxis_id,
+postnumber,
+postcomplement,
+postcomplement2,
+streetaxis2_id,
+postnumber2,
+node.descript,
+cat_node.svg AS svg,
+rotation,
+concat(node_type.link_path,node.link) AS link,
+verified,
+node.the_geom,
+node.undelete,
+label_x,
+label_y,
+label_rotation,
+publish,
+inventory,
+dma.macrodma_id,
+node.expl_id,
+hemisphere,
+num_value
+FROM node
+	LEFT JOIN cat_node on id=nodecat_id
+	JOIN node_type on node_type.id=nodetype_id
+	LEFT JOIN dma ON node.dma_id=dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id;
+
 	
 	
 	
@@ -242,6 +308,79 @@ FROM arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	JOIN arc_type ON arc_type.id=arctype_id
 	LEFT JOIN dma ON (((arc.dma_id) = (dma.dma_id)))
-	LEFT JOIN node a ON a.node_id=node_1
-    LEFT JOIN node b ON b.node_id=node_2;
+	LEFT JOIN vu_node a ON a.node_id=node_1
+    LEFT JOIN vu_node b ON b.node_id=node_2;
 
+	
+DROP VIEW IF EXISTS vu_arc CASCADE;
+CREATE OR REPLACE VIEW vu_arc AS 
+SELECT 
+arc.arc_id, 
+arc.code,
+arc.node_1, 
+arc.node_2, 
+a.elevation as elevation1,
+a.depth as depth1,
+b.elevation as elevation2,
+b.depth as depth2,
+arc.arccat_id, 
+cat_arc.arctype_id,
+type as sys_type,
+cat_arc.matcat_id,
+cat_arc.pnom,
+cat_arc.dnom,
+arc.epa_type, 
+arc.sector_id,
+sector.macrosector_id,
+arc.state, 
+arc.state_type,
+arc.annotation, 
+arc.observ, 
+arc."comment",
+st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+arc.custom_length,
+arc.dma_id,
+arc.presszonecat_id,
+arc.soilcat_id,
+arc.function_type,
+arc.category_type,
+arc.fluid_type,
+arc.location_type,
+arc.workcat_id,
+arc.workcat_id_end,
+arc.buildercat_id,
+arc.enddate,
+arc.ownercat_id,
+arc.muni_id ,
+arc.postcode,
+arc.streetaxis_id,
+arc.postnumber,
+arc.postcomplement,
+arc.postcomplement2,
+arc.streetaxis2_id,
+arc.postnumber2,
+arc.descript,
+concat(arc_type.link_path,arc.link) as link,
+arc.verified,
+arc.undelete,
+arc.label_x,
+arc.label_y,
+arc.label_rotation,
+arc.publish,
+arc.inventory,
+dma.macrodma_id,
+arc.expl_id,
+arc.num_value,
+arc.builtdate, 
+CASE
+	WHEN arc.custom_length IS NOT NULL THEN arc.custom_length::numeric(12,3)
+	ELSE st_length2d(arc.the_geom)::numeric(12,3)
+	END AS length, 
+arc.the_geom
+FROM arc
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
+	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
+	JOIN arc_type ON arc_type.id=arctype_id
+	LEFT JOIN dma ON (((arc.dma_id) = (dma.dma_id)))
+	LEFT JOIN vu_node a ON a.node_id=node_1
+    LEFT JOIN vu_node b ON b.node_id=node_2;
