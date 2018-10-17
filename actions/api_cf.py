@@ -16,6 +16,7 @@ import webbrowser
 
 from functools import partial
 
+
 from PyQt4.QtGui import QDateEdit
 from PyQt4.QtGui import QListWidget
 from PyQt4.QtGui import QListWidgetItem
@@ -28,7 +29,7 @@ from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator, QToolButt
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
 from PyQt4.QtGui import QAbstractItemView, QTabWidget, QTableView
-from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtSql import QSqlTableModel, QSqlRelationalTableModel, QSqlRelation
 
 import utils_giswater
 
@@ -74,6 +75,7 @@ class ApiCF(ApiParent):
             if not complet_result:
                 print("FAIL")
                 return
+
             self.restore(restore_cursor=True)
             self.draw(complet_result, zoom=False)
 
@@ -102,13 +104,46 @@ class ApiCF(ApiParent):
             # Manage tab 'Relations'
             if self.geom_type in ('arc', 'node'):
                 self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
+            # Manage tab rpt
+            self.populate_rpt()
             # TODO
             # Manage 'image'
             # self.set_image(self.dlg_cf, "label_image_ws_shape")
         elif button_clicked == Qt.RightButton:
             self.restore()
 
-
+    def populate_rpt(self):
+        """ Populate QTableView tbl_rpt"""
+        sql = ("SELECT " + self.schema_name + ".gw_fct_getinforpt('" + self.geom_type + "', '"+self.feature_id+"', 9)")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        self.complet_rpt = row
+        # # print(self.complet_rpt[0]['mincuts'])
+        # # print(self.complet_rpt[0]['mincuts'][0])
+        # headers = ''
+        # for x in self.complet_rpt[0]['mincuts'][0]:
+        #     headers += '"' +x+'", '
+        # headers = headers[:-2]
+        # headers2 = []
+        # headers2.append(headers)
+        # # for x in self.complet_rpt[0]['mincuts'][0]:
+        # #     headers.append(x)
+        #
+        # print (headers2)
+        # print (headers2[0])
+        # tbl_rpt = self.dlg_cf.findChild(QTableView, 'tbl_rpt')
+        # model = QSqlRelationalTableModel()
+        # model.setTable("mincuts")
+        # model.setRelation(0, QSqlRelation("teacher_id", "teachers", "teacher_name"))
+        # model.select()
+        # model.setHeaderData(0, Qt.Horizontal, "Annual Pay")
+        # model.setHeaderData(1, Qt.Horizontal, "First Name")
+        # model.setHeaderData(2, Qt.Horizontal, "Last Name")
+        #
+        # tbl_rpt.setModel(model)
+        # tbl_rpt.show()
     def restore(self, restore_cursor=True):
         if restore_cursor:
             QApplication.restoreOverrideCursor()
@@ -256,11 +291,16 @@ class ApiCF(ApiParent):
 
         # Layouts
         top_layout = self.dlg_cf.findChild(QGridLayout, 'top_layout')
+        bot_layout_1 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_1')
+        bot_layout_2 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_2')
+
         tab1_layout1 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout1')
         tab1_layout2 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout2')
         tab1_layout3 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout3')
-        bot_layout_1 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_1')
-        bot_layout_2 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_2')
+
+        tab2_layout1 = self.dlg_cf.findChild(QGridLayout, 'tab2_layout1')
+        tab2_layout2 = self.dlg_cf.findChild(QGridLayout, 'tab2_layout2')
+        tab2_layout3 = self.dlg_cf.findChild(QGridLayout, 'tab2_layout3')
 
         # Get table name for use as title
         self.tablename = row[0]['tableName']
@@ -318,9 +358,17 @@ class ApiCF(ApiParent):
                 widget = self.add_hyperlink(self.dlg_cf, field)
 
             # Prepare layouts
+            # Common layouts
             if field['layout_id'] == 0:
                 top_layout.addWidget(label, 0, field['layout_order'])
                 top_layout.addWidget(widget, 1, field['layout_order'])
+            elif field['layout_id'] == 4:
+                bot_layout_1.addWidget(label, 0, field['layout_order'])
+                bot_layout_1.addWidget(widget, 1, field['layout_order'])
+            elif field['layout_id'] == 5:
+                bot_layout_2.addWidget(label, 0, field['layout_order'])
+                bot_layout_2.addWidget(widget, 1, field['layout_order'])
+            # Tab data
             elif field['layout_id'] == 1:
                 tab1_layout1.addWidget(label, field['layout_order'], 0)
                 tab1_layout1.addWidget(widget, field['layout_order'], 1)
@@ -333,18 +381,24 @@ class ApiCF(ApiParent):
             elif field['layout_id'] == 3:
                 tab1_layout3.addWidget(label, field['layout_order'], 0)
                 tab1_layout3.addWidget(widget, field['layout_order'], 1)
-            elif field['layout_id'] == 4:
-                bot_layout_1.addWidget(label, 0, field['layout_order'])
-                bot_layout_1.addWidget(widget, 1, field['layout_order'])
-            elif field['layout_id'] == 5:
-                bot_layout_2.addWidget(label, 0, field['layout_order'])
-                bot_layout_2.addWidget(widget, 1, field['layout_order'])
-
+            # Tab inp
+            elif field['layout_id'] == 6:
+                tab2_layout1.addWidget(label, field['layout_order'], 0)
+                tab2_layout1.addWidget(widget, field['layout_order'], 1)
+            elif field['layout_id'] == 7:
+                tab2_layout2.addWidget(label, field['layout_order'], 0)
+                tab2_layout2.addWidget(widget, field['layout_order'], 1)
+            elif field['layout_id'] == 8:
+                tab2_layout3.addWidget(label, field['layout_order'], 0)
+                tab2_layout3.addWidget(widget, field['layout_order'], 1)
         vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         tab1_layout1.addItem(vertical_spacer1)
         vertical_spacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         tab1_layout2.addItem(vertical_spacer2)
-
+        vertical_spacer3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        tab2_layout1.addItem(vertical_spacer3)
+        vertical_spacer4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        tab2_layout2.addItem(vertical_spacer4)
         # Find combo parents:
         for field in result["fields"]:
             if field['dv_isparent']:
