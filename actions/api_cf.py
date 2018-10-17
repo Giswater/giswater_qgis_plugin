@@ -90,6 +90,7 @@ class ApiCF(ApiParent):
             self.tab_hydrometer_loaded = False
             self.tab_om_loaded = False
             self.tab_document_loaded = False
+            self.tab_rpt_loaded = False
             self.tab_cost_loaded = False
 
             self.filter = str(complet_result[0]['idName']) + " = '" + str(self.feature_id) + "'"
@@ -105,45 +106,14 @@ class ApiCF(ApiParent):
             if self.geom_type in ('arc', 'node'):
                 self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
             # Manage tab rpt
-            self.populate_rpt()
+
             # TODO
             # Manage 'image'
             # self.set_image(self.dlg_cf, "label_image_ws_shape")
         elif button_clicked == Qt.RightButton:
             self.restore()
 
-    def populate_rpt(self):
-        """ Populate QTableView tbl_rpt"""
-        sql = ("SELECT " + self.schema_name + ".gw_fct_getinforpt('" + self.geom_type + "', '"+self.feature_id+"', 9)")
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        self.complet_rpt = row
-        # # print(self.complet_rpt[0]['mincuts'])
-        # # print(self.complet_rpt[0]['mincuts'][0])
-        # headers = ''
-        # for x in self.complet_rpt[0]['mincuts'][0]:
-        #     headers += '"' +x+'", '
-        # headers = headers[:-2]
-        # headers2 = []
-        # headers2.append(headers)
-        # # for x in self.complet_rpt[0]['mincuts'][0]:
-        # #     headers.append(x)
-        #
-        # print (headers2)
-        # print (headers2[0])
-        # tbl_rpt = self.dlg_cf.findChild(QTableView, 'tbl_rpt')
-        # model = QSqlRelationalTableModel()
-        # model.setTable("mincuts")
-        # model.setRelation(0, QSqlRelation("teacher_id", "teachers", "teacher_name"))
-        # model.select()
-        # model.setHeaderData(0, Qt.Horizontal, "Annual Pay")
-        # model.setHeaderData(1, Qt.Horizontal, "First Name")
-        # model.setHeaderData(2, Qt.Horizontal, "Last Name")
-        #
-        # tbl_rpt.setModel(model)
-        # tbl_rpt.show()
+
     def restore(self, restore_cursor=True):
         if restore_cursor:
             QApplication.restoreOverrideCursor()
@@ -802,8 +772,9 @@ class ApiCF(ApiParent):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self.fill_tab_document()
             self.tab_document_loaded = True
-
-
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
+            self.fill_tab_rpt()
+            self.tab_rpt_loaded = True
         # Tab 'Cost'
         elif (self.tab_main.widget(index_tab).objectName() == 'tab_node_cost' or
               self.tab_main.widget(index_tab).objectName() == 'tab_arc_cost') and not self.tab_om_loaded:
@@ -1660,6 +1631,40 @@ class ApiCF(ApiParent):
 
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_document")
+
+    """ FUNCTIONS RELATED WITH TAB RPT"""
+    def fill_tab_rpt(self):
+        """ Populate QTableView tbl_rpt"""
+        sql = ("SELECT " + self.schema_name + ".gw_fct_getinforpt('" + self.geom_type + "', '"+self.feature_id+"', 9)")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        self.complet_rpt = row
+        # # print(self.complet_rpt[0]['mincuts'])
+        # # print(self.complet_rpt[0]['mincuts'][0])
+        # headers = ''
+        # for x in self.complet_rpt[0]['mincuts'][0]:
+        #     headers += '"' +x+'", '
+        # headers = headers[:-2]
+        # headers2 = []
+        # headers2.append(headers)
+        # # for x in self.complet_rpt[0]['mincuts'][0]:
+        # #     headers.append(x)
+        #
+        # print (headers2)
+        # print (headers2[0])
+        # tbl_rpt = self.dlg_cf.findChild(QTableView, 'tbl_rpt')
+        # model = QSqlRelationalTableModel()
+        # model.setTable("mincuts")
+        # model.setRelation(0, QSqlRelation("teacher_id", "teachers", "teacher_name"))
+        # model.select()
+        # model.setHeaderData(0, Qt.Horizontal, "Annual Pay")
+        # model.setHeaderData(1, Qt.Horizontal, "First Name")
+        # model.setHeaderData(2, Qt.Horizontal, "Last Name")
+        #
+        # tbl_rpt.setModel(model)
+        # tbl_rpt.show()
     """ ****************************  **************************** """
     """ ****************************  **************************** """
     """ ****************************  **************************** """
