@@ -17,19 +17,16 @@ import datetime
 from functools import partial
 
 
-from PyQt4.QtGui import QDateEdit
-from PyQt4.QtGui import QListWidget
-from PyQt4.QtGui import QListWidgetItem
-from qgis.core import QgsFeatureRequest
-
+from PyQt4.QtGui import QStandardItem
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 from PyQt4.QtCore import Qt, QDate, SIGNAL, SLOT
+from PyQt4.QtGui import QDateEdit, QListWidgetItem, QStandardItemModel, QListWidget
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator, QToolButton
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
-from PyQt4.QtGui import QAbstractItemView, QTabWidget, QTableView
-from PyQt4.QtSql import QSqlTableModel, QSqlRelationalTableModel, QSqlRelation
+from PyQt4.QtGui import QTabWidget, QTableView
+from PyQt4.QtSql import QSqlTableModel
 
 import utils_giswater
 
@@ -68,37 +65,6 @@ class ApiCF(ApiParent):
         self.emit_point.canvasClicked.connect(self.get_point)
 
 
-    def set_vdefault_values(self, widget, values, parameter):
-        # Set dates from
-        if type(widget) is QDateEdit:
-            if parameter in values[0]:
-                date = QDate.fromString(values[0][parameter], 'yyyy/MM/dd')
-            else:
-                date = QDate.currentDate()
-            widget.setDate(date)
-        elif type(widget) is QComboBox:
-            if parameter in values[0]:
-                utils_giswater.set_combo_itemData(widget, values[0][parameter], 0)
-        # # self.dlg_cf.date_document_from.setDate(date)
-        # # Set dates to
-        # if 'to_date_vdefault' in values[0]:
-        #     date = QDate.fromString(values[0]['to_date_vdefault'], 'yyyy/MM/dd')
-        # else:
-        #     date = QDate.currentDate()
-        # self.dlg_cf.date_event_to.setDate(date)
-        # self.dlg_cf.date_document_to.setDate(date)
-        # # Set parameter
-        # if 'parameter_vdefault' in values:
-        #     utils_giswater.set_combo_itemData(self.dlg_cf.event_id, values[0]['parameter_vdefault'], 0)
-        #
-        # if 'om_param_type_vdefault' in values:
-        #     utils_giswater.set_combo_itemData(self.dlg_cf.event_type, values[0]['om_param_type_vdefault'], 0)
-        #
-        #
-        # if 'document_type_vdefault' in values:
-        #     utils_giswater.set_combo_itemData(self.dlg_cf.doc_type, values[0]['document_type_vdefault'], 1)
-        #
-
     def get_point(self, point, button_clicked):
         if button_clicked == Qt.LeftButton:
             complet_result = self.open_form(point)
@@ -123,7 +89,7 @@ class ApiCF(ApiParent):
             self.tab_document_loaded = False
             self.tab_rpt_loaded = False
             self.tab_cost_loaded = False
-
+            self.fill_tab_rpt()
             self.filter = str(complet_result[0]['idName']) + " = '" + str(self.feature_id) + "'"
             self.tab_main.currentChanged.connect(self.tab_activation)
 
@@ -148,16 +114,6 @@ class ApiCF(ApiParent):
             # self.set_image(self.dlg_cf, "label_image_ws_shape")
         elif button_clicked == Qt.RightButton:
             self.restore()
-
-
-    def restore(self, restore_cursor=True):
-        if restore_cursor:
-            QApplication.restoreOverrideCursor()
-        # TODO buscar la QAction concreta y deschequearla
-        actions = self.iface.mainWindow().findChildren(QAction)
-        for a in actions:
-            a.setChecked(False)
-        self.emit_point.canvasClicked.disconnect()
 
 
     def open_form(self, point=None, table_name=None, feature_type=None, feature_id=None):
@@ -235,6 +191,8 @@ class ApiCF(ApiParent):
         utils_giswater.set_qtv_config(self.tbl_event)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
         utils_giswater.set_qtv_config(self.tbl_document)
+        self.tbl_rpt = self.dlg_cf.findChild(QTableView, "tbl_rpt")
+        utils_giswater.set_qtv_config(self.tbl_rpt)
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
         action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
@@ -1671,6 +1629,10 @@ class ApiCF(ApiParent):
 
     """ FUNCTIONS RELATED WITH TAB RPT"""
     def fill_tab_rpt(self):
+        self.fill_tbl_rpt()
+        self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
+
+    def fill_tbl_rpt(self):
         """ Populate QTableView tbl_rpt"""
         sql = ("SELECT " + self.schema_name + ".gw_fct_getinforpt('" + self.geom_type + "', '"+self.feature_id+"', 9)")
         row = self.controller.get_row(sql, log_sql=True)
@@ -1678,30 +1640,21 @@ class ApiCF(ApiParent):
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
         self.complet_rpt = row
-        # # print(self.complet_rpt[0]['mincuts'])
-        # # print(self.complet_rpt[0]['mincuts'][0])
-        # headers = ''
-        # for x in self.complet_rpt[0]['mincuts'][0]:
-        #     headers += '"' +x+'", '
-        # headers = headers[:-2]
-        # headers2 = []
-        # headers2.append(headers)
-        # # for x in self.complet_rpt[0]['mincuts'][0]:
-        # #     headers.append(x)
-        #
-        # print (headers2)
-        # print (headers2[0])
-        # tbl_rpt = self.dlg_cf.findChild(QTableView, 'tbl_rpt')
-        # model = QSqlRelationalTableModel()
-        # model.setTable("mincuts")
-        # model.setRelation(0, QSqlRelation("teacher_id", "teachers", "teacher_name"))
-        # model.select()
-        # model.setHeaderData(0, Qt.Horizontal, "Annual Pay")
-        # model.setHeaderData(1, Qt.Horizontal, "First Name")
-        # model.setHeaderData(2, Qt.Horizontal, "Last Name")
-        #
-        # tbl_rpt.setModel(model)
-        # tbl_rpt.show()
+        model = QStandardItemModel()
+        self.dlg_cf.tbl_rpt.setModel(model)
+        self.dlg_cf.tbl_rpt.horizontalHeader().setStretchLastSection(True)
+        # Get headers
+        headers = []
+        for x in self.complet_rpt[0]['mincuts'][0]:
+            headers.append(x)
+        # Set headers
+        model.setHorizontalHeaderLabels(headers)
+
+        for row in self.complet_rpt[0]['mincuts']:
+            items = [QStandardItem(str(value)) for value in row.values()]
+            model.appendRow(items)
+
+
     """ ****************************  **************************** """
     """ ****************************  **************************** """
     """ ****************************  **************************** """
@@ -1849,7 +1802,48 @@ class ApiCF(ApiParent):
 
 
     """ OTHER FUNCTIONS """
-    def set_configuration(self, widget, table_name):
+    def set_vdefault_values(self, widget, values, parameter):
+        # Set dates from
+        if type(widget) is QDateEdit:
+            if parameter in values[0]:
+                date = QDate.fromString(values[0][parameter], 'yyyy/MM/dd')
+            else:
+                date = QDate.currentDate()
+            widget.setDate(date)
+        elif type(widget) is QComboBox:
+            if parameter in values[0]:
+                utils_giswater.set_combo_itemData(widget, values[0][parameter], 0)
+        # # self.dlg_cf.date_document_from.setDate(date)
+        # # Set dates to
+        # if 'to_date_vdefault' in values[0]:
+        #     date = QDate.fromString(values[0]['to_date_vdefault'], 'yyyy/MM/dd')
+        # else:
+        #     date = QDate.currentDate()
+        # self.dlg_cf.date_event_to.setDate(date)
+        # self.dlg_cf.date_document_to.setDate(date)
+        # # Set parameter
+        # if 'parameter_vdefault' in values:
+        #     utils_giswater.set_combo_itemData(self.dlg_cf.event_id, values[0]['parameter_vdefault'], 0)
+        #
+        # if 'om_param_type_vdefault' in values:
+        #     utils_giswater.set_combo_itemData(self.dlg_cf.event_type, values[0]['om_param_type_vdefault'], 0)
+        #
+        #
+        # if 'document_type_vdefault' in values:
+        #     utils_giswater.set_combo_itemData(self.dlg_cf.doc_type, values[0]['document_type_vdefault'], 1)
+        #
+
+    def restore(self, restore_cursor=True):
+        if restore_cursor:
+            QApplication.restoreOverrideCursor()
+        # TODO buscar la QAction concreta y deschequearla
+        actions = self.iface.mainWindow().findChildren(QAction)
+        for a in actions:
+            a.setChecked(False)
+        self.emit_point.canvasClicked.disconnect()
+
+
+    def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
 
         widget = utils_giswater.getWidget(self.dlg_cf, widget)
@@ -1877,9 +1871,11 @@ class ApiCF(ApiParent):
                 widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
 
         # Set order
-        widget.model().setSort(0, Qt.AscendingOrder)
-        widget.model().select()
-
+        if not isQStandardItemModel:
+            widget.model().setSort(sort_order, Qt.AscendingOrder)
+            widget.model().select()
+        else:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
         # Delete columns
         for column in columns_to_delete:
             widget.hideColumn(column)

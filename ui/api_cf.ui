@@ -34,7 +34,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>8</number>
       </property>
       <widget class="QWidget" name="tab_data">
        <attribute name="title">
@@ -825,7 +825,11 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_17">
         <item row="2" column="0">
-         <widget class="QTableView" name="tbl_rpt"/>
+         <widget class="QTableView" name="tbl_rpt">
+          <property name="sortingEnabled">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_18">
