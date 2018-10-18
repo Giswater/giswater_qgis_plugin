@@ -5,6 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+CREATE SCHEMA crm;
+
+
 SET search_path = "crm", public, pg_catalog;
 
 -- warning: this script affects tables on ws (rtc_hydrometer and rtc_hydrometer_x_connec)
@@ -107,8 +110,7 @@ CREATE TABLE crm2gis_traceability
 );
 
 
-ALTER TABLE ws.rtc_hydrometer ADD COLUMN tstamp timestamp default now();
-ALTER TABLE ws.rtc_hydrometer_x_connec ADD COLUMN tstamp timestamp default now();
+ALTER TABLE ws.rtc_hydrometer DISABLE TRIGGER gw_trg_rtc_hydrometer;
 
 
 CREATE INDEX hydrometer_code ON crm.hydrometer USING btree (code);

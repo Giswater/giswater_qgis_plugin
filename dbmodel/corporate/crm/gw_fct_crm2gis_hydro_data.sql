@@ -25,8 +25,6 @@ BEGIN
     -- Search path
     SET search_path = "ws", public;
 
-	ALTER TABLE ws.rtc_hydrometer DISABLE TRIGGER gw_trg_rtc_hydrometer;
-
 	-- count new hydrometer
 	SELECT count(*) INTO v_new_hydrometer FROM crm.hydrometer except (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer);
 
@@ -51,7 +49,6 @@ BEGIN
 		WHERE hydrometer.connec_id is not null
 		and hydrometer.connec_id::text in (SELECT customer_code FROM ws.connec);
 
-	ALTER TABLE ws.rtc_hydrometer ENABLE TRIGGER gw_trg_rtc_hydrometer;
 
 	-- insert into traceability table
 	INSERT INTO crm.crm2gis_traceability (new_hydrometer,  new_hydrometer_x_connec) VALUES (v_new_hydrometer, v_new_hydrometer_x_connec);
