@@ -83,7 +83,7 @@ class ManageDocument(ParentManage):
         self.set_completer_object(self.dlg_add_doc, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "node"
+        geom_type = "arc"
         viewname = "v_edit_" + geom_type
         self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
 
