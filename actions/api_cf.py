@@ -102,12 +102,7 @@ class ApiCF(ApiParent):
             # Manage tab 'Relations'
             if self.geom_type in ('arc', 'node'):
                 self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
-            # Set default values
-            self.values = [{"from_date_vdefault": "2010/02/03",
-                       "to_date_vdefault": "2022/04/05",
-                       "parameter_vdefault": "Arc inspection type 1",
-                       "om_param_type_vdefault": "INSPECTION",
-                       "document_type_vdefault": "AS_BUILT"}]
+
 
             # TODO
             # Manage 'image'
@@ -1107,16 +1102,16 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB OM"""
     def fill_tab_om(self, geom_type):
         """ Fill tab 'O&M' (event) """
-        self.set_vdefault_values(self.dlg_cf.date_event_to, self.values, 'to_date_vdefault')
-        self.set_vdefault_values(self.dlg_cf.date_event_from, self.values, 'from_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['vdefaultValues'], 'to_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['vdefaultValues'], 'from_date_vdefault')
 
         table_event_geom = "v_ui_om_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_geom)
 
-        self.set_vdefault_values(self.dlg_cf.event_type, self.values, 'om_param_type_vdefault')
-        self.set_vdefault_values(self.dlg_cf.event_id, self.values, 'parameter_vdefault')
+        self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['vdefaultValues'], 'om_param_type_vdefault')
+        self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['vdefaultValues'], 'parameter_vdefault')
 
 
     def fill_tbl_event(self, widget, table_name, filter_):
@@ -1500,12 +1495,12 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB DOC"""
     def fill_tab_document(self):
         """ Fill tab 'Document' """
-        self.set_vdefault_values(self.dlg_cf.date_document_to, self.values, 'to_date_vdefault')
-        self.set_vdefault_values(self.dlg_cf.date_document_from, self.values, 'from_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_document_to, self.complet_result[0]['vdefaultValues'], 'to_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_document_from, self.complet_result[0]['vdefaultValues'], 'from_date_vdefault')
         table_document = "v_ui_doc_x_"+self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
-        self.set_vdefault_values(self.dlg_cf.doc_type, self.values, 'document_type_vdefault')
+        self.set_vdefault_values(self.dlg_cf.doc_type, self.complet_result[0]['vdefaultValues'], 'document_type_vdefault')
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
@@ -1813,25 +1808,7 @@ class ApiCF(ApiParent):
         elif type(widget) is QComboBox:
             if parameter in values[0]:
                 utils_giswater.set_combo_itemData(widget, values[0][parameter], 0)
-        # # self.dlg_cf.date_document_from.setDate(date)
-        # # Set dates to
-        # if 'to_date_vdefault' in values[0]:
-        #     date = QDate.fromString(values[0]['to_date_vdefault'], 'yyyy/MM/dd')
-        # else:
-        #     date = QDate.currentDate()
-        # self.dlg_cf.date_event_to.setDate(date)
-        # self.dlg_cf.date_document_to.setDate(date)
-        # # Set parameter
-        # if 'parameter_vdefault' in values:
-        #     utils_giswater.set_combo_itemData(self.dlg_cf.event_id, values[0]['parameter_vdefault'], 0)
-        #
-        # if 'om_param_type_vdefault' in values:
-        #     utils_giswater.set_combo_itemData(self.dlg_cf.event_type, values[0]['om_param_type_vdefault'], 0)
-        #
-        #
-        # if 'document_type_vdefault' in values:
-        #     utils_giswater.set_combo_itemData(self.dlg_cf.doc_type, values[0]['document_type_vdefault'], 1)
-        #
+
 
     def restore(self, restore_cursor=True):
         if restore_cursor:
