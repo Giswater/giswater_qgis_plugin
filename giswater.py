@@ -512,6 +512,7 @@ class Giswater(QObject):
             message = self.controller.last_error  
             if show_warning:
                 self.controller.show_warning(message, 15) 
+                self.controller.log_warning(str(self.controller.layer_source))
             return 
         
         # Cache error message with log_code = -1 (uncatched error)

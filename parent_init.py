@@ -96,6 +96,7 @@ class ParentDialog(QDialog):
         if not status:
             message = self.controller.last_error
             self.controller.show_warning(message) 
+            self.controller.log_warning(str(self.controller.layer_source))            
             return 
             
         # Manage locale and corresponding 'i18n' file

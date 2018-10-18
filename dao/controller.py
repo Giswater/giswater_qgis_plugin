@@ -110,13 +110,13 @@ class DaoController():
         self.last_error = None      
         self.log_codes = {}
         
-        layer_source = self.get_layer_source_from_credentials()
-        if layer_source is None:
+        self.layer_source = self.get_layer_source_from_credentials()
+        if self.layer_source is None:
             return False
             
         # Connect to database
-        self.logged = self.connect_to_database(layer_source['host'], layer_source['port'], 
-                                               layer_source['db'], layer_source['user'], layer_source['password']) 
+        self.logged = self.connect_to_database(self.layer_source['host'], self.layer_source['port'], 
+                                               self.layer_source['db'], self.layer_source['user'], self.layer_source['password']) 
                        
         return self.logged    
     
@@ -166,20 +166,23 @@ class DaoController():
         self.db.setPassword(pwd)
         status = self.db.open() 
         if not status:
-            message = "Database connection error. Please check connection parameters"
+            message = "Database connection error. Please open plugin log file to get more details"
             self.last_error = self.tr(message)
-            return False           
+            details = self.db.lastError().databaseText()
+            self.log_warning(str(details))
+            return False
         
         # Connect to Database 
         self.dao = PgDao()     
         self.dao.set_params(host, port, db, user, pwd)
-        status = self.dao.init_db()                 
+        status = self.dao.init_db()
         if not status:
-            message = "Database connection error. Please check connection parameters"
+            message = "Database connection error. Please open plugin log file to get more details"
             self.last_error = self.tr(message)
-            return False    
+            self.log_warning(str(self.dao.last_error))
+            return False
         
-        return status      
+        return status
     
     
     def get_error_message(self, log_code_id):    
