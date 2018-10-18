@@ -1202,6 +1202,9 @@ class SearchPlus(QObject):
                     list_elements.append(field)
                     records.append(elem)
 
+        if not records:
+            utils_giswater.remove_tab_by_tabName(self.dlg_search.tab_main, "tab_hydro")
+            return
         sql = ("SELECT t1.name FROM " + self.schema_name + ".exploitation AS t1 "
                " INNER JOIN " + self.schema_name + ".selector_expl AS t2 ON t2.expl_id = t1.expl_id "
                " WHERE cur_user = current_user")
