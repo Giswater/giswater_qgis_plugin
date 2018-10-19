@@ -55,22 +55,22 @@ BEGIN
         USING table_id; 
 
 --  force form refresh
-    IF table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_force_form_refresh')::text[]) THEN
+    IF table_id = any((select value from config_param_system where parameter='api_edit_force_form_refresh')::text[]) THEN
     v_force_formrefresh := 'TRUE';
     END IF;
 
 --  force canvas refresh
-    IF table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_force_canvas_refresh')::text[]) THEN
+    IF table_id = any((select value from config_param_system where parameter='api_edit_force_canvas_refresh')::text[]) THEN
     v_force_canvasrefresh := 'TRUE';
     END IF;
 
 --  dissable editgeom button
-    IF table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_dsbl_geom_button')::text[]) THEN
+    IF table_id = any((select value from config_param_system where parameter='api_edit_dsbl_geom_button')::text[]) THEN
     v_enable_editgeom := 'FALSE';
     END IF;
 
 --  dissable delete button
-    IF table_id = any((select value from SCHEMA_NAME.config_param_system where parameter='api_edit_dsbl_del_feature')::text[]) THEN
+    IF table_id = any((select value from config_param_system where parameter='api_edit_dsbl_del_feature')::text[]) THEN
     v_enable_delfeaeture := 'FALSE';
     END IF;
     
@@ -117,7 +117,7 @@ BEGIN
 		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
 	END IF;
 	
-    END LOOP;;
+    END LOOP;
 
 
 --    Get existing values for the element
