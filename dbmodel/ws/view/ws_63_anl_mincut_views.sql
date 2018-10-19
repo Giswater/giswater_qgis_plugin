@@ -385,5 +385,5 @@ SELECT
      LEFT JOIN exploitation ON anl_mincut_result_cat.expl_id = exploitation.expl_id
      LEFT JOIN macroexploitation ON anl_mincut_result_cat.macroexpl_id = macroexploitation.macroexpl_id
      LEFT JOIN ext_streetaxis ON anl_mincut_result_cat.streetaxis_id::text = ext_streetaxis.id::text
-	 LEFT JOIN ext_municipality ON anl_mincut_result_cat.muni_id = ext_streetaxis.muni_id
+	 LEFT JOIN ext_municipality ON anl_mincut_result_cat.muni_id = ext_municipality.muni_id
   WHERE anl_mincut_result_selector.result_id = anl_mincut_result_cat.id AND anl_mincut_result_selector.cur_user = "current_user"()::text;
