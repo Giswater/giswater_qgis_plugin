@@ -29,7 +29,7 @@ BEGIN
 	-- link ID
 
 	IF (NEW.vnode_id IS NULL) THEN
-		NEW.vnode_id:= (SELECT nextval('urn_id_seq'));
+		NEW.vnode_id:= (SELECT nextval('vnode_vnode_id_seq'));
 	END IF;
 
 		
