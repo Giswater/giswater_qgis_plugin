@@ -1624,32 +1624,66 @@ class ApiCF(ApiParent):
 
     """ FUNCTIONS RELATED WITH TAB RPT"""
     def fill_tab_rpt(self):
-        self.fill_tbl_rpt()
+        standar_model = QStandardItemModel()
+        complet_rpt = self.fill_tbl_rpt(standar_model)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
 
-    def fill_tbl_rpt(self):
+        self.dlg_cf.txt_rpt_filter.textChanged.connect(partial(self.filter_tab_tbl_rpt, complet_rpt, standar_model))
+        self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result))
+
+
+        # Prepare completer object
+        list_items = []
+        for item in complet_rpt[0]['mincuts']:
+            if str(item['event_id']) not in list_items:
+                list_items.append(str(item['event_id']))
+        # Set Completer object
+        completer = QCompleter()
+        model = QStringListModel()
+        self.set_completer_object_api(completer, model, self.dlg_cf.txt_rpt_filter, list_items)
+
+
+    def fill_tbl_rpt(self, standar_model):
         """ Populate QTableView tbl_rpt"""
         sql = ("SELECT " + self.schema_name + ".gw_fct_getinforpt('" + self.geom_type + "', '"+self.feature_id+"', 9)")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
-        self.complet_rpt = row
-        model = QStandardItemModel()
-        self.dlg_cf.tbl_rpt.setModel(model)
+        complet_rpt = row
+
+        self.dlg_cf.tbl_rpt.setModel(standar_model)
         self.dlg_cf.tbl_rpt.horizontalHeader().setStretchLastSection(True)
         # Get headers
         headers = []
-        for x in self.complet_rpt[0]['mincuts'][0]:
+        for x in complet_rpt[0]['mincuts'][0]:
             headers.append(x)
         # Set headers
-        model.setHorizontalHeaderLabels(headers)
+        standar_model.setHorizontalHeaderLabels(headers)
+        # Populate rows of QTableView
+        self.filter_tab_tbl_rpt(complet_rpt, standar_model)
+        return complet_rpt
 
-        for row in self.complet_rpt[0]['mincuts']:
-            items = [QStandardItem(str(value)) for value in row.values()]
-            model.appendRow(items)
 
+    def filter_tab_tbl_rpt(self, complet_rpt, standar_model):
+        # Set filter
+        standar_model.clear()
+        filter = utils_giswater.getWidgetText(self.dlg_cf, self.dlg_cf.txt_rpt_filter, False, False)
+        # for item in complet_rpt[0]['mincuts']:
+        #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
+        #     if len(row) > 0:
+        #         standar_model.appendRow(row)
+        for item in complet_rpt[0]['mincuts']:
+            row = []
+            for value in item.values():
+                if filter in str(item['event_id']):
+                    row.append(QStandardItem(str(value)))
+            if len(row) > 0:
+                standar_model.appendRow(row)
 
+    def open_rpt_result(self):
+        self.controller.show_message("TODO", 2)
+        print("TODO")
     """ ****************************  **************************** """
     """ ****************************  **************************** """
     """ ****************************  **************************** """
