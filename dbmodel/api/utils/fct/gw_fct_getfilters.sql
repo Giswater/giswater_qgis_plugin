@@ -111,7 +111,18 @@ BEGIN
 				FROM value_state WHERE id NOT IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY name) a'
 				INTO formTabs_networkStates;	
 				RAISE NOTICE 'TEST20 -> %',formTabs_networkStates;
-
+				
+			ELSIF v_istiled_filterstate = 'disabled' THEN
+			
+				EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , true AS disabled
+				FROM value_state WHERE id IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal('qgisserver') || ')
+				UNION
+				SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , true AS disabled
+				FROM value_state WHERE id NOT IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal('qgisserver') || ') ORDER BY name) a'
+				INTO formTabs_networkStates;	
+				RAISE NOTICE 'TEST30 ->%',formTabs_networkStates;
+				
 			END IF;
 			
 			
@@ -132,16 +143,23 @@ BEGIN
 		formTabs_networkStates := gw_fct_json_object_set_key(formTabs_networkStates, 'tabIdName', 'state_id'::TEXT);
 		formTabs_networkStates := gw_fct_json_object_set_key(formTabs_networkStates, 'active', v_active);
 
-		-- Create tabs array
-		IF v_firsttab THEN 
-			formTabs := formTabs || ',' || formTabs_networkStates::text;
-		ELSE 
-			formTabs := formTabs || formTabs_networkStates::text;
+		raise notice 'formTabs_networkStates %', formTabs_networkStates;
+
+		IF p_istilemap=TRUE AND v_istiled_filterstate = 'disabled' THEN
+		
+			-- If istiled_filterstate is disable, dont create tab Network States
+		ELSE
+			-- Create tabs array
+			IF v_firsttab THEN 
+				formTabs := formTabs || ',' || formTabs_networkStates::text;
+			ELSE 
+				formTabs := formTabs || formTabs_networkStates::text;
+			END IF;
+
+			v_firsttab := TRUE;
+			v_active :=FALSE;
+			
 		END IF;
-
-		v_firsttab := TRUE;
-		v_active :=FALSE;
-
 	END IF;
 
 -- Tab hydrometer state

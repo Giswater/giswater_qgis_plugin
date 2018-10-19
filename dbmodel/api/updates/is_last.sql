@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+			VALUES ('api_config_parameters', '{"istiled_filterstate":"publish_user", "other":"other"}', 'json', 'System', 'API');
 
 
