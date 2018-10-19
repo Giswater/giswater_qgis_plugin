@@ -11,7 +11,7 @@ import re
 from functools import partial
 
 from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer
-from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox
+from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
 from PyQt4.QtGui import QCompleter, QStringListModel
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QGis
@@ -637,6 +637,38 @@ class ApiParent(ParentAction):
 
         # Attach model to table view
         widget.setModel(model)
+
+    def populate_basic_info(self, dialog, row):
+        result = row[0]['editData']
+        if 'fields' not in result:
+            return
+
+        # Get field id name
+        field_id = str(row[0]['idName'])
+
+        grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
+        for field in result["fields"]:
+            label = QLabel()
+            label.setObjectName('lbl_' + field['form_label'])
+            label.setText(field['form_label'].capitalize())
+
+            if 'tooltip' in field:
+                label.setToolTip(field['tooltip'])
+            else:
+                label.setToolTip(field['form_label'].capitalize())
+
+            if field['widgettype'] == 1 or field['widgettype'] == 10:
+                widget = self.add_lineedit(field)
+                if widget.objectName() == field_id:
+                    self.feature_id = widget.text()
+            elif field['widgettype'] == 9:
+                widget = self.add_hyperlink(dialog, field)
+
+            grid_layout.addWidget(label, field['layout_order'], 0)
+            grid_layout.addWidget(widget, field['layout_order'], 1)
+
+        verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        grid_layout.addItem(verticalSpacer1)
 
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:

@@ -37,7 +37,7 @@ from giswater.actions.api_cf import ApiCF
 from giswater.actions.manage_new_psector import ManageNewPsector
 from giswater.actions.manage_visit import ManageVisit
 from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiSearchUi, HydroInfo, ListItems
+from giswater.ui_manager import ApiSearchUi, ApiBasicInfo, ListItems
 
 
 class ApiSearch(ApiParent):
@@ -336,47 +336,19 @@ class ApiSearch(ApiParent):
         sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
                " null, True, 9, 100)")
         row = self.controller.get_row(sql, log_sql=True)
-
+        self.controller.log_info(str("TEST10"))
+        self.controller.log_info(str(row))
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
-        result = row[0]['editData']
-        if 'fields' not in result:
-            return
-        form_type = str(row[0]['formTabs']['form_type'])
 
-        self.hydro_info_dlg = HydroInfo()
+        self.hydro_info_dlg = ApiBasicInfo()
         self.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
 
-        # Get field id name
-        field_id = str(row[0]['idName'])
-
-        grid_layout = self.hydro_info_dlg.findChild(QGridLayout, 'gridLayout')
-        for field in result["fields"]:
-            label = QLabel()
-            label.setObjectName('lbl_' + field['form_label'])
-            label.setText(field['form_label'].capitalize())
-
-            if 'tooltip' in field:
-                label.setToolTip(field['tooltip'])
-            else:
-                label.setToolTip(field['form_label'].capitalize())
-
-            if field['widgettype'] == 1 or field['widgettype'] == 10:
-                widget = self.add_lineedit(field)
-                if widget.objectName() == field_id:
-                    self.feature_id = widget.text()
-            elif field['widgettype'] == 9:
-                widget = self.add_hyperlink(self.hydro_info_dlg, field)
-
-            grid_layout.addWidget(label,  field['layout_order'], 0)
-            grid_layout.addWidget(widget, field['layout_order'], 1)
-
-        verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        grid_layout.addItem(verticalSpacer1)
+        self.populate_basic_info(self.hydro_info_dlg, row)
 
         self.hydro_info_dlg.open()
 

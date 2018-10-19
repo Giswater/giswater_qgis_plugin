@@ -11,6 +11,12 @@ def get_ui_class(ui_file_name):
     ui_file_path = os.path.abspath(os.path.join(ui_folder_path, ui_file_name))
     return uic.loadUiType(ui_file_path)[0]
 
+FORM_CLASS = get_ui_class('api_basic_info.ui')
+class ApiBasicInfo(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
 FORM_CLASS = get_ui_class('api_catalog.ui')
 class ApiCatalogUi(QtGui.QMainWindow, FORM_CLASS):
     def __init__(self):
@@ -200,13 +206,6 @@ class Gallery(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('gallery_zoom.ui')
 class GalleryZoom(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('hydro_info.ui')
-class HydroInfo(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
