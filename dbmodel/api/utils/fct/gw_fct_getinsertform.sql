@@ -44,8 +44,12 @@ BEGIN
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
+	
+--  Control of null values
+    IF id='NULL' or id='' THEN id=null;
+    END IF;
 
-    --  Take form_id 
+--  Take form_id 
     EXECUTE 'SELECT formid FROM config_web_layer WHERE layer_id = $1 LIMIT 1'
         INTO formtodisplay
         USING table_id; 
@@ -76,49 +80,44 @@ BEGIN
     END IF;
 
 
-    
-
---    Get fields
-    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, name, type, "dataType", placeholder FROM config_web_fields WHERE table_id = $1 order by orderby) a'
+ --    Get fields
+    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, label, name, type, "dataType", placeholder, (ROW_NUMBER() OVER()-1) AS rownum, dv_table, dv_id_column, dv_name_column FROM config_web_fields WHERE table_id = $1 order by orderby) a'
         INTO fields_array
-        USING table_id;    
-
---    Get combo rows
-    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, name, type, dv_table, dv_id_column, dv_name_column, ROW_NUMBER() OVER() AS rownum 
-        FROM config_web_fields WHERE table_id = $1) a WHERE type = $2'
-    INTO combo_rows
-    USING table_id, 'combo';
-    combo_rows := COALESCE(combo_rows, '{}');
-
+        USING table_id;  
+    fields_array := COALESCE(fields_array, '{}');
 
 --    Update combos
-    FOREACH aux_json IN ARRAY combo_rows
+    FOREACH aux_json IN ARRAY fields_array
     LOOP
-
---      Get combo id's
-        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
-        || quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
-        INTO combo_json; 
-     
-
---        Update array
-        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
-        IF combo_json IS NOT NULL THEN
-            fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->0);
-        ELSE
-            fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
-        END IF;
-
---        Get combo values
-        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM '
-        || quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
-        INTO combo_json; 
-        combo_json := COALESCE(combo_json, '[]');
     
---      Update array
-        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
+	IF (aux_json->>'type')::text='combo' THEN
 
-    END LOOP;
+		raise notice 'aux_json %', aux_json;
+
+	--      Get combo id's
+		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
+		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
+		INTO combo_json; 
+
+	--        Update array
+		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+		IF combo_json IS NOT NULL THEN
+			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', combo_json->0);
+		ELSE
+			fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'selectedId', to_json('Fred said "Hi."'::text));        
+		END IF;
+
+	--        Get combo values
+		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM '
+		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
+		INTO combo_json; 
+		combo_json := COALESCE(combo_json, '[]');
+	
+	--      Update array
+		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
+	END IF;
+	
+    END LOOP;;
 
 
 --    Get existing values for the element
