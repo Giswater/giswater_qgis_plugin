@@ -192,10 +192,10 @@ UNION
 DROP VIEW IF EXISTS v_ui_node_x_relations;
 CREATE OR REPLACE VIEW v_ui_node_x_relations AS 
 SELECT row_number() OVER (ORDER BY node_id) AS rid,
-parent_id,
+parent_id as node_id,
 nodetype_id,
 nodecat_id,
-node_id,
+node_id as child_id,
 code,
 sys_type
-FROM v_edit_node where parent_id is not null and parent_id in (select node_id from SCHEMA_NAME.v_edit_node);
+FROM v_edit_node where parent_id is not null;
