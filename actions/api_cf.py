@@ -21,7 +21,7 @@ from PyQt4.QtGui import QStandardItem
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 from PyQt4.QtCore import Qt, QDate, SIGNAL, SLOT
-from PyQt4.QtGui import QDateEdit, QListWidgetItem, QStandardItemModel, QListWidget
+from PyQt4.QtGui import QDateEdit, QListWidgetItem, QStandardItemModel, QListWidget, QFrame
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator, QToolButton
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
@@ -89,7 +89,7 @@ class ApiCF(ApiParent):
             self.tab_document_loaded = False
             self.tab_rpt_loaded = False
             self.tab_cost_loaded = False
-            self.fill_tab_rpt()
+            #self.fill_tab_rpt()
             self.filter = str(complet_result[0]['idName']) + " = '" + str(self.feature_id) + "'"
             self.tab_main.currentChanged.connect(self.tab_activation)
 
@@ -162,6 +162,15 @@ class ApiCF(ApiParent):
         # Dialog
         self.dlg_cf = ApiCfUi()
         self.load_settings(self.dlg_cf)
+        # Find actions and set visibles
+        actions_to_show = row[0]['formActions']
+        if 'actions' in actions_to_show:
+            for field in actions_to_show["actions"]:
+                action = None
+                action = self.dlg_cf.findChild(QAction, field)
+                if action is not None:
+                    action.setVisible(True)
+
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
@@ -268,6 +277,7 @@ class ApiCF(ApiParent):
         tab2_layout2 = self.dlg_cf.findChild(QGridLayout, 'tab2_layout2')
         tab2_layout3 = self.dlg_cf.findChild(QGridLayout, 'tab2_layout3')
 
+        plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
         # Get table name for use as title
         self.tablename = row[0]['tableName']
         pos_ini = row[0]['tableName'].rfind("_")
@@ -370,15 +380,40 @@ class ApiCF(ApiParent):
                 widget = self.dlg_cf.findChild(QComboBox, field['column_id'])
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
-        # Find actions and set visibles
-        actions_to_show = row[0]['formActions']
-        if 'actions' in actions_to_show:
-            for field in actions_to_show["actions"]:
-                action = None
-                action = self.dlg_cf.findChild(QAction, field)
-                if action is not None:
-                    action.setVisible(True)
 
+        if self.geom_type == 'arc' or self.geom_type == 'node':
+            sql = ("SELECT " + self.schema_name + ".gw_api_get_infoplan('infoplan', 9)")
+            row = self.controller.get_row(sql, log_sql=True)
+            if not row:
+                self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            else:
+                result = row[0]['editData']
+                if 'fields' not in result:
+                    self.controller.show_message("No fields for: " + row[0]['editData'], 2)
+                else:
+                    for field in result["fields"]:
+                        if field['widgettype'] == 11:
+                            y = 2
+                            for x in range(0, y):
+                                line = self.add_frame(field, x)
+                                plan_layout.addWidget(line, field['layout_order'], x)
+                        else:
+                            label = QLabel()
+                            label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+                            label.setObjectName('lbl_' + field['form_label'])
+                            label.setText(field['form_label'].capitalize())
+                            if 'tooltip' in field:
+                                label.setToolTip(field['tooltip'])
+                            else:
+                                label.setToolTip(field['form_label'].capitalize())
+                        if field['widgettype'] == 12:
+                            widget = self.add_label(field)
+                            label.setWordWrap(True)
+                            plan_layout.addWidget(label, field['layout_order'], 0)
+                            plan_layout.addWidget(widget,  field['layout_order'], 1)
+
+                    plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                    plan_layout.addItem(plan_vertical_spacer)
         if self.layer:
             if self.layer.isEditable():
                 self.enable_all(result)
@@ -1668,7 +1703,14 @@ class ApiCF(ApiParent):
     def filter_tab_tbl_rpt(self, complet_rpt, standar_model):
         # Set filter
         standar_model.clear()
+        # Get headers
+        headers = []
+        for x in complet_rpt[0]['mincuts'][0]:
+            headers.append(x)
+        # Set headers
+        standar_model.setHorizontalHeaderLabels(headers)
         filter = utils_giswater.getWidgetText(self.dlg_cf, self.dlg_cf.txt_rpt_filter, False, False)
+
         # for item in complet_rpt[0]['mincuts']:
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
         #     if len(row) > 0:

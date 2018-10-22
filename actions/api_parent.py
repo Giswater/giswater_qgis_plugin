@@ -13,6 +13,7 @@ from functools import partial
 from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer
 from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
 from PyQt4.QtGui import QCompleter, QStringListModel
+from PyQt4.QtGui import QFrame
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QGis
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
@@ -480,6 +481,22 @@ class ApiParent(ParentAction):
             if not field['iseditable']:
                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
                                      " color: rgb(100, 100, 100)}")
+        return widget
+
+    def add_frame(self, field, x=None):
+        widget = QFrame()
+        widget.setObjectName(field['column_id'] + "_" + str(x))
+        print(widget.objectName())
+        widget.setFrameShape(QFrame.HLine)
+        widget.setFrameShadow(QFrame.Sunken)
+        return widget
+    def add_label(self, field):
+        """ Add widgets QLineEdit type """
+        widget = QLabel()
+        widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        widget.setObjectName(field['column_id'])
+        if 'value' in field:
+            widget.setText(field['value'])
         return widget
 
     def set_calendar_empty(self, widget):
