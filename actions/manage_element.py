@@ -173,6 +173,7 @@ class ManageElement(ParentManage):
 
         # Get values from dialog
         element_id = utils_giswater.getWidgetText(self.dlg_add_element, "element_id", return_string_null=False)
+        code = utils_giswater.getWidgetText(self.dlg_add_element, "code", return_string_null=False)
         elementcat_id = utils_giswater.getWidgetText(self.dlg_add_element, "elementcat_id", return_string_null=False)
         ownercat_id = utils_giswater.getWidgetText(self.dlg_add_element, "ownercat_id", return_string_null=False)
         location_type = utils_giswater.getWidgetText(self.dlg_add_element, "location_type", return_string_null=False)
@@ -234,18 +235,18 @@ class ManageElement(ParentManage):
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
-                sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id, num_elements, state"
+                sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id, code, num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
-                sql_values = (" VALUES ('" + str(elementcat_id) +"', '" + str(num_elements) + "', '" + str(state) + "', '"
+                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(code) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
                               + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
             else:
-                sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, num_elements, state"
+                sql = ("INSERT INTO " + self.schema_name + ".element (element_id, code, elementcat_id, num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
-                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) +"', '" + str(num_elements) + "', '" + str(state) + "', '"
+                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(num_elements) + "', '" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
                               + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
 
@@ -317,6 +318,10 @@ class ManageElement(ParentManage):
                 sql += ", workcat_id = '" + str(workcat_id) + "'"
             else:
                 sql += ", workcat_id = null"
+            if code:
+                sql += ", code = '" + str(code) + "'"
+            else:
+                sql += ", code = null"
             if workcat_id_end:
                 sql += ", workcat_id_end = '" + str(workcat_id_end) + "'"
             else:
