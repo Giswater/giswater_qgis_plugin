@@ -34,7 +34,7 @@ BEGIN
     	INTO query_aux;
     END IF;
 
-	IF query_aux = 'true' THEN
+	IF query_aux = 't' THEN
 
 		--DROP FK
 

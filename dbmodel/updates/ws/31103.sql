@@ -20,5 +20,7 @@ INSERT INTO audit_cat_table VALUES ('v_edit_field_valve', 'System', 'Selector of
 INSERT INTO audit_cat_error values('3012','The position value is bigger than the full length of the arc. ', 'Please review your data.',2,TRUE,'utils');
 INSERT INTO audit_cat_error values('3014','The position id is not node_1 or node_2 of selected arc.', 'Please review your data.',2,TRUE,'utils');
 
+--2018/10/22
+UPDATE audit_cat_table SET qgis_role_id='role_om' where id='v_ui_anl_mincut_result_cat';
 
 

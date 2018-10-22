@@ -19,7 +19,7 @@ INSERT INTO audit_cat_table VALUES ('config_web_fields', 'web', '', 'role_admin'
 INSERT INTO audit_cat_table VALUES ('config_web_forms', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_composer_scale', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 
-INSERT INTO audit_cat_table VALUES ('v_web_composer', 'web', '', '', 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_web_composer', 'web', '', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('selector_composer', 'web', '', 'role_edit', 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 

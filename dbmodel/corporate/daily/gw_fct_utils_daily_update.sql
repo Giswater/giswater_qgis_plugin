@@ -18,8 +18,6 @@ v_return integer;
 
 BEGIN 
 
-	
-BEGIN 
 
 	-- Daily updates
 	PERFORM crm.gw_fct_crm2gis();

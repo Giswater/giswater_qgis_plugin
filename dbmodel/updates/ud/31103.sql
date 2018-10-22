@@ -8,3 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+--2018/10/22
+ALTER TABLE node ADD COLUMN arc_id varchar(16);
