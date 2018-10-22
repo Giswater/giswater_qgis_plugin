@@ -506,6 +506,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.dlg_mincut.close()
         else:
             self.dlg_mincut.close()
+        self.iface.actionPan().trigger()
 
 
     def update_result_selector(self, result_mincut_id, commit=True):    

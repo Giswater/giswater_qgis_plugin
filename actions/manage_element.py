@@ -23,7 +23,7 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         
          
-    def manage_element(self, new_element_id=True, feature=None):
+    def manage_element(self, new_element_id=True, feature=None, geom_type=None):
         """ Button 33: Add element """
 
         self.new_element_id = new_element_id
@@ -103,9 +103,7 @@ class ManageElement(ParentManage):
         self.set_completer_object(self.dlg_add_element, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "node"
-        viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(self.dlg_add_element.feature_id, geom_type, viewname)
+        self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")

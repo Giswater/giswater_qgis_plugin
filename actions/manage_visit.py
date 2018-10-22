@@ -256,7 +256,7 @@ class ManageVisit(ParentManage, QObject):
         if hasattr(self, 'xyCoordinates_conected'):
             if self.xyCoordinates_conected:
                 self.canvas.xyCoordinates.disconnect()
-                self.xyCoordinates_conected = None
+                self.xyCoordinates_conected = False
         self.canvas.setMapTool(self.previous_map_tool)
         # removed current working visit. This should cascade removing of all related records
         if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
