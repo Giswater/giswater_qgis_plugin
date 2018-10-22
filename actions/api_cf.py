@@ -269,13 +269,13 @@ class ApiCF(ApiParent):
         bot_layout_1 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_1')
         bot_layout_2 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_2')
 
-        tab1_layout1 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout1')
-        tab1_layout2 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout2')
-        tab1_layout3 = self.dlg_cf.findChild(QGridLayout, 'tab1_layout3')
+        layout_data_1 = self.dlg_cf.findChild(QGridLayout, 'layout_data_1')
+        layout_data_2 = self.dlg_cf.findChild(QGridLayout, 'layout_data_2')
+        layout_data_3 = self.dlg_cf.findChild(QGridLayout, 'layout_data_3')
 
-        tab2_layout1 = self.dlg_cf.findChild(QGridLayout, 'tab2_layout1')
-        tab2_layout2 = self.dlg_cf.findChild(QGridLayout, 'tab2_layout2')
-        tab2_layout3 = self.dlg_cf.findChild(QGridLayout, 'tab2_layout3')
+        layout_inp_1 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_1')
+        layout_inp_2 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_2')
+        layout_inp_3 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_3')
 
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
         # Get table name for use as title
@@ -345,35 +345,35 @@ class ApiCF(ApiParent):
                 bot_layout_2.addWidget(widget, 1, field['layout_order'])
             # Tab data
             elif field['layout_id'] == 1:
-                tab1_layout1.addWidget(label, field['layout_order'], 0)
-                tab1_layout1.addWidget(widget, field['layout_order'], 1)
+                layout_data_1.addWidget(label, field['layout_order'], 0)
+                layout_data_1.addWidget(widget, field['layout_order'], 1)
                 if field['widgettype'] == 8:
                     v = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-                    tab1_layout1.addItem(v, field['layout_order'], 2)
+                    layout_data_1.addItem(v, field['layout_order'], 2)
             elif field['layout_id'] == 2:
-                tab1_layout2.addWidget(label, field['layout_order'], 0)
-                tab1_layout2.addWidget(widget, field['layout_order'], 1)
+                layout_data_2.addWidget(label, field['layout_order'], 0)
+                layout_data_2.addWidget(widget, field['layout_order'], 1)
             elif field['layout_id'] == 3:
-                tab1_layout3.addWidget(label, field['layout_order'], 0)
-                tab1_layout3.addWidget(widget, field['layout_order'], 1)
+                layout_data_3.addWidget(label, field['layout_order'], 0)
+                layout_data_3.addWidget(widget, field['layout_order'], 1)
             # Tab inp
             elif field['layout_id'] == 6:
-                tab2_layout1.addWidget(label, field['layout_order'], 0)
-                tab2_layout1.addWidget(widget, field['layout_order'], 1)
+                layout_inp_1.addWidget(label, field['layout_order'], 0)
+                layout_inp_1.addWidget(widget, field['layout_order'], 1)
             elif field['layout_id'] == 7:
-                tab2_layout2.addWidget(label, field['layout_order'], 0)
-                tab2_layout2.addWidget(widget, field['layout_order'], 1)
+                layout_inp_2.addWidget(label, field['layout_order'], 0)
+                layout_inp_2.addWidget(widget, field['layout_order'], 1)
             elif field['layout_id'] == 8:
-                tab2_layout3.addWidget(label, field['layout_order'], 0)
-                tab2_layout3.addWidget(widget, field['layout_order'], 1)
+                layout_inp_3.addWidget(label, field['layout_order'], 0)
+                layout_inp_3.addWidget(widget, field['layout_order'], 1)
         vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        tab1_layout1.addItem(vertical_spacer1)
+        layout_data_1.addItem(vertical_spacer1)
         vertical_spacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        tab1_layout2.addItem(vertical_spacer2)
+        layout_data_2.addItem(vertical_spacer2)
         vertical_spacer3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        tab2_layout1.addItem(vertical_spacer3)
+        layout_inp_1.addItem(vertical_spacer3)
         vertical_spacer4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        tab2_layout2.addItem(vertical_spacer4)
+        layout_inp_2.addItem(vertical_spacer4)
         # Find combo parents:
         for field in result["fields"]:
             if field['dv_isparent']:

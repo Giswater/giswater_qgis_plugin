@@ -34,7 +34,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>10</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_data">
        <attribute name="title">
@@ -60,10 +60,10 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <layout class="QGridLayout" name="tab1_layout1"/>
+             <layout class="QGridLayout" name="layout_data_1"/>
             </item>
             <item>
-             <layout class="QGridLayout" name="tab1_layout2"/>
+             <layout class="QGridLayout" name="layout_data_2"/>
             </item>
            </layout>
           </widget>
@@ -81,7 +81,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <layout class="QGridLayout" name="tab1_layout3"/>
+             <layout class="QGridLayout" name="layout_data_3"/>
             </item>
            </layout>
           </widget>
@@ -97,7 +97,7 @@
         <item row="0" column="0">
          <widget class="QToolBox" name="tab_inp_2">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page21">
            <property name="geometry">
@@ -113,10 +113,10 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_11">
             <item>
-             <layout class="QGridLayout" name="tab2_layout1"/>
+             <layout class="QGridLayout" name="layout_inp_1"/>
             </item>
             <item>
-             <layout class="QGridLayout" name="tab2_layout2"/>
+             <layout class="QGridLayout" name="layout_inp_2"/>
             </item>
            </layout>
           </widget>
@@ -134,7 +134,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <item>
-             <layout class="QGridLayout" name="tab2_layout3"/>
+             <layout class="QGridLayout" name="layout_inp_3"/>
             </item>
            </layout>
           </widget>
@@ -333,7 +333,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tab_scada">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_page_event_node">
            <attribute name="title">
