@@ -367,6 +367,13 @@ class Psector_rapport(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('sections.ui')
+class Sections(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('selector_date.ui')
 class SelectorDate(QtGui.QDialog, FORM_CLASS):
     def __init__(self):

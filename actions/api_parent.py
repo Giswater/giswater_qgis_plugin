@@ -156,6 +156,12 @@ class ApiParent(ParentAction):
                 layer.removeSelection()
 
 
+    def set_action(self, action, visible=True, enabled=True):
+        action.setVisible(visible)
+        action.setEnabled(enabled)
+
+
+
     def start_editing(self):
         """ start or stop the edition based on your current status"""
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
@@ -575,7 +581,7 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['geometry']['st_astext']))
+        list_coord = re.search('\((.*)\)', str(complet_result[0]['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
 
         self.resetRubberbands()

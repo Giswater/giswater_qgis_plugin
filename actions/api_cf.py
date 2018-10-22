@@ -39,8 +39,7 @@ from giswater.actions.manage_gallery import ManageGallery
 from actions.api_catalog import ApiCatalog
 from giswater.ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments
 
-
-
+from ui_manager import Sections
 
 
 class ApiCF(ApiParent):
@@ -163,13 +162,7 @@ class ApiCF(ApiParent):
         self.dlg_cf = ApiCfUi()
         self.load_settings(self.dlg_cf)
         # Find actions and set visibles
-        actions_to_show = row[0]['formActions']
-        if 'actions' in actions_to_show:
-            for field in actions_to_show["actions"]:
-                action = None
-                action = self.dlg_cf.findChild(QAction, field)
-                if action is not None:
-                    action.setVisible(True)
+
 
 
         if feature_id:
@@ -210,22 +203,37 @@ class ApiCF(ApiParent):
         action_help = self.dlg_cf.findChild(QAction, "actionHelp")
         action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
-        actions_list = self.dlg_cf.findChildren(QAction)
+        action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
+
+        # Set all action enabled(False) and visible(False) less separators
+        actions_list = self.dlg_cf.toolBar.findChildren(QAction)
         for action in actions_list:
             action.setEnabled(False)
+            action.setVisible(False)
+            if action.objectName() == "":
+                action.setEnabled(True)
+                action.setVisible(True)
 
-        # TODO action_edit.setVisible(lo que venga del json segun permisos)
-        action_edit.setVisible(True)
+        actions_to_show = row[0]['form']['actions']
+        for x in range(0, len(actions_to_show['names'])):
+            action = None
+            action = self.dlg_cf.toolBar.findChild(QAction, actions_to_show['names'][x])
+            if action is not None:
+                action.setVisible(True)
+                action.setToolTip(actions_to_show['tooltips'][x])
 
+        # Force not edition actions  enabled(True) and visible(True)
+        self.set_action(action_zoom_in)
+        self.set_action(action_zoom_out)
+        self.set_action(action_centered)
+        self.set_action(action_link)
+        self.set_action(action_help)
+        self.set_action(action_section)
 
-        action_zoom_in.setEnabled(True)
-        action_zoom_out.setEnabled(True)
-        action_centered.setEnabled(True)
-        action_link.setEnabled(True)
-        action_help.setEnabled(True)
         # TODO action_edit.setEnabled(lo que venga del json segun permisos)
-        action_edit.setEnabled(True)
+        self.set_action(action_edit, visible=True, enabled=True)
+
 
         # Set actions icon
         self.set_icon(action_edit, "101")
@@ -279,10 +287,13 @@ class ApiCF(ApiParent):
 
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
         # Get table name for use as title
-        self.tablename = row[0]['tableName']
-        pos_ini = row[0]['tableName'].rfind("_")
-        pos_fi = len(str(row[0]['tableName']))
-        self.feature_type = row[0]['tableName'][pos_ini+1:pos_fi]
+        print(row[0])
+
+        self.tablename = row[0]['feature']['tablename']
+        print(self.tablename)
+        pos_ini = row[0]['feature']['tablename'].rfind("_")
+        pos_fi = len(str(row[0]['feature']['tablename']))
+        self.feature_type = row[0]['feature']['tablename'][pos_ini+1:pos_fi]
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
@@ -298,7 +309,7 @@ class ApiCF(ApiParent):
         self.geom_type = str(row[0]['featureType'])
 
         # Get field id name
-        self.field_id = str(row[0]['idName'])
+        self.field_id = str(row[0]['feature']['idname'])
         self.feature_id = None
         for field in result["fields"]:
             label = QLabel()
@@ -442,6 +453,7 @@ class ApiCF(ApiParent):
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type))
         #action_rotation.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
+        action_section.triggered.connect(partial(self.open_section_form, self.complet_result))
         action_help.triggered.connect(partial(self.api_action_help, 'ud', 'node'))
 
         # Buttons
@@ -457,7 +469,25 @@ class ApiCF(ApiParent):
         self.dlg_cf.show()
         return self.complet_result
 
+    def open_section_form(self, complet_result):
+        dlg_sections = Sections()
+        self.load_settings(dlg_sections)
+        #section = complet_result[0]['section']
+        section = {"y_param": "Arc inspection type 1",
 
+                     "width": "AS_BUILT",
+                   "areas": "INSPECTION",
+                   "area": "INSPECTION"
+                   }
+        for key, value in section.items():
+            print(key)
+            print(value)
+            widget = dlg_sections.findChild(QLineEdit, key)
+            print(widget)
+            if widget:
+                utils_giswater.setWidgetText(dlg_sections, widget, value)
+        dlg_sections.btn_close.clicked.connect(partial(self.close_dialog, dlg_sections))
+        self.open_dialog(dlg_sections, maximize_button=False)
     def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
         if _json == '' or str(_json) == '{}':
             self.close_dialog(self.dlg_cf)
@@ -1660,16 +1690,17 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB RPT"""
     def fill_tab_rpt(self):
         standar_model = QStandardItemModel()
-        complet_rpt = self.fill_tbl_rpt(standar_model)
+        complet_result = self.fill_tbl_rpt(standar_model)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
 
-        self.dlg_cf.txt_rpt_filter.textChanged.connect(partial(self.filter_tab_tbl_rpt, complet_rpt, standar_model))
-        self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result))
+        self.dlg_cf.txt_rpt_filter.textChanged.connect(partial(self.filter_tab_tbl_rpt, complet_result, standar_model))
+        field_id = "test"
+        self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.filter_tab_tbl_rpt, field_id))
 
 
         # Prepare completer object
         list_items = []
-        for item in complet_rpt[0]['mincuts']:
+        for item in complet_result[0]['mincuts']:
             if str(item['event_id']) not in list_items:
                 list_items.append(str(item['event_id']))
         # Set Completer object
@@ -1700,12 +1731,12 @@ class ApiCF(ApiParent):
         return complet_rpt
 
 
-    def filter_tab_tbl_rpt(self, complet_rpt, standar_model):
+    def filter_tab_tbl_rpt(self, complet_result, standar_model):
         # Set filter
         standar_model.clear()
         # Get headers
         headers = []
-        for x in complet_rpt[0]['mincuts'][0]:
+        for x in complet_result[0]['mincuts'][0]:
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
@@ -1715,7 +1746,7 @@ class ApiCF(ApiParent):
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
         #     if len(row) > 0:
         #         standar_model.appendRow(row)
-        for item in complet_rpt[0]['mincuts']:
+        for item in complet_result[0]['mincuts']:
             row = []
             for value in item.values():
                 if filter in str(item['event_id']):
@@ -1723,9 +1754,42 @@ class ApiCF(ApiParent):
             if len(row) > 0:
                 standar_model.appendRow(row)
 
-    def open_rpt_result(self):
+    def open_rpt_result(self, qtable, field_id):
         self.controller.show_message("TODO", 2)
         print("TODO")
+        return
+        """ Open form of selected element of the @widget?? """
+
+        # Get selected rows
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            node_id = qtable.model().record(row).value(field_id)
+            geom_type = qtable.model().record(row).value('feature_type').lower()
+            table_name = "ve_" + geom_type
+            feature_type = qtable.model().record(row).value('feature_type').lower()
+            feature_id = qtable.model().record(row).value('feature_id')
+            break
+
+        # Open selected element
+
+        self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        complet_result = self.ApiCF.open_form(table_name=table_name, feature_type=feature_type, feature_id=feature_id)
+        # Get list of all coords in field geometry
+        list_coord = re.search('\((.*)\)', str(complet_result[0]['feature']['geometry']['st_astext']))
+
+        points = self.get_points(list_coord)
+        self.rubber_polygon.reset()
+        self.draw_polygon(points)
+
+        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+        self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+
     """ ****************************  **************************** """
     """ ****************************  **************************** """
     """ ****************************  **************************** """

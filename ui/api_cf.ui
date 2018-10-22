@@ -34,7 +34,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>9</number>
       </property>
       <widget class="QWidget" name="tab_data">
        <attribute name="title">
@@ -52,7 +52,7 @@
              <x>0</x>
              <y>0</y>
              <width>634</width>
-             <height>398</height>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>634</width>
-             <height>398</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
@@ -104,8 +104,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>634</width>
-             <height>398</height>
+             <width>100</width>
+             <height>30</height>
             </rect>
            </property>
            <attribute name="label">
@@ -126,7 +126,7 @@
              <x>0</x>
              <y>0</y>
              <width>634</width>
-             <height>398</height>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -333,7 +333,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tab_scada">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_page_event_node">
            <attribute name="title">
@@ -2212,6 +2212,7 @@
    <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
    <addaction name="actionLink"/>
+   <addaction name="actionSection"/>
    <addaction name="separator"/>
    <addaction name="actionHelp"/>
   </widget>
@@ -2227,7 +2228,7 @@
     <string>Zoom</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionCentered">
@@ -2239,7 +2240,7 @@
     <string>Centered</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -2254,7 +2255,7 @@
     <string>Zoom Out</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionCopyPaste">
@@ -2272,7 +2273,7 @@
     <string>Copy&amp;Paste</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionRotation">
@@ -2284,7 +2285,7 @@
     <string>Rotation</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionLink">
@@ -2299,7 +2300,7 @@
     <string>Link</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionEdit">
@@ -2317,7 +2318,7 @@
     <string>Edit</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionWorkcat">
@@ -2329,7 +2330,7 @@
     <string>Workcat</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionCatalog">
@@ -2337,7 +2338,7 @@
     <string>Catalog</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionHelp">
@@ -2352,7 +2353,7 @@
     <string>Help</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionInterpolate">
@@ -2367,7 +2368,18 @@
     <string>Interpolate</string>
    </property>
    <property name="visible">
-    <bool>false</bool>
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSection">
+   <property name="text">
+    <string>Section</string>
+   </property>
+   <property name="toolTip">
+    <string>Show section</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
  </widget>
