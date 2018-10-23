@@ -245,6 +245,7 @@ class ApiCF(ApiParent):
         self.set_icon(action_zoom_out, "107")
         self.set_icon(action_centered, "104")
         self.set_icon(action_link, "173")
+        self.set_icon(action_section, "204")
         self.set_icon(action_help, "73")
         self.set_icon(action_interpolate, "194")
         # self.set_icon(action_switch_arc_id, "141")
@@ -287,13 +288,11 @@ class ApiCF(ApiParent):
 
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
         # Get table name for use as title
-        print(row[0])
-
-        self.tablename = row[0]['feature']['tablename']
-        print(self.tablename)
-        pos_ini = row[0]['feature']['tablename'].rfind("_")
-        pos_fi = len(str(row[0]['feature']['tablename']))
-        self.feature_type = row[0]['feature']['tablename'][pos_ini+1:pos_fi]
+        self.tablename = row[0]['feature']['tableName']
+        pos_ini = row[0]['feature']['tableName'].rfind("_")
+        pos_fi = len(str(row[0]['feature']['tableName']))
+        # Get feature type (Junction, manhole, valve, fountain...)
+        self.feature_type = row[0]['feature']['tableName'][pos_ini+1:pos_fi]
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
@@ -305,11 +304,11 @@ class ApiCF(ApiParent):
             self.iface.setActiveLayer(self.layer)
 
 
-        # Get feature type as geom_type
+        # Get feature type as geom_type (node, arc, connec)
         self.geom_type = str(row[0]['featureType'])
 
         # Get field id name
-        self.field_id = str(row[0]['feature']['idname'])
+        self.field_id = str(row[0]['feature']['idName'])
         self.feature_id = None
         for field in result["fields"]:
             label = QLabel()
