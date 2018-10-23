@@ -409,7 +409,7 @@ class ParentDialog(QDialog):
         """ Execute action of button 33 """
         
         elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
-        elem.manage_element(feature=feature, feature_type=self.geom_type)
+        elem.manage_element(feature=feature, geom_type=self.geom_type)
         elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
 
@@ -551,7 +551,7 @@ class ParentDialog(QDialog):
             # if not exist - insert new Hydrometer id
             # Insert hydrometer_id in v_rtc_hydrometer
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
-            sql+= " VALUES ('"+self.hydro_id+"')"
+            sql += " VALUES ('"+self.hydro_id+"')"
             self.controller.execute_sql(sql) 
             
             # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
