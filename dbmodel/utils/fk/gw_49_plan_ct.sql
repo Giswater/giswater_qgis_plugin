@@ -14,5 +14,5 @@ ALTER TABLE "price_value_unit" DROP CONSTRAINT IF EXISTS "price_value_unit_check
 
 -- ADD CHECK
 
-ALTER TABLE "plan_psector_cat_type" ADD CONSTRAINT plan_psector_cat_type_check CHECK (id IN (1,2,3));
+ALTER TABLE "plan_psector_cat_type" ADD CONSTRAINT plan_psector_cat_type_check CHECK (id = 1);
 ALTER TABLE "price_value_unit" ADD CONSTRAINT price_value_unit_check CHECK (id IN ('kg','m','m2','m3','pa','t','u'));

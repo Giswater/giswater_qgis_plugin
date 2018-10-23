@@ -48,3 +48,9 @@ INSERT INTO audit_cat_table VALUES ('v_plan_aux_arc_pavement', 'Auxiliar layer',
 --2018/10/22
 
 DELETE FROM audit_cat_table WHERE id='audit_cat_table_x_column';
+
+-- 2018/10/23
+
+ALTER TABLE plan_psector_cat_type DROP CONSTRAINT IF EXISTS plan_psector_cat_type_check;
+ALTER TABLE plan_psector_cat_type ADD CONSTRAINT plan_psector_cat_type_check CHECK (id = 1);
+
