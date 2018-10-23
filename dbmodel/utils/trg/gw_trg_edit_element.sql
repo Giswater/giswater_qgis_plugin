@@ -15,6 +15,7 @@ $BODY$
 DECLARE 
 	element_seq int8;
 	expl_id_int integer;
+	code_autofill_bool boolean;
 
 BEGIN
 
@@ -63,6 +64,13 @@ BEGIN
 		-- Element id 
 		IF (NEW.element_id IS NULL) THEN
 			NEW.element_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+		
+		SELECT code_autofill INTO code_autofill_bool FROM element_type join cat_element on element_type.id=cat_element.elementtype_id where cat_element.id=NEW.elementcat_id;
+
+		--Copy id to code field
+		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.element_id;
 		END IF;
 
 		

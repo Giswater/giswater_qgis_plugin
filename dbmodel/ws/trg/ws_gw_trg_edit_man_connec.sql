@@ -173,6 +173,8 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
+		SELECT code_autofill INTO code_autofill_bool FROM connec_type join cat_connec on connec_type.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
+		
 		--Copy id to code field
 		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.connec_id;
