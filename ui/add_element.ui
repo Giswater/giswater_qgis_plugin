@@ -131,7 +131,7 @@
             <item>
              <widget class="QLabel" name="label">
               <property name="text">
-               <string>Code:</string>
+               <string> Code:</string>
               </property>
              </widget>
             </item>
@@ -145,7 +145,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>70</width>
+                <width>68</width>
                 <height>20</height>
                </size>
               </property>
@@ -952,9 +952,6 @@
            </spacer>
           </item>
          </layout>
-         <zorder>btn_add_geom</zorder>
-         <zorder>horizontalLayoutWidget</zorder>
-         <zorder>code</zorder>
         </widget>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">
