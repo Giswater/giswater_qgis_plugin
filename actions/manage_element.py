@@ -235,7 +235,7 @@ class ManageElement(ParentManage):
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
-                sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id,  num_elements, state"
+                sql = ("INSERT INTO " + self.schema_name + ".v_edit_element (elementcat_id,  num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
@@ -243,7 +243,7 @@ class ManageElement(ParentManage):
                               + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
 
             else:
-                sql = ("INSERT INTO " + self.schema_name + ".element (element_id, , elementcat_id, num_elements, state"
+                sql = ("INSERT INTO " + self.schema_name + ".v_edit_element (element_id, , elementcat_id, num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code")
 
