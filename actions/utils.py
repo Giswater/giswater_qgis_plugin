@@ -413,7 +413,7 @@ class Utils(ParentAction):
                    " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
                    " WHERE connec_type.type = 'GREENTAP'")
             rows = self.controller.get_rows(sql)
-            utils_giswater.set_item_data(self.dlg_config.greentap_vdefault, rows, 1)
+            utils_giswater.set_item_data(self.dlg_config.greentapcat_vdefault, rows, 1)
             sql = ("SELECT cat_connec.id, cat_connec.id FROM " + self.schema_name + ".cat_connec"
                     " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
                     " WHERE connec_type.type = 'FOUNTAIN'")
@@ -603,7 +603,7 @@ class Utils(ParentAction):
             self.manage_config_param_user("expansiontankcat_vdefault")
             self.manage_config_param_user("pipecat_vdefault")
             self.manage_config_param_user("wjoincat_vdefault")
-            self.manage_config_param_user("greentap_vdefault")
+            self.manage_config_param_user("greentapcat_vdefault")
             self.manage_config_param_user("fountain_vdefault")
             self.manage_config_param_user("tap_vdefault")
 
