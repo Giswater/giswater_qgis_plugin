@@ -235,16 +235,17 @@ class ManageElement(ParentManage):
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
-                sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id, code, num_elements, state"
+                sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id,  num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
-                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
-                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(code) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
+                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
                               + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
+
             else:
-                sql = ("INSERT INTO " + self.schema_name + ".element (element_id, code, elementcat_id, num_elements, state"
+                sql = ("INSERT INTO " + self.schema_name + ".element (element_id, , elementcat_id, num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
-                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code")
 
                 sql_values = (" VALUES ('" + str(element_id) + "', '" + str(num_elements) + "', '" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
@@ -279,7 +280,10 @@ class ManageElement(ParentManage):
                 self.x = ""
             else:
                 sql_values += ", null"
-
+            if code:
+                sql_values += ", '" + str(code) + "'"
+            else:
+                sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
                 new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
