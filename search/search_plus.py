@@ -408,6 +408,10 @@ class SearchPlus(QObject):
         feature_id = qtable.model().record(row).value('feature_id')
 
         # Get selected layer
+        if str(qtable.model().record(row).value('feature_type')) == 'NULL':
+            message = "FeatureType is null"
+            self.controller.show_warning(message)
+            return
         geom_type = qtable.model().record(row).value('feature_type').lower()
         fieldname = geom_type + "_id"
 
