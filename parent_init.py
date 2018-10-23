@@ -1474,13 +1474,10 @@ class ParentDialog(QDialog):
                 sql += " WHERE " + geom_type + "type_id IN (SELECT DISTINCT (id) FROM " + self.schema_name + "." + geom_type + "_type WHERE type = '" + str(self.sys_type) + "')"
                 sql += " ORDER BY " + self.field3
         else:
-            if geom_type == 'node':
+            if geom_type == 'node' or geom_type == 'arc' or geom_type == 'connec':
                 sql = "SELECT DISTINCT("+self.field3+") AS "+self.field3
                 sql += " FROM "+self.schema_name+".cat_"+geom_type
                 sql += " ORDER BY "+self.field3
-            elif geom_type == 'arc':
-                sql = "SELECT DISTINCT("+self.field3+") "
-                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY " + self.field3
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cf_cat, self.dlg_cf_cat.filter3, rows)
         self.fill_catalog_id(wsoftware, geom_type)
@@ -1546,7 +1543,7 @@ class ParentDialog(QDialog):
                 sql += " ORDER BY "+self.field3
 
         else:
-            if geom_type == 'node' or geom_type == 'arc':
+            if geom_type == 'node' or geom_type == 'arc' or geom_type == 'connec':
                 sql = "SELECT DISTINCT("+self.field3+") FROM "+self.schema_name+".cat_"+geom_type
                 sql += " WHERE (matcat_id LIKE '%"+self.dlg_cf_cat.matcat_id.currentText()+"%' OR matcat_id is null) "
                 sql += " AND ("+self.field2+" LIKE '%"+self.dlg_cf_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
