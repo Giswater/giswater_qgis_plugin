@@ -2758,7 +2758,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="fountain_vdefault">
+      <widget class="QComboBox" name="fountaincat_vdefault">
        <property name="geometry">
         <rect>
          <x>221</x>
@@ -2768,7 +2768,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_fountain_vdefault">
+      <widget class="QCheckBox" name="chk_fountaincat_vdefault">
        <property name="geometry">
         <rect>
          <x>191</x>
@@ -2817,7 +2817,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="tap_vdefault">
+      <widget class="QComboBox" name="tapcat_vdefault">
        <property name="geometry">
         <rect>
          <x>221</x>
@@ -2827,7 +2827,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_tap_vdefault">
+      <widget class="QCheckBox" name="chk_tapcat_vdefault">
        <property name="geometry">
         <rect>
          <x>191</x>
@@ -6680,10 +6680,10 @@
   <tabstop>wjoincat_vdefault</tabstop>
   <tabstop>chk_greentapcat_vdefault</tabstop>
   <tabstop>greentapcat_vdefault</tabstop>
-  <tabstop>chk_fountain_vdefault</tabstop>
-  <tabstop>fountain_vdefault</tabstop>
-  <tabstop>chk_tap_vdefault</tabstop>
-  <tabstop>tap_vdefault</tabstop>
+  <tabstop>chk_fountaincat_vdefault</tabstop>
+  <tabstop>fountaincat_vdefault</tabstop>
+  <tabstop>chk_tapcat_vdefault</tabstop>
+  <tabstop>tapcat_vdefault</tabstop>
   <tabstop>chk_nodetype_vdefault</tabstop>
   <tabstop>nodetype_vdefault</tabstop>
   <tabstop>chk_arctype_vdefault</tabstop>

@@ -418,12 +418,12 @@ class Utils(ParentAction):
                     " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
                     " WHERE connec_type.type = 'FOUNTAIN'")
             rows = self.controller.get_rows(sql)
-            utils_giswater.set_item_data(self.dlg_config.fountain_vdefault, rows, 1)
+            utils_giswater.set_item_data(self.dlg_config.fountaincat_vdefault, rows, 1)
             sql = ("SELECT cat_connec.id, cat_connec.id FROM " + self.schema_name + ".cat_connec"
                     " INNER JOIN " + self.schema_name + ".connec_type ON cat_connec.connectype_id = connec_type.id"
                     " WHERE connec_type.type = 'TAP'")
             rows = self.controller.get_rows(sql)
-            utils_giswater.set_item_data(self.dlg_config.tap_vdefault, rows, 1)
+            utils_giswater.set_item_data(self.dlg_config.tapcat_vdefault, rows, 1)
             sql = ("SELECT DISTINCT(id), id FROM " + self.schema_name + ".cat_presszone"
                    " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg_config, self.dlg_config.exploitation_vdefault, 0)) + "'")
             rows = self.controller.get_rows(sql)
@@ -604,8 +604,8 @@ class Utils(ParentAction):
             self.manage_config_param_user("pipecat_vdefault")
             self.manage_config_param_user("wjoincat_vdefault")
             self.manage_config_param_user("greentapcat_vdefault")
-            self.manage_config_param_user("fountain_vdefault")
-            self.manage_config_param_user("tap_vdefault")
+            self.manage_config_param_user("fountaincat_vdefault")
+            self.manage_config_param_user("tapcat_vdefault")
 
             # Admin - Review - WS
             self.manage_config_param_system("rev_nod_elev_tol")
