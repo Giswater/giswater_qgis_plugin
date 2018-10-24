@@ -92,7 +92,11 @@ class ApiCF(ApiParent):
             self.tab_main.currentChanged.connect(self.tab_activation)
 
             # Remove unused tabs
-            tabs_to_show = complet_result[0]['form']['visibleTabs']['tabname']
+            tabs_to_show = []
+            # tabs_to_show = [tab['tabname'] for tab in complet_result[0]['form']['visibleTabs']]
+            for tab in complet_result[0]['form']['visibleTabs']:
+                tabs_to_show.append(tab['tabname'])
+
             for x in range(self.tab_main.count()-1, 0, -1):
                 if self.tab_main.widget(x).objectName() not in tabs_to_show:
                     utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
@@ -210,12 +214,12 @@ class ApiCF(ApiParent):
                 action.setVisible(True)
 
         actions_to_show = row[0]['form']['actions']
-        for x in range(0, len(actions_to_show['names'])):
+        for x in range(0, len(actions_to_show)):
             action = None
-            action = self.dlg_cf.toolBar.findChild(QAction, actions_to_show['names'][x])
+            action = self.dlg_cf.toolBar.findChild(QAction, actions_to_show[x]['actionname'])
             if action is not None:
                 action.setVisible(True)
-                action.setToolTip(actions_to_show['tooltips'][x])
+                action.setToolTip(actions_to_show[x]['actiontooltip'])
 
         # Force not edition actions  enabled(True) and visible(True)
         self.set_action(action_zoom_in)
