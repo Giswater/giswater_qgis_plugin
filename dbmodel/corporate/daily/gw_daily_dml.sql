@@ -6,5 +6,5 @@ This version of Giswater is provided by Giswater Association
 
 
 
-INSERT INTO utils.config_param_system VALUES (1, 'daily_update_mails', '{'mails': [{'mail':'info@bgeo.es'},{'mail':' info@giswater.org'}]}', 'json', 'daily_update_mails', 'Daily update mails');
+INSERT INTO utils.config_param_system VALUES (1, 'daily_update_mails', '{"mails": [{"mail":"info@bgeo.es"},{"mail":"info@giswater.org"}]}', 'json', 'daily_update_mails', 'Daily update mails');
 
