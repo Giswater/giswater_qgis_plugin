@@ -92,7 +92,7 @@ class ApiCF(ApiParent):
             self.tab_main.currentChanged.connect(self.tab_activation)
 
             # Remove unused tabs
-            tabs_to_show = complet_result[0]['form']['tabs']['tab_name']
+            tabs_to_show = complet_result[0]['form']['tabs']['tabname']
             for x in range(self.tab_main.count()-1, 0, -1):
                 if self.tab_main.widget(x).objectName() not in tabs_to_show:
                     utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
