@@ -11,8 +11,9 @@ from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, Qg
 from qgis.utils import iface
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
+from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -2288,6 +2289,7 @@ class ParentDialog(QDialog):
             self.tabs_removed += 1                    
         else:
             # Manage signal 'doubleClicked'
+            self.tbl_relations.setEditTriggers(QTableView.NoEditTriggers)
             self.tbl_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))         
      
@@ -2304,9 +2306,10 @@ class ParentDialog(QDialog):
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        field_object_id = "parent_id"    
+        field_object_id = "child_id"
         if field_id == "arc_id":
-            field_object_id = "feature_id"             
+            field_object_id = "feature_id"
+
         selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)        
         sys_type = self.tbl_relations.model().record(row).value("sys_type")                
         tablename = "v_edit_man_" + sys_type.lower()             
@@ -2320,7 +2323,7 @@ class ParentDialog(QDialog):
                          
         field_id = self.feature_cat[tablename].type.lower() + "_id"      
         expr_filter = "\"" + field_id+ "\" = "
-        expr_filter += "'" + str(selected_object_id) + "'"     
+        expr_filter += "'" + str(selected_object_id) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
             return           
