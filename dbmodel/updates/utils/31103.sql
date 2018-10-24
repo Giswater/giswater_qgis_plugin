@@ -30,9 +30,7 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 			VALUES ('edit_automatic_insert_link', 'FALSE', 'Boolean', 'System', 'If true link parameter will be the same as element id');
 
-
 INSERT INTO sys_csv2pg_cat VALUES (8, 'Import dxf blocks', 'Import dxf blocks', 'The CSV file must contain only one column and need to be generated as R12 ASCII file', 'role_edit');
-
 
 INSERT INTO audit_cat_function VALUES (2498, 'gw_trg_visit_event_update_xy', 'om', NULL, 'p_event_id', 'Enables the posibility to update the xcoord, ,ycoord columns using position_id and position_value.', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2500, 'gw_trg_edit_field_node', 'edit', NULL, 'p_node_id', 'To update data on field', NULL, NULL, NULL);
@@ -46,11 +44,14 @@ INSERT INTO audit_cat_table VALUES ('v_plan_aux_arc_pavement', 'Auxiliar layer',
 
 
 --2018/10/22
-
 DELETE FROM audit_cat_table WHERE id='audit_cat_table_x_column';
 
--- 2018/10/23
 
+-- 2018/10/23
 ALTER TABLE plan_psector_cat_type DROP CONSTRAINT IF EXISTS plan_psector_cat_type_check;
 ALTER TABLE plan_psector_cat_type ADD CONSTRAINT plan_psector_cat_type_check CHECK (id = 1);
 UPDATE audit_cat_table SET sys_role_id='role_basic' WHERE id='plan_psector_selector';
+
+
+-- 2018/10/24
+INSERT INTO audit_cat_function VALUES (2508, 'gw_fct_getinsertform_vdef', 'edit', NULL, '', '', NULL, NULL, NULL);
