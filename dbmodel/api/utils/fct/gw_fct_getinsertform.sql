@@ -81,7 +81,8 @@ BEGIN
 
 
  --    Get fields
-    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, label, name, type, "dataType", placeholder, (ROW_NUMBER() OVER()-1) AS rownum, dv_table, dv_id_column, dv_name_column FROM config_web_fields WHERE table_id = $1 order by orderby) a'
+    EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, label, name, type, "dataType", placeholder, (ROW_NUMBER() OVER(ORDER BY orderby asc)) AS rownum, 
+        dv_table, dv_id_column, dv_name_column FROM config_web_fields WHERE table_id = $1 order by 7) a'
         INTO fields_array
         USING table_id;  
     fields_array := COALESCE(fields_array, '{}');

@@ -406,6 +406,7 @@ BEGIN
         RETURN ('{"status":"Accepted"' ||
             ', "apiVersion":'|| api_version ||
             ', "enabled":true'||
+            ', "minimumSearch":2'||
             ', "formTabs":' || formTabs ||
             '}')::json;
     END IF;
