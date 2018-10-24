@@ -667,7 +667,7 @@ class ApiParent(ParentAction):
             return
 
         # Get field id name
-        field_id = str(row[0]['idName'])
+        field_id = str(row[0]['feature']['idName'])
 
         grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
         for field in result["fields"]:

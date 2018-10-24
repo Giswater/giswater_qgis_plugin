@@ -89,7 +89,7 @@ class ApiCatalog(ApiParent):
     def get_event_combo_parent(self, fields, row, geom_type):
         if fields == 'fields':
             for field in row["fields"]:
-                if field['dv_isparent']:
+                if field['isparent']:
                     widget = self.dlg_catalog.findChild(QComboBox, field['column_id'])
                     widget.currentIndexChanged.connect(partial(self.fill_child, widget, geom_type))
                     widget.currentIndexChanged.connect(partial(self.populate_catalog_id, geom_type))

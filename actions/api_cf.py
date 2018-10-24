@@ -86,22 +86,16 @@ class ApiCF(ApiParent):
             self.tab_hydrometer_loaded = False
             self.tab_om_loaded = False
             self.tab_document_loaded = False
-            self.tab_rpt_loaded = False
-            self.tab_cost_loaded = False
             #self.fill_tab_rpt()
-            self.filter = str(complet_result[0]['idName']) + " = '" + str(self.feature_id) + "'"
+            self.filter = str(complet_result[0]['feature']['idName']) + " = '" + str(self.feature_id) + "'"
+
             self.tab_main.currentChanged.connect(self.tab_activation)
 
             # Remove unused tabs
-            tabs_to_show = complet_result[0]['formTabs']['tabName']
+            tabs_to_show = complet_result[0]['form']['tabs']['tab_name']
             for x in range(self.tab_main.count()-1, 0, -1):
                 if self.tab_main.widget(x).objectName() not in tabs_to_show:
                     utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
-
-            # Manage tab 'Relations'
-            if self.geom_type in ('arc', 'node'):
-                self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
-
 
             # TODO
             # Manage 'image'
@@ -296,7 +290,7 @@ class ApiCF(ApiParent):
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
-        table_parent = str(row[0]['tableParent'])
+        table_parent = str(row[0]['feature']['tableParent'])
 
         self.layer = self.controller.get_layer_by_tablename(table_parent)
 
@@ -305,7 +299,7 @@ class ApiCF(ApiParent):
 
 
         # Get feature type as geom_type (node, arc, connec)
-        self.geom_type = str(row[0]['featureType'])
+        self.geom_type = str(row[0]['feature']['featureType'])
 
         # Get field id name
         self.field_id = str(row[0]['feature']['idName'])
@@ -386,44 +380,44 @@ class ApiCF(ApiParent):
         layout_inp_2.addItem(vertical_spacer4)
         # Find combo parents:
         for field in result["fields"]:
-            if field['dv_isparent']:
+            if field['isparent']:
                 widget = self.dlg_cf.findChild(QComboBox, field['column_id'])
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
 
-        if self.geom_type == 'arc' or self.geom_type == 'node':
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infoplan('infoplan', 9)")
-            row = self.controller.get_row(sql, log_sql=True)
-            if not row:
-                self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            else:
-                result = row[0]['editData']
-                if 'fields' not in result:
-                    self.controller.show_message("No fields for: " + row[0]['editData'], 2)
-                else:
-                    for field in result["fields"]:
-                        if field['widgettype'] == 11:
-                            y = 2
-                            for x in range(0, y):
-                                line = self.add_frame(field, x)
-                                plan_layout.addWidget(line, field['layout_order'], x)
-                        else:
-                            label = QLabel()
-                            label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-                            label.setObjectName('lbl_' + field['form_label'])
-                            label.setText(field['form_label'].capitalize())
-                            if 'tooltip' in field:
-                                label.setToolTip(field['tooltip'])
-                            else:
-                                label.setToolTip(field['form_label'].capitalize())
-                        if field['widgettype'] == 12:
-                            widget = self.add_label(field)
-                            label.setWordWrap(True)
-                            plan_layout.addWidget(label, field['layout_order'], 0)
-                            plan_layout.addWidget(widget,  field['layout_order'], 1)
-
-                    plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-                    plan_layout.addItem(plan_vertical_spacer)
+        # if self.geom_type == 'arc' or self.geom_type == 'node':
+        #     sql = ("SELECT " + self.schema_name + ".gw_api_get_infoplan('infoplan', 9)")
+        #     row = self.controller.get_row(sql, log_sql=True)
+        #     if not row:
+        #         self.controller.show_message("NOT ROW FOR: " + sql, 2)
+        #     else:
+        #         result = row[0]['editData']
+        #         if 'fields' not in result:
+        #             self.controller.show_message("No fields for: " + row[0]['editData'], 2)
+        #         else:
+        #             for field in result["fields"]:
+        #                 if field['widgettype'] == 11:
+        #                     y = 2
+        #                     for x in range(0, y):
+        #                         line = self.add_frame(field, x)
+        #                         plan_layout.addWidget(line, field['layout_order'], x)
+        #                 else:
+        #                     label = QLabel()
+        #                     label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        #                     label.setObjectName('lbl_' + field['form_label'])
+        #                     label.setText(field['form_label'].capitalize())
+        #                     if 'tooltip' in field:
+        #                         label.setToolTip(field['tooltip'])
+        #                     else:
+        #                         label.setToolTip(field['form_label'].capitalize())
+        #                 if field['widgettype'] == 12:
+        #                     widget = self.add_label(field)
+        #                     label.setWordWrap(True)
+        #                     plan_layout.addWidget(label, field['layout_order'], 0)
+        #                     plan_layout.addWidget(widget,  field['layout_order'], 1)
+        #
+        #             plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        #             plan_layout.addItem(plan_vertical_spacer)
         if self.layer:
             if self.layer.isEditable():
                 self.enable_all(result)
@@ -814,6 +808,8 @@ class ApiCF(ApiParent):
             self.tab_element_loaded = True
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
+            # if self.geom_type in ('arc', 'node'):
+            #     self.manage_tab_relations("v_ui_" + str(self.geom_type) + "_x_relations", str(self.field_id))
             self.fill_tab_relations()
             self.tab_relations_loaded = True
         # Tab 'Conections'
@@ -832,14 +828,12 @@ class ApiCF(ApiParent):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self.fill_tab_document()
             self.tab_document_loaded = True
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt':
             self.fill_tab_rpt()
-            self.tab_rpt_loaded = True
-        # Tab 'Cost'
-        elif (self.tab_main.widget(index_tab).objectName() == 'tab_node_cost' or
-              self.tab_main.widget(index_tab).objectName() == 'tab_arc_cost') and not self.tab_om_loaded:
-            self.fill_tab_cost()
-            self.tab_cost_loaded = True
+        # Tab 'Plan'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_plan':
+            self.fill_tab_plan()
+
 
 
     """ FUNCTIONS RELATED TAB ELEMENT"""
@@ -1041,11 +1035,11 @@ class ApiCF(ApiParent):
 
     def fill_tab_relations(self):
         """ Fill tab 'Relations' """
-
+        print(self.filter)
         table_relations = "v_ui_"+self.geom_type+"_x_relations"
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
         self.set_configuration(self.tbl_relations, table_relations)
-
+        self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
 
     def open_relation(self, field_id):
         """ Open feature form of selected element """
@@ -1166,16 +1160,16 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB OM"""
     def fill_tab_om(self, geom_type):
         """ Fill tab 'O&M' (event) """
-        self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['vdefaultValues'], 'to_date_vdefault')
-        self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['vdefaultValues'], 'from_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['feature']['vdefaultValues'], 'to_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['feature']['vdefaultValues'], 'from_date_vdefault')
 
         table_event_geom = "v_ui_om_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_geom)
 
-        self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['vdefaultValues'], 'om_param_type_vdefault')
-        self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['vdefaultValues'], 'parameter_vdefault')
+        self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['feature']['vdefaultValues'], 'om_param_type_vdefault')
+        self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['feature']['vdefaultValues'], 'parameter_vdefault')
 
 
     def fill_tbl_event(self, widget, table_name, filter_):
@@ -1559,12 +1553,12 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB DOC"""
     def fill_tab_document(self):
         """ Fill tab 'Document' """
-        self.set_vdefault_values(self.dlg_cf.date_document_to, self.complet_result[0]['vdefaultValues'], 'to_date_vdefault')
-        self.set_vdefault_values(self.dlg_cf.date_document_from, self.complet_result[0]['vdefaultValues'], 'from_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_document_to, self.complet_result[0]['feature']['vdefaultValues'], 'to_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_document_from, self.complet_result[0]['feature']['vdefaultValues'], 'from_date_vdefault')
         table_document = "v_ui_doc_x_"+self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
-        self.set_vdefault_values(self.dlg_cf.doc_type, self.complet_result[0]['vdefaultValues'], 'document_type_vdefault')
+        self.set_vdefault_values(self.dlg_cf.doc_type, self.complet_result[0]['feature']['vdefaultValues'], 'document_type_vdefault')
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
@@ -1686,7 +1680,7 @@ class ApiCF(ApiParent):
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_document")
 
-    """ FUNCTIONS RELATED WITH TAB RPT"""
+    """ FUNCTIONS RELATED WITH TAB RPT """
     def fill_tab_rpt(self):
         standar_model = QStandardItemModel()
         complet_result = self.fill_tbl_rpt(standar_model)
@@ -1789,6 +1783,43 @@ class ApiCF(ApiParent):
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
         self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
+
+    """ FUNCTIONS RELATED WITH TAB PLAN """
+    def fill_tab_plan(self):
+        plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
+        if self.geom_type == 'arc' or self.geom_type == 'node':
+            sql = ("SELECT " + self.schema_name + ".gw_api_get_infoplan('infoplan', 9)")
+            row = self.controller.get_row(sql, log_sql=True)
+            if not row:
+                self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            else:
+                result = row[0]['editData']
+                if 'fields' not in result:
+                    self.controller.show_message("No fields for: " + row[0]['editData'], 2)
+                else:
+                    for field in result["fields"]:
+                        if field['widgettype'] == 11:
+                            y = 2
+                            for x in range(0, y):
+                                line = self.add_frame(field, x)
+                                plan_layout.addWidget(line, field['layout_order'], x)
+                        else:
+                            label = QLabel()
+                            label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+                            label.setObjectName('lbl_' + field['form_label'])
+                            label.setText(field['form_label'].capitalize())
+                            if 'tooltip' in field:
+                                label.setToolTip(field['tooltip'])
+                            else:
+                                label.setToolTip(field['form_label'].capitalize())
+                        if field['widgettype'] == 12:
+                            widget = self.add_label(field)
+                            label.setWordWrap(True)
+                            plan_layout.addWidget(label, field['layout_order'], 0)
+                            plan_layout.addWidget(widget, field['layout_order'], 1)
+
+                    plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                    plan_layout.addItem(plan_vertical_spacer)
     """ ****************************  **************************** """
     """ ****************************  **************************** """
     """ ****************************  **************************** """
@@ -1939,14 +1970,14 @@ class ApiCF(ApiParent):
     def set_vdefault_values(self, widget, values, parameter):
         # Set dates from
         if type(widget) is QDateEdit:
-            if parameter in values[0]:
-                date = QDate.fromString(values[0][parameter], 'yyyy/MM/dd')
+            if parameter in values:
+                date = QDate.fromString(values[parameter], 'yyyy/MM/dd')
             else:
                 date = QDate.currentDate()
             widget.setDate(date)
         elif type(widget) is QComboBox:
-            if parameter in values[0]:
-                utils_giswater.set_combo_itemData(widget, values[0][parameter], 0)
+            if parameter in values:
+                utils_giswater.set_combo_itemData(widget, values[parameter], 0)
 
 
     def restore(self, restore_cursor=True):

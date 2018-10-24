@@ -350,7 +350,7 @@ class ApiConfig(ApiParent):
     def get_event_combo_parent(self, fields, row):
         if fields == 'fields':
             for field in row[0]["fields"]:
-                if field['dv_isparent']:
+                if field['isparent']:
                     widget = self.dlg_config.findChild(QComboBox, field['name'])
                     widget.currentIndexChanged.connect(partial(self.fill_child, widget))
 
