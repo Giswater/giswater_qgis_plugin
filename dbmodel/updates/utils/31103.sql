@@ -53,4 +53,4 @@ DELETE FROM audit_cat_table WHERE id='audit_cat_table_x_column';
 
 ALTER TABLE plan_psector_cat_type DROP CONSTRAINT IF EXISTS plan_psector_cat_type_check;
 ALTER TABLE plan_psector_cat_type ADD CONSTRAINT plan_psector_cat_type_check CHECK (id = 1);
-
+UPDATE audit_cat_table SET sys_role_id='role_basic' WHERE id='plan_psector_selector';
