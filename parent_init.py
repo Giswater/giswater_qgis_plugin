@@ -133,9 +133,15 @@ class ParentDialog(QDialog):
             point = self.canvas.mouseLastXY()
             point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), point.x(), point.y())
 
-            sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('"+str(point[0])+"', '"+str(point[1])+"')")
-            row = self.controller.get_row(sql)
+            table_name = self.controller.get_layer_source_table_name(self.layer)
+            id_table = self.feature_cat[table_name].id
+
+            sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('" + str(id_table) + "', '"+str(point[0])+"', '"+str(point[1])+"')")
+            row = self.controller.get_row(sql, log_sql=True)
+            if not row:
+                return
             values = row[0]
+
             # if 'feature_id' in values:
             #     utils_giswater.setWidgetText(self.dialog, self.geom_type + "_id", str(values['feature_id']))
             if 'name' in values['muni_id']:
@@ -146,8 +152,27 @@ class ParentDialog(QDialog):
                 utils_giswater.setWidgetText(self.dialog, 'expl_id', values['expl_id']['name'])
             if 'name' in values['dma_id']:
                 utils_giswater.setWidgetText(self.dialog, 'dma_id', values['dma_id']['name'])
-       
-       
+            if 'name' in values['state']:
+                utils_giswater.setWidgetText(self.dialog, 'state', values['state']['name'])
+            if 'name' in values['state_type']:
+                utils_giswater.setWidgetText(self.dialog, 'state_type', values['state_type']['name'])
+            if 'id' in values['cat_id']:
+                widget_list = ['nodecat_id', 'arccat_id', 'conneccat_id', 'gratecat_id']
+                for w in widget_list:
+                    widget = self.dialog.findChild(QWidget, w)
+                    if widget:
+                        utils_giswater.setWidgetText(self.dialog, widget, values['cat_id']['id'])
+                        break
+            if 'id' in values['type']:
+                widget_list = ['node_type', 'arc_type', 'connec_type', 'gully_type']
+                for w in widget_list:
+                    widget = self.dialog.findChild(QWidget, w)
+                    if widget:
+                        utils_giswater.setWidgetText(self.dialog, widget, values['type']['id'])
+                        break
+
+
+
     def load_default(self, dialog, feature_type=None):
         """ Load default user values from table 'config_param_user' """
         
