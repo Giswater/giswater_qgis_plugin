@@ -86,6 +86,7 @@ class ApiCF(ApiParent):
             self.tab_hydrometer_loaded = False
             self.tab_om_loaded = False
             self.tab_document_loaded = False
+            self.tab_plan_loaded = False
             #self.fill_tab_rpt()
             self.filter = str(complet_result[0]['feature']['idName']) + " = '" + str(self.feature_id) + "'"
 
@@ -835,9 +836,9 @@ class ApiCF(ApiParent):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt':
             self.fill_tab_rpt()
         # Tab 'Plan'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_plan':
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self.fill_tab_plan()
-
+            self.tab_plan_loaded = True
 
 
     """ FUNCTIONS RELATED TAB ELEMENT"""
@@ -1692,7 +1693,7 @@ class ApiCF(ApiParent):
 
         self.dlg_cf.txt_rpt_filter.textChanged.connect(partial(self.filter_tab_tbl_rpt, complet_result, standar_model))
         field_id = "test"
-        self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.filter_tab_tbl_rpt, field_id))
+        self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  standar_model))
 
 
         # Prepare completer object
@@ -1751,10 +1752,10 @@ class ApiCF(ApiParent):
             if len(row) > 0:
                 standar_model.appendRow(row)
 
-    def open_rpt_result(self, qtable, field_id):
+    def open_rpt_result(self, qtable, standar_model):
         self.controller.show_message("TODO", 2)
         print("TODO")
-        return
+
         """ Open form of selected element of the @widget?? """
 
         # Get selected rows
@@ -1764,28 +1765,31 @@ class ApiCF(ApiParent):
             self.controller.show_warning(message)
             return
 
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            node_id = qtable.model().record(row).value(field_id)
-            geom_type = qtable.model().record(row).value('feature_type').lower()
-            table_name = "ve_" + geom_type
-            feature_type = qtable.model().record(row).value('feature_type').lower()
-            feature_id = qtable.model().record(row).value('feature_id')
-            break
+        row = qtable.model().takeRow(selected_list[0].row())
 
-        # Open selected element
+        print(row)
 
-        self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = self.ApiCF.open_form(table_name=table_name, feature_type=feature_type, feature_id=feature_id)
-        # Get list of all coords in field geometry
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['feature']['geometry']['st_astext']))
+        table_name = row[9].text()
+        print(table_name)
+        sys_id_name = row[5].text()
+        print(sys_id_name)
+        feature_id = row[2].text()
+        print(feature_id)
+        print(type(selected_list))
+        print(selected_list)
+        complet_result = self.fill_tbl_rpt(standar_model)
 
-        points = self.get_points(list_coord)
-        self.rubber_polygon.reset()
-        self.draw_polygon(points)
 
-        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-        self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+        return
+        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
+        if not complet_result:
+            print("FAIL")
+            return
+        self.draw(complet_result)
+
+
+
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
