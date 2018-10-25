@@ -67,7 +67,10 @@ class ManNodeDialog(ParentDialog):
         self.filter = self.field_id + " = '" + str(self.id) + "'"
         emit_point = QgsMapToolEmitPoint(self.canvas)
 
-        # Get widget controls      
+        # Get user permisions
+        role_basic = self.controller.check_role_user("role_basic")
+
+        # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
@@ -109,15 +112,18 @@ class ManNodeDialog(ParentDialog):
         self.dialog.destroyed.connect(partial(self.dlg_destroyed, layer=layer))
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
-        action.setChecked(layer.isEditable())
-        layer.editingStarted.connect(partial(self.check_actions, action, True))
-        layer.editingStopped.connect(partial(self.check_actions, action, False))
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionInterpolate").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, self.layer))
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
+        if not role_basic:
+            action.setChecked(layer.isEditable())
+            layer.editingStarted.connect(partial(self.check_actions, action, True))
+            layer.editingStopped.connect(partial(self.check_actions, action, False))
+            self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
+        else:
+            action.setEnabled(False)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)        
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
