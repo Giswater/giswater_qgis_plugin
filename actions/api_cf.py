@@ -309,38 +309,9 @@ class ApiCF(ApiParent):
         # Get field id name
         self.field_id = str(row[0]['feature']['idName'])
         self.feature_id = None
-        for field in result["fields"]:
-            label = QLabel()
-            label.setObjectName('lbl_' + field['form_label'])
-            label.setText(field['form_label'].capitalize())
-            if 'tooltip' in field:
-                label.setToolTip(field['tooltip'])
-            else:
-                label.setToolTip(field['form_label'].capitalize())
-            if field['widgettype'] == 1 or field['widgettype'] == 10:
-                completer = QCompleter()
-                widget = self.add_lineedit(field)
-                widget = self.set_auto_update_lineedit(field, self.dlg_cf, widget)
-                widget = self.set_data_type(field, widget)
-                widget = self.set_widget_type(field, self.dlg_cf, widget, completer)
-                if widget.objectName() == self.field_id:
-                    self.feature_id = widget.text()
-                    # Get selected feature
-                    self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
-            elif field['widgettype'] == 2:
-                widget = self.add_combobox(self.dlg_cf, field)
-                widget = self.set_auto_update_combobox(field, self.dlg_cf, widget)
-            elif field['widgettype'] == 3:
-                widget = self.add_checkbox(self.dlg_cf, field)
-                widget = self.set_auto_update_checkbox(field, self.dlg_cf, widget)
-            elif field['widgettype'] == 4:
-                widget = self.add_calendar(self.dlg_cf, field)
-                widget = self.set_auto_update_dateedit(field, self.dlg_cf, widget)
-            elif field['widgettype'] == 8:
-                widget = self.add_button(self.dlg_cf, field)
-            elif field['widgettype'] == 9:
-                widget = self.add_hyperlink(self.dlg_cf, field)
 
+        for field in result["fields"]:
+            label, widget = self.put_widgets(field)
             # Prepare layouts
             # Common layouts
             if field['layout_id'] == 0:
@@ -390,39 +361,7 @@ class ApiCF(ApiParent):
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
 
-        # if self.geom_type == 'arc' or self.geom_type == 'node':
-        #     sql = ("SELECT " + self.schema_name + ".gw_api_get_infoplan('infoplan', 9)")
-        #     row = self.controller.get_row(sql, log_sql=True)
-        #     if not row:
-        #         self.controller.show_message("NOT ROW FOR: " + sql, 2)
-        #     else:
-        #         result = row[0]['editData']
-        #         if 'fields' not in result:
-        #             self.controller.show_message("No fields for: " + row[0]['editData'], 2)
-        #         else:
-        #             for field in result["fields"]:
-        #                 if field['widgettype'] == 11:
-        #                     y = 2
-        #                     for x in range(0, y):
-        #                         line = self.add_frame(field, x)
-        #                         plan_layout.addWidget(line, field['layout_order'], x)
-        #                 else:
-        #                     label = QLabel()
-        #                     label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        #                     label.setObjectName('lbl_' + field['form_label'])
-        #                     label.setText(field['form_label'].capitalize())
-        #                     if 'tooltip' in field:
-        #                         label.setToolTip(field['tooltip'])
-        #                     else:
-        #                         label.setToolTip(field['form_label'].capitalize())
-        #                 if field['widgettype'] == 12:
-        #                     widget = self.add_label(field)
-        #                     label.setWordWrap(True)
-        #                     plan_layout.addWidget(label, field['layout_order'], 0)
-        #                     plan_layout.addWidget(widget,  field['layout_order'], 1)
-        #
-        #             plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        #             plan_layout.addItem(plan_vertical_spacer)
+
         if self.layer:
             if self.layer.isEditable():
                 self.enable_all(result)
@@ -467,6 +406,42 @@ class ApiCF(ApiParent):
         self.dlg_cf.show()
         return self.complet_result
 
+    def put_widgets(self, field):
+        widget = None
+        label = QLabel()
+        label.setObjectName('lbl_' + field['form_label'])
+        label.setText(field['form_label'].capitalize())
+        if 'tooltip' in field:
+            label.setToolTip(field['tooltip'])
+        else:
+            label.setToolTip(field['form_label'].capitalize())
+        if field['widgettype'] == 1 or field['widgettype'] == 10:
+            completer = QCompleter()
+            widget = self.add_lineedit(field)
+            widget = self.set_auto_update_lineedit(field, self.dlg_cf, widget)
+            widget = self.set_data_type(field, widget)
+            widget = self.set_widget_type(field, self.dlg_cf, widget, completer)
+            if widget.objectName() == self.field_id:
+                self.feature_id = widget.text()
+                # Get selected feature
+                self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+        elif field['widgettype'] == 2:
+            widget = self.add_combobox(self.dlg_cf, field)
+            widget = self.set_auto_update_combobox(field, self.dlg_cf, widget)
+        elif field['widgettype'] == 3:
+            widget = self.add_checkbox(self.dlg_cf, field)
+            widget = self.set_auto_update_checkbox(field, self.dlg_cf, widget)
+        elif field['widgettype'] == 4:
+            widget = self.add_calendar(self.dlg_cf, field)
+            widget = self.set_auto_update_dateedit(field, self.dlg_cf, widget)
+        elif field['widgettype'] == 8:
+            widget = self.add_button(self.dlg_cf, field)
+        elif field['widgettype'] == 9:
+            widget = self.add_hyperlink(self.dlg_cf, field)
+
+        return label, widget
+
+
     def open_section_form(self, complet_result):
         dlg_sections = Sections()
         self.load_settings(dlg_sections)
@@ -486,6 +461,8 @@ class ApiCF(ApiParent):
                 utils_giswater.setWidgetText(dlg_sections, widget, value)
         dlg_sections.btn_close.clicked.connect(partial(self.close_dialog, dlg_sections))
         self.open_dialog(dlg_sections, maximize_button=False)
+
+        
     def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
         if _json == '' or str(_json) == '{}':
             self.close_dialog(self.dlg_cf)
@@ -1709,24 +1686,57 @@ class ApiCF(ApiParent):
 
     def fill_tbl_rpt(self, standar_model):
         """ Populate QTableView tbl_rpt"""
-        sql = ("SELECT " + self.schema_name + ".gw_fct_getinforpt('" + self.geom_type + "', '"+self.feature_id+"', 9)")
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        complet_rpt = row
 
+        # # Populate rows of QTableView
+        # self.filter_tab_tbl_rpt(complet_rpt, standar_model)
+        # return complet_rpt
+        rpt_layout1 = self.dlg_cf.findChild(QGridLayout, "rpt_layout1")
+        complet_list = self.get_list(limit=15)
+        for field in complet_list[0]['data']['filterFields']:
+            label, widget = self.put_widgets(field)
+            rpt_layout1.addWidget(label, 0, field['layout_order'])
+            rpt_layout1.addWidget(widget, 1, field['layout_order'])
+
+
+        vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        rpt_layout1.addItem(vertical_spacer)
+        # Find combo parents:
+        for field in complet_list[0]['data']['filterFields']:
+            if field['isparent']:
+                widget = self.dlg_cf.findChild(QComboBox, field['column_id'])
+                widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
+
+        # Related by Qtable
         self.dlg_cf.tbl_rpt.setModel(standar_model)
         self.dlg_cf.tbl_rpt.horizontalHeader().setStretchLastSection(True)
         # Get headers
         headers = []
-        for x in complet_rpt[0]['mincuts'][0]:
+        for x in complet_list[0]['data']['listValues'][0]:
+            print(x)
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
-        # Populate rows of QTableView
-        self.filter_tab_tbl_rpt(complet_rpt, standar_model)
-        return complet_rpt
+
+        # # Populate rows of QTableView
+        # self.filter_tab_tbl_rpt(complet_rpt, standar_model)
+
+
+    def get_list(self, limit=10):
+        index_tab = self.tab_main.currentIndex()
+        tab_name = self.tab_main.widget(index_tab).objectName()
+
+        header = '"header":{"device":3, "infoType":100, "lang":"ES"}, '
+        form = '"form":{"tabName":"' + tab_name + '"}, '
+        feature = '"feature":{"tableName":"' + self.tablename + '"}, '
+        data = '"data":{"pageInfo":{"limit":"'+str(limit)+'"}}'
+        body = "" + header + form + feature + data
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_list($${" + body + "}$$)")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        complet_list = row
+        return complet_list
 
 
     def filter_tab_tbl_rpt(self, complet_result, standar_model):
@@ -1777,7 +1787,7 @@ class ApiCF(ApiParent):
         print(feature_id)
         print(type(selected_list))
         print(selected_list)
-        complet_result = self.fill_tbl_rpt(standar_model)
+        #complet_result = self.fill_tbl_rpt(standar_model)
 
 
         return
