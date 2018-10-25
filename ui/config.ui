@@ -54,7 +54,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_basic">
     <attribute name="title">
@@ -2663,7 +2663,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_greentap_vdefault">
+      <widget class="QLabel" name="label_greentapcat_vdefault">
        <property name="geometry">
         <rect>
          <x>15</x>
@@ -2699,7 +2699,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="greentap_vdefault">
+      <widget class="QComboBox" name="greentapcat_vdefault">
        <property name="geometry">
         <rect>
          <x>221</x>
@@ -2709,7 +2709,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_greentap_vdefault">
+      <widget class="QCheckBox" name="chk_greentapcat_vdefault">
        <property name="geometry">
         <rect>
          <x>191</x>
@@ -2758,7 +2758,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="fountain_vdefault">
+      <widget class="QComboBox" name="fountaincat_vdefault">
        <property name="geometry">
         <rect>
          <x>221</x>
@@ -2768,7 +2768,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_fountain_vdefault">
+      <widget class="QCheckBox" name="chk_fountaincat_vdefault">
        <property name="geometry">
         <rect>
          <x>191</x>
@@ -2817,7 +2817,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="tap_vdefault">
+      <widget class="QComboBox" name="tapcat_vdefault">
        <property name="geometry">
         <rect>
          <x>221</x>
@@ -2827,7 +2827,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_tap_vdefault">
+      <widget class="QCheckBox" name="chk_tapcat_vdefault">
        <property name="geometry">
         <rect>
          <x>191</x>
@@ -6678,12 +6678,12 @@
   <tabstop>pipecat_vdefault</tabstop>
   <tabstop>chk_wjoincat_vdefault</tabstop>
   <tabstop>wjoincat_vdefault</tabstop>
-  <tabstop>chk_greentap_vdefault</tabstop>
-  <tabstop>greentap_vdefault</tabstop>
-  <tabstop>chk_fountain_vdefault</tabstop>
-  <tabstop>fountain_vdefault</tabstop>
-  <tabstop>chk_tap_vdefault</tabstop>
-  <tabstop>tap_vdefault</tabstop>
+  <tabstop>chk_greentapcat_vdefault</tabstop>
+  <tabstop>greentapcat_vdefault</tabstop>
+  <tabstop>chk_fountaincat_vdefault</tabstop>
+  <tabstop>fountaincat_vdefault</tabstop>
+  <tabstop>chk_tapcat_vdefault</tabstop>
+  <tabstop>tapcat_vdefault</tabstop>
   <tabstop>chk_nodetype_vdefault</tabstop>
   <tabstop>nodetype_vdefault</tabstop>
   <tabstop>chk_arctype_vdefault</tabstop>

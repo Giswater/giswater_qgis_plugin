@@ -23,7 +23,7 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         
          
-    def manage_element(self, new_element_id=True, feature=None):
+    def manage_element(self, new_element_id=True, feature=None, geom_type=None):
         """ Button 33: Add element """
 
         self.new_element_id = new_element_id
@@ -103,9 +103,7 @@ class ManageElement(ParentManage):
         self.set_completer_object(self.dlg_add_element, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "node"
-        viewname = "v_edit_" + geom_type
-        self.set_completer_feature_id(self.dlg_add_element.feature_id, geom_type, viewname)
+        self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")
@@ -175,6 +173,7 @@ class ManageElement(ParentManage):
 
         # Get values from dialog
         element_id = utils_giswater.getWidgetText(self.dlg_add_element, "element_id", return_string_null=False)
+        code = utils_giswater.getWidgetText(self.dlg_add_element, "code", return_string_null=False)
         elementcat_id = utils_giswater.getWidgetText(self.dlg_add_element, "elementcat_id", return_string_null=False)
         ownercat_id = utils_giswater.getWidgetText(self.dlg_add_element, "ownercat_id", return_string_null=False)
         location_type = utils_giswater.getWidgetText(self.dlg_add_element, "location_type", return_string_null=False)
@@ -236,18 +235,19 @@ class ManageElement(ParentManage):
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
-                sql = ("INSERT INTO " + self.schema_name + ".element (elementcat_id, num_elements, state"
+                sql = ("INSERT INTO " + self.schema_name + ".v_edit_element (elementcat_id,  num_elements, state"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate"
-                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
-                sql_values = (" VALUES ('" + str(elementcat_id) +"', '" + str(num_elements) + "', '" + str(state) + "', '"
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
+                sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
                               + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
-            else:
-                sql = ("INSERT INTO " + self.schema_name + ".element (element_id, elementcat_id, num_elements, state"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate"
-                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom)")
 
-                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(elementcat_id) +"', '" + str(num_elements) + "', '" + str(state) + "', '"
+            else:
+                sql = ("INSERT INTO " + self.schema_name + ".v_edit_element (element_id, , elementcat_id, num_elements, state"
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate"
+                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code")
+
+                sql_values = (" VALUES ('" + str(element_id) + "', '" + str(num_elements) + "', '" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
                               + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
 
@@ -277,9 +277,13 @@ class ManageElement(ParentManage):
                 sql_values += ", null"
             if str(self.x) != "":
                 sql_values += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
+                self.x = ""
             else:
                 sql_values += ", null"
-
+            if code:
+                sql_values += ", '" + str(code) + "'"
+            else:
+                sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
                 new_elem_id = self.controller.execute_returning(sql, search_audit=False, log_sql=True)
@@ -318,6 +322,10 @@ class ManageElement(ParentManage):
                 sql += ", workcat_id = '" + str(workcat_id) + "'"
             else:
                 sql += ", workcat_id = null"
+            if code:
+                sql += ", code = '" + str(code) + "'"
+            else:
+                sql += ", code = null"
             if workcat_id_end:
                 sql += ", workcat_id_end = '" + str(workcat_id_end) + "'"
             else:

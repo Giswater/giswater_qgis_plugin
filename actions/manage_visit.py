@@ -256,7 +256,7 @@ class ManageVisit(ParentManage, QObject):
         if hasattr(self, 'xyCoordinates_conected'):
             if self.xyCoordinates_conected:
                 self.canvas.xyCoordinates.disconnect()
-                self.xyCoordinates_conected = None
+                self.xyCoordinates_conected = False
         self.canvas.setMapTool(self.previous_map_tool)
         # removed current working visit. This should cascade removing of all related records
         if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
@@ -614,7 +614,7 @@ class ManageVisit(ParentManage, QObject):
         if table_object == "om_visit":
             expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
             if object_id != 'null':
-                expr_filter += " AND visitcat_id::TEXT ILIKE '%" + str(object_id) + "%'"
+                expr_filter += " AND ext_code::TEXT ILIKE '%" + str(object_id) + "%'"
         else:
             expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
             if object_id != 'null':

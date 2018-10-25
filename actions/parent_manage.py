@@ -378,6 +378,7 @@ class ParentManage(ParentAction, object):
         self.controller.show_info(message)
         self.emit_point.canvasClicked.disconnect()
         self.canvas.xyCoordinates.disconnect()
+        self.xyCoordinates_conected = False
         self.iface.mapCanvas().refreshAllLayers()
         self.vertex_marker.hide()
 

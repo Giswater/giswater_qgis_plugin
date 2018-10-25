@@ -11,8 +11,9 @@ from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, Qg
 from qgis.utils import iface
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QSettings, Qt, QPoint
-from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
+from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -96,6 +97,7 @@ class ParentDialog(QDialog):
         if not status:
             message = self.controller.last_error
             self.controller.show_warning(message) 
+            self.controller.log_warning(str(self.controller.layer_source))            
             return 
             
         # Manage locale and corresponding 'i18n' file
@@ -146,7 +148,7 @@ class ParentDialog(QDialog):
                 utils_giswater.setWidgetText(self.dialog, 'dma_id', values['dma_id']['name'])
        
        
-    def load_default(self, dialog):
+    def load_default(self, dialog, feature_type=None):
         """ Load default user values from table 'config_param_user' """
         
         # Builddate
@@ -179,7 +181,14 @@ class ParentDialog(QDialog):
         self.set_vdefault(dialog, 'verified_vdefault', 'verified')
         self.set_vdefault(dialog, 'workcat_vdefault', 'workcat_id')
         self.set_vdefault(dialog, 'soilcat_vdefault', 'soilcat_id')
-
+        if feature_type:
+            # Feature type
+            sql = ("SELECT id FROM " + self.schema_name + "."+str(feature_type)+"_type WHERE id::text ="
+                   " (SELECT value FROM " + self.schema_name + ".config_param_user"
+                   " WHERE cur_user = current_user AND  parameter = '" + str(feature_type) + "type_vdefault')::text")
+            row = self.controller.get_row(sql)
+            if row:
+                utils_giswater.setWidgetText(dialog, feature_type + "_type", row[0])
 
     def set_vdefault(self, dialog, parameter, widget):
         """ Set default values from default values when insert new feature """
@@ -401,7 +410,7 @@ class ParentDialog(QDialog):
         """ Execute action of button 33 """
         
         elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)          
-        elem.manage_element(feature=feature)
+        elem.manage_element(feature=feature, geom_type=self.geom_type)
         elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
 
@@ -543,7 +552,7 @@ class ParentDialog(QDialog):
             # if not exist - insert new Hydrometer id
             # Insert hydrometer_id in v_rtc_hydrometer
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
-            sql+= " VALUES ('"+self.hydro_id+"')"
+            sql += " VALUES ('"+self.hydro_id+"')"
             self.controller.execute_sql(sql) 
             
             # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
@@ -1466,13 +1475,10 @@ class ParentDialog(QDialog):
                 sql += " WHERE " + geom_type + "type_id IN (SELECT DISTINCT (id) FROM " + self.schema_name + "." + geom_type + "_type WHERE type = '" + str(self.sys_type) + "')"
                 sql += " ORDER BY " + self.field3
         else:
-            if geom_type == 'node':
+            if geom_type == 'node' or geom_type == 'arc' or geom_type == 'connec':
                 sql = "SELECT DISTINCT("+self.field3+") AS "+self.field3
                 sql += " FROM "+self.schema_name+".cat_"+geom_type
                 sql += " ORDER BY "+self.field3
-            elif geom_type == 'arc':
-                sql = "SELECT DISTINCT("+self.field3+") "
-                sql += " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY " + self.field3
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cf_cat, self.dlg_cf_cat.filter3, rows)
         self.fill_catalog_id(wsoftware, geom_type)
@@ -1538,7 +1544,7 @@ class ParentDialog(QDialog):
                 sql += " ORDER BY "+self.field3
 
         else:
-            if geom_type == 'node' or geom_type == 'arc':
+            if geom_type == 'node' or geom_type == 'arc' or geom_type == 'connec':
                 sql = "SELECT DISTINCT("+self.field3+") FROM "+self.schema_name+".cat_"+geom_type
                 sql += " WHERE (matcat_id LIKE '%"+self.dlg_cf_cat.matcat_id.currentText()+"%' OR matcat_id is null) "
                 sql += " AND ("+self.field2+" LIKE '%"+self.dlg_cf_cat.filter2.currentText()+"%' OR "+self.field2 + " is null) "
@@ -2283,6 +2289,7 @@ class ParentDialog(QDialog):
             self.tabs_removed += 1                    
         else:
             # Manage signal 'doubleClicked'
+            self.tbl_relations.setEditTriggers(QTableView.NoEditTriggers)
             self.tbl_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.tbl_relations.doubleClicked.connect(partial(self.open_relation, field_id))         
      
@@ -2299,9 +2306,10 @@ class ParentDialog(QDialog):
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        field_object_id = "parent_id"    
+        field_object_id = "child_id"
         if field_id == "arc_id":
-            field_object_id = "feature_id"             
+            field_object_id = "feature_id"
+
         selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)        
         sys_type = self.tbl_relations.model().record(row).value("sys_type")                
         tablename = "v_edit_man_" + sys_type.lower()             
@@ -2315,7 +2323,7 @@ class ParentDialog(QDialog):
                          
         field_id = self.feature_cat[tablename].type.lower() + "_id"      
         expr_filter = "\"" + field_id+ "\" = "
-        expr_filter += "'" + str(selected_object_id) + "'"     
+        expr_filter += "'" + str(selected_object_id) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)
         if not is_valid:
             return           

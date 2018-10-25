@@ -413,17 +413,17 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Update all the fields
         sql += ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-               " SET mincut_state = '" + str(mincut_result_state) + "',"
-               " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
-               " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
-               " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
-               " assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
+                " SET mincut_state = '" + str(mincut_result_state) + "',"
+                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
+                " anl_tstamp = '" + str(received_date) + "', received_date = '" + str(received_date) + "',"
+                " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
+                " assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
         
         # Manage fields 'work_order' and 'anl_descript'
         if work_order != "":        
-            sql += ", work_order = '" + str(work_order) + "'"        
+            sql += ", work_order = $$" + str(work_order) + "$$"
         if anl_descript != "":        
-            sql += ", anl_descript = $$'" + str(anl_descript) + "'$$ "
+            sql += ", anl_descript = $$" + str(anl_descript) + "$$ "
         
         # Manage address
         if address_exploitation_id != -1:        
@@ -439,13 +439,13 @@ class MincutParent(ParentAction, MultipleSelection):
         if mincut_result_state == 1 or mincut_result_state == 2:
             sql += ", exec_start = '" + str(forecast_start_real) + "', exec_end = '" + str(forecast_end_real) + "'"
             if exec_from_plot != '':
-                sql += ", exec_from_plot = $$'" + str(exec_from_plot) + "'$$"
+                sql += ", exec_from_plot = '" + str(exec_from_plot) + "'"
             if exec_depth != '':
-                sql += ",  exec_depth = $$'" + str(exec_depth) + "'$$"
+                sql += ",  exec_depth = '" + str(exec_depth) + "'"
             if exec_descript != '':
-                sql += ", exec_descript = $$'" + str(exec_descript) + "'$$"
+                sql += ", exec_descript = $$" + str(exec_descript) + "$$"
             if exec_user != '':
-                sql += ", exec_user = '" + str(exec_user) + "'"    
+                sql += ", exec_user = '" + str(exec_user) + "'"
             else:
                 sql += ", exec_user = '" + str(cur_user) + "'"    
                 
@@ -506,6 +506,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.dlg_mincut.close()
         else:
             self.dlg_mincut.close()
+        self.iface.actionPan().trigger()
 
 
     def update_result_selector(self, result_mincut_id, commit=True):    

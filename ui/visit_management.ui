@@ -25,7 +25,7 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Filter by Id:</string>
+           <string>Filter by code:</string>
           </property>
          </widget>
         </item>
