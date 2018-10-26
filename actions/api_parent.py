@@ -693,6 +693,16 @@ class ApiParent(ParentAction):
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         grid_layout.addItem(verticalSpacer1)
 
+
+    def clear_gridlayout(self, layout):
+        """  Remove all widgets of layout """
+        while layout.count() > 0:
+            child = layout.takeAt(0).widget()
+            if child:
+                child.setParent(None)
+                child.deleteLater()
+
+
     def test(self, widget=None):
         # if event.key() == Qt.Key_Escape:
         #     self.controller.log_info(str("IT WORK S"))

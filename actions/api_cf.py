@@ -16,12 +16,11 @@ import webbrowser
 import datetime
 from functools import partial
 
-
-from PyQt4.QtGui import QStandardItem
+from PyQt4.QtGui import QLayoutItem
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
 
 from PyQt4.QtCore import Qt, QDate, SIGNAL, SLOT
-from PyQt4.QtGui import QDateEdit, QListWidgetItem, QStandardItemModel, QListWidget, QFrame
+from PyQt4.QtGui import QDateEdit, QListWidgetItem, QStandardItemModel, QListWidget, QFrame, QStandardItem
 from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator, QToolButton
 from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
 from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter
@@ -1665,70 +1664,62 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB RPT """
     def fill_tab_rpt(self):
         standar_model = QStandardItemModel()
-        complet_result = self.fill_tbl_rpt(standar_model)
+        complet_list, widget_list = self.init_tbl_rpt(self.dlg_cf, standar_model)
+        self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
-
-        self.dlg_cf.txt_rpt_filter.textChanged.connect(partial(self.filter_tab_tbl_rpt, complet_result, standar_model))
-        field_id = "test"
-        self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  standar_model))
-
-
-        # Prepare completer object
-        list_items = []
-        for item in complet_result[0]['mincuts']:
-            if str(item['event_id']) not in list_items:
-                list_items.append(str(item['event_id']))
-        # Set Completer object
-        completer = QCompleter()
-        model = QStringListModel()
-        self.set_completer_object_api(completer, model, self.dlg_cf.txt_rpt_filter, list_items)
+        self.dlg_cf.btn_filter.clicked.connect(partial(self.populate_table, complet_list, standar_model, self.dlg_cf, widget_list))
+        #self.dlg_cf.txt_rpt_filter.textChanged.connect(partial(self.get_filter_qtableview, complet_result, standar_model))
+        # field_id = "test"
+        # self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  standar_model))
 
 
-    def fill_tbl_rpt(self, standar_model):
-        """ Populate QTableView tbl_rpt"""
 
-        # # Populate rows of QTableView
-        # self.filter_tab_tbl_rpt(complet_rpt, standar_model)
-        # return complet_rpt
-        rpt_layout1 = self.dlg_cf.findChild(QGridLayout, "rpt_layout1")
-        complet_list = self.get_list(limit=15)
+
+    def init_tbl_rpt(self, dialog, standar_model,  filter_fields='"filterFields":{}'):
+        """ Prepare tab tab_rpt"""
+
+        rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
+        self.clear_gridlayout(rpt_layout1)
+        complet_list = self.get_list(limit=15, filter_fields=filter_fields)
+
+        # Put filter widgets into layout
+        widget_list = []
         for field in complet_list[0]['data']['filterFields']:
             label, widget = self.put_widgets(field)
+            widget.setMaximumWidth(125)
+            widget_list.append(widget)
             rpt_layout1.addWidget(label, 0, field['layout_order'])
             rpt_layout1.addWidget(widget, 1, field['layout_order'])
-
-
-        vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        rpt_layout1.addItem(vertical_spacer)
+        vertical_spacer = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        rpt_layout1.addItem(vertical_spacer, field['layout_order'], rpt_layout1.columnCount())
         # Find combo parents:
         for field in complet_list[0]['data']['filterFields']:
             if field['isparent']:
-                widget = self.dlg_cf.findChild(QComboBox, field['column_id'])
-                widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
+                widget = dialog.findChild(QComboBox, field['column_id'])
+                widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
 
         # Related by Qtable
         self.dlg_cf.tbl_rpt.setModel(standar_model)
         self.dlg_cf.tbl_rpt.horizontalHeader().setStretchLastSection(True)
-        # Get headers
+
+        # # Get headers
         headers = []
         for x in complet_list[0]['data']['listValues'][0]:
-            print(x)
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
 
-        # # Populate rows of QTableView
-        # self.filter_tab_tbl_rpt(complet_rpt, standar_model)
+        return complet_list, widget_list
 
 
-    def get_list(self, limit=10):
+    def get_list(self, limit=10, filter_fields='"filterFields":{}'):
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
 
         header = '"header":{"device":3, "infoType":100, "lang":"ES"}, '
         form = '"form":{"tabName":"' + tab_name + '"}, '
         feature = '"feature":{"tableName":"' + self.tablename + '"}, '
-        data = '"data":{"pageInfo":{"limit":"'+str(limit)+'"}}'
+        data = '"data":{'+filter_fields+' ,"pageInfo":{"limit":"'+str(limit)+'"}}'
         body = "" + header + form + feature + data
         sql = ("SELECT " + self.schema_name + ".gw_api_get_list($${" + body + "}$$)")
         row = self.controller.get_row(sql, log_sql=True)
@@ -1738,29 +1729,58 @@ class ApiCF(ApiParent):
         complet_list = row
         return complet_list
 
+    def populate_table(self, complet_list, standar_model, dialog, widget_list):
 
-    def filter_tab_tbl_rpt(self, complet_result, standar_model):
-        # Set filter
+        filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
+        complet_list = self.get_list(limit=15, filter_fields=filter_fields)
+        # for item in complet_list[0]['data']['listValues'][0]:
+        #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
+        #     if len(row) > 0:
+        #         standar_model.appendRow(row)
+        for item in complet_list[0]['data']['listValues']:
+            row = []
+            for value in item.values():
+                row.append(QStandardItem(str(value)))
+            if len(row) > 0:
+                standar_model.appendRow(row)
+
+    def get_filter_qtableview(self, complet_list, standar_model, dialog, widget_list):
+
         standar_model.clear()
         # Get headers
         headers = []
-        for x in complet_result[0]['mincuts'][0]:
+        for x in complet_list[0]['data']['listValues'][0]:
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
-        filter = utils_giswater.getWidgetText(self.dlg_cf, self.dlg_cf.txt_rpt_filter, False, False)
+
+        filter = ""
+        for widget in widget_list:
+            column_id = widget.objectName()
+            text = utils_giswater.getWidgetText(dialog , widget)
+            filter += '"' + column_id + '":"'+text+'", '
+        if filter == "":
+            return None
+
+        filter=filter[:-2]
+        filter_fields = '"filterFields":{'+filter+'}'
+        return filter_fields
+        #filter = utils_giswater.getWidgetText(self.dlg_cf, self.dlg_cf.txt_rpt_filter, False, False)
 
         # for item in complet_rpt[0]['mincuts']:
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
         #     if len(row) > 0:
         #         standar_model.appendRow(row)
-        for item in complet_result[0]['mincuts']:
-            row = []
-            for value in item.values():
-                if filter in str(item['event_id']):
-                    row.append(QStandardItem(str(value)))
-            if len(row) > 0:
-                standar_model.appendRow(row)
+        # for item in complet_list[0]['data']['listValues']:
+        #     row = []
+        #     for value in item.values():
+        #         #if filter in str(item['event_id']):
+        #         row.append(QStandardItem(str(value)))
+        #     if len(row) > 0:
+        #         standar_model.appendRow(row)
+    def get_filters(self, layout):
+        while layout.count() > 0:
+            child = layout.takeAt(0).widget()
 
     def open_rpt_result(self, qtable, standar_model):
         self.controller.show_message("TODO", 2)
@@ -1787,7 +1807,7 @@ class ApiCF(ApiParent):
         print(feature_id)
         print(type(selected_list))
         print(selected_list)
-        #complet_result = self.fill_tbl_rpt(standar_model)
+        #complet_result = self.init_tbl_rpt(standar_model)
 
 
         return
