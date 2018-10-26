@@ -8,6 +8,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
+UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_api_service';
+
+
 INSERT INTO audit_cat_table VALUES ('config_web_fields_cat_datatype', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_layer_cat_formtab', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('config_web_layer_cat_form', 'web', '', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
