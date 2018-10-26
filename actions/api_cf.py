@@ -1665,7 +1665,7 @@ class ApiCF(ApiParent):
     def fill_tab_rpt(self):
         standar_model = QStandardItemModel()
         complet_list, widget_list = self.init_tbl_rpt(self.dlg_cf, standar_model, "rpt_layout1", "tbl_rpt")
-        self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list)
+        self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list, filter=False)
         self.set_listeners(complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
         self.dlg_cf.btn_filter.clicked.connect(partial(self.populate_table, complet_list, standar_model, self.dlg_cf, widget_list))
@@ -1677,7 +1677,7 @@ class ApiCF(ApiParent):
         rpt_layout1 = dialog.findChild(QGridLayout, layout_name)
         qtable = dialog.findChild(QTableView, qtv_name)
         self.clear_gridlayout(rpt_layout1)
-        complet_list = self.get_list(limit=15)
+        complet_list = self.get_list(limit=5000)
 
         # Put filter widgets into layout
         widget_list = []
@@ -1735,10 +1735,11 @@ class ApiCF(ApiParent):
         return complet_list
 
 
-    def populate_table(self, complet_list, standar_model, dialog, widget_list):
-
-        filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
-        complet_list = self.get_list(limit=15, filter_fields=filter_fields)
+    def populate_table(self, complet_list, standar_model, dialog, widget_list, filter=True):
+        filter_fields = '"filterFields":{}'
+        if filter:
+            filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
+        complet_list = self.get_list(limit=5000, filter_fields=filter_fields)
         # for item in complet_list[0]['data']['listValues'][0]:
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
         #     if len(row) > 0:
