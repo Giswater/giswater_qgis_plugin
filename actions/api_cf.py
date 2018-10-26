@@ -311,7 +311,7 @@ class ApiCF(ApiParent):
         self.feature_id = None
 
         for field in result["fields"]:
-            label, widget = self.put_widgets(field)
+            label, widget = self.set_widgets(self.dlg_cf, field)
             # Prepare layouts
             # Common layouts
             if field['layout_id'] == 0:
@@ -406,7 +406,7 @@ class ApiCF(ApiParent):
         self.dlg_cf.show()
         return self.complet_result
 
-    def put_widgets(self, field):
+    def set_widgets(self, dialog, field):
         widget = None
         label = QLabel()
         label.setObjectName('lbl_' + field['form_label'])
@@ -418,27 +418,26 @@ class ApiCF(ApiParent):
         if field['widgettype'] == 1 or field['widgettype'] == 10:
             completer = QCompleter()
             widget = self.add_lineedit(field)
-            widget = self.set_auto_update_lineedit(field, self.dlg_cf, widget)
+            widget = self.set_auto_update_lineedit(field, dialog, widget)
             widget = self.set_data_type(field, widget)
-            widget = self.set_widget_type(field, self.dlg_cf, widget, completer)
+            widget = self.set_widget_type(field, dialog, widget, completer)
             if widget.objectName() == self.field_id:
                 self.feature_id = widget.text()
                 # Get selected feature
                 self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
         elif field['widgettype'] == 2:
-            widget = self.add_combobox(self.dlg_cf, field)
-            widget = self.set_auto_update_combobox(field, self.dlg_cf, widget)
+            widget = self.add_combobox(dialog, field)
+            widget = self.set_auto_update_combobox(field, dialog, widget)
         elif field['widgettype'] == 3:
-            widget = self.add_checkbox(self.dlg_cf, field)
-            widget = self.set_auto_update_checkbox(field, self.dlg_cf, widget)
+            widget = self.add_checkbox(dialog, field)
+            widget = self.set_auto_update_checkbox(field,dialog, widget)
         elif field['widgettype'] == 4:
-            widget = self.add_calendar(self.dlg_cf, field)
-            widget = self.set_auto_update_dateedit(field, self.dlg_cf, widget)
+            widget = self.add_calendar(dialog, field)
+            widget = self.set_auto_update_dateedit(field, dialog, widget)
         elif field['widgettype'] == 8:
-            widget = self.add_button(self.dlg_cf, field)
+            widget = self.add_button(dialog, field)
         elif field['widgettype'] == 9:
-            widget = self.add_hyperlink(self.dlg_cf, field)
-
+            widget = self.add_hyperlink(dialog, field)
         return label, widget
 
 
@@ -706,27 +705,27 @@ class ApiCF(ApiParent):
         return widget
 
 
-    def add_calendar(self, dialog, field):
-        widget = QgsDateTimeEdit()
-        widget.setObjectName(field['column_id'])
-        widget.setAllowNull(True)
-        widget.setCalendarPopup(True)
-        widget.setDisplayFormat('yyyy/MM/dd')
-        if 'value' in field:
-            date = QDate.fromString(field['value'], 'yyyy-MM-dd')
-            utils_giswater.setCalendarDate(dialog, widget, date)
-        else:
-            widget.setEmpty()
-        btn_calendar = widget.findChild(QToolButton)
-
-        if field['isautoupdate']:
-            _json = {}
-            btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
-            btn_calendar.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
-        else:
-            btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
-        btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
-        return widget
+    # def add_calendar(self, dialog, field):
+    #     widget = QgsDateTimeEdit()
+    #     widget.setObjectName(field['column_id'])
+    #     widget.setAllowNull(True)
+    #     widget.setCalendarPopup(True)
+    #     widget.setDisplayFormat('yyyy/MM/dd')
+    #     if 'value' in field:
+    #         date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+    #         utils_giswater.setCalendarDate(dialog, widget, date)
+    #     else:
+    #         widget.setEmpty()
+    #     btn_calendar = widget.findChild(QToolButton)
+    #
+    #     if field['isautoupdate']:
+    #         _json = {}
+    #         btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
+    #         btn_calendar.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+    #     else:
+    #         btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
+    #     btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
+    #     return widget
 
 
     def add_button(self, dialog, field):
@@ -1665,28 +1664,25 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB RPT """
     def fill_tab_rpt(self):
         standar_model = QStandardItemModel()
-        complet_list, widget_list = self.init_tbl_rpt(self.dlg_cf, standar_model)
+        complet_list, widget_list = self.init_tbl_rpt(self.dlg_cf, standar_model, "rpt_layout1", "tbl_rpt")
         self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list)
+        self.set_listeners(complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
         self.dlg_cf.btn_filter.clicked.connect(partial(self.populate_table, complet_list, standar_model, self.dlg_cf, widget_list))
-        #self.dlg_cf.txt_rpt_filter.textChanged.connect(partial(self.get_filter_qtableview, complet_result, standar_model))
-        # field_id = "test"
-        # self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  standar_model))
 
 
+    def init_tbl_rpt(self, dialog, standar_model, layout_name, qtv_name):
+        """ Put filter widgets into layout and set headers into QTableView"""
 
-
-    def init_tbl_rpt(self, dialog, standar_model,  filter_fields='"filterFields":{}'):
-        """ Prepare tab tab_rpt"""
-
-        rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
+        rpt_layout1 = dialog.findChild(QGridLayout, layout_name)
+        qtable = dialog.findChild(QTableView, qtv_name)
         self.clear_gridlayout(rpt_layout1)
-        complet_list = self.get_list(limit=15, filter_fields=filter_fields)
+        complet_list = self.get_list(limit=15)
 
         # Put filter widgets into layout
         widget_list = []
         for field in complet_list[0]['data']['filterFields']:
-            label, widget = self.put_widgets(field)
+            label, widget = self.set_widgets(dialog, field)
             widget.setMaximumWidth(125)
             widget_list.append(widget)
             rpt_layout1.addWidget(label, 0, field['layout_order'])
@@ -1700,8 +1696,8 @@ class ApiCF(ApiParent):
                 widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
 
         # Related by Qtable
-        self.dlg_cf.tbl_rpt.setModel(standar_model)
-        self.dlg_cf.tbl_rpt.horizontalHeader().setStretchLastSection(True)
+        qtable.setModel(standar_model)
+        qtable.horizontalHeader().setStretchLastSection(True)
 
         # # Get headers
         headers = []
@@ -1711,6 +1707,14 @@ class ApiCF(ApiParent):
         standar_model.setHorizontalHeaderLabels(headers)
 
         return complet_list, widget_list
+
+
+    def set_listeners(self, complet_list, standar_model, dialog, widget_list):
+        for widget in widget_list:
+            if type(widget) is QLineEdit:
+                widget.textChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list))
+            elif type(widget) is QComboBox:
+                widget.currentIndexChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list))
 
 
     def get_list(self, limit=10, filter_fields='"filterFields":{}'):
@@ -1729,6 +1733,7 @@ class ApiCF(ApiParent):
             return False
         complet_list = row
         return complet_list
+
 
     def populate_table(self, complet_list, standar_model, dialog, widget_list):
 
