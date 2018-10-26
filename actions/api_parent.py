@@ -10,14 +10,14 @@ import os
 import re
 from functools import partial
 
-from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer
+from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer, QDate
 from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
-from PyQt4.QtGui import QCompleter, QStringListModel
+from PyQt4.QtGui import QCompleter, QStringListModel, QToolButton,QPushButton
 from PyQt4.QtGui import QFrame
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QGis
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
-from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
+from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 
 import utils_giswater
 from map_tools.snapping_utils import SnappingConfigManager
@@ -489,6 +489,45 @@ class ApiParent(ParentAction):
                                      " color: rgb(100, 100, 100)}")
         return widget
 
+    def add_comboline(self, dialog, field, completer):
+        """ Add widgets QLineEdit type """
+        widget = QLineEdit()
+        widget.setObjectName(field['column_id'])
+        if 'value' in field:
+            widget.setText(field['value'])
+        if 'iseditable' in field:
+            widget.setReadOnly(not field['iseditable'])
+            if not field['iseditable']:
+                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
+                                     " color: rgb(100, 100, 100)}")
+
+        widget.textChanged.connect(partial(self.populate_comboline, dialog, field, widget, completer))
+
+
+        return widget
+
+    def populate_comboline(self, dialog, field, widget, completer):
+
+        filter = utils_giswater.getWidgetText(dialog, widget)
+
+        #TODO:: Add id_tofilter and table_tosearch into field, and take values.
+        #Get id_tofilter and table_tosearch
+        # id=field['id']
+        # table=field['table']
+        id = 'id'
+        table = 'cat_work'
+
+        sql = ('SELECT ' + self.schema_name + '.gw_api_update_comboline($${"id_tofilter":"'+id+'","table":"'+table+'","text_arg":"'+filter+'"}$$)')
+        row = self.controller.get_row(sql, log_sql=True)
+        list_items = []
+
+        for result in row[0]['data']:
+            list_items.append(result['id'])
+        model = QStringListModel()
+        self.set_completer_object_api(completer, model, widget, list_items)
+
+
+
     def add_frame(self, field, x=None):
         widget = QFrame()
         widget.setObjectName(field['column_id'] + "_" + str(x))
@@ -661,13 +700,12 @@ class ApiParent(ParentAction):
         # Attach model to table view
         widget.setModel(model)
 
-    def populate_basic_info(self, dialog, row):
+    def populate_basic_info(self, dialog, row, field_id):
         result = row[0]['editData']
         if 'fields' not in result:
             return
 
-        # Get field id name
-        field_id = str(row[0]['feature']['idName'])
+        btn_accept = dialog.findChild(QPushButton, 'btn_accept')
 
         grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
         for field in result["fields"]:
@@ -680,18 +718,26 @@ class ApiParent(ParentAction):
             else:
                 label.setToolTip(field['form_label'].capitalize())
 
-            if field['widgettype'] == 1 or field['widgettype'] == 10:
+            if field['widgettype'] == 1:
                 widget = self.add_lineedit(field)
                 if widget.objectName() == field_id:
                     self.feature_id = widget.text()
+            elif field['widgettype'] == 4:
+                widget = self.add_calendar(dialog, field)
+                widget = self.set_auto_update_dateedit(field, dialog, widget)
             elif field['widgettype'] == 9:
                 widget = self.add_hyperlink(dialog, field)
+            elif field['widgettype'] == 10:
+                completer = QCompleter()
+                widget = self.add_comboline(dialog, field, completer)
+
 
             grid_layout.addWidget(label, field['layout_order'], 0)
             grid_layout.addWidget(widget, field['layout_order'], 1)
 
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         grid_layout.addItem(verticalSpacer1)
+
 
 
     def clear_gridlayout(self, layout):
@@ -701,6 +747,28 @@ class ApiParent(ParentAction):
             if child:
                 child.setParent(None)
                 child.deleteLater()
+
+    def add_calendar(self, dialog, field):
+        widget = QgsDateTimeEdit()
+        widget.setObjectName(field['column_id'])
+        widget.setAllowNull(True)
+        widget.setCalendarPopup(True)
+        widget.setDisplayFormat('yyyy/MM/dd')
+        if 'value' in field:
+            date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+            utils_giswater.setCalendarDate(dialog, widget, date)
+        else:
+            widget.setEmpty()
+        btn_calendar = widget.findChild(QToolButton)
+
+        if field['isautoupdate']:
+            _json = {}
+            btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
+            btn_calendar.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+        else:
+            btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
+        btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
+        return widget
 
 
     def test(self, widget=None):

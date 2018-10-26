@@ -39,6 +39,7 @@ from actions.api_catalog import ApiCatalog
 from giswater.ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments
 
 from ui_manager import Sections
+from ui_manager import ApiBasicInfo
 
 
 class ApiCF(ApiParent):
@@ -468,7 +469,7 @@ class ApiCF(ApiParent):
             return
 
         my_json = json.dumps(_json)
-        p_table_id = complet_result['tableName']
+        p_table_id = complet_result['feature']['tableName']
 
         sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertfields('"+str(p_table_id)+"', '"+str(feature_id)+""
                "',null, 9, 100, '"+str(my_json)+"')")
@@ -1864,50 +1865,58 @@ class ApiCF(ApiParent):
     """ NEW WORKCAT"""
     def cf_new_workcat(self, dialog):
 
-        self.dlg_previous_cf = dialog
-        self.dlg_new_workcat = NewWorkcat()
-        self.load_settings(self.dlg_new_workcat)
-        utils_giswater.setCalendarDate(dialog, self.dlg_new_workcat.builtdate, None, True)
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_newworkcat('new_workcat', 9)")
+        row = self.controller.get_row(sql, log_sql=True)
 
-        table_name = "cat_work"
-        completer = QCompleter()
-        model = QStringListModel()
-        self.populate_lineedit(completer, model, table_name, dialog, self.dlg_new_workcat.cat_work_id, 'id')
-        self.dlg_new_workcat.cat_work_id.textChanged.connect(partial(self.populate_lineedit, completer, model, table_name,  dialog, self.dlg_new_workcat.cat_work_id, 'id'))
+        self.dlg_new_workcat = ApiBasicInfo()
+
+        self.load_settings(self.dlg_new_workcat)
         # Set signals
-        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, table_name))
-        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
+        self.dlg_new_workcat.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
+        self.dlg_new_workcat.rejected.connect(partial(self.close_dialog, self.dlg_new_workcat))
+        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, 'cat_work'))
+
+        self.populate_basic_info(self.dlg_new_workcat, row, self.field_id)
 
         # Open dialog
-        self.cf_open_dialog(self.dlg_new_workcat)
+        self.open_dialog(self.dlg_new_workcat)
 
 
     def cf_manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
+
+        # Take widgets
+        cat_work_id = self.dlg_new_workcat.findChild(QLineEdit, "cat_work_id")
+        descript = self.dlg_new_workcat.findChild(QLineEdit, "descript")
+        link = self.dlg_new_workcat.findChild(QLineEdit, "link")
+        workid_key_1 = self.dlg_new_workcat.findChild(QLineEdit, "workid_key_1")
+        workid_key_2 = self.dlg_new_workcat.findChild(QLineEdit, "workid_key_2")
+        builtdate = self.dlg_new_workcat.findChild(QgsDateTimeEdit, "builtdate")
+
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
+        cat_work_id = utils_giswater.getWidgetText(self.dlg_new_workcat, cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += ("'" + str(cat_work_id) + "', ")
-        descript = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.descript)
+        descript = utils_giswater.getWidgetText(self.dlg_new_workcat, descript)
         if descript != "null":
             fields += 'descript, '
             values += ("'" + str(descript) + "', ")
-        link = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.link)
+        link = utils_giswater.getWidgetText(self.dlg_new_workcat, link)
         if link != "null":
             fields += 'link, '
             values += ("'" + str(link) + "', ")
-        workid_key_1 = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.workid_key_1)
+        workid_key_1 = utils_giswater.getWidgetText(self.dlg_new_workcat, workid_key_1)
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += ("'" + str(workid_key_1) + "', ")
-        workid_key_2 = utils_giswater.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.workid_key_2)
+        workid_key_2 = utils_giswater.getWidgetText(self.dlg_new_workcat, workid_key_2)
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += ("'" + str(workid_key_2) + "', ")
-        builtdate = self.dlg_new_workcat.builtdate.dateTime().toString('yyyy-MM-dd')
+        builtdate = builtdate.dateTime().toString('yyyy-MM-dd')
         if builtdate != "null":
             fields += 'builtdate, '
             values += ("'" + str(builtdate) + "', ")
@@ -1932,7 +1941,7 @@ class ApiCF(ApiParent):
                     sql = ("SELECT id, id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        cmb_workcat_id = self.dlg_previous_cf.findChild(QComboBox, "workcat_id")
+                        cmb_workcat_id = self.dlg_cf.findChild(QComboBox, "workcat_id")
                         utils_giswater.set_item_data(cmb_workcat_id, rows, index_to_show=1, combo_clear=True)
                         utils_giswater.set_combo_itemData(cmb_workcat_id, cat_work_id, 1)
                     self.close_dialog(self.dlg_new_workcat)
