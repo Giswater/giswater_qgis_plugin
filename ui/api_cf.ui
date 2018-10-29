@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>634</width>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -125,8 +125,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>634</width>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -827,7 +827,7 @@
         <item row="3" column="0">
          <widget class="QTableView" name="tbl_rpt">
           <property name="sortingEnabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
          </widget>
         </item>

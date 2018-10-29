@@ -69,7 +69,7 @@ class ApiCF(ApiParent):
             complet_result = self.open_form(point)
 
             if not complet_result:
-                print("FAIL")
+                print("FAIL get_point")
                 return
 
             self.restore(restore_cursor=True)
@@ -155,14 +155,22 @@ class ApiCF(ApiParent):
         self.complet_result = row
         result = row[0]['editData']
         if 'fields' not in result:
+            self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
             return False
+        if self.complet_result[0]['form'] == 'GENERIC':
+            # TODO
+            print("GENERIC")
+            # result = self.open_generic_form(feature_id, self.complet_result)
+            # return result
+            return
+        elif self.complet_result[0]['form']['template'] == 'custom feature':
+            result = self.open_custom_form(feature_id, self.complet_result)
+            return result
 
+    def open_custom_form(self, feature_id, complet_result):
         # Dialog
         self.dlg_cf = ApiCfUi()
         self.load_settings(self.dlg_cf)
-        # Find actions and set visibles
-
-
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
@@ -214,7 +222,7 @@ class ApiCF(ApiParent):
                 action.setEnabled(True)
                 action.setVisible(True)
 
-        actions_to_show = row[0]['form']['actions']
+        actions_to_show = complet_result[0]['form']['actions']
         for x in range(0, len(actions_to_show)):
             action = None
             action = self.dlg_cf.toolBar.findChild(QAction, actions_to_show[x]['actionname'])
@@ -287,15 +295,15 @@ class ApiCF(ApiParent):
 
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
         # Get table name for use as title
-        self.tablename = row[0]['feature']['tableName']
-        pos_ini = row[0]['feature']['tableName'].rfind("_")
-        pos_fi = len(str(row[0]['feature']['tableName']))
+        self.tablename = complet_result[0]['feature']['tableName']
+        pos_ini = complet_result[0]['feature']['tableName'].rfind("_")
+        pos_fi = len(str(complet_result[0]['feature']['tableName']))
         # Get feature type (Junction, manhole, valve, fountain...)
-        self.feature_type = row[0]['feature']['tableName'][pos_ini+1:pos_fi]
+        self.feature_type = complet_result[0]['feature']['tableName'][pos_ini+1:pos_fi]
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
-        table_parent = str(row[0]['feature']['tableParent'])
+        table_parent = str(complet_result[0]['feature']['tableParent'])
 
         self.layer = self.controller.get_layer_by_tablename(table_parent)
 
@@ -304,12 +312,12 @@ class ApiCF(ApiParent):
 
 
         # Get feature type as geom_type (node, arc, connec)
-        self.geom_type = str(row[0]['feature']['featureType'])
+        self.geom_type = str(complet_result[0]['feature']['featureType'])
 
         # Get field id name
-        self.field_id = str(row[0]['feature']['idName'])
+        self.field_id = str(complet_result[0]['feature']['idName'])
         self.feature_id = None
-
+        result = complet_result[0]['editData']
         for field in result["fields"]:
             label, widget = self.set_widgets(self.dlg_cf, field)
             # Prepare layouts
@@ -1669,7 +1677,7 @@ class ApiCF(ApiParent):
         self.set_listeners(complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
         self.dlg_cf.btn_filter.clicked.connect(partial(self.populate_table, complet_list, standar_model, self.dlg_cf, widget_list))
-
+        self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
 
     def init_tbl_rpt(self, dialog, standar_model, layout_name, qtv_name):
         """ Put filter widgets into layout and set headers into QTableView"""
@@ -1677,7 +1685,9 @@ class ApiCF(ApiParent):
         rpt_layout1 = dialog.findChild(QGridLayout, layout_name)
         qtable = dialog.findChild(QTableView, qtv_name)
         self.clear_gridlayout(rpt_layout1)
-        complet_list = self.get_list(limit=5000)
+        index_tab = self.tab_main.currentIndex()
+        tab_name = self.tab_main.widget(index_tab).objectName()
+        complet_list = self.get_list(tab_name='"tabName":"' + tab_name + '"', limit=5000)
 
         # Put filter widgets into layout
         widget_list = []
@@ -1717,12 +1727,9 @@ class ApiCF(ApiParent):
                 widget.currentIndexChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list))
 
 
-    def get_list(self, limit=10, filter_fields='"filterFields":{}'):
-        index_tab = self.tab_main.currentIndex()
-        tab_name = self.tab_main.widget(index_tab).objectName()
-
+    def get_list(self, tab_name='', limit=10, filter_fields='"filterFields":{}'):
         header = '"header":{"device":3, "infoType":100, "lang":"ES"}, '
-        form = '"form":{"tabName":"' + tab_name + '"}, '
+        form = '"form":{' + tab_name + '}, '
         feature = '"feature":{"tableName":"' + self.tablename + '"}, '
         data = '"data":{'+filter_fields+' ,"pageInfo":{"limit":"'+str(limit)+'"}}'
         body = "" + header + form + feature + data
@@ -1739,7 +1746,10 @@ class ApiCF(ApiParent):
         filter_fields = '"filterFields":{}'
         if filter:
             filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
-        complet_list = self.get_list(limit=5000, filter_fields=filter_fields)
+        index_tab = self.tab_main.currentIndex()
+        tab_name = self.tab_main.widget(index_tab).objectName()
+        complet_list = self.get_list(tab_name='"tabName":"' + tab_name + '"', limit=5000, filter_fields=filter_fields)
+
         # for item in complet_list[0]['data']['listValues'][0]:
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
         #     if len(row) > 0:
@@ -1789,7 +1799,7 @@ class ApiCF(ApiParent):
         while layout.count() > 0:
             child = layout.takeAt(0).widget()
 
-    def open_rpt_result(self, qtable, standar_model):
+    def open_rpt_result(self, qtable,  complet_list):
         self.controller.show_message("TODO", 2)
         print("TODO")
 
@@ -1805,19 +1815,28 @@ class ApiCF(ApiParent):
         row = qtable.model().takeRow(selected_list[0].row())
 
         print(row)
-
-        table_name = row[9].text()
+        # TODO
+        table_name = complet_list[0]['feature']['tableName']
         print(table_name)
-        sys_id_name = row[5].text()
+        sys_id_name = complet_list[0]['feature']['idName']
         print(sys_id_name)
-        feature_id = row[2].text()
-        print(feature_id)
-        print(type(selected_list))
-        print(selected_list)
+        column_index = complet_list[0]['feature']['action_column_index']['id']
+        print(column_index)
+        column_index = 24
+        feature_id = row[column_index].text()
+        print (feature_id)
+        # table_name = row[9].text()
+        # print(table_name)
+        # sys_id_name = row[5].text()
+        # print(sys_id_name)
+        # feature_id = row[2].text()
+        # print(feature_id)
+        # print(type(selected_list))
+        # print(selected_list)
         #complet_result = self.init_tbl_rpt(standar_model)
 
 
-        return
+        # return
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
         complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
         if not complet_result:
