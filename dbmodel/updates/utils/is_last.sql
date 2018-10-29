@@ -28,3 +28,6 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 		
 -- 2018/10/29
 ALTER TABLE node_type ADD COLUMN isarcdivide boolean DEFAULT TRUE;
+
+
+-- comentari per provar el nou repositori
