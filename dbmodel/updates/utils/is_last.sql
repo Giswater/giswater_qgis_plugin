@@ -24,3 +24,7 @@ SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM con
 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 			VALUES ('sys_custom_views', 'FALSE', 'Boolean', 'System', 'Utils');
+		
+		
+-- 2018/10/29
+ALTER TABLE node_type ADD COLUMN isarcdivide boolean DEFAULT TRUE;

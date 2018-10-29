@@ -18,9 +18,26 @@ edit_arc_division_dsbl_aux boolean;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	
-	SELECT value::boolean INTO edit_arc_division_dsbl_aux FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
 
+	v_project_type = (SELECT wsoftware FROM version LIMIT 1);
+
+	-- get node type arc division config
+	IF v_project_type = 'UD' THEN
+		SELECT isarcdivide INTO v_isarcdivide FROM node_type WHERE NEW.node_type=id;   
+	ELSE
+		SELECT isarcdivide INTO v_isarcdivide FROM cat_node
+			JOIN node_type ON cat_node.nodetype_id=node_type.id
+			WHERE NEW.nodecat_id=cat_node.id;
+	END IF;
+
+	IF v_isarcdivide IS NULL THEN 
+		SELECT value::boolean INTO edit_arc_division_dsbl_aux FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+	ELSIF v_isarcdivide IS TRUE THEN
+		edit_arc_division_dsbl_aux = FALSE;	
+	ELSIF v_isarcdivide IS FALSE THEN 
+		edit_arc_division_dsbl_aux = TRUE;
+	END IF;
+	
 
 --  Only enabled on insert
 	IF TG_OP = 'INSERT' AND edit_arc_division_dsbl_aux IS NOT TRUE THEN

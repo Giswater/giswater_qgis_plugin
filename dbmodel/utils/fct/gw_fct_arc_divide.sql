@@ -146,7 +146,7 @@ BEGIN
 			LOOP
 				UPDATE node SET arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(rec_node.the_geom, 
 				v_edit_arc.the_geom,0.001) AND arc_id != arc_id_aux LIMIT 1) 
-				AND node_id=rec_node.node_id;
+				WHERE node_id=rec_node.node_id;
 			END LOOP;
 
 			-- Capture linked feature information to redraw (later on this function)
