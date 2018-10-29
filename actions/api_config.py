@@ -98,8 +98,8 @@ class ApiConfig(ApiParent):
         self.system_form = QGridLayout()
 
         # Construct form for config and admin
-        self.construct_form(row, 'fields')
-        self.construct_form(row, 'fields_admin')
+        self.construct_form_param_user(row, 'fields')
+        self.construct_form_param_system(row, 'fields_admin')
 
         groupBox_1.setLayout(self.basic_form)
         groupBox_2.setLayout(self.om_form)
@@ -182,45 +182,55 @@ class ApiConfig(ApiParent):
             self.controller.show_info("Function not supported in this Operating System")
 
 
-    def construct_form(self, row, fields):
-        
+    def construct_form_param_user(self, row, fields):
+
         for field in row[0][fields]:
             
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['name'])
                 lbl.setText(field['label'])
+                lbl.setMinimumSize(160, 0)
+                lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
                 chk = QCheckBox()
                 chk.setObjectName('chk_' + field['name'])
                 chk.setChecked(field['checked'])
+                chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
                 if field['widgettype'] == 1:
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.lostFocus.connect(partial(self.get_values_changed, chk, widget, field))
+                    widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 2:
                     widget = QComboBox()
                     self.populate_combo(widget, field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed, chk, widget, field))
+                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 3:
-                    widget = QCheckBox()
-                    widget.setChecked(field['checked'])
-                    widget.stateChanged.connect(partial(self.get_values_changed, chk, widget, field))
+                    widget = chk
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, chk, chk, field))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 4:
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
                     date = QDate.fromString(field['value'], 'yyyy/MM/dd')
                     widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed, chk, widget, field))
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 7:
                     widget = QDoubleSpinBox()
-                    widget.valueChanged.connect(partial(self.get_values_changed, chk, widget, field))
+                    if 'value' in field and field['value'] is not None:
+                        value = float(str(field['value']))
+                        widget.setValue(value)
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                 widget.setObjectName(field['name'])
 
                 # Set signals
-                chk.stateChanged.connect(partial(self.get_values_checked, chk, widget, field))
+                chk.stateChanged.connect(partial(self.get_values_checked_param_user, chk, widget, field))
 
                 if field['layout_id'] == 1:
                     self.order_widgets(field, self.basic_form, lbl, chk, widget)
@@ -257,12 +267,92 @@ class ApiConfig(ApiParent):
                 elif field['layout_id'] == 17:
                     self.order_widgets(field, self.system_form, lbl, chk, widget)
 
+    def construct_form_param_system(self, row, fields):
+        for field in row[0][fields]:
+            if field['label']:
+                lbl = QLabel()
+                lbl.setObjectName('lbl' + field['name'])
+                lbl.setText(field['label'])
+                lbl.setMinimumSize(160, 0)
+                lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
+                if field['widgettype'] == 1:
+                    widget = QLineEdit()
+                    widget.setText(field['value'])
+                    widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 2:
+                    widget = QComboBox()
+                    self.populate_combo(widget, field)
+                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 3:
+                    widget = QCheckBox()
+                    if field['value'].lower() == 'true':
+                        widget.setChecked(True)
+                    elif field['value'].lower() == 'false':
+                        widget.setChecked(False)
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                elif field['widgettype'] == 4:
+                    widget = QDateEdit()
+                    widget.setCalendarPopup(True)
+                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                    widget.setDate(date)
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 7:
+                    widget = QDoubleSpinBox()
+                    if 'value' in field and field['value'] is not None:
+                        value = float(str(field['value']))
+                        widget.setValue(value)
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+                widget.setObjectName(field['name'])
+
+
+                # Order Widgets
+                if field['layout_id'] == 1:
+                    self.order_widgets_system(field, self.basic_form, lbl,  widget)
+                elif field['layout_id'] == 2:
+                    self.order_widgets_system(field, self.om_form, lbl,  widget)
+                elif field['layout_id'] == 3:
+                    self.order_widgets_system(field, self.workcat_form, lbl,  widget)
+                elif field['layout_id'] == 4:
+                    self.order_widgets_system(field, self.mapzones_form, lbl,  widget)
+                elif field['layout_id'] == 5:
+                    self.order_widgets_system(field, self.cad_form, lbl,  widget)
+                elif field['layout_id'] == 6:
+                    self.order_widgets_system(field, self.epa_form, lbl,  widget)
+                elif field['layout_id'] == 7:
+                    self.order_widgets_system(field, self.masterplan_form, lbl,  widget)
+                elif field['layout_id'] == 8:
+                    self.order_widgets_system(field, self.other_form, lbl,  widget)
+                elif field['layout_id'] == 9:
+                    self.order_widgets_system(field, self.node_type_form, lbl,  widget)
+                elif field['layout_id'] == 10:
+                    self.order_widgets_system(field, self.cat_form, lbl,  widget)
+                elif field['layout_id'] == 11:
+                    self.order_widgets_system(field, self.utils_form, lbl,  widget)
+                elif field['layout_id'] == 12:
+                    self.order_widgets_system(field, self.connec_form, lbl,  widget)
+                elif field['layout_id'] == 13:
+                    self.order_widgets_system(field, self.topology_form, lbl,  widget)
+                elif field['layout_id'] == 14:
+                    self.order_widgets_system(field, self.builder_form, lbl,  widget)
+                elif field['layout_id'] == 15:
+                    self.order_widgets_system(field, self.review_form, lbl,  widget)
+                elif field['layout_id'] == 16:
+                    self.order_widgets_system(field, self.analysis_form, lbl,  widget)
+                elif field['layout_id'] == 17:
+                    self.order_widgets_system(field, self.system_form, lbl,  widget)
 
     def get_event_combo_parent(self, fields, row):
         
         if fields == 'fields':
             for field in row[0]["fields"]:
-                if field['dv_isparent']:
+                if field['isparent']:
                     widget = self.dlg_config.findChild(QComboBox, field['name'])
                     widget.currentIndexChanged.connect(partial(self.fill_child, widget))
 
@@ -292,7 +382,7 @@ class ApiConfig(ApiParent):
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "')")
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','')")
         row = self.controller.get_row(sql, log_sql=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
@@ -317,8 +407,18 @@ class ApiConfig(ApiParent):
             form.addWidget(chk, field['layout_order'], 1)
 
 
-    def get_values_checked(self, chk, widget, field, value=None):
-        
+    def order_widgets_system(self, field, form, lbl,  widget):
+
+
+        if field['widgettype'] != 3:
+            form.addWidget(lbl, field['layout_order'], 0)
+            form.addWidget(widget, field['layout_order'], 2)
+        else:
+            form.addWidget(lbl, field['layout_order'], 0)
+            form.addWidget(widget, field['layout_order'], 1)
+
+    def get_values_checked_param_user(self, chk, widget, field, value=None):
+
         elem = {}
         elem['widget'] = str(widget.objectName())
         elem['chk'] = str(chk.objectName())
@@ -335,12 +435,15 @@ class ApiConfig(ApiParent):
         elem['chk'] = str(chk.objectName())
         elem['isChecked'] = str(utils_giswater.isChecked(self.dlg_config, chk))
         elem['value'] = value
-        elem['sys_role_id'] = str(field['sys_role_id'])
+        if 'sys_role_id' in field:
+            elem['sys_role_id'] = str(field['sys_role_id'])
+        else:
+            elem['sys_role_id'] = 'role_admin'
+
         self.list_update.append(elem)
 
+    def get_values_changed_param_user(self, chk, widget, field, value=None):
 
-    def get_values_changed(self, chk, widget, field, value=None):
-        
         elem = {}
         if type(widget) is QLineEdit:
             value = utils_giswater.getWidgetText(self.dlg_config, widget, return_string_null=False)
@@ -358,6 +461,29 @@ class ApiConfig(ApiParent):
             elem['value'] = value
             elem['sys_role_id'] = str(field['sys_role_id'])
             self.list_update.append(elem)
+
+
+    def get_values_changed_param_system(self, widget, value=None):
+
+        elem = {}
+
+        if type(widget) is QLineEdit:
+            value = utils_giswater.getWidgetText(self.dlg_config, widget, return_string_null=False)
+        elif type(widget) is QComboBox:
+            value = utils_giswater.get_item_data(self.dlg_config, widget, 0)
+        elif type(widget) is QCheckBox:
+            value = utils_giswater.isChecked(self.dlg_config, widget)
+        elif type(widget) is QDateEdit:
+            value = utils_giswater.getCalendarDate(self.dlg_config, widget)
+
+
+        elem['widget'] = str(widget.objectName())
+        elem['chk'] = str('')
+        elem['isChecked'] = str('')
+        elem['value'] = value
+        elem['sys_role_id'] = 'role_admin'
+
+        self.list_update.append(elem)
 
 
     def update_values(self):

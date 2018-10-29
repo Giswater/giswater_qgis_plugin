@@ -413,7 +413,7 @@ class ParentDialog(QDialog):
             return
 
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
-        self.add_object(self.tbl_document, "doc", "v_ui_document")
+        self.add_object(self.tbl_document, "doc", "ve_ui_doc")
 
 
     def manage_element(self, dialog, element_id=None, feature=None):
@@ -441,7 +441,7 @@ class ParentDialog(QDialog):
             return
 
         utils_giswater.setWidgetText(dialog, "element_id", elem.element_id)
-        self.add_object(self.tbl_element, "element", "v_ui_element")
+        self.add_object(self.tbl_element, "element", "ve_ui_element")
 
         self.tbl_element.model().select()
 
@@ -694,7 +694,7 @@ class ParentDialog(QDialog):
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
-        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
+        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "ve_ui_doc"))
         btn_doc_new.clicked.connect(partial(self.manage_document, dialog, None, self.feature))
 
         # Set dates
@@ -803,7 +803,7 @@ class ParentDialog(QDialog):
         self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, dialog, widget))
         open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
-        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
+        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "ve_ui_element"))
         new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
         
         # Set model of selected widget
@@ -942,7 +942,7 @@ class ParentDialog(QDialog):
 
             # Get path of selected document
             sql = ("SELECT path"
-                   " FROM " + self.schema_name + ".v_ui_document"
+                   " FROM " + self.schema_name + ".ve_ui_doc"
                    " WHERE id = '" + str(rows[0][0]) + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -991,7 +991,7 @@ class ParentDialog(QDialog):
 
         # Get path of selected document
         sql = ("SELECT path"
-               " FROM " + self.schema_name + ".v_ui_document"
+               " FROM " + self.schema_name + ".ve_ui_doc"
                " WHERE id = '" + str(selected_document) + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -1959,7 +1959,7 @@ class ParentDialog(QDialog):
             return None
             
         # Iterate over all dictionary
-        for feature_cat in self.controller.get_values_from_dictionary(self.feature_cat):           
+        for feature_cat in self.controller.get_values_from_dictionary(self.feature_cat):        
             if sys_feature_cat_id == feature_cat.id:
                 layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 return layer

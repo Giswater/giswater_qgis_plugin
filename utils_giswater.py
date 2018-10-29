@@ -16,7 +16,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.Qt import QDate, QDateTime
     from PyQt4.QtCore import QTime
     from PyQt4.QtGui import QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QLabel, QTextEdit, QDateEdit
-    from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit
+    from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit, QTableView
     from PyQt4.QtGui import QPixmap, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDoubleValidator
     import sys    
     if 'nt' in sys.builtin_module_names:
@@ -24,8 +24,8 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import QDate, QDateTime, QTime, QSortFilterProxyModel, QStringListModel
     from qgis.PyQt.QtGui import QDoubleValidator, QPixmap
-    from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QCompleter, QDateTimeEdit
-    from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QDateEdit, QSpinBox, QTimeEdit
+    from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit
     import sys    
     if 'nt' in sys.builtin_module_names:
         import winreg 
@@ -155,7 +155,8 @@ def getCalendarDate(dialog, widget, date_format = "yyyy/MM/dd", datetime_format 
         date = widget.date().toString(date_format)
     elif type(widget) is QDateTimeEdit:
         date = widget.dateTime().toString(datetime_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy':
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy' \
+            or type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'yyyy/MM/dd':
         date = widget.dateTime().toString(date_format)
     elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss':
         date = widget.dateTime().toString(datetime_format)
@@ -164,13 +165,12 @@ def getCalendarDate(dialog, widget, date_format = "yyyy/MM/dd", datetime_format 
 
 
 def setCalendarDate(dialog, widget, date, default_current_date=True):
-
     if type(widget) is str or type(widget) is unicode:
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
-    if type(widget) is QDateEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy'):
+    if type(widget) is QDateEdit or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy') \
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'yyyy/MM/dd'):
         if date is None:
             if default_current_date:
                 date = QDate.currentDate()
@@ -178,7 +178,7 @@ def setCalendarDate(dialog, widget, date, default_current_date=True):
                 date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss'):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss'):
         if date is None:
             date = QDateTime.currentDateTime()
         widget.setDateTime(date)
@@ -497,5 +497,10 @@ def double_validator(widget, min_=0, max_=999999, decimals=3, notation=QDoubleVa
     validator = QDoubleValidator(min_, max_, decimals)
     validator.setNotation(notation)
     widget.setValidator(validator)
-    
-    
+
+
+def set_qtv_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
+    """ Set QTableView configurations """
+    widget.setSelectionBehavior(selection)
+    widget.setEditTriggers(edit_triggers)
+

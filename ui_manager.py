@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 try:
     from qgis.core import Qgis
 except:
@@ -6,10 +7,10 @@ except:
 
 if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4 import uic, QtCore
-    from PyQt4.QtGui import QMainWindow, QDialog
+    from PyQt4.QtGui import QMainWindow, QDialog, QMessageBox, QDockWidget
 else:
     from qgis.PyQt import uic, QtCore
-    from qgis.PyQt.QtWidgets import QMainWindow, QDialog
+    from qgis.PyQt.QtWidgets import QMainWindow, QDialog, QMessageBox, QDockWidget
         
 import os
 
@@ -22,6 +23,17 @@ def get_ui_class(ui_file_name):
     ui_file_path = os.path.abspath(os.path.join(ui_folder_path, ui_file_name))
     return uic.loadUiType(ui_file_path)[0]
 
+FORM_CLASS = get_ui_class('api_basic_info.ui')
+class ApiBasicInfo(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('api_catalog.ui')
+class ApiCatalogUi(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
 
 FORM_CLASS = get_ui_class('api_cf.ui')
 class ApiCfUi(QMainWindow, FORM_CLASS):
@@ -43,9 +55,9 @@ class ApiConfigUi(QMainWindow, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('api_search.ui')
-class ApiSearchUi(QDialog, FORM_CLASS):
-    def __init__(self):
-        QDialog.__init__(self)
+class ApiSearchUi(QDockWidget, FORM_CLASS):
+    def __init__(self, parent=None):
+        super(ApiSearchUi, self).__init__(parent)
         self.setupUi(self)
 
 
@@ -224,6 +236,13 @@ class InfoShowInfo(QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('list_items.ui')
+class ListItems(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('load_documents.ui')
 class LoadDocuments(QDialog, FORM_CLASS):
     def __init__(self):
@@ -354,6 +373,13 @@ class Psector_management(QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('psector_rapport.ui')
 class Psector_rapport(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('sections.ui')
+class Sections(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)

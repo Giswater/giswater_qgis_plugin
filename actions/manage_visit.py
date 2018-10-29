@@ -559,7 +559,7 @@ class ManageVisit(ParentManage, QObject):
             self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
-            table_object = "v_ui_om_visitman_x_" + str(geom_type)
+            table_object = "v_ui_visit_x_" + str(geom_type)
             expr_filter = geom_type + "_id = '" + feature_id + "'"
             # Refresh model with selected filter            
             self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
@@ -621,7 +621,7 @@ class ManageVisit(ParentManage, QObject):
         if table_object == "om_visit":
             expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
             if object_id != 'null':
-                expr_filter += " AND visitcat_id::TEXT ILIKE '%" + str(object_id) + "%'"
+                expr_filter += " AND ext_code::TEXT ILIKE '%" + str(object_id) + "%'"
         else:
             expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
             if object_id != 'null':
@@ -722,7 +722,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.doc_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_document"
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".ve_ui_doc"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:

@@ -31,9 +31,8 @@ class ManageElement(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         
          
-    def manage_element(self, new_element_id=True, feature=None):
+    def manage_element(self, new_element_id=True, feature=None, geom_type=None):
         """ Button 33: Add element """
-
         self.new_element_id = new_element_id
         # Create the dialog and signals
         self.dlg_add_element = AddElement()
@@ -48,17 +47,17 @@ class ManageElement(ParentManage):
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()    
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')        
+        self.layers['arc'] = self.controller.api_get_group_layers('arc')
+        self.layers['node'] = self.controller.api_get_group_layers('node')
+        self.layers['connec'] = self.controller.api_get_group_layers('connec')
+        self.layers['element'] = self.controller.api_get_group_layers('element')
                 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
             self.dlg_add_element.tab_feature.removeTab(3)
         else:
-            self.layers['gully'] = self.controller.get_group_layers('gully')            
+            self.layers['gully'] = self.controller.api_get_group_layers('gully')
                             
         # Set icons
         self.set_icon(self.dlg_add_element.btn_add_geom, "133")
@@ -111,7 +110,7 @@ class ManageElement(ParentManage):
         self.set_completer_object(self.dlg_add_element, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "node"
+        #geom_type = "node"
         viewname = "v_edit_" + geom_type
         self.set_completer_feature_id(self.dlg_add_element.feature_id, geom_type, viewname)
 
@@ -237,7 +236,7 @@ class ManageElement(ParentManage):
                " WHERE element_id = '" + str(element_id) + "'")
         row = self.controller.get_row(sql, log_info=False, log_sql=True)
 
-        
+
         if row is None:
             # If object not exist perform an INSERT
             if element_id == '':
@@ -364,7 +363,7 @@ class ManageElement(ParentManage):
             self.manage_close(self.dlg_add_element, table_object)
             # TODO Reload table tbl_element
             # filter_ = "node_id = '" + str(feature_id) + "'"
-            # table_element = "v_ui_element_x_node"
+            # table_element = "ve_ui_element_x_node"
             # self.set_model_to_table(self.tbl_element, table_element, filter_)
 
     def filter_elementcat_id(self):
