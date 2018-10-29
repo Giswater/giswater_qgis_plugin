@@ -243,7 +243,7 @@ class ManageNewPsector(ParentManage):
             layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
-            self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
+            self.fill_table_object(self.tbl_document, self.schema_name + ".ve_ui_doc_x_psector", filter_)
             self.tbl_document.doubleClicked.connect(partial(self.document_open))
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state WHERE cur_user = current_user")
@@ -673,7 +673,7 @@ class ManageNewPsector(ParentManage):
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id')
             expr = "psector_id = '" + str(psector_id) + "'"
-            self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
+            self.fill_table_object(self.tbl_document, self.schema_name + ".ve_ui_doc_x_psector", expr_filter=expr)
 
         sql = ("SELECT other, gexpenses, vat"
                " FROM " + self.schema_name + "." + self.plan_om + "_psector "
@@ -1203,7 +1203,7 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.doc_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_document"
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".ve_ui_doc"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:

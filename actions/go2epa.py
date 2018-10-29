@@ -558,7 +558,7 @@ class Go2Epa(ParentAction):
     def check_result_id(self, result_id):  
         """ Check if selected @result_id already exists """
         
-        sql = ("SELECT * FROM " + self.schema_name + ".v_ui_rpt_cat_result"
+        sql = ("SELECT * FROM " + self.schema_name + ".ve_ui_rpt_result_cat"
                " WHERE result_id = '" + str(result_id) + "'")
         row = self.controller.get_row(sql)
         return row
@@ -649,7 +649,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa_result.rejected.connect(partial(self.close_dialog, self.dlg_go2epa_result))
 
         # Set values from widgets of type QComboBox
-        sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
+        sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".ve_ui_rpt_result_cat ORDER BY result_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, rows)
         utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id, rows)
@@ -748,8 +748,8 @@ class Go2Epa(ParentAction):
         # Fill combo box and table view
         self.fill_combo_result_id()        
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-        self.set_table_columns(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 've_ui_rpt_result_cat')
+        self.set_table_columns(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 've_ui_rpt_result_cat')
 
         # Set signals
         self.dlg_manager.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
@@ -767,7 +767,7 @@ class Go2Epa(ParentAction):
 
     def fill_combo_result_id(self):
         
-        sql = "SELECT result_id FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
+        sql = "SELECT result_id FROM " + self.schema_name + ".ve_ui_rpt_result_cat ORDER BY result_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
 
@@ -776,7 +776,7 @@ class Go2Epa(ParentAction):
 
         table = self.dlg_manager.tbl_rpt_cat_result
         widget_txt = self.dlg_manager.txt_result_id  
-        tablename = 'v_ui_rpt_cat_result'
+        tablename = 've_ui_rpt_result_cat'
         result_id = utils_giswater.getWidgetText(self.dlg_manager, widget_txt)
         if result_id != 'null':
             expr = " result_id ILIKE '%" + result_id + "%'"

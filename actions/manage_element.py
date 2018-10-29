@@ -358,7 +358,7 @@ class ManageElement(ParentManage):
             self.manage_close(self.dlg_add_element, table_object)
             # TODO Reload table tbl_element
             # filter_ = "node_id = '" + str(feature_id) + "'"
-            # table_element = "v_ui_element_x_node"
+            # table_element = "ve_ui_element_x_node"
             # self.set_model_to_table(self.tbl_element, table_element, filter_)
 
     def filter_elementcat_id(self):

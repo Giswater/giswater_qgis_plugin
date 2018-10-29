@@ -550,7 +550,7 @@ class ManageVisit(ParentManage, QObject):
             self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
-            table_object = "v_ui_om_visit_x_" + str(geom_type)
+            table_object = "v_ui_visit_x_" + str(geom_type)
             expr_filter = geom_type + "_id = '" + feature_id + "'"
             # Refresh model with selected filter            
             self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
@@ -713,7 +713,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_add_visit.doc_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".v_ui_document"
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".ve_ui_doc"
         rows = self.controller.get_rows(sql, commit=self.autocommit)
         values = []
         if rows:
