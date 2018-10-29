@@ -821,7 +821,7 @@ class ApiCF(ApiParent):
     def fill_tab_element(self):
         """ Fill tab 'Element' """
 
-        table_element = "v_ui_element_x_" + self.geom_type
+        table_element = "ve_ui_element_x_" + self.geom_type
         self.fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
         self.set_configuration(self.tbl_element, table_element)
 
@@ -839,7 +839,7 @@ class ApiCF(ApiParent):
         self.tbl_element.doubleClicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_open_element.clicked.connect(partial(self.open_selected_element, dialog, widget))
         btn_delete.clicked.connect(partial(self.delete_records, widget, table_name))
-        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "v_ui_element"))
+        btn_insert.clicked.connect(partial(self.add_object, widget, "element", "ve_ui_element"))
         btn_new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
 
         # Set model of selected widget
@@ -972,7 +972,7 @@ class ApiCF(ApiParent):
             return
 
         utils_giswater.setWidgetText(dialog, "element_id", elem.element_id)
-        self.add_object(self.tbl_element, "element", "v_ui_element")
+        self.add_object(self.tbl_element, "element", "ve_ui_element")
 
         self.tbl_element.model().select()
 
@@ -1144,7 +1144,7 @@ class ApiCF(ApiParent):
         self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['feature']['vdefaultValues'], 'to_date_vdefault')
         self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['feature']['vdefaultValues'], 'from_date_vdefault')
 
-        table_event_geom = "v_ui_om_event_x_" + geom_type
+        table_event_geom = "v_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_geom)
@@ -1456,7 +1456,7 @@ class ApiCF(ApiParent):
 
             # Get path of selected document
             sql = ("SELECT path"
-                   " FROM " + self.schema_name + ".v_ui_document"
+                   " FROM " + self.schema_name + ".ve_ui_doc"
                    " WHERE id = '" + str(rows[0][0]) + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -1505,7 +1505,7 @@ class ApiCF(ApiParent):
         selected_document = self.tbl_list_doc.currentItem().text()
 
         # Get path of selected document
-        sql = ("SELECT path FROM " + self.schema_name + ".v_ui_document"
+        sql = ("SELECT path FROM " + self.schema_name + ".ve_ui_doc"
                " WHERE id = '" + str(selected_document) + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -1563,7 +1563,7 @@ class ApiCF(ApiParent):
         self.tbl_document.doubleClicked.connect(partial(self.open_selected_document, widget))
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget))
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))
-        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
+        btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "ve_ui_doc"))
         btn_doc_new.clicked.connect(partial(self.manage_new_document, dialog, None, self.feature))
 
         # Fill ComboBox doc_type
@@ -1659,7 +1659,7 @@ class ApiCF(ApiParent):
             return
 
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
-        self.add_object(self.tbl_document, "doc", "v_ui_document")
+        self.add_object(self.tbl_document, "doc", "ve_ui_doc")
 
     """ FUNCTIONS RELATED WITH TAB RPT """
     def fill_tab_rpt(self):
