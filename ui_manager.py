@@ -20,7 +20,7 @@ class ApiBasicInfo(QtGui.QDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('api_catalog.ui')
 class ApiCatalogUi(QtGui.QMainWindow, FORM_CLASS):
     def __init__(self):
-        QtGui.QDialog.__init__(self)
+        QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
 FORM_CLASS = get_ui_class('api_cf.ui')
@@ -38,7 +38,7 @@ class ApiCfUi(QtGui.QMainWindow, FORM_CLASS):
 FORM_CLASS = get_ui_class('api_config.ui')
 class ApiConfigUi(QtGui.QMainWindow, FORM_CLASS):
     def __init__(self):
-        QtGui.QDialog.__init__(self)
+        QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
 
@@ -250,7 +250,7 @@ FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(QtGui.QMainWindow, FORM_CLASS):
     def __init__(self):
         self.closeMainWin = True
-        QtGui.QDialog.__init__(self)
+        QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
     def closeEvent(self, event):
