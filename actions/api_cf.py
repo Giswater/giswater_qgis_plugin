@@ -314,13 +314,14 @@ class ApiCF(ApiParent):
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
-        table_parent = str(complet_result[0]['feature']['tableParent'])
-
-        self.layer = self.controller.get_layer_by_tablename(table_parent)
+        self.table_parent = str(complet_result[0]['feature']['tableParent'])
+        self.layer = self.controller.get_layer_by_tablename(self.table_parent)
 
         if self.layer:
             self.iface.setActiveLayer(self.layer)
-
+        else:
+            self.controller.show_message("Layer not found: " + self.table_parent, 2)
+            return False
 
         # Get feature type as geom_type (node, arc, connec)
         self.geom_type = str(complet_result[0]['feature']['featureType'])
