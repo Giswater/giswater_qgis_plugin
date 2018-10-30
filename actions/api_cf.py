@@ -1675,7 +1675,6 @@ class ApiCF(ApiParent):
         self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list, filter=False)
         self.set_listeners(complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
-        self.dlg_cf.btn_filter.clicked.connect(partial(self.populate_table, complet_list, standar_model, self.dlg_cf, widget_list))
         self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
 
     def init_tbl_rpt(self, dialog, standar_model, layout_name, qtv_name):
@@ -1789,19 +1788,6 @@ class ApiCF(ApiParent):
         filter=filter[:-2]
         filter_fields = '"filterFields":{'+filter+'}'
         return filter_fields
-        #filter = utils_giswater.getWidgetText(self.dlg_cf, self.dlg_cf.txt_rpt_filter, False, False)
-
-        # for item in complet_rpt[0]['mincuts']:
-        #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
-        #     if len(row) > 0:
-        #         standar_model.appendRow(row)
-        # for item in complet_list[0]['data']['listValues']:
-        #     row = []
-        #     for value in item.values():
-        #         #if filter in str(item['event_id']):
-        #         row.append(QStandardItem(str(value)))
-        #     if len(row) > 0:
-        #         standar_model.appendRow(row)
 
 
     def open_rpt_result(self, qtable,  complet_list):
