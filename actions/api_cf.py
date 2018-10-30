@@ -1802,46 +1802,27 @@ class ApiCF(ApiParent):
         #         row.append(QStandardItem(str(value)))
         #     if len(row) > 0:
         #         standar_model.appendRow(row)
-    def get_filters(self, layout):
-        while layout.count() > 0:
-            child = layout.takeAt(0).widget()
+
 
     def open_rpt_result(self, qtable,  complet_list):
-        self.controller.show_message("TODO", 2)
-        print("TODO")
-
         """ Open form of selected element of the @widget?? """
 
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
+
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
             return
 
-        row = qtable.model().takeRow(selected_list[0].row())
+        index = selected_list[0]
+        row = index.row()
 
-        print(row)
-        # TODO
         table_name = complet_list[0]['feature']['tableName']
-        print(table_name)
         sys_id_name = complet_list[0]['feature']['idName']
-        print(sys_id_name)
-        column_index = complet_list[0]['feature']['action_column_index']['id']
-        print(column_index)
-        column_index = 24
-        feature_id = row[column_index].text()
-        print (feature_id)
-        # table_name = row[9].text()
-        # print(table_name)
-        # sys_id_name = row[5].text()
-        # print(sys_id_name)
-        # feature_id = row[2].text()
-        # print(feature_id)
-        # print(type(selected_list))
-        # print(selected_list)
-        #complet_result = self.init_tbl_rpt(standar_model)
-
+        column_index = 0
+        column_index = self.get_column_by_name(qtable, 'sys_id')
+        feature_id = index.sibling(row, column_index).data()
 
         # return
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -1852,7 +1833,13 @@ class ApiCF(ApiParent):
         self.draw(complet_result)
 
 
-
+    def get_column_by_name(self, qtable, column_name):
+        column_index = False
+        for x in range(0, qtable.model().columnCount()):
+            if qtable.model().headerData(x, Qt.Horizontal) == column_name:
+                column_index = x
+                break
+        return column_index
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
