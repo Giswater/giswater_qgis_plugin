@@ -1746,7 +1746,13 @@ class ApiCF(ApiParent):
             filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self.get_list(tab_name='"tabName":"' + tab_name + '"', limit=5000, filter_fields=filter_fields)
+        cmb_limit = dialog.findChild(QComboBox, tab_name+'_limit')
+        limit = 99999
+        if cmb_limit:
+            limit = utils_giswater.get_item_data(dialog, tab_name+"_limit", 1)
+        if limit is None or not limit:
+            limit = 99999
+        complet_list = self.get_list(tab_name='"tabName":"' + tab_name + '"', limit=limit, filter_fields=filter_fields)
 
         # for item in complet_list[0]['data']['listValues'][0]:
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
@@ -1768,12 +1774,14 @@ class ApiCF(ApiParent):
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
-
+        index_tab = dialog.tab_main.currentIndex()
+        tab_name = dialog.tab_main.widget(index_tab).objectName()
         filter = ""
         for widget in widget_list:
-            column_id = widget.objectName()
-            text = utils_giswater.getWidgetText(dialog , widget)
-            filter += '"' + column_id + '":"'+text+'", '
+            if widget.objectName() != tab_name+'_limit':
+                column_id = widget.objectName()
+                text = utils_giswater.getWidgetText(dialog, widget)
+                filter += '"' + column_id + '":"'+text+'", '
         if filter == "":
             return None
 
