@@ -455,6 +455,10 @@ class ApiCF(ApiParent):
             widget = self.add_button(dialog, field)
         elif field['widgettype'] == 9:
             widget = self.add_hyperlink(dialog, field)
+        if 'widgetdim' in field:
+            if field['widgetdim']:
+                widget.setMaximumWidth(field['widgetdim'])
+                widget.setMinimumWidth(field['widgetdim'])
         return label, widget
 
 
