@@ -1821,7 +1821,7 @@ class ApiCF(ApiParent):
         table_name = complet_list[0]['feature']['tableName']
         sys_id_name = complet_list[0]['feature']['idName']
         column_index = 0
-        column_index = self.get_column_by_name(qtable, 'sys_id')
+        column_index = utils_giswater.get_column_by_name(qtable, 'sys_id')
         feature_id = index.sibling(row, column_index).data()
 
         # return
@@ -1832,14 +1832,6 @@ class ApiCF(ApiParent):
             return
         self.draw(complet_result)
 
-
-    def get_column_by_name(self, qtable, column_name):
-        column_index = False
-        for x in range(0, qtable.model().columnCount()):
-            if qtable.model().headerData(x, Qt.Horizontal) == column_name:
-                column_index = x
-                break
-        return column_index
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """

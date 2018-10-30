@@ -14,7 +14,7 @@ except:
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
     from PyQt4.Qt import QDate, QDateTime
-    from PyQt4.QtCore import QTime
+    from PyQt4.QtCore import QTime, Qt
     from PyQt4.QtGui import QWidget, QLineEdit, QComboBox, QPushButton, QCheckBox, QLabel, QTextEdit, QDateEdit
     from PyQt4.QtGui import QDoubleSpinBox, QSpinBox, QDateTimeEdit, QTimeEdit, QTableView
     from PyQt4.QtGui import QPixmap, QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDoubleValidator
@@ -22,7 +22,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     if 'nt' in sys.builtin_module_names:
         import winreg as winreg  
 else:
-    from qgis.PyQt.QtCore import QDate, QDateTime, QTime, QSortFilterProxyModel, QStringListModel
+    from qgis.PyQt.QtCore import QDate, QDateTime, QTime, QSortFilterProxyModel, QStringListModel, Qt
     from qgis.PyQt.QtGui import QDoubleValidator, QPixmap
     from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QDateEdit, QSpinBox, QTimeEdit
     from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit
@@ -504,3 +504,12 @@ def set_qtv_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers
     widget.setSelectionBehavior(selection)
     widget.setEditTriggers(edit_triggers)
 
+
+def get_col_index_by_col_name(qtable, column_name):
+    """ Return column index searching by column name """
+    column_index = False
+    for x in range(0, qtable.model().columnCount()):
+        if qtable.model().headerData(x, Qt.Horizontal) == column_name:
+            column_index = x
+            break
+    return column_index
