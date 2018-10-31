@@ -35,6 +35,7 @@ import subprocess
 import sys
 import urlparse
 import webbrowser
+from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
@@ -612,8 +613,20 @@ class ApiCF(ApiParent):
         self.controller.log_info(str(_json))
 
 
+    def check_tab_data(self, dialog):
+        """ Check if current tab name is tab_data """
+        tab_main = dialog.findChild(QTabWidget, "tab_main")
+        if not tab_main:
+            return
+        index_tab = tab_main.currentIndex()
+        tab_name = tab_main.widget(index_tab).objectName()
+        if tab_name == 'tab_data':
+            return True
+        return False
+
+
     def set_auto_update_lineedit(self, field, dialog, widget):
-        if field['isupdate']:
+        if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
                 widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
@@ -623,7 +636,7 @@ class ApiCF(ApiParent):
         return widget
 
     def set_auto_update_combobox(self, field, dialog, widget):
-        if field['isupdate']:
+        if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -633,7 +646,7 @@ class ApiCF(ApiParent):
         return widget
 
     def set_auto_update_dateedit(self, field, dialog, widget):
-        if field['isupdate']:
+        if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -643,7 +656,7 @@ class ApiCF(ApiParent):
         return widget
 
     def set_auto_update_spinbox(self, field, dialog, widget):
-        if field['isupdate']:
+        if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
@@ -653,7 +666,7 @@ class ApiCF(ApiParent):
         return widget
 
     def set_auto_update_checkbox(self, field, dialog, widget):
-        if field['isupdate']:
+        if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
