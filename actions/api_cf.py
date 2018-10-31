@@ -1741,12 +1741,15 @@ class ApiCF(ApiParent):
         feature = '"feature":{"tableName":"' + self.tablename + '"}, '
         data = '"data":{'+filter_fields+' ,"pageInfo":{"limit":"'+str(limit)+'"}}'
         body = "" + header + form + feature + data
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_list($${" + body + "}$$)")
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_list($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
+
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
-        complet_list = row
+        # Parse string to order dict into List
+        complet_list = [json.loads(row[0],  object_pairs_hook=OrderedDict)]
+
         return complet_list
 
 
