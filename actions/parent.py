@@ -332,8 +332,8 @@ class ParentAction(object):
             dialog = self.dlg
                     
         try:                    
-            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
-            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.property('height'))
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
             y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
             if int(x) < 0 or int(y) < 0:
@@ -346,12 +346,10 @@ class ParentAction(object):
 
     def save_settings(self, dialog=None):
         """ Save QGIS settings related with dialog position and size """
-                
         if dialog is None:
             dialog = self.dlg
-            
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x()+8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y()+31)
         
