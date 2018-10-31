@@ -30,7 +30,6 @@ else:
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
 import json
-import operator
 import os
 import subprocess
 import sys
@@ -377,7 +376,7 @@ class ApiCF(ApiParent):
         # Find combo parents:
         for field in result["fields"]:
             if field['isparent']:
-                widget = self.dlg_cf.findChild(QComboBox, field['column_id'])
+                widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                 widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
         if self.layer:
@@ -408,7 +407,7 @@ class ApiCF(ApiParent):
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type))
         #action_rotation.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
-        action_section.triggered.connect(partial(self.open_section_form, self.complet_result))
+        action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(self.api_action_help, 'ud', 'node'))
 
         # Buttons
@@ -426,25 +425,30 @@ class ApiCF(ApiParent):
 
     def set_widgets(self, dialog, field):
         widget = None
-        label = QLabel()
-        label.setObjectName('lbl_' + field['form_label'])
-        label.setText(field['form_label'].capitalize())
-        if 'tooltip' in field:
-            label.setToolTip(field['tooltip'])
-        else:
-            label.setToolTip(field['form_label'].capitalize())
+        label = None
+        if field['form_label']:
+            label = QLabel()
+
+            label.setObjectName('lbl_' + field['form_label'])
+            label.setText(field['form_label'].capitalize())
+            if 'tooltip' in field:
+                label.setToolTip(field['tooltip'])
+            else:
+                label.setToolTip(field['form_label'].capitalize())
         if field['widgettype'] == 1 or field['widgettype'] == 10:
             completer = QCompleter()
             widget = self.add_lineedit(field)
+            widget = self.set_widget_size(widget, field)
             widget = self.set_auto_update_lineedit(field, dialog, widget)
             widget = self.set_data_type(field, widget)
             widget = self.set_widget_type(field, dialog, widget, completer)
-            if widget.objectName() == self.field_id:
+            if widget.property('column_id') == self.field_id:
                 self.feature_id = widget.text()
                 # Get selected feature
                 self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
         elif field['widgettype'] == 2:
-            widget = self.add_combobox(dialog, field)
+            widget = self.add_combobox(field)
+            widget = self.set_widget_size(widget, field)
             widget = self.set_auto_update_combobox(field, dialog, widget)
         elif field['widgettype'] == 3:
             widget = self.add_checkbox(dialog, field)
@@ -454,32 +458,38 @@ class ApiCF(ApiParent):
             widget = self.set_auto_update_dateedit(field, dialog, widget)
         elif field['widgettype'] == 8:
             widget = self.add_button(dialog, field)
+            widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 9:
             widget = self.add_hyperlink(dialog, field)
-        if 'widgetdim' in field:
-            if field['widgetdim']:
-                widget.setMaximumWidth(field['widgetdim'])
-                widget.setMinimumWidth(field['widgetdim'])
+            widget = self.set_widget_size(widget, field)
+        elif field['widgettype'] == 13:
+            widget = self.add_horizontal_spacer()
+        elif field['widgettype'] == 14:
+            widget = self.add_verical_spacer()
+
         return label, widget
 
 
-    def open_section_form(self, complet_result):
+    def open_section_form(self):
         dlg_sections = Sections()
         self.load_settings(dlg_sections)
-        #section = complet_result[0]['section']
-        section = {"y_param": "Arc inspection type 1",
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_infocrossection('" + self.feature_id + "', 9)")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            return False
+        section_result = row
 
-                     "width": "AS_BUILT",
-                   "areas": "INSPECTION",
-                   "area": "INSPECTION"
-                   }
-        for key, value in section.items():
-            print(key)
-            print(value)
-            widget = dlg_sections.findChild(QLineEdit, key)
-            print(widget)
+        # Set image
+        img = section_result[0]['shapepng']
+        utils_giswater.setImage(dlg_sections, 'lbl_section_image', img+".png")
+        
+        # Set values into QLineEdits
+        for field in section_result[0]['editData']['fields']:
+            widget = dlg_sections.findChild(QLineEdit, field['column_id'])
             if widget:
-                utils_giswater.setWidgetText(dlg_sections, widget, value)
+                if 'value' in field:
+                    utils_giswater.setWidgetText(dlg_sections, widget, field['value'])
+
         dlg_sections.btn_close.clicked.connect(partial(self.close_dialog, dlg_sections))
         self.open_dialog(dlg_sections, maximize_button=False)
 
@@ -520,7 +530,7 @@ class ApiCF(ApiParent):
             widget_list = self.dlg_cf.findChildren(QWidget)
             for widget in widget_list:
                 for field in result['fields']:
-                    if widget.objectName() == field['column_id']:
+                    if widget.objectName() == field['widgetname']:
                         if type(widget) is QLineEdit:
                             widget.setReadOnly(not enable)
                             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
@@ -541,7 +551,7 @@ class ApiCF(ApiParent):
             widget_list = self.dlg_cf.findChildren(QWidget)
             for widget in widget_list:
                 for field in result['fields']:
-                    if widget.objectName() == field['column_id']:
+                    if widget.objectName() == field['widgetname']:
                         if type(widget) is QLineEdit:
                             widget.setReadOnly(not field['iseditable'])
                             if not field['iseditable']:
@@ -596,55 +606,60 @@ class ApiCF(ApiParent):
         if self.layer.isEditable():
             # If widget.isEditable(False) return None, here control it.
             if str(value) == '' or value is None:
-                _json[str(widget.objectName())] = None
+                _json[str(widget.property('column_id'))] = None
             else:
-                _json[str(widget.objectName())] = str(value)
+                _json[str(widget.property('column_id'))] = str(value)
         self.controller.log_info(str(_json))
 
 
     def set_auto_update_lineedit(self, field, dialog, widget):
-        if field['isautoupdate']:
-            _json = {}
-            widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
-            widget.lostFocus.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
-        else:
-            widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
+        if field['isupdate']:
+            if field['isautoupdate']:
+                _json = {}
+                widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
+                widget.lostFocus.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+            else:
+                widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
     def set_auto_update_combobox(self, field, dialog, widget):
-        if field['isautoupdate']:
-            _json = {}
-            widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
-            widget.currentIndexChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
-        else:
-            widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        if field['isupdate']:
+            if field['isautoupdate']:
+                _json = {}
+                widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.currentIndexChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+            else:
+                widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
     def set_auto_update_dateedit(self, field, dialog, widget):
-        if field['isautoupdate']:
-            _json = {}
-            widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
-            widget.dateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
-        else:
-            widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        if field['isupdate']:
+            if field['isautoupdate']:
+                _json = {}
+                widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.dateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+            else:
+                widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
     def set_auto_update_spinbox(self, field, dialog, widget):
-        if field['isautoupdate']:
-            _json = {}
-            widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
-            widget.valueChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
-        else:
-            widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        if field['isupdate']:
+            if field['isautoupdate']:
+                _json = {}
+                widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.valueChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+            else:
+                widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
     def set_auto_update_checkbox(self, field, dialog, widget):
-        if field['isautoupdate']:
-            _json = {}
-            widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
-            widget.stateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
-        else:
-            widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        if field['isupdate']:
+            if field['isautoupdate']:
+                _json = {}
+                widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.stateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+            else:
+                widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
 
@@ -677,33 +692,8 @@ class ApiCF(ApiParent):
         return widget
 
 
-    def add_combobox(self, dialog, field):
-        
-        widget = QComboBox()
-        widget.setObjectName(field['column_id'])
-        self.populate_combo(widget, field)
-        if 'selectedId' in field:
-            utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
-        widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
-        return widget
 
 
-    def populate_combo(self, widget, field):
-        # Generate list of items to add into combo
-        
-        widget.blockSignals(True)
-        widget.clear()
-        widget.blockSignals(False)
-        combolist = []
-        if 'comboIds' in field:
-            for i in range(0, len(field['comboIds'])):
-                elem = [field['comboIds'][i], field['comboNames'][i]]
-                combolist.append(elem)
-
-        records_sorted = sorted(combolist, key=operator.itemgetter(1))
-        # Populate combo
-        for record in records_sorted:
-            widget.addItem(record[1], record)
 
 
     def fill_child(self, dialog, widget):
@@ -726,7 +716,8 @@ class ApiCF(ApiParent):
 
     def add_checkbox(self, dialog, field):
         widget = QCheckBox()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             if field['value'] == "t":
                 widget.setChecked(True)
@@ -737,7 +728,8 @@ class ApiCF(ApiParent):
     def add_button(self, dialog, field):
         
         widget = QPushButton()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         # widget.setStyleSheet("Text-align:left; Text-decoration:underline")
@@ -1151,7 +1143,7 @@ class ApiCF(ApiParent):
         self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['feature']['vdefaultValues'], 'to_date_vdefault')
         self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['feature']['vdefaultValues'], 'from_date_vdefault')
 
-        table_event_geom = "v_ui_event_x_" + geom_type
+        table_event_geom = "ve_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_geom)
@@ -1691,17 +1683,22 @@ class ApiCF(ApiParent):
         widget_list = []
         for field in complet_list[0]['data']['filterFields']:
             label, widget = self.set_widgets(dialog, field)
-            widget.setMaximumWidth(125)
-            widget_list.append(widget)
-            rpt_layout1.addWidget(label, 0, field['layout_order'])
-            rpt_layout1.addWidget(widget, 1, field['layout_order'])
-        vertical_spacer = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        rpt_layout1.addItem(vertical_spacer, field['layout_order'], rpt_layout1.columnCount())
-        # Find combo parents:
-        for field in complet_list[0]['data']['filterFields']:
-            if field['isparent']:
-                widget = dialog.findChild(QComboBox, field['column_id'])
-                widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
+            if widget:
+                if (type(widget)) != QSpacerItem:
+                    widget.setMaximumWidth(125)
+                    widget_list.append(widget)
+                    if label:
+                        rpt_layout1.addWidget(label, 0, field['layout_order'])
+                    rpt_layout1.addWidget(widget, 1, field['layout_order'])
+                else:
+                    rpt_layout1.addItem(widget, 1, field['layout_order'])
+            # vertical_spacer = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+            # rpt_layout1.addItem(vertical_spacer, field['layout_order'], rpt_layout1.columnCount())
+            # Find combo parents:
+            for field in complet_list[0]['data']['filterFields']:
+                if field['isparent']:
+                    widget = dialog.findChild(QComboBox, field['widgetname'])
+                    widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
 
         # Related by Qtable
         qtable.setModel(standar_model)
@@ -1778,8 +1775,9 @@ class ApiCF(ApiParent):
         tab_name = dialog.tab_main.widget(index_tab).objectName()
         filter = ""
         for widget in widget_list:
+            print(widget.objectName())
             if widget.objectName() != tab_name+'_limit':
-                column_id = widget.objectName()
+                column_id = widget.property('column_id')
                 text = utils_giswater.getWidgetText(dialog, widget)
                 filter += '"' + column_id + '":"'+text+'", '
         if filter == "":
@@ -1807,7 +1805,7 @@ class ApiCF(ApiParent):
         table_name = complet_list[0]['feature']['tableName']
         sys_id_name = complet_list[0]['feature']['idName']
         column_index = 0
-        column_index = utils_giswater.get_column_by_name(qtable, 'sys_id')
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'sys_id')
         feature_id = index.sibling(row, column_index).data()
 
         # return
@@ -1981,7 +1979,7 @@ class ApiCF(ApiParent):
         for field in result["fields"]:
                 if field['action_function'] == 'action_link':
                     function_name = field['button_function']
-                    widget = dialog.findChild(HyperLinkLabel, field['column_id'])
+                    widget = dialog.findChild(HyperLinkLabel, field['widgetname'])
                     break
         if widget:
             getattr(self, function_name)(dialog, widget, 2)

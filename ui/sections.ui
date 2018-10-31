@@ -32,7 +32,7 @@
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_image_ud_shape">
+  <widget class="QLabel" name="lbl_section_image">
    <property name="geometry">
     <rect>
      <x>177</x>

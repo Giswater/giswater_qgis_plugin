@@ -28,6 +28,7 @@ from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsE
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 
+import operator
 import os
 import re
 from functools import partial
@@ -493,10 +494,19 @@ class ApiParent(ParentAction):
         return columns_to_show
 
 
+    def set_widget_size(self, widget, field):
+        if 'widgetdim' in field:
+            if field['widgetdim']:
+                widget.setMaximumWidth(field['widgetdim'])
+                widget.setMinimumWidth(field['widgetdim'])
+        return widget
+
+
     def add_lineedit(self, field):
         """ Add widgets QLineEdit type """
         widget = QLineEdit()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         if 'iseditable' in field:
@@ -506,10 +516,40 @@ class ApiParent(ParentAction):
                                      " color: rgb(100, 100, 100)}")
         return widget
 
+
+    def add_combobox(self, field):
+        widget = QComboBox()
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
+        self.populate_combo(widget, field, field['dv_orderby_id'])
+        if 'selectedId' in field:
+            utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
+        return widget
+
+    def populate_combo(self, widget, field, order_by_id=False):
+        # Generate list of items to add into combo
+
+        widget.blockSignals(True)
+        widget.clear()
+        widget.blockSignals(False)
+        combolist = []
+        if 'comboIds' in field:
+            for i in range(0, len(field['comboIds'])):
+                elem = [field['comboIds'][i], field['comboNames'][i]]
+                combolist.append(elem)
+
+        records_sorted = sorted(combolist, key=operator.itemgetter(1))
+        if order_by_id:
+            records_sorted = sorted(combolist, key=operator.itemgetter(0))
+        # Populate combo
+        for record in records_sorted:
+            widget.addItem(record[1], record)
+
     def add_comboline(self, dialog, field, completer):
         """ Add widgets QLineEdit type """
         widget = QLineEdit()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         if 'iseditable' in field:
@@ -547,19 +587,23 @@ class ApiParent(ParentAction):
 
     def add_frame(self, field, x=None):
         widget = QFrame()
-        widget.setObjectName(field['column_id'] + "_" + str(x))
-        print(widget.objectName())
+        widget.setObjectName(field['widgetname'] + "_" + str(x))
+        widget.setProperty('column_id', field['column_id'])
         widget.setFrameShape(QFrame.HLine)
         widget.setFrameShadow(QFrame.Sunken)
         return widget
+
+
     def add_label(self, field):
         """ Add widgets QLineEdit type """
         widget = QLabel()
         widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         return widget
+
 
     def set_calendar_empty(self, widget):
         """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
@@ -567,7 +611,8 @@ class ApiParent(ParentAction):
 
     def add_hyperlink(self, dialog, field):
         widget = HyperLinkLabel()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -585,6 +630,14 @@ class ApiParent(ParentAction):
             self.controller.show_message(msg, 2)
 
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
+        return widget
+
+    def add_horizontal_spacer(self):
+        widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        return widget
+
+    def add_verical_spacer(self):
+        widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         return widget
 
 
@@ -767,7 +820,8 @@ class ApiParent(ParentAction):
 
     def add_calendar(self, dialog, field):
         widget = QgsDateTimeEdit()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
         widget.setAllowNull(True)
         widget.setCalendarPopup(True)
         widget.setDisplayFormat('yyyy/MM/dd')
