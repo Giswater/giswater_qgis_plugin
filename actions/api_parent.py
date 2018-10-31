@@ -683,8 +683,9 @@ class ApiParent(ParentAction):
         return max_x, max_y, min_x, min_y
 
 
-    def zoom_to_rectangle(self, x1, y1, x2, y2):
-        rect = QgsRectangle(float(x1), float(y1), float(x2), float(y2))
+    def zoom_to_rectangle(self, x1, y1, x2, y2, magin=0):
+        # rect = QgsRectangle(float(x1)+10, float(y1)+10, float(x2)-10, float(y2)-10)
+        rect = QgsRectangle(float(x1)+magin, float(y1)+magin, float(x2)-magin, float(y2)-magin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
 
