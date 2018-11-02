@@ -7,9 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
 -- 2018/10/28
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
-
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
-			VALUES ('sys_custom_views', 'FALSE', 'Boolean', 'System', 'Utils');
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('sys_custom_views', 'FALSE', 'Boolean', 'System', 'Utils');
