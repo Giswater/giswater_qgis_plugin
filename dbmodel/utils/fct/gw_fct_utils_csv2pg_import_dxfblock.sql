@@ -6,6 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2504
 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_dxfblock(
+    csv2pgcat_id_aux integer)
+  RETURNS integer AS
+$BODY$
+
 /*
 
 NOTES:
@@ -25,12 +30,7 @@ select SCHEMA_NAME.gw_fct_utils_csv2pg_importdxfblock(8);
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_importdxfblock(
-    csv2pgcat_id_aux integer)
-  RETURNS integer AS
-$BODY$
 DECLARE
-
 v_record record;
 v_target text;
 v_total integer;

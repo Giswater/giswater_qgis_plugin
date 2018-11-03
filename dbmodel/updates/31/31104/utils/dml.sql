@@ -14,6 +14,14 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 
 -- 2018/11/03
 INSERT INTO sys_fprocess_cat VALUES (33, 'Update project data schema', 'System', 'Project data schema', 'utils');
+INSERT INTO audit_cat_function VALUES (2510, 'gw_fct_utils_csv2pg_import_dbprices', 'edit', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2512, 'gw_fct_utils_csv2pg_import_omvisit', 'edit', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2514, 'gw_fct_utils_csv2pg_import_elements', 'edit', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2516, 'gw_fct_utils_csv2pg_import_addfields', 'edit', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2518, 'gw_fct_utils_csv2pg_export_epainp', 'epa', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2520, 'gw_fct_utils_csv2pg_import_eparpt', 'epa', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2522, 'gw_fct_utils_csv2pg_import_epanet_inp', 'admin', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2524, 'gw_fct_utils_csv2pg_import_swmm_inp', 'admin', NULL, '', '', NULL, NULL, NULL);
 
 
 
@@ -29,6 +37,32 @@ INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) V
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'om_visit_parameter', TRUE, 'New field ismultifeature');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'insert_plan_arc_x_pavement', TRUE, 'Bug fix on rule');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'node_type', TRUE, 'New field isarcdivide');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function gw_fct_utils_csv2pg_import_dbprices');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function gw_fct_utils_csv2pg_import_omvisit');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function gw_fct_utils_csv2pg_import_elements');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function gw_fct_utils_csv2pg_import_addfields');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function gw_fct_utils_csv2pg_export_epainp');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function gw_fct_utils_csv2pg_import_eparpt');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function gw_fct_utils_csv2pg_import_epanet_inp');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function gw_fct_utils_csv2pg_import_swmm_inp');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- NOT ALLOWED by using the AUTOMATIC update project data schema (LOG)
 --INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'v_edit_node', FALSE, 'Bug fix');
