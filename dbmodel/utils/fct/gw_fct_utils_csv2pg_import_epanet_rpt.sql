@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION ws_inp.gw_fct_utils_csv2pg_import_epanet_rpt(p_result
 $BODY$
 
 /*EXAMPLE
-SELECT ws_inp.gw_fct_utils_csv2pg_import_epanet_rpt('result1', 'D:\dades\test.inp')
+SELECT ws_inp.gw_fct_utils_csv2pg_import_epanet_rpt('result1', 'D:\dades\test.rpt')
 */
 
 DECLARE
@@ -29,7 +29,7 @@ BEGIN
 	--  Search path
 	SET search_path = "ws_inp", public;
 
-	-- use the copy function of postgres to insert from file in case of file must be provided as a parameter
+	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
 		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=11;
 		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(p_path)||' WITH (NULL '''', FORMAT TEXT)';	

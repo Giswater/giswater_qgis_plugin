@@ -6,12 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2526
 
-CREATE OR REPLACE FUNCTION ws_inp.gw_fct_utils_csv2pg_export_epanet_inp(p_result_id character varying,  p_path_aux text)
+--DROP FUNCTION ws_inp.gw_fct_utils_csv2pg_export_epanet_inp(character varying,text)
+CREATE OR REPLACE FUNCTION ws_inp.gw_fct_utils_csv2pg_export_epanet_inp(p_result_id character varying,  p_path text)
 RETURNS void AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_inp.gw_fct_utils_csv2pg_export_epanet_inp('result1', 'D:\dades\test.inp')
+SELECT ws_inp.gw_fct_utils_csv2pg_export_epanet_inp('result_1', 'D:\dades\test.inp')
 */
 
 DECLARE
@@ -87,10 +88,11 @@ BEGIN
 		END LOOP;
 	END LOOP;
 
-	--export to csv
-    EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 FROM temp_csv2pg WHERE csv2pgcat_id=10 and user_name=current_user order by id) 
-    TO '''||p_path_aux||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
-
+	-- use the copy function of postgres to export to file in case of file must be provided as a parameter
+	IF p_path IS NOT NULL THEN
+		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 FROM temp_csv2pg WHERE csv2pgcat_id=10 and user_name=current_user order by id) 
+		TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
+	END IF;
 	
 RETURN;
         
