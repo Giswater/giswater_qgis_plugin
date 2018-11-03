@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2524
   
- 
- -- Function: ud_inp.gw_fct_ud_data_from_inp(integer)
-
--- DROP FUNCTION ud_inp.gw_fct_ud_data_from_inp(integer);
-
-CREATE OR REPLACE FUNCTION ud_inp.gw_fct_ud_data_from_inp(p_csv2pgcat_id_aux integer)
+CREATE OR REPLACE FUNCTION ud_inp.gw_fct_utils_csv2pg_import_swmm_inp(p_path text)
   RETURNS integer AS
+
+/*EXAMPLE
+SELECT ud_inp.gw_fct_utils_csv2pg_import_swmm_inp('D:\dades\test.inp')
+*/
+
 $BODY$
 	DECLARE
 	rpt_rec record;
@@ -30,10 +30,8 @@ $BODY$
 	v_query_fields text;
 	v_rec_view record;
 	v_sql text;
-
 	
 BEGIN
-
 	-- Search path
 	SET search_path = "ud_inp", public;
 
@@ -47,71 +45,11 @@ BEGIN
 	-- Get SRID
 	SELECT epsg INTO epsg_val FROM version LIMIT 1;
 	
-
-	--DELETE'S
-	-- delete previous registres on the audit log data table
-	DELETE FROM audit_log_project where fprocesscat_id=p_csv2pgcat_id_aux AND user_name=current_user;
- 
-	--delete previous values
-	delete from inp_controls_x_arc;
-	delete from inp_controls_x_node;
-	delete from arc CASCADE;
-	delete from inp_buildup_land_x_pol;
-	delete from inp_coverage_land_x_subc CASCADE;
-	delete from subcatchment CASCADE;
-	delete from inp_aquifer CASCADE;
-	delete from node CASCADE;
-	delete from inp_loadings_pol_x_subc;
-	delete from exploitation;
-	delete from macroexploitation;
-	delete from sector;
-	delete from inp_transects_id ;
-	delete from dma;
-	delete from inp_snowpack;
-	delete from ext_municipality;
-	delete from inp_pollutant;
-	delete from inp_landuses;
-	delete from cat_node;
-	delete from inp_curve_id cascade;
-	delete from inp_inflows cascade;
-	delete from inp_timser_id cascade;
-	delete from inp_pattern cascade;
-	--delete from cat_arc;
-	--delete from cat_mat_arc;
-	delete from cat_mat_node;
-	delete from inp_groundwater	;
-	delete from selector_state where cur_user=current_user;
-	delete from config_param_user where cur_user=current_user;
-
-	
-	
-
-	-- DISSABLE DATABASE CONSTRAINTS AND PROCEDURES
-	-- disabled triggers
-	ALTER TABLE node DISABLE TRIGGER gw_trg_node_update;
-	ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
-
-	-- dissable (temporary) inp foreign keys
-	--  ALTER TABLE ud_inp.subcatchment DROP CONSTRAINT subcatchment_node_id_fkey;
-	--  ALTER TABLE ud_inp.subcatchment DROP CONSTRAINT subcatchment_rg_id_fkey;
-	--  ALTER TABLE ud_inp.subcatchment DROP CONSTRAINT subcatchment_snow_id_fkey;
-	--ALTER TABLE ud_inp.inp_groundwater DROP CONSTRAINT inp_groundwater_subc_id_fkey;
-	--ALTER TABLE ud_inp.inp_groundwater DROP CONSTRAINT inp_groundwater_aquif_id_fkey;
-	--ALTER TABLE ud_inp.inp_groundwater DROP CONSTRAINT inp_groundwater_node_id_fkey;
-	--ALTER TABLE inp_pump DROP CONSTRAINT inp_pump_curve_id_fkey;
-	--ALTER TABLE ud_inp.inp_outlet DROP CONSTRAINT inp_outlet_curve_id_fkey;
-	--ALTER TABLE ud_inp.inp_coverage_land_x_subc DROP CONSTRAINT inp_coverage_land_x_subc_landus_id_fkey;
-	--ALTER TABLE ud_inp.inp_coverage_land_x_subc DROP CONSTRAINT inp_coverage_land_x_subc_subc_id_fkey;
-	--ALTER TABLE ud_inp.inp_dwf DROP CONSTRAINT inp_dwf_pat1_fkey;
-	-- ALTER TABLE ud_inp.inp_dwf DROP CONSTRAINT inp_dwf_pat2_fkey;
-	-- ALTER TABLE ud_inp.inp_dwf DROP CONSTRAINT inp_dwf_pat3_fkey;
-	-- ALTER TABLE ud_inp.inp_dwf DROP CONSTRAINT inp_dwf_pat4_fkey;
-	--ALTER TABLE inp_curve DROP CONSTRAINT inp_curve_curve_id_fkey;
-	--ALTER TABLE ud_inp.inp_inflows_pol_x_node DROP CONSTRAINT inp_inflows_pol_x_node_pattern_id_fkey;
-	--ALTER TABLE ud_inp.inp_inflows DROP CONSTRAINT inp_inflows_pattern_id_fkey;
-	--ALTER TABLE ud_inp.inp_inflows DROP CONSTRAINT inp_inflows_timser_id_fkey;
-	--ALTER TABLE ud_inp.inp_inflows DROP CONSTRAINT inp_inflows_pattern_id_fkey;
-	--ALTER TABLE ud_inp.inp_inflows_pol_x_node DROP CONSTRAINT inp_inflows_pol_x_node_timser_id_fkey;
+	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
+	IF p_path IS NOT NULL THEN
+		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(p_path)||' WITH (NULL '''', FORMAT TEXT)';	
+		UPDATE temp_csv2pg SET csv2pgcat_id=12 WHERE csv2pgcat_id IS NULL AND user_name=current_user;
+	END IF;
 	
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
@@ -125,12 +63,10 @@ BEGIN
 	INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user);
 	INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
 
-	
-
 	-- CATALOGS
 	--cat_feature
 	--node
-	/*INSERT INTO cat_feature VALUES ('EPAMANHOLE','JUNCTION','NODE');
+	INSERT INTO cat_feature VALUES ('EPAMANHOLE','JUNCTION','NODE');
 	INSERT INTO cat_feature VALUES ('EPAOUTFALL','OUTFALL','NODE');
 	INSERT INTO cat_feature VALUES ('EPASTORAGE','STORAGE','NODE');
 	
@@ -163,14 +99,14 @@ BEGIN
 	SELECT DISTINCT csv6 FROM temp_csv2pg WHERE source='[XSECTIONS]' AND csv6 IS NOT NULL;
 
 	--nodarc
-	INSERT INTO cat_mat_arc VALUES ('EPAMAT');	*/
+	INSERT INTO cat_mat_arc VALUES ('EPAMAT');
 		
 	--cat_mat_node 
 	INSERT INTO cat_mat_node VALUES ('EPAMAT');
 
 	--cat_arc
-	--pipe 
-	/*INSERT INTO cat_arc( id, matcat_id, shape, geom1,geom2,geom3,geom4)
+	--conduit 
+	INSERT INTO cat_arc( id, matcat_id, shape, geom1,geom2,geom3,geom4)
 	SELECT DISTINCT ON (concat(csv2,'_',csv3::numeric(4,2),'x',csv4::numeric(4,2))) concat(csv2,'_',csv3::numeric(4,2),'x',csv4::numeric(4,2)),
 	'EPAMAT',csv2,csv3::numeric,csv4::numeric,csv5::numeric,csv6::numeric FROM ud_inp.temp_csv2pg 
 	WHERE source='[XSECTIONS]' AND csv1 not like ';%';
@@ -179,13 +115,12 @@ BEGIN
 	INSERT INTO cat_arc( id,matcat_id) VALUES ('EPAORIFICE-DEF', 'EPAMAT');
 	INSERT INTO cat_arc( id,matcat_id) VALUES ('EPAOUTLET-DEF', 'EPAMAT');
 	INSERT INTO cat_arc( id,matcat_id) VALUES ('EPAWEIR-DEF', 'EPAMAT');
-	*/
+	
 	--cat_node
 	INSERT INTO cat_node VALUES ('EPAMANHOLE-DEF', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPAOUTFALL-DEF', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPASTORAGE-DEF', 'EPAMAT');
 
-	
 	-- HARMONIZE THE SOURCE TABLE
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id_aux order by id
 	LOOP
@@ -284,8 +219,6 @@ BEGIN
 			UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5,';',csv6,csv7,';',csv8,';',csv9,';',csv10,';',csv11,';',csv12,';',csv13),
 			csv3=null,csv4=null, csv5=null,csv6=null,csv7=null,csv8=null,csv9=null,csv10=null,csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
 		END IF;	
-		-- other refactors if we need
-		-- todo
 	END LOOP;
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
@@ -294,7 +227,6 @@ BEGIN
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='ud_inp'
 		LOOP
-		
 			IF v_rec_view.rid=1 THEN
 				v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);
 			ELSE
@@ -308,19 +240,13 @@ BEGIN
 
 		raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;
-		
 	END LOOP;
 		
-
-
-	-- CREATE GEOM'S
-	--arc
-	/*FOR v_data IN SELECT * FROM arc  LOOP
+	--Arc geometry
+	FOR v_data IN SELECT * FROM arc  LOOP
 
 		--Insert start point, add vertices if exist, add end point
-
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
-
 		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id_aux and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
 		LOOP	
 			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
@@ -331,9 +257,9 @@ BEGIN
 
 		UPDATE arc SET the_geom=ST_MakeLine(geom_array) where arc_id=v_data.arc_id;
 		
-	end loop;*/
-	-- CREATE subcatchments
-
+	end loop;
+	
+	-- Subcatchments geometry
 	FOR v_data IN SELECT * FROM subcatchment WHERE subc_id='30130' LOOP
 	
 		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id_aux and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
@@ -346,54 +272,15 @@ BEGIN
 		INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
 	END LOOP;
 		
-	--mapzones
+	-- Mapzones geometry
 	EXECUTE 'SELECT ST_Multi(ST_ConvexHull(ST_Collect(the_geom))) FROM arc;'
 	into v_extend_val;
 	update exploitation SET the_geom=v_extend_val;
 	update sector SET the_geom=v_extend_val;
 	update dma SET the_geom=v_extend_val;
 	update ext_municipality SET the_geom=v_extend_val;
-
-
-	--ENABLE CONSTRAINTS AND PROCEDURES
-	--enable constraints
-	IF project_type_aux='UD' THEN
-	-- enable inp foreign keys
-		--ALTER TABLE ud_inp.subcatchment ADD CONSTRAINT subcatchment_node_id_fkey FOREIGN KEY (node_id) REFERENCES ud_inp.node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE ud_inp.subcatchment ADD CONSTRAINT subcatchment_rg_id_fkey FOREIGN KEY (rg_id) REFERENCES ud_inp.raingage (rg_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE ud_inp.subcatchment ADD CONSTRAINT subcatchment_snow_id_fkey FOREIGN KEY (snow_id) REFERENCES ud_inp.inp_snowpack (snow_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE ud_inp.inp_groundwater ADD CONSTRAINT inp_groundwater_subc_id_fkey FOREIGN KEY (subc_id) REFERENCES ud_inp.subcatchment (subc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE ud_inp.inp_groundwater ADD CONSTRAINT inp_groundwater_aquif_id_fkey FOREIGN KEY (aquif_id) REFERENCES ud_inp.inp_aquifer (aquif_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE ud_inp.inp_groundwater ADD CONSTRAINT inp_groundwater_node_id_fkey FOREIGN KEY (node_id) REFERENCES ud_inp.node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE ud_inp.inp_pump ADD CONSTRAINT inp_pump_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES ud_inp.inp_curve_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE ud_inp.inp_outlet ADD CONSTRAINT inp_outlet_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES ud_inp.inp_curve_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE inp_coverage_land_x_subc ADD CONSTRAINT inp_coverage_land_x_subc_landus_id_fkey FOREIGN KEY (landus_id) REFERENCES inp_landuses (landus_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE inp_coverage_land_x_subc ADD CONSTRAINT inp_coverage_land_x_subc_subc_id_fkey FOREIGN KEY (subc_id) REFERENCES subcatchment (subc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE ud_inp.inp_dwf ADD CONSTRAINT inp_dwf_pat1_fkey FOREIGN KEY (pat1) REFERENCES ud_inp.inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE ud_inp.inp_dwf ADD CONSTRAINT inp_dwf_pat2_fkey FOREIGN KEY (pat2) REFERENCES ud_inp.inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE ud_inp.inp_dwf ADD CONSTRAINT inp_dwf_pat3_fkey FOREIGN KEY (pat3) REFERENCES ud_inp.inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE ud_inp.inp_dwf ADD CONSTRAINT inp_dwf_pat4_fkey FOREIGN KEY (pat4) REFERENCES ud_inp.inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-		--ALTER TABLE inp_curve ADD CONSTRAINT inp_curve_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE inp_inflows_pol_x_node ADD CONSTRAINT inp_inflows_pol_x_node_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE inp_inflows ADD CONSTRAINT inp_inflows_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE ud_inp.inp_inflows ADD CONSTRAINT inp_inflows_timser_id_fkey FOREIGN KEY (timser_id) REFERENCES ud_inp.inp_timser_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-		--ALTER TABLE ud_inp.inp_inflows_pol_x_node ADD CONSTRAINT inp_inflows_pol_x_node_timser_id_fkey FOREIGN KEY (timser_id) REFERENCES ud_inp.inp_timser_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-	END IF;
-
-	--enable triggers
-	ALTER TABLE node ENABLE TRIGGER gw_trg_node_update;
-	ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
-	RETURN v_count;
 	
-	END;
-	$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-ALTER FUNCTION ud_inp.gw_fct_ud_data_from_inp(integer)
-  OWNER TO postgres;
-GRANT EXECUTE ON FUNCTION ud_inp.gw_fct_ud_data_from_inp(integer) TO public;
-GRANT EXECUTE ON FUNCTION ud_inp.gw_fct_ud_data_from_inp(integer) TO postgres;
-GRANT EXECUTE ON FUNCTION ud_inp.gw_fct_ud_data_from_inp(integer) TO geoadmin;
-
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
