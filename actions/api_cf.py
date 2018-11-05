@@ -336,7 +336,7 @@ class ApiCF(ApiParent):
             elif field['layout_id'] == 1:
                 layout_data_1.addWidget(label, field['layout_order'], 0)
                 layout_data_1.addWidget(widget, field['layout_order'], 1)
-                if field['widgettype'] == 8:
+                if field['widgettype'] == 'button':
                     v = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
                     layout_data_1.addItem(v, field['layout_order'], 2)
             elif field['layout_id'] == 2:
@@ -428,7 +428,7 @@ class ApiCF(ApiParent):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['form_label'].capitalize())
-        if field['widgettype'] == 1 or field['widgettype'] == 10:
+        if field['widgettype'] == 'linetext' or field['widgettype'] == 'combotext':
             completer = QCompleter()
             widget = self.add_lineedit(field)
             widget = self.set_widget_size(widget, field)
@@ -439,25 +439,25 @@ class ApiCF(ApiParent):
                 self.feature_id = widget.text()
                 # Get selected feature
                 self.feature = self.get_feature_by_id(self.layer, self.feature_id, self.field_id)
-        elif field['widgettype'] == 2:
+        elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
             widget = self.set_auto_update_combobox(field, dialog, widget)
-        elif field['widgettype'] == 3:
+        elif field['widgettype'] == 'checkbox':
             widget = self.add_checkbox(dialog, field)
             widget = self.set_auto_update_checkbox(field,dialog, widget)
-        elif field['widgettype'] == 4:
+        elif field['widgettype'] == 'date':
             widget = self.add_calendar(dialog, field)
             widget = self.set_auto_update_dateedit(field, dialog, widget)
-        elif field['widgettype'] == 8:
+        elif field['widgettype'] == 'button':
             widget = self.add_button(dialog, field)
             widget = self.set_widget_size(widget, field)
-        elif field['widgettype'] == 9:
+        elif field['widgettype'] == 'hyperlink':
             widget = self.add_hyperlink(dialog, field)
             widget = self.set_widget_size(widget, field)
-        elif field['widgettype'] == 13:
+        elif field['widgettype'] == 'hspacer':
             widget = self.add_horizontal_spacer()
-        elif field['widgettype'] == 14:
+        elif field['widgettype'] == 'vspacer':
             widget = self.add_verical_spacer()
 
         return label, widget
@@ -670,16 +670,18 @@ class ApiCF(ApiParent):
 
     def set_data_type(self, field, widget):
         if 'datatype' in field:
-            if field['datatype'] == 1:  # Integer
+            if field['datatype'] == 'integer':  # Integer
                 widget.setValidator(QIntValidator())
-            elif field['datatype'] == 2:  # String
+            elif field['datatype'] == 'string':  # String
                 function_name = "test"
                 widget.returnPressed.connect(partial(getattr(self, function_name)))
-            elif field['datatype'] == 3:  # Date
+            elif field['datatype'] == 'date':  # Date
                 pass
-            elif field['datatype'] == 4:  # Boolean
+            elif field['datatype'] == 'datetime':  # DateTime
                 pass
-            elif field['datatype'] == 5:  # Double
+            elif field['datatype'] == 'boolean':  # Boolean
+                pass
+            elif field['datatype'] == 'double':  # Double
                 validator = QDoubleValidator()
                 validator.setRange(-9999999.0, 9999999.0, 3)
                 validator.setNotation(QDoubleValidator().StandardNotation)
@@ -688,7 +690,7 @@ class ApiCF(ApiParent):
 
 
     def set_widget_type(self, field, dialog, widget, completer):
-        if field['widgettype'] == 10:
+        if field['widgettype'] == 'combotext':
             if 'dv_table' in field:
                 table_name = field['dv_table']
                 model = QStringListModel()
@@ -1844,7 +1846,7 @@ class ApiCF(ApiParent):
                     self.controller.show_message("No fields for: " + row[0]['editData'], 2)
                 else:
                     for field in result["fields"]:
-                        if field['widgettype'] == 11:
+                        if field['widgettype'] == 'line':
                             y = 2
                             for x in range(0, y):
                                 line = self.add_frame(field, x)
@@ -1858,7 +1860,7 @@ class ApiCF(ApiParent):
                                 label.setToolTip(field['tooltip'])
                             else:
                                 label.setToolTip(field['form_label'].capitalize())
-                        if field['widgettype'] == 12:
+                        if field['widgettype'] == 'label':
                             widget = self.add_label(field)
                             label.setWordWrap(True)
                             plan_layout.addWidget(label, field['layout_order'], 0)

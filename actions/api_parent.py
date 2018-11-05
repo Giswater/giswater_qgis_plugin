@@ -789,16 +789,16 @@ class ApiParent(ParentAction):
             else:
                 label.setToolTip(field['form_label'].capitalize())
 
-            if field['widgettype'] == 1:
+            if field['widgettype'] == 'linetext':
                 widget = self.add_lineedit(field)
                 if widget.objectName() == field_id:
                     self.feature_id = widget.text()
-            elif field['widgettype'] == 4:
+            elif field['widgettype'] == 'date':
                 widget = self.add_calendar(dialog, field)
                 widget = self.set_auto_update_dateedit(field, dialog, widget)
-            elif field['widgettype'] == 9:
+            elif field['widgettype'] == 'hyperlink':
                 widget = self.add_hyperlink(dialog, field)
-            elif field['widgettype'] == 10:
+            elif field['widgettype'] == 'combotext':
                 completer = QCompleter()
                 widget = self.add_comboline(dialog, field, completer)
 

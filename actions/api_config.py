@@ -198,28 +198,28 @@ class ApiConfig(ApiParent):
                 chk.setChecked(field['checked'])
                 chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-                if field['widgettype'] == 1:
+                if field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
                     widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 2:
+                elif field['widgettype'] == 'combo':
                     widget = QComboBox()
                     self.populate_combo(widget, field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 3:
+                elif field['widgettype'] == 'checkbox':
                     widget = chk
                     widget.stateChanged.connect(partial(self.get_values_changed_param_user, chk, chk, field))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 4:
+                elif field['widgettype'] == 'date':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
                     date = QDate.fromString(field['value'], 'yyyy/MM/dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 7:
+                elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
@@ -276,17 +276,17 @@ class ApiConfig(ApiParent):
                 lbl.setMinimumSize(160, 0)
                 lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
-                if field['widgettype'] == 1:
+                if field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
                     widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 2:
+                elif field['widgettype'] == 'combo':
                     widget = QComboBox()
                     self.populate_combo(widget, field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 3:
+                elif field['widgettype'] == 'checkbox':
                     widget = QCheckBox()
                     if field['value'].lower() == 'true':
                         widget.setChecked(True)
@@ -294,14 +294,14 @@ class ApiConfig(ApiParent):
                         widget.setChecked(False)
                     widget.stateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 4:
+                elif field['widgettype'] == 'date':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
                     date = QDate.fromString(field['value'], 'yyyy/MM/dd')
                     widget.setDate(date)
                     widget.dateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 7:
+                elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
@@ -398,7 +398,7 @@ class ApiConfig(ApiParent):
 
     def order_widgets(self, field, form, lbl, chk, widget):
         
-        if field['widgettype'] != 3:
+        if field['widgettype'] != 'checkbox':
             form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(chk, field['layout_order'], 1)
             form.addWidget(widget, field['layout_order'], 2)
@@ -410,7 +410,7 @@ class ApiConfig(ApiParent):
     def order_widgets_system(self, field, form, lbl,  widget):
 
 
-        if field['widgettype'] != 3:
+        if field['widgettype'] != 'checkbox':
             form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(widget, field['layout_order'], 2)
         else:
