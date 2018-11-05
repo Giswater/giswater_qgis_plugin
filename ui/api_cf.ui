@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>634</width>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -82,59 +82,6 @@
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <layout class="QGridLayout" name="layout_data_3"/>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_inp">
-       <attribute name="title">
-        <string>Inp</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_16">
-        <item row="0" column="0">
-         <widget class="QToolBox" name="tab_inp_2">
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <widget class="QWidget" name="page21">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>98</width>
-             <height>28</height>
-            </rect>
-           </property>
-           <attribute name="label">
-            <string>Page 1</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_11">
-            <item>
-             <layout class="QGridLayout" name="layout_inp_1"/>
-            </item>
-            <item>
-             <layout class="QGridLayout" name="layout_inp_2"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="page_22">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>98</width>
-             <height>28</height>
-            </rect>
-           </property>
-           <attribute name="label">
-            <string>Page 2</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_12">
-            <item>
-             <layout class="QGridLayout" name="layout_inp_3"/>
             </item>
            </layout>
           </widget>
@@ -330,125 +277,89 @@
         <string>Hydrometer</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_10">
+        <item row="1" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QLineEdit" name="txt_hydrometer_id">
+            <property name="maximumSize">
+             <size>
+              <width>250</width>
+              <height>250</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_link">
+            <property name="maximumSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <widget class="QTableView" name="tbl_hydrometer"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_hydrometer_val">
+       <attribute name="title">
+        <string>Hydrometer values</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
-         <widget class="QTabWidget" name="tab_scada">
-          <property name="currentIndex">
-           <number>0</number>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Cat period filter :</string>
           </property>
-          <widget class="QWidget" name="tab_page_event_node">
-           <attribute name="title">
-            <string>Hydrometer</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_13">
-            <item row="2" column="0">
-             <widget class="QTableView" name="tbl_hydrometer"/>
-            </item>
-            <item row="0" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout_9">
-              <item>
-               <widget class="QLineEdit" name="txt_hydrometer_id">
-                <property name="maximumSize">
-                 <size>
-                  <width>250</width>
-                  <height>250</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btn_add_hydrometer">
-                <property name="maximumSize">
-                 <size>
-                  <width>24</width>
-                  <height>24</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btn_delete_hydrometer">
-                <property name="maximumSize">
-                 <size>
-                  <width>24</width>
-                  <height>24</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btn_link">
-                <property name="maximumSize">
-                 <size>
-                  <width>24</width>
-                  <height>24</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_page_event_element_2">
-           <attribute name="title">
-            <string>Hydrometer values</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_12">
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Cat period filter :</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QTableView" name="tbl_hydrometer_value"/>
-            </item>
-            <item row="2" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
-              <item>
-               <widget class="QComboBox" name="cmb_cat_period_id_filter"/>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
          </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QTableView" name="tbl_hydrometer_value">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QComboBox" name="cmb_cat_period_id_filter"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>

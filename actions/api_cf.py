@@ -16,7 +16,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
     from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
     from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget, \
-        QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget
+        QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QAbstractItemView
     from PyQt4.QtSql import QSqlTableModel
 
 else:
@@ -24,7 +24,7 @@ else:
     from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator
     from qgis.PyQt.QtWidgets import QApplication, QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, \
         QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QListWidgetItem, QStandardItemModel, \
-        QStandardItem, QTabWidget
+        QStandardItem, QTabWidget, QAbstractItemView
     from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
@@ -100,6 +100,7 @@ class ApiCF(ApiParent):
         self.tab_connections_loaded = False
         self.tab_conections_loaded = False
         self.tab_hydrometer_loaded = False
+        self.tab_hydrometer_val_loaded = False
         self.tab_om_loaded = False
         self.tab_document_loaded = False
         self.tab_plan_loaded = False
@@ -178,7 +179,8 @@ class ApiCF(ApiParent):
         self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
         utils_giswater.set_qtv_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        utils_giswater.set_qtv_config(self.tbl_hydrometer_value)
+        #QAbstractItemView.SelectItems,
+        utils_giswater.set_qtv_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
         self.tbl_event = self.dlg_cf.findChild(QTableView, "tbl_event")
         utils_giswater.set_qtv_config(self.tbl_event)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
@@ -209,9 +211,9 @@ class ApiCF(ApiParent):
         for tab in complet_result[0]['form']['visibleTabs']:
             tabs_to_show.append(tab['tabname'])
 
-        for x in range(self.tab_main.count() - 1, 0, -1):
-            if self.tab_main.widget(x).objectName() not in tabs_to_show:
-                utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
+        # for x in range(self.tab_main.count() - 1, 0, -1):
+        #     if self.tab_main.widget(x).objectName() not in tabs_to_show:
+        #         utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
 
 
         # Actions
@@ -281,9 +283,7 @@ class ApiCF(ApiParent):
         self.set_icon(self.dlg_cf.btn_delete, "112b")
         self.set_icon(self.dlg_cf.btn_new_element, "131b")
         self.set_icon(self.dlg_cf.btn_open_element, "134b")
-        # tab scada.hydrometer
-        self.set_icon(self.dlg_cf.btn_add_hydrometer, "111b")
-        self.set_icon(self.dlg_cf.btn_delete_hydrometer, "112b")
+        # tab hydrometer
         self.set_icon(self.dlg_cf.btn_link, "70b")
         # tab om
         self.set_icon(self.dlg_cf.btn_open_visit, "65b")
@@ -359,10 +359,7 @@ class ApiCF(ApiParent):
         layout_data_1.addItem(vertical_spacer1)
         vertical_spacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout_data_2.addItem(vertical_spacer2)
-        vertical_spacer3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        layout_inp_1.addItem(vertical_spacer3)
-        vertical_spacer4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        layout_inp_2.addItem(vertical_spacer4)
+
         # Find combo parents:
         for field in result["fields"]:
             if field['isparent']:
@@ -412,7 +409,7 @@ class ApiCF(ApiParent):
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
 
         # Open dialog
-        self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
+        #self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_cf.show()
         return self.complet_result
 
@@ -807,6 +804,10 @@ class ApiCF(ApiParent):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer' and not self.tab_hydrometer_loaded:
             self.fill_tab_hydrometer()
             self.tab_hydrometer_loaded = True
+        # Tab 'Hydrometer values'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer_val' and not self.tab_hydrometer_val_loaded:
+            self.fill_tab_hydrometer_values()
+            self.tab_hydrometer_loaded = True
         # Tab 'O&M'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_om' and not self.tab_om_loaded:
             self.fill_tab_om(self.geom_type)
@@ -954,7 +955,6 @@ class ApiCF(ApiParent):
             self.controller.execute_sql(sql, log_sql=True)
             widget.model().select()
 
-
     def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
         elem = ManageElement(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -971,7 +971,6 @@ class ApiCF(ApiParent):
         # Open dialog
         elem.open_dialog(elem.dlg_add_element)
 
-
     def manage_element_new(self, dialog, elem):
         """ Get inserted element_id and add it to current feature """
         if elem.element_id is None:
@@ -982,14 +981,14 @@ class ApiCF(ApiParent):
 
         self.tbl_element.model().select()
 
-    def set_model_to_table(self, widget, table_name, expr_filter=None):
+    def set_model_to_table(self, widget, table_name, expr_filter=None, edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setEditStrategy(edit_strategy)
         if expr_filter:
             model.setFilter(expr_filter)
         model.select()
@@ -1003,6 +1002,7 @@ class ApiCF(ApiParent):
             widget.setModel(model)
         else:
             self.controller.log_info("set_model_to_table: widget not found")
+
 
     """ FUNCTIONS RELATED WITH TAB RELATIONS"""
     def manage_tab_relations(self, viewname, field_id):
@@ -1101,29 +1101,35 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
     def fill_tab_hydrometer(self):
         """ Fill tab 'Hydrometer' """
-        # TODO faltan los botones por hacer
-        # Sub-tab hydrometer
+        utils_giswater.setWidgetEnabled(self.dlg_cf, "open_link", False)
         table_hydro = "v_rtc_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydro)
         self.set_configuration(self.tbl_hydrometer, table_hydro)
         txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer,  table_hydro))
 
-        # Sub-tab hydrometer values
-        table_hydro_value = "v_edit_rtc_hydro_data_x_connec"
-        cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
-        # Populate combo filter hydrometer value
-        sql = ("SELECT DISTINCT cat_period_id, cat_period_id "
-               " FROM " + self.schema_name + ".v_edit_rtc_hydro_data_x_connec ORDER BY cat_period_id")
 
-        rows = self.controller.get_rows(sql, log_sql=True)
-        rows.append(['', ''])
-        utils_giswater.set_item_data(cmb_cat_period_id_filter, rows)
-        self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
-        self.set_configuration(self.tbl_hydrometer_value, table_hydro_value)
 
-        cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
-        cmb_cat_period_id_filter.currentIndexChanged.connect(partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value,  table_hydro_value))
+        # self.dlg_cf.findChild(QPushButton, "open_link").clicked.connect(self.open_url)
+        # self.tbl_hydrometer.clicked.connect(self.check_url)
+
+
+    def check_url(self):
+        """ Check URL. Enable/Disable button that opens it """
+
+        selected_list = self.tbl_hydrometer.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+        url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
+        if url != '':
+            self.url = url
+            utils_giswater.setWidgetEnabled(self.dialog, "open_link")
+        else:
+            utils_giswater.setWidgetEnabled(self.dialog, "open_link", False)
 
 
     def fill_tbl_hydrometer(self, qtable, table_name):
@@ -1141,8 +1147,27 @@ class ApiCF(ApiParent):
         filter = "connec_id ILIKE '%" + self.feature_id + "%' "
         filter += " AND cat_period_id ILIKE '%" + utils_giswater.get_item_data(self.dlg_cf, cmb_cat_period_id_filter) + "%'"
         # Set model of selected widget
-        self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter)
+        self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter, QSqlTableModel.OnFieldChange)
 
+
+    """ FUNCTIONS RELATED WITH TAB HYDROMETER VALUES"""
+    def fill_tab_hydrometer_values(self):
+
+        table_hydro_value = "ve_ui_hydroval_x_connec"
+        cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
+        # Populate combo filter hydrometer value
+        sql = ("SELECT DISTINCT cat_period_id, cat_period_id "
+               " FROM " + self.schema_name + ".ve_ui_hydroval_x_connec ORDER BY cat_period_id")
+
+        rows = self.controller.get_rows(sql, log_sql=True)
+        rows.append(['', ''])
+        utils_giswater.set_item_data(cmb_cat_period_id_filter, rows)
+        self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
+        self.set_configuration(self.tbl_hydrometer_value, table_hydro_value)
+
+        cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
+        cmb_cat_period_id_filter.currentIndexChanged.connect(
+            partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value, table_hydro_value))
 
     def set_filter_hydrometer_values(self, widget):
         """ Get Filter for table hydrometer value with combo value"""
@@ -1254,6 +1279,7 @@ class ApiCF(ApiParent):
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
 
+
     def open_visit_event(self):
         """ Open event of selected record of the table """
 
@@ -1298,6 +1324,7 @@ class ApiCF(ApiParent):
 
         self.dlg_event_full.open()
 
+
     def tbl_event_clicked(self, table_name):
 
         # Enable/Disable buttons
@@ -1328,6 +1355,7 @@ class ApiCF(ApiParent):
         # If document 'True' or 'False'
         if str(row[1]) == 'True':
             btn_open_visit_doc.setEnabled(True)
+
 
     def set_filter_table_event(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
@@ -1389,6 +1417,7 @@ class ApiCF(ApiParent):
         widget.model().setFilter(expr)
         widget.model().select()
 
+
     def set_filter_table_event2(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
 
@@ -1421,12 +1450,14 @@ class ApiCF(ApiParent):
         widget.model().setFilter(expr)
         widget.model().select()
 
+
     def open_visit(self):
         """ Call button 65: om_visit_management """
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
         manage_visit.visit_added.connect(self.update_visit_table)
         manage_visit.edit_visit(self.geom_type, self.feature_id)
+
 
     # creat the new visit GUI
     def update_visit_table(self):
@@ -1450,6 +1481,7 @@ class ApiCF(ApiParent):
         sql = ("SELECT id FROM " + self.schema_name + ".om_visit LIMIT 1")
         self.controller.get_rows(sql, commit=True)
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id)
+
 
     def open_gallery(self):
         """ Open gallery of selected record of the table """
@@ -1520,6 +1552,7 @@ class ApiCF(ApiParent):
 
             self.dlg_load_doc.open()
 
+
     def open_selected_doc(self):
 
         # Selected item from list
@@ -1561,6 +1594,7 @@ class ApiCF(ApiParent):
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
         self.set_vdefault_values(self.dlg_cf.doc_type, self.complet_result[0]['feature']['vdefaultValues'], 'document_type_vdefault')
+
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show documents """
@@ -1657,6 +1691,7 @@ class ApiCF(ApiParent):
         else:
             webbrowser.open(path)
 
+
     def manage_new_document(self, dialog, doc_id=None, feature=None):
         """ Execute action of button 34 """
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -1682,6 +1717,7 @@ class ApiCF(ApiParent):
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "ve_ui_doc")
 
+
     """ FUNCTIONS RELATED WITH TAB RPT """
     def fill_tab_rpt(self):
         standar_model = QStandardItemModel()
@@ -1690,6 +1726,7 @@ class ApiCF(ApiParent):
         self.set_listeners(complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
         self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
+
 
     def init_tbl_rpt(self, dialog, standar_model, layout_name, qtv_name):
         """ Put filter widgets into layout and set headers into QTableView"""
@@ -1745,13 +1782,7 @@ class ApiCF(ApiParent):
 
 
     def get_list(self, form_name='', tab_name='', limit=10, filter_fields=''):
-        client = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        form = '"form":{"formName":"' + form_name + '", "tabName":"'+tab_name+'"}, '
-        feature = '"feature":{"tableName":"' + self.tablename + '"}, '
-        filter_fields = '"filterFields":{'+filter_fields+'}'
-        page_info = '"pageInfo":{"limit":"'+str(limit)+'"}'
-        data = '"data":{'+filter_fields+', '+page_info+'} '
-        body = "" + client + form + feature + data
+        body = self.create_body(form_name, tab_name, self.tablename, 10, filter_fields)
         sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
 
@@ -1788,6 +1819,7 @@ class ApiCF(ApiParent):
                 row.append(QStandardItem(str(value)))
             if len(row) > 0:
                 standar_model.appendRow(row)
+
 
     def get_filter_qtableview(self, complet_list, standar_model, dialog, widget_list):
 
@@ -1842,17 +1874,22 @@ class ApiCF(ApiParent):
         self.draw(complet_result)
 
 
-
     """ FUNCTIONS RELATED WITH TAB PLAN """
     def fill_tab_plan(self):
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
         if self.geom_type == 'arc' or self.geom_type == 'node':
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infoplan('infoplan', 9)")
+            body = self.create_body(form_name='', tab_name='', tablename='', limit=10, filter_fields='')
+            sql = ("SELECT " + self.schema_name + ".gw_api_getinfoplan($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True)
+
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
+                return False
+            # Parse string to order dict into List
+
             else:
-                result = row[0]['editData']
+                complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+                result = complet_list[0]['editData']
                 if 'fields' not in result:
                     self.controller.show_message("No fields for: " + row[0]['editData'], 2)
                 else:

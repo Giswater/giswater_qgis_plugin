@@ -90,7 +90,7 @@ class ApiParent(ParentAction):
         return editable_layer
 
 
-    def set_completer_object_api(self, completer, model, widget, list_items):
+    def set_completer_object_api(self, completer, model, widget, list_items, max_visible=10):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object.
             WARNING: Each QlineEdit needs their own QCompleter and their own QStringListModel!!!
@@ -98,7 +98,7 @@ class ApiParent(ParentAction):
 
         # Set completer and model: add autocomplete in the widget
         completer.setCaseSensitivity(Qt.CaseInsensitive)
-        completer.setMaxVisibleItems(10)
+        completer.setMaxVisibleItems(max_visible)
         widget.setCompleter(completer)
         completer.setCompletionMode(1)
         model.setStringList(list_items)
@@ -843,6 +843,18 @@ class ApiParent(ParentAction):
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
         btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
         return widget
+
+
+    def create_body(self, form_name='', tab_name='', tablename='', limit=10, filter_fields=''):
+        """ Create and return parameters as body to functions"""
+        client = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        form = '"form":{"formName":"' + form_name + '", "tabName":"' + tab_name + '"}, '
+        feature = '"feature":{"tableName":"' + tablename + '"}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{"limit":"' + str(limit) + '"}'
+        data = '"data":{' + filter_fields + ', ' + page_info + '} '
+        body = "" + client + form + feature + data
+        return body
 
 
     def test(self, widget=None):
