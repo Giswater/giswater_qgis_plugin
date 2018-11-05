@@ -8,14 +8,18 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfodocs"(element_type varchar, id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
+/*EXAMPLE QUERYS
+SELECT ws_sample.gw_fct_getinfodocs('node', '1007', 3)
+SELECT ws_sample.gw_fct_getinfodocs('arc', '2001', 3)
+SELECT ws_sample.gw_fct_getinfodocs('connec', '3004', 3)
+*/
+
 --    Variables
     query_result character varying;
     query_result_docs json;
     api_version json;
 
-
 BEGIN
-
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
@@ -50,9 +54,7 @@ BEGIN
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
         RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
         
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
-
