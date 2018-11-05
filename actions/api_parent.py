@@ -623,21 +623,23 @@ class ApiParent(ParentAction):
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
             else:
-                msg = ("parameter button_function is null for button " + widget.objectName())
+                msg = ("parameter widgetfunction is null for widget " + widget.objectName())
                 self.controller.show_message(msg, 2)
         else:
-            msg = "parameter button_function not found"
+            msg = "parameter widgetfunction not found"
             self.controller.show_message(msg, 2)
 
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
-    def add_horizontal_spacer(self):
+    def add_horizontal_spacer(self, field):
         widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        #widget.setObjectName(field['widgetname'])
         return widget
 
-    def add_verical_spacer(self):
+    def add_verical_spacer(self, field):
         widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        #widget.setObjectName(field['widgetname'])
         return widget
 
 

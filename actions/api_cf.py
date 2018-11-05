@@ -421,7 +421,7 @@ class ApiCF(ApiParent):
         label = None
         if field['label']:
             label = QLabel()
-            label.setObjectName('lbl_' + field['label'])
+            label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
@@ -455,9 +455,10 @@ class ApiCF(ApiParent):
             widget = self.add_hyperlink(dialog, field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
-            widget = self.add_horizontal_spacer()
+
+            widget = self.add_horizontal_spacer(field)
         elif field['widgettype'] == 'vspacer':
-            widget = self.add_verical_spacer()
+            widget = self.add_verical_spacer(field)
 
         return label, widget
 
@@ -1698,13 +1699,13 @@ class ApiCF(ApiParent):
         self.clear_gridlayout(rpt_layout1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self.get_list(tab_name='"tabName":"' + tab_name + '"', limit=5000)
+        complet_list = self.get_list(tab_name=tab_name, limit=5000)
 
         # Put filter widgets into layout
         widget_list = []
-        for field in complet_list[0]['data']['filterFields']:
+        for field in complet_list[0]['body']['data']['filterFields']:
             label, widget = self.set_widgets(dialog, field)
-            if widget:
+            if widget is not None:
                 if (type(widget)) != QSpacerItem:
                     widget.setMaximumWidth(125)
                     widget_list.append(widget)
@@ -1716,7 +1717,7 @@ class ApiCF(ApiParent):
             # vertical_spacer = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
             # rpt_layout1.addItem(vertical_spacer, field['layout_order'], rpt_layout1.columnCount())
             # Find combo parents:
-            for field in complet_list[0]['data']['filterFields']:
+            for field in complet_list[0]['body']['data']['filterFields']:
                 if field['isparent']:
                     widget = dialog.findChild(QComboBox, field['widgetname'])
                     widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
@@ -1727,7 +1728,7 @@ class ApiCF(ApiParent):
 
         # # Get headers
         headers = []
-        for x in complet_list[0]['data']['listValues'][0]:
+        for x in complet_list[0]['body']['data']['listValues'][0]:
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
@@ -1743,13 +1744,15 @@ class ApiCF(ApiParent):
                 widget.currentIndexChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list))
 
 
-    def get_list(self, tab_name='', limit=10, filter_fields='"filterFields":{}'):
-        header = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        form = '"form":{' + tab_name + '}, '
+    def get_list(self, form_name='', tab_name='', limit=10, filter_fields=''):
+        client = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        form = '"form":{"formName":"' + form_name + '", "tabName":"'+tab_name+'"}, '
         feature = '"feature":{"tableName":"' + self.tablename + '"}, '
-        data = '"data":{'+filter_fields+' ,"pageInfo":{"limit":"'+str(limit)+'"}}'
-        body = "" + header + form + feature + data
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_list($${" + body + "}$$)::text")
+        filter_fields = '"filterFields":{'+filter_fields+'}'
+        page_info = '"pageInfo":{"limit":"'+str(limit)+'"}'
+        data = '"data":{'+filter_fields+', '+page_info+'} '
+        body = "" + client + form + feature + data
+        sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
 
         if not row:
@@ -1762,7 +1765,7 @@ class ApiCF(ApiParent):
 
 
     def populate_table(self, complet_list, standar_model, dialog, widget_list, filter=True):
-        filter_fields = '"filterFields":{}'
+        filter_fields = ''
         if filter:
             filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
         index_tab = self.tab_main.currentIndex()
@@ -1773,13 +1776,13 @@ class ApiCF(ApiParent):
             limit = utils_giswater.get_item_data(dialog, tab_name+"_limit", 1)
         if limit is None or not limit:
             limit = 99999
-        complet_list = self.get_list(tab_name='"tabName":"' + tab_name + '"', limit=limit, filter_fields=filter_fields)
+        complet_list = self.get_list(tab_name=tab_name, limit=limit, filter_fields=filter_fields)
 
-        # for item in complet_list[0]['data']['listValues'][0]:
+        # for item in complet_list[0]['body']['data']['listValues'][0]:
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
         #     if len(row) > 0:
         #         standar_model.appendRow(row)
-        for item in complet_list[0]['data']['listValues']:
+        for item in complet_list[0]['body']['data']['listValues']:
             row = []
             for value in item.values():
                 row.append(QStandardItem(str(value)))
@@ -1791,7 +1794,7 @@ class ApiCF(ApiParent):
         standar_model.clear()
         # Get headers
         headers = []
-        for x in complet_list[0]['data']['listValues'][0]:
+        for x in complet_list[0]['body']['data']['listValues'][0]:
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
@@ -1799,7 +1802,6 @@ class ApiCF(ApiParent):
         tab_name = dialog.tab_main.widget(index_tab).objectName()
         filter = ""
         for widget in widget_list:
-            print(widget.objectName())
             if widget.objectName() != tab_name+'_limit':
                 column_id = widget.property('column_id')
                 text = utils_giswater.getWidgetText(dialog, widget)
@@ -1807,8 +1809,7 @@ class ApiCF(ApiParent):
         if filter == "":
             return None
 
-        filter=filter[:-2]
-        filter_fields = '"filterFields":{'+filter+'}'
+        filter_fields = filter[:-2]
         return filter_fields
 
 
@@ -1826,8 +1827,8 @@ class ApiCF(ApiParent):
         index = selected_list[0]
         row = index.row()
 
-        table_name = complet_list[0]['feature']['tableName']
-        sys_id_name = complet_list[0]['feature']['idName']
+        table_name = complet_list[0]['body']['feature']['tableName']
+        sys_id_name = complet_list[0]['body']['feature']['idName']
         column_index = 0
         column_index = utils_giswater.get_col_index_by_col_name(qtable, 'sys_id')
         feature_id = index.sibling(row, column_index).data()
