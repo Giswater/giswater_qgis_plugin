@@ -619,9 +619,9 @@ class ApiParent(ParentAction):
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
         function_name = 'no_function_asociated'
 
-        if 'button_function' in field:
-            if field['button_function'] is not None:
-                function_name = field['button_function']
+        if 'widgetfunction' in field:
+            if field['widgetfunction'] is not None:
+                function_name = field['widgetfunction']
             else:
                 msg = ("parameter button_function is null for button " + widget.objectName())
                 self.controller.show_message(msg, 2)
@@ -781,13 +781,13 @@ class ApiParent(ParentAction):
         grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
         for field in result["fields"]:
             label = QLabel()
-            label.setObjectName('lbl_' + field['form_label'])
-            label.setText(field['form_label'].capitalize())
+            label.setObjectName('lbl_' + field['label'])
+            label.setText(field['label'].capitalize())
 
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:
-                label.setToolTip(field['form_label'].capitalize())
+                label.setToolTip(field['label'].capitalize())
 
             if field['widgettype'] == 'linetext':
                 widget = self.add_lineedit(field)

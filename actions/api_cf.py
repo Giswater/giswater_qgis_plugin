@@ -419,15 +419,14 @@ class ApiCF(ApiParent):
     def set_widgets(self, dialog, field):
         widget = None
         label = None
-        if field['form_label']:
+        if field['label']:
             label = QLabel()
-
-            label.setObjectName('lbl_' + field['form_label'])
-            label.setText(field['form_label'].capitalize())
+            label.setObjectName('lbl_' + field['label'])
+            label.setText(field['label'].capitalize())
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:
-                label.setToolTip(field['form_label'].capitalize())
+                label.setToolTip(field['label'].capitalize())
         if field['widgettype'] == 'linetext' or field['widgettype'] == 'combotext':
             completer = QCompleter()
             widget = self.add_lineedit(field)
@@ -745,9 +744,9 @@ class ApiCF(ApiParent):
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
         function_name = 'no_function_asociated'
 
-        if 'button_function' in field:
-            if field['button_function'] is not None:
-                function_name = field['button_function']
+        if 'widgetfunction' in field:
+            if field['widgetfunction'] is not None:
+                function_name = field['widgetfunction']
             else:
                 msg = ("parameter button_function is null for button " + widget.objectName())
                 self.controller.show_message(msg, 2)
@@ -1734,7 +1733,7 @@ class ApiCF(ApiParent):
 
 
     def get_list(self, tab_name='', limit=10, filter_fields='"filterFields":{}'):
-        header = '"header":{"device":3, "infoType":100, "lang":"ES"}, '
+        header = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
         form = '"form":{' + tab_name + '}, '
         feature = '"feature":{"tableName":"' + self.tablename + '"}, '
         data = '"data":{'+filter_fields+' ,"pageInfo":{"limit":"'+str(limit)+'"}}'
@@ -1854,12 +1853,12 @@ class ApiCF(ApiParent):
                         else:
                             label = QLabel()
                             label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-                            label.setObjectName('lbl_' + field['form_label'])
-                            label.setText(field['form_label'].capitalize())
+                            label.setObjectName('lbl_' + field['label'])
+                            label.setText(field['label'].capitalize())
                             if 'tooltip' in field:
                                 label.setToolTip(field['tooltip'])
                             else:
-                                label.setToolTip(field['form_label'].capitalize())
+                                label.setToolTip(field['label'].capitalize())
                         if field['widgettype'] == 'label':
                             widget = self.add_label(field)
                             label.setWordWrap(True)
@@ -1992,7 +1991,7 @@ class ApiCF(ApiParent):
         function_name = 'no_function_associated'
         for field in result["fields"]:
                 if field['action_function'] == 'action_link':
-                    function_name = field['button_function']
+                    function_name = field['widgetfunction']
                     widget = dialog.findChild(HyperLinkLabel, field['widgetname'])
                     break
         if widget:

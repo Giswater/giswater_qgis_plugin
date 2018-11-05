@@ -58,8 +58,8 @@ class ApiCatalog(ApiParent):
 
         for field in result['fields']:
             label = QLabel()
-            label.setObjectName('lbl_' + field['form_label'])
-            label.setText(field['form_label'].capitalize())
+            label.setObjectName('lbl_' + field['label'])
+            label.setText(field['label'].capitalize())
             if field['widgettype'] == 'combo':
                 widget = self.add_combobox(self.dlg_catalog, field)
             if field['layout_id'] == 1:
