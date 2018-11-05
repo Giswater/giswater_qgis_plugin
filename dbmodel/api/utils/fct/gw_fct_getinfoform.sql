@@ -43,20 +43,23 @@ BEGIN
 --    Get form fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
     (SELECT a.attname as label, a.attname as name, 
-     ''text'' as type, ''string'' as "dataType", ''''::TEXT as placeholder, false as "disabled" 
-   FROM pg_attribute a
-  JOIN pg_class t on a.attrelid = t.oid
-  JOIN pg_namespace s on t.relnamespace = s.oid
-WHERE a.attnum > 0 
-  AND NOT a.attisdropped
-  AND t.relname = $1 
-  AND s.nspname = $2
-  AND s.attname !=''the_geom''
-  AND s.attname !=''geom''
-  AND a.atttypid != 150381
-ORDER BY a.attnum) a'
+	(case when a.atttypid=16 then ''check'' else ''text'' end ) as type, 
+	(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "dataType", 
+	''''::TEXT as placeholder, false as "disabled" 
+	FROM pg_attribute a
+	JOIN pg_class t on a.attrelid = t.oid
+	JOIN pg_namespace s on t.relnamespace = s.oid
+	WHERE a.attnum > 0 
+	AND NOT a.attisdropped
+	AND t.relname = $1
+	AND s.nspname = $2
+	AND s.attname !=''the_geom''
+    AND s.attname !=''geom''
+	AND a.atttypid != 150381
+	ORDER BY a.attnum ) a'
         INTO fields_array
-        USING table_id, schemas_array[1];    
+        USING table_id, schemas_array[1];  
+		
 
 --    Get id column
     EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
