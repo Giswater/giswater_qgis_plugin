@@ -209,9 +209,9 @@ class ApiCF(ApiParent):
         for tab in complet_result[0]['form']['visibleTabs']:
             tabs_to_show.append(tab['tabname'])
 
-        # for x in range(self.tab_main.count() - 1, 0, -1):
-        #     if self.tab_main.widget(x).objectName() not in tabs_to_show:
-        #         utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
+        for x in range(self.tab_main.count() - 1, 0, -1):
+            if self.tab_main.widget(x).objectName() not in tabs_to_show:
+                utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
 
 
         # Actions
@@ -1100,48 +1100,59 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
     def fill_tab_hydrometer(self):
         """ Fill tab 'Hydrometer' """
-        # TODO faltan los botones por hacer  y el onchange del txt
+        # TODO faltan los botones por hacer
         # Sub-tab hydrometer
         table_hydro = "v_rtc_hydrometer"
-        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name + "." + table_hydro, self.filter)
+        txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
+        self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydro)
         self.set_configuration(self.tbl_hydrometer, table_hydro)
+        txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer,  table_hydro))
 
         # Sub-tab hydrometer values
         table_hydro_value = "v_edit_rtc_hydro_data_x_connec"
-        # Get widgets
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
         # Populate combo filter hydrometer value
         sql = ("SELECT DISTINCT cat_period_id, cat_period_id "
                " FROM " + self.schema_name + ".v_edit_rtc_hydro_data_x_connec ORDER BY cat_period_id")
+
         rows = self.controller.get_rows(sql, log_sql=True)
+        rows.append(['', ''])
         utils_giswater.set_item_data(cmb_cat_period_id_filter, rows)
-        self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, self.schema_name + "." + table_hydro_value, self.filter)
+        self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
         self.set_configuration(self.tbl_hydrometer_value, table_hydro_value)
+
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
-        cmb_cat_period_id_filter.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, self.tbl_hydrometer_value))
+        cmb_cat_period_id_filter.currentIndexChanged.connect(partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value,  table_hydro_value))
 
-    def fill_tbl_hydrometer(self, qtable, table_name, filter_):
+
+    def fill_tbl_hydrometer(self, qtable, table_name):
         """ Fill the table control to show hydrometers"""
+        txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
+        filter = "connec_id ILIKE '%" + self.feature_id + "%' "
+        filter += " AND hydrometer_customer_code ILIKE '%" + txt_hydrometer_id.text() + "%'"
         # Set model of selected widget
-        self.set_model_to_table(qtable, table_name, filter_)
+        self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter)
 
 
-    def fill_tbl_hydrometer_values(self, qtable, table_name, filter_):
+    def fill_tbl_hydrometer_values(self, qtable, table_name):
         """ Fill the table control to show hydrometers values"""
+        cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
+        filter = "connec_id ILIKE '%" + self.feature_id + "%' "
+        filter += " AND cat_period_id ILIKE '%" + utils_giswater.get_item_data(self.dlg_cf, cmb_cat_period_id_filter) + "%'"
         # Set model of selected widget
-        self.set_model_to_table(qtable, table_name, filter_)
+        self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter)
 
 
     def set_filter_hydrometer_values(self, widget):
         """ Get Filter for table hydrometer value with combo value"""
 
         # Get combo value
-        cat_period_id_filter = utils_giswater.get_item_data(self.dlg_cf, self.cmb_cat_period_id_filter, 0)
+        cat_period_id_filter = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 0)
 
         # Set filter
         expr = self.field_id + " = '" + self.feature_id + "'"
-        expr += " AND cat_period_id = '" + cat_period_id_filter + "'"
-        print (expr)
+        expr += " AND cat_period_id ILIKE '%" + cat_period_id_filter + "%'"
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
