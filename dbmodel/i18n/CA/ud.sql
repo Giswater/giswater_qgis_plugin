@@ -23,7 +23,7 @@ INSERT INTO cat_feature VALUES ('NODE_FICTICI', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('PRESA', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('SALT', 'WJUMP', 'NODE');
 INSERT INTO cat_feature VALUES ('POU_RECTANGULAR', 'MANHOLE', 'NODE');
-INSERT INTO cat_feature VALUES ('ARQUETA_SORRERA', 'NETINIT', 'NODE');
+INSERT INTO cat_feature VALUES ('ARQUETA_SORRERA', 'MANHOLE', 'NODE');
 INSERT INTO cat_feature VALUES ('EDAR', 'WWTP', 'NODE');
 INSERT INTO cat_feature VALUES ('VALVULA', 'VALVE', 'NODE');
 INSERT INTO cat_feature VALUES ('DIPOSIT', 'STORAGE', 'NODE');
@@ -36,6 +36,7 @@ INSERT INTO cat_feature VALUES ('REIXA', 'GULLY', 'GULLY');
 INSERT INTO cat_feature VALUES ('UNIO', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'NODE');
 INSERT INTO cat_feature VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'NODE');
+INSERT INTO cat_feature VALUES ('INICI', 'NETINIT', 'NODE');
 
 
 -- Records of node type system table
@@ -49,7 +50,7 @@ INSERT INTO node_type VALUES ('NODE_FICTICI', 'JUNCTION', 'JUNCTION', 'man_junct
 INSERT INTO node_type VALUES ('PRESA', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction');
 INSERT INTO node_type VALUES ('SALT', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction');
 INSERT INTO node_type VALUES ('POU_RECTANGULAR', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('ARQUETA_SORRERA', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
+INSERT INTO node_type VALUES ('ARQUETA_SORRERA', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
 INSERT INTO node_type VALUES ('EDAR', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction');
 INSERT INTO node_type VALUES ('VALVULA', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction');
 INSERT INTO node_type VALUES ('DIPOSIT', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
@@ -59,6 +60,8 @@ INSERT INTO node_type VALUES ('EMBORNAL_TOPO', 'NETGULLY', 'JUNCTION', 'man_netg
 INSERT INTO node_type VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction');
 INSERT INTO node_type VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
+INSERT INTO node_type VALUES ('INICI', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
+
 
 
 -- Records of arc type system table

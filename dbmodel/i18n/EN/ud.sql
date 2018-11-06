@@ -19,11 +19,11 @@ INSERT INTO cat_feature VALUES ('CIRC-MANHOLE', 'MANHOLE', 'NODE');
 INSERT INTO cat_feature VALUES ('HIGHPOINT', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('REGISTER', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('CHANGE', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('VNODE', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('VIRTUAL_NODE', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('WEIR', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('JUMP', 'WJUMP', 'NODE');
 INSERT INTO cat_feature VALUES ('RECT-MANHOLE', 'MANHOLE', 'NODE');
-INSERT INTO cat_feature VALUES ('SANDBOX', 'NETINIT', 'NODE');
+INSERT INTO cat_feature VALUES ('SANDBOX', 'MANHOLE', 'NODE');
 INSERT INTO cat_feature VALUES ('WWTP', 'WWTP', 'NODE');
 INSERT INTO cat_feature VALUES ('VALVE', 'VALVE', 'NODE');
 INSERT INTO cat_feature VALUES ('SEWER-STORAGE', 'STORAGE', 'NODE');
@@ -36,6 +36,7 @@ INSERT INTO cat_feature VALUES ('PGULLY', 'GULLY', 'GULLY');
 INSERT INTO cat_feature VALUES ('JUNCTION', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE');
 INSERT INTO cat_feature VALUES ('PUMP-STATION', 'CHAMBER', 'NODE');
+INSERT INTO cat_feature VALUES ('NETINIT', 'NETINIT', 'NODE');
 
 -- Records of node type system table
 -- ----------------------------
@@ -44,11 +45,11 @@ INSERT INTO node_type VALUES ('CIRC-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhol
 INSERT INTO node_type VALUES ('HIGHPOINT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('REGISTER', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('CHANGE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('VNODE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('VIRTUAL_NODE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('WEIR', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction');
 INSERT INTO node_type VALUES ('JUMP', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction');
 INSERT INTO node_type VALUES ('RECT-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('SANDBOX', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
+INSERT INTO node_type VALUES ('SANDBOX', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
 INSERT INTO node_type VALUES ('WWTP', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction');
 INSERT INTO node_type VALUES ('VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction');
 INSERT INTO node_type VALUES ('SEWER-STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
@@ -58,6 +59,7 @@ INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully'
 INSERT INTO node_type VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
 INSERT INTO node_type VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction');
 INSERT INTO node_type VALUES ('PUMP-STATION', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
+INSERT INTO node_type VALUES ('NETINIT', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
 
 -- Records of arc type system table
 -- ----------------------------
