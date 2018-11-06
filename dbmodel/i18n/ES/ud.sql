@@ -9,41 +9,57 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- Records of cat_feature
 -- ----------------------------
-INSERT INTO cat_feature VALUES ('NODO VIRTUAL','JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('REGISTRO','JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('POZO_RECTANGULAR', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('POZO_CIRCULAR','JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('CAMBIO DE SECCION','JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('PUNTO ALTO','JUNCTION','NODE');
-INSERT INTO cat_feature VALUES ('SALTO','JUNCTION','NODE');
-INSERT INTO cat_feature VALUES ('ARQUETA ARENAL','JUNCTION','NODE');
-INSERT INTO cat_feature VALUES ('PRESA','JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('DEPOSITO','STORAGE','NODE');
-INSERT INTO cat_feature VALUES ('DEPOSITO DE DESBORDAMIENTO','STORAGE', 'NODE');
-INSERT INTO cat_feature VALUES ('DESAGUE','OUTFALL','NODE');
 INSERT INTO cat_feature VALUES ('CONDUCTO', 'CONDUIT', 'ARC');
-INSERT INTO cat_feature VALUES ('IMPULSION', 'CONDUIT', 'ARC');
 INSERT INTO cat_feature VALUES ('SIFON', 'SIPHON', 'ARC');
 INSERT INTO cat_feature VALUES ('RAPIDO', 'WACCEL', 'ARC');
-INSERT INTO cat_feature VALUES ('FICTICIO', 'VARC',  'ARC');
+INSERT INTO cat_feature VALUES ('FICTICIO', 'VARC', 'ARC'); 
+INSERT INTO cat_feature VALUES ('IMPULSION', 'CONDUIT', 'ARC');
+INSERT INTO cat_feature VALUES ('CAMERA', 'CHAMBER', 'NODE');
+INSERT INTO cat_feature VALUES ('POZO_CIRCULAR', 'MANHOLE', 'NODE');
+INSERT INTO cat_feature VALUES ('PUNTO_ALTO', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('REGISTRO', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('CAMBIO_SECCION', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('NODO_FICTICIO', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('PRESA', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('SALTO', 'WJUMP', 'NODE');
+INSERT INTO cat_feature VALUES ('POZO_RECTANGULAR', 'MANHOLE', 'NODE');
+INSERT INTO cat_feature VALUES ('ARQUETA_ARENAL', 'NETINIT', 'NODE');
+INSERT INTO cat_feature VALUES ('EDAR', 'WWTP', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('DEPOSITO', 'STORAGE', 'NODE');
+INSERT INTO cat_feature VALUES ('DEPOSITO_DESBORDAMIENTO', 'STORAGE', 'NODE');
+INSERT INTO cat_feature VALUES ('DESAGUE', 'OUTFALL', 'NODE');
+INSERT INTO cat_feature VALUES ('SUMIDERO_TOPO', 'NETGULLY', 'NODE');
 INSERT INTO cat_feature VALUES ('ACOMETIDA', 'CONNEC', 'CONNEC');
 INSERT INTO cat_feature VALUES ('SUMIDERO', 'GULLY', 'GULLY');
 INSERT INTO cat_feature VALUES ('REJA', 'GULLY', 'GULLY');
+INSERT INTO cat_feature VALUES ('UNION', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('ELEMENTO_TOPO', 'NETELEMENT', 'NODE');
+INSERT INTO cat_feature VALUES ('ESTACION_BOMBEO', 'CHAMBER', 'NODE');
+
 
 -- Records of node type system table
 -- ----------------------------
-INSERT INTO "node_type" VALUES ('NODO VIRTUAL','JUNCTION','JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('REGISTRO','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('POZO_RECTANGULAR','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('POZO_CIRCULAR','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('CAMBIO DE SECCION','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('PUNTO ALTO','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('SALTO','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('ARQUETA ARENAL','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('PRESA','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',true);
-INSERT INTO "node_type" VALUES ('DEPOSITO','STORAGE', 'STORAGE', 'man_storage', 'inp_storage',true);
-INSERT INTO "node_type" VALUES ('DEPOSITO DE DESBORDAMIENTO','STORAGE', 'STORAGE', 'man_storage', 'inp_storage',true);
-INSERT INTO "node_type" VALUES ('DESAGUE','OUTFALL','OUTFALL', 'man_outfall', 'inp_outfall',true);
+INSERT INTO node_type VALUES ('CAMERA', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
+INSERT INTO node_type VALUES ('POZO_CIRCULAR', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
+INSERT INTO node_type VALUES ('PUNTO_ALTO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('REGISTRO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('CAMBIO_SECCION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('NODO_FICTICIO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('PRESA', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction');
+INSERT INTO node_type VALUES ('SALTO', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction');
+INSERT INTO node_type VALUES ('POZO_RECTANGULAR', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
+INSERT INTO node_type VALUES ('ARQUETA_ARENAL', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
+INSERT INTO node_type VALUES ('EDAR', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction');
+INSERT INTO node_type VALUES ('VALVULA', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction');
+INSERT INTO node_type VALUES ('DEPOSITO', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
+INSERT INTO node_type VALUES ('DEPOSITO_DESBORDAMIENTO', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
+INSERT INTO node_type VALUES ('DESAGUE', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall');
+INSERT INTO node_type VALUES ('SUMIDERO_TOPO', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction');
+INSERT INTO node_type VALUES ('UNION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
+INSERT INTO node_type VALUES ('ELEMENTO_TOPO', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction');
+INSERT INTO node_type VALUES ('ESTACION_BOMBEO', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
+
 
 -- Records of arc type system table
 -- ----------------------------
@@ -64,10 +80,13 @@ INSERT INTO gully_type VALUES ('REJA', 'GULLY', 'man_gully',true);
 
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO "element_type" VALUES ('TAPA', true, true, NULL, NULL);
-INSERT INTO "element_type" VALUES ('PATE' , true, true, NULL, NULL);
-INSERT INTO "element_type" VALUES ('BOMBA', true, true, NULL, NULL);
-INSERT INTO "element_type" VALUES ('COMPUERTA', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('TAPA', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('COMPUERTA', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('SENSOR_IOT', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('BOMBA', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('PATE', true, true, NULL, NULL);
+INSERT INTO element_type VALUES ('PROTECTOR', true, true, NULL, NULL);
+
 
 -- Records of element cat_arc_shape
 -- ----------------------------
@@ -93,4 +112,4 @@ INSERT INTO cat_arc_shape VALUES ('DUMMY', 'DUMMY', NULL, NULL, 'ud_section_dumm
 INSERT INTO cat_arc_shape VALUES ('FORCE_MAIN', 'FORCE_MAIN', NULL, NULL, 'ud_section_force_main.png', NULL, true);
 INSERT INTO cat_arc_shape VALUES ('CUSTOM', 'CUSTOM', NULL, NULL, 'ud_section_custom.png', 'Custom defined closed shape using the curve values of some curve defined on inp_curve table. Needed to normalize as a simetric shape', true);
 INSERT INTO cat_arc_shape VALUES ('IRREGULAR', 'IRREGULAR', NULL, NULL, 'ud_section_irregular.png', 'Custom defined open inrregular channel shape using HEC format and storing information on some tsect values stored on inp_transects table', true);
-INSERT INTO cat_arc_shape VALUES ('VIRTUAL', 'VIRTUAL', NULL, NULL, 'null.png', 'Non real shape.', false);¡
+INSERT INTO cat_arc_shape VALUES ('VIRTUAL', 'VIRTUAL', NULL, NULL, 'null.png', 'Non real shape.', false);

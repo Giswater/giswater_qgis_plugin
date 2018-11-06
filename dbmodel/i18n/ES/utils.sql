@@ -52,7 +52,7 @@ INSERT INTO om_visit_parameter VALUES ('INT3', NULL, 'INSPECCION', 'NODE', 'TEXT
 
 -- Records of doc type table
 -- ----------------------------
-INSERT INTO doc_type VALUES ('SEGUN CONSTRUIDO');
+INSERT INTO doc_type VALUES ('AS_BUILT');
 INSERT INTO doc_type VALUES ('INCIDENTE');
 INSERT INTO doc_type VALUES ('RELACION DE TRABAJO');
 INSERT INTO doc_type VALUES ('OTROS');

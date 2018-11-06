@@ -16,7 +16,7 @@ INSERT INTO "value_state" VALUES (2,'PLANIFIED');
 -- Records of value_state_type
 -- ----------------------------
 INSERT INTO value_state_type VALUES (1, 0, 'OBSOLETE', false, false);
-INSERT INTO value_state_type VALUES (2, 1, 'ON SERVICE', true, true);
+INSERT INTO value_state_type VALUES (2, 1, 'ON_SERVICE', true, true);
 INSERT INTO value_state_type VALUES (3, 2, 'PLANIFIED', true, true);
 INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUCT', true, false);
 INSERT INTO value_state_type VALUES (5, 1, 'PROVISIONAL', false, true);

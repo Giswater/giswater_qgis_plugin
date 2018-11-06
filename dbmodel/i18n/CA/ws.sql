@@ -9,107 +9,92 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- Records of cat_feature
 -- ----------------------------
-INSERT INTO cat_feature VALUES ('ESC SIMPLE', 'WJOIN', 'CONNEC');
-INSERT INTO cat_feature VALUES ('ESC MULTIPLE', 'WJOIN', 'CONNEC');
-INSERT INTO cat_feature VALUES ('ESC ANTIINCENDIS', 'WJOIN', 'CONNEC');
-INSERT INTO cat_feature VALUES ('FONT ORNAMENTAL', 'FOUNTAIN', 'CONNEC');
-INSERT INTO cat_feature VALUES ('FONT PUBLICA', 'TAP', 'CONNEC');
-INSERT INTO cat_feature VALUES ('BOCA DE REG', 'GREENTAP', 'CONNEC');
-INSERT INTO cat_feature VALUES ('PUNT DE MOSTREIG', 'NETSAMPLEPOINT', 'NODE');
+INSERT INTO cat_feature VALUES ('ESCOMESA', 'WJOIN', 'CONNEC');
+INSERT INTO cat_feature VALUES ('FONT_ORNAMENTAL', 'FOUNTAIN', 'CONNEC');
+INSERT INTO cat_feature VALUES ('FONT', 'TAP', 'CONNEC');
+INSERT INTO cat_feature VALUES ('BOCA_REG', 'GREENTAP', 'CONNEC');
+INSERT INTO cat_feature VALUES ('POU', 'WATERWELL', 'NODE');
+INSERT INTO cat_feature VALUES ('PUNT_MOSTREIG', 'NETSAMPLEPOINT', 'NODE');
 INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE');
-INSERT INTO cat_feature VALUES ('ESTACIÓ TRACTAMENT', 'WTP', 'NODE');
+INSERT INTO cat_feature VALUES ('ESTACIO_TRACTAMENT', 'WTP', 'NODE');
 INSERT INTO cat_feature VALUES ('TUBERIA', 'PIPE', 'ARC');
 INSERT INTO cat_feature VALUES ('VARC', 'VARC', 'ARC');
-INSERT INTO cat_feature VALUES ('VALVULA CONTROL', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA REDUCTORA', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA VERDA', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_CONTROL', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_REDUCTORA', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('GREEN-VALVE', 'VALVE', 'NODE');
 INSERT INTO cat_feature VALUES ('CORBA', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('FILTRE', 'FILTER', 'NODE');
-INSERT INTO cat_feature VALUES ('FINAL LINEA', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('FL-CONTR.VALVE', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('GEN-PURP.VALVE', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('HYDRANT', 'HYDRANT', 'NODE');
-INSERT INTO cat_feature VALUES ('PR-BREAK.VALVE', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('OUTFALL-VALVE', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('FINAL_LINEA', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('HIDRANT', 'HYDRANT', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_TRENCA_PRESSIO', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_DESGUAS', 'VALVE', 'NODE');
 INSERT INTO cat_feature VALUES ('UNIO', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('VALV. SOSTENIDORA', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('SHUTOFF-VALVE', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_SOST_PRESSIO', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_SHUTOFF', 'VALVE', 'NODE');
 INSERT INTO cat_feature VALUES ('REDUCCIO', 'REDUCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('BOMBA POU', 'PUMP', 'NODE');
-INSERT INTO cat_feature VALUES ('BOMBA GRUP PRESSIO', 'PUMP', 'NODE');
+INSERT INTO cat_feature VALUES ('BOMBA', 'PUMP', 'NODE');
 INSERT INTO cat_feature VALUES ('DIPOSIT', 'TANK', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA ACCELERACIÓ', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA COMPORTA', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('TE', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('TAP', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_ACCEL', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('T', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('X', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('CAPTACIO', 'SOURCE', 'NODE');
-INSERT INTO cat_feature VALUES ('POU DE CAPTACIÓ', 'MANHOLE', 'NODE');
+INSERT INTO cat_feature VALUES ('POU_CAPTACIO', 'MANHOLE', 'NODE');
 INSERT INTO cat_feature VALUES ('REGISTRE', 'REGISTER', 'NODE');
-INSERT INTO cat_feature VALUES ('CONTROL-REGISTRE', 'REGISTER', 'NODE');
-INSERT INTO cat_feature VALUES ('BYPASS-REGISTRE', 'REGISTER', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA-REGISTRE', 'REGISTER', 'NODE');
-INSERT INTO cat_feature VALUES ('ESCOMESA DE XARXA', 'NETWJOIN', 'NODE');
-INSERT INTO cat_feature VALUES ('UNIÓ FLEXIBLE', 'FLEXUNION', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA D''AIRE', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA VENTOSA', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('MEDIDOR DE FLUID', 'METER', 'NODE');
-INSERT INTO cat_feature VALUES ('TANC D''EXPANSIÓ', 'EXPANSIONTANK', 'NODE');
-INSERT INTO cat_feature VALUES ('MESURADOR PRESSIO', 'METER', 'NODE');
+INSERT INTO cat_feature VALUES ('REGISTRE_CONTROL', 'REGISTER', 'NODE');
+INSERT INTO cat_feature VALUES ('REGISTRE_BYPASS', 'REGISTER', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_REGISTRE', 'REGISTER', 'NODE');
+INSERT INTO cat_feature VALUES ('ESCOMESA_TOPO', 'NETWJOIN', 'NODE');
+INSERT INTO cat_feature VALUES ('DILATADOR', 'FLEXUNION', 'NODE');
+INSERT INTO cat_feature VALUES ('VALVULA_VENTOSA', 'VALVE', 'NODE');
+INSERT INTO cat_feature VALUES ('MEDIDOR_FLUID', 'METER', 'NODE');
+INSERT INTO cat_feature VALUES ('TANC_EXPANSIO', 'EXPANSIONTANK', 'NODE');
+INSERT INTO cat_feature VALUES ('MEDIDOR_PRESSIO', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('ADAPTACIO', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('AIGUA ALTA', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('LUVE', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('AIXETA', 'JUNCTION', 'NODE');
-INSERT INTO cat_feature VALUES ('HIDRANT', 'HYDRANT', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA DESCARREGA', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA DE PAS', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA RETENCIO', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('VALVULA PAPALLONA', 'VALVE', 'NODE');
-INSERT INTO cat_feature VALUES ('CABALIMETRE', 'METER', 'NODE');
-INSERT INTO cat_feature VALUES ('COMPTADOR', 'METER', 'NODE');
-INSERT INTO cat_feature VALUES ('MANOMETRE', 'METER', 'NODE');
-INSERT INTO cat_feature VALUES ('MINA', 'WATERWELL', 'NODE');
-INSERT INTO cat_feature VALUES ('POU', 'WATERWELL', 'NODE');
+
 
 -- Records of node type system table
 -- ----------------------------
-INSERT INTO node_type VALUES ('CORBA','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Corba');
-INSERT INTO node_type VALUES ('REDUCCIO','REDUCTION','JUNCTION', 'man_reduction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Reducció');
-INSERT INTO node_type VALUES ('LUVE','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Luve');
-INSERT INTO node_type VALUES ('ADAPTACIO','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Adaptació');
-INSERT INTO node_type VALUES ('AIGUA ALTA','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Aigua alta');
-INSERT INTO node_type VALUES ('UNIO','JUNCTION','JUNCTION', 'man_junction',  'inp_junction', TRUE, TRUE, 2, TRUE, 'Unió');
-INSERT INTO node_type VALUES ('FINAL LINEA','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 1, TRUE, 'Final de línea');
-INSERT INTO node_type VALUES ('X','JUNCTION', 'JUNCTION','man_junction', 'inp_junction', TRUE, TRUE, 4, TRUE, 'Unió on 4 conductes convergeixen');
-INSERT INTO node_type VALUES ('TE','JUNCTION', 'JUNCTION','man_junction', 'inp_junction', TRUE, TRUE, 3, TRUE, 'Unió on 3 conductes convergeixen');
-INSERT INTO node_type VALUES ('AIXETA','JUNCTION', 'JUNCTION', 'man_junction',  'inp_junction,', TRUE, TRUE, 2, TRUE, 'Aixeta');
-INSERT INTO node_type VALUES ('DIPOSIT','TANK', 'TANK', 'man_tank', 'inp_tank', TRUE, TRUE, 2, TRUE, 'Dipòsit');
-INSERT INTO node_type VALUES ('HIDRANT','HYDRANT','JUNCTION', 'man_hydrant', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Hidrant');
-INSERT INTO node_type VALUES ('VALVULA VERDA','VALVE','JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Vàlvula verda');
-INSERT INTO node_type VALUES ('VALVULA D''AIRE','VALVE','JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Vàlvula d''aire');
-INSERT INTO node_type VALUES ('VALVULA VENTOSA','VALVE','JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Vàlvula ventosa');
-INSERT INTO node_type VALUES ('VALVULA DESCARREGA','VALVE', 'JUNCTION', 'man_valve',  'inp_junction', TRUE, TRUE, 2, TRUE, 'Vàlvula de descàrrega');
-INSERT INTO node_type VALUES ('MESURADOR PRESSIO','METER', 'JUNCTION', 'man_meter',  'inp_junction', TRUE, TRUE, 2, TRUE, 'Mesurador de pressió');
-INSERT INTO node_type VALUES ('VALVULA DE PAS','VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Vàlvula de pas');
-INSERT INTO node_type VALUES ('VALVULA RETENCIO','VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Vàlvula de retenció');
-INSERT INTO node_type VALUES ('VALVULA REDUCTORA','VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula reductora');
-INSERT INTO node_type VALUES ('VALVULA COMPORTA','VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Vàlvula comporta');
-INSERT INTO node_type VALUES ('VALV. SOSTENIDORA','VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula sostenidora de pressió');
-INSERT INTO node_type VALUES ('PR-BREAK.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula trencadora de pressió');
-INSERT INTO node_type VALUES ('FL-CONTR.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula controladora de fluxe');
-INSERT INTO node_type VALUES ('VALVULA PAPALLONA','VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula papallona');
-INSERT INTO node_type VALUES ('GEN-PURP.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula genèrica');
-INSERT INTO node_type VALUES ('BOMBA POU','PUMP', 'PUMP', 'man_pump', 'inp_pump', TRUE, TRUE, 2, TRUE, 'Bomba pou');
-INSERT INTO node_type VALUES ('BOMBA GRUP PRESSIO','PUMP', 'PUMP', 'man_pump', 'inp_pump', TRUE, TRUE, 2, TRUE, 'Bomba grup pressió');
-INSERT INTO node_type VALUES ('FILTRE','FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe',TRUE, TRUE, 2, TRUE, 'Filtre');
-INSERT INTO node_type VALUES ('CABALIMETRE','METER', 'SHORTPIPE', 'man_meter', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Cabalimetre');
-INSERT INTO node_type VALUES ('COMPTADOR','METER', 'SHORTPIPE', 'man_meter', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Comptador');
-INSERT INTO node_type VALUES ('MANOMETRE','METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Manòmetre');
-INSERT INTO node_type VALUES ('POU DE CAPTACIÓ', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou');
+INSERT INTO node_type VALUES ('ADAPTACIO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Adaptació');
+INSERT INTO node_type VALUES ('VALVULA_CONTROL', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Vàlvula de control');
+INSERT INTO node_type VALUES ('VALVULA_VENTOSA', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Vàlvula ventosa');
+INSERT INTO node_type VALUES ('VALVULA_REDUCTORA', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula reductora');
+INSERT INTO node_type VALUES ('GREEN-VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Green valve');
+INSERT INTO node_type VALUES ('CORBA', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Corba');
+INSERT INTO node_type VALUES ('FILTRE', 'FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Filtre');
+INSERT INTO node_type VALUES ('FINAL_LINEA', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 1, TRUE, 'Final de línia');
+INSERT INTO node_type VALUES ('VALVULA_CONTROL_FL', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula controladora de fluxe');
+INSERT INTO node_type VALUES ('VALVULA', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula genèrica');
+INSERT INTO node_type VALUES ('HIDRANT', 'HYDRANT', 'JUNCTION', 'man_hydrant', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Hidrant');
+INSERT INTO node_type VALUES ('VALVULA_TRENCA_PRESSIO', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula trencadora de pressió');
+INSERT INTO node_type VALUES ('VALVULA_DESGUAS', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Vàlvula de desguàs');
+INSERT INTO node_type VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Unió');
+INSERT INTO node_type VALUES ('VALVULA_SOST_PRESSIO', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula sostenidora de pressió');
+INSERT INTO node_type VALUES ('VALVULA_SHUTOFF', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', TRUE, TRUE, 2, TRUE, 'Vàlvula shutoff');
+INSERT INTO node_type VALUES ('REDUCCIO', 'REDUCTION', 'JUNCTION', 'man_reduction', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Reducció');
+INSERT INTO node_type VALUES ('BOMBA', 'PUMP', 'PUMP', 'man_pump', 'inp_pump', TRUE, TRUE, 2, TRUE, 'Bomba');
+INSERT INTO node_type VALUES ('DIPOSIT', 'TANK', 'TANK', 'man_tank', 'inp_tank', TRUE, TRUE, 2, TRUE, 'Dipòsit');
+INSERT INTO node_type VALUES ('VALVULA_ACCEL', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Vàlvula d''acceleració');
+INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 3, TRUE, 'Unió on 3 conductes convergeixen');
+INSERT INTO node_type VALUES ('POU', 'WATERWELL', 'JUNCTION', 'man_waterwell', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou');
+INSERT INTO node_type VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction,', TRUE, TRUE, 2, TRUE, 'Tap');
+INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 4, TRUE, 'Unió on 4 conductes convergeixen');
 INSERT INTO node_type VALUES ('CAPTACIO', 'SOURCE', 'JUNCTION', 'man_source', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Captació');
-INSERT INTO node_type VALUES ('MINA', 'WATERWELL', 'RESERVOIR', 'man_waterwell', 'inp_reservoir', TRUE, TRUE, 2, TRUE, 'Mina');
-INSERT INTO node_type VALUES ('POU', 'WATERWELL', 'RESERVOIR', 'man_waterwell', 'inp_reservoir', TRUE, TRUE, 2, TRUE, 'Pou');
-INSERT INTO node_type VALUES ('TAP','JUNCTION', 'JUNCTION','man_junction', 'inp_junction', TRUE, TRUE, 3, TRUE, 'Tap');
+INSERT INTO node_type VALUES ('POU_CAPTACIO', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Pou de captació');
+INSERT INTO node_type VALUES ('REGISTRE', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registre');
+INSERT INTO node_type VALUES ('REGISTRE_CONTROL', 'REGISTER', 'VALVE', 'man_register', 'inp_valve', TRUE, TRUE, 2, TRUE, 'Registre de control');
+INSERT INTO node_type VALUES ('REGISTRE_BYPASS', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registre de bypass');
+INSERT INTO node_type VALUES ('VALVULA_REGISTRE', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Registre de vàlvula');
+INSERT INTO node_type VALUES ('ESCOMESA_TOPO', 'NETWJOIN', 'JUNCTION', 'man_netwjoin', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Escomesa topològica');
+INSERT INTO node_type VALUES ('TANC_EXPANSIO', 'EXPANSIONTANK', 'JUNCTION', 'man_expansiontank', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Tanc d''expansió');
+INSERT INTO node_type VALUES ('DILATADOR', 'FLEXUNION', 'JUNCTION', 'man_flexunion', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Dilatador');
+INSERT INTO node_type VALUES ('MEDIDOR_FLUID', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Medidor de fluid');
+INSERT INTO node_type VALUES ('MEDIDOR_PRESSIO', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Medidor de pressió');
+INSERT INTO node_type VALUES ('PUNT_MOSTREIG', 'NETSAMPLEPOINT', 'JUNCTION', 'man_netsamplepoint', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Punt de mostreig');
+INSERT INTO node_type VALUES ('ESTACIO_TRACTAMENT', 'WTP', 'RESERVOIR', 'man_wtp', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Estació de tractament');
+INSERT INTO node_type VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Element topològic');
+
 
 -- Records of arc type system table
 -- ----------------------------
@@ -118,12 +103,10 @@ INSERT INTO arc_type VALUES ('VARC','VARC','PIPE', 'man_varc', 'inp_pipe', TRUE,
 
 -- Records of connec_type system table
 -- ----------------------------
-INSERT INTO connec_type VALUES ('ESC SIMPLE', 'WJOIN', 'man_wjoin',  TRUE, TRUE, 'Escomesa simple');
-INSERT INTO connec_type VALUES ('ESC MULTIPLE', 'WJOIN', 'man_wjoin',  TRUE, TRUE, 'Escomesa múltiple');
-INSERT INTO connec_type VALUES ('ESC ANTIINCENDIS', 'WJOIN', 'man_wjoin',  TRUE, TRUE, 'Escomesa antiincendis');
-INSERT INTO connec_type VALUES ('BOCA DE REG', 'GREENTAP', 'man_greentap',  TRUE, TRUE, 'Boca de reg');
-INSERT INTO connec_type VALUES ('FONT ORNAMENTAL', 'FOUNTAIN', 'man_fountain',  TRUE, TRUE, 'Font ornamental');
-INSERT INTO connec_type VALUES ('FONT PUBLICA', 'TAP', 'man_tap',  TRUE, TRUE, 'Font pública');
+INSERT INTO connec_type VALUES ('ESCOMESA', 'WJOIN', 'man_wjoin',  TRUE, TRUE, 'Escomesa');
+INSERT INTO connec_type VALUES ('BOCA_REG', 'GREENTAP', 'man_greentap',  TRUE, TRUE, 'Boca de reg');
+INSERT INTO connec_type VALUES ('FONT_ORNAMENTAL', 'FOUNTAIN', 'man_fountain',  TRUE, TRUE, 'Font ornamental');
+INSERT INTO connec_type VALUES ('FONT', 'TAP', 'man_tap',  TRUE, TRUE, 'Font pública');
 
 -- Records of element type system table
 -- ----------------------------
@@ -131,10 +114,11 @@ INSERT INTO element_type VALUES ('REGISTRE', true, true, 'REGISTRE', NULL);
 INSERT INTO element_type VALUES ('POU', true, true, 'POU', NULL);
 INSERT INTO element_type VALUES ('TAPA', true, true, 'TAPA', NULL);
 INSERT INTO element_type VALUES ('PATE', true, true, 'PATE', NULL);
+INSERT INTO element_type VALUES ('BANDA_PROTECCIO', true, true, 'BANDA_PROTECCIO', NULL);
 
 -- Records of mincut tables
 -- ----------------------------
-INSERT INTO anl_mincut_selector_valve VALUES ('VALVULA COMPORTA');
+INSERT INTO anl_mincut_selector_valve VALUES ('VALVULA_SHUTOFF');
 
 INSERT INTO anl_mincut_cat_cause VALUES ('Accidental', NULL);
 INSERT INTO anl_mincut_cat_cause VALUES ('Planificat', NULL);
