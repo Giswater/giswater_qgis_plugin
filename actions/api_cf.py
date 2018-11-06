@@ -127,10 +127,14 @@ class ApiCF(ApiParent):
                    + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
         # IF come from QPushButtons node1 or node2 from custom form
         elif feature_id and feature_type:
-            sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+" = '" + str(feature_id) + "'")
-            row = self.controller.get_row(sql, log_sql=True)
+            the_geom = self.check_column_exist(table_name, 'the_geom')
+            print (the_geom)
+            row = None
+            if the_geom is not None:
+                sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+" = '" + str(feature_id) + "'")
+                row = self.controller.get_row(sql, log_sql=True)
             the_geom = 'null'
-            if row:
+            if row is not None:
                 the_geom = "'" + str(row[0]) + "'"
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
                    " " + str(the_geom)+", " + str(is_project_editable) + ", 9, 100)")
@@ -144,15 +148,24 @@ class ApiCF(ApiParent):
         if 'fields' not in result:
             self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
             return False
-        if self.complet_result[0]['form'] == 'GENERIC':
-            # TODO
-            print("GENERIC")
-            # result = self.open_generic_form(feature_id, self.complet_result)
-            # return result
-            return
+        if self.complet_result[0]['form']['template'] == 'GENERIC':
+            result = self.open_generic_form(feature_id, self.complet_result)
+            return result
         elif self.complet_result[0]['form']['template'] == 'custom feature':
             result = self.open_custom_form(feature_id, self.complet_result)
             return result
+
+
+    def open_generic_form(self, feature_id, complet_result):
+        self.hydro_info_dlg = ApiBasicInfo()
+        self.load_settings(self.hydro_info_dlg)
+        self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
+        field_id = str(self.complet_result[0]['feature']['idName'])
+        result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id)
+
+        self.hydro_info_dlg.open()
+        return result
 
     def open_custom_form(self, feature_id, complet_result):
         # Dialog
@@ -208,11 +221,11 @@ class ApiCF(ApiParent):
         tabs_to_show = []
         # tabs_to_show = [tab['tabname'] for tab in complet_result[0]['form']['visibleTabs']]
         for tab in complet_result[0]['form']['visibleTabs']:
-            tabs_to_show.append(tab['tabname'])
+            tabs_to_show.append(tab['tabName'])
 
-        # for x in range(self.tab_main.count() - 1, 0, -1):
-        #     if self.tab_main.widget(x).objectName() not in tabs_to_show:
-        #         utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
+        for x in range(self.tab_main.count() - 1, 0, -1):
+            if self.tab_main.widget(x).objectName() not in tabs_to_show:
+                utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
 
 
         # Actions
@@ -243,10 +256,10 @@ class ApiCF(ApiParent):
         actions_to_show = complet_result[0]['form']['actions']
         for x in range(0, len(actions_to_show)):
             action = None
-            action = self.dlg_cf.toolBar.findChild(QAction, actions_to_show[x]['actionname'])
+            action = self.dlg_cf.toolBar.findChild(QAction, actions_to_show[x]['actionName'])
             if action is not None:
                 action.setVisible(True)
-                action.setToolTip(actions_to_show[x]['actiontooltip'])
+                action.setToolTip(actions_to_show[x]['actionTooltip'])
 
         # Force not edition actions  enabled(True) and visible(True)
         self.set_action(action_zoom_in)
@@ -806,7 +819,7 @@ class ApiCF(ApiParent):
         # Tab 'Hydrometer values'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer_val' and not self.tab_hydrometer_val_loaded:
             self.fill_tab_hydrometer_values()
-            self.tab_hydrometer_loaded = True
+            self.tab_hydrometer_val_loaded = True
         # Tab 'O&M'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_om' and not self.tab_om_loaded:
             self.fill_tab_om(self.geom_type)
@@ -1100,17 +1113,39 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
     def fill_tab_hydrometer(self):
         """ Fill tab 'Hydrometer' """
-        utils_giswater.setWidgetEnabled(self.dlg_cf, "open_link", False)
+        utils_giswater.setWidgetEnabled(self.dlg_cf, "btn_link", False)
         table_hydro = "v_rtc_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydro)
         self.set_configuration(self.tbl_hydrometer, table_hydro)
         txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer,  table_hydro))
+        self.tbl_hydrometer.doubleClicked.connect(partial(self.open_selected_hydro, self.tbl_hydrometer))
+        self.dlg_cf.findChild(QPushButton, "btn_link").clicked.connect(self.check_url)
 
 
+    def open_selected_hydro(self, qtable=None):
+        selected_list = qtable.selectionModel().selectedRows()
 
-        # self.dlg_cf.findChild(QPushButton, "open_link").clicked.connect(self.open_url)
-        # self.tbl_hydrometer.clicked.connect(self.check_url)
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        index = selected_list[0]
+        row = index.row()
+
+        table_name = 'v_ui_hydrometer'
+        sys_id_name = self.complet_result[0]['feature']['idName']
+        column_index = 0
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, 'hydrometer_id')
+        feature_id = index.sibling(row, column_index).data()
+
+        # return
+        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
+        if not complet_result:
+            print("FAIL")
+            return
 
 
     def check_url(self):
@@ -1125,10 +1160,16 @@ class ApiCF(ApiParent):
         row = selected_list[0].row()
         url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
         if url != '':
-            self.url = url
-            utils_giswater.setWidgetEnabled(self.dialog, "open_link")
-        else:
-            utils_giswater.setWidgetEnabled(self.dialog, "open_link", False)
+            if os.path.exists(url):
+                # Open the document
+                if sys.platform == "win32":
+                    os.startfile(url)
+                else:
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, url])
+            else:
+                webbrowser.open(url)
+
 
 
     def fill_tbl_hydrometer(self, qtable, table_name):
@@ -1140,13 +1181,6 @@ class ApiCF(ApiParent):
         self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter)
 
 
-    def fill_tbl_hydrometer_values(self, qtable, table_name):
-        """ Fill the table control to show hydrometers values"""
-        cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
-        filter = "connec_id ILIKE '%" + self.feature_id + "%' "
-        filter += " AND cat_period_id ILIKE '%" + utils_giswater.get_item_data(self.dlg_cf, cmb_cat_period_id_filter) + "%'"
-        # Set model of selected widget
-        self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter, QSqlTableModel.OnFieldChange)
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER VALUES"""
@@ -1167,6 +1201,15 @@ class ApiCF(ApiParent):
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
         cmb_cat_period_id_filter.currentIndexChanged.connect(
             partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value, table_hydro_value))
+
+
+    def fill_tbl_hydrometer_values(self, qtable, table_name):
+        """ Fill the table control to show hydrometers values"""
+        cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
+        filter = "connec_id ILIKE '%" + self.feature_id + "%' "
+        filter += " AND cat_period_id ILIKE '%" + utils_giswater.get_item_data(self.dlg_cf, cmb_cat_period_id_filter) + "%'"
+        # Set model of selected widget
+        self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter, QSqlTableModel.OnFieldChange)
 
     def set_filter_hydrometer_values(self, widget):
         """ Get Filter for table hydrometer value with combo value"""
@@ -2151,6 +2194,11 @@ class ApiCF(ApiParent):
         utils_giswater.setImage(dialog, widget, "ws_shape.png")
 
 
+    def check_column_exist(self, table_name, column_name):
+        sql = ("SELECT DISTINCT column_name FROM information_schema.columns"
+               " WHERE table_name = '" + table_name + "' AND column_name = '" + column_name + "'")
+        row = self.controller.get_row(sql, log_sql=True)
+        return row
     # def disconnect_snapping(self, refresh_canvas=True):
     #     """ Select 'refreshAllLayers' as current map tool and disconnect snapping """
     #

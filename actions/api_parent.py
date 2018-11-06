@@ -693,6 +693,8 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
+        if complet_result[0]['feature']['geometry'] is None:
+            return
         list_coord = re.search('\((.*)\)', str(complet_result[0]['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
 
@@ -778,8 +780,6 @@ class ApiParent(ParentAction):
         if 'fields' not in result:
             return
 
-        btn_accept = dialog.findChild(QPushButton, 'btn_accept')
-
         grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
         for field in result["fields"]:
             label = QLabel()
@@ -810,7 +810,7 @@ class ApiParent(ParentAction):
 
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         grid_layout.addItem(verticalSpacer1)
-
+        return result
 
 
     def clear_gridlayout(self, layout):
