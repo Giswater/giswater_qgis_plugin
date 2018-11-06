@@ -632,12 +632,12 @@ class ApiParent(ParentAction):
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
-    def add_horizontal_spacer(self, field):
+    def add_horizontal_spacer(self, field=None):
         widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
         #widget.setObjectName(field['widgetname'])
         return widget
 
-    def add_verical_spacer(self, field):
+    def add_verical_spacer(self, field=None):
         widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         #widget.setObjectName(field['widgetname'])
         return widget
@@ -845,11 +845,12 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def create_body(self, form_name='', tab_name='', tablename='', limit=10, filter_fields=''):
+    def create_body(self, form='', feature='', limit=10, filter_fields=''):
         """ Create and return parameters as body to functions"""
         client = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        form = '"form":{"formName":"' + form_name + '", "tabName":"' + tab_name + '"}, '
-        feature = '"feature":{"tableName":"' + tablename + '"}, '
+        form = '"form":{'+form+'}, '
+
+        feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
         page_info = '"pageInfo":{"limit":"' + str(limit) + '"}'
         data = '"data":{' + filter_fields + ', ' + page_info + '} '

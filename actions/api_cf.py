@@ -179,7 +179,6 @@ class ApiCF(ApiParent):
         self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
         utils_giswater.set_qtv_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        #QAbstractItemView.SelectItems,
         utils_giswater.set_qtv_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
         self.tbl_event = self.dlg_cf.findChild(QTableView, "tbl_event")
         utils_giswater.set_qtv_config(self.tbl_event)
@@ -820,7 +819,7 @@ class ApiCF(ApiParent):
             self.fill_tab_rpt()
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
-            self.fill_tab_plan()
+            self.fill_tab_plan(self.complet_result)
             self.tab_plan_loaded = True
 
 
@@ -1782,7 +1781,9 @@ class ApiCF(ApiParent):
 
 
     def get_list(self, form_name='', tab_name='', limit=10, filter_fields=''):
-        body = self.create_body(form_name, tab_name, self.tablename, 10, filter_fields)
+        form = '"formName":"' + form_name + '", "tabName":"' + tab_name + '"'
+        feature = '"tableName":"' + self.tablename + '"'
+        body = self.create_body(form, feature, limit, filter_fields)
         sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
 
@@ -1832,17 +1833,18 @@ class ApiCF(ApiParent):
         standar_model.setHorizontalHeaderLabels(headers)
         index_tab = dialog.tab_main.currentIndex()
         tab_name = dialog.tab_main.widget(index_tab).objectName()
-        filter = ""
+        _filter = ""
         for widget in widget_list:
             if widget.objectName() != tab_name+'_limit':
                 column_id = widget.property('column_id')
                 text = utils_giswater.getWidgetText(dialog, widget)
-                filter += '"' + column_id + '":"'+text+'", '
-        if filter == "":
-            return None
+                if text != "null":
+                    _filter += '"' + column_id + '":"'+text+'", '
 
-        filter_fields = filter[:-2]
-        return filter_fields
+        if _filter != "":
+            _filter = _filter[:-2]
+
+        return _filter
 
 
     def open_rpt_result(self, qtable,  complet_list):
@@ -1875,28 +1877,33 @@ class ApiCF(ApiParent):
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
-    def fill_tab_plan(self):
+    def fill_tab_plan(self, complet_result):
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
+
         if self.geom_type == 'arc' or self.geom_type == 'node':
-            body = self.create_body(form_name='', tab_name='', tablename='', limit=10, filter_fields='')
+            index_tab = self.tab_main.currentIndex()
+            tab_name = self.tab_main.widget(index_tab).objectName()
+            form = '"tabName":"'+tab_name+'"'
+            feature = '"featureType":"'+complet_result[0]['feature']['featureType']+'", '
+            feature += '"tableName":"' + self.tablename + '", '
+            feature += '"idName":"' + self.field_id + '", '
+            feature += '"id":"' + self.feature_id + '"'
+            body = self.create_body(form, feature, limit=10, filter_fields='')
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfoplan($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True)
 
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 return False
-            # Parse string to order dict into List
-
             else:
                 complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-                result = complet_list[0]['editData']
+                result = complet_list[0]['body']['data']
                 if 'fields' not in result:
-                    self.controller.show_message("No fields for: " + row[0]['editData'], 2)
+                    self.controller.show_message("No listValues for: " + row[0]['body']['data'], 2)
                 else:
-                    for field in result["fields"]:
+                    for field in complet_list[0]['body']['data']['fields']:
                         if field['widgettype'] == 'line':
-                            y = 2
-                            for x in range(0, y):
+                            for x in range(0, 2):
                                 line = self.add_frame(field, x)
                                 plan_layout.addWidget(line, field['layout_order'], x)
                         else:
@@ -1910,6 +1917,7 @@ class ApiCF(ApiParent):
                                 label.setToolTip(field['label'].capitalize())
                         if field['widgettype'] == 'label':
                             widget = self.add_label(field)
+                            widget.setAlignment(Qt.AlignRight)
                             label.setWordWrap(True)
                             plan_layout.addWidget(label, field['layout_order'], 0)
                             plan_layout.addWidget(widget, field['layout_order'], 1)
