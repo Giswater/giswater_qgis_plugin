@@ -1930,7 +1930,11 @@ class ApiCF(ApiParent):
     """ NEW WORKCAT"""
     def cf_new_workcat(self, dialog):
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_newworkcat('new_workcat', 9)")
+        sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${"
+              "'client':{'device':3, 'infoType':100, 'lang':'ES'},"
+              " 'form':{'formName':'new_workcat', 'tabName':'data', 'editable':'TRUE'}, "
+              "'feature':{'tableName':'ve_arc_pipe', 'idName':'arc_id', 'id':'2001'}, "
+              "'data':{'fields':{'matcat_id':'PVC', 'pn':'16', 'dn':'160'}}}$$)")
         row = self.controller.get_row(sql, log_sql=True)
 
         self.dlg_new_workcat = ApiBasicInfo()
