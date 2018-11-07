@@ -185,8 +185,8 @@ class SearchPlus(QObject):
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
-        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm, workcat_id))
+        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end, workcat_id))
         self.items_dialog.export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
@@ -217,7 +217,7 @@ class SearchPlus(QObject):
         self.items_dialog.open()
 
 
-    def force_state(self, qbutton, state, qtable):
+    def force_state(self, qbutton, state, qtable, workcat_id):
         """ Force selected state and set qtable enabled = True """
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
                " WHERE cur_user=current_user AND state_id ='" + str(state) + "'")
@@ -231,6 +231,14 @@ class SearchPlus(QObject):
         qbutton.setEnabled(False)
         self.refresh_map_canvas()
 
+        table_name = "v_ui_workcat_x_feature"
+        table_name_end = "v_ui_workcat_x_feature_end"
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm, table_name)
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
 
     def disable_qatable_by_state(self, qtable, _id, qbutton):
 
