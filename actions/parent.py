@@ -43,7 +43,7 @@ class ParentAction(object):
         """ Class constructor """
 
         # Initialize instance attributes
-        self.giswater_version = "3.0"
+        self.giswater_version = "3.1"
         self.iface = iface
         self.canvas = self.iface.mapCanvas()        
         self.settings = settings

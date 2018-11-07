@@ -1113,7 +1113,6 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
     def fill_tab_hydrometer(self):
         """ Fill tab 'Hydrometer' """
-        utils_giswater.setWidgetEnabled(self.dlg_cf, "btn_link", False)
         table_hydro = "v_rtc_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydro)
