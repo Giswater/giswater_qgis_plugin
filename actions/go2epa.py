@@ -40,15 +40,16 @@ class Go2Epa(ParentAction):
 
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
+        # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
+        #self.get_last_gsw_file()
 
-        if not self.get_last_gsw_file():
-            return
 
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
         self.dlg_go2epa.setFixedSize(620, 300)        
-
+        # TODO habilitar todos estos widgets cuando Edgar acabe el giswater_java en python
+        """
         # Set widgets
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
@@ -59,7 +60,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.chk_export_subcatch.setVisible(False)
         self.dlg_go2epa.chk_exec.setVisible(False)
         self.dlg_go2epa.chk_import.setVisible(False)
-
+        """
         # Set signals
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
@@ -107,14 +108,17 @@ class Go2Epa(ParentAction):
 
         # Get last GSW file from giswater properties file
         self.set_java_settings(show_warning)
-
         # Check if that file exists
-        if not os.path.exists(self.file_gsw):
-            message = "GSW file not found"
-            if show_warning:            
+        message = "GSW file not found"
+        if self.file_gsw is not None:
+            if not os.path.exists(self.file_gsw):
+                if show_warning:
+                    self.controller.show_warning(message, parameter=str(self.file_gsw))
+                return False
+        else:
+            if show_warning:
                 self.controller.show_warning(message, parameter=str(self.file_gsw))
             return False
-        
         # Get INP, RPT file path and project name from GSW file
         self.set_gsw_settings()
         self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
