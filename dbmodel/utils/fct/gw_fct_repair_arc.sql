@@ -6,15 +6,20 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2496
 
-CREATE OR REPLACE FUNCTION gw_fct_arc_repair( p_arc_id text, counter bigint default 0, total bigint default 0)
-
-  RETURNS character varying AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_arc( p_arc_id text, counter bigint default 0, total bigint default 0)
+RETURNS character varying AS
 
 $BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_repair_arc(arc_id, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.arc)) FROM SCHEMA_NAME.arc
+*/
 
 DECLARE
 
 BEGIN
+	  -- set search_path
+	  SET search_path='SCHEMA_NAME';
 
       -- Set config parameter
       UPDATE config_param_system SET value = TRUE WHERE parameter = 'edit_topocontrol_dsbl_error' ;
