@@ -845,14 +845,14 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def create_body(self, form='', feature='', limit=10, filter_fields=''):
+    def create_body(self, form='', feature='', filter_fields=''):
         """ Create and return parameters as body to functions"""
         client = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
         form = '"form":{'+form+'}, '
 
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
-        page_info = '"pageInfo":{"limit":"' + str(limit) + '"}'
+        page_info = '"pageInfo":{}'
         data = '"data":{' + filter_fields + ', ' + page_info + '} '
         body = "" + client + form + feature + data
         return body

@@ -1764,7 +1764,7 @@ class ApiCF(ApiParent):
     def fill_tab_rpt(self):
         standar_model = QStandardItemModel()
         complet_list, widget_list = self.init_tbl_rpt(self.dlg_cf, standar_model, "rpt_layout1", "tbl_rpt")
-        self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list, filter=False)
+        self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list, _filter=False)
         self.set_listeners(complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
         self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
@@ -1778,7 +1778,7 @@ class ApiCF(ApiParent):
         self.clear_gridlayout(rpt_layout1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self.get_list(tab_name=tab_name, limit=5000)
+        complet_list = self.get_list(tab_name=tab_name)
 
         # Put filter widgets into layout
         widget_list = []
@@ -1818,15 +1818,15 @@ class ApiCF(ApiParent):
     def set_listeners(self, complet_list, standar_model, dialog, widget_list):
         for widget in widget_list:
             if type(widget) is QLineEdit:
-                widget.textChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list))
+                widget.textChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list, True))
             elif type(widget) is QComboBox:
-                widget.currentIndexChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list))
+                widget.currentIndexChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list, True))
 
 
-    def get_list(self, form_name='', tab_name='', limit=10, filter_fields=''):
+    def get_list(self, form_name='', tab_name='', filter_fields=''):
         form = '"formName":"' + form_name + '", "tabName":"' + tab_name + '"'
         feature = '"tableName":"' + self.tablename + '"'
-        body = self.create_body(form, feature, limit, filter_fields)
+        body = self.create_body(form, feature,  filter_fields)
         sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
 
@@ -1839,19 +1839,13 @@ class ApiCF(ApiParent):
         return complet_list
 
 
-    def populate_table(self, complet_list, standar_model, dialog, widget_list, filter=True):
+    def populate_table(self, complet_list, standar_model, dialog, widget_list, _filter=True):
         filter_fields = ''
-        if filter:
+        if _filter:
             filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        cmb_limit = dialog.findChild(QComboBox, tab_name+'_limit')
-        limit = 99999
-        if cmb_limit:
-            limit = utils_giswater.get_item_data(dialog, tab_name+"_limit", 1)
-        if limit is None or not limit:
-            limit = 99999
-        complet_list = self.get_list(tab_name=tab_name, limit=limit, filter_fields=filter_fields)
+        complet_list = self.get_list(tab_name=tab_name, filter_fields=filter_fields)
 
         # for item in complet_list[0]['body']['data']['listValues'][0]:
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
@@ -1866,7 +1860,6 @@ class ApiCF(ApiParent):
 
 
     def get_filter_qtableview(self, complet_list, standar_model, dialog, widget_list):
-
         standar_model.clear()
         # Get headers
         headers = []
@@ -1874,20 +1867,18 @@ class ApiCF(ApiParent):
             headers.append(x)
         # Set headers
         standar_model.setHorizontalHeaderLabels(headers)
-        index_tab = dialog.tab_main.currentIndex()
-        tab_name = dialog.tab_main.widget(index_tab).objectName()
-        _filter = ""
+
+        filter_fields = ""
         for widget in widget_list:
-            if widget.objectName() != tab_name+'_limit':
-                column_id = widget.property('column_id')
-                text = utils_giswater.getWidgetText(dialog, widget)
-                if text != "null":
-                    _filter += '"' + column_id + '":"'+text+'", '
+            column_id = widget.property('column_id')
+            text = utils_giswater.getWidgetText(dialog, widget)
+            if text != "null":
+                filter_fields += '"' + column_id + '":"'+text+'", '
 
-        if _filter != "":
-            _filter = _filter[:-2]
+        if filter_fields != "":
+            filter_fields = filter_fields[:-2]
 
-        return _filter
+        return filter_fields
 
 
     def open_rpt_result(self, qtable,  complet_list):
@@ -1931,7 +1922,7 @@ class ApiCF(ApiParent):
             feature += '"tableName":"' + self.tablename + '", '
             feature += '"idName":"' + self.field_id + '", '
             feature += '"id":"' + self.feature_id + '"'
-            body = self.create_body(form, feature, limit=10, filter_fields='')
+            body = self.create_body(form, feature, filter_fields='')
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfoplan($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True)
 
