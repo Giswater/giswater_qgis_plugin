@@ -27,8 +27,6 @@ import os.path
 import sys  
 from functools import partial
 
-from actions.api_cf import ApiCF
-from actions.api_search import ApiSearch
 from actions.go2epa import Go2Epa
 from actions.basic import Basic
 from actions.edit import Edit
@@ -136,14 +134,8 @@ class Giswater(QObject):
             action = self.actions[index_action]                
 
             # Basic toolbar actions
-            if int(index_action) in (32, 41, 48, 86):
+            if int(index_action) in (32, 37, 41, 48, 86):
                 callback_function = getattr(self.basic, function_name)  
-                action.triggered.connect(callback_function)
-            # elif int(index_action) == 32:
-            #     callback_function = getattr(self.api_search, function_name)
-            #     action.triggered.connect(callback_function)
-            elif int(index_action) == 37:
-                callback_function = getattr(self.api_cf, function_name)
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
             elif int(index_action) in (26, 27) and self.wsoftware == 'ws':
@@ -565,8 +557,6 @@ class Giswater(QObject):
         self.wsoftware = self.controller.get_project_type()
 
         # Set actions classes (define one class per plugin toolbar)
-        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic.set_giswater(self)

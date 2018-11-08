@@ -11,6 +11,7 @@ from functools import partial
 
 import utils_giswater
 from giswater.ui_manager import Multirow_selector
+from giswater.actions.api_cf import ApiCF
 from giswater.actions.api_search import ApiSearch
 from giswater.actions.parent import ParentAction
 
@@ -21,12 +22,17 @@ class Basic(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
+        self.iface = iface
+        self.settings = settings
+        self.controller = controller
+        self.plugin_dir = plugin_dir
         self.minor_version = "3.0"
         self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.logged = False
         self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')
-        self.api_search = ApiSearch(iface, settings, controller, plugin_dir)
+
+
 
     def set_giswater(self, giswater):
         self.giswater = giswater
@@ -103,8 +109,15 @@ class Basic(ParentAction):
 
     def basic_api_search(self):
         """ Button 32: SearchPlus """
+        self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_search.api_search()
-     
+
+
+    def basic_api_info(self):
+        """ Button 32: SearchPlus """
+        self.api_info = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_info.api_info()
+
     def close_dialog(self, dlg):
         ParentAction.close_dialog(self, dlg)
         try:
