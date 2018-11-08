@@ -693,7 +693,7 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
-        if complet_result[0]['feature']['geometry'] is None:
+        if complet_result[0]['feature']['geometry']['st_astext'] is None:
             return
         list_coord = re.search('\((.*)\)', str(complet_result[0]['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
@@ -775,13 +775,13 @@ class ApiParent(ParentAction):
         # Attach model to table view
         widget.setModel(model)
 
-    def populate_basic_info(self, dialog, row, field_id):
-        result = row[0]['editData']
-        if 'fields' not in result:
+    def populate_basic_info(self, dialog, result, field_id):
+        fields = result[0]['editData']
+        if 'fields' not in fields:
             return
 
         grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
-        for field in result["fields"]:
+        for field in fields["fields"]:
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
             label.setText(field['label'].capitalize())

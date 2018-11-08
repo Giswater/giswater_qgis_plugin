@@ -84,7 +84,7 @@ class ApiSearch(ApiParent):
                 first_tab = tab['tabName']
             tab_widget = QWidget(main_tab)
             tab_widget.setObjectName(tab['tabName'])
-            main_tab.addTab(tab_widget, tab['tabLabel'])
+            main_tab.addTab(tab_widget, tab['tabHeaderText'])
             gridlayout = QGridLayout()
             tab_widget.setLayout(gridlayout)
             x = 0
@@ -92,11 +92,11 @@ class ApiSearch(ApiParent):
                 label = QLabel()
                 label.setObjectName('lbl_' + field['label'])
                 label.setText(field['label'].capitalize())
-                if field['type'] == 'typeahead':
+                if field['widgettype'] == 'combotext':
                     completer = QCompleter()
                     widget = self.add_lineedit(field)
                     widget = self.set_completer(widget, completer)
-                elif field['type'] == 'combo':
+                elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
 
                 gridlayout.addWidget(label, x, 0)
@@ -106,7 +106,6 @@ class ApiSearch(ApiParent):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
-        # TODO: Save position when destroy dlg
 
         # Open dialog
         self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -147,16 +146,15 @@ class ApiSearch(ApiParent):
                 break
         # IF for zoom to tab network
         if self.dlg_search.main_tab.widget(index).objectName() == 'network':
-            layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
-            if layer is None:
-                msg = "Layer not found"
-                self.controller.show_message(msg, message_level=2, duration=3)
-                return
-
-            self.iface.setActiveLayer(layer)
+            # layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
+            # if layer is None:
+            #     msg = "Layer not found"
+            #     self.controller.show_message(msg, message_level=2, duration=3)
+            #     return
+            #
+            # self.iface.setActiveLayer(layer)
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
             complet_result = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=item['feature_type'], feature_id=item['sys_id'])
-
             if not complet_result:
                 print("FAIL")
                 return
@@ -229,12 +227,13 @@ class ApiSearch(ApiParent):
             combo = combo_list[0]
             id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
-            json_updatesearch[combo.objectName()] = {}
+            json_updatesearch[combo.property('column_id')] = {}
+            print(combo.property('column_id'))
             _json = {}
             _json['id'] = id
             _json['name'] = name
-            json_updatesearch[combo.objectName()] = _json
-            json_updatesearch_add[combo.objectName()] = _json
+            json_updatesearch[combo.property('column_id')] = _json
+            json_updatesearch_add[combo.property('column_id')] = _json
 
         if line_list:
             # Prepare an aux json because 1 field of main json is another json
@@ -248,11 +247,12 @@ class ApiSearch(ApiParent):
             value = utils_giswater.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
             if str(value) == '':
                 return
-            json_updatesearch[line_edit.objectName()] = {}
-            json_updatesearch_add[line_edit.objectName()] = {}
+            json_updatesearch[line_edit.property('column_id')] = {}
+            json_updatesearch_add[line_edit.property('column_id')] = {}
             _json['text'] = value
-            json_updatesearch[line_edit.objectName()] = _json
-            json_updatesearch_add[line_edit.objectName()] = _json
+            widget.property('column_id')
+            json_updatesearch[line_edit.property('column_id')] = _json
+            json_updatesearch_add[line_edit.property('column_id')] = _json
             json_updatesearch = json.dumps(json_updatesearch)
 
             sql = ("SELECT " + self.schema_name + ".gw_api_updatesearch($$" +json_updatesearch + "$$)")
@@ -284,9 +284,9 @@ class ApiSearch(ApiParent):
             if str(value) == 'null':
                 return
 
-            json_updatesearch_add[line_edit_add.objectName()] = {}
+            json_updatesearch_add[line_edit_add.property('column_id')] = {}
             _json['text'] = value
-            json_updatesearch_add[line_edit_add.objectName()] = _json
+            json_updatesearch_add[line_edit_add.property('column_id')] = _json
             json_updatesearch_add = json.dumps(json_updatesearch_add)
 
             sql = ("SELECT " + self.schema_name + ".gw_api_updatesearch_add($$" + json_updatesearch_add + "$$)")
@@ -307,9 +307,10 @@ class ApiSearch(ApiParent):
 
 
     def add_combobox(self, field):
-        
+
         widget = QComboBox()
-        widget.setObjectName(field['column_id'])
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
@@ -339,8 +340,6 @@ class ApiSearch(ApiParent):
         sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
                " null, True, 9, 100)")
         row = self.controller.get_row(sql, log_sql=True)
-        self.controller.log_info(str("TEST10"))
-        self.controller.log_info(str(row))
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
@@ -350,8 +349,8 @@ class ApiSearch(ApiParent):
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
-
-        self.populate_basic_info(self.hydro_info_dlg, row)
+        field_id = str(row[0]['feature']['idName'])
+        self.populate_basic_info(self.hydro_info_dlg, row, field_id)
 
         self.hydro_info_dlg.open()
 

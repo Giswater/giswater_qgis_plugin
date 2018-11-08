@@ -127,17 +127,18 @@ class ApiCF(ApiParent):
                    + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
         # IF come from QPushButtons node1 or node2 from custom form
         elif feature_id and feature_type:
-            the_geom = self.check_column_exist(table_name, 'the_geom')
-            print (the_geom)
-            row = None
-            if the_geom is not None:
-                sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+" = '" + str(feature_id) + "'")
-                row = self.controller.get_row(sql, log_sql=True)
-            the_geom = 'null'
-            if row is not None:
-                the_geom = "'" + str(row[0]) + "'"
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
-                   " " + str(the_geom)+", " + str(is_project_editable) + ", 9, 100)")
+            # the_geom = self.check_column_exist(table_name, 'the_geom')
+            # print (the_geom)
+            # row = None
+            # if the_geom is not None:
+            #     sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+" = '" + str(feature_id) + "'")
+            #     row = self.controller.get_row(sql, log_sql=True)
+            # the_geom = 'null'
+            # if row is not None:
+            #     if row[0] is not None:
+            #         the_geom = "'" + str(row[0]) + "'"
+            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"', "
+                   " null, " + str(is_project_editable) + ", 9, 100)")
 
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
@@ -149,14 +150,14 @@ class ApiCF(ApiParent):
             self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
             return False
         if self.complet_result[0]['form']['template'] == 'GENERIC':
-            result = self.open_generic_form(feature_id, self.complet_result)
+            result = self.open_generic_form(self.complet_result)
             return result
         elif self.complet_result[0]['form']['template'] == 'custom feature':
             result = self.open_custom_form(feature_id, self.complet_result)
             return result
 
 
-    def open_generic_form(self, feature_id, complet_result):
+    def open_generic_form(self, complet_result):
         self.hydro_info_dlg = ApiBasicInfo()
         self.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
@@ -829,7 +830,7 @@ class ApiCF(ApiParent):
             self.fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt':
-            self.fill_tab_rpt()
+            result = self.fill_tab_rpt()
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self.fill_tab_plan(self.complet_result)
@@ -1763,11 +1764,13 @@ class ApiCF(ApiParent):
     def fill_tab_rpt(self):
         standar_model = QStandardItemModel()
         complet_list, widget_list = self.init_tbl_rpt(self.dlg_cf, standar_model, "rpt_layout1", "tbl_rpt")
-        self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list, _filter=False)
+        if complet_list is False:
+            return False
+        result = self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list, _filter=False)
         self.set_listeners(complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
         self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
-
+        return result
 
     def init_tbl_rpt(self, dialog, standar_model, layout_name, qtv_name):
         """ Put filter widgets into layout and set headers into QTableView"""
@@ -1778,7 +1781,8 @@ class ApiCF(ApiParent):
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         complet_list = self.get_list(tab_name=tab_name)
-
+        if complet_list is False:
+            return False, False
         # Put filter widgets into layout
         widget_list = []
         for field in complet_list[0]['body']['data']['filterFields']:
@@ -1845,7 +1849,8 @@ class ApiCF(ApiParent):
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         complet_list = self.get_list(tab_name=tab_name, filter_fields=filter_fields)
-
+        if complet_list is False:
+            return False
         # for item in complet_list[0]['body']['data']['listValues'][0]:
         #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
         #     if len(row) > 0:
@@ -1856,7 +1861,7 @@ class ApiCF(ApiParent):
                 row.append(QStandardItem(str(value)))
             if len(row) > 0:
                 standar_model.appendRow(row)
-
+        return complet_list
 
     def get_filter_qtableview(self, complet_list, standar_model, dialog, widget_list):
         standar_model.clear()
