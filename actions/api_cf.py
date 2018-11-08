@@ -830,7 +830,7 @@ class ApiCF(ApiParent):
             self.fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt':
-            result = self.fill_tab_rpt()
+            result = self.fill_tab_rpt(self.complet_result)
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self.fill_tab_plan(self.complet_result)
@@ -1761,18 +1761,18 @@ class ApiCF(ApiParent):
 
 
     """ FUNCTIONS RELATED WITH TAB RPT """
-    def fill_tab_rpt(self):
+    def fill_tab_rpt(self, complet_result):
         standar_model = QStandardItemModel()
-        complet_list, widget_list = self.init_tbl_rpt(self.dlg_cf, standar_model, "rpt_layout1", "tbl_rpt")
+        complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf, standar_model, "rpt_layout1", "tbl_rpt")
         if complet_list is False:
             return False
-        result = self.populate_table(complet_list, standar_model, self.dlg_cf, widget_list, _filter=False)
-        self.set_listeners(complet_list, standar_model, self.dlg_cf, widget_list)
+        result = self.populate_table(complet_result, complet_list, standar_model, self.dlg_cf, widget_list, _filter=False)
+        self.set_listeners(complet_result, complet_list, standar_model, self.dlg_cf, widget_list)
         self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
         self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
         return result
 
-    def init_tbl_rpt(self, dialog, standar_model, layout_name, qtv_name):
+    def init_tbl_rpt(self, complet_result, dialog, standar_model, layout_name, qtv_name):
         """ Put filter widgets into layout and set headers into QTableView"""
 
         rpt_layout1 = dialog.findChild(QGridLayout, layout_name)
@@ -1780,7 +1780,7 @@ class ApiCF(ApiParent):
         self.clear_gridlayout(rpt_layout1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self.get_list(tab_name=tab_name)
+        complet_list = self.get_list(complet_result, tab_name=tab_name)
         if complet_list is False:
             return False, False
         # Put filter widgets into layout
@@ -1818,17 +1818,18 @@ class ApiCF(ApiParent):
         return complet_list, widget_list
 
 
-    def set_listeners(self, complet_list, standar_model, dialog, widget_list):
+    def set_listeners(self, complet_result, complet_list, standar_model, dialog, widget_list):
         for widget in widget_list:
             if type(widget) is QLineEdit:
-                widget.textChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list, True))
+                widget.textChanged.connect(partial(self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
             elif type(widget) is QComboBox:
-                widget.currentIndexChanged.connect(partial(self.populate_table, complet_list, standar_model, dialog, widget_list, True))
+                widget.currentIndexChanged.connect(partial(self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
 
 
-    def get_list(self, form_name='', tab_name='', filter_fields=''):
+    def get_list(self, complet_result, form_name='', tab_name='', filter_fields=''):
         form = '"formName":"' + form_name + '", "tabName":"' + tab_name + '"'
-        feature = '"tableName":"' + self.tablename + '"'
+        id_name = complet_result[0]['feature']['idName']
+        feature = '"tableName":"' + self.tablename + '", "idName":"'+id_name+'", "id":"'+self.feature_id+'"'
         body = self.create_body(form, feature,  filter_fields)
         sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
@@ -1842,13 +1843,13 @@ class ApiCF(ApiParent):
         return complet_list
 
 
-    def populate_table(self, complet_list, standar_model, dialog, widget_list, _filter=True):
+    def populate_table(self, complet_result, complet_list, standar_model, dialog, widget_list, _filter=True):
         filter_fields = ''
         if _filter:
             filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self.get_list(tab_name=tab_name, filter_fields=filter_fields)
+        complet_list = self.get_list(complet_result, tab_name=tab_name, filter_fields=filter_fields)
         if complet_list is False:
             return False
         # for item in complet_list[0]['body']['data']['listValues'][0]:
