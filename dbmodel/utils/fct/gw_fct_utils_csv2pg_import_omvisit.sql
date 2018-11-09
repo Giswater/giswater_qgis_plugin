@@ -8,21 +8,19 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2512
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(p_visit_type integer, p_visit_descript text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(p_isvisitexists boolean, p_isparametervalue boolean, p_visit_descript text)
   RETURNS integer AS
 $BODY$
 
 
 /*INSTRUCTIONS
+
+Three parameters:
+1: p_isvisitexists: 	- If true, no visit is added because events are related to existing visits
+2: p_isparametervalue:	- On the column of om_visit_event.parameter_id in spite of insert parameter_id, parameter value is inserted. The field of parameter value keeps with nulls
+3: p_visit_descript:	- om_visit.descript value
+
 Three steps:
-
-p_visit_type  - 1: Standard model   2: Simplified model
-1: Standard model: parameter - value
-2: Simplifed model: 	- No new visit is added because events are related to existing visits
-			- On the column of om_visit_event.parameter_id in spite of insert parameter_id, parameter value is inserted. The field of parameter value keeps with nulls
-
-p_visit_descript - om_visit.descript value
-
 1) PREVIOUS
 	1) Check all the news visit_id does not exists on om_visit table
 	2) Check the visicat_id is defined on om_visit_cat table
@@ -73,10 +71,11 @@ BEGIN
 	SELECT csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
 	FROM temp_csv2pg;
 
-	IF p_visit_type = 1 THEN
-
-		FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=2 AND user_name=current_user
-		LOOP
+	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=2 AND user_name=current_user
+	LOOP
+	
+		IF p_isvisitexists IS FALSE THEN
+		
 			-- Insert into visit table
 			INSERT INTO om_visit (id, visitcat_id, startdate, enddate, ext_code, user_name, descript) 
 			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv7::date, v_visit.csv7::date, v_visit.csv8, v_visit.csv9, p_visit_descript);
@@ -84,94 +83,56 @@ BEGIN
 			-- Insert into feature table
 			EXECUTE 'UPDATE om_visit_x_'||v_visit.csv5||' SET is_last=FALSE where '||v_visit.csv5||'_id::text='||v_visit.csv6||'::text';
 			EXECUTE 'INSERT INTO om_visit_x_'||v_visit.csv5||' (visit_id, '||v_visit.csv5||'_id) VALUES ( '||v_visit.csv1||','||v_visit.csv6||')';
-	
-			v_csv=10;
-			
-			FOREACH v_parameter_id IN ARRAY v_parameters
-			LOOP			
-				-- parameters are defined from row csv10 to row csv20
-				IF v_csv = 10 THEN
-					v_parameter_value = v_visit.csv10;
-				ELSIF v_csv = 11 THEN
-					v_parameter_value = v_visit.csv11;
-				ELSIF v_csv = 12 THEN	
-					v_parameter_value = v_visit.csv12;
-				ELSIF v_csv = 13 THEN
-					v_parameter_value = v_visit.csv13;
-				ELSIF v_csv = 14 THEN
-					v_parameter_value = v_visit.csv14;
-				ELSIF v_csv = 15 THEN
-					v_parameter_value = v_visit.csv15;
-				ELSIF v_csv = 16 THEN
-					v_parameter_value = v_visit.csv16;
-				ELSIF v_csv = 17 THEN
-					v_parameter_value = v_visit.csv17;
-				ELSIF v_csv = 18 THEN
-					v_parameter_value = v_visit.csv18;
-				ELSIF v_csv = 19 THEN
-					v_parameter_value = v_visit.csv19;
-				ELSIF v_csv = 20 THEN
-					v_parameter_value = v_visit.csv20;
-				END IF;
-				v_csv=v_csv+1;
-
-				raise notice 'v_parameter_id: %, v_parameter_value: %', v_parameter_id, v_parameter_value;
 		
+		END IF;
+	
+		v_csv=10;
+			
+		FOREACH v_parameter_id IN ARRAY v_parameters
+		LOOP			
+			-- parameters are defined from row csv10 to row csv20
+			IF v_csv = 10 THEN
+				v_parameter_value = v_visit.csv10;
+			ELSIF v_csv = 11 THEN
+				v_parameter_value = v_visit.csv11;
+			ELSIF v_csv = 12 THEN	
+				v_parameter_value = v_visit.csv12;
+			ELSIF v_csv = 13 THEN
+				v_parameter_value = v_visit.csv13;
+			ELSIF v_csv = 14 THEN
+				v_parameter_value = v_visit.csv14;
+			ELSIF v_csv = 15 THEN
+				v_parameter_value = v_visit.csv15;
+			ELSIF v_csv = 16 THEN
+				v_parameter_value = v_visit.csv16;
+			ELSIF v_csv = 17 THEN
+				v_parameter_value = v_visit.csv17;
+			ELSIF v_csv = 18 THEN
+				v_parameter_value = v_visit.csv18;
+			ELSIF v_csv = 19 THEN
+				v_parameter_value = v_visit.csv19;
+			ELSIF v_csv = 20 THEN
+				v_parameter_value = v_visit.csv20;
+			END IF;
+			v_csv=v_csv+1;
+				raise notice 'v_parameter_id: %, v_parameter_value: %', v_parameter_id, v_parameter_value;
+	
+			IF p_isparametervalue IS FALSE
 				-- set previous to is_last=false
 				EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_id)||' AND visit_id IN (SELECT visit_id FROM om_visit_x_'||v_visit.csv5||'
 					WHERE '||v_visit.csv5||'_id = '||v_visit.csv6||'::text)';
 				-- insert event
 				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (v_visit.csv1::bigint, v_parameter_id, v_parameter_value , v_visit.csv7::timestamp);
-			END LOOP;				
-		END LOOP;
-		
-	ELSIF p_visit_type = 2 THEN
-
-		FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=2 AND user_name=current_user
-		LOOP
-			-- Insert into visit table
-			-- Inserting visits is not neeeded because visit exists		
-			v_csv=10;
-			FOREACH v_parameter_id IN ARRAY v_parameters
-			LOOP			
-				-- parameters are defined from row csv10 to row csv20
-				IF v_csv = 10 THEN
-					v_parameter_value = v_visit.csv10;
-				ELSIF v_csv = 11 THEN
-					v_parameter_value = v_visit.csv11;
-				ELSIF v_csv = 12 THEN	
-					v_parameter_value = v_visit.csv12;
-				ELSIF v_csv = 13 THEN
-					v_parameter_value = v_visit.csv13;
-				ELSIF v_csv = 14 THEN
-					v_parameter_value = v_visit.csv14;
-				ELSIF v_csv = 15 THEN
-					v_parameter_value = v_visit.csv15;
-				ELSIF v_csv = 16 THEN
-					v_parameter_value = v_visit.csv16;
-				ELSIF v_csv = 17 THEN
-					v_parameter_value = v_visit.csv17;
-				ELSIF v_csv = 18 THEN
-					v_parameter_value = v_visit.csv18;
-				ELSIF v_csv = 19 THEN
-					v_parameter_value = v_visit.csv19;
-				ELSIF v_csv = 20 THEN
-					v_parameter_value = v_visit.csv20;
-				END IF;
-				v_csv=v_csv+1;
-
-				raise notice 'v_parameter_id: %, v_parameter_value: %', v_parameter_id, v_parameter_value;
-
-				IF v_parameter_value IS NOT NULL THEN 
-					-- set previous to is_last=false
-					EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_value)||' AND visit_id IN (SELECT visit_id FROM om_visit_x_'||v_visit.csv5||'
-						WHERE '||v_visit.csv5||'_id = '||v_visit.csv6||'::text)';
-					-- insert event
-					INSERT INTO om_visit_event (visit_id, parameter_id, tstamp) VALUES (v_visit.csv1::bigint, v_parameter_value, v_visit.csv7::timestamp);
-				END IF;
-			END LOOP;				
-		END LOOP;
-	END IF;
+			
+			ELSIF p_isparametervalue IS TRUE AND v_parameter_value IS NOT NULL THEN 
+				-- set previous to is_last=false
+				EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_value)||' AND visit_id IN (SELECT visit_id FROM om_visit_x_'||v_visit.csv5||'
+					WHERE '||v_visit.csv5||'_id = '||v_visit.csv6||'::text)';
+				-- insert event
+				INSERT INTO om_visit_event (visit_id, parameter_id, tstamp) VALUES (v_visit.csv1::bigint, v_parameter_value, v_visit.csv7::timestamp);
+			END IF;
+		END LOOP;				
+	END LOOP;
 	
 RETURN 0;
 	
