@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
---FUNCTION CODE: XXX
+--FUNCTION CODE: 2534
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_link( p_link_id integer, counter bigint default 0, total bigint default 0)
 RETURNS character varying AS

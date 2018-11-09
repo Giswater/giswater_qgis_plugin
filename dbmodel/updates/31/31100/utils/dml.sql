@@ -28,7 +28,7 @@ INSERT INTO config_param_system VALUES (168, 'basic_search_hyd_hydro_field_3', '
 INSERT INTO config_param_system VALUES (169, 'basic_search_workcat_filter', 'code', 'text', 'searchplus', NULL);
 INSERT INTO config_param_system VALUES (170, 'om_mincut_use_pgrouting', 'TRUE', 'boolean', 'mincut', NULL);
 INSERT INTO sys_fprocess_cat VALUES (28, 'Massive downgrade features', 'Edit', 'Massive downgrade features', 'utils');
-INSERT INTO sys_fprocess_cat VALUES (29, 'Audit mincut data', 'OM', 'Audit mincut data', 'ws');
+INSERT INTO sys_fprocess_cat VALUES (29, 'Mincut pipe hazard analysis', 'OM', 'Massive network hazard analysis', 'ws');
 
 --28/05/2018
 -----------------------
