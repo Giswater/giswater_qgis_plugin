@@ -187,7 +187,7 @@ class Giswater(QObject):
             action = QAction(text, action_group) 
         else:
             action = QAction(icon, text, action_group)  
-            
+        action.setObjectName(function_name)
         # Button add_node or add_arc: add drop down menu to button in toolbar
         if self.schema_exists and (index_action == '01' or index_action == '02'):
             action = self.manage_dropdown_menu(action, index_action)
