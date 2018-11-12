@@ -140,5 +140,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ud.gw_fct_utils_csv2pg_import_omvisit(text)
-  OWNER TO bgeoadmin;
+
