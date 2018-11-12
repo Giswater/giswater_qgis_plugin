@@ -51,7 +51,7 @@ class Go2Epa(ParentAction):
 
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
-
+        self.controller.restore_info()
         if not self.get_last_gsw_file():
             return
 
@@ -650,7 +650,7 @@ class Go2Epa(ParentAction):
 
     def go2epa_result_selector(self):
         """ Button 29: Epa result selector """
-
+        self.controller.restore_info()
         # Create the dialog and signals
         self.dlg_go2epa_result = EpaResultCompareSelector()
         self.load_settings(self.dlg_go2epa_result)
@@ -751,7 +751,7 @@ class Go2Epa(ParentAction):
     
     def go2epa_result_manager(self):
         """ Button 25: Epa result manager """
-
+        self.controller.restore_info()
         # Create the dialog
         self.dlg_manager = EpaResultManager()
         self.load_settings(self.dlg_manager)

@@ -49,12 +49,13 @@ class Master(ParentAction):
 
     def master_new_psector(self, psector_id=None):
         """ Button 45: New psector """
+        self.controller.restore_info()
         self.manage_new_psector.new_psector(psector_id, 'plan')
 
 
     def master_psector_mangement(self):
         """ Button 46: Psector management """
-
+        self.controller.restore_info()
         # Create the dialog and signals
         self.dlg_psector_mng = Psector_management()
 
@@ -219,7 +220,7 @@ class Master(ParentAction):
 
     def master_psector_selector(self):
         """ Button 47: Psector selector """
-
+        self.controller.restore_info()
         # Create the dialog and signals
         self.dlg_psector_selector = Multirow_selector()
         self.load_settings(self.dlg_psector_selector)
@@ -242,7 +243,7 @@ class Master(ParentAction):
         
     def master_estimate_result_new(self, tablename=None, result_id=None, index=0):
         """ Button 38: New estimate result """
-
+        self.controller.restore_info()
         # Create dialog 
         dlg_estimate_result_new = EstimateResultNew()
         self.load_settings(dlg_estimate_result_new)
@@ -356,7 +357,7 @@ class Master(ParentAction):
 
     def master_estimate_result_selector(self):
         """ Button 49: Estimate result selector """
-
+        self.controller.restore_info()
         # Create dialog 
         self.dlg_estimate_result_selector = EstimateResultSelector()
         self.load_settings(self.dlg_estimate_result_selector)
@@ -444,7 +445,7 @@ class Master(ParentAction):
 
     def master_estimate_result_manager(self):
         """ Button 50: Plan estimate result manager """
-
+        self.controller.restore_info()
         # Create the dialog and signals
         self.dlg_merm = EstimateResultManager()
         self.load_settings(self.dlg_merm)

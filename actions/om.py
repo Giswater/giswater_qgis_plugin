@@ -47,22 +47,25 @@ class Om(ParentAction):
 
     def om_add_visit(self):
         """ Button 64: Add visit """
+        self.controller.restore_info()
         self.manage_visit.manage_visit(is_new=True)
 
 
     def om_visit_management(self):
         """ Button 65: Visit management """
+        self.controller.restore_info()
         self.manage_visit.edit_visit()     
         
 
     def om_psector(self, psector_id=None):
         """ Button 81: Psector """
+        self.controller.restore_info()
         self.manage_new_psector.new_psector(psector_id, 'om')
         
 
     def om_psector_management(self):
         """ Button 82: Psector management """
-
+        self.controller.restore_info()
         self.dlg_psector_mng = Psector_management()
         self.load_settings(self.dlg_psector_mng)
         table_name = "om_psector"
@@ -225,7 +228,7 @@ class Om(ParentAction):
 
     def selector_date(self):
         """ Button 84: Selector dates """
-
+        self.controller.restore_info()
         self.dlg_selector_date = SelectorDate()
         self.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")

@@ -195,7 +195,7 @@ class CadAddPoint(ParentMapTool):
 
 
     def activate(self):
-        
+        self.controller.restore_info()
         # Get SRID
         self.srid = self.controller.plugin_settings_value('srid')
         

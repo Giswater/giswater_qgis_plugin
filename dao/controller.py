@@ -1139,11 +1139,12 @@ class DaoController():
         action = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
         if action.isChecked():
             action.setChecked(False)
-            QApplication.restoreOverrideCursor()
-            if self.api_cf.emit_point is not None:
-                ep = self.api_cf.emit_point
-                ep.canvasClicked.disconnect()
-                self.api_cf = None
-
         else:
             print("NOT FOUND")
+        QApplication.restoreOverrideCursor()
+        if self.api_cf is not None:
+            ep = self.api_cf.emit_point
+            ep.canvasClicked.disconnect()
+            self.api_cf = None
+
+

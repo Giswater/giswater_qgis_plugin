@@ -403,7 +403,7 @@ class ChangeElemType(ParentMapTool):
 
 
     def activate(self):
-        
+        self.controller.restore_info()
         # Check button
         self.action().setChecked(True)     
 

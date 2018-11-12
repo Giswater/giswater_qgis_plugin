@@ -46,7 +46,7 @@ class Utils(ParentAction):
 
     def utils_arc_topo_repair(self):
         """ Button 19: Topology repair """
-
+        self.controller.restore_info()
         # Create dialog to check wich topology functions we want to execute
         self.dlg_toolbox = Toolbox()
         self.load_settings(self.dlg_toolbox)
@@ -210,7 +210,7 @@ class Utils(ParentAction):
 
     def utils_import_csv(self):
         """ Button 83: Import CSV """
-
+        self.controller.restore_info()
         self.dlg_csv = Csv2Pg()
         self.load_settings(self.dlg_csv)
         roles = self.controller.get_rolenames()

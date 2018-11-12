@@ -42,7 +42,7 @@ class ManageDocument(ParentManage):
 
     def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None):
         """ Button 34: Add document """
-
+        self.controller.restore_info()
         # Create the dialog and signals
         self.dlg_add_doc = AddDoc()
         self.load_settings(self.dlg_add_doc)
@@ -214,8 +214,8 @@ class ManageDocument(ParentManage):
 
 
     def edit_document(self):
-        """ Button 66: Edit document """ 
-        
+        """ Button 66: Edit document """
+        self.controller.restore_info()
         # Create the dialog
         self.dlg_man = DocManagement()
         self.load_settings(self.dlg_man)

@@ -57,7 +57,7 @@ class ManageVisit(ParentManage, QObject):
         if geom_type => lock geom_type in relations tab
         if feature_id => load related feature basing on geom_type in relation
         if single_tool notify that the tool is used called from another dialog."""
-
+        self.controller.restore_info()
         # parameter to set if the dialog is working as single tool or integrated in another tool
         self.single_tool_mode = single_tool
 
@@ -542,7 +542,7 @@ class ManageVisit(ParentManage, QObject):
 
     def edit_visit(self, geom_type=None, feature_id=None):
         """ Button 65: Edit visit """
-
+        self.controller.restore_info()
         # Create the dialog
         self.dlg_man = VisitManagement()
         self.load_settings(self.dlg_man)

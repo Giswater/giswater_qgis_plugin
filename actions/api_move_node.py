@@ -44,7 +44,7 @@ class ApiMoveNode(ApiParent):
 
     def api_move_node(self):
         """ Button 37: Own Giswater info """
-        
+        self.controller.restore_info()
         # Create the appropriate map tool and connect the gotPoint() signal.
         QApplication.setOverrideCursor(Qt.CrossCursor)
         self.canvas = self.iface.mapCanvas()
@@ -146,10 +146,8 @@ class ApiMoveNode(ApiParent):
             
     def open_form(self):
         
-        self.controller.log_info(str("TEST 21"))
         sql = ("SELECT parameter, value  FROM " + self.schema_name + ".config_param_user "
                " WHERE parameter  = 'open_info' AND cur_user=current_user")
-        self.controller.log_info(str("TEST 22"))
         row = self.controller.get_row(sql, log_sql=True)
         self.controller.log_info(str("TEST 23"))
         self.controller.log_info(str(row))

@@ -33,6 +33,7 @@ class ManageElement(ParentManage):
          
     def manage_element(self, new_element_id=True, feature=None, geom_type=None):
         """ Button 33: Add element """
+        self.controller.restore_info()
         self.new_element_id = new_element_id
         # Create the dialog and signals
         self.dlg_add_element = AddElement()
@@ -376,8 +377,8 @@ class ManageElement(ParentManage):
 
 
     def edit_element(self):
-        """ Button 67: Edit element """          
-        
+        """ Button 67: Edit element """
+        self.controller.restore_info()
         # Create the dialog
         self.dlg_man = ElementManagement()
         self.load_settings(self.dlg_man)

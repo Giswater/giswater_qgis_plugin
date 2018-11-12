@@ -150,7 +150,7 @@ class MincutConfig(ParentAction):
 
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
-
+        self.controller.restore_info()
         self.action = "mg_mincut_management"
 
         # Create the dialog and signals

@@ -102,7 +102,7 @@ class MoveNodeMapTool(ParentMapTool):
 
     def activate(self):
         """ Called when set as currently active map tool """
-
+        self.controller.restore_info()
         # Check button
         self.action().setChecked(True)
 

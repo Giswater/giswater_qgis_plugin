@@ -204,7 +204,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mg_mincut(self):
         """ Button 26: New Mincut """
-
+        self.controller.restore_info()
         self.init_mincut_form()
         self.action = "mg_mincut"
 
@@ -1639,7 +1639,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
-
+        self.controller.restore_info()
         self.action = "mg_mincut_management"
         self.mincut_config.mg_mincut_management()
 

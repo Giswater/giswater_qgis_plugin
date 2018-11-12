@@ -42,7 +42,7 @@ class ApiConfig(ApiParent):
 
     def api_config(self):
         """ Button 36: Info show info, open giswater and visit web page """
-
+        self.controller.restore_info()
         self.list_update = []
 
         sql = ("SELECT " + self.schema_name + ".gw_fct_getinfoform_config(3)")

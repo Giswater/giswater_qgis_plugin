@@ -29,7 +29,7 @@ class Edit(ParentAction):
 
     def edit_add_feature(self, layername):
         """ Button 01, 02: Add 'node' or 'arc' """
-                
+        self.controller.restore_info()
         # Set active layer and triggers action Add Feature
         layer = self.controller.get_layer_by_layername(layername)
         if layer:
@@ -42,26 +42,31 @@ class Edit(ParentAction):
 
 
     def edit_add_element(self):
-        """ Button 33: Add element """       
+        """ Button 33: Add element """
+        self.controller.restore_info()
         self.manage_element.manage_element()
 
 
     def edit_add_file(self):
-        """ Button 34: Add document """   
+        """ Button 34: Add document """
+        self.controller.restore_info()
         self.manage_document.manage_document()
         
     
     def edit_document(self):
-        """ Button 66: Edit document """          
+        """ Button 66: Edit document """
+        self.controller.restore_info()
         self.manage_document.edit_document()        
         
             
     def edit_element(self):
-        """ Button 67: Edit element """          
+        """ Button 67: Edit element """
+        self.controller.restore_info()
         self.manage_element.edit_element()
 
 
     def edit_end_feature(self):
         """ Button 68: Edit end feature """
+        self.controller.restore_info()
         self.manage_workcat_end.manage_workcat_end()
 

@@ -54,7 +54,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def activate(self):
-
+        self.controller.restore_info()
         # Remove all selections on canvas
         self.remove_selection()
 

@@ -40,6 +40,7 @@ class ApiCatalog(ApiParent):
         self.project_type = project_type
 
     def api_catalog(self, previous_dialog, widget_name, geom_type):
+        self.controller.restore_info()
         sql = ("SELECT " + self.schema_name + ".gw_api_get_catalog('upsert_catalog_"+geom_type+"','','','',9)")
         row = self.controller.get_row(sql, log_sql=True)
         groupBox_1 = QGroupBox("Filter")

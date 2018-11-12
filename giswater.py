@@ -131,8 +131,7 @@ class Giswater(QObject):
             return 
         
         try:
-            action = self.actions[index_action]                
-
+            action = self.actions[index_action]
             # Basic toolbar actions
             if int(index_action) in (32, 37, 41, 48, 86):
                 callback_function = getattr(self.basic, function_name)  
@@ -269,8 +268,8 @@ class Giswater(QObject):
         """
         
         map_tool = None
-        action = self.actions[index_action]          
-        
+        action = self.actions[index_action]
+
         # Check if the @action has an associated map_tool         
         if int(index_action) == 16:
             map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action)

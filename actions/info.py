@@ -27,7 +27,7 @@ class Info(ParentAction):
 
     def info_show_info(self):
         """ Button 36: Info show info, open giswater and visit web page """
-        
+        self.controller.restore_info()
         # Create form
         self.dlg_info = InfoShowInfo()
         self.load_settings(self.dlg_info)
