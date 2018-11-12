@@ -56,7 +56,7 @@ INSERT INTO dsector_type VALUES (3, dinletsector, 'Dynamic mapzone defined as ar
 -- AUDIT CONTROL 
 ---------------------------------------------
 
-ALTER TABLE ws_sample.audit_log_project ALTER COLUMN user_name SET DEFAULT "31104"();
+ALTER TABLE SCHEMA_NAME.audit_log_project ALTER COLUMN user_name SET DEFAULT "31104"();
 
 -- ENABLED by using the AUTOMATIC update project data schema  (LOG)
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter sys_custom_views');
@@ -91,4 +91,4 @@ INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) V
 -- NOT ALLOWED by using the AUTOMATIC update project data schema (LOG)
 --INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'v_edit_node', FALSE, 'Bug fix');
 
-ALTER TABLE ws_sample.audit_log_project ALTER COLUMN user_name SET DEFAULT "current_user"();
+ALTER TABLE SCHEMA_NAME.audit_log_project ALTER COLUMN user_name SET DEFAULT "current_user"();

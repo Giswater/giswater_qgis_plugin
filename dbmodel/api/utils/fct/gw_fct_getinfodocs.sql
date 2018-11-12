@@ -9,9 +9,9 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfodocs"(element_type varch
 DECLARE
 
 /*EXAMPLE QUERYS
-SELECT ws_sample.gw_fct_getinfodocs('node', '1007', 3)
-SELECT ws_sample.gw_fct_getinfodocs('arc', '2001', 3)
-SELECT ws_sample.gw_fct_getinfodocs('connec', '3004', 3)
+SELECT SCHEMA_NAME.gw_fct_getinfodocs('node', '1007', 3)
+SELECT SCHEMA_NAME.gw_fct_getinfodocs('arc', '2001', 3)
+SELECT SCHEMA_NAME.gw_fct_getinfodocs('connec', '3004', 3)
 */
 
 --    Variables

@@ -179,12 +179,12 @@ BEGIN
 			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric);
 
 		ELSIF rpt_rec.csv1='WARNING' THEN
-			INSERT INTO ud_sample.rpt_warning_summary(result_id,warning_number, text)
+			INSERT INTO SCHEMA_NAME.rpt_warning_summary(result_id,warning_number, text)
 			VALUES (p_result_id,concat(rpt_rec.csv1,' ',rpt_rec.csv2), concat(rpt_rec.csv3,' ',rpt_rec.csv4,'',rpt_rec.csv5,' ' ,rpt_rec.csv6,' ',rpt_rec.csv7,' ',
 			rpt_rec.csv8,' ',rpt_rec.csv9,' ',rpt_rec.csv10,' ',rpt_rec.csv11,' ',rpt_rec.csv12,' ',rpt_rec.csv13,' ',rpt_rec.csv14,' ',rpt_rec.csv15));
    				
 		ELSIF type_aux='rpt_instability_index' THEN
-			INSERT INTO ud_sample.rpt_instability_index(result_id, text)
+			INSERT INTO SCHEMA_NAME.rpt_instability_index(result_id, text)
    			VALUES (p_result_id,  concat(rpt_rec.csv1,' ',rpt_rec.csv2,'',rpt_rec.csv3));
    		
 		ELSIF rpt_rec.csv1 IN (SELECT poll_id FROM inp_pollutant) AND type_aux='rpt_outfallload_sum' THEN
@@ -200,5 +200,5 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
-ALTER FUNCTION ws_inp.gw_fct_utils_csv2pg(integer, text)
+ALTER FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg(integer, text)
   OWNER TO postgres;

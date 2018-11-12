@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2440
 
 
-CREATE OR REPLACE FUNCTION ws_inp.gw_fct_utils_csv2pg(csv2pgcat_id_aux integer, label_aux text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg(csv2pgcat_id_aux integer, label_aux text)
 RETURNS integer AS
 $BODY$
 
@@ -18,7 +18,7 @@ DECLARE
 BEGIN
 
 --  Search path
-    SET search_path = "ws_inp", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
