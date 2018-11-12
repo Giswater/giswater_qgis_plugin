@@ -6,6 +6,20 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QAction
+
+try:
+    from PyQt4.QtCore import Qt
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtGui import QApplication
+else:
+    from qgis.PyQt.QtCore import Qt
+    from qgis.PyQt.QtWidgets import QApplication
+
 import os
 from functools import partial
 
@@ -14,7 +28,6 @@ from giswater.ui_manager import Multirow_selector
 from giswater.actions.api_cf import ApiCF
 from giswater.actions.api_search import ApiSearch
 from giswater.actions.parent import ParentAction
-
 
 
 
@@ -33,7 +46,6 @@ class Basic(ParentAction):
         self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')
 
 
-
     def set_giswater(self, giswater):
         self.giswater = giswater
 
@@ -44,7 +56,8 @@ class Basic(ParentAction):
 
     def basic_exploitation_selector(self):
         """ Button 41: Explotation selector """
-                
+
+        self.controller.restore_info()
         self.dlg_expoitation = Multirow_selector()
         self.load_settings(self.dlg_expoitation)
 
@@ -67,7 +80,7 @@ class Basic(ParentAction):
 
     def basic_state_selector(self):
         """ Button 48: State selector """
-            
+        self.controller.restore_info()
         # Create the dialog and signals
         self.dlg_state = Multirow_selector()
         self.load_settings(self.dlg_state)
@@ -89,6 +102,7 @@ class Basic(ParentAction):
 
     def basic_hydrometer_state_selector(self):
         """ Button 51: Hydrometer selector """
+        self.controller.restore_info()
         # Create the dialog and signals
         self.dlg_hydro_state = Multirow_selector()
         self.load_settings(self.dlg_hydro_state)
@@ -109,14 +123,18 @@ class Basic(ParentAction):
 
     def basic_api_search(self):
         """ Button 32: SearchPlus """
+        self.controller.restore_info()
         self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_search.api_search()
 
 
     def basic_api_info(self):
-        """ Button 32: SearchPlus """
-        self.api_info = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.api_info.api_info()
+        """ Button 37: ApiCf """
+        QApplication.setOverrideCursor(Qt.WhatsThisCursor)
+        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_cf.api_info()
+        self.controller.api_cf = self.api_cf
+
 
     def close_dialog(self, dlg):
         ParentAction.close_dialog(self, dlg)
@@ -124,3 +142,4 @@ class Basic(ParentAction):
             self.search_plus.refresh_data()
         except:
             pass
+

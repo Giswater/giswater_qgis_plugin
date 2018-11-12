@@ -14,20 +14,20 @@ except:
 if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import Qt, QSettings
     from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
-    from PyQt4.QtGui import QStringListModel, QCompleter
+    from PyQt4.QtGui import QStringListModel, QCompleter, QAction
     from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
     from qgis.gui import QgsMapCanvasSnapper
     import ConfigParser as configparser
 else:
     from qgis.PyQt.QtCore import Qt, QSettings, QStringListModel
-    from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
+    from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap, QAction
     from qgis.PyQt.QtWidgets import QAbstractItemView, QApplication, QCompleter, QFileDialog, QTableView
     from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel 
     from qgis.gui import QgsMapCanvas
     import configparser 
 
 #QStringListModel
-from qgis.core import QgsExpression, QgsFeatureRequest
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils
 
 import os
 import sys
@@ -53,15 +53,15 @@ class ParentAction(object):
         self.schema_name = self.controller.schema_name
         self.project_type = None
         self.file_gsw = None
-        self.gsw_settings = None        
-          
+        self.gsw_settings = None
+
         # Get files to execute giswater jar (only in Windows)
         if 'nt' in sys.builtin_module_names: 
             self.plugin_version = self.get_plugin_version()
             self.java_exe = self.get_java_exe()              
             (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
     
-    
+
     def set_controller(self, controller):
         """ Set controller class """
         
@@ -817,5 +817,4 @@ class ParentAction(object):
             pass
         
         return snapper
-        
-        
+

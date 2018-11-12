@@ -13,7 +13,7 @@ except:
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import Qt, QDate
-    from PyQt4.QtGui import QApplication, QIntValidator, QDoubleValidator
+    from PyQt4.QtGui import QIntValidator, QDoubleValidator
     from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
     from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget, \
         QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QAbstractItemView
@@ -22,7 +22,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
     from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator
-    from qgis.PyQt.QtWidgets import QApplication, QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, \
+    from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, \
         QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QListWidgetItem, QStandardItemModel, \
         QStandardItem, QTabWidget, QAbstractItemView
     from qgis.PyQt.QtSql import QSqlTableModel
@@ -66,24 +66,25 @@ class ApiCF(ApiParent):
         """ Button 37: Own Giswater info """
 
         # Create the appropriate map tool and connect the gotPoint() signal.
-        QApplication.setOverrideCursor(Qt.WhatsThisCursor)
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.emit_point.canvasClicked.connect(self.get_point)
+        self.emit_point.canvasClicked.connect(partial(self.init_info))
+
+
+    def init_info(self, point, button_clicked):
+        self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.info_cf.get_point(point, button_clicked)
 
 
     def get_point(self, point, button_clicked):
-        
         if button_clicked == Qt.LeftButton:
             complet_result = self.open_form(point)
-            self.restore(restore_cursor=True)
             if not complet_result:
                 print("FAIL get_point")
                 return
-
         elif button_clicked == Qt.RightButton:
-            self.restore()
+            self.controller.restore_info()
 
 
     def open_form(self, point=None, table_name=None, feature_type=None, feature_id=None):
@@ -2138,14 +2139,7 @@ class ApiCF(ApiParent):
                 utils_giswater.set_combo_itemData(widget, values[parameter], 0)
 
 
-    def restore(self, restore_cursor=True):
-        if restore_cursor:
-            QApplication.restoreOverrideCursor()
-        # TODO buscar la QAction concreta y deschequearla
-        actions = self.iface.mainWindow().findChildren(QAction)
-        for a in actions:
-            a.setChecked(False)
-        self.emit_point.canvasClicked.disconnect()
+
 
 
     def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):

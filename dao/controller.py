@@ -7,8 +7,11 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 try:
+    from PyQt4.QtGui import QAction, QApplication
     from qgis.core import Qgis
 except:
+    from qgis.PyQt.QtGui import QAction
+    from qgis.PyQt.QtWidgets import QApplication
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
@@ -49,6 +52,7 @@ class DaoController():
         self.logged = False 
         self.postgresql_version = None
         self.logger = None
+        self.api_cf = None
         if create_logger:
             self.set_logger(logger_name)
                 
@@ -1127,6 +1131,19 @@ class DaoController():
         else:
             list_values = iter(dictionary.values())
             
-        return list_values   
-    
-    
+        return list_values
+
+
+    def restore_info(self):
+        """  Disconnect canvasClicked from Api_CF  and restore cursor"""
+        action = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
+        if action.isChecked():
+            action.setChecked(False)
+            QApplication.restoreOverrideCursor()
+            if self.api_cf.emit_point is not None:
+                ep = self.api_cf.emit_point
+                ep.canvasClicked.disconnect()
+                self.api_cf = None
+
+        else:
+            print("NOT FOUND")

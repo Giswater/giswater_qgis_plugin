@@ -53,10 +53,6 @@ class ApiSearch(ApiParent):
         self.json_search = {}
         self.lbl_visible = False
 
-
-
-
-
     def api_search(self):
         
         # Dialog
@@ -228,7 +224,6 @@ class ApiSearch(ApiParent):
             id = utils_giswater.get_item_data(self.dlg_search, combo, 0)
             name = utils_giswater.get_item_data(self.dlg_search, combo, 1)
             json_updatesearch[combo.property('column_id')] = {}
-            print(combo.property('column_id'))
             _json = {}
             _json['id'] = id
             _json['name'] = name
