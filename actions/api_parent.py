@@ -685,7 +685,7 @@ class ApiParent(ParentAction):
         return max_x, max_y, min_x, min_y
 
 
-    def zoom_to_rectangle(self, x1, y1, x2, y2, magin=0):
+    def zoom_to_rectangle(self, x1, y1, x2, y2, magin=5):
         # rect = QgsRectangle(float(x1)+10, float(y1)+10, float(x2)-10, float(y2)-10)
         rect = QgsRectangle(float(x1)+magin, float(y1)+magin, float(x2)-magin, float(y2)-magin)
         self.canvas.setExtent(rect)
@@ -706,7 +706,8 @@ class ApiParent(ParentAction):
             points = self.get_points(list_coord)
             self.draw_polygon(points)
         if zoom:
-            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            margin = float(complet_result[0]['feature']['zoomCanvasMargin']['mts'])
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
     def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
 
