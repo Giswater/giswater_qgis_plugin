@@ -7,10 +7,15 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+-- 2018/10/27
+UPDATE om_visit_parameter SET ismultifeature=TRUE WHERE form_type='event_standard';
+
+
 -- 2018/10/28
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('sys_custom_views', 'FALSE', 'Boolean', 'System', 'Utils');
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('sys_currency', '{"id":"EUR", "descript":"EURO", "symbol":€"}', 'Boolean', 'System', 'Utils');
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('sys_currency', '{"id":"EUR", "descript":"EURO", "symbol":€"}', 'Json', 'System', 'Utils');
 
 -- 2018/11/03
 INSERT INTO sys_fprocess_cat VALUES (33, 'Update project data schema', 'System', 'Project data schema', 'utils');
@@ -52,6 +57,11 @@ INSERT INTO dsector_type VALUES (1, dminsector, 'Dynamic mapzone defined as a mi
 INSERT INTO dsector_type VALUES (2, pipehazard, 'Dyapzone defined as district meter area');
 INSERT INTO dsector_type VALUES (3, dinletsector, 'Dynamic mapzone defined as area supplied from the same inlet');
 
+--2018/11/12
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_valvestat_using_valveunaccess', 'FALSE', 'Boolean', 'System', 'ws');
+UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='man_valve'
+
+
 
 -- AUDIT CONTROL 
 ---------------------------------------------
@@ -86,6 +96,8 @@ INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) V
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New process (35) - mincut analysis dynamic inlet sector');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New table - dattrib');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New table - dattrib_type');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter om_mincut_valvestat_using_valveunaccess');
+
 
 
 -- NOT ALLOWED by using the AUTOMATIC update project data schema (LOG)
