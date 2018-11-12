@@ -14,7 +14,6 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp('result_1', 'D:\dades\test.inp')
 */
-
 DECLARE
 	rec_table record;
 	column_number integer;
@@ -99,6 +98,5 @@ RETURN;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_utils_pg2csv(integer, text)
-  OWNER TO postgres;
+
 
