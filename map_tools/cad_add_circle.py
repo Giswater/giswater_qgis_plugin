@@ -18,7 +18,7 @@ else:
     from qgis.PyQt.QtCore import QPoint, Qt
     from qgis.PyQt.QtGui import QDoubleValidator
     
-from qgis.core import QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel
+from qgis.core import QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsVectorLayer
 from qgis.gui import QgsVertexMarker
 
 import utils_giswater
@@ -204,7 +204,12 @@ class CadAddCircle(ParentMapTool):
         if row:
             self.snap_to_selected_layer = True
             self.vdefault_layer = self.controller.get_layer_by_layername(row[0])
+            if type(self.vdefault_layer) is not QgsVectorLayer:
+                self.controller.show_warning("Layer not found ", parameter=row[0])
+                return
+
             self.iface.setActiveLayer(self.vdefault_layer)
+
         else:
             # Get current layer
             self.vdefault_layer = self.iface.activeLayer()
