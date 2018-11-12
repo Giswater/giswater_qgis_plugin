@@ -6,11 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2524
   
-CREATE OR REPLACE FUNCTION ud_inp.gw_fct_utils_csv2pg_import_swmm_inp(p_path text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(p_path text)
   RETURNS integer AS
 
 /*EXAMPLE
-SELECT ud_inp.gw_fct_utils_csv2pg_import_swmm_inp('D:\dades\test.inp')
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp('D:\dades\test.inp')
 */
 
 $BODY$
@@ -33,7 +33,7 @@ $BODY$
 	
 BEGIN
 	-- Search path
-	SET search_path = "ud_inp", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- GET'S
     	-- Get schema name
@@ -108,7 +108,7 @@ BEGIN
 	--conduit 
 	INSERT INTO cat_arc( id, matcat_id, shape, geom1,geom2,geom3,geom4)
 	SELECT DISTINCT ON (concat(csv2,'_',csv3::numeric(4,2),'x',csv4::numeric(4,2))) concat(csv2,'_',csv3::numeric(4,2),'x',csv4::numeric(4,2)),
-	'EPAMAT',csv2,csv3::numeric,csv4::numeric,csv5::numeric,csv6::numeric FROM ud_inp.temp_csv2pg 
+	'EPAMAT',csv2,csv3::numeric,csv4::numeric,csv5::numeric,csv6::numeric FROM SCHEMA_NAME.temp_csv2pg 
 	WHERE source='[XSECTIONS]' AND csv1 not like ';%';
 	INSERT INTO cat_arc( id,matcat_id) VALUES ('EPACONDUIT-DEF', 'EPAMAT');
 	INSERT INTO cat_arc( id,matcat_id) VALUES ('EPAPUMP-DEF', 'EPAMAT');
@@ -225,7 +225,7 @@ BEGIN
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=10 order by id
 	LOOP
 		--identifing the humber of fields of the editable view
-		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='ud_inp'
+		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 		LOOP
 			IF v_rec_view.rid=1 THEN
 				v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);

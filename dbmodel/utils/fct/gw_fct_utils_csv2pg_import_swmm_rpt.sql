@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
-CREATE OR REPLACE FUNCTION ud_inp.gw_fct_utils_csv2pg_import_swmm_rpt(p_result_id text, p_path text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(p_result_id text, p_path text)
   RETURNS integer AS
 $BODY$
 
 /*EXAMPLE
-SELECT ud_inp.gw_fct_utils_csv2pg_import_swmm_rpt('result1', 'D:\dades\test.inp')
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt('result1', 'D:\dades\test.inp')
 */
 
 DECLARE
@@ -27,7 +27,7 @@ DECLARE
 BEGIN
 
 	--  Search path
-	SET search_path = "ud_inp", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN

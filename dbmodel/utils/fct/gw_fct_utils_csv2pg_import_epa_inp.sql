@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2532
 
-CREATE OR REPLACE FUNCTION ud_inp.gw_fct_utils_csv2pg_import_epa_inp()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_inp()
 RETURNS integer AS
 $BODY$
 
@@ -18,7 +18,7 @@ DECLARE
 BEGIN
 
 	-- Search path
-	SET search_path = "ud_inp", public;
+	SET search_path = "SCHEMA_NAME", public;
 
    	-- Get schema name
 	schemas_array := current_schemas(FALSE);

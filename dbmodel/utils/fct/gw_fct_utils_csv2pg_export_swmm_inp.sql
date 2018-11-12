@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
-CREATE OR REPLACE FUNCTION ud_inp.gw_fct_utils_csv2pg_export_swmm_inp(p_result_id character varying,  p_path text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp(p_result_id character varying,  p_path text)
 RETURNS void AS
 $BODY$
 
 /*EXAMPLE
-SELECT ud_inp.gw_fct_utils_csv2pg_export_swmm_inp('result_1', 'D:\dades\test_ud.inp')
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_export_swmm_inp('result_1', 'D:\dades\test_ud.inp')
 */
 
 DECLARE
@@ -27,10 +27,10 @@ DECLARE
 BEGIN
 
 	-- Search path
-	SET search_path = "ud_inp", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- execute pg2epa function
-	PERFORM ud_inp.gw_fct_pg2epa(p_result_id, false);
+	PERFORM SCHEMA_NAME.gw_fct_pg2epa(p_result_id, false);
 
 	--Delete previous
 	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_pg2csvcat_id;
@@ -54,12 +54,12 @@ BEGIN
 	
 		INSERT INTO temp_csv2pg (csv2pgcat_id,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12) 
 		SELECT v_pg2csvcat_id,rpad(concat(';',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
-		FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''ud_inp'' and table_name='''||rec_table.tablename||'''::text') 
+		FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
 		AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text);
 	
 		INSERT INTO temp_csv2pg (csv2pgcat_id) VALUES (10) RETURNING id INTO id_last;
 	
-		SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='ud_inp';
+		SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
 	
 		--add underlines    
 		FOR num_col_rec IN 1..num_column
