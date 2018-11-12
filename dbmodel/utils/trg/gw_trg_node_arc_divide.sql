@@ -14,6 +14,8 @@ DECLARE
 rec record;
 arc_id_aux varchar;
 edit_arc_division_dsbl_aux boolean;
+v_project_type varchar;
+v_isarcdivide boolean;
 
 BEGIN
 
