@@ -53,9 +53,9 @@ INSERT INTO audit_cat_table VALUES ('dattrib_type', 'om' 'Table to store the dif
 INSERT INTO audit_cat_table VALUES ('anl_mincut_inlet_x_arc', 'om' 'Table to arcs as a inlets', role_admin, 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
-INSERT INTO dsector_type VALUES (1, dminsector, 'Dynamic mapzone defined as a minimun portion of network limited by operative valves');
-INSERT INTO dsector_type VALUES (2, pipehazard, 'Dyapzone defined as district meter area');
-INSERT INTO dsector_type VALUES (3, dinletsector, 'Dynamic mapzone defined as area supplied from the same inlet');
+INSERT INTO dattrib_type VALUES (1, 'dminsector', 'Dynamic mapzone defined as a minimun portion of network limited by operative valves');
+INSERT INTO dattrib_type VALUES (2, 'pipehazard', 'Dyapzone defined as district meter area');
+INSERT INTO dattrib_type VALUES (3, 'dinletsector', 'Dynamic mapzone defined as area supplied from the same inlet');
 
 --2018/11/12
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_valvestat_using_valveunaccess', 'FALSE', 'Boolean', 'System', 'ws');
