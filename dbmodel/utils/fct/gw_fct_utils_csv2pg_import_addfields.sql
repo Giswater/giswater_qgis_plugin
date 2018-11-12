@@ -10,17 +10,17 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2_import_addfields(csv2pg
 RETURNS integer AS
 $BODY$
 DECLARE
-	units_rec record;
+	v_addfields record;
 
 BEGIN
 
 	--  Search path
     SET search_path = "SCHEMA_NAME", public;
 
-	FOR addfields_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=4
+	FOR v_addfields IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=4
 	LOOP
 		INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES
-		(addfields_rec.csv1, addfields_rec.csv2::integer, addfields_rec.csv3);			
+		(v_addfields.csv1, v_addfields.csv2::integer, v_addfields.csv3);			
 		END LOOP;
 			
 	-- Delete values on temporal table

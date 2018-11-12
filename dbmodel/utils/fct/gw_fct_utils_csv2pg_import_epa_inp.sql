@@ -12,6 +12,8 @@ $BODY$
 
 DECLARE
 	project_type_aux text;
+	schemas_array name[];
+
 	
 BEGIN
 
