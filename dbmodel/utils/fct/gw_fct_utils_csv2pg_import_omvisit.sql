@@ -117,7 +117,7 @@ BEGIN
 			v_csv=v_csv+1;
 				raise notice 'v_parameter_id: %, v_parameter_value: %', v_parameter_id, v_parameter_value;
 	
-			IF p_isparametervalue IS FALSE
+			IF p_isparametervalue IS FALSE THEN
 				-- set previous to is_last=false
 				EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_id)||' AND visit_id IN (SELECT visit_id FROM om_visit_x_'||v_visit.csv5||'
 					WHERE '||v_visit.csv5||'_id = '||v_visit.csv6||'::text)';
