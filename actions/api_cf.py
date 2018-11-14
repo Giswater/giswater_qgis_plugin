@@ -7,26 +7,27 @@ or (at your option) any later version.
 
 # -*- coding: latin-1 -*-
 try:
-    from qgis.core import Qgis
+    from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 except:
-    from qgis.core import QGis as Qgis
+    from qgis.core import QGis as Qgis, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtCore import Qt, QDate
-    from PyQt4.QtGui import QIntValidator, QDoubleValidator
+    from PyQt4.QtCore import Qt, QDate, QPoint
+    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu
     from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
     from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget, \
         QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QAbstractItemView
     from PyQt4.QtSql import QSqlTableModel
 
 else:
-    from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
-    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator
+    from qgis.PyQt.QtCore import Qt, QDate, QStringListModel,QPoint
+    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QMenu
     from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, \
         QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QListWidgetItem, QStandardItemModel, \
         QStandardItem, QTabWidget, QAbstractItemView
     from qgis.PyQt.QtSql import QSqlTableModel
 
+from qgis.core import QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
 import json
@@ -35,6 +36,7 @@ import subprocess
 import sys
 import urlparse
 import webbrowser
+import win32gui
 from collections import OrderedDict
 from functools import partial
 
@@ -49,7 +51,6 @@ from giswater.actions.api_catalog import ApiCatalog
 from giswater.ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments
 from giswater.ui_manager import Sections
 from giswater.ui_manager import ApiBasicInfo
-
 
 class ApiCF(ApiParent):
 
@@ -72,19 +73,35 @@ class ApiCF(ApiParent):
         self.emit_point.canvasClicked.connect(partial(self.init_info))
 
 
+
     def init_info(self, point, button_clicked):
         self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
         self.info_cf.get_point(point, button_clicked)
 
 
     def get_point(self, point, button_clicked):
+        """ Get coord from clicked point """
         if button_clicked == Qt.LeftButton:
             complet_result = self.open_form(point)
             if not complet_result:
                 print("FAIL get_point")
                 return
         elif button_clicked == Qt.RightButton:
-            self.controller.restore_info()
+            x, y = win32gui.GetCursorPos()
+            click_point = QPoint(x + 5, y + 5)
+            menu = QMenu()
+            for layer in self.canvas.layers():
+                action = QAction(layer.name(), None)
+                menu.addAction(action)
+                action.triggered.connect(partial(self.set_active_layer, action, point))
+            menu.exec_(click_point)
+
+
+    def set_active_layer(self, action, point):
+        """ Set active selected layer """
+        layer = self.controller.get_layer_by_layername(action.text())
+        self.iface.setActiveLayer(layer)
+        self.open_form(point)
 
 
     def open_form(self, point=None, table_name=None, feature_type=None, feature_id=None):
