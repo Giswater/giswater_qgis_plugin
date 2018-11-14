@@ -18,6 +18,7 @@ else:
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 
 from functools import partial
+import ctypes
 import operator
 import os
 import csv
@@ -1459,21 +1460,27 @@ class SearchPlus(QObject):
         for column in columns_to_delete:
             widget.hideColumn(column)
 
-
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
-
+        screens = ctypes.windll.user32
+        screen_x = screens.GetSystemMetrics(78)
+        screen_y = screens.GetSystemMetrics(79)
         if dialog is None:
-            dialog = self.dlg_search
+            dialog = self.dlg
 
         try:
-            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
-            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
             y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.property('height'))
+
             if int(x) < 0 or int(y) < 0:
                 dialog.resize(int(width), int(height))
             else:
+                if int(x) > screen_x:
+                    x = int(screen_x) - int(width)
+                if int(y) > screen_y:
+                    y = int(screen_y)
                 dialog.setGeometry(int(x), int(y), int(width), int(height))
         except:
             pass

@@ -30,6 +30,7 @@ from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
 
+import ctypes
 import os
 import sys  
 import urlparse
@@ -328,24 +329,31 @@ class ParentDialog(QDialog):
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")                           
         if close:
-            self.dialog.parent().setVisible(False)         
-        
+            self.dialog.parent().setVisible(False)
+
 
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
-         
+        screens = ctypes.windll.user32
+        screen_x = screens.GetSystemMetrics(78)
+        screen_y = screens.GetSystemMetrics(79)
         if dialog is None:
             dialog = self.dialog
         
         try:                          
-            key = self.layer.name()                                   
+            key = self.layer.name()
+            x = self.controller.plugin_settings_value(key + "_x")
+            y = self.controller.plugin_settings_value(key + "_y")
             width = self.controller.plugin_settings_value(key + "_width", dialog.parent().width())
             height = self.controller.plugin_settings_value(key + "_height", dialog.parent().height())
-            x = self.controller.plugin_settings_value(key + "_x")
-            y = self.controller.plugin_settings_value(key + "_y")                                             
-            if x == "" or y == "":
+
+            if x == "" or y == "" or int(x) < 0 or int(y) < 0:
                 dialog.resize(int(width), int(height))
             else:
+                if int(x) > screen_x:
+                    x = int(screen_x) - int(width)
+                if int(y) > screen_y:
+                    y = int(screen_y)
                 dialog.setGeometry(int(x), int(y), int(width), int(height))
         except:
             pass
