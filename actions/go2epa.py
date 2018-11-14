@@ -52,8 +52,8 @@ class Go2Epa(ParentAction):
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
         self.controller.restore_info()
-        if not self.get_last_gsw_file():
-            return
+        # if not self.get_last_gsw_file():
+        #     return
 
         # Create dialog
         self.dlg_go2epa = FileManager()
@@ -120,12 +120,22 @@ class Go2Epa(ParentAction):
         self.set_java_settings(show_warning)
 
         # Check if that file exists
-        if not os.path.exists(self.file_gsw):
-            message = "GSW file not found"
-            if show_warning:            
+        # if not os.path.exists(self.file_gsw):
+        #     message = "GSW file not found"
+        #     if show_warning:
+        #         self.controller.show_warning(message, parameter=str(self.file_gsw))
+        #     return False
+
+        message = "GSW file not found"
+        if self.file_gsw is not None:
+            if not os.path.exists(self.file_gsw):
+                if show_warning:
+                    self.controller.show_warning(message, parameter=str(self.file_gsw))
+                return False
+        else:
+            if show_warning:
                 self.controller.show_warning(message, parameter=str(self.file_gsw))
             return False
-        
         # Get INP, RPT file path and project name from GSW file
         self.set_gsw_settings()
         self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
