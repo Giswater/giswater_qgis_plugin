@@ -45,6 +45,13 @@ class Om(ParentAction):
         self.project_type = project_type
 
 
+    def om_insert_flow_trace(self):
+        """ Button 198: execute function: gw_fct_anl_inletflowtrace and refresh map canvas """
+        sql = ("SELECT " + self.schema_name + ".gw_fct_anl_inletflowtrace()")
+        row = self.controller.get_row(sql, log_sql=True)
+        self.refresh_map_canvas()
+
+
     def om_add_visit(self):
         """ Button 64: Add visit """
         self.controller.restore_info()

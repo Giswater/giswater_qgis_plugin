@@ -141,7 +141,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.mincut, function_name)
                 action.triggered.connect(callback_function)            
             # OM toolbar actions
-            elif int(index_action) in (64, 65, 81, 82, 84):
+            elif int(index_action) in (198, 64, 65, 81, 82, 84):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
@@ -252,7 +252,7 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        if int(index_action) in (19, 23, 25, 26, 27, 29, 32, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
+        if int(index_action) in (19, 23, 25, 26, 27, 29, 32, 33, 34, 36, 38, 41, 198, 45, 46, 47, 48, 49,
                                  50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
@@ -310,7 +310,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)
 
         toolbar_id = "om_ws"
-        list_actions = ['26', '27', '64', '65', '84']
+        list_actions = ['198', '26', '27', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions) 
             
         toolbar_id = "om_ud"
