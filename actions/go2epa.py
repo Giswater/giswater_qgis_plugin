@@ -15,6 +15,7 @@ import csv
 from functools import partial
 
 import utils_giswater
+from actions.update_sql import UpdateSQL
 from giswater.ui_manager import FileManager
 from giswater.ui_manager import Multirow_selector
 from giswater.ui_manager import WSoptions
@@ -792,4 +793,7 @@ class Go2Epa(ParentAction):
         else:
             self.fill_table(table, tablename)
             
-            
+
+    def update_sql(self):
+        usql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
+        usql.init_sql()

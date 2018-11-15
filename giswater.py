@@ -22,6 +22,7 @@ from actions.mincut import MincutParent
 from actions.om import Om
 from actions.utils import Utils
 from actions.info import Info
+from actions.update_sql import UpdateSQL
 from dao.controller import DaoController
 from map_tools.cad_add_circle import CadAddCircle
 from map_tools.cad_add_point import CadAddPoint
@@ -36,6 +37,7 @@ from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
+
 from ui_manager import AuditCheckProjectResult
 
 
@@ -128,7 +130,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 25, 29):
+            elif int(index_action) in (23, 25, 29, 500):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
@@ -230,7 +232,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
+                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99, 500):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -304,7 +306,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)   
         
         toolbar_id = "epa"
-        list_actions = ['23', '25', '29']               
+        list_actions = ['23', '25', '29', '500']
         self.manage_toolbar(toolbar_id, list_actions)    
         
         toolbar_id = "master"
@@ -337,7 +339,7 @@ class Giswater(QObject):
             self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)  
         self.utils.set_controller(self.controller)                   
-        self.info.set_controller(self.controller)                   
+        self.info.set_controller(self.controller)
         self.basic.set_project_type(self.wsoftware)
         self.go2epa.set_project_type(self.wsoftware)
         self.edit.set_project_type(self.wsoftware)
@@ -345,7 +347,7 @@ class Giswater(QObject):
         self.om.set_project_type(self.wsoftware)
         self.utils.set_project_type(self.wsoftware)
         self.info.set_project_type(self.wsoftware)
-            
+
         # Enable toobar 'basic' and 'info'
         self.enable_toolbar("basic")           
         self.enable_toolbar("info")           
@@ -546,7 +548,8 @@ class Giswater(QObject):
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)    
-        self.info = Info(self.iface, self.settings, self.controller, self.plugin_dir)    
+        self.info = Info(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.updatesql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers
         if not self.manage_layers():

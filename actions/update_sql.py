@@ -1,7 +1,7 @@
 """
 This file is part of Giswater 2.0
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
-General Public License as published by the Free Software Foundation, either version 3 of the License, 
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
 
@@ -22,16 +22,15 @@ from dao.controller import DaoController
 from ui_manager import ReadsqlCreateProject
 
 
-class Info(ParentAction):
+class UpdateSQL(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.project_type = controller.get_project_type()
 
-    def set_project_type(self, project_type):
-        self.project_type = project_type
 
-    def info_show_info(self):
+    def init_sql(self):
         """ Button 100: Execute SQL. Info show info """
         print("info")
         # Create the dialog and signals
@@ -40,7 +39,6 @@ class Info(ParentAction):
         self.dlg_info_show_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info_show_info))
 
         # Get widgets from toolbox
-
 
         # Checkbox SCHEMA & API
         self.chk_schema_ddl_dml = self.dlg_info_show_info.findChild(QCheckBox, 'chk_schema_ddl_dml')
@@ -129,6 +127,7 @@ class Info(ParentAction):
             self.chk_schema_ddl_dml.setEnabled(False)
             self.chk_api_ddl_dml.setEnabled(False)
 
+        self.controller.log_info(str(self.schema_name))
 
         # Open dialog
         self.dlg_info_show_info.show()
@@ -210,10 +209,13 @@ class Info(ParentAction):
             if status is False:
                 return False
         if self.process_folder(self.folderLocale, utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)) is False:
-            if self.process_folder(self.folderLocale, 'EN') is not False:
+            if self.process_folder(self.folderLocale, 'EN') is False:
                 return False
             else:
-                return False
+                status = self.executeFiles(os.listdir(
+                    self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale))
+                if status is False:
+                    return False
         else:
             status = self.executeFiles(os.listdir(self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale))
             if status is False:
@@ -262,10 +264,16 @@ class Info(ParentAction):
             status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
             if status is False:
                 return False
-        if self.process_folder(self.folderLocale, '') is False:
-            return False
+        if self.process_folder(self.folderLocale, utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)) is False:
+            if self.process_folder(self.folderLocale, 'EN') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(
+                    self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale))
+                if status is False:
+                    return False
         else:
-            status = self.executeFiles(os.listdir(self.folderLocale + ''), self.folderLocale + '')
+            status = self.executeFiles(os.listdir(self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale))
             if status is False:
                 return False
 
@@ -300,8 +308,17 @@ class Info(ParentAction):
                                 return False
                         if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
                                 utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale) + '/'), '') is False:
-                            print(False)
-                            return False
+                            if self.process_folder(self.folderLocale, 'EN') is False:
+                                return False
+                            else:
+                                print("HOLA EDGAR")
+                                status = self.executeFiles(os.listdir(
+                                    self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,
+                                                                                     self.cmb_locale)),
+                                    self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,
+                                                                                     self.cmb_locale))
+                                if status is False:
+                                    return False
                         else:
                             status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'), self.folderUpdates + folder + '/' + sub_folder + '/utils/')
                             if status is False:
@@ -631,12 +648,11 @@ class Info(ParentAction):
     def check_relaod_views(self):
 
         # sys_custom_views
-        sql = ("SELECT value FROM" + self.schema_name + ".config_param_system WHERE parameter = 'sys_custom_views'")
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system WHERE parameter = 'sys_custom_views'")
         row = self.controller.get_row(sql)
-        if row is False:
-            return False
-
-        return True
+        if row:
+            return True
+        return False
 
     def check_version_schema(self):
 
@@ -666,14 +682,13 @@ class Info(ParentAction):
 
     def executeFiles(self, filelist, filedir):
         for file in filelist:
-            try:
-                f = open(filedir + '/' + file, 'r')
-                f_to_read = str(f.read().replace('SCHEMA_NAME','ws_sample').decode(str('utf-8-sig')))
+            f = open(filedir + '/' + file, 'r')
+            if f:
+                f_to_read = str(f.read().replace("SCHEMA_NAME", "ws_sample").decode(str('utf-8-sig')))
                 status = self.controller.execute_sql(str(f_to_read))
                 if status is False:
                     print(str(file))
                     return False
-
-            except OperationalError, msg:
-                print "Command skipped: ", msg
+            else:
+                return False
         return True
