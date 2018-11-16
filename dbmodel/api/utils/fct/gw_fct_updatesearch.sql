@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch"(search_data json) RETURNS pg_catalog.json AS $BODY$DECLARE
+CREATE OR REPLACE FUNCTION "ws"."gw_fct_updatesearch"(search_data json) RETURNS pg_catalog.json AS $BODY$DECLARE
 
 --    Variables
     response_json json;
@@ -115,7 +115,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch"(search_data json)
 BEGIN
 
 --   Set search path to local schema
-     SET search_path = "SCHEMA_NAME", public;
+     SET search_path = "ws", public;
 
 --   Set api version
      EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -332,7 +332,7 @@ ELSIF tab_arg = 'address' THEN
 		FROM '||quote_ident(v_hydro_layer)||'
 		JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_connec_field)||')
 		WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
-			AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+			AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||')
 			ILIKE '||quote_literal(text_arg)||'
 			LIMIT 10) a'
 			INTO response_json; 
