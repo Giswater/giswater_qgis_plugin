@@ -28,7 +28,7 @@ else:
     from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.core import QgsVectorLayer
-from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
+from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit, QgsMapToolIdentify
 
 import json
 import os
@@ -88,18 +88,66 @@ class ApiCF(ApiParent):
                 return
         elif button_clicked == Qt.RightButton:
             x, y = win32gui.GetCursorPos()
-            click_point = QPoint(x + 5, y + 5)
-            menu = QMenu()
-            for layer in self.canvas.layers():
-                action = QAction(layer.name(), None)
-                menu.addAction(action)
-                action.triggered.connect(partial(self.set_active_layer, action, point))
-            menu.exec_(click_point)
 
+            # ## action = self.iface.actionIdentify().trigger()
+            # ident = QgsMapToolIdentify(self.canvas)
+            # ident.activate()
+            # print(x)
+            # print(point.x())
+            # indentifiedFeatures = ident.identify(x, y, ident.TopDownAll)
+            # self.controller.log_info(str(indentifiedFeatures))
+            # self.controller.log_info(str(type(indentifiedFeatures)))
+            # # indentifiedFeatures = ident.identify(point.x(), point.y(), ident.TopDownAll)
+            # # self.controller.log_info(str(indentifiedFeatures))
+            # # self.controller.log_info(str(type(indentifiedFeatures)))
+            # for x in indentifiedFeatures:
+            #     self.controller.log_info(str(x.mLayer.name()))
+            # # if not indentifiedFeatures[0].mFeature.id() == self.featureId:
+            # #     self.featureId = indentifiedFeatures[0].mFeature.id()
+            # #     indentifiedFeatures[0].mLayer.select(self.featureId)
+
+
+
+            click_point = QPoint(x + 5, y + 5)
+            visible_layers = self.get_visible_layers(as_list=True)
+            scale_zoom = self.iface.mapCanvas().scale()
+            srid = self.controller.plugin_settings_value('srid')
+
+            extras = '"pointClickCoords":{"xcoord":' + str(point.x()) + ',"ycoord":' + str(point.y()) + '}, '
+            extras += '"visibleLayers":' + str(visible_layers) + ', '
+            extras += '"zoomScale":' + str(scale_zoom) + ', '
+            extras += '"srid":' + str(srid)
+
+            body = self.create_body(extras=extras)
+            # Get layers under mouse clicked
+            sql = ("SELECT " + self.schema_name + ".gw_api_getlayersfromcoordinates($${" + body + "}$$)::text")
+            row = self.controller.get_row(sql, log_sql=True)
+
+            # main_menu = QMenu()
+            # for layer in row[0]['fields']:
+            #     layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
+            #     action = QAction(layer_name.name(), None)
+            #     main_menu.addAction(action)
+            #     action.triggered.connect(partial(self.set_active_layer, action, point))
+            # # menu.exec_(click_point)
+            main_menu = QMenu()
+            for layer in row[0]['fields']:
+                layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
+                sub_menu = main_menu.addMenu(layer_name.name())
+                for x in range(0, 3):
+                    self.controller.log_info(str(x))
+                    action = QAction(str(x), None)
+                    action.triggered.connect(partial(self.set_active_layer, action, point))
+                    sub_menu.addAction(action)
+                #main_menu.addMenu(sub_menu)
+
+            main_menu.addSeparator()
+            main_menu.exec_(click_point)
 
     def set_active_layer(self, action, point):
         """ Set active selected layer """
         layer = self.controller.get_layer_by_layername(action.text())
+        #layer = self.controller.get_layer_by_tablename(action.text())
         self.iface.setActiveLayer(layer)
         self.open_form(point)
 

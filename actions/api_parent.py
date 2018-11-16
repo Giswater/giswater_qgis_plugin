@@ -66,16 +66,24 @@ class ApiParent(ParentAction):
         return editable_project
 
 
-    def get_visible_layers(self):
-        """ Return string as {...} with name of table in DB of all visible layer in TOC """
+    def get_visible_layers(self, as_list=False):
+        """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
         
         visible_layer = '{'
+        if as_list is True:
+            visible_layer = '['
         for layer in QgsMapLayerRegistry.instance().mapLayers().values():
             if self.controller.is_layer_visible(layer):
                 table_name = self.controller.get_layer_source_table_name(layer)
                 visible_layer += '"' + str(table_name) + '", '
-        visible_layer = visible_layer[:-2] + "}"
+        visible_layer = visible_layer[:-2]
+
+        if as_list is True:
+            visible_layer += ']'
+        else:
+            visible_layer += '}'
         return visible_layer
+
 
 
     def get_editable_layers(self):
@@ -846,15 +854,18 @@ class ApiParent(ParentAction):
         return widget
 
 
-    def create_body(self, form='', feature='', filter_fields=''):
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
         client = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
         form = '"form":{'+form+'}, '
-
         feature = '"feature":{' + feature + '}, '
         filter_fields = '"filterFields":{' + filter_fields + '}'
         page_info = '"pageInfo":{}'
-        data = '"data":{' + filter_fields + ', ' + page_info + '} '
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras is not None:
+            data += ', ' + extras
+        data += '} '
+
         body = "" + client + form + feature + data
         return body
 

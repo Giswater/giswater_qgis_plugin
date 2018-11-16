@@ -130,6 +130,15 @@ class Basic(ParentAction):
 
     def basic_api_info(self):
         """ Button 37: ApiCf """
+        if self.controller.api_cf is not None:
+            self.controller.restore_info()
+            # ep = self.api_cf.emit_point
+            # ep.canvasClicked.disconnect()
+            # self.controller.api_cf = None
+            # QApplication.restoreOverrideCursor()
+
+            return
+
         QApplication.setOverrideCursor(Qt.WhatsThisCursor)
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
         self.api_cf.api_info()
