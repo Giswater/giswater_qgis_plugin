@@ -60,8 +60,8 @@
    <widget class="QPushButton" name="btn_times">
     <property name="geometry">
      <rect>
-      <x>444</x>
-      <y>39</y>
+      <x>409</x>
+      <y>40</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -73,8 +73,8 @@
    <widget class="QPushButton" name="btn_hs_ds">
     <property name="geometry">
      <rect>
-      <x>156</x>
-      <y>39</y>
+      <x>49</x>
+      <y>40</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -83,24 +83,11 @@
      <string>Scenario selector</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_sector_selection">
-    <property name="geometry">
-     <rect>
-      <x>13</x>
-      <y>39</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Sector Selection</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="btn_options">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>39</y>
+      <x>229</x>
+      <y>40</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -333,7 +320,6 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>btn_sector_selection</tabstop>
   <tabstop>btn_hs_ds</tabstop>
   <tabstop>btn_options</tabstop>
   <tabstop>btn_times</tabstop>

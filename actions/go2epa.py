@@ -51,15 +51,16 @@ class Go2Epa(ParentAction):
 
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
-        self.controller.restore_info()
-        # if not self.get_last_gsw_file():
-        #     return
+        # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
+        #self.get_last_gsw_file()
+
 
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
         self.dlg_go2epa.setFixedSize(620, 300)        
-
+        # TODO habilitar todos estos widgets cuando Edgar acabe el giswater_java en python
+        """
         # Set widgets
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
@@ -70,7 +71,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.chk_export_subcatch.setVisible(False)
         self.dlg_go2epa.chk_exec.setVisible(False)
         self.dlg_go2epa.chk_import.setVisible(False)
-
+        """
         # Set signals
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
@@ -81,11 +82,6 @@ class Go2Epa(ParentAction):
             self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
             self.dlg_go2epa.btn_options.clicked.connect(self.ws_options)
             self.dlg_go2epa.btn_times.clicked.connect(self.ws_times)
-            tableleft = "sector"
-            tableright = "inp_selector_sector"
-            field_id_left = "sector_id"
-            field_id_right = "sector_id"
-            self.dlg_go2epa.btn_sector_selection.clicked.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
             tableleft = "cat_dscenario"
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
@@ -97,17 +93,21 @@ class Go2Epa(ParentAction):
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
             self.dlg_go2epa.btn_options.clicked.connect(self.ud_options)
             self.dlg_go2epa.btn_times.clicked.connect(self.ud_times)
-            tableleft = "sector"
-            tableright = "inp_selector_sector"
-            field_id_left = "sector_id"
-            field_id_right = "sector_id"
-            self.dlg_go2epa.btn_sector_selection.clicked.connect(
-                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+
 
         # Open dialog
         self.open_dialog(self.dlg_go2epa, dlg_name='file_manager', maximize_button=False)
 
-    
+    def go2epa_sector_selector(self):
+
+            tableleft = "sector"
+            tableright = "inp_selector_sector"
+            field_id_left = "sector_id"
+            field_id_right = "sector_id"
+            self.sector_selection(tableleft, tableright, field_id_left, field_id_right)
+
+
+
     def get_last_gsw_file(self, show_warning=True):
         """ Get last GSW file used by Giswater """
         
@@ -118,14 +118,7 @@ class Go2Epa(ParentAction):
 
         # Get last GSW file from giswater properties file
         self.set_java_settings(show_warning)
-
         # Check if that file exists
-        # if not os.path.exists(self.file_gsw):
-        #     message = "GSW file not found"
-        #     if show_warning:
-        #         self.controller.show_warning(message, parameter=str(self.file_gsw))
-        #     return False
-
         message = "GSW file not found"
         if self.file_gsw is not None:
             if not os.path.exists(self.file_gsw):
@@ -151,12 +144,14 @@ class Go2Epa(ParentAction):
         dlg_psector_sel = Multirow_selector()
         self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
-        dlg_psector_sel.setWindowTitle("Selector")
+        # dlg_psector_sel.setWindowTitle(" Dscenario selector")
         if tableleft == 'sector':
+            dlg_psector_sel.setWindowTitle(" Sector selector")
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Sector name', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected sectors', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected, self.controller.tr('Selected sectors', context_name='labels'))
         if tableleft == 'cat_dscenario':
+            dlg_psector_sel.setWindowTitle(" Dscenario selector")
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Dscenario name', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected, self.controller.tr('Unselected dscenarios', context_name='labels'))
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected, self.controller.tr('Selected dscenarios', context_name='labels'))
