@@ -670,6 +670,12 @@ class Go2Epa(ParentAction):
         utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, rows)
         utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id, rows)
 
+        sql = ("SELECT DISTINCT time, time FROM " + self.schema_name + ".rpt_arc ORDER BY time")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
+        utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
+
+
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_result"
         row = self.controller.get_row(sql)
@@ -687,22 +693,33 @@ class Go2Epa(ParentAction):
 
     def result_selector_accept(self):
         """ Update current values to the table """
+        # Delete previous values
+        sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result;\n"
+               "DELETE FROM " + self.schema_name + ".rpt_selector_compare;\n"
+               "DELETE FROM " + self.schema_name + ".rpt_selector_hourly;\n"
+               "DELETE FROM " + self.schema_name + ".rpt_selector_hourly_compare;\n")
 
         # Get new values from widgets of type QComboBox
         rpt_selector_result_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
         rpt_selector_compare_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
-
+        time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
+        time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
         # Set project user
         user = self.controller.get_project_user()
 
-        # Delete previous values
+
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result;\n"
-               "DELETE FROM " + self.schema_name + ".rpt_selector_compare;\n"
-               "INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
+
+        self.controller.execute_sql(sql)
+        #TODO SEPARAR SENTENCIAS PARA CONTROLAR NULOS
+        sql =("INSERT INTO " + self.schema_name + ".rpt_selector_result (result_id, cur_user)"
                " VALUES ('" + rpt_selector_result_id + "', '" + user + "');\n"
                "INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
-               " VALUES ('" + rpt_selector_compare_id + "', '" + user + "');")
+               " VALUES ('" + rpt_selector_compare_id + "', '" + user + "');\n"
+               "INSERT INTO " + self.schema_name + ".rpt_selector_hourly(time, cur_user)"
+               " VALUES ('" + time_to_show + "', '" + user + "');\n"
+               "INSERT INTO " + self.schema_name + ".rpt_selector_hourly_compare(time, cur_user)"
+               " VALUES ('" + time_to_compare + "', '" + user + "');\n")
         self.controller.execute_sql(sql)
 
         # Show message to user
