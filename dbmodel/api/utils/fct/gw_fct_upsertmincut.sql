@@ -224,12 +224,13 @@ BEGIN
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
         ', "infoMessage":"' || v_message ||'"'||
+        ', "visibleLayers":["v_anl_mincut_init_point", "v_anl_mincut_result_valve", "v_anl_mincut_result_node", "v_anl_mincut_result_arc", "v_anl_mincut_result_connec"]'||
         ', "mincut_id":' || mincut_id ||
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+ --   EXCEPTION WHEN OTHERS THEN 
+  --  RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
