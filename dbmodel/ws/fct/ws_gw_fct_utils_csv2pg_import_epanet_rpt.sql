@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2520
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_csv2pg_import_epanet_rpt(p_result_id text, p_path text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt(p_result_id text, p_path text)
   RETURNS integer AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_utils_csv2pg_import_epanet_rpt('result1', 'D:\dades\test.rpt')
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt('result1', 'D:\dades\test.rpt')
 */
 
 DECLARE
@@ -27,7 +27,7 @@ DECLARE
 BEGIN
 
 	--  Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
@@ -101,5 +101,5 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
-ALTER FUNCTION ws_sample.gw_fct_utils_csv2pg(integer, text)
+ALTER FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg(integer, text)
   OWNER TO postgres;
