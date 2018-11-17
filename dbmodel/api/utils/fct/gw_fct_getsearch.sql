@@ -417,7 +417,7 @@ BEGIN
         RETURN ('{"status":"Accepted"' ||
             ', "apiVersion":'|| api_version ||
             ', "enabled":true'||
-            ', "characterNumber":'||v_character_number||
+            ', "threshold":'||v_character_number||
             ', "formTabs":' || formTabs ||
             '}')::json;
     END IF;
