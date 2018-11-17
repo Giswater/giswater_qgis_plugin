@@ -24,7 +24,7 @@ INSERT INTO audit_cat_function VALUES (2510, 'gw_fct_utils_csv2pg_import_dbprice
 INSERT INTO audit_cat_function VALUES (2512, 'gw_fct_utils_csv2pg_import_omvisit', 'edit', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2514, 'gw_fct_utils_csv2pg_import_elements', 'edit', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2516, 'gw_fct_utils_csv2pg_import_addfields', 'edit', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2518, 'gw_fct_utils_csv2pg_export_epainp', 'epa', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2518, 'gw_fct_utils_csv2pg_export_epa_inp', 'epa', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2520, 'gw_fct_utils_csv2pg_import_epanet_rpt', 'epa', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2522, 'gw_fct_utils_csv2pg_import_epanet_inp', 'admin', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2524, 'gw_fct_utils_csv2pg_import_swmm_inp', 'admin', NULL, '', '', NULL, NULL, NULL);
@@ -32,6 +32,7 @@ INSERT INTO audit_cat_function VALUES (2526, 'gw_fct_utils_csv2pg_export_epanet_
 INSERT INTO audit_cat_function VALUES (2528, 'gw_fct_utils_csv2pg_export_swmm_inp', 'epa', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2530, 'gw_fct_utils_csv2pg_import_swmm_rpt', 'epa', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2532, 'gw_fct_utils_csv2pg_import_epa_inp', 'epa', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2536, 'gw_fct_utils_csv2pg_import_epa_rpt', 'epa', NULL, '', '', NULL, NULL, NULL);
 
 
 -- 2018/11/08
@@ -88,6 +89,7 @@ INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) V
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2530) - gw_fct_utils_csv2pg_import_swmm_rpt');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2532) - gw_fct_utils_csv2pg_import_epa_inp');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2534) - gw_fct_repair_link');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2536) - gw_fct_utils_csv2pg_import_epa_rpt');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New parameter utils_csv2pg_om_visit_parameters');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New parameter om_mincut_analysis_dminsector');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New parameter om_mincut_analysis_pipehazard');
