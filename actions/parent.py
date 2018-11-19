@@ -26,8 +26,7 @@ else:
     from qgis.gui import QgsMapCanvas
     import configparser 
 
-#QStringListModel
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils
+from qgis.core import QgsExpression, QgsFeatureRequest
 
 import ctypes
 import os

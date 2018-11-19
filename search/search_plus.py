@@ -653,8 +653,10 @@ class SearchPlus(QObject):
             self.dlg_search.tab_main.removeTab(2)
         else:
             # Get project variable 'expl_id'
-            expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl))
-            if expl_id:           
+            expl_id = None
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl))
+            if expl_id:
                 # Set SQL to get 'expl_name'
                 sql = ("SELECT " + self.params['expl_field_name'] + ""
                        " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""

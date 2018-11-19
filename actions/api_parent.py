@@ -67,11 +67,18 @@ class ApiParent(ParentAction):
 
 
     def get_editable_project(self):
-        """ Get variable 'editable_project' from qgis project variables"""
-        editable_project = QgsExpressionContextUtils.projectScope().variable('editable_project')
-        if editable_project is None:
-            return False
-        return editable_project
+        """ Get variable 'editable_project' from qgis project variables """
+        
+        # TODO: 3.x
+        editable_project = False
+        try:
+            editable_project = QgsExpressionContextUtils.projectScope().variable('editable_project')
+            if editable_project is None:
+                return False
+        except:
+            pass
+        finally:
+            return editable_project
 
 
     def get_visible_layers(self, as_list=False):
@@ -92,7 +99,6 @@ class ApiParent(ParentAction):
         else:
             visible_layer += '}'
         return visible_layer
-
 
 
     def get_editable_layers(self):
@@ -140,7 +146,6 @@ class ApiParent(ParentAction):
                " FROM " + self.schema_name + "." + table_object)
 
         rows = self.controller.get_rows(sql, log_sql=True)
-
         for i in range(0, len(rows)):
             aux = rows[i]
             rows[i] = str(aux[0])
@@ -163,6 +168,7 @@ class ApiParent(ParentAction):
         except AttributeError:
             pass
 
+            
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
 
@@ -174,7 +180,6 @@ class ApiParent(ParentAction):
             self.controller.log_warning(message, parameter=expr_filter)
             return (False, expr)
         return (True, expr)
-
 
 
     def select_features_by_expr(self, layer, expr):
@@ -195,7 +200,6 @@ class ApiParent(ParentAction):
     def set_action(self, action, visible=True, enabled=True):
         action.setVisible(visible)
         action.setEnabled(enabled)
-
 
 
     def start_editing(self):
@@ -264,6 +268,7 @@ class ApiParent(ParentAction):
                 message = "File not found"
                 self.controller.show_warning(message, parameter=pdf_path)
 
+                
     def api_action_copy_paste(self, dialog, geom_type):
         """ Copy some fields from snapped feature to current feature """
 
@@ -300,6 +305,7 @@ class ApiParent(ParentAction):
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
 
+        
     def api_action_copy_paste_mouse_move(self, point):
         """ Slot function when mouse is moved in the canvas.
             Add marker if any feature is snapped
@@ -325,6 +331,7 @@ class ApiParent(ParentAction):
             self.vertex_marker.show()
             break
 
+            
     def api_action_copy_paste_canvas_clicked(self, dialog, point, btn):
         """ Slot function when canvas is clicked """
 
@@ -332,7 +339,7 @@ class ApiParent(ParentAction):
             self.api_disable_copy_paste(dialog)
             return
 
-            # Get clicked point
+        # Get clicked point
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -427,9 +434,9 @@ class ApiParent(ParentAction):
                 elif utils_giswater.getWidgetType(dialog, widget) is QComboBox:
                     utils_giswater.set_combo_itemData(widget, snapped_feature_attr_aux[i], 1)
 
-
         self.api_disable_copy_paste(dialog)
 
+        
     def api_disable_copy_paste(self, dialog):
         """ Disable actionCopyPaste and set action 'Identify' """
 
@@ -446,6 +453,7 @@ class ApiParent(ParentAction):
         except:
             pass
 
+            
     def set_table_columns(self, dialog, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """
 
@@ -483,6 +491,7 @@ class ApiParent(ParentAction):
 
 
     def set_table_columns_for_query(self, dialog, widget, table_name):
+    
         widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
             return
@@ -525,6 +534,7 @@ class ApiParent(ParentAction):
 
     def add_lineedit(self, field):
         """ Add widgets QLineEdit type """
+        
         widget = QLineEdit()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('column_id', field['column_id'])
@@ -539,6 +549,7 @@ class ApiParent(ParentAction):
 
 
     def add_combobox(self, field):
+    
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('column_id', field['column_id'])
@@ -547,6 +558,7 @@ class ApiParent(ParentAction):
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
         return widget
 
+        
     def populate_combo(self, widget, field, order_by_id=False):
         # Generate list of items to add into combo
 
@@ -566,8 +578,10 @@ class ApiParent(ParentAction):
         for record in records_sorted:
             widget.addItem(record[1], record)
 
+            
     def add_comboline(self, dialog, field, completer):
         """ Add widgets QLineEdit type """
+        
         widget = QLineEdit()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('column_id', field['column_id'])
@@ -581,8 +595,8 @@ class ApiParent(ParentAction):
 
         widget.textChanged.connect(partial(self.populate_comboline, dialog, field, widget, completer))
 
-
         return widget
+        
 
     def populate_comboline(self, dialog, field, widget, completer):
 
@@ -605,8 +619,8 @@ class ApiParent(ParentAction):
         self.set_completer_object_api(completer, model, widget, list_items)
 
 
-
     def add_frame(self, field, x=None):
+    
         widget = QFrame()
         widget.setObjectName(field['widgetname'] + "_" + str(x))
         widget.setProperty('column_id', field['column_id'])
@@ -617,6 +631,7 @@ class ApiParent(ParentAction):
 
     def add_label(self, field):
         """ Add widgets QLineEdit type """
+        
         widget = QLabel()
         widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
         widget.setObjectName(field['widgetname'])
@@ -630,7 +645,9 @@ class ApiParent(ParentAction):
         """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
         widget.setEmpty()
 
+        
     def add_hyperlink(self, dialog, field):
+    
         widget = HyperLinkLabel()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('column_id', field['column_id'])
@@ -653,11 +670,13 @@ class ApiParent(ParentAction):
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
+        
     def add_horizontal_spacer(self, field=None):
         widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
         #widget.setObjectName(field['widgetname'])
         return widget
 
+        
     def add_verical_spacer(self, field=None):
         widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         #widget.setObjectName(field['widgetname'])
@@ -714,6 +733,7 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
+    
         if complet_result[0]['feature']['geometry']['st_astext'] is None:
             return
         list_coord = re.search('\((.*)\)', str(complet_result[0]['feature']['geometry']['st_astext']))
@@ -730,6 +750,7 @@ class ApiParent(ParentAction):
             margin = float(complet_result[0]['feature']['zoomCanvasMargin']['mts'])
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
+            
     def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
 
         if Qgis.QGIS_VERSION_INT >= 10900:
@@ -802,7 +823,9 @@ class ApiParent(ParentAction):
         # Attach model to table view
         widget.setModel(model)
 
+        
     def populate_basic_info(self, dialog, result, field_id):
+    
         fields = result[0]['editData']
         if 'fields' not in fields:
             return
@@ -831,24 +854,27 @@ class ApiParent(ParentAction):
                 completer = QCompleter()
                 widget = self.add_comboline(dialog, field, completer)
 
-
             grid_layout.addWidget(label, field['layout_order'], 0)
             grid_layout.addWidget(widget, field['layout_order'], 1)
 
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         grid_layout.addItem(verticalSpacer1)
+        
         return result
 
 
     def clear_gridlayout(self, layout):
         """  Remove all widgets of layout """
+        
         while layout.count() > 0:
             child = layout.takeAt(0).widget()
             if child:
                 child.setParent(None)
                 child.deleteLater()
+                
 
     def add_calendar(self, dialog, field):
+    
         widget = QgsDateTimeEdit()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('column_id', field['column_id'])
@@ -874,6 +900,7 @@ class ApiParent(ParentAction):
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
+        
         client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
         form = '"form":{'+form+'}, '
         feature = '"feature":{' + feature + '}, '
