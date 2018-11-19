@@ -6,19 +6,17 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QAction
-
 try:
-    from PyQt4.QtCore import Qt
     from qgis.core import Qgis
 except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtGui import QApplication
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import QApplication, QAction
 else:
     from qgis.PyQt.QtCore import Qt
-    from qgis.PyQt.QtWidgets import QApplication
+    from qgis.PyQt.QtWidgets import QApplication, QAction
 
 import os
 from functools import partial

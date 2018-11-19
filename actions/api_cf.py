@@ -20,15 +20,18 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget, \
         QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QAbstractItemView
     from PyQt4.QtSql import QSqlTableModel
+    import urlparse
+    import win32gui
 
 else:
     from qgis.PyQt import QtCore
     from qgis.PyQt.QtCore import Qt, QDate, QStringListModel,QPoint
-    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QMenu
+    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QStandardItem, QStandardItemModel
     from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, \
-        QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QListWidgetItem, QStandardItemModel, \
-        QStandardItem, QTabWidget, QAbstractItemView
+        QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QListWidgetItem, \
+        QTabWidget, QAbstractItemView, QMenu
     from qgis.PyQt.QtSql import QSqlTableModel
+    import urllib.parse as urlparse
 
 from qgis.core import QgsPoint, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
@@ -38,9 +41,7 @@ import os
 import re
 import subprocess
 import sys
-import urlparse
 import webbrowser
-import win32gui
 from collections import OrderedDict
 from functools import partial
 

@@ -20,8 +20,8 @@ if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
     import ConfigParser as configparser
 else:
     from qgis.PyQt.QtCore import Qt, QSettings, QStringListModel
-    from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap, QAction
-    from qgis.PyQt.QtWidgets import QAbstractItemView, QApplication, QCompleter, QFileDialog, QTableView
+    from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QApplication, QCompleter, QFileDialog, QTableView, QAction
     from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel 
     from qgis.gui import QgsMapCanvas
     import configparser 

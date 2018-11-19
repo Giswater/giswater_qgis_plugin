@@ -14,16 +14,17 @@ except:
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900: 
     from PyQt4.QtCore import Qt
     from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QLineEdit
+    import urlparse
+    import urllib2
 else:
     from qgis.PyQt.QtCore import Qt
-    from qgis.PyQt.QtWidgets import QLabel, QPixmap, QPushButton, QLineEdit  
+    from qgis.PyQt.QtGui import QPixmap
+    from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
+    import urllib.parse as urlparse
     
-import urllib2
-import urlparse
-
-import ExtendedQLabel
 from functools import partial
 
+import giswater.actions.ExtendedQLabel
 from giswater.ui_manager import Gallery
 from giswater.ui_manager import GalleryZoom
 from giswater.actions.parent_manage import ParentManage

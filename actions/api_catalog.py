@@ -6,29 +6,33 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4 import QtCore, QtGui
+    from PyQt4.QtGui import QTabWidget, QWidget, QVBoxLayout
+    from PyQt4.QtCore import QDate
+    from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QHBoxLayout, QFormLayout, \
+        QSpacerItem, QSizePolicy, QIntValidator, QDoubleValidator, QLineEdit, QGraphicsLinearLayout
+    from PyQt4.QtGui import QGridLayout, QCompleter
+    from PyQt4.QtGui import QLabel
+    from PyQt4.QtGui import QLineEdit
+    from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsDateTimeEdit
 
 import json
 import sys
-# import config
-from functools import partial
-
 import operator
-from PyQt4.QtCore import QDate
-from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QHBoxLayout, QFormLayout, \
-    QSpacerItem, QSizePolicy, QIntValidator, QDoubleValidator, QLineEdit, QGraphicsLinearLayout
-from PyQt4.QtGui import QGridLayout, QCompleter
-from PyQt4.QtGui import QLabel
-from PyQt4.QtGui import QLineEdit
-from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint,  QgsDateTimeEdit
-import utils_giswater
-from actions.api_parent import ApiParent
-from parent import ParentAction
-
-from ui_manager import ApiCatalogUi
-
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtGui import QTabWidget, QWidget, QVBoxLayout
+from functools import partial
 from datetime import datetime
+
+import utils_giswater
+from giswater.actions.api_parent import ApiParent
+from giswater.actions.parent import ParentAction
+from giswater.ui_manager import ApiCatalogUi
+
 
 class ApiCatalog(ApiParent):
 

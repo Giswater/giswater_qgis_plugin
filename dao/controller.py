@@ -7,23 +7,20 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 try:
-    from PyQt4.QtGui import QAction, QApplication
     from qgis.core import Qgis
 except:
-    from qgis.PyQt.QtGui import QAction
-    from qgis.PyQt.QtWidgets import QApplication
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.Qt import QToolBox
     from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
-    from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
+    from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QApplication, QAction
     from PyQt4.QtSql import QSqlDatabase
     from qgis.core import QgsDataSourceURI as QgsDataSourceUri
     from qgis.core import QgsMapLayerRegistry    
 else:   
     from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
-    from qgis.PyQt.QtWidgets import QToolBox, QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
+    from qgis.PyQt.QtWidgets import QToolBox, QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QApplication, QAction
     from qgis.PyQt.QtSql import QSqlDatabase
     from qgis.core import QgsDataSourceUri
     from qgis.core import QgsProject

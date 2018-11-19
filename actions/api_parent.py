@@ -16,17 +16,18 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
     from PyQt4.QtGui import QCompleter, QStringListModel, QToolButton, QPushButton, QFrame
     from PyQt4.QtSql import QSqlTableModel
-    from qgis.core import QgsMapLayerRegistry    
+    from qgis.gui import QgsMapCanvasSnapper    
 else:
-    from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate
-    from qgis.PyQt.QtWidgets import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
-    from qgis.PyQt.QtWidgets import QCompleter, QStringListModel, QToolButton, QPushButton, QFrame
+    from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel
+    from qgis.PyQt.QtGui import QColor
+    from qgis.PyQt.QtWidgets import QAction, QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
+    from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QPushButton, QFrame
     from qgis.PyQt.QtSql import QSqlTableModel
     from qgis.PyQt.QtWidgets import QAction
 
-from qgis.core import QgsMapLayerRegistry, QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils, QGis
+from qgis.core import QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
-from qgis.gui import QgsMapCanvasSnapper, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
+from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 
 import operator
 import os
@@ -72,7 +73,8 @@ class ApiParent(ParentAction):
         visible_layer = '{'
         if as_list is True:
             visible_layer = '['
-        for layer in QgsMapLayerRegistry.instance().mapLayers().values():
+        layers = self.controller.get_layers()
+        for layer in layers:
             if self.controller.is_layer_visible(layer):
                 table_name = self.controller.get_layer_source_table_name(layer)
                 visible_layer += '"' + str(table_name) + '", '
@@ -90,7 +92,8 @@ class ApiParent(ParentAction):
         """ Return string as {...}  with name of table in DB of all editable layer in TOC """
         
         editable_layer = '{'
-        for layer in QgsMapLayerRegistry.instance().mapLayers().values():
+        layers = self.controller.get_layers()
+        for layer in layers:
             if not layer.isReadOnly():
                 table_name = self.controller.get_layer_source_table_name(layer)
                 editable_layer += '"' + str(table_name) + '", '
@@ -257,6 +260,9 @@ class ApiParent(ParentAction):
     def api_action_copy_paste(self, dialog, geom_type):
         """ Copy some fields from snapped feature to current feature """
 
+        if Qgis.QGIS_VERSION_INT > 29900:
+            return
+        
         # Set map tool emit point and signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)

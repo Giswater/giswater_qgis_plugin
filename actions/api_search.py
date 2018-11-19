@@ -20,7 +20,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import QgsTextAnnotationItem
 else:
     from qgis.PyQt.QtCore import Qt, QStringListModel
-    from qgis.PyQt.QtWidgets import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QSizePolicy, QSpacerItem, QCompleter
+    from qgis.PyQt.QtWidgets import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QSizePolicy, QSpacerItem, QCompleter, QTableView
     from qgis.PyQt.QtSql import QSqlTableModel
     from qgis.core import QgsPointXY as QgsPoint, QgsMarkerSymbol as QgsMarkerSymbolV2
     from qgis.core import QgsTextAnnotation as QgsTextAnnotationItem
