@@ -154,5 +154,5 @@ class ApiMoveNode(ApiParent):
         self.controller.log_info(str("TEST 24"))
         node_id = '1040'
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.ApiCF.open_form(table_name=self.table_parent, node_type=self.node_type, node_id=node_id)
+        self.ApiCF.open_form(table_name=self.table_parent,  node_id=node_id)
         

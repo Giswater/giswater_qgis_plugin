@@ -150,7 +150,7 @@ class ApiSearch(ApiParent):
             #
             # self.iface.setActiveLayer(layer)
             self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-            complet_result = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_type=item['feature_type'], feature_id=item['sys_id'])
+            complet_result = self.ApiCF.open_form(table_name=item['sys_table_id'], feature_id=item['sys_id'])
             if not complet_result:
                 print("FAIL")
                 return
@@ -598,11 +598,11 @@ class ApiSearch(ApiParent):
 
         geom_type = qtable.model().record(row).value('feature_type').lower()
         table_name = "ve_" + geom_type
-        feature_type = qtable.model().record(row).value('feature_type').lower()
+
         feature_id = qtable.model().record(row).value('feature_id')
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = self.ApiCF.open_form(table_name=table_name,  feature_type=feature_type, feature_id=feature_id)
+        complet_result = self.ApiCF.open_form(table_name=table_name,  feature_id=feature_id)
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result[0]['geometry']['st_astext']))
 
