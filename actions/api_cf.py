@@ -6,10 +6,12 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
+import re
+
 try:
-    from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+    from qgis.core import Qgis
 except:
-    from qgis.core import QGis as Qgis, QgsCoordinateReferenceSystem, QgsCoordinateTransform
+    from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import Qt, QDate, QPoint
@@ -27,7 +29,7 @@ else:
         QStandardItem, QTabWidget, QAbstractItemView
     from qgis.PyQt.QtSql import QSqlTableModel
 
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsPoint, QgsCoordinateReferenceSystem, QgsCoordinateTransform
 from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit, QgsMapToolIdentify
 
 import json
@@ -39,6 +41,7 @@ import webbrowser
 import win32gui
 from collections import OrderedDict
 from functools import partial
+from osgeo import ogr
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
@@ -122,7 +125,10 @@ class ApiCF(ApiParent):
             # Get layers under mouse clicked
             sql = ("SELECT " + self.schema_name + ".gw_api_getlayersfromcoordinates($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True)
-
+            if not row:
+                self.controller.show_message("NOT ROW FOR: " + sql, 2)
+                return False
+            complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             # main_menu = QMenu()
             # for layer in row[0]['fields']:
             #     layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
@@ -131,25 +137,50 @@ class ApiCF(ApiParent):
             #     action.triggered.connect(partial(self.set_active_layer, action, point))
             # # menu.exec_(click_point)
             main_menu = QMenu()
-            for layer in row[0]['fields']:
+            for layer in complet_list[0]['body']['data']['layersNames']:
                 layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
                 sub_menu = main_menu.addMenu(layer_name.name())
-                for x in range(0, 3):
-                    self.controller.log_info(str(x))
-                    action = QAction(str(x), None)
-                    action.triggered.connect(partial(self.set_active_layer, action, point))
-                    sub_menu.addAction(action)
-                #main_menu.addMenu(sub_menu)
 
+                for feature in layer['ids']:
+                    self.controller.log_info(str(feature['id']))
+                    action = QAction(str(feature['id']), None)
+                    sub_menu.addAction(action)
+                    action.triggered.connect(partial(self.set_active_layer, action))
+                    action.hovered.connect(partial(self.draw_by_action, feature))
+
+            main_menu.addSeparator()
+            action = QAction('Identify all', None)
+            action.triggered.connect(partial(self.identify_all))
+            main_menu.addAction(action)
             main_menu.addSeparator()
             main_menu.exec_(click_point)
 
-    def set_active_layer(self, action, point):
+    def identify_all(self):
+        self.controller.log_info(str("IDENTIFY ALL"))
+
+
+    def draw_by_action(self, feature):
+        """ Draw lines based on geometry """
+        if feature['geometry'] is None:
+            return
+        list_coord = re.search('\((.*)\)', str(feature['geometry']))
+        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+        self.resetRubberbands()
+        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
+            point = QgsPoint(float(max_x), float(max_y))
+            self.draw_point(point)
+        else:
+            points = self.get_points(list_coord)
+            self.draw_polygon(points)
+
+    def set_active_layer(self, action):
         """ Set active selected layer """
-        layer = self.controller.get_layer_by_layername(action.text())
-        #layer = self.controller.get_layer_by_tablename(action.text())
+        parent_menu = action.associatedWidgets()[0]
+        layer = self.controller.get_layer_by_layername(parent_menu.title())
+        table_name = self.controller.get_layer_source(layer)
         self.iface.setActiveLayer(layer)
-        self.open_form(point)
+        complet_result = self.open_form(table_name=table_name['table'], feature_id=action.text())
+        self.draw(complet_result)
 
 
     def open_form(self, point=None, table_name=None, feature_id=None):
