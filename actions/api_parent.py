@@ -24,6 +24,7 @@ else:
     from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QPushButton, QFrame
     from qgis.PyQt.QtSql import QSqlTableModel
     from qgis.PyQt.QtWidgets import QAction
+    from qgis.core import QgsWkbTypes    
 
 from qgis.core import QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
@@ -43,20 +44,26 @@ from giswater.actions.HyperLinkLabel import HyperLinkLabel
 class ApiParent(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
+    
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
         self.tabs_removed = 0
-        if Qgis.QGIS_VERSION_INT >= 10900:
-            self.rubber_point = QgsRubberBand(self.canvas, QGis.Point)
-            self.rubber_point.setColor(Qt.yellow)
-            # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
-            self.rubber_point.setIconSize(10)
-            self.rubber_polygon = QgsRubberBand(self.canvas)
-            self.rubber_polygon.setColor(Qt.darkRed)
-            self.rubber_polygon.setIconSize(20)
-        else:
+        if Qgis.QGIS_VERSION_INT < 20000:
             self.vMarker = QgsVertexMarker(self.canvas)
             self.vMarker.setIconSize(10)
+            return
+            
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            self.rubber_point = QgsRubberBand(self.canvas, Qgis.Point)
+        else:
+            self.rubber_point = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
+
+        self.rubber_point.setColor(Qt.yellow)
+        # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
+        self.rubber_point.setIconSize(10)
+        self.rubber_polygon = QgsRubberBand(self.canvas)
+        self.rubber_polygon.setColor(Qt.darkRed)
+        self.rubber_polygon.setIconSize(20)
 
 
     def get_editable_project(self):
@@ -762,14 +769,19 @@ class ApiParent(ParentAction):
 
 
     def resetRubberbands(self):
+    
         canvas = self.canvas
-        if Qgis.QGIS_VERSION_INT >= 10900:
+        if Qgis.QGIS_VERSION_INT < 20000:
+            self.vMarker.hide()
+            canvas.scene().removeItem(self.vMarker)
+        elif Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_point.reset(Qgis.Point)
             self.rubber_polygon.reset()
         else:
-            self.vMarker.hide()
-            canvas.scene().removeItem(self.vMarker)
+            self.rubber_point.reset(QgsWkbTypes.PointGeometry)
+            self.rubber_polygon.reset()
 
+            
     def fill_table(self, widget, table_name, filter_=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
