@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-import re
 
 try:
     from qgis.core import Qgis
@@ -14,6 +13,7 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4 import QtCore
     from PyQt4.QtCore import Qt, QDate, QPoint
     from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu
     from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
@@ -22,6 +22,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtSql import QSqlTableModel
 
 else:
+    from qgis.PyQt import QtCore
     from qgis.PyQt.QtCore import Qt, QDate, QStringListModel,QPoint
     from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QMenu
     from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, \
@@ -30,10 +31,11 @@ else:
     from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.core import QgsPoint, QgsCoordinateReferenceSystem, QgsCoordinateTransform
-from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit, QgsMapToolIdentify
+from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
 
 import json
 import os
+import re
 import subprocess
 import sys
 import urlparse
@@ -41,7 +43,7 @@ import webbrowser
 import win32gui
 from collections import OrderedDict
 from functools import partial
-from osgeo import ogr
+
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
@@ -57,6 +59,7 @@ from giswater.ui_manager import ApiBasicInfo
 
 class ApiCF(ApiParent):
 
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
@@ -68,12 +71,20 @@ class ApiCF(ApiParent):
 
     def api_info(self):
         """ Button 37: Own Giswater info """
-
+        # add "listener" to all actions to desactivate basic_api_info
+        actions_list = self.iface.mainWindow().findChildren(QAction)
+        for action in actions_list:
+            if action.objectName() != 'basic_api_info':
+                action.triggered.connect(partial(self.controller.restore_info))
         # Create the appropriate map tool and connect the gotPoint() signal.
+
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
+
         self.emit_point.canvasClicked.connect(partial(self.init_info))
+
+
 
 
 
@@ -91,25 +102,6 @@ class ApiCF(ApiParent):
                 return
         elif button_clicked == Qt.RightButton:
             x, y = win32gui.GetCursorPos()
-
-            # ## action = self.iface.actionIdentify().trigger()
-            # ident = QgsMapToolIdentify(self.canvas)
-            # ident.activate()
-            # print(x)
-            # print(point.x())
-            # indentifiedFeatures = ident.identify(x, y, ident.TopDownAll)
-            # self.controller.log_info(str(indentifiedFeatures))
-            # self.controller.log_info(str(type(indentifiedFeatures)))
-            # # indentifiedFeatures = ident.identify(point.x(), point.y(), ident.TopDownAll)
-            # # self.controller.log_info(str(indentifiedFeatures))
-            # # self.controller.log_info(str(type(indentifiedFeatures)))
-            # for x in indentifiedFeatures:
-            #     self.controller.log_info(str(x.mLayer.name()))
-            # # if not indentifiedFeatures[0].mFeature.id() == self.featureId:
-            # #     self.featureId = indentifiedFeatures[0].mFeature.id()
-            # #     indentifiedFeatures[0].mLayer.select(self.featureId)
-
-
 
             click_point = QPoint(x + 5, y + 5)
             visible_layers = self.get_visible_layers(as_list=True)
@@ -129,13 +121,7 @@ class ApiCF(ApiParent):
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 return False
             complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            # main_menu = QMenu()
-            # for layer in row[0]['fields']:
-            #     layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
-            #     action = QAction(layer_name.name(), None)
-            #     main_menu.addAction(action)
-            #     action.triggered.connect(partial(self.set_active_layer, action, point))
-            # # menu.exec_(click_point)
+
             main_menu = QMenu()
             for layer in complet_list[0]['body']['data']['layersNames']:
                 layer_name = self.controller.get_layer_by_tablename(layer['layerName'])

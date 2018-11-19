@@ -1134,14 +1134,15 @@ class DaoController():
         return list_values
 
 
-    def restore_info(self):
+    def restore_info(self, restore_cursor=True):
         """  Disconnect canvasClicked from Api_CF  and restore cursor"""
-        action = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
-        if action.isChecked():
-            action.setChecked(False)
+        action_info = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
+        if action_info.isChecked():
+            action_info.setChecked(False)
         else:
             print("NOT FOUND")
-        QApplication.restoreOverrideCursor()
+        if restore_cursor:
+            QApplication.restoreOverrideCursor()
         if self.api_cf is not None:
             ep = self.api_cf.emit_point
             ep.canvasClicked.disconnect()
