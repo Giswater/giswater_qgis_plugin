@@ -46,7 +46,7 @@ class ApiParent(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
         self.tabs_removed = 0
-        if QGis.QGIS_VERSION_INT >= 10900:
+        if Qgis.QGIS_VERSION_INT >= 10900:
             self.rubber_point = QgsRubberBand(self.canvas, QGis.Point)
             self.rubber_point.setColor(Qt.yellow)
             # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
@@ -725,7 +725,7 @@ class ApiParent(ParentAction):
 
     def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
 
-        if QGis.QGIS_VERSION_INT >= 10900:
+        if Qgis.QGIS_VERSION_INT >= 10900:
             rb = self.rubber_point
             rb.setColor(color)
             rb.setWidth(width)
@@ -744,7 +744,7 @@ class ApiParent(ParentAction):
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
 
-        if QGis.QGIS_VERSION_INT >= 10900:
+        if Qgis.QGIS_VERSION_INT >= 10900:
             rb = self.rubber_polygon
             rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
             rb.setColor(color)
@@ -763,8 +763,8 @@ class ApiParent(ParentAction):
 
     def resetRubberbands(self):
         canvas = self.canvas
-        if QGis.QGIS_VERSION_INT >= 10900:
-            self.rubber_point.reset(QGis.Point)
+        if Qgis.QGIS_VERSION_INT >= 10900:
+            self.rubber_point.reset(Qgis.Point)
             self.rubber_polygon.reset()
         else:
             self.vMarker.hide()
