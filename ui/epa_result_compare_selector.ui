@@ -20,7 +20,7 @@
       <number>15</number>
      </property>
      <property name="bottomMargin">
-      <number>15</number>
+      <number>7</number>
      </property>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -115,7 +115,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <property name="topMargin">
-      <number>15</number>
+      <number>7</number>
      </property>
      <property name="bottomMargin">
       <number>15</number>
