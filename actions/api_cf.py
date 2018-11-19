@@ -152,7 +152,7 @@ class ApiCF(ApiParent):
         self.open_form(point)
 
 
-    def open_form(self, point=None, table_name=None, feature_type=None, feature_id=None):
+    def open_form(self, point=None, table_name=None, feature_id=None):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -192,7 +192,7 @@ class ApiCF(ApiParent):
                    + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
                    + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
         # IF come from QPushButtons node1 or node2 from custom form
-        elif feature_id and feature_type:
+        elif feature_id:
             # the_geom = self.check_column_exist(table_name, 'the_geom')
             # print (the_geom)
             # row = None
@@ -1128,7 +1128,6 @@ class ApiCF(ApiParent):
 
 
         table_name = self.tbl_relations.model().record(row).value("sys_table_id")
-        sys_id_name = self.tbl_relations.model().record(row).value("sys_id_name")
         feature_id = self.tbl_relations.model().record(row).value("sys_id")
         layer = self.controller.get_layer_by_tablename(table_name, log_info=True)
         if not layer:
@@ -1137,7 +1136,7 @@ class ApiCF(ApiParent):
             return
 
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
+        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id)
         if not complet_result:
             print("FAIL")
             return
@@ -1167,10 +1166,9 @@ class ApiCF(ApiParent):
 
         row = selected_list[0].row()
         table_name = qtable.model().record(row).value("sys_table_id")
-        sys_id_name = qtable.model().record(row).value("sys_id_name")
         feature_id = qtable.model().record(row).value("sys_id")
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
+        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id)
         if not complet_result:
             print("FAIL")
             return
@@ -1201,14 +1199,13 @@ class ApiCF(ApiParent):
         row = index.row()
 
         table_name = 'v_ui_hydrometer'
-        sys_id_name = self.complet_result[0]['feature']['idName']
         column_index = 0
         column_index = utils_giswater.get_col_index_by_col_name(qtable, 'hydrometer_id')
         feature_id = index.sibling(row, column_index).data()
 
         # return
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
+        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id)
         if not complet_result:
             print("FAIL")
             return
@@ -1967,14 +1964,14 @@ class ApiCF(ApiParent):
         row = index.row()
 
         table_name = complet_list[0]['body']['feature']['tableName']
-        sys_id_name = complet_list[0]['body']['feature']['idName']
+
         column_index = 0
         column_index = utils_giswater.get_col_index_by_col_name(qtable, 'sys_id')
         feature_id = index.sibling(row, column_index).data()
 
         # return
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = api_cf.open_form(table_name=table_name, feature_type=sys_id_name, feature_id=feature_id)
+        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id)
         if not complet_result:
             print("FAIL")
             return
@@ -2183,7 +2180,7 @@ class ApiCF(ApiParent):
 
         feature_id = utils_giswater.getWidgetText(dialog, widget)
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = self.ApiCF.open_form(table_name='ve_node',  feature_type='node_id', feature_id=feature_id)
+        complet_result = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id)
         if not complet_result:
             print("FAIL")
             return
