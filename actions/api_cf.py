@@ -1897,7 +1897,7 @@ class ApiCF(ApiParent):
         sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
 
-        if not row:
+        if row is None or row[0] is None:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
         # Parse string to order dict into List
