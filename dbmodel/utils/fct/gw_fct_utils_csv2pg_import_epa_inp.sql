@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2532
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_inp()
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_csv2pg_import_epa_inp()
 RETURNS integer AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_inp()
+SELECT ws_sample.gw_fct_utils_csv2pg_import_epa_inp()
 */
 
 DECLARE
@@ -21,7 +21,7 @@ DECLARE
 BEGIN
 
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 
    	-- Get schema name
 	schemas_array := current_schemas(FALSE);
@@ -37,7 +37,7 @@ BEGIN
 	
 	END IF;
 		
-RETURN v_count;
+RETURN 0;
 	
 END;
 $BODY$
