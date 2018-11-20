@@ -75,14 +75,12 @@ class ApiCF(ApiParent):
         # add "listener" to all actions to desactivate basic_api_info
         actions_list = self.iface.mainWindow().findChildren(QAction)
         for action in actions_list:
-            if action.objectName() != 'basic_api_info':
+            if action.objectName() != 'basic_api_info' and self.controller.api_cf is not None:
                 action.triggered.connect(partial(self.controller.restore_info))
         # Create the appropriate map tool and connect the gotPoint() signal.
-
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-
         self.emit_point.canvasClicked.connect(partial(self.init_info))
 
 
