@@ -62,6 +62,8 @@ INSERT INTO dattrib_type VALUES (3, 'dinletsector', 'Dynamic mapzone defined as 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_valvestat_using_valveunaccess', 'FALSE', 'Boolean', 'System', 'ws');
 UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='man_valve'
 
+--2018/11/20
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_debug', 'FALSE', 'Boolean', 'System', 'ws');
 
 
 -- AUDIT CONTROL 
@@ -99,6 +101,7 @@ INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) V
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New table - dattrib');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New table - dattrib_type');
 INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter om_mincut_valvestat_using_valveunaccess');
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter om_mincut_debug');
 
 
 

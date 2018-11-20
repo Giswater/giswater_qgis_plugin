@@ -21,26 +21,31 @@ node_aux      	public.geometry;
 rec_table      	record;
 rec_result 	record;
 first_row      	boolean;
-inlet_path      boolean;
+inlet_path      boolean=false;
 element_id_arg  varchar(16);
 controlValue	smallint;
 node_1_aux	varchar(16);
 node_2_aux	varchar(16);
 query_text	text;
-
+v_debug		Boolean;
 
 BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
-    inlet_path=false;
 
+    -- Get debug variable
+    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
+
+    -- Starting process
     SELECT * INTO mincut_rec FROM anl_mincut_result_cat WHERE id=result_id_arg;
 
     -- Loop for all the proposed valves
     FOR rec_valve IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id=result_id_arg AND proposed=TRUE
     LOOP
-		RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
+		IF v_debug THEN
+			RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
+		END IF;
 		FOR rec_tank IN SELECT v_edit_node.node_id, v_edit_node.the_geom FROM anl_mincut_inlet_x_exploitation
 		JOIN v_edit_node ON v_edit_node.node_id=anl_mincut_inlet_x_exploitation.node_id
 		JOIN value_state_type ON state_type=value_state_type.id JOIN node_type ON node_type.id=nodetype_id
@@ -81,19 +86,21 @@ BEGIN
 
 			IF query_text IS NOT NULL THEN	
 				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 
-					RAISE NOTICE' query_text: %',query_text;
+					IF v_debug THEN
+						RAISE NOTICE' query_text: %',query_text;
+					END IF;
 				END IF;
 
 				EXECUTE query_text INTO rec_result;
-
-
-				
+	
 			END IF;
 
 			IF rec_result IS NOT NULL THEN
 				inlet_path=true;
-				RAISE NOTICE 'valve % tank % inlet_path % ', rec_valve.node_id, rec_tank.node_id, inlet_path;
-				RAISE NOTICE '-------------------------------------------------------------------------------';
+				IF v_debug THEN
+					RAISE NOTICE 'valve % tank % inlet_path % ', rec_valve.node_id, rec_tank.node_id, inlet_path;
+					RAISE NOTICE '-------------------------------------------------------------------------------';
+				END IF;
 				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 
 					FOR rec_result IN EXECUTE query_text
 					LOOP 
@@ -104,16 +111,18 @@ BEGIN
 				EXIT;
 			ELSE 
 				inlet_path=false;
-				RAISE NOTICE 'valve % tank % inlet_path % ', rec_valve.node_id, rec_tank.node_id, inlet_path;
-				RAISE NOTICE '-------------------------------------------------------------------------------';
-
+				IF v_debug THEN
+					RAISE NOTICE 'valve % tank % inlet_path % ', rec_valve.node_id, rec_tank.node_id, inlet_path;
+					RAISE NOTICE '-------------------------------------------------------------------------------';
+				END IF;
 			END IF;
 
 		END LOOP;
 	
 		IF inlet_path IS FALSE THEN
-     
-			RAISE NOTICE 'Finding additional affectations to valve %', rec_valve.node_id;
+			IF v_debug THEN
+				RAISE NOTICE 'Finding additional affectations to valve %', rec_valve.node_id;
+			END IF;
 			SELECT arc_id INTO element_id_arg FROM v_edit_arc WHERE (node_1=rec_valve.node_id OR node_2=rec_valve.node_id)
 			AND arc_id NOT IN (SELECT arc_id FROM anl_mincut_result_arc WHERE result_id=result_id_arg);
 	
@@ -123,7 +132,9 @@ BEGIN
 				SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 	
 				-- Insert arc id
-				RAISE NOTICE 'inserting into anl_mincut_result_arc arc_id: %',element_id_arg;
+				IF v_debug THEN
+					RAISE NOTICE 'inserting into anl_mincut_result_arc arc_id: %',element_id_arg;
+				END IF;
 				INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
 			
 				-- Run for extremes node
@@ -146,15 +157,18 @@ BEGIN
 					PERFORM gw_fct_mincut_inverted_flowtrace_engine(node_2_aux, result_id_arg);
 				END IF;
 			ELSE 
-				RAISE NOTICE 'Valve: % has no more arc to affect',rec_valve.node_id;
-	
+				IF v_debug THEN
+					RAISE NOTICE 'Valve: % has no more arc to affect',rec_valve.node_id;
+				END IF;
 			END IF;
 		
 			--Valve has no exit. Update proposed value
 			UPDATE anl_mincut_result_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id=rec_valve.node_id;			
 		END IF;
 
-	RAISE NOTICE 'End flow analisys process for valve: %',rec_valve.node_id;
+	IF v_debug THEN
+		RAISE NOTICE 'End flow analisys process for valve: %',rec_valve.node_id;
+	END IF;
 	
 	END LOOP;
 	
