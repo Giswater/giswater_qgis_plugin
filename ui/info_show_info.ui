@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="2" column="1">
+    <item row="4" column="3">
      <widget class="QPushButton" name="btn_close">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -28,7 +28,7 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="2">
+    <item row="3" column="0" colspan="4">
      <widget class="QTabWidget" name="btn_api_file_to_db">
       <property name="currentIndex">
        <number>0</number>
@@ -141,6 +141,19 @@
            <string>Project data schema</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
+           <item row="0" column="2">
+            <widget class="QPushButton" name="btn_schema_create">
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Create</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_custom_node_type">
              <property name="font">
@@ -165,47 +178,13 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_custom_node_type_2">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="project_schema_name">
+             <property name="enabled">
+              <bool>true</bool>
              </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <property name="text">
-              <string>Title:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="margin">
-              <number>3</number>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="btn_schema_create">
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Create</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QPushButton" name="btn_schema_rename">
-             <property name="text">
-              <string>Rename</string>
+             <property name="frame">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -216,27 +195,10 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_custom_node_type_3">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="btn_schema_rename">
              <property name="text">
-              <string>Author:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="margin">
-              <number>3</number>
+              <string>Rename</string>
              </property>
             </widget>
            </item>
@@ -271,20 +233,58 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="2">
-            <widget class="QPushButton" name="btn_copy">
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="project_schema_last_update">
              <property name="text">
-              <string>Copy</string>
+              <string/>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="project_schema_name">
-             <property name="enabled">
-              <bool>true</bool>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_custom_node_type_2">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
              </property>
-             <property name="frame">
-              <bool>true</bool>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <property name="text">
+              <string>Title:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="margin">
+              <number>3</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_custom_node_type_3">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <property name="text">
+              <string>Author:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="margin">
+              <number>3</number>
              </property>
             </widget>
            </item>
@@ -295,10 +295,10 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="project_schema_last_update">
+           <item row="2" column="2">
+            <widget class="QPushButton" name="btn_copy">
              <property name="text">
-              <string/>
+              <string>Copy</string>
              </property>
             </widget>
            </item>
@@ -860,28 +860,20 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="0" colspan="2">
-     <widget class="QComboBox" name="locale"/>
+    <item row="2" column="3">
+     <widget class="QComboBox" name="cmb_project_type"/>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Project Type:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>577</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuSample">
-    <property name="title">
-     <string>Sample</string>
-    </property>
-    <addaction name="action_create_sample"/>
-    <addaction name="action_create_sample_dev"/>
-   </widget>
-   <addaction name="menuSample"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_create_sample">
