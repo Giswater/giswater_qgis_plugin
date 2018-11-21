@@ -38,10 +38,7 @@ New function (2536) gw_fct_utils_csv2pg_import_epa_rpt
 New system parameter sys_custom_views
 New system parameter sys_currency
 New system parameter utils_csv2pg_om_visit_parameters
-New datrib_type value dminsector
-New datrib_type value pipehazard
-New datrib_type value dinletsector
-New datrib_type value dstaticpress
+
 
 
 
