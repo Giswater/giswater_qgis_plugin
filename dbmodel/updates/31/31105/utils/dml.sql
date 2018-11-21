@@ -54,65 +54,14 @@ INSERT INTO audit_cat_table VALUES ('dattrib_type', 'om' 'Table to store the dif
 INSERT INTO audit_cat_table VALUES ('anl_mincut_inlet_x_arc', 'om' 'Table to arcs as a inlets', role_admin, 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
-INSERT INTO dattrib_type VALUES (1, 'dminsector', 'Dynamic mapzone defined as a minimun portion of network limited by operative valves');
-INSERT INTO dattrib_type VALUES (2, 'pipehazard', 'Dyapzone defined as district meter area');
-INSERT INTO dattrib_type VALUES (3, 'dinletsector', 'Dynamic mapzone defined as area supplied from the same inlet');
-
---2018/11/12
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_valvestat_using_valveunaccess', 'FALSE', 'Boolean', 'System', 'ws');
-UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='man_valve'
-
 --2018/11/20
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_debug', 'FALSE', 'Boolean', 'System', 'ws');
-
 INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_psector', 'om' null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_hydrometer', 'om' null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_plan_psector', 'om' null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_ui_workcat_polygon_all', 'om' null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
-
-
--- AUDIT CONTROL 
----------------------------------------------
-
-ALTER TABLE SCHEMA_NAME.audit_log_project ALTER COLUMN user_name SET DEFAULT "31104"();
-
--- ENABLED by using the AUTOMATIC update project data schema  (LOG)
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter sys_custom_views');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter sys_currency');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'sys_fprocess_cat', TRUE, 'New process catalog to audit project data schema');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'om_visit_parameter', TRUE, 'New field ismultifeature');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'insert_plan_arc_x_pavement', TRUE, 'Bug fix on rule');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'node_type', TRUE, 'New field isarcdivide');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2510) - gw_fct_utils_csv2pg_import_dbprices');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2512) - gw_fct_utils_csv2pg_import_omvisit');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2514) - gw_fct_utils_csv2pg_import_elements');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2516) - gw_fct_utils_csv2pg_import_addfields');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2518) - gw_fct_utils_csv2pg_export_epainp');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2520) - gw_fct_utils_csv2pg_import_epa_rpt');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2522) - gw_fct_utils_csv2pg_import_epanet_inp');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2524) - gw_fct_utils_csv2pg_import_swmm_inp');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2526) - gw_fct_utils_csv2pg_export_epanet_inp');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2528) - gw_fct_utils_csv2pg_export_swmm_inp');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2530) - gw_fct_utils_csv2pg_import_swmm_rpt');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2532) - gw_fct_utils_csv2pg_import_epa_inp');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2534) - gw_fct_repair_link');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New function (2536) - gw_fct_utils_csv2pg_import_epa_rpt');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New parameter utils_csv2pg_om_visit_parameters');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New parameter om_mincut_analysis_dminsector');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New parameter om_mincut_analysis_pipehazard');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New parameter om_mincut_analysis_dinletsector');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New process (34) - mincut analysis dynamic minimun sector');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New process (35) - mincut analysis dynamic inlet sector');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New table - dattrib');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'audit_cat_function', TRUE, 'New table - dattrib_type');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter om_mincut_valvestat_using_valveunaccess');
-INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter om_mincut_debug');
-
-
-
--- NOT ALLOWED by using the AUTOMATIC update project data schema (LOG)
---INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'v_edit_node', FALSE, 'Bug fix');
-
-ALTER TABLE SCHEMA_NAME.audit_log_project ALTER COLUMN user_name SET DEFAULT "current_user"();
+INSERT INTO dattrib_type VALUES (1, 'dminsector', 'Dynamic mapzone defined as a minimun portion of network limited by operative valves', 'ws');
+INSERT INTO dattrib_type VALUES (2, 'pipehazard', 'Number of hydrometers afected in case of break of pipe', 'ws');
+INSERT INTO dattrib_type VALUES (3, 'dinletsector', 'Dynamic mapzone defined as area supplied from the same inlet','ws');
+INSERT INTO dattrib_type VALUES (4, 'dstaticpress', 'In function of inlet, value of the static pressure using inlet eletavion on feature elevation', 'ws');

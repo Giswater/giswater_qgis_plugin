@@ -32,19 +32,8 @@ CREATE TABLE dattrib(
 CREATE TABLE dattrib_type(
   id INTEGER PRIMARY KEY,
   idval varchar(30),
+  project_type varchar(30),
   observ text);
 
 ALTER TABLE dattrib ADD CONSTRAINT dattrib_dattrib_type_fkey FOREIGN KEY (dattrib_type)
 REFERENCES dattrib_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
-CREATE TABLE anl_mincut_inlet_x_arc(
-  node_id character varying(16),
-  arc_id character varying(16),
-  CONSTRAINT anl_mincut_inlet_x_arc_pkey PRIMARY KEY (node_id, arc_id));
-  
-ALTER TABLE anl_mincut_inlet_x_arc ADD CONSTRAINT anl_mincut_inlet_x_arc_node_fkey FOREIGN KEY (node_id)
-REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE anl_mincut_inlet_x_arc ADD CONSTRAINT anl_mincut_inlet_x_arc_arc_fkey FOREIGN KEY (arc_id)
-REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
