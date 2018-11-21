@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
+from PyQt4.QtGui import QIcon
 
 try:
     from qgis.core import Qgis
@@ -120,14 +121,22 @@ class ApiCF(ApiParent):
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 return False
             complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-
+            self.icon_folder = self.plugin_dir + '/icons/'
             main_menu = QMenu()
             for layer in complet_list[0]['body']['data']['layersNames']:
                 layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
-                sub_menu = main_menu.addMenu(layer_name.name())
+                icon = None
+                icon_path = self.icon_folder + layer['icon'] + '.svg'
+                if os.path.exists(str(icon_path)):
+                    icon = QIcon(icon_path)
+                    sub_menu = main_menu.addMenu(icon, layer_name.name())
+                else:
+                    sub_menu = main_menu.addMenu(layer_name.name())
+
 
                 for feature in layer['ids']:
                     self.controller.log_info(str(feature['id']))
+
                     action = QAction(str(feature['id']), None)
                     sub_menu.addAction(action)
                     action.triggered.connect(partial(self.set_active_layer, action))
