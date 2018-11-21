@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-NOT VIEW UPDATES
+NOT_VIEW_UPDATES
 ----------------
 New table anl_mincut_inlet_x_arc
 New system parameter om_mincut_valvestat_using_valveunaccess

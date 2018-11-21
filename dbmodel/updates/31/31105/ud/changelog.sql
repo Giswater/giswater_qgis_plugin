@@ -7,6 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 
 
-NOT VIEW UPDATES
+NOT_VIEW_UPDATES
 ----------------
 New system parameter code_vd

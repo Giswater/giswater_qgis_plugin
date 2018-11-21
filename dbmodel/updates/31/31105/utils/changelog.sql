@@ -5,13 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-VIEWS UPDATES
+VIEWS_UPDATES
 -------------
 Bug fix on v_edit_node
 
 
 
-NOT VIEW UPDATES
+NOT_VIEW_UPDATES
 ----------------
 Bug fix on rule on insert_plan_arc_x_pavement
 New table dattrib
