@@ -65,6 +65,13 @@ UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='man_valve'
 --2018/11/20
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_debug', 'FALSE', 'Boolean', 'System', 'ws');
 
+INSERT INTO audit_cat_table VALUES ('v_ui_doc_x_psector', 'om' null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_hydrometer', 'om' null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_plan_psector', 'om' null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('v_ui_workcat_polygon_all', 'om' null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
+
+
+
 
 -- AUDIT CONTROL 
 ---------------------------------------------
