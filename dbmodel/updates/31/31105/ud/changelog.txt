@@ -9,4 +9,4 @@ This version of Giswater is provided by Giswater Association
 
 NOT_VIEW_UPDATES
 ----------------
-New system parameter code_vd
+New system parameter code_vd, issue#567
