@@ -1,4 +1,11 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getsearch"(device int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getsearch"(device int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -24,6 +31,7 @@ DECLARE
     v_firsttab boolean := FALSE;
     v_active boolean;
     rec_fields record;
+    v_character_number json;
 
 
     --Address
@@ -41,9 +49,12 @@ BEGIN
 -- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
 
---  get api version
+--  get api values
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
+
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''api_search_character_number'') row'
+        INTO v_character_number;
 
 -- Create tabs array
     formTabs := '[';
@@ -406,7 +417,7 @@ BEGIN
         RETURN ('{"status":"Accepted"' ||
             ', "apiVersion":'|| api_version ||
             ', "enabled":true'||
-            ', "minimumSearch":2'||
+            ', "threshold":'||v_character_number||
             ', "formTabs":' || formTabs ||
             '}')::json;
     END IF;

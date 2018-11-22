@@ -13,7 +13,7 @@ RETURNS character varying AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_repair_link(link_id, (row_number() over (order by link_id)), (select count(*) from SCHEMA_NAME.link)) FROM SCHEMA_NAME.link
+SELECT SCHEMA_NAME.gw_fct_repair_link(link_id, (row_number() over (order by link_id)), (select count(*) from SCHEMA_NAME.link)) FROM SCHEMA_NAME.link;
 */
 
 DECLARE
@@ -40,13 +40,8 @@ BEGIN
 	-- reconnect to connec (if exists)
 	SELECT connec.* INTO v_connec FROM connec WHERE ST_DWithin(ST_startpoint(v_link.the_geom), connec.the_geom, 0.5)
 	ORDER BY ST_Distance(connec.the_geom, ST_startpoint(v_link.the_geom)) LIMIT 1;
-	
-	IF v_connec IS NOT NULL THEN 
-		-- Update the start point link geometry
-		UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_connec.the_geom) WHERE link_id = p_link_id;
-		-- update link values
-		UPDATE link SET feature_type='CONNEC', feature_id= v_connec.connec_id WHERE link_id=p_link_id;
-	END IF;
+
+
 
 	IF v_connec.connec_id IS NULL THEN 
 
@@ -54,7 +49,7 @@ BEGIN
 		SELECT connec.* INTO v_connec FROM connec WHERE ST_DWithin(ST_endpoint(v_link.the_geom), connec.the_geom, 0.5)
 		ORDER BY ST_Distance(connec.the_geom, ST_endpoint(v_link.the_geom)) LIMIT 1;
 
-		IF v_connec IS NOT NULL THEN 
+		IF v_connec.connec_id IS NOT NULL THEN 
 			-- reverse geometry
 			UPDATE link SET the_geom = ST_reverse(the_geom) WHERE link_id=p_link_id;
 			-- Update the start point link geometry
@@ -74,7 +69,7 @@ BEGIN
 			
 		-- Update the end point link geometry
 		v_end_point = (ST_ClosestPoint(v_arc.the_geom, (ST_endpoint(v_link.the_geom))));
-		v_link.the_geom = (ST_SetPoint(v_link.the_geom, ST_NumPoints(v_link.the_geom) - 1, v_end_point));
+		v_link.the_geom = (ST_SetPoint(v_link.the_geom, -1, v_end_point));
 	
 		UPDATE link SET the_geom = v_link.the_geom WHERE link_id = p_link_id;
 
@@ -82,16 +77,21 @@ BEGIN
 		INSERT INTO vnode (vnode_type, sector_id, state, expl_id, the_geom) VALUES ('CUSTOM', v_connec.sector_id, v_connec.state, v_connec.expl_id, v_end_point) RETURNING vnode_id INTO v_id;
 
 		-- update link values
-		UPDATE link SET exit_id= v_id WHERE link_id=p_link_id;
+		UPDATE link SET exit_id= v_id, exit_type='VNODE' WHERE link_id=p_link_id;
 
 		-- update connec values
 		UPDATE connec SET arc_id= v_arc.arc_id WHERE connec_id=v_connec.connec_id; 
+
+		-- Update the start point link geometry
+		UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_connec.the_geom) WHERE link_id = p_link_id;
+		-- update link values
+		UPDATE link SET feature_type='CONNEC', feature_id= v_connec.connec_id WHERE link_id=p_link_id;
 
 		v_status = 'RECONNECTED';
 
 	ELSE
 		-- INSERT ON LOG TABLE THE LINK NOT FOUNDED WITH CONNEC CLOSE TO IT
-		v_status = 'No connec founded. Nothing done';
+		v_status = 'No connec found. Nothing done';
 
 	END IF;
 
@@ -113,4 +113,4 @@ $BODY$
 
 LANGUAGE plpgsql VOLATILE
 
-COST 100;
+	COST 100;

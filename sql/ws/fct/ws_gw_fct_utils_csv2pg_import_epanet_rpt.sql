@@ -33,8 +33,9 @@ BEGIN
 	IF p_path IS NOT NULL THEN
 		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=11;
 		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(p_path)||' WITH (NULL '''', FORMAT TEXT)';	
-		UPDATE temp_csv2pg SET csv2pgcat_id=11 WHERE csv2pgcat_id IS NULL AND user_name=current_user;
 	END IF;
+
+	UPDATE temp_csv2pg SET csv2pgcat_id=11 WHERE csv2pgcat_id IS NULL AND user_name=current_user;
 	
 	--remove data from with the same result_id
 	FOR rpt_rec IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=11 EXCEPT SELECT * FROM sys_csv2pg_config WHERE tablename='rpt_cat_result' LOOP

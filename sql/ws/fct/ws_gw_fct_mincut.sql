@@ -6,13 +6,49 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2304
 
---DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer, text);
+------------------------------------------
+-- Mincut function with massive parameters
+------------------------------------------
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
-    element_id_arg character varying,
-    type_element_arg character varying,
-    result_id_arg integer,
-    cur_user_var text)
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_mincut(p_feature_id character varying, p_feature_type character varying, p_result_id integer, counter int8, total int8)
+  RETURNS void AS
+$BODY$
+
+/*EXAMPLE
+SELECT ws_sample.gw_fct_mincut(arc_id, 'arc', 1, (row_number() over (order by arc_id)), (select count(*) from ws_sample.v_edit_arc)) FROM ws_sample.v_edit_arc;
+*/
+
+DECLARE
+
+BEGIN
+    -- Search path
+    SET search_path = ws_sample, public;
+  	
+	PERFORM gw_fct_mincut (p_feature_id, p_feature_type, p_result_id, current_user);
+	
+	-- raise notice
+	IF counter>0 AND total>0 THEN
+		RAISE NOTICE '[%/%]  Feature id: % ', counter, total, p_feature_id;
+	ELSIF counter>0 THEN
+		RAISE NOTICE '[%] Feature id: % ', counter, p_feature_id;
+	ELSE
+		RAISE NOTICE 'Feature id: % ', p_feature_id;
+	END IF;
+	
+	
+	RETURN;
+
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+	
+	
+------------------------------------------
+-- Mincut function (with nornal parameters)
+------------------------------------------
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer, cur_user_var text)
   RETURNS text AS
 $BODY$
 DECLARE
@@ -35,12 +71,17 @@ DECLARE
     v_length 		double precision;
     v_numconnecs 	integer;
     v_numhydrometer	integer;
+    v_debug		Boolean;
 
 BEGIN
     -- Search path
-    SET search_path = SCHEMA_NAME, public;
-  	
-    RAISE NOTICE '1-Delete previous data from same result_id';
+    SET search_path = ws_sample, public;
+
+    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
+
+    IF v_debug THEN
+	RAISE NOTICE '1-Delete previous data from same result_id';
+    END IF;
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_arc" where result_id=result_id_arg;
     DELETE FROM "anl_mincut_result_polygon" where result_id=result_id_arg;
@@ -48,7 +89,9 @@ BEGIN
     DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
     DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
 
-    RAISE NOTICE '2-Identification exploitation, macroexploitation and municipality';
+    IF v_debug THEN
+	RAISE NOTICE '2-Identification exploitation, macroexploitation and municipality';
+    END IF;
     IF type_element_arg='node' OR type_element_arg='NODE' THEN
 		SELECT expl_id INTO expl_id_arg FROM node WHERE node_id=element_id_arg;
 		SELECT muni_id INTO v_muni_id FROM node WHERE node_id=element_id_arg;
@@ -61,17 +104,22 @@ BEGIN
 
     UPDATE anl_mincut_result_cat SET muni_id=v_muni_id WHERE id=result_id_arg;
     
-    
-    RAISE NOTICE '3-Update exploitation selector (of user) according the macroexploitation system';
+    IF v_debug THEN
+	RAISE NOTICE '3-Update exploitation selector (of user) according the macroexploitation system';
+    END IF;    
     INSERT INTO selector_expl (expl_id, cur_user)
     SELECT expl_id, current_user from exploitation 
     where macroexpl_id=macroexpl_id_arg and expl_id not in (select expl_id from selector_expl);
 
-    RAISE NOTICE '4-update values of mincut cat table';
+    IF v_debug THEN
+	RAISE NOTICE '4-update values of mincut cat table';
+    END IF;
     UPDATE anl_mincut_result_cat SET expl_id=expl_id_arg WHERE id=result_id_arg;
     UPDATE anl_mincut_result_cat SET macroexpl_id=macroexpl_id_arg WHERE id=result_id_arg;
-     
-    RAISE NOTICE '5-Start mincut process';
+
+    IF v_debug THEN
+	RAISE NOTICE '5-Start mincut process';
+    END IF;     
     INSERT INTO anl_mincut_result_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
     SELECT result_id_arg, node.node_id, false::boolean, closed, broken, node.the_geom
     FROM v_anl_mincut_selected_valve
@@ -79,7 +127,9 @@ BEGIN
     JOIN exploitation ON node.expl_id=exploitation.expl_id
     WHERE macroexpl_id=macroexpl_id_arg;
 
-    RAISE NOTICE '6-Identify unaccess valves';
+    IF v_debug THEN
+	RAISE NOTICE '6-Identify unaccess valves';
+    END IF;
     UPDATE anl_mincut_result_valve SET unaccess=true WHERE result_id=result_id_arg AND node_id IN 
     (SELECT node_id FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_arg);
 
@@ -183,16 +233,18 @@ BEGIN
 
 	-- Working with the normal case (om_mincut_analysis_dminsector NOT TRUE)--> This variable is reserved to use mincut as tool to identify the mininum agrupation of elements of network
 	IF (SELECT value::boolean from config_param_user where parameter='om_mincut_analysis_dminsector' and cur_user=current_user) IS NOT TRUE THEN 
-				
-		RAISE NOTICE '7-Compute flow trace on network using the tanks and sources that belong on the macroexpl_id using inlet function or inverted flowtrace function';
-
+		IF v_debug THEN
+			RAISE NOTICE '7-Compute flow trace on network using the tanks and sources that belong on the macroexpl_id using inlet function or inverted flowtrace function';
+		END IF;		
 		IF (select value::boolean from config_param_system where parameter='om_mincut_use_pgrouting')  IS NOT TRUE THEN 
 			SELECT gw_fct_mincut_inlet_flowtrace (result_id_arg) into cont1;
 		ELSE
 			SELECT gw_fct_mincut_inverted_flowtrace(result_id_arg) into cont1;
 		END IF;
-
-		RAISE NOTICE '8-Delete valves not proposed, not unaccessible, not closed and not broken';
+		
+		IF v_debug THEN
+			RAISE NOTICE '8-Delete valves not proposed, not unaccessible, not closed and not broken';
+		END IF;
 		DELETE FROM anl_mincut_result_valve WHERE node_id NOT IN (SELECT node_1 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id 
 						WHERE result_id=result_id_arg UNION 
 						SELECT node_2 FROM arc JOIN anl_mincut_result_arc ON anl_mincut_result_arc.arc_id=arc.arc_id WHERE result_id=result_id_arg)
@@ -201,12 +253,16 @@ BEGIN
 		UPDATE anl_mincut_result_valve SET proposed = FALSE WHERE closed = TRUE AND result_id=result_id_arg ;
 
 		IF (select value::boolean from config_param_system where parameter='om_mincut_disable_check_temporary_overlap')  IS NOT TRUE THEN 
-			RAISE NOTICE '9-Check temporary overlap control against other planified mincuts';
+			IF v_debug THEN
+				RAISE NOTICE '9-Check temporary overlap control against other planified mincuts';
+			END IF;
 			SELECT gw_fct_mincut_result_overlap(result_id_arg, current_user) INTO v_return_text;
 	
 		END IF;
-		
-		RAISE NOTICE '10-Update mincut selector';
+
+		IF v_debug THEN
+			RAISE NOTICE '10-Update mincut selector';
+		END IF;
 		--    Update the selector
 		IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = current_user) > 0 THEN
 			UPDATE anl_mincut_result_selector SET result_id = result_id_arg WHERE cur_user = current_user;
@@ -222,12 +278,16 @@ BEGIN
 				INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
 			END IF;
 		END IF;	
-					
-		RAISE NOTICE '11-Insert into anl_mincut_result_connec table ';
+		
+		IF v_debug THEN
+			RAISE NOTICE '11-Insert into anl_mincut_result_connec table ';
+		END IF;			
 		INSERT INTO anl_mincut_result_connec (result_id, connec_id, the_geom)
 		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN anl_mincut_result_arc ON connec.arc_id=anl_mincut_result_arc.arc_id WHERE result_id=result_id_arg AND state=1;
-	
-		RAISE NOTICE '12-Insert into anl_mincut_result_hydrometer table ';
+
+		IF v_debug THEN
+			RAISE NOTICE '12-Insert into anl_mincut_result_hydrometer table ';
+		END IF;
 		INSERT INTO anl_mincut_result_hydrometer (result_id, hydrometer_id)
 		SELECT result_id_arg,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
 		JOIN anl_mincut_result_connec ON rtc_hydrometer_x_connec.connec_id=anl_mincut_result_connec.connec_id 
@@ -265,7 +325,9 @@ BEGIN
 		NOT IN (SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user);
 	END IF;
 
-	RAISE NOTICE 'End of process ';
+	IF v_debug THEN
+		RAISE NOTICE 'End of process ';
+	END IF;
 	RETURN v_return_text;
 
 

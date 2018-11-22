@@ -14,12 +14,12 @@ from sqlite3 import OperationalError
 import utils_giswater
 from giswater.actions.parent import ParentAction
 from giswater.ui_manager import InfoShowInfo
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton
+from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView
 from PyQt4.QtCore import QSettings
 import psycopg2
 
 from dao.controller import DaoController
-from ui_manager import ReadsqlCreateProject
+from ui_manager import ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo
 
 
 class UpdateSQL(ParentAction):
@@ -40,8 +40,8 @@ class UpdateSQL(ParentAction):
 
         # Get widgets from form
 
-        self.chk_schema_ddl_dml = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_ud')
-        self.chk_schema_view = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_ws')
+        # self.chk_schema_ddl_dml = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_ud')
+        # self.chk_schema_view = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_ws')
 
         # Checkbox SCHEMA & API
         self.chk_schema_ddl_dml = self.dlg_info_show_info.findChild(QCheckBox, 'chk_schema_ddl_dml')
@@ -57,14 +57,20 @@ class UpdateSQL(ParentAction):
         self.chk_api_funcion = self.dlg_info_show_info.findChild(QCheckBox, 'chk_api_funcion')
         self.chk_api_trigger = self.dlg_info_show_info.findChild(QCheckBox, 'chk_api_trigger')
 
+        btn_info = self.dlg_info_show_info.findChild(QPushButton, 'btn_info')
+        self.set_icon(btn_info, '73')
+
+
         self.cmb_locale = 'EN'
         self.filter_srid_value = self.controller.plugin_settings_value('srid')
-        print(self.filter_srid_value)
+        self.schema = None
         #TODO: Populate combo project type with all projects types (Dinamic)
         cmb_project_type = self.dlg_info_show_info.findChild(QComboBox, 'cmb_project_type')
         cmb_project_type.addItem('ws')
         cmb_project_type.addItem('ud')
         cmb_project_type.addItem('tree manage')
+
+        self.populate_data_shcema_name(cmb_project_type)
 
         # # RadioButton FK & Not null
         # self.rdb_enable_fk = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_enable_fk')
@@ -104,12 +110,13 @@ class UpdateSQL(ParentAction):
 
         # Set Listeners
         self.dlg_info_show_info.btn_schema_create.clicked.connect(partial(self.open_create_project))
-        self.dlg_info_show_info.btn_schema_rename.clicked.connect(partial(self.rename_project_data_schema))
+        self.dlg_info_show_info.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_info_show_info.btn_api_create.clicked.connect(partial(self.implement_api))
         self.dlg_info_show_info.btn_schema_custom_load_file.clicked.connect(partial(self.load_custom_sql_files))
         self.dlg_info_show_info.btn_api_custom_load_file.clicked.connect(partial(self.load_custom_sql_files))
         self.dlg_info_show_info.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
         self.dlg_info_show_info.btn_api_file_to_db_2.clicked.connect(partial(self.api_file_to_db))
+        btn_info.clicked.connect(partial(self.show_info))
 
         cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, cmb_project_type))
 
@@ -315,7 +322,7 @@ class UpdateSQL(ParentAction):
                                     self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,
                                                                                      self.cmb_locale)),
                                     self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,
-                                                                                     self.cmb_locale))
+                                                                                     self.cmb_locale) + '/')
                                 if status is False:
                                     return False
                         else:
@@ -495,6 +502,7 @@ class UpdateSQL(ParentAction):
     # BUTTONS CALLING FUNCTIONS
 
     def create_project_data_schema(self):
+        self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         if self.rdb_import_data.isChecked():
             print("rdb_import_data")
             self.load_base_no_ct()
@@ -536,6 +544,8 @@ class UpdateSQL(ParentAction):
             self.load_views()
             # self.execute_last_process()
             return
+
+        self.close_dialog(self.dlg_readsql_create_project)
 
     def create_sample(self):
         self.load_base()
@@ -608,6 +618,83 @@ class UpdateSQL(ParentAction):
 
     # OTHER FUNCTIONS
 
+    def show_info(self):
+        # Create dialog
+        self.dlg_readsql_show_info = ReadsqlShowInfo()
+        self.load_settings(self.dlg_readsql_show_info)
+
+        self.read_info_version()
+
+        # Open dialog
+        self.dlg_readsql_show_info.show()
+
+    def read_info_version(self):
+        status = True
+
+        folders = os.listdir(self.folderUpdates + '')
+        print(folders)
+        for folder in folders:
+            print(folder)
+            if str(folder) > str(self.version):
+                sub_folders = os.listdir(self.folderUpdates + folder)
+                print(sub_folders)
+                for sub_folder in sub_folders:
+                    print(sub_folder)
+                    if str(sub_folder) > str(self.version):
+                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
+                            print(False)
+                            return False
+                        else:
+                            status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'),self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/*.txt')
+                            if status is False:
+                                print(False)
+                                return False
+                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
+                            print(False)
+                            return False
+                        else:
+                            status = self.executeFiles(
+                                os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'),self.folderUpdates + folder + '/' + sub_folder + '/utils/*.txt')
+                            if status is False:
+                                print(False)
+                                return False
+                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale) + '/'),'') is False:
+                            if self.process_folder(self.folderLocale, 'EN') is False:
+                                return False
+                            else:
+                                status = self.executeFiles(os.listdir(self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale)),self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale) + '/*.txt')
+                                if status is False:
+                                    return False
+                        else:
+                            status = self.executeFiles(
+                                os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'),
+                                self.folderUpdates + folder + '/' + sub_folder + '/utils/*.txt')
+                            if status is False:
+                                print(False)
+                                return False
+            else:
+                print("Dont have updates")
+        print(status)
+        return True
+
+
+    def close_dialog(self, dlg=None):
+        """ Close dialog """
+
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            self.save_settings(dlg)
+            dlg.close()
+            map_tool = self.canvas.mapTool()
+            # If selected map tool is from the plugin, set 'Pan' as current one
+            if map_tool.toolName() == '':
+                self.iface.actionPan().trigger()
+        except AttributeError:
+            pass
+
+        self.schema = None
+
     def update_locale(self):
         print(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.cmb_locale))
         self.folderLocale = self.sql_dir + '\i18n/' + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale) + '/'
@@ -629,7 +716,13 @@ class UpdateSQL(ParentAction):
         utils_giswater.set_item_data(self.dlg_info_show_info.project_schema_name, rows, 1)
 
     def filter_srid_changed(self):
-        self.filter_srid_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
+        print("FILTER PLS!")
+        filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
+        if filter_value is 'null':
+            filter_value = ''
+        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(filter_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
+        # Populate Table
+        self.fill_table_by_query(self.tbl_srid, sql)
 
     def process_folder(self, folderPath, filePattern):
         status = True
@@ -723,18 +816,23 @@ class UpdateSQL(ParentAction):
         self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
         self.rdb_sample_dev = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_dev')
         self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
+        self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
 
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
         self.btn_push_file  = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
-
 
         if permisions is False:
             self.rdb_no_ct.setEnabled(False)
             self.rdb_sample_dev.setEnabled(False)
 
-        self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'filter')
+        self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', '25831')
+        self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
+        self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
+        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+'25831'+"%' ORDER BY substr(srtext, 1, 6), srid"
 
-        self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
+        # Populate Table
+        self.fill_table_by_query(self.tbl_srid, sql)
 
         # TODO::
         cmb_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_project_type')
@@ -751,33 +849,55 @@ class UpdateSQL(ParentAction):
         self.filter_srid_value = '25831'
 
         # Set listeners
-        self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.executeFiles))
+        self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
+        self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_create_project))
         self.cmb_locale.currentIndexChanged.connect(partial(self.update_locale))
         self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
         self.filter_srid.textChanged.connect(partial(self.filter_srid_changed))
 
+
         # Open dialog
         self.dlg_readsql_create_project.show()
 
+    def open_rename(self):
+        # Create dialog
+        self.dlg_readsql_rename = ReadsqlRename()
+        self.load_settings(self.dlg_readsql_rename)
+
+        # Set listeners
+        self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema))
+        self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_rename))
+        print(self.dlg_readsql_rename)
+
+        # Open dialog
+        self.dlg_readsql_rename.show()
+
     def executeFiles(self, filelist, filedir):
-        schema_name = self.schema_name.replace('"','')
-        filter_srid_value = self.filter_srid_value.replace('"','')
+        if self.schema is None:
+            schema_name = self.schema_name.replace('"','')
+        else:
+            schema_name = self.schema.replace('"', '')
+        filter_srid_value = str(self.filter_srid_value).replace('"','')
         for file in filelist:
+            print(file)
             try:
                 f = open(filedir + '/' + file, 'r')
                 if f:
-                    f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID", filter_srid_value).decode(str('utf-8-sig')))
-                    # f_to_read = str(f.read().replace("SRID", filter_srid_value))
-                    # f_to_read = f_to_read.decode(str('utf-8-sig'))
+                    f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(str('utf-8-sig'))
+                    self.controller.log_info(str(f_to_read))
                     status = self.controller.execute_sql(str(f_to_read))
                     if status is False:
                         print(str(file))
+                        print "Error to execute"
+                        self.dao.rollback()
                         return False
                 else:
                     return False
-            except:
+            except Exception as e:
                 print "Command skipped. Unexpected error"
-                # self.dao.rollback()
+                print (e)
+                self.dao.rollback()
+                return False
                 # self.dao.close()
                 # print lengthy error description!!
                 # sys.exit(2)

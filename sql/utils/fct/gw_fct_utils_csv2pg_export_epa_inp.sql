@@ -4,24 +4,25 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:2532
+--FUNCTION CODE:2518
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_csv2pg_import_epa_inp()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_export_epa_inp(p_resultname text)
 RETURNS integer AS
 $BODY$
 
-/*EXAMPLE
-SELECT ws_sample.gw_fct_utils_csv2pg_import_epa_inp()
+/* EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_export_epa_inp('demo1')
 */
 
 DECLARE
 	project_type_aux text;
 	schemas_array name[];
+
 	
 BEGIN
 
 	-- Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
    	-- Get schema name
 	schemas_array := current_schemas(FALSE);
@@ -30,14 +31,14 @@ BEGIN
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
 	IF project_type_aux='WS' THEN
-		PERFORM gw_fct_utils_csv2pg_import_epanet_inp(null);
+		PERFORM gw_fct_utils_csv2pg_export_epanet_inp(p_resultname, null);
 	
 	ELSE
-		PERFORM gw_fct_utils_csv2pg_import_swmm_inp(null);
+		PERFORM gw_fct_utils_csv2pg_export_swmm_inp(p_resultname, null);
 	
 	END IF;
 		
-RETURN 0;
+RETURN v_count;
 	
 END;
 $BODY$

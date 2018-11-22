@@ -33,6 +33,9 @@ DECLARE
     v_new_planified_interval date;
     v_old_values record;
     v_message text;
+    v_visible_layers text;
+    v_zoom_layer text;
+
     
 BEGIN
 
@@ -42,8 +45,14 @@ BEGIN
 
 --    Get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO api_version;    
+		INTO api_version;
 
+--    Get visible layers
+    v_visible_layers := (SELECT value FROM config_param_system WHERE parameter='api_mincut_visible_layers');
+		
+--    Get zoom layer
+    v_zoom_layer := (SELECT (value::json->>'mincut_zoom_layer') FROM config_param_system WHERE parameter='api_mincut_parameters');
+	
 --    Mincut id is an argument
     mincut_id := mincut_id_arg;
 
@@ -97,6 +106,13 @@ BEGIN
 
         -- Update state
         insert_data := gw_fct_json_object_set_key(insert_data, 'mincut_state', 0);
+		
+		
+		-- insert into selector publish user
+        IF v_mincut_class=1 THEN
+			SELECT value FROM config_param_system WHERE parameter='api_publish_user' INTO v_publish_user;
+			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, mincut_id);	
+		END IF;
 
     ELSE
         --getting old values
@@ -224,12 +240,14 @@ BEGIN
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
         ', "infoMessage":"' || v_message ||'"'||
+        ', "visibleLayers":' || v_visible_layers ||
+        ', "zoomLayer":"' || v_zoom_layer ||'"'||
         ', "mincut_id":' || mincut_id ||
         '}')::json;
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+ --   EXCEPTION WHEN OTHERS THEN 
+  --  RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

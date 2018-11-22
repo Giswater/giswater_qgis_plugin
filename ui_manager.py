@@ -335,6 +335,18 @@ class ReadsqlCreateProject(QMainWindow, FORM_CLASS):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+FORM_CLASS = get_ui_class('readsql_rename.ui')
+class ReadsqlRename(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('readsql_show_info.ui')
+class ReadsqlShowInfo(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
 FORM_CLASS = get_ui_class('selector_date.ui')
 class SelectorDate(QtGui.QDialog, FORM_CLASS):
     def __init__(self):

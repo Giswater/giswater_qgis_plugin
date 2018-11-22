@@ -374,8 +374,8 @@ class ParentDialog(QDialog):
             
         try:
             key = self.layer.name()         
-            self.controller.plugin_settings_set_value(key + "_width", dialog.parent().width())
-            self.controller.plugin_settings_set_value(key + "_height", dialog.parent().height())
+            self.controller.plugin_settings_set_value(key + "_width", dialog.parent().property('width'))
+            self.controller.plugin_settings_set_value(key + "_height", dialog.parent().property('height'))
             self.controller.plugin_settings_set_value(key + "_x", dialog.parent().pos().x())
             self.controller.plugin_settings_set_value(key + "_y", dialog.parent().pos().y())        
         except:

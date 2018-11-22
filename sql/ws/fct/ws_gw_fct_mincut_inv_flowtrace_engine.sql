@@ -17,12 +17,15 @@ DECLARE
     node_aux       public.geometry;
     arc_aux        public.geometry;
     stack          varchar[];
+    v_debug	   Boolean;
 
 BEGIN
 
-
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
+
+    -- Get debug variable
+    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
 
     --Push first element into the array
     stack := array_append(stack, node_id_arg);
@@ -51,13 +54,15 @@ BEGIN
             stack := stack[1:(array_length(stack,1) - 1)];
         ELSE
                  
-        -- Check if the anl_mincut_result_valve is already computed
-        SELECT node_id INTO exists_id FROM anl_mincut_result_node WHERE node_id = node_id_arg AND result_id=result_id_arg;
+		-- Check if the anl_mincut_result_valve is already computed
+		SELECT node_id INTO exists_id FROM anl_mincut_result_node WHERE node_id = node_id_arg AND result_id=result_id_arg;
 
-        -- Compute proceed
-        IF NOT FOUND THEN
-			-- Update value
-			RAISE NOTICE ' Inserting into anl_mincut_result_node; %', node_id_arg;
+		-- Compute proceed
+		IF NOT FOUND THEN
+		-- Update value
+			IF v_debug THEN	
+				RAISE NOTICE ' Inserting into anl_mincut_result_node; %', node_id_arg;
+			END IF;
 			INSERT INTO anl_mincut_result_node (node_id, the_geom, result_id) VALUES(node_id_arg, node_aux, result_id_arg);
 
 			-- Loop for all the upstream nodes
@@ -68,7 +73,9 @@ BEGIN
 				SELECT arc_id INTO exists_id FROM anl_mincut_result_arc WHERE arc_id = rec_table.arc_id  AND result_id=result_id_arg;
 				-- Compute proceed
 				IF NOT FOUND THEN
-					RAISE NOTICE ' Inserting into anl_mincut_result_arc; %', rec_table.arc_id;
+					IF v_debug THEN	
+						RAISE NOTICE ' Inserting into anl_mincut_result_arc; %', rec_table.arc_id;
+					END IF;
 					INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES(rec_table.arc_id, rec_table.the_geom, result_id_arg);
 				END IF;
 				--Push element into the array
@@ -84,7 +91,9 @@ BEGIN
 		
 				-- Compute proceed
 				IF NOT FOUND THEN
-					RAISE NOTICE ' Inserting into anl_mincut_result_arc; %', rec_table.arc_id;
+					IF v_debug THEN
+						RAISE NOTICE ' Inserting into anl_mincut_result_arc; %', rec_table.arc_id;
+					END IF;
 					INSERT INTO "anl_mincut_result_arc" (arc_id, the_geom, result_id) VALUES(rec_table.arc_id, rec_table.the_geom, result_id_arg);                  
 				END IF;
 		

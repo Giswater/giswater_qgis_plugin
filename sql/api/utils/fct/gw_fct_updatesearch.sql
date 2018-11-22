@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch"(search_data json) RETURNS pg_catalog.json AS $BODY$DECLARE
+CREATE OR REPLACE FUNCTION "ws"."gw_fct_updatesearch"(search_data json) RETURNS pg_catalog.json AS $BODY$DECLARE
 
 --    Variables
     response_json json;
@@ -83,6 +83,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch"(search_data json)
     v_hydro_search_field_1 varchar;
     v_hydro_search_field_2 varchar;
     v_hydro_search_field_3 varchar;
+    v_hydro_search_field_4 varchar;
     v_hydro_parent_field varchar;
 
     --workcat
@@ -114,7 +115,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch"(search_data json)
 BEGIN
 
 --   Set search path to local schema
-     SET search_path = "SCHEMA_NAME", public;
+     SET search_path = "ws", public;
 
 --   Set api version
      EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -293,6 +294,7 @@ ELSIF tab_arg = 'address' THEN
     SELECT ((value::json)->>'sys_search_field_1') INTO v_hydro_search_field_1 FROM config_param_system WHERE parameter='api_search_hydrometer';
     SELECT ((value::json)->>'sys_search_field_2') INTO v_hydro_search_field_2 FROM config_param_system WHERE parameter='api_search_hydrometer';
     SELECT ((value::json)->>'sys_search_field_3') INTO v_hydro_search_field_3 FROM config_param_system WHERE parameter='api_search_hydrometer';
+    SELECT ((value::json)->>'sys_search_field_4') INTO v_hydro_search_field_4 FROM config_param_system WHERE parameter='api_search_hydrometer';
     SELECT ((value::json)->>'sys_parent_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='api_search_hydrometer';
 
     -- Text to search
@@ -306,19 +308,37 @@ ELSIF tab_arg = 'address' THEN
     DELETE FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user;
     INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_exploitation_vdefault',id_arg, current_user);
 
-    
-    -- Get hydrometer 
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-        SELECT '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
-        concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
-         AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
-        FROM '||quote_ident(v_hydro_layer)||'
-        JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_connec_field)||')
-        WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
-                AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
-                ILIKE '||quote_literal(text_arg)||'
-                LIMIT 10) a'
-        INTO response_json; 
+
+    IF v_hydro_search_field_4 IS NULL THEN
+   
+	-- Get hydrometer 
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+		SELECT '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
+		concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+		AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
+		FROM '||quote_ident(v_hydro_layer)||'
+		JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_connec_field)||')
+		WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
+			AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+			ILIKE '||quote_literal(text_arg)||'
+			LIMIT 10) a'
+			INTO response_json; 
+     ELSE
+	-- Get hydrometer with v_hydro_search_field_4 NOT NULL
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+		SELECT '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
+		concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||')
+		AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
+		FROM '||quote_ident(v_hydro_layer)||'
+		JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_connec_field)||')
+		WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
+			AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||')
+			ILIKE '||quote_literal(text_arg)||'
+			LIMIT 10) a'
+			INTO response_json; 
+     END IF;
+
+
 
 -- Workcat tab
 --------------
