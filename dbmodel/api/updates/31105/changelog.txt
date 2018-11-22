@@ -1,0 +1,5 @@
+
+
+
+----------------
+INSERT INTO audit_log_project (fprocesscat_id, table_id, enabled, log_message) VALUES (33, 'config_param_system', TRUE, 'New parameter api_mincut_visible_layers');
