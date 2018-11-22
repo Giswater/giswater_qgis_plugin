@@ -37,3 +37,7 @@ CREATE TABLE dattrib_type(
 
 ALTER TABLE dattrib ADD CONSTRAINT dattrib_dattrib_type_fkey FOREIGN KEY (dattrib_type)
 REFERENCES dattrib_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--2018/11/21
+ALTER TABLE dimensions ADD COLUMN observ character varying (255);
