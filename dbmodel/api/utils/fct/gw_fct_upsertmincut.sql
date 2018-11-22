@@ -10,7 +10,7 @@ RETURNS pg_catalog.json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_upsertmincut(20, 418995.41052735,4576657.3129692,25831,3,'{}','arc','es')
+SELECT SCHEMA_NAME.gw_fct_upsertmincut(420, 418995.41052735,4576657.3129692,25831,3,'{}','arc','es')
 */
 
 
@@ -42,7 +42,9 @@ DECLARE
     v_old_values record;
     v_message text;
     v_visible_layers text;
-    v_rectgeometry text;
+    v_rectgeometry json;
+    v_rectgeometry_geom public.geometry;
+
 
     
 BEGIN
@@ -232,10 +234,8 @@ BEGIN
             RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, mincut_id, current_user_var;
             conflict_text := gw_fct_mincut(id_arg, p_element_type, mincut_id, current_user_var);
             RAISE NOTICE 'MinCut: %', conflict_text;
-    END IF;
-    
+    END IF;   
 */
-
     -- Geometry to zoom
     WITH mincut_polygon AS ( SELECT st_collect(a.the_geom) AS locations, a.result_id
 				FROM (SELECT result_id,the_geom FROM anl_mincut_result_node
@@ -247,17 +247,20 @@ BEGIN
 					WHEN st_geometrytype(st_concavehull(mincut_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text 
 					THEN st_buffer(st_concavehull(mincut_polygon.locations, 0.99::double precision), 10::double precision)::geometry(Polygon,25831)
 					ELSE st_expand(st_buffer(mincut_polygon.locations, 10::double precision), 1::double precision)::geometry(Polygon,25831)
-				END AS the_geom INTO v_rectgeometry
+				END AS the_geom INTO v_rectgeometry_geom
 				FROM mincut_polygon
 				WHERE result_id=v_mincut_id;
-				
-    SELECT st_astext (st_envelope (v_rectgeometry)) INTO v_rectgeometry;
 
-    IF v_rectgeometry IS NULL THEN
-	v_rectgeometry  = st_astext (st_envelope (st_buffer(anl_the_geom,50))) FROM anl_mincut_result_cat WHERE id=v_mincut_id;
-    END IF;
+        IF v_rectgeometry_geom IS NULL THEN
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText(St_Envelope (St_Buffer(anl_the_geom,50))) FROM anl_mincut_result_cat WHERE id=$1)row' 
+			INTO v_rectgeometry
+			USING v_mincut_id;
+	ELSE 
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText (st_envelope ($1)))row' 
+			INTO v_rectgeometry
+			USING v_rectgeometry_geom;
 
-    RAISE NOTICE 'v_rectgeometry %',v_rectgeometry;
+	END IF;
 
 --    Control NULL's
     v_message := COALESCE(v_message, '{}');
@@ -269,7 +272,7 @@ BEGIN
         ', "apiVersion":'|| api_version ||
         ', "infoMessage":"' || v_message ||'"'||
         ', "visibleLayers":' || v_visible_layers ||
-        ', "rectGeometry":"' || v_rectgeometry ||'"'||
+        ', "geometry":' || v_rectgeometry ||
         ', "mincut_id":' || v_mincut_id ||
         '}')::json;
 
