@@ -103,7 +103,6 @@ CREATE OR REPLACE VIEW v_edit_dimensions AS
     dimensions.direction_arrow,
     dimensions.x_symbol,
     dimensions.y_symbol,
-	dimensions.observ,
     dimensions.feature_id,
     dimensions.feature_type,
     dimensions.state,

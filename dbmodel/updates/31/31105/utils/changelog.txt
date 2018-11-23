@@ -19,7 +19,6 @@ New table dattrib, issue#561
 New table dattrib_type, issue#561
 New field ismultifeature on om_visit_parameter, issue#549
 New field isarcdivide on node_type, issue#556
-New field observ on dimensions, issue#569
 New process (33) audit project data schema, issue#537
 New process (34) mincut analysis dynamic minimum sector, issue#566
 New process (35) mincut analysis dynamic inlet sector, issue#566
