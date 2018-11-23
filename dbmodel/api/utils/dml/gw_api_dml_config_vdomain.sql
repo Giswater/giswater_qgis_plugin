@@ -129,15 +129,6 @@ INSERT INTO config_web_fields VALUES (33, 'F31', 'add_muni', NULL, NULL, NULL, N
 INSERT INTO config_web_fields VALUES (34, 'F31', 'add_street', NULL, NULL, NULL, NULL, NULL, 'Carrer:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (38, 'F31', 'visit_search', NULL, NULL, NULL, NULL, NULL, 'Visita:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO config_web_fields VALUES (280, 'v_anl_mincut_result_valve', 'id', false, 'string', NULL, NULL, NULL, 'Id:', 'text', NULL, NULL, NULL, NULL, false, 1);
-INSERT INTO config_web_fields VALUES (281, 'v_anl_mincut_result_valve', 'result_id', false, 'double', 32, 0, NULL, 'Result id:', 'text', NULL, NULL, NULL, NULL, false, 2);
-INSERT INTO config_web_fields VALUES (282, 'v_anl_mincut_result_valve', 'work_order', false, 'string', NULL, NULL, NULL, 'Work order:', 'text', NULL, NULL, NULL, NULL, true, 3);
-INSERT INTO config_web_fields VALUES (283, 'v_anl_mincut_result_valve', 'node_id', false, 'string', NULL, NULL, NULL, 'Node_id:', 'text', NULL, NULL, NULL, NULL, false, 4);
-INSERT INTO config_web_fields VALUES (284, 'v_anl_mincut_result_valve', 'closed', false, 'boolean', NULL, NULL, NULL, 'Closed:', 'text', NULL, NULL, NULL, NULL, false, 5);
-INSERT INTO config_web_fields VALUES (285, 'v_anl_mincut_result_valve', 'broken', false, 'boolean', NULL, NULL, NULL, 'Broken:', 'text', NULL, NULL, NULL, NULL, false, 6);
-INSERT INTO config_web_fields VALUES (286, 'v_anl_mincut_result_valve', 'unaccess', false, 'boolean', NULL, NULL, NULL, 'Unaccess:', 'check', NULL, NULL, NULL, NULL, true, 8);
-INSERT INTO config_web_fields VALUES (287, 'v_anl_mincut_result_valve', 'proposed', false, 'boolean', NULL, NULL, NULL, 'Proposed:', 'text', NULL, NULL, NULL, NULL, false, 7);
-
 INSERT INTO config_web_fields VALUES (290, 'F45', 'mincut_muni', NULL, NULL, NULL, NULL, NULL, 'Municipi:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (291, 'F45', 'mincut_class', NULL, NULL, NULL, NULL, NULL, 'Classe:', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_web_fields VALUES (292, 'F45', 'mincut_workorder', NULL, NULL, NULL, NULL, NULL, 'Expedient:', NULL, NULL, NULL, NULL, NULL, NULL);

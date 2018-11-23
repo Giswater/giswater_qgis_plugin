@@ -50,6 +50,3 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 -- exploitation
 INSERT INTO config_param_system (parameter, value, data_type, context, descript)  VALUES ('api_search_exploitation', '{"sys_table_id":"exploitation", "sys_id_field":"expl_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}', NULL, 'apì_search_psector', NULL);
 
--- mincut
-INSERT INTO config_param_system (parameter, value, data_type, context, descript)  VALUES ('api_mincut_parameters', '{"mincut_valve_layer":"v_anl_mincut_result_valve"}', NULL, NULL, NULL);
-INSERT INTO config_param_system (parameter, value, data_type, context, descript)  VALUES ('api_mincut_new_vdef', '{"mincut_state":"0", "mincut_type":"Real", "anl_cause":"Accidental", "assigned_to":"1"}', 'json', 'api_mincut', NULL);

@@ -19,15 +19,6 @@ INSERT INTO config_web_layer VALUES ('v_edit_man_wjoin', false, NULL, true, NULL
 INSERT INTO config_web_layer VALUES ('v_edit_arc', true, 'v_web_parent_arc', false, NULL, 'F13', 'Arc', 3, 'link');
 INSERT INTO config_web_layer VALUES ('v_ui_hydrometer', false, NULL, false, 'v_ui_hydrometer', 'F11', 'Hydrometer', 99, 'hydrometer_link');
 
---ws specific
---INSERT INTO config_web_layer VALUES ('v_edit_connec', true, 'v_web_parent_connec', false, NULL, 'F14', 'Connec', 4, 'link');
---INSERT INTO config_web_layer VALUES ('v_anl_mincut_result_valve', false, NULL, TRUE, NULL, 'F11', 'Mincut Valve', 1, 'link');
-
-
-
---ud speficic
-INSERT INTO config_web_layer VALUES ('v_edit_connec', false, null, false, 'v_edit_gully', 'F14', 'Connec', 3, 'link');
-INSERT INTO config_web_layer VALUES ('v_edit_gully', false, null, false, 'v_edit_gully', 'F15', 'Gully', 3, 'link');
 
 INSERT INTO config_web_tabs VALUES (242, 'v_edit_connec', 'tabElement', 'Element', 'Llistat d''elements');
 INSERT INTO config_web_tabs VALUES (245, 'v_edit_connec', 'tabVisit', 'Visit', 'Històric d''events');
