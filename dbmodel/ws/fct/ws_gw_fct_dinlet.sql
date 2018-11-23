@@ -43,29 +43,38 @@ BEGIN
 	PERFORM gw_fct_mincut_inlet_flowtrace(-1, p_node_id)  ;
 
 	-- Moving from log result to dattrib table (3-dinlet)
-	DELETE FROM dattrib WHERE dattrib_type=3;
+	DELETE FROM dattrib WHERE dattrib_type=3 AND feature_id IN 
+		(SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=35 AND user_name=current_user);
+		
 	INSERT INTO dattrib 
-	SELECT 3, feature_id, 'arc', log_message FROM audit_log_data 
-	WHERE fprocesscat_id=35 AND user_name=current_user;
+		SELECT 3, feature_id, 'arc', log_message FROM audit_log_data 
+		WHERE fprocesscat_id=35 AND user_name=current_user;
 
 	-- Moving from log result to dattrib table (4- static pressure)
-	DELETE FROM dattrib WHERE dattrib_type=4;
+	DELETE FROM dattrib WHERE dattrib_type=4 AND feature_id IN 
+		(SELECT node.node_id FROM audit_log_data 
+		JOIN node ON node.node_id=log_message
+		JOIN node inlet ON inlet.node_id=log_message
+		WHERE fprocesscat_id=35 AND user_name=current_user;
+	DELETE FROM dattrib WHERE dattrib_type=4 AND feature_id IN 
+		(SELECT connec_id FROM audit_log_data
+		JOIN connec ON connec.arc_id=audit_log_data.feature_id
+		WHERE fprocesscat_id=35 AND user_name=current_user;	
+		
 	INSERT INTO dattrib
-	SELECT 4 as dattrib_type, node.node_id, 'node' as feature_type, inlet.elevation-node.elevation AS static_pressure 
-	FROM audit_log_data 
-	JOIN node ON node.node_id=log_message
-	JOIN node inlet ON inlet.node_id=log_message
-	WHERE fprocesscat_id=35 AND user_name=current_user	
-        UNION
-        SELECT 4, connec_id, 'connec', inlet.elevation-connec.elevation AS static_pressure FROM audit_log_data
-        JOIN node inlet ON inlet.node_id=log_message
-	JOIN connec ON connec.arc_id=audit_log_data.feature_id
-        WHERE fprocesscat_id=35 AND user_name=current_user;
+		SELECT 4 as dattrib_type, node.node_id, 'node' as feature_type, inlet.elevation-node.elevation AS static_pressure 
+		FROM audit_log_data 
+		JOIN node ON node.node_id=log_message
+		JOIN node inlet ON inlet.node_id=log_message
+		WHERE fprocesscat_id=35 AND user_name=current_user	
+			UNION
+		SELECT 4, connec_id, 'connec', inlet.elevation-connec.elevation AS static_pressure FROM audit_log_data
+		JOIN node inlet ON inlet.node_id=log_message
+		JOIN connec ON connec.arc_id=audit_log_data.feature_id
+		WHERE fprocesscat_id=35 AND user_name=current_user;
 
 	-- Restore system
 	UPDATE config_param_user SET value=FALSE WHERE parameter='om_mincut_analysis_dinletsector' AND cur_user=current_user;
-	DELETE FROM anl_mincut_result_cat WHERE id=999999;
-			
 	RETURN;
 
 END;
