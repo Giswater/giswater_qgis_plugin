@@ -10,19 +10,19 @@ This version of Giswater is provided by Giswater Association
 -- Mincut function with massive parameters
 ------------------------------------------
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_mincut(p_feature_id character varying, p_feature_type character varying, p_result_id integer, counter int8, total int8)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(p_feature_id character varying, p_feature_type character varying, p_result_id integer, counter int8, total int8)
   RETURNS void AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_mincut(arc_id, 'arc', 1, (row_number() over (order by arc_id)), (select count(*) from ws_sample.v_edit_arc)) FROM ws_sample.v_edit_arc;
+SELECT SCHEMA_NAME.gw_fct_mincut(arc_id, 'arc', 1, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.v_edit_arc)) FROM SCHEMA_NAME.v_edit_arc;
 */
 
 DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = ws_sample, public;
+    SET search_path = SCHEMA_NAME, public;
   	
 	PERFORM gw_fct_mincut (p_feature_id, p_feature_type, p_result_id, current_user);
 	
@@ -48,7 +48,7 @@ $BODY$
 ------------------------------------------
 -- Mincut function (with nornal parameters)
 ------------------------------------------
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer, cur_user_var text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer, cur_user_var text)
   RETURNS text AS
 $BODY$
 DECLARE
@@ -75,7 +75,7 @@ DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = ws_sample, public;
+    SET search_path = SCHEMA_NAME, public;
 
     SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
 
@@ -308,15 +308,6 @@ BEGIN
 			
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
 			VALUES (29, 'arc', element_id_arg, v_return_text);
-		END IF;
-
-		-- Working with the case of study of inlet dynamic sector analysis (om_mincut_analysis_dinletsector=true)
-		IF (SELECT value::boolean FROM config_param_user WHERE parameter='om_mincut_analysis_dinletsector' AND cur_user=current_user) IS TRUE THEN
-		
-			-- Insert values on audit_log_data table
-			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
-			SELECT 35, 'arc', arc_id, element_id_arg FROM anl_mincut_result_arc WHERE result_id=result_id_arg;
-
 		END IF;
 	ELSE
 		-- Insert values on audit_log_data table when case of study of mincut minimum sector analysis (om_mincut_analysis_dminsector=true)
