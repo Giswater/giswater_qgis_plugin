@@ -5,9 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
 -- 2018/11/21
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('api_mincut_visible_layers', '["v_anl_mincut_result_valve", "v_anl_mincut_result_node", "v_anl_mincut_result_arc", "v_anl_mincut_result_connec"]', 'Array', 'System', 'Utils');
 
 
+UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id='F32' and name='composer';
+UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id='F32' and name='scale';

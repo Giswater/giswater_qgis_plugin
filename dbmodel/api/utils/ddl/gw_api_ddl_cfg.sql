@@ -77,9 +77,8 @@ CREATE TABLE "config_web_tableinfo_x_inforole"(
 
 
 
-
-CREATE TABLE "config_web_fields"
-( id serial NOT NULL,
+CREATE TABLE ws.config_web_fields(
+  id serial PRIMARY KEY,
   table_id character varying(50),
   name character varying(30),
   is_mandatory boolean,
@@ -95,10 +94,9 @@ CREATE TABLE "config_web_fields"
   sql_text text,
   is_enabled boolean,
   orderby integer,
-  CONSTRAINT config_web_fields_pkey PRIMARY KEY (id)
-  );
-
-
+  is_navigation boolean)
+    
+  
 
 CREATE TABLE "config_web_forms" (
 id serial NOT NULL,
