@@ -164,7 +164,7 @@ class ManageVisit(ParentManage, QObject):
         # Fill combo boxes of the form and related events
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_add_visit))
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
-        self.fill_combos()
+        self.fill_combos(visit_id=visit_id)
 
         # Set autocompleters of the form
         self.set_completers()
@@ -626,7 +626,7 @@ class ManageVisit(ParentManage, QObject):
 
 
 
-    def fill_combos(self):
+    def fill_combos(self, visit_id=None):
         """ Fill combo boxes of the form """
 
         # Visit tab
@@ -657,6 +657,17 @@ class ManageVisit(ParentManage, QObject):
                     pass
                 except ValueError:
                     pass
+            elif visit_id is not None:
+                sql = ("SELECT visitcat_id"
+                       " FROM " + self.schema_name + ".om_visit"
+                       " WHERE id ='" + str(visit_id) + "' ")
+                id_visitcat = self.controller.get_row(sql)
+                sql = ("SELECT id, name"
+                       " FROM " + self.schema_name + ".om_visit_cat"
+                       " WHERE active is true AND id ='"+str(id_visitcat[0])+"' "
+                       " ORDER BY name")
+                row = self.controller.get_row(sql)
+                utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Relations tab
         # fill feature_type
