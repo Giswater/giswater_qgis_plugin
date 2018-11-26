@@ -685,7 +685,7 @@ class DaoController():
                         'host': None, 'port': None, 'user': None, 'password': None}
         
         # Get dbname, host, port, user and password
-        uri = layer.dataProvider().dataSourceUri().lower()
+        uri = layer.dataProvider().dataSourceUri()
         pos_db = uri.find('dbname=')
         pos_host = uri.find(' host=')
         pos_port = uri.find(' port=')
