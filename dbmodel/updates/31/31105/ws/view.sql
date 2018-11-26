@@ -6,6 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+/* Instructions to fill this file for developers
+- Use CREATE OR REPLACE
+- DROP CASCADE IS FORBIDDEN
+- Only use DROP when view:
+	- is not customizable view (ie ve_node_* or ve_arc_*)
+	- has not other views over
+	- has not trigger
+*/
+
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_dattrib AS 
  SELECT arc_id,

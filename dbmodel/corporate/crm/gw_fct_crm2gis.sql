@@ -25,7 +25,7 @@ BEGIN
     SET search_path = "crm", public;
 	
 	-- crm. its mandatory due bug of Postgres only in this case
-	PERFORM crm.gw._fct_crm2gis_hydro_catalog();
+	PERFORM crm.gw_fct_crm2gis_hydro_catalog();
 	PERFORM crm.gw_fct_crm2gis_hydro_data();
 	PERFORM crm.gw_fct_crm2gis_hydro_flow();
 
