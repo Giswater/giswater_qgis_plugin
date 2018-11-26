@@ -5,10 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-NOT_VIEW_UPDATES
-----------------
-New parameter api_mincut_visible_layers, #issue570
-New fields on the config_web_fields, #issue571
-
+-- 2018/11/21
+UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id='F32' and name='composer';
+UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id='F32' and name='scale';

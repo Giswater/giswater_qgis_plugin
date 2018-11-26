@@ -1,14 +1,5 @@
-/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
-
-
-
-NOT_VIEW_UPDATES
-----------------
+31105-i18n
+----------
 New datrib_type value dminsector, issue#566
 New datrib_type value pipehazard, issue#566
 New datrib_type value dinletsector, issue#566

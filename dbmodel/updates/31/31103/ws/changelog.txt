@@ -1,0 +1,8 @@
+31103-ws
+--------
+New view v_anl_mincut_init_point;
+New view v_edit_field_valve;
+Bug fix on audit_cat_tables set sys_role_id='role_om' WHERE id='v_anl_mincut_result_cat';
+Bug fix on audit_cat_tables set sys_role_id='role_om' WHERE id='v_ui_anl_mincut_result_cat';
+New error message (3012);
+New error message (3014);
