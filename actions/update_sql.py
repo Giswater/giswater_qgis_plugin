@@ -14,7 +14,7 @@ from sqlite3 import OperationalError
 import utils_giswater
 from giswater.actions.parent import ParentAction
 from giswater.ui_manager import InfoShowInfo
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView
+from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit
 from PyQt4.QtCore import QSettings
 import psycopg2
 
@@ -61,7 +61,17 @@ class UpdateSQL(ParentAction):
         self.set_icon(btn_info, '73')
 
 
-        self.cmb_locale = 'EN'
+        self.message_update = ''
+
+        # Get locale of QGIS application
+        self.locale = QSettings().value('locale/userLocale').lower()
+        if self.locale == 'es_es':
+            self.locale = 'ES'
+        elif self.locale == 'es_ca':
+            self.locale = 'CA'
+        elif self.locale == 'en_us':
+            self.locale = 'EN'
+
         self.filter_srid_value = self.controller.plugin_settings_value('srid')
         self.schema = None
         #TODO: Populate combo project type with all projects types (Dinamic)
@@ -71,6 +81,7 @@ class UpdateSQL(ParentAction):
         cmb_project_type.addItem('tree manage')
 
         self.populate_data_shcema_name(cmb_project_type)
+        self.set_info_project()
 
         # # RadioButton FK & Not null
         # self.rdb_enable_fk = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_enable_fk')
@@ -102,131 +113,241 @@ class UpdateSQL(ParentAction):
 
         # Declare all directorys
         self.folderSoftware = self.sql_dir + '/' + self.project_type + '/'
-        self.folderLocale = self.sql_dir + '\i18n/' + self.cmb_locale + '/'
+        self.folderLocale = self.sql_dir + '\i18n/' + str(self.locale) + '/'
         self.folderUtils = self.sql_dir + '\utils/'
         self.folderUpdates = self.sql_dir + '\updates/'
         self.folderExemple = self.sql_dir, '\example/'
         self.folderPath = ''
 
+        # Declare all directorys api
+        self.folderSoftwareApi = self.sql_dir + '/api/' + self.project_type + '/'
+        self.folderUtilsApi = self.sql_dir + '/api/utils/'
+        self.folderUpdatesApi = self.sql_dir + '/api/updates/'
+        self.folderLocaleApi = self.sql_dir + '/api\i18n/' + str(self.locale) + '/'
+        self.folderExempleApi = self.sql_dir, '/api/example/'
+
         # Set Listeners
         self.dlg_info_show_info.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_info_show_info.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_info_show_info.btn_api_create.clicked.connect(partial(self.implement_api))
-        self.dlg_info_show_info.btn_schema_custom_load_file.clicked.connect(partial(self.load_custom_sql_files))
-        self.dlg_info_show_info.btn_api_custom_load_file.clicked.connect(partial(self.load_custom_sql_files))
+        self.dlg_info_show_info.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_info_show_info, "path_folder"))
+        self.dlg_info_show_info.btn_schema_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_info_show_info, "schema_path_folder"))
+        self.dlg_info_show_info.btn_api_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_info_show_info, "api_path_folder"))
         self.dlg_info_show_info.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
         self.dlg_info_show_info.btn_api_file_to_db_2.clicked.connect(partial(self.api_file_to_db))
         btn_info.clicked.connect(partial(self.show_info))
-
+        self.dlg_info_show_info.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
         cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, cmb_project_type))
+        self.dlg_info_show_info.btn_select_file.clicked.connect(partial(self.get_file_dialog, self.dlg_info_show_info, "path_folder"))
+        self.dlg_info_show_info.btn_schema_select_file.clicked.connect(partial(self.get_file_dialog, self.dlg_info_show_info, "schema_path_folder"))
+        self.dlg_info_show_info.btn_api_select_file.clicked.connect(partial(self.get_file_dialog, self.dlg_info_show_info, "api_path_folder"))
 
 
-        # self.chk_schema_update.stateChanged.connect(partial(self.check_primary_to_foreing, self.chk_schema_update, self.chk_schema_reload_update_funcion, self.chk_schema_reload_update_trigger))
-        # self.chk_api_update.stateChanged.connect(partial(self.check_primary_to_foreing, self.chk_api_update, self.chk_api_reload_update_funcion, self.chk_api_reload_update_trigger))
-        # self.chk_schema_reload_update_funcion.stateChanged.connect(partial(self.check_foreing_to_primary, self.chk_schema_reload_update_funcion, self.chk_schema_update))
-        # self.chk_schema_reload_update_trigger.stateChanged.connect(partial(self.check_foreing_to_primary, self.chk_schema_reload_update_trigger, self.chk_schema_update))
-        # self.chk_api_reload_update_funcion.stateChanged.connect(partial(self.check_foreing_to_primary, self.chk_api_reload_update_funcion,self.chk_api_update))
-        # self.chk_api_reload_update_trigger.stateChanged.connect(partial(self.check_foreing_to_primary, self.chk_api_reload_update_trigger,self.chk_api_update))
-
-        # TODO:: Descomentar esto
-        # if self.check_relaod_views() is True:
-        #     self.chk_schema_view.setEnabled(False)
-        #     self.chk_api_view.setEnabled(False)
-        # if self.check_version_schema() is False:
-        #     self.chk_schema_ddl_dml.setEnabled(False)
-        #     self.chk_api_ddl_dml.setEnabled(False)
+        if self.check_relaod_views() is True:
+            self.chk_schema_view.setEnabled(False)
+            self.chk_api_view.setEnabled(False)
+            self.btn_schema_rename.setEnabled(False)
+        if self.check_version_schema() is False:
+            self.chk_schema_ddl_dml.setEnabled(False)
+            self.chk_api_ddl_dml.setEnabled(False)
 
         # Open dialog
         self.dlg_info_show_info.show()
 
-    def load_base(self):
+    def load_base(self, api=False):
 
         status = True
 
-        if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
-            if status is False:
-                return False
-        if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
-            if status is False:
-                return False
-        if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
-            if status is False:
-                return False
-        if self.process_folder(self.folderSoftware, self.file_pattern_rules + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
-            if status is False:
-                return False
-        if self.process_folder(self.folderSoftware, self.file_pattern_fk + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
-            if status is False:
-                return False
-        if self.process_folder(self.folderSoftware, self.file_pattern_trg + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
-            if status is False:
-                return False
-        if self.process_folder(self.folderUtils, self.file_pattern_ddl + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddl), self.folderUtils + self.file_pattern_ddl)
-            if status is False:
-                return False
-        if self.process_folder(self.folderUtils, self.file_pattern_dml + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_dml), self.folderUtils + self.file_pattern_dml)
-            if status is False:
-                return False
-        if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
-            if status is False:
-                return False
-        if self.process_folder(self.folderUtils, self.file_pattern_rules + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_rules), self.folderUtils + self.file_pattern_rules)
-            if status is False:
-                return False
-        if self.process_folder(self.folderUtils, self.file_pattern_fk + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
-            if status is False:
-                return False
-        if self.process_folder(self.folderUtils, self.file_pattern_trg + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
-            if status is False:
-                return False
-        if self.process_folder(self.folderLocale, utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)) is False:
-            if self.process_folder(self.folderLocale, 'EN') is False:
+        # Check is api
+        if api:
+
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_ddl + '/') is False:
                 return False
             else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_ddl),
+                                           self.folderSoftwareApi + self.file_pattern_ddl)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_dml + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_dml),
+                                           self.folderSoftwareApi + self.file_pattern_dml)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fct + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fct),
+                                           self.folderSoftwareApi + self.file_pattern_fct)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_rules + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_rules),
+                                           self.folderSoftwareApi + self.file_pattern_rules)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fk + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fk),
+                                           self.folderSoftwareApi + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
+                                           self.folderSoftwareApi + self.file_pattern_trg)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_ddl + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_ddl),
+                                           self.folderUtilsApi + self.file_pattern_ddl)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_dml + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_dml),
+                                           self.folderUtilsApi + self.file_pattern_dml)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_fct + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fct),
+                                           self.folderUtilsApi + self.file_pattern_fct)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_rules + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_rules),
+                                           self.folderUtilsApi + self.file_pattern_rules)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_fk + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fk),
+                                           self.folderUtilsApi + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_trg),
+                                           self.folderUtilsApi + self.file_pattern_trg)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderLocaleApi,
+                                   utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)) is False:
+                if self.process_folder(self.folderLocaleApi, 'EN') is False:
+                    return False
+                else:
+                    status = self.executeFiles(os.listdir(
+                        self.folderLocaleApi + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)),
+                        self.folderLocaleApi + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale))
+                    if status is False:
+                        return False
+            else:
                 status = self.executeFiles(os.listdir(
-                    self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale))
+                    self.folderLocaleApi + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)),
+                                           self.folderLocaleApi + utils_giswater.getWidgetText(self.dlg_info_show_info,
+                                                                                            self.cmb_locale))
                 if status is False:
                     return False
         else:
-            status = self.executeFiles(os.listdir(self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale))
-            if status is False:
+
+            if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
                 return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_rules + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_fk + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_ddl + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddl), self.folderUtils + self.file_pattern_ddl)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_dml + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_dml), self.folderUtils + self.file_pattern_dml)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_rules + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_rules), self.folderUtils + self.file_pattern_rules)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_fk + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderLocale, utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)) is False:
+                if self.process_folder(self.folderLocale, 'EN') is False:
+                    return False
+                else:
+                    status = self.executeFiles(os.listdir(
+                        self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale))
+                    if status is False:
+                        return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale))
+                if status is False:
+                    return False
 
         print(status)
         return True
@@ -287,13 +408,61 @@ class UpdateSQL(ParentAction):
         print(status)
         return True
 
-    def load_update_ddl_dml(self):
+    def load_update_ddl_dml(self, api=False):
 
         status = True
 
-        folders = os.listdir(self.folderUpdates + '')
-        for folder in folders:
-            if str(folder) > str(self.version):
+        # Check is api
+        if api:
+            folders = os.listdir(self.folderUpdatesApi + '')
+            for folder in folders:
+                sub_folders = os.listdir(self.folderUpdatesApi + folder)
+                for sub_folder in sub_folders:
+                    if str(sub_folder) > str(self.version):
+                        if self.process_folder(
+                                self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                '') is False:
+                            print(False)
+                            return False
+                        else:
+                            print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                            status = self.executeFiles(os.listdir(
+                                self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/'),
+                                                       self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                            if status is False:
+                                print(False)
+                                return False
+                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
+                            print(False)
+                            return False
+                        else:
+                            status = self.executeFiles(
+                                os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/'),
+                                self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
+                            if status is False:
+                                print(False)
+                                return False
+                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(
+                                utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale) + '/'),
+                                               '') is False:
+                            if self.process_folder(self.folderLocaleApi, 'EN') is False:
+                                return False
+                            else:
+                                status = self.executeFiles(os.listdir(
+                                    self.folderLocaleApi + self.locale),
+                                    self.folderLocaleApi + self.locale + '/')
+                                if status is False:
+                                    return False
+                        else:
+                            status = self.executeFiles(
+                                os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/'),
+                                self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
+                            if status is False:
+                                print(False)
+                                return False
+        else:
+            folders = os.listdir(self.folderUpdates + '')
+            for folder in folders:
                 sub_folders = os.listdir(self.folderUpdates + folder)
                 for sub_folder in sub_folders:
                     if str(sub_folder) > str(self.version):
@@ -301,6 +470,7 @@ class UpdateSQL(ParentAction):
                             print(False)
                             return False
                         else:
+                            print(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
                             status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'), self.folderUpdates + folder + '/' + sub_folder + '/' +self.project_type + '/')
                             if status is False:
                                 print(False)
@@ -319,10 +489,8 @@ class UpdateSQL(ParentAction):
                                 return False
                             else:
                                 status = self.executeFiles(os.listdir(
-                                    self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,
-                                                                                     self.cmb_locale)),
-                                    self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,
-                                                                                     self.cmb_locale) + '/')
+                                    self.folderLocale + self.locale),
+                                    self.folderLocale + self.locale + '/')
                                 if status is False:
                                     return False
                         else:
@@ -334,22 +502,37 @@ class UpdateSQL(ParentAction):
         print(status)
         return True
 
-    def load_views(self):
+    def load_views(self, api=False):
 
         status = True
 
-        if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
-            if status is False:
+        # Check is api
+        if api:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
                 return False
-        if self.process_folder(self.folderUtils, self.file_pattern_view + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_view), self.folderUtils + self.file_pattern_view)
-            if status is False:
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_view + '/') is False:
                 return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_view), self.folderUtilsApi + self.file_pattern_view)
+                if status is False:
+                    return False
+        else:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_view), self.folderUtilsApi + self.file_pattern_view)
+                if status is False:
+                    return False
 
         print(status)
         return True
@@ -382,105 +565,187 @@ class UpdateSQL(ParentAction):
         print(status)
         return True
 
-    def load_fct(self):
+    def load_fct(self, api=False):
 
         status = True
-
-        if self.process_folder(self.folderSoftware, self.file_pattern_fct) is False:
-            print(False)
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
-            if status is False:
+        # Check is api
+        if api:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fct) is False:
                 print(False)
                 return False
-        if self.process_folder(self.folderUtils, self.file_pattern_fct) is False:
-            print(False)
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
-            if status is False:
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fct),
+                                           self.folderSoftwareApi + self.file_pattern_fct)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_fct) is False:
                 print(False)
                 return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fct),
+                                           self.folderUtilsApi + self.file_pattern_fct)
+                if status is False:
+                    print(False)
+                    return False
+        else:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fct) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fct), self.folderSoftwareApi + self.file_pattern_fct)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_fct) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fct), self.folderUtilsApi + self.file_pattern_fct)
+                if status is False:
+                    print(False)
+                    return False
 
         print(status)
         return True
 
-    def load_rules(self):
+    def load_rules(self, api=False):
 
         status = True
-
-        if self.process_folder(self.folderSoftware, self.file_pattern_rules) is False:
-            print(False)
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
-            if status is False:
+        # Check is api
+        if api:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_rules) is False:
                 print(False)
                 return False
-        if self.process_folder(self.folderUtils, self.file_pattern_rules) is False:
-            print(False)
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_rules), self.folderUtils + self.file_pattern_rules)
-            if status is False:
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_rules),
+                                           self.folderSoftwareApi + self.file_pattern_rules)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_rules) is False:
                 print(False)
                 return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_rules),
+                                           self.folderUtilsApi + self.file_pattern_rules)
+                if status is False:
+                    print(False)
+                    return False
+        else:
+            if self.process_folder(self.folderSoftware, self.file_pattern_rules) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_rules) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_rules), self.folderUtils + self.file_pattern_rules)
+                if status is False:
+                    print(False)
+                    return False
 
         print(status)
         return True
 
-    def load_fk(self):
+    def load_fk(self, api=False):
 
         status = True
-        print(status)
-        if self.process_folder(self.folderSoftware, self.file_pattern_fk) is False:
-            print(False)
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
-            if status is False:
+
+        # Check is api
+        if api:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fk) is False:
                 print(False)
                 return False
-        print(status)
-        if self.process_folder(self.folderUtils, self.file_pattern_fk) is False:
-            print(False)
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
-            if status is False:
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fk), self.folderSoftwareApi + self.file_pattern_fk)
+                if status is False:
+                    print(False)
+                    return False
+            print(status)
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_fk) is False:
                 print(False)
                 return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fk), self.folderUtilsApi + self.file_pattern_fk)
+                if status is False:
+                    print(False)
+                    return False
+        else:
+            if self.process_folder(self.folderSoftware, self.file_pattern_fk) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
+                if status is False:
+                    print(False)
+                    return False
+            print(status)
+            if self.process_folder(self.folderUtils, self.file_pattern_fk) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
+                if status is False:
+                    print(False)
+                    return False
 
         print(status)
         return True
 
-    def load_trg(self):
+    def load_trg(self, api=False):
 
         status = True
 
-        if self.process_folder(self.folderSoftware, self.file_pattern_trg) is False:
-            print(False)
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
-            if status is False:
+        # Check is api
+        if api:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg) is False:
                 print(False)
                 return False
-        if self.process_folder(self.folderUtils, self.file_pattern_trg) is False:
-            print(False)
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
-            if status is False:
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
+                                           self.folderSoftwareApi + self.file_pattern_trg)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_trg) is False:
                 print(False)
                 return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_trg),
+                                           self.folderUtilsApi + self.file_pattern_trg)
+                if status is False:
+                    print(False)
+                    return False
+        else:
+            if self.process_folder(self.folderSoftware, self.file_pattern_trg) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_trg) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
+                if status is False:
+                    print(False)
+                    return False
 
         print(status)
         return True
 
     # TODO:: take path folder from widget custom folder
-    def load_sql(self):
+    def load_sql(self, path_folder):
+        print(path_folder)
         return
 
     # FUNCTION EXECUCION PROCESS
@@ -512,14 +777,12 @@ class UpdateSQL(ParentAction):
             self.load_trg()
             self.load_dev_data()
             # self.execute_last_process()
-            return
         elif self.rdb_no_ct.isChecked():
             print(str("rdb_no_ct"))
             self.load_base_no_ct()
             self.load_update_ddl_dml()
             self.load_views()
             # self.execute_last_process()
-            return
         elif self.rdb_sample.isChecked():
             print(str("rdb_sample"))
             self.load_base()
@@ -527,7 +790,6 @@ class UpdateSQL(ParentAction):
             self.load_views()
             self.load_sample_data()
             # self.execute_last_process()
-            return
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
             self.load_base()
@@ -536,14 +798,21 @@ class UpdateSQL(ParentAction):
             self.load_sample_data()
             self.load_dev_data()
             # self.execute_last_process()
-            return
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
             self.load_base()
             self.load_update_ddl_dml()
             self.load_views()
             # self.execute_last_process()
-            return
+
+        # Insert information into table inp_project_id and version
+        schemaName = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.project_name)
+        title = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.project_title)
+        author = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_author)
+        date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
+
+        sql = "INSERT INTO "+schemaName+".inp_project_id VALUES ('"+title+"', '"+author+"', '"+date+"')"
+        self.controller.execute_sql(sql)
 
         self.close_dialog(self.dlg_readsql_create_project)
 
@@ -572,6 +841,7 @@ class UpdateSQL(ParentAction):
         # self.execute_last_process()
 
     def rename_project_data_schema(self):
+        self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
         self.load_trg()
         self.load_fk()
         self.load_rules()
@@ -579,40 +849,41 @@ class UpdateSQL(ParentAction):
         # self.execute_last_process()
 
     def implement_api(self):
-        self.load_base()
-        self.load_update_ddl_dml()
-        self.load_views()
+        self.load_base(True)
+        self.load_update_ddl_dml(True)
+        self.load_views(True)
         # self.execute_last_process()
 
-    def load_custom_sql_files(self):
-        self.load_sql()
+    def load_custom_sql_files(self, dialog, widget):
+        folder_path = utils_giswater.getWidgetText(dialog, widget)
+        self.load_sql(folder_path)
         # self.execute_last_process()
 
 
     # CHECKBOX CALLING FUNCTIONS
 
-    def update_ddl_dml(self):
-        self.load_update_ddl_dml()
+    def update_ddl_dml(self, api=False):
+        self.load_update_ddl_dml(api)
         # self.execute_last_process()
 
-    def reload_views(self):
-        self.load_views()
+    def reload_views(self, api=False):
+        self.load_views(api)
         # self.execute_last_process()
 
-    def reload_update_fk(self):
-        self.load_fk()
+    def reload_update_fk(self, api=False):
+        self.load_fk(api)
         # self.execute_last_process()
 
-    def reload_update_rules(self):
-        self.load_rules()
+    def reload_update_rules(self, api=False):
+        self.load_rules(api)
         # self.execute_last_process()
 
-    def reload_update_fct(self):
-        self.load_fct()
+    def reload_update_fct(self, api=False):
+        self.load_fct(api)
         # self.execute_last_process()
 
-    def reload_update_trg(self):
-        self.load_trg()
+    def reload_update_trg(self, api=False):
+        self.load_trg(api)
         # self.execute_last_process()
 
 
@@ -623,7 +894,13 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_show_info = ReadsqlShowInfo()
         self.load_settings(self.dlg_readsql_show_info)
 
+        info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
+
         self.read_info_version()
+
+        info_updates.setText(self.message_update)
+
+
 
         # Open dialog
         self.dlg_readsql_show_info.show()
@@ -635,48 +912,47 @@ class UpdateSQL(ParentAction):
         print(folders)
         for folder in folders:
             print(folder)
-            if str(folder) > str(self.version):
-                sub_folders = os.listdir(self.folderUpdates + folder)
-                print(sub_folders)
-                for sub_folder in sub_folders:
-                    print(sub_folder)
-                    if str(sub_folder) > str(self.version):
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
+            print(self.version)
+            sub_folders = os.listdir(self.folderUpdates + folder)
+            print(sub_folders)
+            for sub_folder in sub_folders:
+                print(sub_folder)
+                if str(sub_folder) > str(self.version):
+                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
+                        print(False)
+                        return False
+                    else:
+                        status = self.readFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'),self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                        if status is False:
                             print(False)
                             return False
-                        else:
-                            status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'),self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/*.txt')
-                            if status is False:
-                                print(False)
-                                return False
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
+                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
+                        print(False)
+                        return False
+                    else:
+                        status = self.readFiles(
+                            os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'),self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                        if status is False:
                             print(False)
                             return False
+                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + self.locale,'') is False:
+                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/EN', '') is False:
+                            return False
                         else:
-                            status = self.executeFiles(
-                                os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'),self.folderUpdates + folder + '/' + sub_folder + '/utils/*.txt')
+                            status = self.readFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/i18n/EN' ),self.folderUpdates + folder + '/' + sub_folder + '/i18n/EN' )
                             if status is False:
-                                print(False)
                                 return False
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale) + '/'),'') is False:
-                            if self.process_folder(self.folderLocale, 'EN') is False:
-                                return False
-                            else:
-                                status = self.executeFiles(os.listdir(self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale)),self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale) + '/*.txt')
-                                if status is False:
-                                    return False
-                        else:
-                            status = self.executeFiles(
-                                os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'),
-                                self.folderUpdates + folder + '/' + sub_folder + '/utils/*.txt')
-                            if status is False:
-                                print(False)
-                                return False
-            else:
-                print("Dont have updates")
+                    else:
+                        status = self.readFiles(
+                            os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + self.locale),
+                            self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + self.locale)
+                        if status is False:
+                            print(False)
+                            return False
+                else:
+                    print("Dont have updates")
         print(status)
         return True
-
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
@@ -716,13 +992,32 @@ class UpdateSQL(ParentAction):
         utils_giswater.set_item_data(self.dlg_info_show_info.project_schema_name, rows, 1)
 
     def filter_srid_changed(self):
-        print("FILTER PLS!")
         filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
         if filter_value is 'null':
             filter_value = ''
         sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(filter_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
+
+    def set_info_project(self):
+        schema_name = utils_giswater.getWidgetText(self.dlg_info_show_info, self.dlg_info_show_info.project_schema_name)
+        sql = "SELECT title, author, date FROM " + schema_name + ".inp_project_id"
+        row = self.controller.get_row(sql)
+        print(row)
+        if row is None:
+            utils_giswater.setWidgetText(self.dlg_info_show_info,
+                                         self.dlg_info_show_info.project_schema_title, '')
+            utils_giswater.setWidgetText(self.dlg_info_show_info,
+                                         self.dlg_info_show_info.project_schema_author, '')
+            utils_giswater.setWidgetText(self.dlg_info_show_info,
+                                         self.dlg_info_show_info.project_schema_last_update, '')
+            return
+        utils_giswater.setWidgetText(self.dlg_info_show_info,
+                                     self.dlg_info_show_info.project_schema_title, str(row[0]))
+        utils_giswater.setWidgetText(self.dlg_info_show_info,
+                                     self.dlg_info_show_info.project_schema_author, str(row[1]))
+        utils_giswater.setWidgetText(self.dlg_info_show_info,
+                                     self.dlg_info_show_info.project_schema_last_update, str(row[2]))
 
     def process_folder(self, folderPath, filePattern):
         status = True
@@ -754,29 +1049,17 @@ class UpdateSQL(ParentAction):
     def api_file_to_db(self):
 
         if self.chk_api_ddl_dml.isChecked():
-            self.update_ddl_dml()
+            self.update_ddl_dml(True)
         if self.chk_api_view.isChecked():
-            self.reload_views()
+            self.reload_views(True)
         if self.chk_api_fk.isChecked():
-            self.reload_update_fk()
+            self.reload_update_fk(True)
         if self.chk_api_rules.isChecked():
-            self.reload_update_rules()
+            self.reload_update_rules(True)
         if self.chk_api_funcion.isChecked():
-            self.reload_update_fct()
+            self.reload_update_fct(True)
         if self.chk_api_trigger.isChecked():
-            self.reload_update_trg()
-
-    def check_foreing_to_primary(self, foreing_widget, primary_widget):
-        if foreing_widget.isChecked() == False:
-            primary_widget.setChecked(False)
-
-    def check_primary_to_foreing(self, primary_widget, foreing_widget1, foreing_widget2):
-        if primary_widget.isChecked() == False:
-            foreing_widget1.setChecked(False)
-            foreing_widget2.setChecked(False)
-        elif primary_widget.isChecked() == True:
-            foreing_widget1.setChecked(True)
-            foreing_widget2.setChecked(True)
+            self.reload_update_trg(True)
 
     def check_relaod_views(self):
 
@@ -791,9 +1074,9 @@ class UpdateSQL(ParentAction):
 
         # TODO:: END FUNCION
         # # Python version
-        # sql = ("SELECT giswater FROM" + self.schema_name + ".version WHERE wsoftware = '" + self.project_type + "'")
+        # sql = ("SELECT * FROM ws_sample.audit_log_project WHERE fprocesscat_id=0 AND user_name='' AND enabled=FALSE")
         # row = self.controller.get_row(sql)
-        # if row > 'python_version':
+        # if xxx:
         #     return False
 
         return True
@@ -834,8 +1117,11 @@ class UpdateSQL(ParentAction):
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
 
-        # TODO::
+        # TODO: Populate combo project type with all projects types (Dinamic)
         cmb_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_project_type')
+        cmb_project_type.addItem('ws')
+        cmb_project_type.addItem('ud')
+        cmb_project_type.addItem('tree manage')
         # Populate combo with all locales
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
         locales = os.listdir(self.sql_dir + '\i18n/')
@@ -880,25 +1166,42 @@ class UpdateSQL(ParentAction):
         filter_srid_value = str(self.filter_srid_value).replace('"','')
         for file in filelist:
             print(file)
-            try:
-                f = open(filedir + '/' + file, 'r')
-                if f:
-                    f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(str('utf-8-sig'))
-                    self.controller.log_info(str(f_to_read))
-                    status = self.controller.execute_sql(str(f_to_read))
-                    if status is False:
-                        print(str(file))
-                        print "Error to execute"
-                        self.dao.rollback()
+            if ".sql" in file:
+                try:
+                    f = open(filedir + '/' + file, 'r')
+                    if f:
+                        f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(str('utf-8-sig'))
+                        self.controller.log_info(str(f_to_read))
+                        status = self.controller.execute_sql(str(f_to_read))
+                        if status is False:
+                            print(str(file))
+                            print "Error to execute"
+                            self.dao.rollback()
+                            return False
+                    else:
                         return False
-                else:
+                except Exception as e:
+                    print "Command skipped. Unexpected error"
+                    print (e)
+                    self.dao.rollback()
                     return False
-            except Exception as e:
-                print "Command skipped. Unexpected error"
-                print (e)
-                self.dao.rollback()
-                return False
-                # self.dao.close()
-                # print lengthy error description!!
-                # sys.exit(2)
+        return True
+
+    def readFiles(self, filelist, filedir):
+        for file in filelist:
+            print(file)
+            if ".txt" in file:
+                try:
+                    f = open(filedir + '/' + file, 'r')
+                    if f:
+                        f_to_read = str(f.read()).decode(str('utf-8-sig'))
+                        self.controller.log_info(str(f_to_read))
+                        self.message_update = self.message_update + '\n' + str(f_to_read)
+                    else:
+                        return False
+                except Exception as e:
+                    print "Command skipped. Unexpected error"
+                    print (e)
+                    self.dao.rollback()
+                    return False
         return True

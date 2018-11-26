@@ -42,7 +42,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="schema_rename"/>
       </item>
      </layout>
     </item>
