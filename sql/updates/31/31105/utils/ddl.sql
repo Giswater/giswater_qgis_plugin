@@ -37,3 +37,7 @@ CREATE TABLE dattrib_type(
 
 ALTER TABLE dattrib ADD CONSTRAINT dattrib_dattrib_type_fkey FOREIGN KEY (dattrib_type)
 REFERENCES dattrib_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+CREATE INDEX dattrib_feature_id_index ON dattrib USING btree (feature_id COLLATE pg_catalog."default");
+
+CREATE INDEX dattrib_dattrib_type_index ON dattrib USING btree (dattrib_type)

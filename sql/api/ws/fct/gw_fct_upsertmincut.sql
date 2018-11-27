@@ -5,7 +5,15 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_upsertmincut"(mincut_id_arg int4, x float8, y float8, srid_arg int4, device int4, insert_data json, p_element_type varchar, id_arg varchar) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_upsertmincut"(mincut_id_arg int4, x float8, y float8, srid_arg int4, device int4, insert_data json, p_element_type varchar, id_arg varchar) 
+RETURNS pg_catalog.json AS 
+$BODY$
+
+/*
+SELECT SCHEMA_NAME.gw_fct_upsertmincut(420, 418995.41052735,4576657.3129692,25831,3,'{}','arc','es')
+*/
+
+
 DECLARE
 
 --    Variables
@@ -18,7 +26,7 @@ DECLARE
     api_version json;
     p_parameter_type text;
     record_aux record;
-    mincut_id integer;
+    v_mincut_id integer;
     inputstring text;
     muni_id_var integer;
     streetaxis_id_var character varying(16);
@@ -34,7 +42,9 @@ DECLARE
     v_old_values record;
     v_message text;
     v_visible_layers text;
-    v_zoom_layer text;
+    v_rectgeometry json;
+    v_rectgeometry_geom public.geometry;
+
 
     
 BEGIN
@@ -50,11 +60,8 @@ BEGIN
 --    Get visible layers
     v_visible_layers := (SELECT value FROM config_param_system WHERE parameter='api_mincut_visible_layers');
 		
---    Get zoom layer
-    v_zoom_layer := (SELECT (value::json->>'mincut_zoom_layer') FROM config_param_system WHERE parameter='api_mincut_parameters');
-	
 --    Mincut id is an argument
-    mincut_id := mincut_id_arg;
+    v_mincut_id := mincut_id_arg;
 
 --    Get current user
     EXECUTE 'SELECT current_user'
@@ -67,7 +74,7 @@ BEGIN
     END IF;
     
 --    Perform INSERT in case of new mincut
-    IF mincut_id ISNULL THEN
+    IF v_mincut_id ISNULL THEN
 
         --    Get mincut class
         IF p_element_type='arc' THEN 
@@ -91,7 +98,7 @@ BEGIN
 
 --        Calculate geometry
         IF v_mincut_class=1 THEN
-            EXECUTE 'SELECT St_closestPoint(arc.the_geom,$1) FROM SCHEMA_NAME.arc ORDER BY ST_Distance(arc.the_geom, $1) LIMIT 1'
+            EXECUTE 'SELECT St_closestPoint(arc.the_geom,$1) FROM arc ORDER BY ST_Distance(arc.the_geom, $1) LIMIT 1'
                 INTO v_geometry
                 USING point_geom;
         ELSE
@@ -102,7 +109,7 @@ BEGIN
         -- Insert mincut
         EXECUTE 'INSERT INTO anl_mincut_result_cat (anl_the_geom) VALUES ($1) RETURNING id'
         USING v_geometry
-        INTO mincut_id;
+        INTO v_mincut_id;
 
         -- Update state
         insert_data := gw_fct_json_object_set_key(insert_data, 'mincut_state', 0);
@@ -111,12 +118,12 @@ BEGIN
 		-- insert into selector publish user
         IF v_mincut_class=1 THEN
 			SELECT value FROM config_param_system WHERE parameter='api_publish_user' INTO v_publish_user;
-			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, mincut_id);	
+			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, v_mincut_id);	
 		END IF;
 
     ELSE
         --getting old values
-        SELECT * INTO v_old_values FROM anl_mincut_result_cat where id=mincut_id;
+        SELECT * INTO v_old_values FROM anl_mincut_result_cat where id=v_mincut_id;
         
         -- Location data is not combo components, the ID's are computed from values
 
@@ -188,7 +195,7 @@ BEGIN
     FOR column_name_var, column_type_var IN SELECT column_name, data_type FROM information_schema.Columns WHERE table_schema = schemas_array[1]::TEXT AND table_name = 'anl_mincut_result_cat' LOOP
         IF (insert_data->>column_name_var) IS NOT NULL THEN
             EXECUTE 'UPDATE anl_mincut_result_cat SET ' || quote_ident(column_name_var) || ' = $1::' || column_type_var || ' WHERE anl_mincut_result_cat.id = $2'
-            USING insert_data->>column_name_var, mincut_id;
+            USING insert_data->>column_name_var, v_mincut_id;
         END IF;
     END LOOP;
 
@@ -197,12 +204,12 @@ BEGIN
     IF mincut_id_arg ISNULL THEN
     
         IF v_mincut_class = 2 THEN
-            INSERT INTO anl_mincut_result_connec(result_id, connec_id, the_geom) VALUES (mincut_id, id_arg, point_geom);
+            INSERT INTO anl_mincut_result_connec(result_id, connec_id, the_geom) VALUES (v_mincut_id, id_arg, point_geom);
         ELSIF v_mincut_class = 3 THEN
-            INSERT INTO anl_mincut_result_hydrometer(result_id, hydrometer_id) VALUES (mincut_id, id_arg);
+            INSERT INTO anl_mincut_result_hydrometer(result_id, hydrometer_id) VALUES (v_mincut_id, id_arg);
         ELSE
-            RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, mincut_id, current_user_var;
-            conflict_text := gw_fct_mincut(id_arg, p_element_type, mincut_id, current_user_var);
+            RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, v_mincut_id, current_user_var;
+            conflict_text := gw_fct_mincut(id_arg, p_element_type, v_mincut_id, current_user_var);
             RAISE NOTICE 'MinCut: %', conflict_text;
         END IF;
 
@@ -210,7 +217,6 @@ BEGIN
         
     ELSE 
     /*
-        v_old_planified_interval:=
         v_new_planified_interval:=
     */
         IF conflict_text = '' or conflict_text is null THEN
@@ -228,12 +234,37 @@ BEGIN
             RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, mincut_id, current_user_var;
             conflict_text := gw_fct_mincut(id_arg, p_element_type, mincut_id, current_user_var);
             RAISE NOTICE 'MinCut: %', conflict_text;
-    END IF;
-    
+    END IF;   
 */
+    -- Geometry to zoom
+    WITH mincut_polygon AS ( SELECT st_collect(a.the_geom) AS locations, a.result_id
+				FROM (SELECT result_id,the_geom FROM anl_mincut_result_node
+					UNION
+					SELECT result_id,the_geom FROM anl_mincut_result_arc )a
+				GROUP BY a.result_id)
+			SELECT 
+				CASE
+					WHEN st_geometrytype(st_concavehull(mincut_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text 
+					THEN st_buffer(st_concavehull(mincut_polygon.locations, 0.99::double precision), 10::double precision)::geometry(Polygon,25831)
+					ELSE st_expand(st_buffer(mincut_polygon.locations, 10::double precision), 1::double precision)::geometry(Polygon,25831)
+				END AS the_geom INTO v_rectgeometry_geom
+				FROM mincut_polygon
+				WHERE result_id=v_mincut_id;
+
+        IF v_rectgeometry_geom IS NULL THEN
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText(St_Envelope (St_Buffer(anl_the_geom,50))) FROM anl_mincut_result_cat WHERE id=$1)row' 
+			INTO v_rectgeometry
+			USING v_mincut_id;
+	ELSE 
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText (st_envelope ($1)))row' 
+			INTO v_rectgeometry
+			USING v_rectgeometry_geom;
+
+	END IF;
 
 --    Control NULL's
     v_message := COALESCE(v_message, '{}');
+    v_visible_layers := COALESCE(v_visible_layers, '{}');
     api_version := COALESCE(api_version, '{}');
 
 --    Return
@@ -241,8 +272,8 @@ BEGIN
         ', "apiVersion":'|| api_version ||
         ', "infoMessage":"' || v_message ||'"'||
         ', "visibleLayers":' || v_visible_layers ||
-        ', "zoomLayer":"' || v_zoom_layer ||'"'||
-        ', "mincut_id":' || mincut_id ||
+        ', "geometry":' || v_rectgeometry ||
+        ', "mincut_id":' || v_mincut_id ||
         '}')::json;
 
 --    Exception handling

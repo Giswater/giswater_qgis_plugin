@@ -1,18 +1,6 @@
-/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
-
-VIEWS_UPDATES
--------------
-Bug fix on v_edit_node, issue#564
-
-
-
-NOT_VIEW_UPDATES
-----------------
+31105-utils
+-----------
+Bug fix when user has not cofigured any value default and do not choose any value on mandatory fields of custom forms, issue#547
 Bug fix on rule on insert_plan_arc_x_pavement, issue#565
 New table dattrib, issue#561
 New table dattrib_type, issue#561
@@ -35,11 +23,8 @@ New function (2530) gw_fct_utils_csv2pg_import_swmm_rpt, issue#536
 New function (2532) gw_fct_utils_csv2pg_import_epa_inp, issue#536
 New function (2534) gw_fct_repair_link, issue#568
 New function (2536) gw_fct_utils_csv2pg_import_epa_rpt, issue#536
+New function (2538) gw_fct_dinlet, issue#566
+New numeration for existing function (2540) gw_fct_inlet_flowtrace, issue#566
 New system parameter sys_custom_views, issue#537 
 New system parameter sys_currency, issue#531
 New system parameter utils_csv2pg_om_visit_parameters, issue#566
-
-
-
-
-

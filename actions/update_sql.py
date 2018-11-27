@@ -38,6 +38,10 @@ class UpdateSQL(ParentAction):
         self.load_settings(self.dlg_info_show_info)
         self.dlg_info_show_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info_show_info))
 
+        # TODO::Get permisions for config_param_system parameter
+        #Set user permisions
+        self.permisions = False
+
         # Get widgets from form
 
         # self.chk_schema_ddl_dml = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_ud')
@@ -82,12 +86,6 @@ class UpdateSQL(ParentAction):
 
         self.populate_data_shcema_name(cmb_project_type)
         self.set_info_project()
-
-        # # RadioButton FK & Not null
-        # self.rdb_enable_fk = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_enable_fk')
-        # self.rdb_disable_fk = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_disable_fk')
-        # self.rdb_enable_null = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_enable_null')
-        # self.rdb_disable_null = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_disable_null')
 
         # Get version
 
@@ -138,9 +136,9 @@ class UpdateSQL(ParentAction):
         btn_info.clicked.connect(partial(self.show_info))
         self.dlg_info_show_info.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
         cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, cmb_project_type))
-        self.dlg_info_show_info.btn_select_file.clicked.connect(partial(self.get_file_dialog, self.dlg_info_show_info, "path_folder"))
-        self.dlg_info_show_info.btn_schema_select_file.clicked.connect(partial(self.get_file_dialog, self.dlg_info_show_info, "schema_path_folder"))
-        self.dlg_info_show_info.btn_api_select_file.clicked.connect(partial(self.get_file_dialog, self.dlg_info_show_info, "api_path_folder"))
+        self.dlg_info_show_info.btn_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_info_show_info, "path_folder"))
+        self.dlg_info_show_info.btn_schema_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_info_show_info, "schema_path_folder"))
+        self.dlg_info_show_info.btn_api_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_info_show_info, "api_path_folder"))
 
 
         if self.check_relaod_views() is True:
@@ -150,6 +148,11 @@ class UpdateSQL(ParentAction):
         if self.check_version_schema() is False:
             self.chk_schema_ddl_dml.setEnabled(False)
             self.chk_api_ddl_dml.setEnabled(False)
+
+        #TODO::Descomentar
+        # if self.permisions is False:
+        #     utils_giswater.remove_tab_by_tabName(self.dlg_info_show_info.tab_main, "devtools")
+        #     utils_giswater.remove_tab_by_tabName(self.dlg_info_show_info.tab_main, "api")
 
         # Open dialog
         self.dlg_info_show_info.show()
@@ -246,20 +249,19 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     return False
             if self.process_folder(self.folderLocaleApi,
-                                   utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)) is False:
+                                   str(self.locale)) is False:
                 if self.process_folder(self.folderLocaleApi, 'EN') is False:
                     return False
                 else:
                     status = self.executeFiles(os.listdir(
-                        self.folderLocaleApi + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)),
-                        self.folderLocaleApi + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale))
+                        self.folderLocaleApi + str(self.locale)),
+                        self.folderLocaleApi + str(self.locale))
                     if status is False:
                         return False
             else:
                 status = self.executeFiles(os.listdir(
-                    self.folderLocaleApi + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)),
-                                           self.folderLocaleApi + utils_giswater.getWidgetText(self.dlg_info_show_info,
-                                                                                            self.cmb_locale))
+                    self.folderLocaleApi + str(self.locale)),
+                                           self.folderLocaleApi + str(self.locale))
                 if status is False:
                     return False
         else:
@@ -336,16 +338,16 @@ class UpdateSQL(ParentAction):
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
                 if status is False:
                     return False
-            if self.process_folder(self.folderLocale, utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)) is False:
-                if self.process_folder(self.folderLocale, 'EN') is False:
+            if self.process_folder(self.folderLocale, '') is False:
+                if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                     return False
                 else:
                     status = self.executeFiles(os.listdir(
-                        self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale))
+                        self.sql_dir + '\i18n/' + 'EN'), self.sql_dir + '\i18n/' + 'EN')
                     if status is False:
                         return False
             else:
-                status = self.executeFiles(os.listdir(self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale))
+                status = self.executeFiles(os.listdir(self.folderLocale), self.folderLocale)
                 if status is False:
                     return False
 
@@ -392,16 +394,16 @@ class UpdateSQL(ParentAction):
             status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
             if status is False:
                 return False
-        if self.process_folder(self.folderLocale, utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)) is False:
+        if self.process_folder(self.folderLocale, str(self.locale)) is False:
             if self.process_folder(self.folderLocale, 'EN') is False:
                 return False
             else:
                 status = self.executeFiles(os.listdir(
-                    self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info,self.cmb_locale))
+                    self.folderLocale + str(self.locale)), self.folderLocale + str(self.locale))
                 if status is False:
                     return False
         else:
-            status = self.executeFiles(os.listdir(self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale)), self.folderLocale + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale))
+            status = self.executeFiles(os.listdir(self.folderLocale + str(self.locale)), self.folderLocale + str(self.locale))
             if status is False:
                 return False
 
@@ -414,10 +416,20 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
+            print("api1")
             folders = os.listdir(self.folderUpdatesApi + '')
+            print("folders2")
+            print(folders)
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdatesApi + folder)
+                print("sub_folders3")
+                print(sub_folders)
+
                 for sub_folder in sub_folders:
+                    print("sub_folder4")
+                    print(sub_folder)
+                    print("version5")
+                    print(self.version)
                     if str(sub_folder) > str(self.version):
                         if self.process_folder(
                                 self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
@@ -442,8 +454,7 @@ class UpdateSQL(ParentAction):
                             if status is False:
                                 print(False)
                                 return False
-                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(
-                                utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale) + '/'),
+                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                                '') is False:
                             if self.process_folder(self.folderLocaleApi, 'EN') is False:
                                 return False
@@ -483,8 +494,7 @@ class UpdateSQL(ParentAction):
                             if status is False:
                                 print(False)
                                 return False
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
-                                utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale) + '/'), '') is False:
+                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'), '') is False:
                             if self.process_folder(self.folderLocale, 'EN') is False:
                                 return False
                             else:
@@ -494,7 +504,7 @@ class UpdateSQL(ParentAction):
                                 if status is False:
                                     return False
                         else:
-                            status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'), self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                            status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/')), self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'))
                             if status is False:
                                 print(False)
                                 return False
@@ -521,16 +531,16 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     return False
         else:
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
+            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
                 if status is False:
                     return False
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_view + '/') is False:
+            if self.process_folder(self.folderUtils, self.file_pattern_view + '/') is False:
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_view), self.folderUtilsApi + self.file_pattern_view)
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_view), self.folderUtils + self.file_pattern_view)
                 if status is False:
                     return False
 
@@ -589,19 +599,19 @@ class UpdateSQL(ParentAction):
                     print(False)
                     return False
         else:
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fct) is False:
+            if self.process_folder(self.folderSoftware, self.file_pattern_fct) is False:
                 print(False)
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fct), self.folderSoftwareApi + self.file_pattern_fct)
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
                 if status is False:
                     print(False)
                     return False
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_fct) is False:
+            if self.process_folder(self.folderUtils, self.file_pattern_fct) is False:
                 print(False)
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fct), self.folderUtilsApi + self.file_pattern_fct)
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
                 if status is False:
                     print(False)
                     return False
@@ -745,7 +755,13 @@ class UpdateSQL(ParentAction):
 
     # TODO:: take path folder from widget custom folder
     def load_sql(self, path_folder):
-        print(path_folder)
+        for (path, ficheros, archivos) in os.walk(path_folder):
+            print path
+            print ficheros
+            print archivos
+            status = self.executeFiles(archivos, path)
+            if status is False:
+                return False
         return
 
     # FUNCTION EXECUCION PROCESS
@@ -900,6 +916,10 @@ class UpdateSQL(ParentAction):
 
         info_updates.setText(self.message_update)
 
+        #Set listeners
+        self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_show_info))
+
+
 
 
         # Open dialog
@@ -1023,6 +1043,7 @@ class UpdateSQL(ParentAction):
         status = True
 
         try:
+            print("test10")
             print(os.listdir(folderPath + filePattern))
         # except Exception, e: print str(e)
         except Exception as e:
@@ -1087,7 +1108,6 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_create_project = ReadsqlCreateProject()
         self.load_settings(self.dlg_readsql_create_project)
 
-        permisions = False
 
         # Find Widgets in form
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
@@ -1104,7 +1124,7 @@ class UpdateSQL(ParentAction):
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
         self.btn_push_file  = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
-        if permisions is False:
+        if self.permisions is False:
             self.rdb_no_ct.setEnabled(False)
             self.rdb_sample_dev.setEnabled(False)
 
@@ -1159,6 +1179,11 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_rename.show()
 
     def executeFiles(self, filelist, filedir):
+        print("test20")
+        print(filelist)
+        print(filedir)
+        if not filelist:
+            return
         if self.schema is None:
             schema_name = self.schema_name.replace('"','')
         else:

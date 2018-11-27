@@ -18,7 +18,7 @@ v_flag boolean = false;
 BEGIN 
 	-- set search_path
     SET search_path= 'SCHEMA_NAME','public';
-
+	
 	SELECT anl_feature_id INTO feature_id_aux FROM anl_mincut_result_cat WHERE id=result_id_var;
 	SELECT anl_feature_type INTO feature_type_aux FROM anl_mincut_result_cat WHERE id=result_id_var;
 
@@ -39,7 +39,7 @@ BEGIN
 	END IF;
 	
 	-- Recalculate the mincut
-	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var, cur_user_var);
+	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var, current_user);
 
 	-- In case of variable om_mincut_valvestat_using_valveunaccess on TRUE and valve closed status on TRUE)
 	IF v_flag IS TRUE THEN

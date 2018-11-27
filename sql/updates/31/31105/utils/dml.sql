@@ -65,3 +65,7 @@ INSERT INTO dattrib_type VALUES (1, 'dminsector', 'Dynamic mapzone defined as a 
 INSERT INTO dattrib_type VALUES (2, 'pipehazard', 'Number of hydrometers afected in case of break of pipe', 'ws');
 INSERT INTO dattrib_type VALUES (3, 'dinletsector', 'Dynamic mapzone defined as area supplied from the same inlet','ws');
 INSERT INTO dattrib_type VALUES (4, 'dstaticpress', 'In function of inlet, value of the static pressure using inlet eletavion on feature elevation', 'ws');
+
+-- 2018/11/23
+INSERT INTO audit_cat_function VALUES (2538, 'gw_fct_dinlet', 'om', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2540, 'gw_fct_inlet_flowtrace', 'om', NULL, '', '', NULL, NULL, NULL);

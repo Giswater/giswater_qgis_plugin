@@ -31,8 +31,8 @@ DECLARE
     v_firsttab boolean := FALSE;
     v_active boolean;
     rec_fields record;
-    v_character_number json;
-
+    threshold integer;
+    threshold_postnumber integer;
 
     --Address
     v_search_vdef text;
@@ -47,14 +47,19 @@ BEGIN
 
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+   SET search_path = "SCHEMA_NAME", public;
 
 --  get api values
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+   EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''api_search_character_number'') row'
-        INTO v_character_number;
+-- get numbers of character to search (to all searcher box in exception postnumber)
+   EXECUTE 'SELECT value::integer FROM config_param_system WHERE parameter=''api_search_character_number'' LIMIT 1'
+        INTO threshold;
+
+-- get numbers of character to search on postnumber
+    EXECUTE 'SELECT value::integer FROM config_param_system WHERE parameter=''api_search_minimsearch'' LIMIT 1'
+        INTO threshold_postnumber;
 
 -- Create tabs array
     formTabs := '[';
@@ -85,8 +90,8 @@ BEGIN
 
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='net_code';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType',
-        'string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string',
+        'threshold', threshold, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
         
         -- Create array with network fields
         fieldsJson := '[' || comboType || ',' || editCode || ']';
@@ -116,8 +121,8 @@ BEGIN
     
         -- Create search field
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='generic_search';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead', 'searchService', 
-        (SELECT value FROM config_param_system WHERE parameter='api_search_service' LIMIT 1),'dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead', 'searchService', 'dataType','string',
+        'threshold', threshold, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
         
         fieldsJson := '[' ||  editCode || ']';
         fieldsJson := COALESCE(fieldsJson, '[]');
@@ -181,14 +186,14 @@ BEGIN
 
         -- Create street search field
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='add_street';
-        editCode1 := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode1 := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType', 'string',
+        'threshold', threshold, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
                 
 
         -- Create postnumber search field
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='add_postnumber';
-        editCode2 := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','threshold', 
-        (SELECT value::integer FROM config_param_system WHERE parameter='api_search_minimsearch' LIMIT 1),
-        'dataType','string','placeholder','','disabled',true,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode2 := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string',
+        'threshold', threshold_postnumber, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
     
         -- Create array with network fields
@@ -254,7 +259,8 @@ BEGIN
     
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='hydro_search';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string',
+        'threshold', threshold, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
     
         -- Create array with hydro fields
         fieldsJson := '[' || comboType || ',' || editCode || ']';
@@ -284,7 +290,8 @@ BEGIN
 
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='workcat_search';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string',
+        'threshold', threshold, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
         -- Create array with workcat fields
         fieldsJson := '[' || editCode || ']';
@@ -347,7 +354,8 @@ BEGIN
     
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='psector_search';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string',
+        'threshold', threshold, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
     
         -- Create array with hydro fields
         fieldsJson := '[' || comboType || ',' || editCode || ']';
@@ -374,7 +382,8 @@ BEGIN
 
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='visit_search';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string','placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead','dataType','string',
+        'threshold', threshold, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
 
         -- Create array with workcat fields
         fieldsJson := '[' || editCode || ']';
@@ -417,7 +426,6 @@ BEGIN
         RETURN ('{"status":"Accepted"' ||
             ', "apiVersion":'|| api_version ||
             ', "enabled":true'||
-            ', "threshold":'||v_character_number||
             ', "formTabs":' || formTabs ||
             '}')::json;
     END IF;

@@ -4,8 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- 2&/11/2018
-ALTER TABLE ext_cat_period RENAME starttime TO start_date;
-ALTER TABLE ext_cat_period RENAME endtime TO end_date;
 
-ALTER TABLE ext_rtc_hydrometer_x_data ADD COLUMN value_date date;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
+-- 2018/11/21
+UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id='F32' and name='composer';
+UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id='F32' and name='scale';

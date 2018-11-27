@@ -53,8 +53,7 @@ BEGIN
 	AND NOT a.attisdropped
 	AND t.relname = $1
 	AND s.nspname = $2
-	AND s.attname !=''the_geom''
-    AND s.attname !=''geom''
+	AND (a.attname !=''the_geom'' OR a.attname !=''geom'')
 	AND a.atttypid != 150381
 	ORDER BY a.attnum ) a'
         INTO fields_array
