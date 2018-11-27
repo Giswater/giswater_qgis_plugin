@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-drop view IF EXISTS v_rtc_hydrometer cascade;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
  SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
