@@ -5,7 +5,15 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoconnects"(element_type varchar, id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
+-- Function: SCHEMA_NAME.gw_fct_getinfoconnects(character varying, character varying, integer)
+
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfoconnects(
+    v_element_type character varying,
+    v_id character varying,
+    device integer)
+  RETURNS json AS
+$BODY$
 DECLARE
 
 /*EXAMPLE QUERYS
@@ -35,13 +43,13 @@ BEGIN
         INTO api_version;
 
 --  Armonize element type
-     element_type := lower (element_type);
-     IF RIGHT (element_type,1)=':' THEN
-            element_type := reverse(substring(reverse(element_type) from 2 for 99));
+     v_element_type := lower (v_element_type);
+     IF RIGHT (v_element_type,1)=':' THEN
+            v_element_type := reverse(substring(reverse(v_element_type) from 2 for 99));
      END IF;
 
 --    Query depends on element type
-    IF element_type = 'arc' THEN
+    IF v_element_type = 'arc' THEN
 
 --        Get label
 --	Label is used from what is called on the geinfofromid method. Only for nodes label is called from this method
@@ -51,20 +59,27 @@ BEGIN
             INTO query_result
             USING device;
 
+            raise notice 'query_result %', query_result;
+
 --        Get connects
-        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE concat($2,''_id'')::text = $1) a'
+        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE arc_id::text = $1::text) a'
             INTO query_result_connects
-            USING id, element_type;
+            USING v_id, v_element_type;
+
+            raise notice 'query_result_connects %', query_result_connects;
+            raise notice 'v_id %', v_id;
+            raise notice 'v_element_type %', v_element_type;
+
 
 --        Get node_1
         EXECUTE 'SELECT row_to_json(a) FROM (SELECT node_1 AS sys_id, ''v_edit_node'' as sys_table_id, ''node_id'' as sys_idname FROM arc JOIN node ON (node_1 = node_id) WHERE arc.arc_id::text = $1) a'
             INTO query_result_node_1
-            USING id;
+            USING v_id;
 
 --        Get node_2
         EXECUTE 'SELECT row_to_json(a) FROM (SELECT node_2 AS sys_id,  ''v_edit_node'' as sys_table_id, ''node_id'' as sys_idname FROM arc JOIN node ON (node_2 = node_id) WHERE arc.arc_id::text = $1) a'
             INTO query_result_node_2
-            USING id;
+            USING v_id;
 
 --        Control NULL's
         query_result_connects := COALESCE(query_result_connects, '{}');
@@ -91,7 +106,7 @@ BEGIN
 --      Get connects upstream
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE node_id::text = $1) a'
 		INTO query_result_upstream
-		USING id;
+		USING v_id;
 
 --      Get query for connects downstream
         EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = ''node_x_connect_downstream'' AND device = $1'
@@ -100,7 +115,7 @@ BEGIN
 --        Get connects downstream
        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE node_id::text = $1) a'
 		INTO query_result_downstream
-		USING id;       
+		USING v_id;       
     END IF;
 
 --        Control NULL's
