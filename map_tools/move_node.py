@@ -115,12 +115,12 @@ class MoveNodeMapTool(ParentMapTool):
         # Get active layer
         self.active_layer = self.iface.activeLayer()
         
-        # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        # Set active layer to 've_node'
+        self.layer_node = self.controller.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer_node)    
         
-        # Get layer to 'v_edit_arc'
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")          
+        # Get layer to 've_arc'
+        self.layer_arc = self.controller.get_layer_by_tablename("ve_arc")
  
         # Set the mapTool's parent cursor
         self.canvas.setCursor(self.cursor)  
@@ -173,7 +173,7 @@ class MoveNodeMapTool(ParentMapTool):
         # Snap to node
         if self.snapped_feat is None:
             
-            # Make sure active layer is 'v_edit_node'
+            # Make sure active layer is 've_node'
             cur_layer = self.iface.activeLayer()
             if cur_layer != self.layer_node:
                 self.iface.setActiveLayer(self.layer_node)             
@@ -196,7 +196,7 @@ class MoveNodeMapTool(ParentMapTool):
         # Snap to arc
         else:
             
-            # Make sure active layer is 'v_edit_arc'
+            # Make sure active layer is 've_arc'
             cur_layer = self.iface.activeLayer()
             if cur_layer != self.layer_arc:
                 self.iface.setActiveLayer(self.layer_arc)               

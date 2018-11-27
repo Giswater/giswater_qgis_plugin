@@ -88,21 +88,21 @@ class ParentManage(ParentAction, object):
     def remove_selection(self, remove_groups=True):
         """ Remove all previous selections """
 
-        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        layer = self.controller.get_layer_by_tablename("ve_arc")
         if layer:
             layer.removeSelection()
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        layer = self.controller.get_layer_by_tablename("ve_node")
         if layer:
             layer.removeSelection()
-        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        layer = self.controller.get_layer_by_tablename("ve_connec")
         if layer:
             layer.removeSelection()
-        layer = self.controller.get_layer_by_tablename("v_edit_element")
+        layer = self.controller.get_layer_by_tablename("ve_element")
         if layer:
             layer.removeSelection()
             
         if self.project_type == 'ud':
-            layer = self.controller.get_layer_by_tablename("v_edit_gully")
+            layer = self.controller.get_layer_by_tablename("ve_gully")
             if layer:
                 layer.removeSelection()
 
@@ -425,7 +425,7 @@ class ParentManage(ParentAction, object):
 
         self.hide_generic_layers()                  
         widget_name = "tbl_" + table_object + "_x_" + str(self.geom_type)
-        viewname = "v_edit_" + str(self.geom_type)
+        viewname = "ve_" + str(self.geom_type)
         self.widget = utils_giswater.getWidget(dialog, widget_name)
             
         # Adding auto-completion to a QLineEdit
@@ -574,7 +574,7 @@ class ParentManage(ParentAction, object):
                 return expr
 
         # Set a model with selected filter expression
-        table_name = "v_edit_" + geom_type
+        table_name = "ve_" + geom_type
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -766,6 +766,7 @@ class ParentManage(ParentAction, object):
 
     def selection_init(self, dialog, table_object, query=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
+        self.controller.log_info(str("TEST"))
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
                                              parent_manage=self, table_object=table_object, dialog=dialog)
         self.previous_map_tool = self.canvas.mapTool()        
@@ -1072,20 +1073,20 @@ class ParentManage(ParentAction, object):
     def hide_generic_layers(self, visible=False):       
         """ Hide generic layers """
         
-        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        layer = self.controller.get_layer_by_tablename("ve_arc")
         self.controller.set_layer_visible(layer, visible)
         
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        layer = self.controller.get_layer_by_tablename("ve_node")
         self.controller.set_layer_visible(layer, visible)
         
-        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        layer = self.controller.get_layer_by_tablename("ve_connec")
         self.controller.set_layer_visible(layer, visible)
         
-        layer = self.controller.get_layer_by_tablename("v_edit_element")
+        layer = self.controller.get_layer_by_tablename("ve_element")
         self.controller.set_layer_visible(layer, visible)
             
         if self.project_type == 'ud':
-            layer = self.controller.get_layer_by_tablename("v_edit_gully")
+            layer = self.controller.get_layer_by_tablename("ve_gully")
             self.controller.set_layer_visible(layer, visible)
         
     

@@ -118,8 +118,8 @@ class DrawProfiles(ParentMapTool):
 
             self.dlg_draw_profile.cbx_template.currentIndexChanged.connect(self.set_template)
 
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.layer_node = self.controller.get_layer_by_tablename("ve_node")
+        self.layer_arc = self.controller.get_layer_by_tablename("ve_arc")
         
         self.nodes = []
         self.list_of_selected_nodes = []
@@ -235,7 +235,7 @@ class DrawProfiles(ParentMapTool):
         # Select arcs of the shortest path
         for element_id in arc_id:
             sql = ("SELECT sys_type"
-                   " FROM " + self.schema_name + ".v_edit_arc"
+                   " FROM " + self.schema_name + ".ve_arc"
                    " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -276,7 +276,7 @@ class DrawProfiles(ParentMapTool):
         # Select nodes of shortest path on layers v_edit_man_|feature
         for element_id in node_id:
             sql = ("SELECT sys_type"
-                   " FROM " + self.schema_name + ".v_edit_node"
+                   " FROM " + self.schema_name + ".ve_node"
                    " WHERE node_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -295,7 +295,7 @@ class DrawProfiles(ParentMapTool):
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
             self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
-        # Select arcs of shortest path on v_edit_arc for ZOOM SELECTION
+        # Select arcs of shortest path on ve_arc for ZOOM SELECTION
         expr_filter = "\"arc_id\" IN ("
         for i in range(len(arc_id)):
             expr_filter += "'" + str(arc_id[i]) + "', "
@@ -553,9 +553,9 @@ class DrawProfiles(ParentMapTool):
 
         # Get length (gis_length) of arcs and save them in separate list ( self.gis_length )
         for arc_id in self.list_of_selected_arcs:
-            # Get gis_length from v_edit_arc
+            # Get gis_length from ve_arc
             sql = ("SELECT gis_length"
-                   " FROM " + self.schema_name + ".v_edit_arc"
+                   " FROM " + self.schema_name + ".ve_arc"
                    " WHERE arc_id = '" + str(arc_id) + "'")
             row = self.controller.get_row(sql)
             if row:
@@ -579,10 +579,10 @@ class DrawProfiles(ParentMapTool):
             # self.parameters : list of parameters for one node
             # self.parameters [start_point, top_elev, y_max,z1, z2, cat_geom1, geom1, slope, elev1, elev2,y1 ,y2, node_id, elev]
             parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None, None]
-            # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
+            # Get data top_elev ,y_max, elev, nodecat_id from ve_node
             # Change elev to sys_elev
             sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code"
-                   " FROM  " + self.schema_name + ".v_edit_node"
+                   " FROM  " + self.schema_name + ".ve_node"
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
             columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
@@ -604,7 +604,7 @@ class DrawProfiles(ParentMapTool):
                 nodecat_id = row[3]
                 parameters[14] = row[4]
 
-            # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
+            # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from ve_arc
             # Change to elevmax1 and elevmax2
             # Geom1 from cat_node
             sql = ("SELECT geom1"
@@ -634,7 +634,7 @@ class DrawProfiles(ParentMapTool):
         for element_id in self.arc_id:
 
             sql = ("SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, sys_y1 AS y1, sys_y2 AS y2, slope"
-                   " FROM " + self.schema_name + ".v_edit_arc"
+                   " FROM " + self.schema_name + ".ve_arc"
                    " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             columns = ['z1','z2','cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
@@ -1141,7 +1141,7 @@ class DrawProfiles(ParentMapTool):
         # Select arcs of the shortest path
         for element_id in self.arc_id:
             sql = ("SELECT sys_type"
-                   " FROM " + self.schema_name + ".v_edit_arc"
+                   " FROM " + self.schema_name + ".ve_arc"
                    " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -1163,7 +1163,7 @@ class DrawProfiles(ParentMapTool):
         # Select nodes of shortest path on layers v_edit_man_|feature
         for element_id in self.node_id:
             sql = ("SELECT sys_type"
-                   " FROM " + self.schema_name + ".v_edit_node"
+                   " FROM " + self.schema_name + ".ve_node"
                    " WHERE node_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
             if not row:
@@ -1182,7 +1182,7 @@ class DrawProfiles(ParentMapTool):
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
             self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
-        # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
+        # Select nodes of shortest path on ve_arc for ZOOM SELECTION
         expr_filter = "\"arc_id\" IN ("
         for i in range(len(self.arc_id)):
             expr_filter += "'" + str(self.arc_id[i]) + "', "
@@ -1477,7 +1477,7 @@ class DrawProfiles(ParentMapTool):
             # Select arcs of the shortest path
             for element_id in self.arc_id:
                 sql = ("SELECT sys_type"
-                       " FROM " + self.schema_name + ".v_edit_arc"
+                       " FROM " + self.schema_name + ".ve_arc"
                        " WHERE arc_id = '" + str(element_id) + "'")
                 row = self.controller.get_row(sql)
                 if not row:
@@ -1499,7 +1499,7 @@ class DrawProfiles(ParentMapTool):
             # Select nodes of shortest path on layers v_edit_man_|feature
             for element_id in self.node_id:
                 sql = ("SELECT sys_type"
-                       " FROM " + self.schema_name + ".v_edit_node"
+                       " FROM " + self.schema_name + ".ve_node"
                        " WHERE node_id = '" + str(element_id) + "'")
                 row = self.controller.get_row(sql)
                 if not row:
@@ -1518,7 +1518,7 @@ class DrawProfiles(ParentMapTool):
                 selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
                 self.layer_feature.setSelectedFeatures([a.id() for a in selection])
 
-            # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
+            # Select nodes of shortest path on ve_arc for ZOOM SELECTION
             expr_filter = "\"arc_id\" IN ("
             for i in range(len(self.arc_id)):
                 expr_filter += "'" + str(self.arc_id[i]) + "', "

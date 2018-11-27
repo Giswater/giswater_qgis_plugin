@@ -1346,7 +1346,7 @@ class ParentDialog(QDialog):
         self.cat_period_id_filter = self.dialog.findChild(QComboBox, "cat_period_id_filter")
 
         # Populate combo filter hydrometer value
-        sql = "SELECT distinct(cat_period_id) FROM " + self.schema_name + ".v_edit_rtc_hydro_data_x_connec ORDER BY cat_period_id"
+        sql = "SELECT distinct(cat_period_id) FROM " + self.schema_name + ".ve_rtc_hydro_data_x_connec ORDER BY cat_period_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dialog, self.cat_period_id_filter, rows)
         self.controller.log_info(str(sql))
@@ -1949,7 +1949,7 @@ class ParentDialog(QDialog):
         node = None
         srid = self.controller.plugin_settings_value('srid')        
         geom_point = "ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), " + str(srid) + ")"     
-        sql = ("SELECT node_id FROM " + self.schema_name + ".v_edit_node" 
+        sql = ("SELECT node_id FROM " + self.schema_name + ".ve_node"
                " WHERE ST_DWithin(" + str(geom_point) + ", the_geom, " + str(arc_searchnodes) + ")" 
                " ORDER BY ST_Distance(" + str(geom_point) + ", the_geom) LIMIT 1")          
         row = self.controller.get_row(sql, log_sql=True)  

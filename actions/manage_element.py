@@ -112,11 +112,11 @@ class ManageElement(ParentManage):
 
         # Adding auto-completion to a QLineEdit for default feature
         #geom_type = "node"
-        viewname = "v_edit_" + geom_type
+        viewname = "ve_" + geom_type
         self.set_completer_feature_id(self.dlg_add_element.feature_id, geom_type, viewname)
 
         # Get layer element and save if is visible or not for restore when finish process
-        layer_element = self.controller.get_layer_by_tablename("v_edit_element")
+        layer_element = self.controller.get_layer_by_tablename("ve_element")
         layer_is_visible = self.controller.is_layer_visible(layer_element)
 
         # Set signals
@@ -140,7 +140,7 @@ class ManageElement(ParentManage):
         self.geom_type = "arc"
         self.tab_feature_changed(self.dlg_add_element, table_object)
 
-        # Force layer v_edit_element set active True
+        # Force layer ve_element set active True
         self.controller.set_layer_visible(layer_element)
 
         # If is a new element dont need set enddate
@@ -167,7 +167,7 @@ class ManageElement(ParentManage):
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = geom_type + "_id = '" + str(feature_id) + "'"
         # Set model of selected widget
-        table_name = self.schema_name + ".v_edit_" + geom_type
+        table_name = self.schema_name + ".ve_" + geom_type
         self.set_model_to_table(widget, table_name, expr_filter)
 
         # Adding auto-completion to a QLineEdit

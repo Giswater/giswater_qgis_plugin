@@ -139,8 +139,8 @@ class DeleteNodeMapTool(ParentMapTool):
         # Clear snapping
         self.snapper_manager.clear_snapping()
 
-        # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        # Set active layer to 've_node'
+        self.layer_node = self.controller.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer_node)            
 
         # Change cursor

@@ -94,7 +94,7 @@ class ManageWorkcatEnd(ParentManage):
 
         # Adding auto-completion to a QLineEdit for default feature
         geom_type = "arc"
-        viewname = "v_edit_" + geom_type
+        viewname = "ve_" + geom_type
         self.set_completer_feature_id(self.dlg_work_end.feature_id, geom_type, viewname)
 
         # Set default tab 'arc'
@@ -239,7 +239,7 @@ class ManageWorkcatEnd(ParentManage):
     def update_geom_type(self, geom_type, ids_list):
         """ Get elements from @geom_type and update his corresponding table """
         
-        tablename = "v_edit_" + geom_type
+        tablename = "ve_" + geom_type
         if self.selected_list is None:
             return
 
@@ -296,7 +296,7 @@ class ManageWorkcatEnd(ParentManage):
 
         # Get sys_feature_cat.id from cat_feature.id
         sql = ("SELECT sys_type"
-               " FROM " + self.schema_name + ".v_edit_arc"
+               " FROM " + self.schema_name + ".ve_arc"
                " WHERE arc_id = '" + arc_id + "'")
         row = self.controller.get_row(sql)
         if not row:

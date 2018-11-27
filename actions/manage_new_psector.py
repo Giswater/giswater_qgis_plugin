@@ -238,10 +238,10 @@ class ManageNewPsector(ParentManage):
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
 
-            layer = self.controller.get_layer_by_tablename('v_edit_'+self.plan_om+'_psector')
+            layer = self.controller.get_layer_by_tablename('ve_'+self.plan_om+'_psector')
             if not layer:
                 message = "Layer not found"
-                self.controller.show_message(message, message_level=2, parameter='v_edit_'+self.plan_om+'_psector')
+                self.controller.show_message(message, message_level=2, parameter='ve_'+self.plan_om+'_psector')
                 return
             expr_filter = "psector_id = '" + str(psector_id) + "'"
             (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
@@ -262,7 +262,7 @@ class ManageNewPsector(ParentManage):
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Set signals
-        self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.insert_or_update_new_psector, "v_edit_" + self.plan_om + '_psector', True))
+        self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.insert_or_update_new_psector, "ve_" + self.plan_om + '_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.psector_type.currentIndexChanged.connect(partial(self.populate_result_id, self.dlg_plan_psector.result_id, self.plan_om + '_result_cat'))
@@ -283,7 +283,7 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_plan_psector, table_object))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, self.plan_om + '_psector'))
         self.dlg_plan_psector.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_plan_psector, self.dlg_plan_psector.txt_name,
-            self.dlg_plan_psector.all_rows, 'v_price_compost', 'v_edit_'+self.plan_om + '_psector_x_other', "id"))
+            self.dlg_plan_psector.all_rows, 'v_price_compost', 've_'+self.plan_om + '_psector_x_other', "id"))
 
         self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'gexpenses'))
         self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calulate_percents, self.plan_om + '_psector', psector_id, 'vat'))
@@ -306,7 +306,7 @@ class ManageNewPsector(ParentManage):
 
         # Adding auto-completion to a QLineEdit for default feature
         self.geom_type = "arc"
-        viewname = "v_edit_" + self.geom_type
+        viewname = "ve_" + self.geom_type
         self.set_completer_feature_id(self.dlg_plan_psector.feature_id, self.geom_type, viewname)
 
         # Set default tab 'arc'
@@ -676,11 +676,11 @@ class ManageNewPsector(ParentManage):
     def check_tab_position(self):
         
         self.dlg_plan_psector.name.setEnabled(False)
-        self.insert_or_update_new_psector(tablename='v_edit_'+self.plan_om + '_psector', close_dlg=False)
+        self.insert_or_update_new_psector(tablename='ve_'+self.plan_om + '_psector', close_dlg=False)
         self.update = True
         if self.dlg_plan_psector.tabWidget.currentIndex() == 2:
             tableleft = "v_price_compost"
-            tableright = "v_edit_" + self.plan_om + "_psector_x_other"
+            tableright = "ve_" + self.plan_om + "_psector_x_other"
             field_id_right = "price_id"
             self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
             self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
@@ -811,7 +811,7 @@ class ManageNewPsector(ParentManage):
             self.enable_buttons(True)
 
         sql = ("SELECT column_name FROM information_schema.columns"
-               " WHERE table_name = '" + "v_edit_" + self.plan_om + "_psector'"
+               " WHERE table_name = '" + "ve_" + self.plan_om + "_psector'"
                " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
                " ORDER BY ordinal_position")
         rows = self.controller.get_rows(sql)
