@@ -65,8 +65,8 @@ class ManageNewPsector(ParentManage):
         self.list_elemets = {}
         self.reset_lists()
         self.reset_layers()
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
+        self.layers['arc'] = self.controller.api_get_group_layers('arc')
+        self.layers['node'] = self.controller.api_get_group_layers('node')
         self.update = False  # if false: insert; if true: update
 
         # Remove all previous selections

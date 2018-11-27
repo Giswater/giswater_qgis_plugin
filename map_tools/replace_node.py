@@ -82,10 +82,9 @@ class ReplaceNodeMapTool(ParentMapTool):
 
         # Get nodetype_id from current node
         project_type = self.controller.get_project_type()
-        if project_type == 'ws':
-            node_type = feature.attribute('nodetype_id')
+        node_type = feature.attribute('node_type')
+
         if project_type == 'ud':
-            node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".cat_node ORDER BY id"
             rows = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(self.dlg_nodereplace, "node_nodecat_id", rows, allow_nulls=False)

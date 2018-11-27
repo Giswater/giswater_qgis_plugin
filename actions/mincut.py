@@ -99,7 +99,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Parametrize list of layers
-        self.layers_connec = self.controller.get_group_layers('connec')                        
+        self.layers_connec = self.controller.api_get_group_layers('connec')
         self.layer_node = self.controller.get_layer_by_tablename("ve_node")
         self.layer_arc = self.controller.get_layer_by_tablename("ve_arc")
 
@@ -1404,7 +1404,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 node_exist = '0'
 
             if node_exist == '0':
-                layers_arc = self.controller.get_group_layers('arc')
+                layers_arc = self.controller.api_get_group_layers('arc')
                 self.layernames_arc = []
                 for layer in layers_arc:
                     self.layernames_arc.append(layer.name())

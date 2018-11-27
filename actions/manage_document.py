@@ -66,7 +66,7 @@ class ManageDocument(ParentManage):
         if self.project_type == 'ws':
             self.dlg_add_doc.tab_feature.removeTab(3)
         else:
-            self.layers['gully'] = self.controller.get_group_layers('gully')                  
+            self.layers['gully'] = self.controller.api_get_group_layers('gully')
         
         # Remove all previous selections
         if self.single_tool_mode:
