@@ -82,7 +82,7 @@ class UpdateSQL(ParentAction):
         cmb_project_type = self.dlg_info_show_info.findChild(QComboBox, 'cmb_project_type')
         cmb_project_type.addItem('ws')
         cmb_project_type.addItem('ud')
-        cmb_project_type.addItem('tree manage')
+        cmb_project_type.addItem('tm')
 
         self.populate_data_shcema_name(cmb_project_type)
         self.set_info_project()
@@ -144,7 +144,7 @@ class UpdateSQL(ParentAction):
         if self.check_relaod_views() is True:
             self.chk_schema_view.setEnabled(False)
             self.chk_api_view.setEnabled(False)
-            self.btn_schema_rename.setEnabled(False)
+            self.dlg_info_show_info.btn_schema_rename.setEnabled(False)
         if self.check_version_schema() is False:
             self.chk_schema_ddl_dml.setEnabled(False)
             self.chk_api_ddl_dml.setEnabled(False)
@@ -753,12 +753,8 @@ class UpdateSQL(ParentAction):
         print(status)
         return True
 
-    # TODO:: take path folder from widget custom folder
     def load_sql(self, path_folder):
         for (path, ficheros, archivos) in os.walk(path_folder):
-            print path
-            print ficheros
-            print archivos
             status = self.executeFiles(archivos, path)
             if status is False:
                 return False
@@ -1087,7 +1083,8 @@ class UpdateSQL(ParentAction):
         # sys_custom_views
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_system WHERE parameter = 'sys_custom_views'")
         row = self.controller.get_row(sql)
-        if row:
+        print(str(row[0]))
+        if str(row[0]) != 'FALSE':
             return True
         return False
 
@@ -1141,7 +1138,7 @@ class UpdateSQL(ParentAction):
         cmb_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_project_type')
         cmb_project_type.addItem('ws')
         cmb_project_type.addItem('ud')
-        cmb_project_type.addItem('tree manage')
+        cmb_project_type.addItem('tm')
         # Populate combo with all locales
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
         locales = os.listdir(self.sql_dir + '\i18n/')
@@ -1151,7 +1148,6 @@ class UpdateSQL(ParentAction):
         # enable_disable data file widgets
         self.enable_datafile()
 
-        # TODO: Filter line edit and populate table
         self.filter_srid_value = '25831'
 
         # Set listeners
@@ -1179,9 +1175,6 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_rename.show()
 
     def executeFiles(self, filelist, filedir):
-        print("test20")
-        print(filelist)
-        print(filedir)
         if not filelist:
             return
         if self.schema is None:
