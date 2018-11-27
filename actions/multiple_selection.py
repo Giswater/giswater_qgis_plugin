@@ -14,6 +14,7 @@ except:
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:  
     from PyQt4.QtCore import Qt, pyqtSignal, QPoint
     from PyQt4.QtGui import QApplication, QColor
+    from qgis.gui import QgsMapCanvasSnapper
 else:
     from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
     from qgis.PyQt.QtGui import QColor
@@ -56,6 +57,22 @@ class MultipleSelection(QgsMapTool):
         self.reset()
         self.snapper = self.get_snapper()
         self.selected_features = []
+
+    def get_snapper(self):
+        """ Return snapper """
+
+        snapper = None
+        try:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                snapper = QgsMapCanvasSnapper(self.canvas)
+            else:
+                # TODO: 3.x
+                # snapper = QgsMapCanvas.snappingUtils()
+                snapper = None
+        except:
+            pass
+
+        return snapper
 
 
     def reset(self):
