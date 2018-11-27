@@ -100,8 +100,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Parametrize list of layers
         self.layers_connec = self.controller.get_group_layers('connec')                        
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")                
+        self.layer_node = self.controller.get_layer_by_tablename("ve_node")
+        self.layer_arc = self.controller.get_layer_by_tablename("ve_arc")
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
@@ -427,11 +427,10 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Update all the fields
         sql += ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
-               " SET mincut_state = '" + str(mincut_result_state) + "',"
-               " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
-               " anl_tstamp = '" + str(received_date) +"', received_date = '" + str(received_date) +"',"
-               " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
-               " assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
+                " SET mincut_state = '" + str(mincut_result_state) + "',"
+                " mincut_type = '" + str(mincut_result_type) + "', anl_cause = '" + str(anl_cause) + "',"
+                " forecast_start = '" + str(forecast_start_predict) + "', forecast_end = '" + str(forecast_end_predict) + "',"
+                " assigned_to = '" + str(assigned_to) + "', exec_appropiate = '" + str(appropiate_status) + "'")
         
         # Manage fields 'work_order' and 'anl_descript'
         if work_order != "":        
@@ -467,8 +466,8 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Update table 'anl_mincut_result_selector'
         sql += ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
-               "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
-               " (current_user, " + str(result_mincut_id) + ");")
+                "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
+                " (current_user, " + str(result_mincut_id) + ");")
         
         # Check if any 'connec' or 'hydro' associated
         if self.sql_connec != "":
@@ -624,7 +623,7 @@ class MincutParent(ParentAction, MultipleSelection):
         """ Set autocompleter for 'customer_code' """
         
         # Get list of 'customer_code'
-        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".v_edit_connec"
+        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".ve_connec"
         rows = self.controller.get_rows(sql)
         values = []
         if rows:
@@ -1028,7 +1027,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def get_connec_id_from_customer_code(self, customer_code):
         """ Get 'connec_id' from @customer_code """
                    
-        sql = ("SELECT connec_id FROM " + self.schema_name + ".v_edit_connec"
+        sql = ("SELECT connec_id FROM " + self.schema_name + ".ve_connec"
                " WHERE customer_code = '" + customer_code + "'")
         row = self.controller.get_row(sql)
         if not row:
@@ -1102,10 +1101,10 @@ class MincutParent(ParentAction, MultipleSelection):
     def reload_table_connec(self, expr_filter=None):
         """ Reload contents of table 'connec' with selected @expr_filter """
                          
-        table_name = self.schema_name + ".v_edit_connec"
+        table_name = self.schema_name + ".ve_connec"
         widget = self.dlg_connec.tbl_mincut_connec     
         expr = self.set_table_model(widget, table_name, expr_filter)
-        self.set_table_columns(self.dlg_connec, widget, 'v_edit_connec')
+        self.set_table_columns(self.dlg_connec, widget, 've_connec')
         return expr
 
 
@@ -1547,7 +1546,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mouse_move_node_arc(self, p):
        
-        viewname = "v_edit_arc"     
+        viewname = "ve_arc"
         self.layer_arc = self.controller.get_layer_by_tablename(viewname, log_info=True)
         if not self.layer_arc:
             return
@@ -1594,6 +1593,7 @@ class MincutParent(ParentAction, MultipleSelection):
             # Check feature
             for snapped_point in result:
                 viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
+                self.controller.log_info(str(viewname.name()))
                 if viewname == 'v_anl_mincut_result_valve':
                     # Get the point. Leave selection
                     snapp_feat = next(snapped_point.layer.getFeatures(

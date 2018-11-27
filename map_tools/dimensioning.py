@@ -36,7 +36,7 @@ class Dimensioning(ParentMapTool):
         # Check button
         self.action().setChecked(True)          
 
-        layer = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)        
+        layer = self.controller.get_layer_by_tablename("ve_dimensions", show_warning=True)
         if layer:
             self.iface.setActiveLayer(layer)
             self.controller.set_layer_visible(layer, True)

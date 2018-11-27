@@ -65,7 +65,6 @@ class Giswater(QObject):
         # Initialize instance attributes
         self.iface = iface
         self.actions = {}
-        self.search_plus = None
         self.map_tools = {}
         self.srid = None  
         self.plugin_toolbars = {}
@@ -388,16 +387,16 @@ class Giswater(QObject):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """ 
         
         # Get tables or views specified in 'db' config section         
-        self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
-        self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
-        self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
-        self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
-        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')   
+        self.table_arc = self.settings.value('db/table_arc', 've_arc')
+        self.table_node = self.settings.value('db/table_node', 've_node')
+        self.table_connec = self.settings.value('db/table_connec', 've_connec')
+        self.table_gully = self.settings.value('db/table_gully', 've_gully')
+        # self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')
         self.table_version = self.settings.value('db/table_version', 'version') 
 
-        self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
-        self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
-        self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_gully_pol') 
+        # self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')
+        # self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')
+        # self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_gully_pol')
 
         # Delete python compiled files
         self.delete_pyc_files()  
@@ -412,7 +411,8 @@ class Giswater(QObject):
         # Dictionary to keep every record of table 'sys_feature_cat'
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
-        self.feature_cat = {}             
+        self.feature_cat = {}
+        # TODO ya no es sys_feature_cat
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
         rows = self.controller.dao.get_rows(sql)
         if not rows:
@@ -462,9 +462,7 @@ class Giswater(QObject):
                     plugin_toolbar.toolbar.setVisible(False)                
                     del plugin_toolbar.toolbar
 
-            if self.search_plus:
-                self.search_plus.unload()
-            
+
             # unload all loaded giswater related modules
             for modName, mod in sys.modules.items():
                 if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
@@ -645,123 +643,123 @@ class Giswater(QObject):
             uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
             if uri_table:
  
-                if 'v_edit_man_chamber' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                elif 'v_edit_man_manhole' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                elif 'v_edit_man_netgully' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                elif 'v_edit_man_netinit' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                elif 'v_edit_man_wjump' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                elif 'v_edit_man_wwtp' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                elif 'v_edit_man_junction' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                    self.layer_man_junction = cur_layer                  
-                elif 'v_edit_man_outfall' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                elif 'v_edit_man_valve' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-                elif 'v_edit_man_storage' == uri_table:
-                    self.layer_node_man_ud.append(cur_layer)
-
-                # Node group from WS project
-                if 'v_edit_man_source' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_pump' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_meter' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_tank' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_hydrant' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_waterwell' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_manhole' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_reduction' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_junction' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_valve' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_filter' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_register' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_netwjoin' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_expansiontank' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_flexunion' == uri_table:
-                    self.layer_node_man_ws.append(cur_layer)
-                elif 'v_edit_man_wtp' == uri_table:                  
-                    self.layer_node_man_ws.append(cur_layer)                    
-                elif 'v_edit_man_netsamplepoint' == uri_table:                  
-                    self.layer_node_man_ws.append(cur_layer)                    
-                elif 'v_edit_man_netelement' == uri_table:                  
-                    self.layer_node_man_ws.append(cur_layer)                    
+                # if 'v_edit_man_chamber' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                # elif 'v_edit_man_manhole' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                # elif 'v_edit_man_netgully' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                # elif 'v_edit_man_netinit' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                # elif 'v_edit_man_wjump' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                # elif 'v_edit_man_wwtp' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                # elif 'v_edit_man_junction' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                #     self.layer_man_junction = cur_layer
+                # elif 'v_edit_man_outfall' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                # elif 'v_edit_man_valve' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                # elif 'v_edit_man_storage' == uri_table:
+                #     self.layer_node_man_ud.append(cur_layer)
+                #
+                # # Node group from WS project
+                # if 'v_edit_man_source' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_pump' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_meter' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_tank' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_hydrant' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_waterwell' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_manhole' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_reduction' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_junction' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_valve' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_filter' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_register' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_netwjoin' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_expansiontank' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_flexunion' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_wtp' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_netsamplepoint' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
+                # elif 'v_edit_man_netelement' == uri_table:
+                #     self.layer_node_man_ws.append(cur_layer)
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
                 
-                if self.table_man_connec == uri_table or self.table_connec == uri_table:
-                    self.layer_connec_man_ud.append(cur_layer)
-                if 'v_edit_man_greentap' == uri_table:
-                    self.layer_connec_man_ws.append(cur_layer)
-                elif 'v_edit_man_wjoin' == uri_table:
-                    self.layer_connec_man_ws.append(cur_layer)
-                elif 'v_edit_man_fountain' == uri_table:
-                    self.layer_connec_man_ws.append(cur_layer)
-                elif 'v_edit_man_tap' == uri_table:
-                    self.layer_connec_man_ws.append(cur_layer)
+                # if self.table_man_connec == uri_table or self.table_connec == uri_table:
+                #     self.layer_connec_man_ud.append(cur_layer)
+                # if 'v_edit_man_greentap' == uri_table:
+                #     self.layer_connec_man_ws.append(cur_layer)
+                # elif 'v_edit_man_wjoin' == uri_table:
+                #     self.layer_connec_man_ws.append(cur_layer)
+                # elif 'v_edit_man_fountain' == uri_table:
+                #     self.layer_connec_man_ws.append(cur_layer)
+                # elif 'v_edit_man_tap' == uri_table:
+                #     self.layer_connec_man_ws.append(cur_layer)
+                #
+                # if 'v_edit_man_conduit' == uri_table:
+                #     self.layer_arc_man_ud.append(cur_layer)
+                # elif 'v_edit_man_siphon' == uri_table:
+                #     self.layer_arc_man_ud.append(cur_layer)
+                # elif 'v_edit_man_varc' == uri_table:
+                #     self.layer_arc_man_ud.append(cur_layer)
+                # elif 'v_edit_man_waccel' == uri_table:
+                #     self.layer_arc_man_ud.append(cur_layer)
+                # elif 'v_edit_man_gully' == uri_table:
+                #     self.layer_arc_man_ud.append(cur_layer)
+                #
+                # if 'v_edit_man_pipe' == uri_table:
+                #     self.layer_arc_man_ws.append(cur_layer)
+                # elif 'v_edit_man_varc' == uri_table:
+                #     self.layer_arc_man_ws.append(cur_layer)
                     
-                if 'v_edit_man_conduit' == uri_table:
-                    self.layer_arc_man_ud.append(cur_layer)
-                elif 'v_edit_man_siphon' == uri_table:
-                    self.layer_arc_man_ud.append(cur_layer)
-                elif 'v_edit_man_varc' == uri_table:
-                    self.layer_arc_man_ud.append(cur_layer)
-                elif 'v_edit_man_waccel' == uri_table:
-                    self.layer_arc_man_ud.append(cur_layer)
-                elif 'v_edit_man_gully' == uri_table:
-                    self.layer_arc_man_ud.append(cur_layer)                    
-                    
-                if 'v_edit_man_pipe' == uri_table:
-                    self.layer_arc_man_ws.append(cur_layer)
-                elif 'v_edit_man_varc' == uri_table:
-                    self.layer_arc_man_ws.append(cur_layer)
-                    
-                if 'v_edit_dimensions' == uri_table:
+                if 've_dimensions' == uri_table:
                     self.layer_dimensions = cur_layer
 
                 if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
                     
-                if self.table_pgully == uri_table:
-                    self.layer_pgully = cur_layer
+                # if self.table_pgully == uri_table:
+                #     self.layer_pgully = cur_layer
 
-                if self.table_man_gully == uri_table:
-                    self.layer_man_gully = cur_layer
-                    self.layer_gully_man_ud.append(cur_layer)                    
+                # if self.table_man_gully == uri_table:
+                #     self.layer_man_gully = cur_layer
+                #     self.layer_gully_man_ud.append(cur_layer)
                     
-                if self.table_man_pgully == uri_table:
-                    self.layer_man_pgully = cur_layer
-                
+                # if self.table_man_pgully == uri_table:
+                #     self.layer_man_pgully = cur_layer
+                #
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
 
         # Set arrow cursor
         QApplication.setOverrideCursor(Qt.ArrowCursor)       
-        layers = self.controller.get_layers()       
-        status = self.populate_audit_check_project(layers)
-        QApplication.restoreOverrideCursor()      
-        if not status:
-            return False
-
+        layers = self.controller.get_layers()
+        # TODO descomentar y revisar esto
+        #  status = self.populate_audit_check_project(layers)
+        # if not status:
+        #     return False
+        QApplication.restoreOverrideCursor()
         return True
 
 
@@ -773,98 +771,98 @@ class Giswater(QObject):
             layer = self.controller.get_layer_by_tablename('v_edit_man_pipe')
             if layer:
                 QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_arc')
+            layer = self.controller.get_layer_by_tablename('ve_arc')
             if layer:
                 QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_connec')
+            layer = self.controller.get_layer_by_tablename('ve_connec')
             if layer:
                 QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_node')
+            layer = self.controller.get_layer_by_tablename('ve_node')
             if layer:
                 QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_gully')
+            layer = self.controller.get_layer_by_tablename('ve_gully')
             if layer:
                 QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_man_conduit')
-            if layer:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)  
+            # layer = self.controller.get_layer_by_tablename('vedit_man_conduit')
+            # if layer:
+            #     QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
         except:
             pass  
             
                     
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
-        
-        # WS        
-        if self.layer_arc_man_ws: 
-            for i in range(len(self.layer_arc_man_ws)):
-                if self.layer_arc_man_ws[i]:      
-                    self.set_layer_custom_form(self.layer_arc_man_ws[i], 'man_arc')
-            
-        if self.layer_node_man_ws:  
-            for i in range(len(self.layer_node_man_ws)):
-                if self.layer_node_man_ws[i]:   
-                    self.set_layer_custom_form(self.layer_node_man_ws[i], 'man_node')
-                                                                           
-        if self.layer_connec:       
-            self.set_layer_custom_form(self.layer_connec, 'connec')
-            
-        if self.layer_connec_man_ws:   
-            for i in range(len(self.layer_connec_man_ws)):
-                if self.layer_connec_man_ws[i]:  
-                    self.set_layer_custom_form(self.layer_connec_man_ws[i], 'man_connec')  
-              
-        # UD      
-        if self.layer_arc_man_ud:
-            for i in range(len(self.layer_arc_man_ud)):
-                if self.layer_arc_man_ud[i]:    
-                    self.set_layer_custom_form(self.layer_arc_man_ud[i], 'man_arc')
-            
-        if self.layer_node_man_ud: 
-            for i in range(len(self.layer_node_man_ud)):
-                if self.layer_node_man_ud[i]:       
-                    self.set_layer_custom_form(self.layer_node_man_ud[i], 'man_node')                                               
-            
-        if self.layer_connec_man_ud:
-            for i in range(len(self.layer_connec_man_ud)):
-                if self.layer_connec_man_ud[i]:      
-                    self.set_layer_custom_form(self.layer_connec_man_ud[i], 'man_connec')
-            
-        if self.layer_gully:       
-            self.set_layer_custom_form(self.layer_gully, 'gully') 
-        if self.layer_man_gully:       
-            self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
 
-        # Set custom for layer dimensions 
-        self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
-                
-                                    
-    def set_layer_custom_form(self, layer, geom_type):
-        """ Set custom UI form and init python code of selected layer """
-        
-        if self.basic.project_type is None:
-            return
-        
-        layer_tablename = self.controller.get_layer_source_table_name(layer)
-        if layer_tablename == 'v_edit_arc' or layer_tablename == 'v_edit_node' \
-            or layer_tablename == 'v_edit_connec' or layer_tablename == 'v_edit_gully' or layer_tablename == 'v_edit_gully_pol':
-            return
-        
-        layer_tablename = layer_tablename.replace("v_edit_", "")
-        name_ui = self.basic.project_type + '_' + layer_tablename + '.ui'
-        name_init = self.basic.project_type + '_' + geom_type + '_init.py'
-        name_function = 'formOpen'
-        path_ui = os.path.join(self.plugin_dir, 'init_ui', name_ui)
-        # If specific UI form not found, it will load the generic one
-        if not os.path.exists(path_ui):
-            name_ui = self.basic.project_type + '_' + geom_type + '.ui'            
-            path_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-            
-        path_init = os.path.join(self.plugin_dir, 'init', name_init)
-        layer.editFormConfig().setUiForm(path_ui) 
-        layer.editFormConfig().setInitCodeSource(1)
-        layer.editFormConfig().setInitFilePath(path_init)           
-        layer.editFormConfig().setInitFunction(name_function) 
+        # # WS
+        # if self.layer_arc_man_ws:
+        #     for i in range(len(self.layer_arc_man_ws)):
+        #         if self.layer_arc_man_ws[i]:
+        #             self.set_layer_custom_form(self.layer_arc_man_ws[i], 'man_arc')
+        #
+        # if self.layer_node_man_ws:
+        #     for i in range(len(self.layer_node_man_ws)):
+        #         if self.layer_node_man_ws[i]:
+        #             self.set_layer_custom_form(self.layer_node_man_ws[i], 'man_node')
+        #
+        # if self.layer_connec:
+        #     self.set_layer_custom_form(self.layer_connec, 'connec')
+        #
+        # if self.layer_connec_man_ws:
+        #     for i in range(len(self.layer_connec_man_ws)):
+        #         if self.layer_connec_man_ws[i]:
+        #             self.set_layer_custom_form(self.layer_connec_man_ws[i], 'man_connec')
+        #
+        # # UD
+        # if self.layer_arc_man_ud:
+        #     for i in range(len(self.layer_arc_man_ud)):
+        #         if self.layer_arc_man_ud[i]:
+        #             self.set_layer_custom_form(self.layer_arc_man_ud[i], 'man_arc')
+        #
+        # if self.layer_node_man_ud:
+        #     for i in range(len(self.layer_node_man_ud)):
+        #         if self.layer_node_man_ud[i]:
+        #             self.set_layer_custom_form(self.layer_node_man_ud[i], 'man_node')
+        #
+        # if self.layer_connec_man_ud:
+        #     for i in range(len(self.layer_connec_man_ud)):
+        #         if self.layer_connec_man_ud[i]:
+        #             self.set_layer_custom_form(self.layer_connec_man_ud[i], 'man_connec')
+        #
+        # if self.layer_gully:
+        #     self.set_layer_custom_form(self.layer_gully, 'gully')
+        # if self.layer_man_gully:
+        #     self.set_layer_custom_form(self.layer_man_gully, 'man_gully')
+
+        # Set custom for layer dimensions
+        self.set_layer_custom_form_dimensions(self.layer_dimensions)
+
+
+    # def set_layer_custom_form(self, layer, geom_type):
+    #     """ Set custom UI form and init python code of selected layer """
+    #
+    #     if self.basic.project_type is None:
+    #         return
+    #
+    #     layer_tablename = self.controller.get_layer_source_table_name(layer)
+    #     if layer_tablename == 'v_edit_arc' or layer_tablename == 'v_edit_node' \
+    #         or layer_tablename == 'v_edit_connec' or layer_tablename == 'v_edit_gully' or layer_tablename == 'v_edit_gully_pol':
+    #         return
+    #
+    #     layer_tablename = layer_tablename.replace("v_edit_", "")
+    #     name_ui = self.basic.project_type + '_' + layer_tablename + '.ui'
+    #     name_init = self.basic.project_type + '_' + geom_type + '_init.py'
+    #     name_function = 'formOpen'
+    #     path_ui = os.path.join(self.plugin_dir, 'init_ui', name_ui)
+    #     # If specific UI form not found, it will load the generic one
+    #     if not os.path.exists(path_ui):
+    #         name_ui = self.basic.project_type + '_' + geom_type + '.ui'
+    #         path_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
+    #
+    #     path_init = os.path.join(self.plugin_dir, 'init', name_init)
+    #     layer.editFormConfig().setUiForm(path_ui)
+    #     layer.editFormConfig().setInitCodeSource(1)
+    #     layer.editFormConfig().setInitFilePath(path_init)
+    #     layer.editFormConfig().setInitFunction(name_function)
         
         
     def set_layer_custom_form_dimensions(self, layer):
@@ -890,12 +888,12 @@ class Giswater(QObject):
             fieldname_connec = "connec_depth"
             
         if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:            
-            layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+            layer_node = self.controller.get_layer_by_tablename("ve_node")
             if layer_node:
                 display_field = 'depth : [% "' + fieldname_node + '" %]'
                 layer_node.setDisplayField(display_field)
             
-            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+            layer_connec = self.controller.get_layer_by_tablename("ve_connec")
             if layer_connec:
                 display_field = 'depth : [% "' + fieldname_connec + '" %]'
                 layer_connec.setDisplayField(display_field)

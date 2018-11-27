@@ -32,7 +32,6 @@ class Catalog(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
         self.minor_version = "3.0"
-        self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
 

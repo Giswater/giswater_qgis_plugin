@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from map_tools.snapping_utils import SnappingConfigManager
+
 try:
     from qgis.core import Qgis
 except:
@@ -57,6 +59,8 @@ class Dimensions(ParentDialog):
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface, self.controller)
         self.snapper = self.snapper_manager.get_snapper()
 
         # Vertex marker
@@ -74,9 +78,9 @@ class Dimensions(ParentDialog):
         self.set_icon(btn_snapping, "129")
         
         # Set layers dimensions, node and connec
-        self.layer_dimensions = self.controller.get_layer_by_tablename("v_edit_dimensions")
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+        self.layer_dimensions = self.controller.get_layer_by_tablename("ve_dimensions")
+        self.layer_node = self.controller.get_layer_by_tablename("ve_node")
+        self.layer_connec = self.controller.get_layer_by_tablename("ve_connec")
 
         self.create_map_tips()
         
