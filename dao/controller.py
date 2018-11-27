@@ -906,20 +906,20 @@ class DaoController():
         return self.dao.check_column(self.schema_name, tablename, columname)
     
 
-    def get_group_layers(self, geom_type):
-        """ Get layers of the group @geom_type """
-        
-        list_items = []        
-        sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
-               " WHERE type = '" + geom_type.upper() + "'")
-        rows = self.get_rows(sql)
-        if rows:
-            for row in rows:
-                layer = self.get_layer_by_tablename(row[0])
-                if layer:
-                    list_items.append(layer)
-        
-        return list_items
+    # def get_group_layers(self, geom_type):
+    #     """ Get layers of the group @geom_type """
+    #
+    #     list_items = []
+    #     sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
+    #            " WHERE type = '" + geom_type.upper() + "'")
+    #     rows = self.get_rows(sql)
+    #     if rows:
+    #         for row in rows:
+    #             layer = self.get_layer_by_tablename(row[0])
+    #             if layer:
+    #                 list_items.append(layer)
+    #
+    #     return list_items
 
     # TODO same function that GET_GROUP_LAYER but this is for api
     def api_get_group_layers(self, geom_type):
