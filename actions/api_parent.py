@@ -284,7 +284,7 @@ class ApiParent(ParentAction):
         self.geom_type = geom_type
 
         # Store user snapping configuration
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = SnappingConfigManager(self.iface, self.controller)
         self.snapper_manager.store_snapping_options()
 
         # Clear snapping
@@ -733,7 +733,8 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
-    
+        if complet_result[0]['feature']['geometry'] is None:
+            return
         if complet_result[0]['feature']['geometry']['st_astext'] is None:
             return
         list_coord = re.search('\((.*)\)', str(complet_result[0]['feature']['geometry']['st_astext']))
