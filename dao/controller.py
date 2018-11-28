@@ -51,6 +51,7 @@ class DaoController():
         self.postgresql_version = None
         self.logger = None
         self.api_cf = None
+        self.previous_maptool = None
         if create_logger:
             self.set_logger(logger_name)
                 

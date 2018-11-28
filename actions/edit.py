@@ -6,21 +6,30 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from functools import partial
+
 try:
     from qgis.core import Qgis
 except:
     from qgis.core import QGis as Qgis
 if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import QApplication
+    from PyQt4.QtCore import Qt, QPoint
+    from PyQt4.QtGui import QApplication, QAction, QColor
 else:
-    from qgis.PyQt.QtCore import Qt
-    from qgis.PyQt.QtWidgets import QApplication
+    from qgis.PyQt.QtCore import Qt, QPoint
+    from qgis.PyQt.QtGui import QColor
+    from qgis.PyQt.QtWidgets import QApplication, QAction
+
+
+from qgis.core import QgsPoint
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
 from giswater.actions.api_cf import ApiCF
 from giswater.actions.manage_element import ManageElement        
 from giswater.actions.manage_document import ManageDocument      
-from giswater.actions.manage_workcat_end import ManageWorkcatEnd      
+from giswater.actions.manage_workcat_end import ManageWorkcatEnd
+
+from giswater.actions.api_parent import ApiParent
 from giswater.actions.parent import ParentAction
 
 
@@ -40,24 +49,94 @@ class Edit(ParentAction):
 
 
     def edit_add_feature(self, feature_cat):
-        self.controller.log_info(str(feature_cat))
         """ Button 01, 02: Add 'node' or 'arc' """
+        active_layer = self.iface.activeLayer()
+        if active_layer is None:
+            active_layer = self.controller.get_layer_by_tablename('version')
+            self.iface.setActiveLayer(active_layer)
+        self.points = None
+        self.last_points = None
+        self.previous_map_tool = self.canvas.mapTool()
         self.controller.restore_info()
-        # Set active layer and triggers action Add Feature
-        # add "listener" to all actions to desactivate basic_api_info
-        # actions_list = self.iface.mainWindow().findChildren(QAction)
-        # for action in actions_list:
-        #     if action.objectName() != 'basic_api_info' and self.controller.api_cf is not None:
-        #         action.triggered.connect(partial(self.controller.restore_info))
-        # Create the appropriate map tool and connect the gotPoint() signal.
-        # self.canvas = self.iface.mapCanvas()
-        # self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        # self.canvas.setMapTool(self.emit_point)
+        # Vertex marker
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
 
-        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.controller.api_cf = self.api_cf
-        self.api_cf.api_info()
+        if feature_cat.type.lower() in ('node', 'connec'):
+            self.controller.log_info(str("NODE"))
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        elif feature_cat.type.lower() in ('arc'):
+            self.controller.log_info(str("ARC"))
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setPenWidth(3)
+        # Snapper
+        self.snapper = self.get_snapper()
 
+        self.canvas = self.iface.mapCanvas()
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.canvas.xyCoordinates.connect(self.mouse_move)
+        self.xyCoordinates_conected = True
+        self.emit_point.canvasClicked.connect(partial(self.set_geom, feature_cat))
+
+
+    def mouse_move(self, p):
+        self.snapped_point = None
+        self.vertex_marker.hide()
+        map_point = self.canvas.getCoordinateTransform().transform(p)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+
+        # That's the snapped point
+        if result:
+            # Check feature
+            for snapped_point in result:
+                self.snapped_point = QgsPoint(snapped_point.snappedVertex)
+                self.vertex_marker.setCenter(self.snapped_point)
+                self.vertex_marker.show()
+        else:
+            self.vertex_marker.hide()
+
+
+    def set_geom(self, feature_cat, point, button_clicked):
+        # Control features with 1 point
+        if button_clicked == Qt.LeftButton and feature_cat.type.lower() in ('node', 'connec'):
+            self.points = '"x1":' + str(point.x()) + ', "y1":' + str(point.y())
+            action_info = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
+            action_info.setChecked(True)
+            self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+            self.controller.api_cf = self.api_cf
+            self.api_cf.open_form(point=self.points, feature_cat=feature_cat)
+        elif button_clicked == Qt.RightButton and feature_cat.type.lower() in ('node', 'connec'):
+            if self.controller.previous_maptool is not None:
+                self.canvas.setMapTool(self.controller.previous_maptool)
+            self.emit_point.canvasClicked.disconnect()
+        # Control features with more than 1 point
+        if button_clicked == Qt.LeftButton and feature_cat.type.lower() in ('arc'):
+            if self.points is None:
+                self.points = '"x1":' + str(point.x()) + ', "y1":' + str(point.y())
+            else:
+                self.last_points = ', "x2":' + str(point.x()) + ', "y2":' + str(point.y())
+        elif button_clicked == Qt.RightButton and feature_cat.type.lower() in ('arc'):
+            if self.last_points is None:
+                if self.controller.previous_maptool is not None:
+                    self.canvas.setMapTool(self.controller.previous_maptool)
+                self.emit_point.canvasClicked.disconnect()
+                return
+            else:
+
+                self.points = self.points + self.last_points
+
+                action_info = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
+                action_info.setChecked(True)
+                self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+                self.controller.api_cf = self.api_cf
+                self.api_cf.open_form(point=self.points, feature_cat=feature_cat)
 
 
         # layer = self.controller.get_layer_by_tablename(layername)

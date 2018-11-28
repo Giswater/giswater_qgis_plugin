@@ -177,7 +177,7 @@ class ApiCF(ApiParent):
         self.draw(complet_result)
 
 
-    def open_form(self, point=None, table_name=None, feature_id=None):
+    def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -211,27 +211,28 @@ class ApiCF(ApiParent):
         scale_zoom = self.iface.mapCanvas().scale()
         is_project_editable = self.get_editable_project()
 
+        # IF insert new feature
+        if point and feature_cat:
+            if self.controller.previous_maptool is not None:
+                self.canvas.setMapTool(self.controller.previous_maptool)
+            feature = '"tableName":"' + str(feature_cat.child_layer.lower()) + '"'
+            extras = '"coordinates":{'+str(point) + '}'
+            body = self.create_body(feature=feature, extras=extras)
+            sql = ("SELECT " + self.schema_name + ".gw_api_setgeom($${" + body + "}$$)")
+            self.controller.log_info(str(sql))
         # IF click over canvas
-        if point:
+        elif point:
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
                    + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
                    + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
         # IF come from QPushButtons node1 or node2 from custom form
         elif feature_id:
-            # the_geom = self.check_column_exist(table_name, 'the_geom')
-            # print (the_geom)
-            # row = None
-            # if the_geom is not None:
-            #     sql = ("SELECT the_geom FROM " + self.schema_name + "."+table_name+" WHERE "+str(feature_type)+" = '" + str(feature_id) + "'")
-            #     row = self.controller.get_row(sql, log_sql=True)
-            # the_geom = 'null'
-            # if row is not None:
-            #     if row[0] is not None:
-            #         the_geom = "'" + str(row[0]) + "'"
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"', "
                    " null, " + str(is_project_editable) + ", 9, 100)")
 
+
         row = self.controller.get_row(sql, log_sql=True)
+        #self.controller.log_info(str(row))
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
