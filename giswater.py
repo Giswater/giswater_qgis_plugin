@@ -6,6 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+
+
+from PyQt4.QtGui import QKeySequence
+
 try:
     from qgis.core import Qgis
 except:
@@ -24,7 +28,8 @@ else:
 from qgis.core import QgsExpressionContextUtils, QgsProject
 
 import os.path
-import sys  
+import sys
+from collections import OrderedDict
 from functools import partial
 
 from actions.go2epa import Go2Epa
@@ -213,27 +218,29 @@ class Giswater(QObject):
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.type == 'NODE') or (index_action == '02' and feature_cat.type == 'ARC'):
-                obj_action = QAction(str(feature_cat.layername), self)
-                obj_action.setShortcut(str(feature_cat.shortcut_key))
+                obj_action = QAction(str(feature_cat.id), self)
+                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
         menu.addSeparator()
+        list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.type == 'CONNEC'):
-                obj_action = QAction(str(feature_cat.layername), self)
-                obj_action.setShortcut(str(feature_cat.shortcut_key))
+                obj_action = QAction(str(feature_cat.id), self)
+                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
         menu.addSeparator()
+        list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
             if (index_action == '01' and feature_cat.type == 'GULLY' and self.wsoftware == 'ud'):
-                obj_action = QAction(str(feature_cat.layername), self)
-                obj_action.setShortcut(str(feature_cat.shortcut_key))
+                obj_action = QAction(str(feature_cat.id), self)
+                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 menu.addSeparator()
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
 
-            action.setMenu(menu)
+        action.setMenu(menu)
         
         return action        
 
@@ -414,15 +421,18 @@ class Giswater(QObject):
         self.feature_cat = {}
         # TODO ya no es sys_feature_cat
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
+        sql = "SELECT * FROM " + self.schema_name + ".cat_feature"
         rows = self.controller.dao.get_rows(sql)
         if not rows:
             return False
 
         for row in rows:
-            tablename = row['tablename']
-            elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
+            tablename = row['child_layer']
+            #elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
+            elem = SysFeatureCat(row['id'], row['system_id'], row['type'], row['shortcut_key'], row['parent_layer'], row['child_layer'], row['orderby'], row['active'])
             self.feature_cat[tablename] = elem
 
+        self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
         return True
     
 

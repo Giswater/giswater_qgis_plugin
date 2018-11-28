@@ -5,7 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-          
+# -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import QApplication
+else:
+    from qgis.PyQt.QtCore import Qt
+    from qgis.PyQt.QtWidgets import QApplication
+
+from giswater.actions.api_cf import ApiCF
 from giswater.actions.manage_element import ManageElement        
 from giswater.actions.manage_document import ManageDocument      
 from giswater.actions.manage_workcat_end import ManageWorkcatEnd      
