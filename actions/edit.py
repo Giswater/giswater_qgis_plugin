@@ -39,18 +39,35 @@ class Edit(ParentAction):
         self.project_type = project_type
 
 
-    def edit_add_feature(self, layername):
+    def edit_add_feature(self, feature_cat):
+        self.controller.log_info(str(feature_cat))
         """ Button 01, 02: Add 'node' or 'arc' """
         self.controller.restore_info()
         # Set active layer and triggers action Add Feature
-        layer = self.controller.get_layer_by_layername(layername)
-        if layer:
-            self.iface.setActiveLayer(layer)
-            layer.startEditing()
-            self.iface.actionAddFeature().trigger()
-        else:
-            message = "Selected layer name not found"
-            self.controller.show_warning(message, parameter=layername)
+        # add "listener" to all actions to desactivate basic_api_info
+        # actions_list = self.iface.mainWindow().findChildren(QAction)
+        # for action in actions_list:
+        #     if action.objectName() != 'basic_api_info' and self.controller.api_cf is not None:
+        #         action.triggered.connect(partial(self.controller.restore_info))
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        # self.canvas = self.iface.mapCanvas()
+        # self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        # self.canvas.setMapTool(self.emit_point)
+
+        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.controller.api_cf = self.api_cf
+        self.api_cf.api_info()
+
+
+
+        # layer = self.controller.get_layer_by_tablename(layername)
+        # if layer:
+        #     self.iface.setActiveLayer(layer)
+        #     layer.startEditing()
+        #     self.iface.actionAddFeature().trigger()
+        # else:
+        #     message = "Selected layer name not found"
+        #     self.controller.show_warning(message, parameter=layername)
 
 
     def edit_add_element(self):
