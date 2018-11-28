@@ -722,7 +722,8 @@ class SearchPlus(QObject):
             return
         connec_group = self.controller.get_group_layers('connec')
         for layer in connec_group:
-            layer = self.controller.get_layer_by_tablename('v_edit_man_' + str(layer.name().lower()))
+            layer_source = self.controller.get_layer_source(layer)
+            layer = self.controller.get_layer_by_tablename(layer_source['table'])
             if layer:
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 ids = [i.id() for i in it]
