@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
+from collections import OrderedDict
+
 try:
     from qgis.core import Qgis as Qgis
 except:
@@ -45,8 +47,16 @@ class ApiConfig(ApiParent):
         self.controller.restore_info()
         self.list_update = []
 
-        sql = ("SELECT " + self.schema_name + ".gw_fct_getinfoform_config(3)")
+        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        body += '"form":{"formName":"config"}, '
+        body += '"feature":{}, '
+        body += '"data":{}'
+
+        # Get layers under mouse clicked
+        sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
+
         row = self.controller.get_row(sql, log_sql=True)
+        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         self.dlg_config = ApiConfigUi()
         self.load_settings(self.dlg_config)
@@ -98,8 +108,8 @@ class ApiConfig(ApiParent):
         self.system_form = QGridLayout()
 
         # Construct form for config and admin
-        self.construct_form_param_user(row, 'fields')
-        self.construct_form_param_system(row, 'fields_admin')
+        self.construct_form_param_user(complet_list[0]['body']['form']['formTabs'], 0)
+        self.construct_form_param_system(complet_list[0]['body']['form']['formTabs'], 1)
 
         groupBox_1.setLayout(self.basic_form)
         groupBox_2.setLayout(self.om_form)
@@ -160,7 +170,7 @@ class ApiConfig(ApiParent):
         # self.remove_empty_groupBox(admin_layout2)
 
         # Event on change from combo parent
-        self.get_event_combo_parent('fields', row)
+        self.get_event_combo_parent('fields', complet_list[0]['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
         self.chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
@@ -182,9 +192,9 @@ class ApiConfig(ApiParent):
             self.controller.show_info("Function not supported in this Operating System")
 
 
-    def construct_form_param_user(self, row, fields):
+    def construct_form_param_user(self, row, pos):
 
-        for field in row[0][fields]:
+        for field in row[pos]['fields']:
             
             if field['label']:
                 lbl = QLabel()
@@ -195,7 +205,10 @@ class ApiConfig(ApiParent):
 
                 chk = QCheckBox()
                 chk.setObjectName('chk_' + field['name'])
-                chk.setChecked(field['checked'])
+                if field['checked'] == "True":
+                    chk.setChecked(True)
+                elif field['checked'] == "False":
+                    chk.setChecked(False)
                 chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
                 if field['widgettype'] == 'linetext':
@@ -267,8 +280,8 @@ class ApiConfig(ApiParent):
                 elif field['layout_id'] == 17:
                     self.order_widgets(field, self.system_form, lbl, chk, widget)
 
-    def construct_form_param_system(self, row, fields):
-        for field in row[0][fields]:
+    def construct_form_param_system(self, row, pos):
+        for field in row[pos]['fields']:
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['name'])
@@ -489,7 +502,13 @@ class ApiConfig(ApiParent):
     def update_values(self):
 
         my_json = json.dumps(self.list_update)
-        sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertconfig('" + my_json + "')")
+        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        body += '"form":{"formName":"config"}, '
+        body += '"feature":{}, '
+        body += '"data":{"fields":'+my_json+'}'
+
+        sql = ("SELECT " + self.schema_name + ".gw_api_setconfig($${" + body + "}$$)")
+        self.controller.log_info(str(sql))
         self.controller.execute_sql(sql)
 
         # Close dialog
@@ -519,5 +538,3 @@ class ApiConfig(ApiParent):
             widget_list = groupBox.findChildren(QWidget)
             if not widget_list:
                 groupBox.setVisible(False)
-                
-                
