@@ -5,8 +5,31 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinfofromcoordinates(
+    p_x double precision,
+    p_y double precision,
+    p_epsg integer,
+    p_active_layer text,
+    p_visible_layer text,
+    p_editable_layer text,
+    p_istilemap boolean,
+    p_zoom_ratio double precision,
+    p_device integer,
+    p_info_type integer,
+    p_lang character varying)
+  RETURNS json AS
+$BODY$
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromcoordinates"(p_x float8, p_y float8, p_epsg int4, p_active_layer text, p_visible_layer text, p_editable_layer text, p_istilemap bool, p_zoom_ratio float8, p_device int4, p_info_type int4, p_lang varchar) RETURNS pg_catalog.json AS $BODY$
+/* example
+SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates(419082.2424301,4576638.9710621,25831,'v_edit_man_wjoin','{"v_edit_man_junction","v_edit_man_wjoin","v_edit_man_pipe","v_edit_plan_psector"}',
+'{"v_edit_man_wjoin","v_edit_man_pipe","v_edit_dma","v_anl_mincut_result_valve","v_edit_man_junction","exploitation"}',False,0.14912394710811,3,100,'es') AS result
+
+SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates(419082.2424301,4576638.9710621,25831,'v_edit_man_wjoin','{"v_edit_man_junction","v_edit_man_wjoin","v_edit_man_pipe","v_edit_plan_psector"}',
+'{"v_edit_man_wjoin","v_edit_man_pipe","v_edit_dma","v_anl_mincut_result_valve","v_edit_man_junction","exploitation"}',False,0.14912394710811,3,100,'es') AS result
+*/
+
+
+
 DECLARE
 
 --    Variables
@@ -53,6 +76,8 @@ BEGIN
      SELECT ST_SetSRID(ST_MakePoint(p_x,p_y),p_epsg) INTO v_point;
 
 --  Get layer and element
+
+    -- is tilemap
     IF p_istilemap IS TRUE THEN
     v_sql := 'SELECT layer_id, 0 as orderby FROM config_web_layer WHERE layer_id= '||quote_literal(p_active_layer)||' UNION 
           SELECT layer_id, orderby FROM config_web_layer WHERE is_tiled IS TRUE UNION
@@ -61,6 +86,11 @@ BEGIN
 
     v_sql := 'SELECT layer_id, 0 as orderby FROM config_web_layer WHERE layer_id= '||quote_literal(p_active_layer)||' UNION 
           SELECT layer_id, orderby FROM config_web_layer WHERE layer_id = any('''||p_visible_layer||'''::text[]) ORDER BY orderby';
+    END IF;
+
+    -- if active layer is editable
+    IF p_active_layer = any (p_editable_layer::text[]) THEN 
+	v_sql = 'SELECT layer_id, 0 as orderby FROM config_web_layer WHERE layer_id= '||quote_literal(p_active_layer);
     END IF;
 
     FOR v_layer IN EXECUTE v_sql 
@@ -155,5 +185,5 @@ BEGIN
 
 END;
 $BODY$
-LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
