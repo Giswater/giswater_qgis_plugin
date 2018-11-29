@@ -189,7 +189,7 @@ class HydrologySelector(QtGui.QDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('info_show_info.ui')
-class InfoShowInfo(QMainWindow, FORM_CLASS):
+class InfoShowInfo(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
@@ -327,6 +327,12 @@ FORM_CLASS = get_ui_class('psector_rapport.ui')
 class Psector_rapport(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('readsql.ui')
+class Readsql(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
         self.setupUi(self)
 
 FORM_CLASS = get_ui_class('readsql_create_project.ui')

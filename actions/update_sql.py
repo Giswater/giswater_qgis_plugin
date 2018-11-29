@@ -13,7 +13,7 @@ from sqlite3 import OperationalError
 
 import utils_giswater
 from giswater.actions.parent import ParentAction
-from giswater.ui_manager import InfoShowInfo
+from giswater.ui_manager import Readsql
 from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit
 from PyQt4.QtCore import QSettings
 import psycopg2
@@ -34,34 +34,34 @@ class UpdateSQL(ParentAction):
         """ Button 100: Execute SQL. Info show info """
         print("info")
         # Create the dialog and signals
-        self.dlg_info_show_info = InfoShowInfo()
-        self.load_settings(self.dlg_info_show_info)
-        self.dlg_info_show_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info_show_info))
+        self.dlg_readsql = Readsql()
+        self.load_settings(self.dlg_readsql)
+        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
 
-        # TODO::Get permisions for config_param_system parameter
-        #Set user permisions
-        self.permisions = False
+        #Check if user have dev permisions
+        self.permisions = self.settings.value('system_variables/devoloper_mode').upper()
+
+        #Get pluguin version
+        self.pluguin_version = self.get_plugin_version()
 
         # Get widgets from form
 
-        # self.chk_schema_ddl_dml = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_ud')
-        # self.chk_schema_view = self.dlg_info_show_info.findChild(QRadioButton, 'rdb_ws')
-
         # Checkbox SCHEMA & API
-        self.chk_schema_ddl_dml = self.dlg_info_show_info.findChild(QCheckBox, 'chk_schema_ddl_dml')
-        self.chk_schema_view = self.dlg_info_show_info.findChild(QCheckBox, 'chk_schema_view')
-        self.chk_schema_fk = self.dlg_info_show_info.findChild(QCheckBox, 'chk_schema_fk')
-        self.chk_schema_rules = self.dlg_info_show_info.findChild(QCheckBox, 'chk_schema_rules')
-        self.chk_schema_funcion = self.dlg_info_show_info.findChild(QCheckBox, 'chk_schema_funcion')
-        self.chk_schema_trigger = self.dlg_info_show_info.findChild(QCheckBox, 'chk_schema_trigger')
-        self.chk_api_ddl_dml = self.dlg_info_show_info.findChild(QCheckBox, 'chk_api_ddl_dml')
-        self.chk_api_view = self.dlg_info_show_info.findChild(QCheckBox, 'chk_api_view')
-        self.chk_api_fk = self.dlg_info_show_info.findChild(QCheckBox, 'chk_api_fk')
-        self.chk_api_rules = self.dlg_info_show_info.findChild(QCheckBox, 'chk_api_rules')
-        self.chk_api_funcion = self.dlg_info_show_info.findChild(QCheckBox, 'chk_api_funcion')
-        self.chk_api_trigger = self.dlg_info_show_info.findChild(QCheckBox, 'chk_api_trigger')
+        self.chk_schema_ddl_dml = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_ddl_dml')
+        self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
+        self.chk_schema_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_fk')
+        self.chk_schema_rules = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_rules')
+        self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
+        self.chk_schema_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_trigger')
+        self.chk_api_ddl_dml = self.dlg_readsql.findChild(QCheckBox, 'chk_api_ddl_dml')
+        self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
+        self.chk_api_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_api_fk')
+        self.chk_api_rules = self.dlg_readsql.findChild(QCheckBox, 'chk_api_rules')
+        self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
+        self.chk_api_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_api_trigger')
+        self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
-        btn_info = self.dlg_info_show_info.findChild(QPushButton, 'btn_info')
+        btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
         self.set_icon(btn_info, '73')
 
 
@@ -78,11 +78,12 @@ class UpdateSQL(ParentAction):
 
         self.filter_srid_value = self.controller.plugin_settings_value('srid')
         self.schema = None
-        #TODO: Populate combo project type with all projects types (Dinamic)
-        cmb_project_type = self.dlg_info_show_info.findChild(QComboBox, 'cmb_project_type')
-        cmb_project_type.addItem('ws')
-        cmb_project_type.addItem('ud')
-        cmb_project_type.addItem('tm')
+
+        #Populate combo types
+        self.project_types = self.settings.value('system_variables/project_types')
+        cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
+        for type in self.project_types:
+            cmb_project_type.addItem(str(type))
 
         self.populate_data_shcema_name(cmb_project_type)
         self.set_info_project()
@@ -91,7 +92,7 @@ class UpdateSQL(ParentAction):
 
         sql = ("SELECT giswater from " + self.schema_name + ".version")
         row = self.controller.get_row(sql)
-        self.version = row[0].replace('.','')
+        self.version = row[0]
 
 
         # Declare all file variables
@@ -125,37 +126,50 @@ class UpdateSQL(ParentAction):
         self.folderExempleApi = self.sql_dir, '/api/example/'
 
         # Set Listeners
-        self.dlg_info_show_info.btn_schema_create.clicked.connect(partial(self.open_create_project))
-        self.dlg_info_show_info.btn_schema_rename.clicked.connect(partial(self.open_rename))
-        self.dlg_info_show_info.btn_api_create.clicked.connect(partial(self.implement_api))
-        self.dlg_info_show_info.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_info_show_info, "path_folder"))
-        self.dlg_info_show_info.btn_schema_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_info_show_info, "schema_path_folder"))
-        self.dlg_info_show_info.btn_api_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_info_show_info, "api_path_folder"))
-        self.dlg_info_show_info.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
-        self.dlg_info_show_info.btn_api_file_to_db_2.clicked.connect(partial(self.api_file_to_db))
+        self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
+        self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
+        self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
+        self.dlg_readsql.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "path_folder"))
+        self.dlg_readsql.btn_schema_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "schema_path_folder"))
+        self.dlg_readsql.btn_api_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "api_path_folder"))
+        self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
+        self.dlg_readsql.btn_api_file_to_db_2.clicked.connect(partial(self.api_file_to_db))
         btn_info.clicked.connect(partial(self.show_info))
-        self.dlg_info_show_info.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
         cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, cmb_project_type))
-        self.dlg_info_show_info.btn_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_info_show_info, "path_folder"))
-        self.dlg_info_show_info.btn_schema_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_info_show_info, "schema_path_folder"))
-        self.dlg_info_show_info.btn_api_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_info_show_info, "api_path_folder"))
+        self.dlg_readsql.btn_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "path_folder"))
+        self.dlg_readsql.btn_schema_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "schema_path_folder"))
+        self.dlg_readsql.btn_api_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "api_path_folder"))
 
 
         if self.check_relaod_views() is True:
             self.chk_schema_view.setEnabled(False)
             self.chk_api_view.setEnabled(False)
-            self.dlg_info_show_info.btn_schema_rename.setEnabled(False)
-        if self.check_version_schema() is False:
+            self.dlg_readsql.btn_schema_rename.setEnabled(False)
+        if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
             self.chk_schema_ddl_dml.setEnabled(False)
             self.chk_api_ddl_dml.setEnabled(False)
+        if self.permisions != 'TRUE':
+            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "devtools")
+            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api")
 
-        #TODO::Descomentar
-        # if self.permisions is False:
-        #     utils_giswater.remove_tab_by_tabName(self.dlg_info_show_info.tab_main, "devtools")
-        #     utils_giswater.remove_tab_by_tabName(self.dlg_info_show_info.tab_main, "api")
+        #Put current info into software version info widget
+        self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
+                                           'DataBase version: ' + self.version)
+
+
+        print("test10")
+        print("test15")
+        last_version = ''
+        folders = os.listdir(self.folderUpdates + '')
+        for folder in folders:
+            sub_folders = os.listdir(self.folderUpdates + folder)
+            last_version = sub_folders[-1]
+        print("test20")
+        print(last_version)
 
         # Open dialog
-        self.dlg_info_show_info.show()
+        self.dlg_readsql.show()
 
     def load_base(self, api=False):
 
@@ -416,21 +430,11 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
-            print("api1")
             folders = os.listdir(self.folderUpdatesApi + '')
-            print("folders2")
-            print(folders)
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdatesApi + folder)
-                print("sub_folders3")
-                print(sub_folders)
-
                 for sub_folder in sub_folders:
-                    print("sub_folder4")
-                    print(sub_folder)
-                    print("version5")
-                    print(self.version)
-                    if str(sub_folder) > str(self.version):
+                    if str(sub_folder) > str(self.version).replace('.',''):
                         if self.process_folder(
                                 self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
                                 '') is False:
@@ -438,9 +442,8 @@ class UpdateSQL(ParentAction):
                             return False
                         else:
                             print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            status = self.executeFiles(os.listdir(
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/'),
-                                                       self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                            status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                            # status = self.executeFiles(os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/'),self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
                             if status is False:
                                 print(False)
                                 return False
@@ -448,9 +451,10 @@ class UpdateSQL(ParentAction):
                             print(False)
                             return False
                         else:
-                            status = self.executeFiles(
-                                os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/'),
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
+                            status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
+                            # status = self.executeFiles(
+                            #     os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/'),
+                            #     self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
                             if status is False:
                                 print(False)
                                 return False
@@ -466,8 +470,8 @@ class UpdateSQL(ParentAction):
                                     return False
                         else:
                             status = self.executeFiles(
-                                os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/'),
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
+                                os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/'),
+                                self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/')
                             if status is False:
                                 print(False)
                                 return False
@@ -476,13 +480,13 @@ class UpdateSQL(ParentAction):
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdates + folder)
                 for sub_folder in sub_folders:
-                    if str(sub_folder) > str(self.version):
+                    if str(sub_folder) > str(self.version).replace('.',''):
                         if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
                             print(False)
                             return False
                         else:
-                            print(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'), self.folderUpdates + folder + '/' + sub_folder + '/' +self.project_type + '/')
+                            status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                            # status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'), self.folderUpdates + folder + '/' + sub_folder + '/' +self.project_type + '/')
                             if status is False:
                                 print(False)
                                 return False
@@ -490,7 +494,8 @@ class UpdateSQL(ParentAction):
                             print(False)
                             return False
                         else:
-                            status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'), self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                            status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                            # status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'), self.folderUpdates + folder + '/' + sub_folder + '/utils/')
                             if status is False:
                                 print(False)
                                 return False
@@ -508,7 +513,6 @@ class UpdateSQL(ParentAction):
                             if status is False:
                                 print(False)
                                 return False
-
         print(status)
         return True
 
@@ -758,22 +762,31 @@ class UpdateSQL(ParentAction):
             status = self.executeFiles(archivos, path)
             if status is False:
                 return False
-        return
+        return True
 
     # FUNCTION EXECUCION PROCESS
 
     def execute_last_process(self):
 
         # Execute permissions
-        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_permissions();")
+        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_role_permissions()")
         self.controller.execute_sql(sql)
 
+        print("test10")
+        print("test15")
+        last_version = ''
+        folders = os.listdir(self.folderUpdates + '')
+        last_version = folders[-1]
+        print("test20")
+        print(last_version)
         # Update table version
-        # TODO: Update table version
+        sql = ("UPDATE " + self.schema_name + ".version SET giswater ='" + last_version + "'")
+        self.controller.execute_sql(sql)
 
-    # TODO
     def execute_import_data(self):
-        return
+        # Execute import data
+        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_import_epa_inp()")
+        self.controller.execute_sql(sql)
 
 
     # BUTTONS CALLING FUNCTIONS
@@ -788,20 +801,20 @@ class UpdateSQL(ParentAction):
             self.load_rules()
             self.load_trg()
             self.load_dev_data()
-            # self.execute_last_process()
+            self.execute_last_process()
         elif self.rdb_no_ct.isChecked():
             print(str("rdb_no_ct"))
             self.load_base_no_ct()
             self.load_update_ddl_dml()
             self.load_views()
-            # self.execute_last_process()
+            self.execute_last_process()
         elif self.rdb_sample.isChecked():
             print(str("rdb_sample"))
             self.load_base()
             self.update_ddl_dml()
             self.load_views()
             self.load_sample_data()
-            # self.execute_last_process()
+            self.execute_last_process()
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
             self.load_base()
@@ -809,13 +822,13 @@ class UpdateSQL(ParentAction):
             self.load_views()
             self.load_sample_data()
             self.load_dev_data()
-            # self.execute_last_process()
+            self.execute_last_process()
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
             self.load_base()
             self.load_update_ddl_dml()
             self.load_views()
-            # self.execute_last_process()
+            self.execute_last_process()
 
         # Insert information into table inp_project_id and version
         schemaName = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.project_name)
@@ -833,7 +846,7 @@ class UpdateSQL(ParentAction):
         self.load_update_ddl_dml()
         self.load_views()
         self.load_sample_data()
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def create_sample_dev(self):
         self.load_base()
@@ -841,7 +854,7 @@ class UpdateSQL(ParentAction):
         self.load_views()
         self.load_sample_data()
         self.load_dev_data()
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def import_epa_file(self):
         self.load_base_no_ct()
@@ -850,7 +863,7 @@ class UpdateSQL(ParentAction):
         self.load_rules()
         self.load_trg()
         self.load_views()
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def rename_project_data_schema(self):
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
@@ -858,45 +871,45 @@ class UpdateSQL(ParentAction):
         self.load_fk()
         self.load_rules()
         self.load_views()
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def implement_api(self):
         self.load_base(True)
         self.load_update_ddl_dml(True)
         self.load_views(True)
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def load_custom_sql_files(self, dialog, widget):
         folder_path = utils_giswater.getWidgetText(dialog, widget)
         self.load_sql(folder_path)
-        # self.execute_last_process()
+        self.execute_last_process()
 
 
     # CHECKBOX CALLING FUNCTIONS
 
     def update_ddl_dml(self, api=False):
         self.load_update_ddl_dml(api)
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def reload_views(self, api=False):
         self.load_views(api)
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def reload_update_fk(self, api=False):
         self.load_fk(api)
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def reload_update_rules(self, api=False):
         self.load_rules(api)
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def reload_update_fct(self, api=False):
         self.load_fct(api)
-        # self.execute_last_process()
+        self.execute_last_process()
 
     def reload_update_trg(self, api=False):
         self.load_trg(api)
-        # self.execute_last_process()
+        self.execute_last_process()
 
 
     # OTHER FUNCTIONS
@@ -913,10 +926,7 @@ class UpdateSQL(ParentAction):
         info_updates.setText(self.message_update)
 
         #Set listeners
-        self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_show_info))
-
-
-
+        self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_show_info))
 
         # Open dialog
         self.dlg_readsql_show_info.show()
@@ -925,15 +935,10 @@ class UpdateSQL(ParentAction):
         status = True
 
         folders = os.listdir(self.folderUpdates + '')
-        print(folders)
         for folder in folders:
-            print(folder)
-            print(self.version)
             sub_folders = os.listdir(self.folderUpdates + folder)
-            print(sub_folders)
             for sub_folder in sub_folders:
-                print(sub_folder)
-                if str(sub_folder) > str(self.version):
+                if str(sub_folder) > str(self.version).replace('.',''):
                     if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
                         print(False)
                         return False
@@ -989,7 +994,7 @@ class UpdateSQL(ParentAction):
 
     def update_locale(self):
         print(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.cmb_locale))
-        self.folderLocale = self.sql_dir + '\i18n/' + utils_giswater.getWidgetText(self.dlg_info_show_info, self.cmb_locale) + '/'
+        self.folderLocale = self.sql_dir + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/'
 
     def enable_datafile(self):
         if self.rdb_import_data.isChecked() is True:
@@ -1001,11 +1006,11 @@ class UpdateSQL(ParentAction):
 
     def populate_data_shcema_name(self, widget):
         # Get filter
-        filter = str(utils_giswater.getWidgetText(self.dlg_info_show_info, widget))
+        filter = str(utils_giswater.getWidgetText(self.dlg_readsql, widget))
         # Populate Project data schema Name
         sql = ("SELECT schema_name, schema_name FROM information_schema.schemata WHERE schema_name LIKE '%"+filter+"%'")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_info_show_info.project_schema_name, rows, 1)
+        utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, rows, 1)
 
     def filter_srid_changed(self):
         filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
@@ -1016,24 +1021,24 @@ class UpdateSQL(ParentAction):
         self.fill_table_by_query(self.tbl_srid, sql)
 
     def set_info_project(self):
-        schema_name = utils_giswater.getWidgetText(self.dlg_info_show_info, self.dlg_info_show_info.project_schema_name)
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         sql = "SELECT title, author, date FROM " + schema_name + ".inp_project_id"
         row = self.controller.get_row(sql)
         print(row)
         if row is None:
-            utils_giswater.setWidgetText(self.dlg_info_show_info,
-                                         self.dlg_info_show_info.project_schema_title, '')
-            utils_giswater.setWidgetText(self.dlg_info_show_info,
-                                         self.dlg_info_show_info.project_schema_author, '')
-            utils_giswater.setWidgetText(self.dlg_info_show_info,
-                                         self.dlg_info_show_info.project_schema_last_update, '')
+            utils_giswater.setWidgetText(self.dlg_readsql,
+                                         self.dlg_readsql.project_schema_title, '')
+            utils_giswater.setWidgetText(self.dlg_readsql,
+                                         self.dlg_readsql.project_schema_author, '')
+            utils_giswater.setWidgetText(self.dlg_readsql,
+                                         self.dlg_readsql.project_schema_last_update, '')
             return
-        utils_giswater.setWidgetText(self.dlg_info_show_info,
-                                     self.dlg_info_show_info.project_schema_title, str(row[0]))
-        utils_giswater.setWidgetText(self.dlg_info_show_info,
-                                     self.dlg_info_show_info.project_schema_author, str(row[1]))
-        utils_giswater.setWidgetText(self.dlg_info_show_info,
-                                     self.dlg_info_show_info.project_schema_last_update, str(row[2]))
+        utils_giswater.setWidgetText(self.dlg_readsql,
+                                     self.dlg_readsql.project_schema_title, str(row[0]))
+        utils_giswater.setWidgetText(self.dlg_readsql,
+                                     self.dlg_readsql.project_schema_author, str(row[1]))
+        utils_giswater.setWidgetText(self.dlg_readsql,
+                                     self.dlg_readsql.project_schema_last_update, str(row[2]))
 
     def process_folder(self, folderPath, filePattern):
         status = True
@@ -1088,17 +1093,6 @@ class UpdateSQL(ParentAction):
             return True
         return False
 
-    def check_version_schema(self):
-
-        # TODO:: END FUNCION
-        # # Python version
-        # sql = ("SELECT * FROM ws_sample.audit_log_project WHERE fprocesscat_id=0 AND user_name='' AND enabled=FALSE")
-        # row = self.controller.get_row(sql)
-        # if xxx:
-        #     return False
-
-        return True
-
     def open_create_project(self):
 
         # Create dialog
@@ -1121,7 +1115,7 @@ class UpdateSQL(ParentAction):
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
         self.btn_push_file  = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
-        if self.permisions is False:
+        if self.permisions != 'TRUE':
             self.rdb_no_ct.setEnabled(False)
             self.rdb_sample_dev.setEnabled(False)
 
@@ -1134,11 +1128,10 @@ class UpdateSQL(ParentAction):
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
 
-        # TODO: Populate combo project type with all projects types (Dinamic)
         cmb_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_project_type')
-        cmb_project_type.addItem('ws')
-        cmb_project_type.addItem('ud')
-        cmb_project_type.addItem('tm')
+        for type in self.project_types:
+            cmb_project_type.addItem(str(type))
+
         # Populate combo with all locales
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
         locales = os.listdir(self.sql_dir + '\i18n/')
