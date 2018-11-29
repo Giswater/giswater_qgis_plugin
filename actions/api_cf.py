@@ -219,7 +219,6 @@ class ApiCF(ApiParent):
             extras = '"coordinates":{'+str(point) + '}'
             body = self.create_body(feature=feature, extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_setgeom($${" + body + "}$$)")
-            self.controller.log_info(str(sql))
         # IF click over canvas
         elif point:
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
@@ -242,12 +241,34 @@ class ApiCF(ApiParent):
             self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
             return False
         if self.complet_result[0]['form']['template'] == 'GENERIC':
-            result = self.open_generic_form(self.complet_result)
+            result, dialog = self.open_generic_form(self.complet_result)
+            if feature_cat is not None:
+                self.manage_new_feature(self.complet_result, dialog)
             return result
         elif self.complet_result[0]['form']['template'] == 'custom feature':
-            result = self.open_custom_form(feature_id, self.complet_result)
+            result, dialog = self.open_custom_form(feature_id, self.complet_result)
+            if feature_cat is not None:
+                self.manage_new_feature(self.complet_result, dialog)
             return result
 
+    def manage_new_feature(self, complet_result, dialog):
+        result = complet_result[0]['editData']
+        for field in result["fields"]:
+            widget = dialog.findChild(QWidget, field['widgetname'])
+            value = None
+            if type(widget) is QLineEdit:
+                value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+            elif type(widget) is QComboBox:
+                value = utils_giswater.get_item_data(dialog, widget, 0)
+            elif type(widget) is QCheckBox:
+                value = utils_giswater.isChecked(dialog, widget)
+            elif type(widget) is QgsDateTimeEdit:
+                value = utils_giswater.getCalendarDate(dialog, widget)
+
+            if str(value) != '' and value is not None and value is not -1:
+                self.my_json[str(widget.property('column_id'))] = str(value)
+
+        self.controller.log_info(str(self.my_json))
 
     def open_generic_form(self, complet_result):
         self.hydro_info_dlg = ApiBasicInfo()
@@ -258,7 +279,7 @@ class ApiCF(ApiParent):
         result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id)
 
         self.hydro_info_dlg.open()
-        return result
+        return result, self.hydro_info_dlg
 
     def open_custom_form(self, feature_id, complet_result):
         # Dialog
@@ -516,7 +537,7 @@ class ApiCF(ApiParent):
         # Open dialog
         #self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_cf.show()
-        return self.complet_result
+        return self.complet_result, self.dlg_cf
 
     def set_widgets(self, dialog, field):
         widget = None
@@ -719,10 +740,18 @@ class ApiCF(ApiParent):
         return False
 
 
+    def clean_my_json(self, widget):
+        """ Delete keys if exist, when widget is autoupdate"""
+        try:
+            self.my_json.pop(str(widget.property('column_id')), None)
+        except KeyError:
+            pass
+
     def set_auto_update_lineedit(self, field, dialog, widget):
         if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
+                widget.lostFocus.connect(partial(self.clean_my_json, widget))
                 widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
                 widget.lostFocus.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
             else:
@@ -733,6 +762,7 @@ class ApiCF(ApiParent):
         if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
+                widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
             else:
@@ -743,6 +773,7 @@ class ApiCF(ApiParent):
         if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
+                widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
             else:
@@ -753,6 +784,7 @@ class ApiCF(ApiParent):
         if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
+                widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
             else:
@@ -763,6 +795,7 @@ class ApiCF(ApiParent):
         if self.check_tab_data(dialog):
             if field['isautoupdate']:
                 _json = {}
+                widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
             else:

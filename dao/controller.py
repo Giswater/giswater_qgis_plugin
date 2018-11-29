@@ -1143,8 +1143,9 @@ class DaoController():
         if restore_cursor:
             QApplication.restoreOverrideCursor()
         if self.api_cf is not None:
-            ep = self.api_cf.emit_point
-            ep.canvasClicked.disconnect()
+            if hasattr(self.api_cf, 'emit_point'):
+                ep = self.api_cf.emit_point
+                ep.canvasClicked.disconnect()
             self.api_cf = None
 
 

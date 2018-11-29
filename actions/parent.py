@@ -825,3 +825,11 @@ class ParentAction(object):
         
         return snapper
 
+
+    def disconect_xyCoordinates(self):
+        if hasattr(self, 'xyCoordinates_conected'):
+            if self.xyCoordinates_conected:
+                self.canvas.xyCoordinates.disconnect()
+                self.xyCoordinates_conected = None
+
+

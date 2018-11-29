@@ -50,38 +50,41 @@ class Edit(ParentAction):
 
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
-        active_layer = self.iface.activeLayer()
-        if active_layer is None:
-            active_layer = self.controller.get_layer_by_tablename('version')
-            self.iface.setActiveLayer(active_layer)
+        self.api_parent = ApiParent(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.coords_list = []
         self.points = None
         self.last_points = None
         self.previous_map_tool = self.canvas.mapTool()
         self.controller.restore_info()
-        # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
+        layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
+        if layer:
+            self.iface.setActiveLayer(layer)
+            layer.startEditing()
+            self.iface.actionAddFeature().trigger()
+        # # Vertex marker
+        # self.vertex_marker = QgsVertexMarker(self.canvas)
+        # self.vertex_marker.setColor(QColor(255, 100, 255))
+        # self.vertex_marker.setIconSize(15)
+        #
+        # if feature_cat.type.lower() in ('node', 'connec'):
+        #     self.controller.log_info(str("NODE"))
+        #     self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        # elif feature_cat.type.lower() in ('arc'):
+        #     self.controller.log_info(str("ARC"))
+        #     self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        # self.vertex_marker.setPenWidth(3)
 
-        if feature_cat.type.lower() in ('node', 'connec'):
-            self.controller.log_info(str("NODE"))
-            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        elif feature_cat.type.lower() in ('arc'):
-            self.controller.log_info(str("ARC"))
-            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
         # Snapper
-        self.snapper = self.get_snapper()
-
+        #self.snapper = self.get_snapper()
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.canvas.xyCoordinates.connect(self.mouse_move)
-        self.xyCoordinates_conected = True
+        #self.canvas.xyCoordinates.connect(self.mouse_move)
+        #self.xyCoordinates_conected = True
         self.emit_point.canvasClicked.connect(partial(self.set_geom, feature_cat))
 
 
-    def mouse_move(self, p):
+    def mouse_move(self,  p):
         self.snapped_point = None
         self.vertex_marker.hide()
         map_point = self.canvas.getCoordinateTransform().transform(p)
@@ -104,25 +107,37 @@ class Edit(ParentAction):
 
 
     def set_geom(self, feature_cat, point, button_clicked):
+
         # Control features with 1 point
         if button_clicked == Qt.LeftButton and feature_cat.type.lower() in ('node', 'connec'):
+            #self.disconect_xyCoordinates()
+            self.emit_point.canvasClicked.disconnect()
             self.points = '"x1":' + str(point.x()) + ', "y1":' + str(point.y())
-            action_info = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
-            action_info.setChecked(True)
             self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
             self.controller.api_cf = self.api_cf
             self.api_cf.open_form(point=self.points, feature_cat=feature_cat)
         elif button_clicked == Qt.RightButton and feature_cat.type.lower() in ('node', 'connec'):
+            #self.disconect_xyCoordinates()
+            self.emit_point.canvasClicked.disconnect()
             if self.controller.previous_maptool is not None:
                 self.canvas.setMapTool(self.controller.previous_maptool)
-            self.emit_point.canvasClicked.disconnect()
+
+
         # Control features with more than 1 point
         if button_clicked == Qt.LeftButton and feature_cat.type.lower() in ('arc'):
             if self.points is None:
                 self.points = '"x1":' + str(point.x()) + ', "y1":' + str(point.y())
+                point = QgsPoint(float(point.x()), float(point.y()))
+                self.coords_list.append(point)
+                print(self.coords_list)
+
             else:
                 self.last_points = ', "x2":' + str(point.x()) + ', "y2":' + str(point.y())
+                point = QgsPoint(float(point.x()), float(point.y()))
+                self.coords_list.append(point)
+
         elif button_clicked == Qt.RightButton and feature_cat.type.lower() in ('arc'):
+            #self.disconect_xyCoordinates()
             if self.last_points is None:
                 if self.controller.previous_maptool is not None:
                     self.canvas.setMapTool(self.controller.previous_maptool)
@@ -131,9 +146,6 @@ class Edit(ParentAction):
             else:
 
                 self.points = self.points + self.last_points
-
-                action_info = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
-                action_info.setChecked(True)
                 self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
                 self.controller.api_cf = self.api_cf
                 self.api_cf.open_form(point=self.points, feature_cat=feature_cat)
