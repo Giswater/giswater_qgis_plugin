@@ -41,14 +41,16 @@ class Go2Epa(ParentAction):
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
 
-        if not self.get_last_gsw_file():
-            return
+        # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
+        #self.get_last_gsw_file()
+
 
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
-        self.dlg_go2epa.setFixedSize(620, 300)        
-
+        self.dlg_go2epa.setFixedSize(620, 300)
+        # TODO habilitar todos estos widgets cuando Edgar acabe el giswater_java en python
+        """
         # Set widgets
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
@@ -59,6 +61,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.chk_export_subcatch.setVisible(False)
         self.dlg_go2epa.chk_exec.setVisible(False)
         self.dlg_go2epa.chk_import.setVisible(False)
+        """
 
         # Set signals
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
