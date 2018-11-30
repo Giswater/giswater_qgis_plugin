@@ -5,7 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "ws"."gw_fct_updatesearch"(search_data json) RETURNS pg_catalog.json AS $BODY$DECLARE
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch"(search_data json) RETURNS pg_catalog.json AS 
+$BODY$
+
+/*example
+SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"network","net_type":{"id":"samplepoint","name":"Punt de mostreig"},"net_code":{"text":"1"}}$$) AS result
+*/
+
+DECLARE
 
 --    Variables
     response_json json;
@@ -33,6 +40,7 @@ CREATE OR REPLACE FUNCTION "ws"."gw_fct_updatesearch"(search_data json) RETURNS 
     p_network_layer_gully varchar;
     p_network_layer_element varchar;
     p_network_layer_visit varchar;
+    p_network_layer_samplepoint varchar;
 
     p_network_search_field_arc_id varchar;
     p_network_search_field_node_id varchar;
@@ -40,13 +48,15 @@ CREATE OR REPLACE FUNCTION "ws"."gw_fct_updatesearch"(search_data json) RETURNS 
     p_network_search_field_gully_id varchar;
     p_network_search_field_element_id varchar;
     p_network_search_field_visit_id varchar;
-
+    p_network_search_field_samplepoint_id varchar;
+    
     p_network_search_field_arc_cat varchar; 
     p_network_search_field_node_cat varchar;
     p_network_search_field_connec_cat varchar;
     p_network_search_field_gully_cat varchar;
     p_network_search_field_element_cat varchar;
     p_network_search_field_visit_cat varchar;
+    p_network_search_field_samplepoint_cat varchar;
 
     p_network_search_field_arc varchar;
     p_network_search_field_node varchar;
@@ -54,6 +64,7 @@ CREATE OR REPLACE FUNCTION "ws"."gw_fct_updatesearch"(search_data json) RETURNS 
     p_network_search_field_gully varchar;
     p_network_search_field_element varchar;
     p_network_search_field_visit varchar;
+    p_network_search_field_samplepoint varchar;
     
   
     --muni
@@ -115,7 +126,7 @@ CREATE OR REPLACE FUNCTION "ws"."gw_fct_updatesearch"(search_data json) RETURNS 
 BEGIN
 
 --   Set search path to local schema
-     SET search_path = "ws", public;
+     SET search_path = "SCHEMA_NAME", public;
 
 --   Set api version
      EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -139,6 +150,7 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
     SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
     SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_visit FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_samplepoint FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_samplepoint';
 
     -- Layer's primary key;
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
@@ -147,7 +159,8 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_gully_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_element_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_visit_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
-
+    SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_samplepoint_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_samplepoint';
+    
     -- Layer's field to search:
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_arc FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_node FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
@@ -155,6 +168,7 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_gully FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_element FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
     SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_visit FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
+    SELECT ((value::json)->>'sys_search_field') INTO p_network_search_field_samplepoint FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_samplepoint';
    
     -- Layer's catalog field;
     SELECT ((value::json)->>'cat_field') INTO p_network_search_field_arc_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
@@ -163,6 +177,8 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'cat_field') INTO p_network_search_field_gully_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_gully';
     SELECT ((value::json)->>'cat_field') INTO p_network_search_field_element_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_element';
     SELECT ((value::json)->>'cat_field') INTO p_network_search_field_visit_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
+    SELECT ((value::json)->>'cat_field') INTO p_network_search_field_samplepoint_cat FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_samplepoint';
+
     
     -- Text to search
     combo1 := search_data->>'net_type';
@@ -224,7 +240,14 @@ IF tab_arg = 'network' THEN
                  quote_literal(p_network_layer_visit), '::text AS sys_table_id FROM ', p_network_layer_visit);
    END IF;
 
-
+  IF p_network_layer_samplepoint IS NOT NULL THEN 
+           IF query_text IS NOT NULL THEN query_text=concat(query_text,' UNION '); END IF;
+        query_text=concat (query_text, 'SELECT ',p_network_search_field_samplepoint_id,'::varchar AS sys_id, ',
+                 p_network_search_field_samplepoint,'::varchar AS search_field, ', 
+                 p_network_search_field_samplepoint_cat,'::varchar AS cat_id, ',
+                 p_network_search_field_samplepoint_id, '::varchar AS sys_idname, ',
+                 quote_literal(p_network_layer_samplepoint), '::text AS sys_table_id FROM ', p_network_layer_samplepoint);
+   END IF;
 
     IF id_arg = '' THEN 
         -- Get Ids for type combo
@@ -242,7 +265,6 @@ IF tab_arg = 'network' THEN
                     INTO response_json;
     END IF;
 
-    
     
 -- address
 ---------
