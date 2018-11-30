@@ -55,11 +55,11 @@ BEGIN
 		(SELECT node.node_id FROM audit_log_data 
 		JOIN node ON node.node_id=log_message
 		JOIN node inlet ON inlet.node_id=log_message
-		WHERE fprocesscat_id=35 AND user_name=current_user;
+		WHERE fprocesscat_id=35 AND user_name=current_user);
 	DELETE FROM dattrib WHERE dattrib_type=4 AND feature_id IN 
 		(SELECT connec_id FROM audit_log_data
 		JOIN connec ON connec.arc_id=audit_log_data.feature_id
-		WHERE fprocesscat_id=35 AND user_name=current_user;	
+		WHERE fprocesscat_id=35 AND user_name=current_user);	
 		
 	INSERT INTO dattrib
 		SELECT 4 as dattrib_type, node.node_id, 'node' as feature_type, inlet.elevation-node.elevation AS static_pressure 
