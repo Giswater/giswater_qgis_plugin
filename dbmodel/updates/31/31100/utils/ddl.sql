@@ -51,22 +51,6 @@ CREATE TABLE selector_hydrometer(
   CONSTRAINT selector_hydrometer_state_id_cur_user_unique UNIQUE (state_id, cur_user)
 );
 
-
---28/05/2018
------------------------
-INSERT INTO config_param_system VALUES (184, 'ymax_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
-INSERT INTO config_param_system VALUES (183, 'top_elev_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
-INSERT INTO config_param_system VALUES (185, 'sys_elev_vd', '1', 'decimal', 'draw_profile', 'For Node. Only for UD');
-INSERT INTO config_param_system VALUES (186, 'geom1_vd', '0.4', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
-INSERT INTO config_param_system VALUES (187, 'z1_vd', '0.1', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
-INSERT INTO config_param_system VALUES (188, 'z2_vd', '0.1', 'decimal', 'draw_profile', 'For Arc Catalog. Only for UD');
-INSERT INTO config_param_system VALUES (189, 'cat_geom1_vd', '1', 'decimal', 'draw_profile', 'For Node Catalog. Only for UD');
-INSERT INTO config_param_system VALUES (190, 'sys_elev1_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-INSERT INTO config_param_system VALUES (191, 'sys_elev2_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-INSERT INTO config_param_system VALUES (192, 'y1_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-INSERT INTO config_param_system VALUES (193, 'y2_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-INSERT INTO config_param_system VALUES (194, 'slope_vd', '1', 'decimal', 'draw_profile', 'For Arc. Only for UD');
-
 ALTER TABLE cat_node ADD COLUMN label varchar(255);
 ALTER TABLE cat_arc ADD COLUMN label varchar(255);
 ALTER TABLE cat_connec ADD COLUMN label varchar(255);

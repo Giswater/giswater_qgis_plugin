@@ -101,5 +101,5 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg(integer, text)
+ALTER FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt(text, text)
   OWNER TO postgres;
