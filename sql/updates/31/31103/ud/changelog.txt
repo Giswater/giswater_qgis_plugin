@@ -1,4 +1,0 @@
-31103-ud
---------
-Alter table node adding column arc_id;
-

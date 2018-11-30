@@ -1,6 +1,0 @@
-31105-i18n
-----------
-New datrib_type value dminsector, issue#566
-New datrib_type value pipehazard, issue#566
-New datrib_type value dinletsector, issue#566
-New datrib_type value dstaticpress, issue#560

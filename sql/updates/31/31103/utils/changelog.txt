@@ -1,5 +1,0 @@
-31103-utils
------------
-Alter table anl_node adding column arc_distance;
-Alter table anl_node adding column arc_id;
-Bug fix on constraint on table plan_psector_cat_type;

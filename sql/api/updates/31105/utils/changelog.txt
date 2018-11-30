@@ -1,4 +1,0 @@
-31103-utils (api)
------------------
-New fields on the config_web_fields, #issue571
-
