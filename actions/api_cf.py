@@ -73,11 +73,11 @@ class ApiCF(ApiParent):
 
     def api_info(self):
         """ Button 37: Own Giswater info """
-        # add "listener" to all actions to desactivate basic_api_info
+        # add "listener" to all actions to deactivate basic_api_info
         actions_list = self.iface.mainWindow().findChildren(QAction)
         for action in actions_list:
             if action.objectName() != 'basic_api_info' and self.controller.api_cf is not None:
-                action.triggered.connect(partial(self.controller.restore_info))
+                action.triggered.connect(partial(self.controller.restore_info, restore_cursor=True))
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
