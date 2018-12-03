@@ -201,7 +201,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		SELECT code_autofill INTO code_autofill_bool FROM node JOIN cat_node ON cat_node.id =node.nodecat_id JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id ;   
+		SELECT code_autofill INTO code_autofill_bool FROM node_type JOIN cat_node ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
 
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN

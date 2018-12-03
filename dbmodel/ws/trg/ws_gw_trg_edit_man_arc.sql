@@ -139,7 +139,7 @@ BEGIN
 			END IF;
 		END IF;
 
-        SELECT code_autofill INTO code_autofill_bool FROM arc JOIN cat_arc ON cat_arc.id =arc.arccat_id JOIN arc_type ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
+		SELECT code_autofill INTO code_autofill_bool FROM arc_type JOIN cat_arc ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
 	           
         -- Set EPA type
         NEW.epa_type = 'PIPE';        
