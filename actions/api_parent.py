@@ -910,7 +910,7 @@ class ApiParent(ParentAction):
         data = '"data":{' + filter_fields + ', ' + page_info
         if extras is not None:
             data += ', ' + extras
-        data += '} '
+        data += '}'
 
         body = "" + client + form + feature + data
         return body

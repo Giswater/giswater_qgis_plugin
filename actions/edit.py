@@ -13,16 +13,16 @@ try:
 except:
     from qgis.core import QGis as Qgis
 if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtCore import Qt, QPoint
+    from PyQt4.QtCore import Qt, QPoint, pyqtSignal
     from PyQt4.QtGui import QApplication, QAction, QColor
 else:
-    from qgis.PyQt.QtCore import Qt, QPoint
+    from qgis.PyQt.QtCore import Qt, QPoint, pyqtSignal
     from qgis.PyQt.QtGui import QColor
     from qgis.PyQt.QtWidgets import QApplication, QAction
 
 
 from qgis.core import QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker, QgsMapTool
 
 from giswater.actions.api_cf import ApiCF
 from giswater.actions.manage_element import ManageElement        
@@ -31,6 +31,8 @@ from giswater.actions.manage_workcat_end import ManageWorkcatEnd
 
 from giswater.actions.api_parent import ApiParent
 from giswater.actions.parent import ParentAction
+
+
 
 
 class Edit(ParentAction):
@@ -42,6 +44,7 @@ class Edit(ParentAction):
         self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
         self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
+
 
 
     def set_project_type(self, project_type):
@@ -57,62 +60,63 @@ class Edit(ParentAction):
         self.previous_map_tool = self.canvas.mapTool()
         self.controller.restore_info()
         layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
+
+
         if layer:
             self.iface.setActiveLayer(layer)
             layer.startEditing()
+            layer.featureAdded.connect(partial(self.open_new_feature, layer, feature_cat))
             self.iface.actionAddFeature().trigger()
-        # # Vertex marker
-        # self.vertex_marker = QgsVertexMarker(self.canvas)
-        # self.vertex_marker.setColor(QColor(255, 100, 255))
-        # self.vertex_marker.setIconSize(15)
-        #
-        # if feature_cat.type.lower() in ('node', 'connec'):
-        #     self.controller.log_info(str("NODE"))
-        #     self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        # elif feature_cat.type.lower() in ('arc'):
-        #     self.controller.log_info(str("ARC"))
-        #     self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        # self.vertex_marker.setPenWidth(3)
 
-        # Snapper
-        #self.snapper = self.get_snapper()
-        self.canvas = self.iface.mapCanvas()
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        #self.canvas.xyCoordinates.connect(self.mouse_move)
-        #self.xyCoordinates_conected = True
-        self.emit_point.canvasClicked.connect(partial(self.set_geom, feature_cat))
-
-
-    def mouse_move(self,  p):
-        self.snapped_point = None
-        self.vertex_marker.hide()
-        map_point = self.canvas.getCoordinateTransform().transform(p)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
-
-        # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
-        # That's the snapped point
-        if result:
-            # Check feature
-            for snapped_point in result:
-                self.snapped_point = QgsPoint(snapped_point.snappedVertex)
-                self.vertex_marker.setCenter(self.snapped_point)
-                self.vertex_marker.show()
         else:
-            self.vertex_marker.hide()
+            message = "Selected layer name not found"
+            self.controller.show_warning(message, parameter=feature_cat.parent_layer)
 
 
-    def set_geom(self, feature_cat, point, button_clicked):
+    def open_new_feature(self, layer, feature_cat, feature_id):
+        feature = self.get_feature_by_id(layer, feature_id)
+        geom = feature.geometry()
+
+        if layer.geometryType() == Qgis.Point:
+            points = geom.asPoint()
+            list_points = '"x1":' + str(points.x()) + ', "y1":' + str(points.y())
+            the_geom = geom.asWkb().encode('hex')
+
+        elif layer.geometryType() in(Qgis.Line, Qgis.Polygon):
+            points = geom.asPolyline()
+            init_point = points[0]
+            last_point = points[-1]
+            list_points = '"x1":' + str(init_point.x()) + ', "y1":' + str(init_point.y())
+            list_points += ', "x2":' + str(last_point.x()) + ', "y2":' + str(last_point.y())
+            the_geom = geom.asWkb().encode('hex')
+
+        else:
+            self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
+
+        self.controller.log_info(str("INIT:") + str(the_geom))
+        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.controller.api_cf = self.api_cf
+        self.api_cf.open_form(point=list_points, feature_cat=feature_cat, new_feature_id=feature_id, layer_new_feature=layer)
+
+
+    def get_feature_by_id(self, layer, id_):
+        iter = layer.getFeatures()
+        for feature in iter:
+            if feature.id() == id_:
+                return feature
+        return False
+
+
+    def set_geom(self, layer, feature_id,feature_cat,points, point, button_clicked ):
+        self.controlloer.log_info(str("WORKWORKWORKWORKWORKWORKWORKWORK"))
+        self.controlloer.log_info(str("WORKWORKWORKWORKWORKWORKWORKWORK"))
+        self.controlloer.log_info(str("WORKWORKWORKWORKWORKWORKWORKWORK"))
 
         # Control features with 1 point
         if button_clicked == Qt.LeftButton and feature_cat.type.lower() in ('node', 'connec'):
             #self.disconect_xyCoordinates()
-            self.emit_point.canvasClicked.disconnect()
-            self.points = '"x1":' + str(point.x()) + ', "y1":' + str(point.y())
+
+            self.points = '"x1":' + str(points.x()) + ', "y1":' + str(points.y())
             self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
             self.controller.api_cf = self.api_cf
             self.api_cf.open_form(point=self.points, feature_cat=feature_cat)

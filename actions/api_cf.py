@@ -177,7 +177,7 @@ class ApiCF(ApiParent):
         self.draw(complet_result)
 
 
-    def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None):
+    def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None, layer_new_feature=None):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -218,7 +218,8 @@ class ApiCF(ApiParent):
             feature = '"tableName":"' + str(feature_cat.child_layer.lower()) + '"'
             extras = '"coordinates":{'+str(point) + '}'
             body = self.create_body(feature=feature, extras=extras)
-            sql = ("SELECT " + self.schema_name + ".gw_api_setgeom($${" + body + "}$$)")
+            # sql = ("SELECT " + self.schema_name + ".gw_api_setgeom($${" + body + "}$$)")
+            sql = ("SELECT " + self.schema_name + ".gw_api_getfeatureinsert($${" + body + "}$$)")
         # IF click over canvas
         elif point:
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
@@ -229,9 +230,7 @@ class ApiCF(ApiParent):
             sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"', "
                    " null, " + str(is_project_editable) + ", 9, 100)")
 
-
         row = self.controller.get_row(sql, log_sql=True)
-        #self.controller.log_info(str(row))
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
@@ -246,7 +245,7 @@ class ApiCF(ApiParent):
                 self.manage_new_feature(self.complet_result, dialog)
             return result
         elif self.complet_result[0]['form']['template'] == 'custom feature':
-            result, dialog = self.open_custom_form(feature_id, self.complet_result)
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, new_feature_id, layer_new_feature)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result
@@ -281,7 +280,7 @@ class ApiCF(ApiParent):
         self.hydro_info_dlg.open()
         return result, self.hydro_info_dlg
 
-    def open_custom_form(self, feature_id, complet_result):
+    def open_custom_form(self, feature_id, complet_result, new_feature_id=None, layer_new_feature=None):
         # Dialog
         self.dlg_cf = ApiCfUi()
         self.load_settings(self.dlg_cf)
@@ -530,7 +529,7 @@ class ApiCF(ApiParent):
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        btn_accept.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, self.my_json))
+        btn_accept.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, self.my_json, new_feature_id=new_feature_id, layer_new_feature=layer_new_feature))
         self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
 
@@ -610,16 +609,30 @@ class ApiCF(ApiParent):
         self.open_dialog(dlg_sections, maximize_button=False)
 
         
-    def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
+    def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True, new_feature_id=None, layer_new_feature=None):
         if _json == '' or str(_json) == '{}':
             self.close_dialog(self.dlg_cf)
             return
-
+        if new_feature_id is not None:
+            new_feature = None
+            iter = layer_new_feature.getFeatures()
+            for feature in iter:
+                if feature.id() == new_feature_id:
+                    new_feature = feature
+            print(new_feature)
+            print(type(new_feature))
+            geom = new_feature.geometry()
+            the_geom = geom.asWkb().encode('hex')
+            _json['the_geom'] = the_geom
+            self.controller.log_info(str("LAST:") + str(the_geom))
         my_json = json.dumps(_json)
         p_table_id = complet_result['feature']['tableName']
-
-        sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertfields('"+str(p_table_id)+"', '"+str(feature_id)+""
-               "',null, 9, 100, '"+str(my_json)+"')")
+        feature = '"tableName":"' + str(p_table_id) + '", "id":"'+str(feature_id)+'"'
+        extras = '"fields":'+my_json+''
+        body = self.create_body(feature=feature, extras=extras)
+        sql = ("SELECT " + self.schema_name + ".gw_api_setfeatureinsert($${" + body + "}$$)")
+        # sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertfields('"+str(p_table_id)+"', '"+str(feature_id)+""
+        #        "',null, 9, 100, '"+str(my_json)+"')")
         row = self.controller.execute_returning(sql, log_sql=True)
         if not row:
             msg = "Fail in: {0}".format(sql)
