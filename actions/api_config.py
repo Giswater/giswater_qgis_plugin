@@ -397,6 +397,7 @@ class ApiConfig(ApiParent):
 
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','')")
         row = self.controller.get_row(sql, log_sql=True)
+        #TODO::Refactor input and output for function "gw_api_get_combochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child, row)
@@ -494,7 +495,7 @@ class ApiConfig(ApiParent):
         elem['chk'] = str('')
         elem['isChecked'] = str('')
         elem['value'] = value
-        elem['sys_role_id'] = 'role_admin'
+        elem['sysRoleId'] = 'role_admin'
 
         self.list_update.append(elem)
 
