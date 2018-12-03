@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
+from collections import OrderedDict
+
 try:
     from qgis.core import Qgis as Qgis
 except:
@@ -30,7 +32,7 @@ from giswater.ui_manager import ApiConfigUi
 
 
 class ApiConfig(ApiParent):
-    
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
@@ -45,8 +47,16 @@ class ApiConfig(ApiParent):
         self.controller.restore_info()
         self.list_update = []
 
-        sql = ("SELECT " + self.schema_name + ".gw_fct_getinfoform_config(3)")
+        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        body += '"form":{"formName":"config"}, '
+        body += '"feature":{}, '
+        body += '"data":{}'
+
+        # Get layers under mouse clicked
+        sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
+
         row = self.controller.get_row(sql, log_sql=True)
+        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         self.dlg_config = ApiConfigUi()
         self.load_settings(self.dlg_config)
@@ -98,8 +108,8 @@ class ApiConfig(ApiParent):
         self.system_form = QGridLayout()
 
         # Construct form for config and admin
-        self.construct_form_param_user(row, 'fields')
-        self.construct_form_param_system(row, 'fields_admin')
+        self.construct_form_param_user(complet_list[0]['body']['form']['formTabs'], 0)
+        self.construct_form_param_system(complet_list[0]['body']['form']['formTabs'], 1)
 
         groupBox_1.setLayout(self.basic_form)
         groupBox_2.setLayout(self.om_form)
@@ -160,7 +170,7 @@ class ApiConfig(ApiParent):
         # self.remove_empty_groupBox(admin_layout2)
 
         # Event on change from combo parent
-        self.get_event_combo_parent('fields', row)
+        self.get_event_combo_parent('fields', complet_list[0]['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
         self.chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
@@ -182,10 +192,10 @@ class ApiConfig(ApiParent):
             self.controller.show_info("Function not supported in this Operating System")
 
 
-    def construct_form_param_user(self, row, fields):
+    def construct_form_param_user(self, row, pos):
 
-        for field in row[0][fields]:
-            
+        for field in row[pos]['fields']:
+
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['name'])
@@ -195,7 +205,10 @@ class ApiConfig(ApiParent):
 
                 chk = QCheckBox()
                 chk.setObjectName('chk_' + field['name'])
-                chk.setChecked(field['checked'])
+                if field['checked'] == "True":
+                    chk.setChecked(True)
+                elif field['checked'] == "False":
+                    chk.setChecked(False)
                 chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
                 if field['widgettype'] == 'linetext':
@@ -267,8 +280,8 @@ class ApiConfig(ApiParent):
                 elif field['layout_id'] == 17:
                     self.order_widgets(field, self.system_form, lbl, chk, widget)
 
-    def construct_form_param_system(self, row, fields):
-        for field in row[0][fields]:
+    def construct_form_param_system(self, row, pos):
+        for field in row[pos]['fields']:
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['name'])
@@ -349,7 +362,7 @@ class ApiConfig(ApiParent):
                     self.order_widgets_system(field, self.system_form, lbl,  widget)
 
     def get_event_combo_parent(self, fields, row):
-        
+
         if fields == 'fields':
             for field in row[0]["fields"]:
                 if field['isparent']:
@@ -358,7 +371,7 @@ class ApiConfig(ApiParent):
 
 
     def populate_combo(self, widget, field):
-        
+
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()
@@ -378,26 +391,27 @@ class ApiConfig(ApiParent):
 
 
     def fill_child(self, widget):
-        
+
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
 
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','')")
         row = self.controller.get_row(sql, log_sql=True)
+        #TODO::Refactor input and output for function "gw_api_get_combochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child, row)
 
 
     def populate_child(self, combo_child, result):
-        
+
         child = self.dlg_config.findChild(QComboBox, str(combo_child['childName']))
         if child:
             self.populate_combo(child, combo_child)
 
 
     def order_widgets(self, field, form, lbl, chk, widget):
-        
+
         if field['widgettype'] != 'checkbox':
             form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(chk, field['layout_order'], 1)
@@ -481,7 +495,7 @@ class ApiConfig(ApiParent):
         elem['chk'] = str('')
         elem['isChecked'] = str('')
         elem['value'] = value
-        elem['sys_role_id'] = 'role_admin'
+        elem['sysRoleId'] = 'role_admin'
 
         self.list_update.append(elem)
 
@@ -489,7 +503,13 @@ class ApiConfig(ApiParent):
     def update_values(self):
 
         my_json = json.dumps(self.list_update)
-        sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertconfig('" + my_json + "')")
+        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        body += '"form":{"formName":"config"}, '
+        body += '"feature":{}, '
+        body += '"data":{"fields":'+my_json+'}'
+
+        sql = ("SELECT " + self.schema_name + ".gw_api_setconfig($${" + body + "}$$)")
+        self.controller.log_info(str(sql))
         self.controller.execute_sql(sql)
 
         # Close dialog
@@ -508,7 +528,7 @@ class ApiConfig(ApiParent):
 
     # TODO:
     def remove_empty_groupBox(self, layout):
-        
+
         self.controller.log_info(str("TEST"))
         groupBox_list = layout.findChild(QWidget)
         self.controller.log_info(str(layout.objectName()))
@@ -519,5 +539,3 @@ class ApiConfig(ApiParent):
             widget_list = groupBox.findChildren(QWidget)
             if not widget_list:
                 groupBox.setVisible(False)
-                
-                
