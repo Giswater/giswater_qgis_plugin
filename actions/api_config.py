@@ -512,6 +512,8 @@ class ApiConfig(ApiParent):
         self.controller.log_info(str(sql))
         self.controller.execute_sql(sql)
 
+        message = "Values has been updated"
+        self.controller.show_info(message)
         # Close dialog
         self.close_dialog(self.dlg_config)
 
