@@ -142,10 +142,6 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_api_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "api_path_folder"))
 
 
-        if self.check_relaod_views() is True:
-            self.chk_schema_view.setEnabled(False)
-            self.chk_api_view.setEnabled(False)
-            self.dlg_readsql.btn_schema_rename.setEnabled(False)
         if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
             self.chk_schema_ddl_dml.setEnabled(False)
             self.chk_api_ddl_dml.setEnabled(False)
@@ -157,16 +153,6 @@ class UpdateSQL(ParentAction):
         self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
                                            'DataBase version: ' + self.version)
 
-
-        print("test10")
-        print("test15")
-        last_version = ''
-        folders = os.listdir(self.folderUpdates + '')
-        for folder in folders:
-            sub_folders = os.listdir(self.folderUpdates + folder)
-            last_version = sub_folders[-1]
-        print("test20")
-        print(last_version)
 
         # Open dialog
         self.dlg_readsql.show()
@@ -891,9 +877,6 @@ class UpdateSQL(ParentAction):
         self.load_update_ddl_dml(api)
         self.execute_last_process()
 
-    def reload_views(self, api=False):
-        self.load_views(api)
-        self.execute_last_process()
 
     def reload_update_fk(self, api=False):
         self.load_fk(api)
@@ -1057,8 +1040,6 @@ class UpdateSQL(ParentAction):
 
         if self.chk_schema_ddl_dml.isChecked():
             self.update_ddl_dml()
-        if self.chk_schema_view.isChecked():
-            self.reload_views()
         if self.chk_schema_fk.isChecked():
             self.reload_update_fk()
         if self.chk_schema_rules.isChecked():
@@ -1072,8 +1053,6 @@ class UpdateSQL(ParentAction):
 
         if self.chk_api_ddl_dml.isChecked():
             self.update_ddl_dml(True)
-        if self.chk_api_view.isChecked():
-            self.reload_views(True)
         if self.chk_api_fk.isChecked():
             self.reload_update_fk(True)
         if self.chk_api_rules.isChecked():
@@ -1083,15 +1062,6 @@ class UpdateSQL(ParentAction):
         if self.chk_api_trigger.isChecked():
             self.reload_update_trg(True)
 
-    def check_relaod_views(self):
-
-        # sys_custom_views
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system WHERE parameter = 'sys_custom_views'")
-        row = self.controller.get_row(sql)
-        print(str(row[0]))
-        if str(row[0]) != 'FALSE':
-            return True
-        return False
 
     def open_create_project(self):
 
