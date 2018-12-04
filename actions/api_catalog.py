@@ -48,10 +48,8 @@ class ApiCatalog(ApiParent):
     def api_catalog(self, previous_dialog, widget_name, geom_type):
         self.controller.restore_info()
 
-        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        body += '"form":{"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"}, '
-        body += '"feature":{}, '
-        body += '"data":{}'
+        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
+        body = self.create_body(form)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -109,10 +107,9 @@ class ApiCatalog(ApiParent):
         pn_value = utils_giswater.get_item_data(self.dlg_catalog, pn)
         dn_value = utils_giswater.get_item_data(self.dlg_catalog, dn)
 
-        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        body += '"form":{"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"}, '
-        body += '"feature":{}, '
-        body += '"data":{"fields":{"matcat_id":"'+str(matcat_id_value)+'", "pn":"'+str(pn_value)+'", "dn":"'+str(dn_value)+'"}}'
+        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
+        extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'", "pn":"'+str(pn_value)+'", "dn":"'+str(dn_value)+'"}'
+        body = self.create_body(form=form, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -126,10 +123,9 @@ class ApiCatalog(ApiParent):
 
         matcat_id_value = utils_giswater.get_item_data(self.dlg_catalog, matcat_id)
 
-        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
-        body += '"form":{"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"}, '
-        body += '"feature":{}, '
-        body += '"data":{"fields":{"matcat_id":"'+str(matcat_id_value)+'"}}'
+        form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
+        extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'"}'
+        body = self.create_body(form=form, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
