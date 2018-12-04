@@ -1139,7 +1139,7 @@ class DaoController():
         if action_info.isChecked():
             action_info.setChecked(False)
         else:
-            print("NOT FOUND")
+            print("DELETE THIS ELSE IN restore_info")
         if restore_cursor:
             QApplication.restoreOverrideCursor()
         if self.api_cf is not None:
