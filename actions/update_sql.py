@@ -164,48 +164,6 @@ class UpdateSQL(ParentAction):
         # Check is api
         if api:
 
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_ddl + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_ddl),
-                                           self.folderSoftwareApi + self.file_pattern_ddl)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_dml + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_dml),
-                                           self.folderSoftwareApi + self.file_pattern_dml)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fct + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fct),
-                                           self.folderSoftwareApi + self.file_pattern_fct)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_rules + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_rules),
-                                           self.folderSoftwareApi + self.file_pattern_rules)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fk + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fk),
-                                           self.folderSoftwareApi + self.file_pattern_fk)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
-                                           self.folderSoftwareApi + self.file_pattern_trg)
-                if status is False:
-                    return False
             if self.process_folder(self.folderUtilsApi, self.file_pattern_ddl + '/') is False:
                 return False
             else:
@@ -248,6 +206,48 @@ class UpdateSQL(ParentAction):
                                            self.folderUtilsApi + self.file_pattern_trg)
                 if status is False:
                     return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_ddl + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_ddl),
+                                           self.folderSoftwareApi + self.file_pattern_ddl)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_dml + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_dml),
+                                           self.folderSoftwareApi + self.file_pattern_dml)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fct + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fct),
+                                           self.folderSoftwareApi + self.file_pattern_fct)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_rules + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_rules),
+                                           self.folderSoftwareApi + self.file_pattern_rules)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fk + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fk),
+                                           self.folderSoftwareApi + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
+                                           self.folderSoftwareApi + self.file_pattern_trg)
+                if status is False:
+                    return False
             if self.process_folder(self.folderLocaleApi,
                                    str(self.locale)) is False:
                 if self.process_folder(self.folderLocaleApi, 'EN') is False:
@@ -266,42 +266,6 @@ class UpdateSQL(ParentAction):
                     return False
         else:
 
-            if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_rules + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_fk + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_trg + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
-                if status is False:
-                    return False
             if self.process_folder(self.folderUtils, self.file_pattern_ddl + '/') is False:
                 return False
             else:
@@ -338,6 +302,42 @@ class UpdateSQL(ParentAction):
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
                 if status is False:
                     return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_rules + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_fk + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
+                if status is False:
+                    return False
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                     return False
@@ -358,24 +358,6 @@ class UpdateSQL(ParentAction):
 
         status = True
 
-        if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
-            if status is False:
-                return False
-        if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
-            if status is False:
-                return False
-        if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
-            return False
-        else:
-            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
-            if status is False:
-                return False
         if self.process_folder(self.folderUtils, self.file_pattern_ddl + '/') is False:
             return False
         else:
@@ -392,6 +374,24 @@ class UpdateSQL(ParentAction):
             return False
         else:
             status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
+            if status is False:
+                return False
+        if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
+            return False
+        else:
+            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
+            if status is False:
+                return False
+        if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
+            return False
+        else:
+            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
+            if status is False:
+                return False
+        if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
+            return False
+        else:
+            status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
             if status is False:
                 return False
         if self.process_folder(self.folderLocale, str(self.locale)) is False:
@@ -421,6 +421,14 @@ class UpdateSQL(ParentAction):
                 sub_folders = os.listdir(self.folderUpdatesApi + folder)
                 for sub_folder in sub_folders:
                     if str(sub_folder) > str(self.version).replace('.',''):
+                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
+                            print(False)
+                            return False
+                        else:
+                            status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
+                            if status is False:
+                                print(False)
+                                return False
                         if self.process_folder(
                                 self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
                                 '') is False:
@@ -429,18 +437,6 @@ class UpdateSQL(ParentAction):
                         else:
                             print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
                             status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            # status = self.executeFiles(os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/'),self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            if status is False:
-                                print(False)
-                                return False
-                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
-                            print(False)
-                            return False
-                        else:
-                            status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
-                            # status = self.executeFiles(
-                            #     os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/'),
-                            #     self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
                             if status is False:
                                 print(False)
                                 return False
@@ -467,21 +463,19 @@ class UpdateSQL(ParentAction):
                 sub_folders = os.listdir(self.folderUpdates + folder)
                 for sub_folder in sub_folders:
                     if str(sub_folder) > str(self.version).replace('.',''):
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
-                            print(False)
-                            return False
-                        else:
-                            status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            # status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'), self.folderUpdates + folder + '/' + sub_folder + '/' +self.project_type + '/')
-                            if status is False:
-                                print(False)
-                                return False
                         if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                             print(False)
                             return False
                         else:
                             status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
-                            # status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'), self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                            if status is False:
+                                print(False)
+                                return False
+                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
+                            print(False)
+                            return False
+                        else:
+                            status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
                             if status is False:
                                 print(False)
                                 return False
@@ -508,29 +502,29 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
-                if status is False:
-                    return False
             if self.process_folder(self.folderUtilsApi, self.file_pattern_view + '/') is False:
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_view), self.folderUtilsApi + self.file_pattern_view)
                 if status is False:
                     return False
-        else:
-            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
                 if status is False:
                     return False
+        else:
             if self.process_folder(self.folderUtils, self.file_pattern_view + '/') is False:
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_view), self.folderUtils + self.file_pattern_view)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
                 if status is False:
                     return False
 
@@ -570,15 +564,7 @@ class UpdateSQL(ParentAction):
         status = True
         # Check is api
         if api:
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fct) is False:
-                print(False)
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fct),
-                                           self.folderSoftwareApi + self.file_pattern_fct)
-                if status is False:
-                    print(False)
-                    return False
+
             if self.process_folder(self.folderUtilsApi, self.file_pattern_fct) is False:
                 print(False)
                 return False
@@ -588,20 +574,30 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     print(False)
                     return False
-        else:
-            if self.process_folder(self.folderSoftware, self.file_pattern_fct) is False:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fct) is False:
                 print(False)
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fct),
+                                           self.folderSoftwareApi + self.file_pattern_fct)
                 if status is False:
                     print(False)
                     return False
+        else:
+
             if self.process_folder(self.folderUtils, self.file_pattern_fct) is False:
                 print(False)
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_fct) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
                 if status is False:
                     print(False)
                     return False
@@ -614,15 +610,7 @@ class UpdateSQL(ParentAction):
         status = True
         # Check is api
         if api:
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_rules) is False:
-                print(False)
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_rules),
-                                           self.folderSoftwareApi + self.file_pattern_rules)
-                if status is False:
-                    print(False)
-                    return False
+
             if self.process_folder(self.folderUtilsApi, self.file_pattern_rules) is False:
                 print(False)
                 return False
@@ -632,20 +620,30 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     print(False)
                     return False
-        else:
-            if self.process_folder(self.folderSoftware, self.file_pattern_rules) is False:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_rules) is False:
                 print(False)
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_rules),
+                                           self.folderSoftwareApi + self.file_pattern_rules)
                 if status is False:
                     print(False)
                     return False
+        else:
+
             if self.process_folder(self.folderUtils, self.file_pattern_rules) is False:
                 print(False)
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_rules), self.folderUtils + self.file_pattern_rules)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_rules) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
                 if status is False:
                     print(False)
                     return False
@@ -659,15 +657,6 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fk) is False:
-                print(False)
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fk), self.folderSoftwareApi + self.file_pattern_fk)
-                if status is False:
-                    print(False)
-                    return False
-            print(status)
             if self.process_folder(self.folderUtilsApi, self.file_pattern_fk) is False:
                 print(False)
                 return False
@@ -676,21 +665,28 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     print(False)
                     return False
-        else:
-            if self.process_folder(self.folderSoftware, self.file_pattern_fk) is False:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fk) is False:
                 print(False)
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fk), self.folderSoftwareApi + self.file_pattern_fk)
                 if status is False:
                     print(False)
                     return False
-            print(status)
+        else:
             if self.process_folder(self.folderUtils, self.file_pattern_fk) is False:
                 print(False)
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_fk) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
                 if status is False:
                     print(False)
                     return False
@@ -704,15 +700,7 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg) is False:
-                print(False)
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
-                                           self.folderSoftwareApi + self.file_pattern_trg)
-                if status is False:
-                    print(False)
-                    return False
+
             if self.process_folder(self.folderUtilsApi, self.file_pattern_trg) is False:
                 print(False)
                 return False
@@ -722,20 +710,30 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     print(False)
                     return False
-        else:
-            if self.process_folder(self.folderSoftware, self.file_pattern_trg) is False:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg) is False:
                 print(False)
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
+                                           self.folderSoftwareApi + self.file_pattern_trg)
                 if status is False:
                     print(False)
                     return False
+        else:
+
             if self.process_folder(self.folderUtils, self.file_pattern_trg) is False:
                 print(False)
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_trg) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
                 if status is False:
                     print(False)
                     return False
@@ -754,6 +752,8 @@ class UpdateSQL(ParentAction):
 
     def execute_last_process(self):
 
+        # TODO::Take last version and update values
+        return
         # Execute permissions
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_role_permissions()")
         self.controller.execute_sql(sql)
@@ -922,20 +922,21 @@ class UpdateSQL(ParentAction):
             sub_folders = os.listdir(self.folderUpdates + folder)
             for sub_folder in sub_folders:
                 if str(sub_folder) > str(self.version).replace('.',''):
-                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
-                        print(False)
-                        return False
-                    else:
-                        status = self.readFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'),self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                        if status is False:
-                            print(False)
-                            return False
+
                     if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                         print(False)
                         return False
                     else:
                         status = self.readFiles(
                             os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'),self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                        if status is False:
+                            print(False)
+                            return False
+                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
+                        print(False)
+                        return False
+                    else:
+                        status = self.readFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'),self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
                         if status is False:
                             print(False)
                             return False
@@ -1061,7 +1062,6 @@ class UpdateSQL(ParentAction):
             self.reload_update_fct(True)
         if self.chk_api_trigger.isChecked():
             self.reload_update_trg(True)
-
 
     def open_create_project(self):
 
