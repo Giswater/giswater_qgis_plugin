@@ -8,21 +8,22 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from PyQt4.QtCore import QObject, QSettings, Qt
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView
+from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView, QToolButton
 from PyQt4.QtSql import QSqlQueryModel
 import os.path
 import sys  
 from functools import partial
 
-from actions.go2epa import Go2Epa
+
 from actions.basic import Basic
 from actions.edit import Edit
+from actions.go2epa import Go2Epa
 from actions.master import Master
 from actions.mincut import MincutParent
 from actions.om import Om
-from actions.utils import Utils
-from actions.info import Info
 from actions.update_sql import UpdateSQL
+from actions.utils import Utils
+
 from dao.controller import DaoController
 from map_tools.cad_add_circle import CadAddCircle
 from map_tools.cad_add_point import CadAddPoint
@@ -82,8 +83,8 @@ class Giswater(QObject):
         
         # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix) 
         self.qgis_settings = QSettings()
-        self.qgis_settings.setIniCodec(sys.getfilesystemencoding()) 
-        
+        self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
+
         # Define signals
         self.set_signals()
         
@@ -91,12 +92,28 @@ class Giswater(QObject):
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable
        
-               
+
+        
     def set_signals(self): 
         """ Define widget and event signals """
         self.iface.projectRead.connect(self.project_read)                
 
-  
+    def set_info_button(self):
+        self.toolButton = QToolButton()
+        self.iface.addToolBarWidget(self.toolButton)
+
+        icon_path = self.icon_folder + '36.png'
+        if os.path.exists(icon_path):
+            icon =QIcon(icon_path)
+        if icon is None:
+            action = QAction("Show info", self.iface.mainWindow())
+        else:
+            action = QAction(icon, "Show info", self.iface.mainWindow())
+        self.toolButton.setDefaultAction(action)
+
+        self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
+        action.triggered.connect(self.update_sql.init_sql)
+
     def tr(self, message):
         if self.controller:
             return self.controller.tr(message)      
@@ -130,7 +147,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 25, 29, 500):
+            elif int(index_action) in (23, 25, 29):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
@@ -140,10 +157,6 @@ class Giswater(QObject):
             # Utils toolbar actions
             elif int(index_action) in (19, 83, 99):
                 callback_function = getattr(self.utils, function_name)
-                action.triggered.connect(callback_function)                
-            # Info toolbar actions
-            elif int(index_action) == 36:
-                callback_function = getattr(self.info, function_name)
                 action.triggered.connect(callback_function)                
             # Generic function
             else:        
@@ -231,8 +244,8 @@ class Giswater(QObject):
             return None
             
         # Buttons NOT checkable (normally because they open a form)
-        if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99, 500):
+        if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49,
+                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -306,7 +319,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)   
         
         toolbar_id = "epa"
-        list_actions = ['23', '25', '29', '500']
+        list_actions = ['23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)    
         
         toolbar_id = "master"
@@ -317,9 +330,6 @@ class Giswater(QObject):
         list_actions = ['19', '99', '83']               
         self.manage_toolbar(toolbar_id, list_actions)                                      
             
-        toolbar_id = "info"
-        list_actions = ['36']               
-        self.manage_toolbar(toolbar_id, list_actions)                                      
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()           
@@ -339,18 +349,16 @@ class Giswater(QObject):
             self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)  
         self.utils.set_controller(self.controller)                   
-        self.info.set_controller(self.controller)
         self.basic.set_project_type(self.wsoftware)
         self.go2epa.set_project_type(self.wsoftware)
         self.edit.set_project_type(self.wsoftware)
         self.master.set_project_type(self.wsoftware)
         self.om.set_project_type(self.wsoftware)
         self.utils.set_project_type(self.wsoftware)
-        self.info.set_project_type(self.wsoftware)
 
         # Enable toobar 'basic' and 'info'
         self.enable_toolbar("basic")           
-        self.enable_toolbar("info")           
+
            
            
     def manage_toolbar(self, toolbar_id, list_actions): 
@@ -503,40 +511,38 @@ class Giswater(QObject):
                           
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
-        
-        # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
-        self.controller.set_plugin_dir(self.plugin_dir)        
+        self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
         connection_status = self.controller.set_database_connection()
         if not connection_status:
-            message = self.controller.last_error  
+            message = self.controller.last_error
             if show_warning:
-                self.controller.show_warning(message, 15) 
+                self.controller.show_warning(message, 15)
                 self.controller.log_warning(str(self.controller.layer_source))
-            return 
-        
+            return
         # Cache error message with log_code = -1 (uncatched error)
-        self.controller.get_error_message(-1)       
-                
+        self.controller.get_error_message(-1)
+
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
-                
+
         # Get schema name from table 'version' and set it in controller and in config file
         layer_version = self.controller.get_layer_by_tablename("version")
-        layer_source = self.controller.get_layer_source(layer_version)  
+        layer_source = self.controller.get_layer_source(layer_version)
         self.schema_name = layer_source['schema']
-        self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
-        self.controller.set_schema_name(self.schema_name) 
-          
+        self.controller.plugin_settings_set_value("schema_name", self.schema_name)
+        self.controller.set_schema_name(self.schema_name)
+
         # Check if schema exists
         self.schema_exists = self.controller.dao.check_schema(self.schema_name)
-        if not self.schema_exists and show_warning:
+        if not self.schema_exists:
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
 
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
+
 
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -547,13 +553,15 @@ class Giswater(QObject):
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)    
-        self.info = Info(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.updatesql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
+
 
         # Manage layers
         if not self.manage_layers():
+            self.set_info_button()
             return
+        else:
+            self.set_info_button()
               
         # Manage layer names of the tables present in table 'sys_feature_cat'
         self.manage_layer_names()   

@@ -34,6 +34,8 @@ class DaoController():
         self.logged = False 
         self.postgresql_version = None
         self.logger = None
+        self.schema_name = None
+        self.dao = None
         if create_logger:
             self.set_logger(logger_name)
                 

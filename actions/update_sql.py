@@ -16,9 +16,7 @@ from giswater.actions.parent import ParentAction
 from giswater.ui_manager import Readsql
 from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit
 from PyQt4.QtCore import QSettings
-import psycopg2
 
-from dao.controller import DaoController
 from ui_manager import ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo
 
 
@@ -26,7 +24,14 @@ class UpdateSQL(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
+        # Initialize instance attributes
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.giswater_version = "3.1"
+        self.iface = iface
+        self.settings = settings
+        self.controller = controller
+        self.plugin_dir = plugin_dir
+        self.schema_name = self.controller.schema_name
         self.project_type = controller.get_project_type()
 
 
@@ -149,7 +154,7 @@ class UpdateSQL(ParentAction):
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "devtools")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api")
 
-        #Put current info into software version info widget
+        # Put current info into software version info widget
         self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
                                            'DataBase version: ' + self.version)
 
@@ -214,7 +219,19 @@ class UpdateSQL(ParentAction):
                                            self.folderSoftwareApi + self.file_pattern_fk)
                 if status is False:
                     return False
-
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
+                                           self.folderSoftwareApi + self.file_pattern_trg)
+                if status is False:
+                    return False
             if self.process_folder(self.folderLocaleApi,
                                    str(self.locale)) is False:
                 if self.process_folder(self.folderLocaleApi, 'EN') is False:
@@ -441,19 +458,6 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
-                                           self.folderSoftwareApi + self.file_pattern_trg)
-                if status is False:
-                    return False
             if self.process_folder(self.folderUtilsApi, self.file_pattern_view + '/') is False:
                 return False
             else:
