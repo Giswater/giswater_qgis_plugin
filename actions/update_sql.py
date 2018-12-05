@@ -288,18 +288,7 @@ class UpdateSQL(ParentAction):
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
                 if status is False:
                     return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_trg + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
-                if status is False:
-                    return False
+
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                     return False
@@ -500,6 +489,18 @@ class UpdateSQL(ParentAction):
                     return False
 
         else:
+            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
+                if status is False:
+                    return False
             if self.process_folder(self.folderUtils, self.file_pattern_view + '/') is False:
                 return False
             else:
