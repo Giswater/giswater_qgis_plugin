@@ -178,34 +178,7 @@ class UpdateSQL(ParentAction):
                                            self.folderUtilsApi + self.file_pattern_dml)
                 if status is False:
                     return False
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_fct + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fct),
-                                           self.folderUtilsApi + self.file_pattern_fct)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_rules + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_rules),
-                                           self.folderUtilsApi + self.file_pattern_rules)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_fk + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fk),
-                                           self.folderUtilsApi + self.file_pattern_fk)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_trg + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_trg),
-                                           self.folderUtilsApi + self.file_pattern_trg)
-                if status is False:
-                    return False
+
             if self.process_folder(self.folderSoftwareApi, self.file_pattern_ddl + '/') is False:
                 return False
             else:
@@ -278,30 +251,7 @@ class UpdateSQL(ParentAction):
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_dml), self.folderUtils + self.file_pattern_dml)
                 if status is False:
                     return False
-            if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderUtils, self.file_pattern_rules + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_rules), self.folderUtils + self.file_pattern_rules)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderUtils, self.file_pattern_fk + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderUtils, self.file_pattern_trg + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
-                if status is False:
-                    return False
+
             if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
                 return False
             else:
@@ -330,6 +280,12 @@ class UpdateSQL(ParentAction):
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
                 if status is False:
                     return False
             if self.process_folder(self.folderSoftware, self.file_pattern_trg + '/') is False:
@@ -508,6 +464,34 @@ class UpdateSQL(ParentAction):
                 status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_view), self.folderUtilsApi + self.file_pattern_view)
                 if status is False:
                     return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_fct + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fct),
+                                           self.folderUtilsApi + self.file_pattern_fct)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_rules + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_rules),
+                                           self.folderUtilsApi + self.file_pattern_rules)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_fk + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fk),
+                                           self.folderUtilsApi + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_trg),
+                                           self.folderUtilsApi + self.file_pattern_trg)
+                if status is False:
+                    return False
             if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
                 return False
             else:
@@ -521,12 +505,31 @@ class UpdateSQL(ParentAction):
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_view), self.folderUtils + self.file_pattern_view)
                 if status is False:
                     return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
+            if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
                 if status is False:
                     return False
+            if self.process_folder(self.folderUtils, self.file_pattern_rules + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_rules), self.folderUtils + self.file_pattern_rules)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_fk + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
+                if status is False:
+                    return False
+
 
         print(status)
         return True
