@@ -553,6 +553,13 @@ class ApiCF(ApiParent):
         self.iface.actionRollbackEdits().trigger()
 
 
+    def set_setStyleSheet(self, field, widget, wtype='label'):
+        if field['stylesheet'] is not None:
+            if wtype in field['stylesheet']:
+                widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
+        return widget
+
+
     def set_widgets(self, dialog, field):
         widget = None
         label = None
@@ -560,7 +567,8 @@ class ApiCF(ApiParent):
             label = QLabel()
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
-            label.setStyleSheet("QLabel{color:pink;}")
+            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+                label = self.set_setStyleSheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:
