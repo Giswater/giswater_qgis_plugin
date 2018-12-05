@@ -240,7 +240,7 @@ class UpdateSQL(ParentAction):
             else:
                 status = self.executeFiles(os.listdir(
                     self.folderLocaleApi + str(self.locale)),
-                                           self.folderLocaleApi + str(self.locale))
+                                           self.folderLocaleApi + str(self.locale), True)
                 if status is False:
                     return False
         else:
@@ -305,7 +305,7 @@ class UpdateSQL(ParentAction):
                     return False
                 else:
                     status = self.executeFiles(os.listdir(
-                        self.sql_dir + '\i18n/' + 'EN'), self.sql_dir + '\i18n/' + 'EN')
+                        self.sql_dir + '\i18n/' + 'EN'), self.sql_dir + '\i18n/' + 'EN', True)
                     if status is False:
                         return False
             else:
@@ -1141,7 +1141,7 @@ class UpdateSQL(ParentAction):
         # Open dialog
         self.dlg_readsql_rename.show()
 
-    def executeFiles(self, filelist, filedir):
+    def executeFiles(self, filelist, filedir, i18n=False):
         if not filelist:
             return
         if self.schema is None:
@@ -1149,27 +1149,60 @@ class UpdateSQL(ParentAction):
         else:
             schema_name = self.schema.replace('"', '')
         filter_srid_value = str(self.filter_srid_value).replace('"','')
-        for file in filelist:
-            print(file)
-            if ".sql" in file:
-                try:
-                    f = open(filedir + '/' + file, 'r')
-                    if f:
-                        f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(str('utf-8-sig'))
-                        self.controller.log_info(str(f_to_read))
-                        status = self.controller.execute_sql(str(f_to_read))
-                        if status is False:
-                            print(str(file))
-                            print "Error to execute"
-                            self.dao.rollback()
-                            return False
-                    else:
+        if i18n:
+            try:
+                f = open(filedir + '/utils.sql', 'r')
+                if f:
+                    f_to_read = str(
+                        f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
+                        str('utf-8-sig'))
+                    self.controller.log_info(str(f_to_read))
+                    status = self.controller.execute_sql(str(f_to_read))
+                    if status is False:
+                        print(str('utils.sql'))
+                        print "Error to execute"
+                        self.dao.rollback()
                         return False
-                except Exception as e:
-                    print "Command skipped. Unexpected error"
-                    print (e)
-                    self.dao.rollback()
-                    return False
+
+                f = open(filedir + '/' + self.project_type + '.sql', 'r')
+                if f:
+                    f_to_read = str(
+                        f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
+                        str('utf-8-sig'))
+                    self.controller.log_info(str(f_to_read))
+                    status = self.controller.execute_sql(str(f_to_read))
+                    if status is False:
+                        print(str('utils.sql'))
+                        print "Error to execute"
+                        self.dao.rollback()
+                        return False
+            except Exception as e:
+                print "Command skipped. Unexpected error"
+                print (e)
+                self.dao.rollback()
+                return False
+        else:
+            for file in filelist:
+                print(file)
+                if ".sql" in file:
+                    try:
+                        f = open(filedir + '/' + file, 'r')
+                        if f:
+                            f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(str('utf-8-sig'))
+                            self.controller.log_info(str(f_to_read))
+                            status = self.controller.execute_sql(str(f_to_read))
+                            if status is False:
+                                print(str(file))
+                                print "Error to execute"
+                                self.dao.rollback()
+                                return False
+                        else:
+                            return False
+                    except Exception as e:
+                        print "Command skipped. Unexpected error"
+                        print (e)
+                        self.dao.rollback()
+                        return False
         return True
 
     def readFiles(self, filelist, filedir):
