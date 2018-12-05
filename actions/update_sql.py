@@ -214,19 +214,7 @@ class UpdateSQL(ParentAction):
                                            self.folderSoftwareApi + self.file_pattern_fk)
                 if status is False:
                     return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
-                                           self.folderSoftwareApi + self.file_pattern_trg)
-                if status is False:
-                    return False
+
             if self.process_folder(self.folderLocaleApi,
                                    str(self.locale)) is False:
                 if self.process_folder(self.folderLocaleApi, 'EN') is False:
@@ -453,6 +441,19 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_trg),
+                                           self.folderSoftwareApi + self.file_pattern_trg)
+                if status is False:
+                    return False
             if self.process_folder(self.folderUtilsApi, self.file_pattern_view + '/') is False:
                 return False
             else:
