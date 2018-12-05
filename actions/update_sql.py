@@ -214,6 +214,12 @@ class UpdateSQL(ParentAction):
                                            self.folderSoftwareApi + self.file_pattern_fk)
                 if status is False:
                     return False
+            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
+                if status is False:
+                    return False
             if self.process_folder(self.folderSoftwareApi, self.file_pattern_trg + '/') is False:
                 return False
             else:
@@ -492,12 +498,7 @@ class UpdateSQL(ParentAction):
                                            self.folderUtilsApi + self.file_pattern_trg)
                 if status is False:
                     return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
-                if status is False:
-                    return False
+
         else:
             if self.process_folder(self.folderUtils, self.file_pattern_view + '/') is False:
                 return False
