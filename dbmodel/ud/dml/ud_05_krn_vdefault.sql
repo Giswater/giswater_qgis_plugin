@@ -7,5 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+ALTER TABLE node ALTER COLUMN feature_type SET DEFAULT 'NODE';
+ALTER TABLE arc ALTER COLUMN feature_type SET DEFAULT 'ARC';
+ALTER TABLE connec ALTER COLUMN feature_type SET DEFAULT 'CONNEC';
 
 ALTER TABLE gully ALTER COLUMN feature_type SET DEFAULT 'GULLY';
