@@ -9,5 +9,6 @@ New system parameter om_mincut_debug, , issue#562;
 New user parameter om_mincut_analysis_dminsector, issue#561;
 New user parameter om_mincut_analysis_pipehazard, issue#561;
 New user parameter om_mincut_analysis_dinletsector, issue#561;
+New views v_arc_dattrib, v_node_dattrib, v_connec_dattrib, issue#561;
 
 
