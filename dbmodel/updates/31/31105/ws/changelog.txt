@@ -1,9 +1,5 @@
 31105-ws
 --------
-Alter table ext_cat_period renaming starttime TO start_date;
-Alter table ext_cat_period renaming endtime TO end_date;
-Alter table ext_rtc_hydrometer_x_data adding column value_date date;
-New field cat_period_code on v_edit_rtc_hydrometer_x_data, issue#577;
 New system parameter om_mincut_valvestat_using_valveunaccess, issue#563;
 New system parameter om_mincut_debug, , issue#562;
 New user parameter om_mincut_analysis_dminsector, issue#561;

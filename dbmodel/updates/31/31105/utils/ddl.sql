@@ -41,3 +41,15 @@ REFERENCES dattrib_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 CREATE INDEX dattrib_feature_id_index ON dattrib USING btree (feature_id COLLATE pg_catalog."default");
 
 CREATE INDEX dattrib_dattrib_type_index ON dattrib USING btree (dattrib_type)
+
+
+-- 2018/11/28
+ALTER TABLE ext_cat_period RENAME starttime TO start_date;
+ALTER TABLE ext_cat_period RENAME endtime TO end_date;
+
+ALTER TABLE ext_rtc_hydrometer_x_data ADD COLUMN value_date date;
+
+-- 2018/12/6
+CREATE INDEX rtc_hydrometer_x_connec_index_connec_id ON rtc_hydrometer_x_connec  USING btree  (connec_id);
+CREATE INDEX ext_rtc_hydrometer_x_data_index_hydrometer_id ON ext_rtc_hydrometer_x_data USING btree (hydrometer_id);
+CREATE INDEX ext_rtc_hydrometer_x_data_index_cat_period_id ON ext_rtc_hydrometer_x_data USING btree (cat_period_id);

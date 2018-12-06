@@ -2,10 +2,14 @@
 -----------
 Bug fix when user has not cofigured any value default and do not choose any value on mandatory fields of custom forms, issue#547
 Bug fix on rule on insert_plan_arc_x_pavement, issue#565
-New table dattrib, issue#561
-New table dattrib_type, issue#561
+Alter table ext_cat_period renaming starttime TO start_date;
+Alter table ext_cat_period renaming endtime TO end_date;
+Alter table ext_rtc_hydrometer_x_data adding column value_date date;
+New field cat_period_code on v_edit_rtc_hydrometer_x_data, issue#577;
 New field ismultifeature on om_visit_parameter, issue#549
 New field isarcdivide on node_type, issue#556
+New table dattrib, issue#561
+New table dattrib_type, issue#561
 New process (33) audit project data schema, issue#537
 New process (34) mincut analysis dynamic minimum sector, issue#566
 New process (35) mincut analysis dynamic inlet sector, issue#566
