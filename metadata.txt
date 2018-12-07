@@ -12,7 +12,8 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 # End of mandatory metadata
 
 # Uncomment the following line and add your changelog:
-# changelog=
+changelog=Version 3.1.105 (30/12/2018)
+- Enhancement: Change zoom to node after mincut
 
 # Tags are comma separated with spaces allowed
 tags=giswater, water, hydraulic, model, water supply, urban drainage
