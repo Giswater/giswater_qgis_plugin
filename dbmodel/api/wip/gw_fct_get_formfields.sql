@@ -76,7 +76,7 @@ BEGIN
 	p_tabname = 'tabname';
      END IF;
 
--- Get fields	
+--   Get fields	
 	IF p_formname!='infoplan' THEN 
 		IF v_bmapsclient is true THEN
 			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS name, widgettype as type,

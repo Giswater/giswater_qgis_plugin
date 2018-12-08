@@ -28,25 +28,53 @@ DECLARE
 	v_form json;
 	v_body json;
 	v_return json;
-
+	v_feature json;
+	v_idname text;
+	v_schemaname text;
+	v_tablename text;
+	
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ws_sample", public;
+	SET search_path = "ws_sample", public;
+	v_schemaname = 'ws_sample';
 
 --  Creating the form actions  
    	v_formactions = '[{"actionName":"actionZoom","actionTooltip":"Zoom"},{"actionName":"actionSelect","actionTooltip":"Select"}
 			,{"actionName":"actionLink","actionTooltip":"Link"},{"actionName":"actionDelete","actionTooltip":"Delete"}]';
 
-    SELECT gw_api_getlist (p_data) INTO v_return;
+	SELECT gw_api_getlist (p_data) INTO v_return;
+
+-- getting idname
+	v_tablename = (p_data->>'feature')::json->>'tableName';
+
+	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+		INTO v_idname
+		USING v_tablename, v_schemaname;
+		
+	-- For views it suposse pk is the first column
+	IF v_idname ISNULL THEN
+		EXECUTE '
+		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+		AND t.relname = $1 
+		AND s.nspname = $2
+		ORDER BY a.attnum LIMIT 1'
+		INTO v_idname
+		USING v_tablename, v_schemaname;
+	END IF;
+
+-- setting the idname
+	v_feature = gw_fct_json_object_set_key(((v_return->>'body')::json->>'feature')::json, 'idName', v_idname);
+	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'feature', v_feature); 
+	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 
 --  setting the formactions
-    v_form = gw_fct_json_object_set_key(((v_return->>'body')::json->>'form')::json, 'formActions', v_formactions);
-    v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'form', v_form);
-    v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
+	v_form = gw_fct_json_object_set_key(((v_return->>'body')::json->>'form')::json, 'formActions', v_formactions);
+	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'form', v_form);
+	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
    
---    Return
-    RETURN v_return;
+--  Return
+	RETURN v_return;
        
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 

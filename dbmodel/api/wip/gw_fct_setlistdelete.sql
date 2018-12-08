@@ -5,13 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setfeaturedelete(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_setlistdelete(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
 visit:
-SELECT ws_sample.gw_api_setfeaturedelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT ws_sample.gw_api_setlistdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
 		"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1130, "idname": "visit_id"}}')
 */
 

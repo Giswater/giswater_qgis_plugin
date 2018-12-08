@@ -77,13 +77,8 @@ BEGIN
 
     RAISE NOTICE 'featuretype:%,  visitclass:%,  v_visit:%,  formname:%,  tablename:%,  device:%',v_featuretype, v_visitclass, v_id, v_formname, v_tablename, v_device;
 
--- get formactions
-    -- TODO: EXECUTE 'SELECT json(array_agg(row_to_json(a))) FROM (SELECT formaction as "actionName", actiontooltip as "actionTooltip" FROM config_api_form_actions WHERE formname = $1
-		-- ORDER BY id desc) a' INTO v_formactions USING v_formname;
-
-    v_formactions = '[{"actionName":"actionZoom","actionTooltip":"Zoom"},{"actionName":"actionSelect","actionTooltip":"Select"}
-		,{"actionName":"actionLink","actionTooltip":"Link"},{"actionName":"actionDelete","actionTooltip":"Delete"}]';
-
+    v_formactions = '[	{"actionName":"actionAdd","actionTooltip":"Add"},
+			{"actionName":"actionDelete","actionTooltip":"Delete"}]';
     
 --  get form fields
     IF v_id IS NULL THEN
