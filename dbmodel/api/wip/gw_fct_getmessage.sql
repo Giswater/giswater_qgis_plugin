@@ -1,4 +1,9 @@
-﻿-- Function: ws_sample.gw_api_getlist(json)
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
 
 CREATE OR REPLACE FUNCTION ws_sample.gw_api_getmessage(p_data json, p_message integer)
   RETURNS json AS
@@ -7,6 +12,7 @@ $BODY$
 /*EXAMPLE:
 SELECT ws_sample.gw_api_getmessage($${"featureType":"visit", "idName":"visit_id", "id":"2001"}$$, 30)
 */
+
 DECLARE
 	v_record record;
 	v_message text;

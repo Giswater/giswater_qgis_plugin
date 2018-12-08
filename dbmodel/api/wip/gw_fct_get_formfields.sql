@@ -1,4 +1,11 @@
-﻿CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_formfields(
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_formfields(
     p_formname character varying,
     p_formtype character varying,
     p_tabname character varying,
@@ -60,9 +67,14 @@ BEGIN
      EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 	INTO api_version;
 
--- Get project type
-    SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
-    SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
+--   get project type
+     SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
+     SELECT value INTO v_bmapsclient FROM config_param_system WHERE parameter = 'api_bmaps_client';
+
+--   setting tabname
+     IF p_tabname IS NULL THEN
+	p_tabname = 'tabname';
+     END IF;
 
 -- Get fields	
 	IF p_formname!='infoplan' THEN 
@@ -70,14 +82,14 @@ BEGIN
 			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS name, widgettype as type,
 				widgetdim, datatype AS "dataType" , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
 				concat('||quote_literal(p_tabname)||',''_'',layout_id) as layoutname, layout_order, dv_parent_id, isparent, widgetfunction as "changeAction", dv_querytext, dv_querytext_filterc, 
-				action_function, isautoupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
+				action_function, isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
 					INTO fields_array
 					USING p_formname, p_formtype;	
 		ELSE
 			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype,
 				widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
 				concat('||quote_literal(p_tabname)||',''_'',layout_id) as layoutname, layout_order, dv_parent_id, isparent, widgetfunction, dv_querytext, dv_querytext_filterc, 
-				action_function, isautoupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
+				action_function, isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
 					INTO fields_array
 					USING p_formname, p_formtype;
 		END IF;
@@ -97,12 +109,25 @@ BEGIN
 				INTO fields_array
 				USING p_formname, p_id ;
 	END IF;
-
-	raise notice 'fields_array %', fields_array;
-
+	
 	fields_array := COALESCE(fields_array, '{}');  
+
 	FOREACH aux_json IN ARRAY fields_array
 	LOOP
+		-- setting the typeahead widgets
+		IF (aux_json->>'typeahead') IS NOT NULL THEN
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'threshold', ((aux_json->>'typeahead')::json->>'threshold'));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'noresultsMsg', ((aux_json->>'typeahead')::json->>'noresultsMsg'));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'loadingMsg', ((aux_json->>'typeahead')::json->>'loadingMsg'));
+		END IF;
+
+		-- setting the not updateable fields
+		IF p_tgop ='UPDATE' THEN
+			IF (aux_json->>'isnotupdate')::boolean IS TRUE THEN
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isEditable','False');
+			END IF;		
+		END IF;
+		
 		-- for image widgets
 		IF (aux_json->>'widgettype')='image' THEN
 		      	EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
@@ -217,12 +242,21 @@ BEGIN
 						END IF;
 		
 						combo_json_child := COALESCE(combo_json_child, '[]');
-						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);		
+						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);								
+
+						--removing the not used fields
+						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json_child->>'orderby')::INT],
+						'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'typeahead','orderby');								
 					  END IF;
 				END IF;
 			END LOOP;
-		    END IF;	
+		    END IF;			    
 		END IF;	
+		
+	--removing the not used fields
+	fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
+	'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'typeahead', 'orderby');
+	
 	END LOOP;
 
 --    Convert to json

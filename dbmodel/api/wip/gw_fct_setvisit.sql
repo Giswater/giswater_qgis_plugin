@@ -1,6 +1,9 @@
-﻿-- Function: ws_sample.gw_api_setvisit(json)
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
--- DROP FUNCTION ws_sample.gw_api_setvisit(json);
 
 CREATE OR REPLACE FUNCTION ws_sample.gw_api_setvisit(p_data json)
   RETURNS json AS
@@ -11,7 +14,7 @@ $BODY$
 SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":null, "idname": "visit_id"},
+"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":null, "idname":"visit_id"},
 "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
 	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
@@ -20,8 +23,9 @@ SELECT ws_sample.gw_api_setvisit($${
 SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1135,"idname": "visit_id"},
-"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":101121200, "desperfectes_arc":1, "neteja_arc":3},"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
+"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1135,"idname":"visit_id"},
+"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":101121200, "desperfectes_arc":1, "neteja_arc":3},
+	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
 */
 

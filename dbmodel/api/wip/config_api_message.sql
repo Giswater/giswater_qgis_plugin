@@ -4,25 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE TABLE ws_sample.sys_combo_cat
+
+CREATE TABLE ws_sample.config_api_message
 (
-  id serial NOT NULL,
-  idval text,
-  CONSTRAINT sys_combo_cat_pkey PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
-);
-
-
-
-CREATE TABLE ws_sample.sys_combo_values
-(
-  sys_combo_cat_id integer NOT NULL,
   id integer NOT NULL,
-  idval text,
-  descript text,
-  CONSTRAINT sys_combo_pkey PRIMARY KEY (sys_combo_cat_id, id)
+  loglevel integer,
+  message text,
+  hintmessage text,
+  mtype text,
+  CONSTRAINT config_api_message_pkey PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE

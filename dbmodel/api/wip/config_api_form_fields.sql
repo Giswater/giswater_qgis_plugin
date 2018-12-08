@@ -1,3 +1,11 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+
 CREATE TABLE ws_sample.config_api_form_fields
 (
   id serial NOT NULL,
@@ -28,6 +36,8 @@ CREATE TABLE ws_sample.config_api_form_fields
   action_function text,
   isreload boolean,
   stylesheet json,
+  isnotupdate boolean,
+  threshold integer
   CONSTRAINT config_api_form_fields_pkey PRIMARY KEY (id),
   CONSTRAINT config_api_form_fields_pkey2 UNIQUE (formname, formtype, column_id)
 )

@@ -1,23 +1,36 @@
-﻿-- Function: ws_sample.gw_api_getlist(json)
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
--- DROP FUNCTION ws_sample.gw_api_getlist(json);
 
 CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlist(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
+-- ToC list with custom filters
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"form":{"formType":"", "formName":"", "tabName":"rpt"},
-"feature":{"featureType":"", "tableName":"ve_arc_pipe", "idName":"", "id":""},
+"feature":{"tableName":"v_edit_man_pipe"},
+"data":{"filterFields":{"arccat_id":"PVC160-PN16", "limit":5},
+    "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
+
+
+-- ToC list with custom filters and canvas
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"v_edit_man_pipe"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN16", "limit":5},
     "canvasExtend":{"x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
+
+
 */
 
 DECLARE
-	api_version text;
+	v_apiversion text;
 	v_filter_fields  json[];
 	v_filter_fields_json json;
 	v_filter_values  json;
@@ -53,7 +66,7 @@ BEGIN
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-        INTO api_version;
+        INTO v_apiversion;
 
 
 --  Creating the list fields
@@ -94,7 +107,7 @@ BEGIN
 
 
 	-- getting the list of filters fields
-	SELECT gw_api_get_formfields(v_formname, 'list', v_tabname, null, null, null, null,'INSERT', null, v_device)
+	SELECT gw_api_get_formfields(v_formname, 'list', null, null, null, null, null,'INSERT', null, v_device)
 		INTO v_filter_fields;
 
 	v_filter_fields_json = array_to_json (v_filter_fields);
@@ -196,27 +209,22 @@ BEGIN
 		v_query_result := v_query_result || ' LIMIT '|| v_offset;
 	END IF;
 
-	RAISE NOTICE 'v_query_result %', v_query_result;
-
-
 	-- Execute query result
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
 
-	raise notice 'v_filter_fields %', v_filter_fields;
-
-	raise notice 'v_result_list %', v_result_list;
+	raise notice 'v_filter_fields  %', v_filter_fields ;
+	raise notice 'v_result_list % ', v_result_list;
 
 --    Control NULL's
 	v_filter_fields := COALESCE(v_filter_fields, '{}');
 	v_result_list := COALESCE(v_result_list, '{}');
-	api_version := COALESCE(api_version, '{}');
+	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_action_column_index := COALESCE(v_action_column_index, '{}');
 
-    
 --    Return
-    RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
-             ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
-			',"form":{"formName":"", "formHeaderText":"", "formBodyText":""'|| 
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
+             ',"body":{"form":{"formName":"", "formHeaderText":"", "formBodyText":""'|| 
 				',"formTabs":[{"tabName":"","tabHeaderText":"","tabBodyText":""}]'||
 				',"formActions":[{"actionName":"actionZoom","actionTooltip":"Zoom"}'||
 					       ',{"actionName":"actionLink","actionTooltip":"Link"}'||
@@ -229,7 +237,7 @@ BEGIN
 
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 
