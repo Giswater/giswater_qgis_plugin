@@ -1,5 +1,6 @@
 31105-ws
 --------
+Bug fix on view v_om_visit;  TODO: SAME UD & CREATE ISSUE
 New system parameter om_mincut_valvestat_using_valveunaccess, issue#563;
 New system parameter om_mincut_debug, , issue#562;
 New user parameter om_mincut_analysis_dminsector, issue#561;

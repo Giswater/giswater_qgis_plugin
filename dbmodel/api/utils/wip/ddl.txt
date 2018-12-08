@@ -1,0 +1,12 @@
+CREATE TABLE ws_sample.config_api_message
+(
+  id integer NOT NULL,
+  loglevel integer,
+  message text,
+  hintmessage text,
+  mtype text,
+  CONSTRAINT config_api_message_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);

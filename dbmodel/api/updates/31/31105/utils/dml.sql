@@ -15,3 +15,6 @@ UPDATE config_web_fields SET widgetfunction='gw_fct_updateprint' WHERE table_id=
 -- 2018/11/29
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript)  VALUES ('api_search_samplepoint', '{"sys_table_id":"samplepoint", "sys_id_field":"id", "sys_search_field":"code", "alias":"Punt de mostreig", "cat_field":"lab_code", "orderby":"7"}', 'text', 'api_search_network', NULL);
+
+-- 2018/12/06
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('api_bmaps_client', 'FALSE', 'boolean', 'System', 'Utils');
