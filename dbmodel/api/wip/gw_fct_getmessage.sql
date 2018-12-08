@@ -5,9 +5,7 @@ CREATE OR REPLACE FUNCTION ws_sample.gw_api_getmessage(p_data json, p_message in
 $BODY$
 
 /*EXAMPLE:
-SELECT ws_sample.gw_api_getmessage($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"featureType":"visit", "idName":"visit_id", "id":"2001"}}$$, 30)
+SELECT ws_sample.gw_api_getmessage($${"featureType":"visit", "idName":"visit_id", "id":"2001"}$$, 30)
 */
 DECLARE
 	v_record record;
@@ -23,7 +21,7 @@ BEGIN
     IF v_record.mtype='alone' THEN
 		v_message = concat('{"level":"',v_record.loglevel,'", "text":"',v_record.message,'", "hint":"',v_record.hintmessage,'"}');
     ELSIF v_record.mtype='withfeature' THEN
-		v_message = concat('{"level":"',v_record.loglevel,'", "text":"',(((p_data)->>'feature')::json->>'featureType'),' ',(((p_data)->>'feature')::json->>'id'),' ',v_record.message,'", "hint":"',v_record.hintmessage,'"}');
+		v_message = concat('{"level":"',v_record.loglevel,'", "text":"',(p_data)->>'featureType',' ',(p_data)->>'id',' ',v_record.message,'", "hint":"',v_record.hintmessage,'"}');
     END IF;
     
 --    Return
