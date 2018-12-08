@@ -36,8 +36,12 @@ DECLARE
 	v_forminfo json;
 	v_formtabid json;
 	v_formtablabel json;
-	v_formtabtext json;
+	v_formtabtext json;	
+	v_formtabtable json;
 	v_formheader text;
+	v_formtabtablename json;
+	v_formtabidname json;
+	v_formactions json;
 
 BEGIN
 
@@ -72,6 +76,14 @@ BEGIN
     v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
 
     RAISE NOTICE 'featuretype:%,  visitclass:%,  v_visit:%,  formname:%,  tablename:%,  device:%',v_featuretype, v_visitclass, v_id, v_formname, v_tablename, v_device;
+
+-- get formactions
+    -- TODO: EXECUTE 'SELECT json(array_agg(row_to_json(a))) FROM (SELECT formaction as "actionName", actiontooltip as "actionTooltip" FROM config_api_form_actions WHERE formname = $1
+		-- ORDER BY id desc) a' INTO v_formactions USING v_formname;
+
+    v_formactions = '[{"actionName":"actionZoom","actionTooltip":"Zoom"},{"actionName":"actionSelect","actionTooltip":"Select"}
+		,{"actionName":"actionLink","actionTooltip":"Link"},{"actionName":"actionDelete","actionTooltip":"Delete"}]';
+
     
 --  get form fields
     IF v_id IS NULL THEN
@@ -89,16 +101,28 @@ BEGIN
     	v_formtabid = array_to_json('{tabInfo,tabEvent,tabFile}'::text[]);
 	v_formtablabel = array_to_json('{Info,Events,Files}'::text[]);
 	v_formtabtext = array_to_json('{Info,Events,Files}'::text[]);
+	v_formtabtablename = array_to_json('{null,v_ui_om_event,v_ui_om_visit_x_doc}'::text[]);
+	v_formtabidname = array_to_json('{null,id,id}'::text[]);
+
     ELSE 
     	v_formtabid = array_to_json('{tabInfo,tabFile}'::text[]);
 	v_formtablabel = array_to_json('{Info,Files}'::text[]);
 	v_formtabtext = array_to_json('{Info,Files}'::text[]);
+	v_formtabtablename = array_to_json('{null,v_ui_om_visit_x_doc}'::text[]);
+	v_formtabidname = array_to_json('{null,id}'::text[]);
+	
     END IF;
     	
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formTabs', v_formtabid);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'tabLabel', v_formtablabel);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'tabText', v_formtabtext);
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'tabTableName', v_formtabtablename);
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'tabIdName', v_formtabidname);
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
+
+
+
 
 --  Control NULL's
 	v_fields_json := COALESCE(v_fields_json, '{}');

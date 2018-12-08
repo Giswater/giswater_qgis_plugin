@@ -4,29 +4,47 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlist(p_data json)
-  RETURNS json AS
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlist(p_data json)  RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
--- ToC list with custom filters
+
+-- attribute table using custom filters
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_pipe"},
+"feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN16", "limit":5},
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
 
-
--- ToC list with custom filters and canvas
+-- attribute table using canvas filter
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_pipe"},
-"data":{"filterFields":{"arccat_id":"PVC160-PN16", "limit":5},
+"feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
+"data":{"filterFields":{"arccat_id":null, "limit":null},
     "canvasExtend":{"x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
-    "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
+    "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
+-- Visit -> events
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
+"data":{"filterFields":{"visit_id":232, "limit":10},
+    "canvasExtend":{"x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
+    "pageInfo":{"orderby":"tstamp", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
+-- Visit -> files
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"v_ui_om_visit_x_doc", "idName":"id"},
+"data":{"filterFields":{"visit_id":232, "limit":10},
+    "pageInfo":{"orderby":"doc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
+
+-- Arc -> elements
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
+"data":{"filterFields":{"arc_id":"2001"},
+    "pageInfo":{"orderby":"element_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 */
 
 DECLARE
@@ -38,7 +56,6 @@ DECLARE
 	aux_json json;
 	v_result_list json;
 	v_query_result text;
-	v_tablename varchar;
 	v_id  varchar;
 	v_device integer;
 	v_infotype integer;
@@ -55,32 +72,45 @@ DECLARE
 	text text;
 	i integer=1;
 	v_tabname text;
-	v_action_column_index json;
-	v_formname text;
+	v_action_column json;
+	v_tablename text;
+	v_formactions json;
+	v_x1 float;
+	v_y1 float;
+	v_x2 float;
+	v_y2 float;
+	v_canvas public.geometry;
+	v_the_geom text;
+	v_canvasextend json;
+	v_srid integer;
+	v_i integer;
 	
 BEGIN
 
 -- Set search path to local schema
     SET search_path = "ws_sample", public;
     v_schema_name := 'ws_sample';
-
+  
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO v_apiversion;
 
+    SELECT epsg INTO v_srid FROM version LIMIT 1;
 
---  Creating the list fields
-----------------------------
-	-- Get input parameters:
+-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
 	v_tabname := (p_data ->> 'form')::json->> 'tabName';
-	v_formname := (p_data ->> 'feature')::json->> 'tableName';
-	
+	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
+	v_canvasextend := (p_data ->> 'data')::json->> 'canvasExtend';
+
+
+--  Creating the list fields
+----------------------------
 	-- Get idname column
 	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
 		INTO v_idname
-		USING v_formname;
+		USING v_tablename;
         
 	-- For views it suposse pk is the first column
 	IF v_idname ISNULL THEN
@@ -89,7 +119,7 @@ BEGIN
 			AND s.nspname = $2
 			ORDER BY a.attnum LIMIT 1'
 			INTO v_idname
-			USING v_formname, v_schema_name;
+			USING v_tablename, v_schema_name;
 	END IF;
 
 	-- Get column type
@@ -102,19 +132,39 @@ BEGIN
 	    AND t.relname = $2 
 	    AND s.nspname = $1
 	    ORDER BY a.attnum'
-            USING v_schema_name, v_formname, v_idname
+            USING v_schema_name, v_tablename, v_idname
             INTO v_column_type;
 
-
+        -- Getting geometry column
+        EXECUTE 'SELECT attname FROM pg_attribute a        
+            JOIN pg_class t on a.attrelid = t.oid
+            JOIN pg_namespace s on t.relnamespace = s.oid
+            WHERE a.attnum > 0 
+            AND NOT a.attisdropped
+            AND t.relname = $1
+            AND s.nspname = $2
+            AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+            ORDER BY a.attnum' 
+            USING v_tablename, v_schema_name
+            INTO v_the_geom;
+        
 	-- getting the list of filters fields
-	SELECT gw_api_get_formfields(v_formname, 'list', null, null, null, null, null,'INSERT', null, v_device)
+	SELECT gw_api_get_formfields(v_tablename, 'list', v_tabname, null, null, null, null,'INSERT', null, v_device)
 		INTO v_filter_fields;
 
+	-- adding the right widgets
+		--identifing the dimension of array
+		v_i = cardinality(v_filter_fields) ;
+
+		-- setting new wigdets
+		v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
+		v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
+		v_filter_fields[v_i+3] := gw_fct_createwidgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
+
+	-- converting to json
 	v_filter_fields_json = array_to_json (v_filter_fields);
 
-	raise notice ' v_filter_fields_json %', v_filter_fields_json;
 
-	
 	/* getting value defaults for filters fields
 	To do: Use widgettype to put on the audit_cat_param_user the name of the filter
 	FOREACH aux_json IN ARRAY fields_array 
@@ -134,29 +184,26 @@ BEGIN
 ---------------------------
 	--  get querytext
 	EXECUTE 'SELECT query_text, action_fields FROM config_api_list WHERE tablename = $1 AND device = $2'
-		INTO v_query_result, v_action_column_index
-		USING v_formname, v_device;
+		INTO v_query_result, v_action_column
+		USING v_tablename, v_device;
 
 	-- if v_device is not configured on config_api_list table
 	IF v_query_result IS NULL THEN
 		EXECUTE 'SELECT query_text, action_fields  FROM config_api_list WHERE tablename = $1 LIMIT 1'
-			INTO v_query_result, v_action_column_index
-			USING v_formname;
+			INTO v_query_result, v_action_column
+			USING v_tablename;
 	END IF;
 
-	-- if v_formname is not configured on config_api_list table
+	-- if v_tablename is not configured on config_api_list table
 	IF v_query_result IS NULL THEN
-		v_query_result = 'SELECT * FROM '||v_formname||' WHERE '||v_idname||' IS NOT NULL ';
+		v_query_result = 'SELECT * FROM '||v_tablename||' WHERE '||v_idname||' IS NOT NULL ';
 	END IF;
 
 	--  add filters
 	v_filter_values := (p_data ->> 'data')::json->> 'filterFields';
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
 
-	i=1;
-
 	IF v_text IS NOT NULL THEN
-
 		FOREACH text IN ARRAY v_text
 		LOOP
 			-- Get field and value from json
@@ -175,7 +222,19 @@ BEGIN
 	END IF;
 
 	-- add extend filter
-	-- to do (working with extend parameter of inputdaa)
+	IF v_the_geom IS NOT NULL AND v_canvasextend IS NOT NULL THEN
+		
+		-- getting coordinates values
+		v_x1 = v_canvasextend->>'x1coord';
+		v_y1 = v_canvasextend->>'y1coord';
+		v_x2 = v_canvasextend->>'x2coord';
+		v_y2 = v_canvasextend->>'y2coord';	
+
+		-- adding on the query text the extend filter
+		v_query_result := v_query_result || ' AND ST_dwithin ( '|| v_tablename || '.' || v_the_geom || ',' || 
+		'ST_MakePolygon(ST_GeomFromText(''LINESTRING ('||v_x1||' '||v_y1||', '||v_x1||' '||v_y2||', '||v_x2||' '||v_y2||', '||v_x2||' '||v_y1||', '||v_x1||' '||v_y1||')'','||v_srid||')),1)';
+		
+	END IF;
 
 	-- add orderby
 	v_orderby := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'orderby';
@@ -183,25 +242,15 @@ BEGIN
 		v_query_result := v_query_result || ' ORDER BY '||v_orderby;
 	END IF;
 
-	RAISE NOTICE 'v_query_result %', v_query_result;
-
 	v_ordertype := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'orderType';
 	IF v_ordertype IS NOT NULL THEN
 		v_query_result := v_query_result ||' '||v_ordertype;
 	END IF;
 
-	RAISE NOTICE 'v_query_result %', v_query_result;
-
-	-- add limit
-	-- comment due we use limit as a parameter from filters not from the other body of json
-	--IF v_limit IS NULL THEN 
-	--	v_limit := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'limit';
-	--END IF;
-	
+	-- add linit
 	IF v_limit IS NOT NULL THEN
 		v_query_result := v_query_result || ' LIMIT '|| v_limit;
 	END IF;
-	RAISE NOTICE 'v_query_result %', v_query_result;
 
 	-- add offset
 	v_offset := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'offset';
@@ -213,33 +262,23 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
 
-	raise notice 'v_filter_fields  %', v_filter_fields ;
-	raise notice 'v_result_list % ', v_result_list;
-
 --    Control NULL's
 	v_filter_fields := COALESCE(v_filter_fields, '{}');
 	v_result_list := COALESCE(v_result_list, '{}');
 	v_apiversion := COALESCE(v_apiversion, '{}');
-	v_action_column_index := COALESCE(v_action_column_index, '{}');
+	v_action_column := COALESCE(v_action_column, '{}');
 
 --    Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
-             ',"body":{"form":{"formName":"", "formHeaderText":"", "formBodyText":""'|| 
-				',"formTabs":[{"tabName":"","tabHeaderText":"","tabBodyText":""}]'||
-				',"formActions":[{"actionName":"actionZoom","actionTooltip":"Zoom"}'||
-					       ',{"actionName":"actionLink","actionTooltip":"Link"}'||
-					       ',{"actionName":"actionDelete","actionTooltip":"Delete"}]}'||
-			',"feature":{"tableName":"' || v_formname ||'","idName":"'|| v_idname ||'","actionFields":'||v_action_column_index||'}'||
-			',"data":{"filterFields":' || v_filter_fields_json ||
-				',"listValues":' || v_result_list ||'}}'||
+             ',"body":{"form":{}'||
+		     ',"feature":{"tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'","actionFields":'||v_action_column||'}'||
+		     ',"data":{"filterFields":' || v_filter_fields_json ||
+			     ',"listValues":' || v_result_list ||'}}'||
 	    '}')::json;
        
-
 --    Exception handling
 --    EXCEPTION WHEN OTHERS THEN 
         --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
-
-
 
 END;
 $BODY$
