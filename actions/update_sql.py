@@ -13,7 +13,7 @@ from sqlite3 import OperationalError
 
 import utils_giswater
 from giswater.actions.parent import ParentAction
-from giswater.ui_manager import Readsql
+from giswater.ui_manager import Readsql, InfoShowInfo
 from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit
 from PyQt4.QtCore import QSettings
 
@@ -37,130 +37,142 @@ class UpdateSQL(ParentAction):
 
     def init_sql(self):
         """ Button 100: Execute SQL. Info show info """
-        print("info")
-        # Create the dialog and signals
-        self.dlg_readsql = Readsql()
-        self.load_settings(self.dlg_readsql)
-        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
+        role_admin = self.controller.check_role_user("role_admin")
 
-        #Check if user have dev permisions
-        self.permisions = self.settings.value('system_variables/devoloper_mode').upper()
-
-        #Get pluguin version
-        self.pluguin_version = self.get_plugin_version()
-
-        # Get widgets from form
-
-        # Checkbox SCHEMA & API
-        self.chk_schema_ddl_dml = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_ddl_dml')
-        self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
-        self.chk_schema_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_fk')
-        self.chk_schema_rules = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_rules')
-        self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
-        self.chk_schema_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_trigger')
-        self.chk_api_ddl_dml = self.dlg_readsql.findChild(QCheckBox, 'chk_api_ddl_dml')
-        self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
-        self.chk_api_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_api_fk')
-        self.chk_api_rules = self.dlg_readsql.findChild(QCheckBox, 'chk_api_rules')
-        self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
-        self.chk_api_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_api_trigger')
-        self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
-
-        btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
-        self.set_icon(btn_info, '73')
+        # Manage user 'postgres'
+        if self.controller.user in ('postgres', 'gisadmin'):
+            role_admin = True
 
 
-        self.message_update = ''
+        if role_admin is None:
+            print("No soc Admin :(")
+            self.info_show_info()
+            return
+        else:
+            print("info")
+            # Create the dialog and signals
+            self.dlg_readsql = Readsql()
+            self.load_settings(self.dlg_readsql)
+            self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
 
-        # Get locale of QGIS application
-        self.locale = QSettings().value('locale/userLocale').lower()
-        if self.locale == 'es_es':
-            self.locale = 'ES'
-        elif self.locale == 'es_ca':
-            self.locale = 'CA'
-        elif self.locale == 'en_us':
-            self.locale = 'EN'
+            #Check if user have dev permisions
+            self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
 
-        self.filter_srid_value = self.controller.plugin_settings_value('srid')
-        self.schema = None
+            #Get pluguin version
+            self.pluguin_version = self.get_plugin_version()
 
-        #Populate combo types
-        self.project_types = self.settings.value('system_variables/project_types')
-        cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
-        for type in self.project_types:
-            cmb_project_type.addItem(str(type))
+            # Get widgets from form
 
-        self.populate_data_shcema_name(cmb_project_type)
-        self.set_info_project()
+            # Checkbox SCHEMA & API
+            self.chk_schema_ddl_dml = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_ddl_dml')
+            self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
+            self.chk_schema_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_fk')
+            self.chk_schema_rules = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_rules')
+            self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
+            self.chk_schema_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_trigger')
+            self.chk_api_ddl_dml = self.dlg_readsql.findChild(QCheckBox, 'chk_api_ddl_dml')
+            self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
+            self.chk_api_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_api_fk')
+            self.chk_api_rules = self.dlg_readsql.findChild(QCheckBox, 'chk_api_rules')
+            self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
+            self.chk_api_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_api_trigger')
+            self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
-        # Get version
-
-        sql = ("SELECT giswater from " + self.schema_name + ".version")
-        row = self.controller.get_row(sql)
-        self.version = row[0]
-
-
-        # Declare all file variables
-        self.file_pattern_fk = "fk"
-        self.file_pattern_ddl = "ddl"
-        self.file_pattern_dml = "dml"
-        self.file_pattern_fct = "fct"
-        self.file_pattern_trg = "trg"
-        self.file_pattern_view = "view"
-        self.file_pattern_rules = "rules"
-        self.file_pattern_vdefault = "vdefault"
-        self.file_pattern_other = "other"
-        self.file_pattern_roles = "roles"
-
-        # Declare sql directory
-        self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + '\sql'
-
-        # Declare all directorys
-        self.folderSoftware = self.sql_dir + '/' + self.project_type + '/'
-        self.folderLocale = self.sql_dir + '\i18n/' + str(self.locale) + '/'
-        self.folderUtils = self.sql_dir + '\utils/'
-        self.folderUpdates = self.sql_dir + '\updates/'
-        self.folderExemple = self.sql_dir, '\example/'
-        self.folderPath = ''
-
-        # Declare all directorys api
-        self.folderSoftwareApi = self.sql_dir + '/api/' + self.project_type + '/'
-        self.folderUtilsApi = self.sql_dir + '/api/utils/'
-        self.folderUpdatesApi = self.sql_dir + '/api/updates/'
-        self.folderLocaleApi = self.sql_dir + '/api\i18n/' + str(self.locale) + '/'
-        self.folderExempleApi = self.sql_dir, '/api/example/'
-
-        # Set Listeners
-        self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
-        self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
-        self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
-        self.dlg_readsql.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "path_folder"))
-        self.dlg_readsql.btn_schema_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "schema_path_folder"))
-        self.dlg_readsql.btn_api_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "api_path_folder"))
-        self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
-        self.dlg_readsql.btn_api_file_to_db_2.clicked.connect(partial(self.api_file_to_db))
-        btn_info.clicked.connect(partial(self.show_info))
-        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
-        cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, cmb_project_type))
-        self.dlg_readsql.btn_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "path_folder"))
-        self.dlg_readsql.btn_schema_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "schema_path_folder"))
-        self.dlg_readsql.btn_api_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "api_path_folder"))
+            btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
+            self.set_icon(btn_info, '73')
 
 
-        if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
-            self.chk_schema_ddl_dml.setEnabled(False)
-            self.chk_api_ddl_dml.setEnabled(False)
-        if self.permisions != 'TRUE':
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "devtools")
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api")
+            self.message_update = ''
 
-        # Put current info into software version info widget
-        self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
-                                           'DataBase version: ' + self.version)
+            # Get locale of QGIS application
+            self.locale = QSettings().value('locale/userLocale').lower()
+            if self.locale == 'es_es':
+                self.locale = 'ES'
+            elif self.locale == 'es_ca':
+                self.locale = 'CA'
+            elif self.locale == 'en_us':
+                self.locale = 'EN'
+
+            self.filter_srid_value = self.controller.plugin_settings_value('srid')
+            self.schema = None
+
+            #Populate combo types
+            self.project_types = self.settings.value('system_variables/project_types')
+            cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
+            for type in self.project_types:
+                cmb_project_type.addItem(str(type))
+
+            self.populate_data_shcema_name(cmb_project_type)
+            self.set_info_project()
+
+            # Get version
+
+            sql = ("SELECT giswater from " + self.schema_name + ".version")
+            row = self.controller.get_row(sql)
+            self.version = row[0]
 
 
-        # Open dialog
-        self.dlg_readsql.show()
+            # Declare all file variables
+            self.file_pattern_fk = "fk"
+            self.file_pattern_ddl = "ddl"
+            self.file_pattern_dml = "dml"
+            self.file_pattern_fct = "fct"
+            self.file_pattern_trg = "trg"
+            self.file_pattern_view = "view"
+            self.file_pattern_rules = "rules"
+            self.file_pattern_vdefault = "vdefault"
+            self.file_pattern_other = "other"
+            self.file_pattern_roles = "roles"
+
+            # Declare sql directory
+            self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + '\sql'
+
+            # Declare all directorys
+            self.folderSoftware = self.sql_dir + '/' + self.project_type + '/'
+            self.folderLocale = self.sql_dir + '\i18n/' + str(self.locale) + '/'
+            self.folderUtils = self.sql_dir + '\utils/'
+            self.folderUpdates = self.sql_dir + '\updates/'
+            self.folderExemple = self.sql_dir, '\example/'
+            self.folderPath = ''
+
+            # Declare all directorys api
+            self.folderSoftwareApi = self.sql_dir + '/api/' + self.project_type + '/'
+            self.folderUtilsApi = self.sql_dir + '/api/utils/'
+            self.folderUpdatesApi = self.sql_dir + '/api/updates/'
+            self.folderLocaleApi = self.sql_dir + '/api\i18n/' + str(self.locale) + '/'
+            self.folderExempleApi = self.sql_dir, '/api/example/'
+
+            # Set Listeners
+            self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
+            self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
+            self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
+
+            #TODO:: QGIS project file (hidden)
+            # self.dlg_readsql.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "path_folder"))
+
+            self.dlg_readsql.btn_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
+            self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
+            self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
+            btn_info.clicked.connect(partial(self.show_info))
+            self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
+            cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, cmb_project_type))
+            self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
+
+
+            if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
+                self.chk_schema_ddl_dml.setEnabled(False)
+                self.chk_api_ddl_dml.setEnabled(False)
+            if self.dev_user != 'TRUE':
+                utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "devtools")
+                utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api")
+
+            #Put current info into software version info widget
+            self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
+                                               'DataBase version: ' + self.version)
+
+
+            # Open dialog
+            self.dlg_readsql.show()
 
     def load_base(self, api=False):
 
@@ -239,7 +251,7 @@ class UpdateSQL(ParentAction):
                 else:
                     status = self.executeFiles(os.listdir(
                         self.folderLocaleApi + str(self.locale)),
-                        self.folderLocaleApi + str(self.locale))
+                        self.folderLocaleApi + str(self.locale), True)
                     if status is False:
                         return False
             else:
@@ -303,7 +315,7 @@ class UpdateSQL(ParentAction):
                     if status is False:
                         return False
             else:
-                status = self.executeFiles(os.listdir(self.folderLocale), self.folderLocale)
+                status = self.executeFiles(os.listdir(self.folderLocale), self.folderLocale, True)
                 if status is False:
                     return False
 
@@ -355,11 +367,11 @@ class UpdateSQL(ParentAction):
                 return False
             else:
                 status = self.executeFiles(os.listdir(
-                    self.folderLocale + str(self.locale)), self.folderLocale + str(self.locale))
+                    self.folderLocale + str(self.locale)), self.folderLocale + str(self.locale), True)
                 if status is False:
                     return False
         else:
-            status = self.executeFiles(os.listdir(self.folderLocale + str(self.locale)), self.folderLocale + str(self.locale))
+            status = self.executeFiles(os.listdir(self.folderLocale + str(self.locale)), self.folderLocale + str(self.locale), True)
             if status is False:
                 return False
 
@@ -403,13 +415,13 @@ class UpdateSQL(ParentAction):
                             else:
                                 status = self.executeFiles(os.listdir(
                                     self.folderLocaleApi + self.locale),
-                                    self.folderLocaleApi + self.locale + '/')
+                                    self.folderLocaleApi + self.locale + '/', True)
                                 if status is False:
                                     return False
                         else:
                             status = self.executeFiles(
                                 os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/'),
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/')
+                                self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/', True)
                             if status is False:
                                 print(False)
                                 return False
@@ -441,7 +453,7 @@ class UpdateSQL(ParentAction):
                             else:
                                 status = self.executeFiles(os.listdir(
                                     self.folderLocale + self.locale),
-                                    self.folderLocale + self.locale + '/')
+                                    self.folderLocale + self.locale + '/', True)
                                 if status is False:
                                     return False
                         else:
@@ -887,7 +899,6 @@ class UpdateSQL(ParentAction):
         self.load_update_ddl_dml(api)
         self.execute_last_process()
 
-
     def reload_update_fk(self, api=False):
         self.load_fk(api)
         self.execute_last_process()
@@ -1095,7 +1106,7 @@ class UpdateSQL(ParentAction):
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
         self.btn_push_file  = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
-        if self.permisions != 'TRUE':
+        if self.dev_user != 'TRUE':
             self.rdb_no_ct.setEnabled(False)
             self.rdb_sample_dev.setEnabled(False)
 
@@ -1154,62 +1165,77 @@ class UpdateSQL(ParentAction):
             schema_name = self.schema_name.replace('"','')
         else:
             schema_name = self.schema.replace('"', '')
-        filter_srid_value = str(self.filter_srid_value).replace('"','')
+        filter_srid_value = str(self.filter_srid_value).replace('"', '')
         if i18n:
-            try:
-                f = open(filedir + '/utils.sql', 'r')
-                if f:
-                    f_to_read = str(
-                        f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
-                        str('utf-8-sig'))
-                    self.controller.log_info(str(f_to_read))
-                    status = self.controller.execute_sql(str(f_to_read))
-                    if status is False:
-                        print(str('utils.sql'))
-                        print "Error to execute"
-                        self.dao.rollback()
-                        return False
-
-                f = open(filedir + '/' + self.project_type + '.sql', 'r')
-                if f:
-                    f_to_read = str(
-                        f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
-                        str('utf-8-sig'))
-                    self.controller.log_info(str(f_to_read))
-                    status = self.controller.execute_sql(str(f_to_read))
-                    if status is False:
-                        print(str('utils.sql'))
-                        print "Error to execute"
-                        self.dao.rollback()
-                        return False
-            except Exception as e:
-                print "Command skipped. Unexpected error"
-                print (e)
-                self.dao.rollback()
-                return False
+            print('utils.sql')
+            self.read_execute_file(filedir, '/utils.sql', schema_name, filter_srid_value)
+            print(str(self.project_type) + '.sql')
+            self.read_execute_file(filedir, '/' + str(self.project_type) + '.sql', schema_name, filter_srid_value)
         else:
             for file in filelist:
                 print(file)
                 if ".sql" in file:
-                    try:
-                        f = open(filedir + '/' + file, 'r')
-                        if f:
-                            f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(str('utf-8-sig'))
-                            self.controller.log_info(str(f_to_read))
-                            status = self.controller.execute_sql(str(f_to_read))
-                            if status is False:
-                                print(str(file))
-                                print "Error to execute"
-                                self.dao.rollback()
-                                return False
-                        else:
-                            return False
-                    except Exception as e:
-                        print "Command skipped. Unexpected error"
-                        print (e)
-                        self.dao.rollback()
-                        return False
+                    self.read_execute_file(filedir, file, schema_name, filter_srid_value)
+
         return True
+
+    def read_execute_file(self, filedir, file, schema_name, filter_srid_value):
+        try:
+            f = open(filedir + '/' + file, 'r')
+            if f:
+                f_to_read = str(
+                    f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
+                    str('utf-8-sig'))
+                self.controller.log_info(str(f_to_read))
+                status = self.controller.execute_sql(str(f_to_read))
+                if status is False:
+                    print "Error to execute"
+                    self.dao.rollback()
+                    return False
+
+        except Exception as e:
+            print "Command skipped. Unexpected error"
+            print (e)
+            self.dao.rollback()
+            return False
+
+    # Info basic
+    def info_show_info(self):
+        """ Button 36: Info show info, open giswater and visit web page """
+
+        # Create form
+        self.dlg_info = InfoShowInfo()
+        self.load_settings(self.dlg_info)
+
+        # Get Plugin, Giswater, PostgreSQL and Postgis version
+        postgresql_version = self.controller.get_postgresql_version()
+        postgis_version = self.controller.get_postgis_version()
+        plugin_version = self.get_plugin_version()
+        (giswater_file_path, giswater_build_version) = self.get_giswater_jar()  #@UnusedVariable
+        project_version = self.controller.get_project_version()
+
+        message = ("Plugin version:     " + str(plugin_version) + "\n"
+                   "Project version:    " + str(project_version) + "\n"                    
+                   "Giswater version:   " + str(giswater_build_version) + "\n" 
+                   "PostgreSQL version: " + str(postgresql_version) + "\n" 
+                   "Postgis version:    " + str(postgis_version))
+        utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, message)
+
+        # Set signals
+        self.dlg_info.btn_open_giswater.clicked.connect(self.open_giswater)
+        self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, self.dlg_info, None))
+        self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
+
+        # Open dialog
+        self.open_dialog(self.dlg_info, maximize_button=False)
+
+    def open_giswater(self):
+        """ Open giswater.jar with last opened .gsw file """
+
+        if 'nt' in sys.builtin_module_names:
+            self.execute_giswater("ed_giswater_jar")
+        else:
+            self.controller.show_info("Function not supported in this Operating System")
 
     def readFiles(self, filelist, filedir):
         for file in filelist:
