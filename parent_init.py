@@ -6,6 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+import json
+from collections import OrderedDict
+
+from PyQt4.QtGui import QStandardItem
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
@@ -14,10 +18,11 @@ from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
 from datetime import datetime
+
 import ctypes
 import os
 import sys  
@@ -390,15 +395,16 @@ class ParentDialog(QDialog):
             pass             
         
         
-    def set_model_to_table(self, widget, table_name, expr_filter): 
+    def set_model_to_table(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
         # Set model
-        model = QSqlTableModel();
+        model = QSqlTableModel()
         model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
-        model.setFilter(expr_filter)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        if expr_filter is not None:
+            model.setFilter(expr_filter)
         model.select()
 
         # Check for errors
@@ -660,24 +666,23 @@ class ParentDialog(QDialog):
         widget.model().select()  
         
         
-    def set_configuration(self, widget, table_name):
+    def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
         
         widget = utils_giswater.getWidget(self.dialog, widget)
         if not widget:
             return
-
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
                " FROM " + self.schema_name + ".config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
-        rows = self.controller.get_rows(sql, log_info=False)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return
-        
-        for row in rows:        
+
+        for row in rows:
             if not row['status']:
                 columns_to_delete.append(row['column_index']-1)
             else:
@@ -685,15 +690,24 @@ class ParentDialog(QDialog):
                 if width is None:
                     width = 100
                 widget.setColumnWidth(row['column_index']-1, width)
-                widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
-    
-        # Set order
-        widget.model().setSort(0, Qt.AscendingOrder)    
-        widget.model().select()
+                if row['alias'] is not None:
+                    widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
 
-        # Delete columns        
+        # Set order
+        if not isQStandardItemModel:
+            if widget.model() is QSqlTableModel:
+                widget.model().setSort(sort_order, Qt.AscendingOrder)
+                widget.model().select()
+            elif widget.model() is QSqlQueryModel:
+                #widget.setModel(model)
+                widget.show()
+
+        else:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+
+        # Delete columns
         for column in columns_to_delete:
-            widget.hideColumn(column) 
+            widget.hideColumn(column)
         
         
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
