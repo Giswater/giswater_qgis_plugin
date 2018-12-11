@@ -1250,8 +1250,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1682,8 +1682,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2376,8 +2376,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2757,7 +2757,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_event_node">
        <attribute name="title">
@@ -2903,6 +2903,29 @@
         </property>
         <property name="text">
          <string>Cat period filter :</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="lbl_hyd_customer_code">
+        <property name="geometry">
+         <rect>
+          <x>265</x>
+          <y>4</y>
+          <width>146</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Hydrometer customer code:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="cmb_hyd_customer_code">
+        <property name="geometry">
+         <rect>
+          <x>265</x>
+          <y>26</y>
+          <width>121</width>
+          <height>18</height>
+         </rect>
         </property>
        </widget>
       </widget>

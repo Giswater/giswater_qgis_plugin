@@ -398,6 +398,8 @@ class ParentDialog(QDialog):
     def set_model_to_table(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
 
         # Set model
         model = QSqlTableModel()
@@ -602,7 +604,7 @@ class ParentDialog(QDialog):
             # Refresh table in Qtableview
             # Fill tab Hydrometer
             table_hydrometer = "v_rtc_hydrometer"
-            self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
+            self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydrometer, self.filter)
           
             self.dlg_sum.close_dialog()
                 
@@ -746,7 +748,6 @@ class ParentDialog(QDialog):
         utils_giswater.fillComboBox(dialog, "doc_type", rows)
         
         # Set model of selected widget
-        table_name = self.schema_name + "." + table_name   
         self.set_model_to_table(widget, table_name, expr_filter)
         
         # Adding auto-completion to a QLineEdit
@@ -844,7 +845,6 @@ class ParentDialog(QDialog):
         new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
         
         # Set model of selected widget
-        table_name = self.schema_name + "." + table_name   
         self.set_model_to_table(widget, table_name, expr_filter)
         
         # Adding auto-completion to a QLineEdit
@@ -1358,7 +1358,7 @@ class ParentDialog(QDialog):
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText(self.dialog, "event_type")
         if event_type_value != 'null':
-            expr+= " AND parameter_type = '" + event_type_value + "'"
+            expr += " AND parameter_type = '" + event_type_value + "'"
         event_id = utils_giswater.getWidgetText(self.dialog, "event_id")
         if event_id != 'null':
             expr+= " AND parameter_id = '" + event_id + "'"
@@ -1373,16 +1373,24 @@ class ParentDialog(QDialog):
 
         # Get widgets
         self.cat_period_id_filter = self.dialog.findChild(QComboBox, "cat_period_id_filter")
+        self.cmb_hyd_customer_code = self.dialog.findChild(QComboBox, "cmb_hyd_customer_code")
 
         # Populate combo filter hydrometer value
-        sql = "SELECT distinct(cat_period_id) FROM " + self.schema_name + ".v_edit_rtc_hydro_data_x_connec ORDER BY cat_period_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dialog, self.cat_period_id_filter, rows)
-        self.controller.log_info(str(sql))
+        sql = "SELECT id, code FROM " + self.schema_name + ".ext_cat_period ORDER BY code"
+        rows = [('', '')]
+        rows.extend(self.controller.get_rows(sql, log_sql=False))
+        utils_giswater.set_item_data(self.cat_period_id_filter, rows, 1)
+
+        sql = ("SELECT hydrometer_id, hydrometer_customer_code "
+               "FROM " + self.schema_name + ".v_rtc_hydrometer ORDER BY hydrometer_customer_code")
+        rows = [('', '')]
+        rows.extend(self.controller.get_rows(sql, log_sql=True))
+        utils_giswater.set_item_data(self.cmb_hyd_customer_code, rows, 1)
 
         # Set signals
         if widget == self.tbl_hydrometer_value:
             self.cat_period_id_filter.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, widget))
+            self.cmb_hyd_customer_code.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, widget))
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
@@ -1391,12 +1399,14 @@ class ParentDialog(QDialog):
         """ Get Filter for table hydrometer value with combo value"""
 
         # Get combo value
-        cat_period_id_filter = str(self.cat_period_id_filter.currentText())
-
+        cat_period_id_filter = utils_giswater.get_item_data(self.dialog, self.cat_period_id_filter)
+        hyd_customer_code = utils_giswater.get_item_data(self.dialog, self.cmb_hyd_customer_code)
         # Set filter
         expr = self.field_id + " = '" + self.id + "'"
-        expr += " AND cat_period_id = '" + cat_period_id_filter + "'"
-
+        if cat_period_id_filter not in (None, ''):
+            expr += " AND cat_period_id = '" + cat_period_id_filter + "'"
+        if hyd_customer_code not in (None, ''):
+            expr += " AND hydrometer_id = '" + hyd_customer_code + "'"
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()

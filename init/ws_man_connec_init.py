@@ -190,9 +190,9 @@ class ManConnecDialog(ParentDialog):
 
         table_hydrometer = "v_rtc_hydrometer"    
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
-        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name + "." + table_hydrometer, self.filter)
+        self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydrometer, self.filter)
         self.set_configuration(self.tbl_hydrometer, table_hydrometer)
-        self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name + "." + table_hydrometer_value, self.filter)
+        self.fill_tbl_hydrometer(self.tbl_hydrometer_value, table_hydrometer_value, self.filter)
         self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)        

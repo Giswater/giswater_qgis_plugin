@@ -20,6 +20,7 @@ changelog=Version 3.1.105 (30/12/2018)
     - Enhancement: populate tables Workcat on search plus
     - Temporarily canceled the call to the get_last_gsw_file function
     - Enhancement: Change zoom to node after mincut
+    - Enhancement: Now show code in combo hydrometer info and now filter by hydrometer customer code
 
 
 # Tags are comma separated with spaces allowed
