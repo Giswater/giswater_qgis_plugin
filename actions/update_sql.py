@@ -62,18 +62,17 @@ class UpdateSQL(ParentAction):
             self.pluguin_version = self.get_plugin_version()
 
             # Get widgets from form
+            self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
+            self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
+            self.btn_update_api = self.dlg_readsql.findChild(QPushButton, 'btn_update_api')
 
             # Checkbox SCHEMA & API
-            self.chk_schema_ddl_dml = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_ddl_dml')
             self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
             self.chk_schema_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_fk')
-            self.chk_schema_rules = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_rules')
             self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
             self.chk_schema_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_trigger')
-            self.chk_api_ddl_dml = self.dlg_readsql.findChild(QCheckBox, 'chk_api_ddl_dml')
             self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
             self.chk_api_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_api_fk')
-            self.chk_api_rules = self.dlg_readsql.findChild(QCheckBox, 'chk_api_rules')
             self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
             self.chk_api_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_api_trigger')
             self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
@@ -151,6 +150,8 @@ class UpdateSQL(ParentAction):
             # self.dlg_readsql.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "path_folder"))
 
             self.dlg_readsql.btn_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
+            self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.update_ddl_dml))
+            self.dlg_readsql.btn_update_api.clicked.connect(partial(self.update_ddl_dml, True))
             self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
             self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
             btn_info.clicked.connect(partial(self.show_info))
@@ -160,8 +161,8 @@ class UpdateSQL(ParentAction):
 
 
             if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
-                self.chk_schema_ddl_dml.setEnabled(False)
-                self.chk_api_ddl_dml.setEnabled(False)
+                self.btn_update_schema.setEnabled(False)
+                self.btn_update_api.setEnabled(False)
             if self.dev_user != 'TRUE':
                 utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "devtools")
                 utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api")
@@ -170,9 +171,29 @@ class UpdateSQL(ParentAction):
             self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
                                                'DataBase version: ' + self.version)
 
+            #Populate combo connections
+            s = QSettings()
+            s.beginGroup("PostgreSQL/connections")
+            connections = s.childGroups()
+            list_connections = []
+            for con in connections:
+                elem = [con, con]
+                list_connections.append(elem)
+
+            s.endGroup()
+
+            utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
+            if self.controller.logged:
+                utils_giswater.set_combo_itemData(self.cmb_connection, str(self.controller.layer_source['db']), 1)
+                self.cmb_connection.setEnabled(False)
+            else:
+                return
+                #TODO:: Set listener on combo index changed.
+                self.dlg_readsql.cmb_connection.currentIndexChanged.connect(partial(self.controller.set_database_connection()))
 
             # Open dialog
             self.dlg_readsql.show()
+
 
     def load_base(self, api=False):
 
@@ -224,19 +245,6 @@ class UpdateSQL(ParentAction):
                                            self.folderSoftwareApi + self.file_pattern_rules)
                 if status is False:
                     return False
-            if self.process_folder(self.folderSoftwareApi, self.file_pattern_fk + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_fk),
-                                           self.folderSoftwareApi + self.file_pattern_fk)
-                if status is False:
-                    return False
-            # if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
-            #     return False
-            # else:
-            #     status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
-            #     if status is False:
-            #         return False
             if self.process_folder(self.folderLocaleApi,
                                    str(self.locale)) is False:
                 if self.process_folder(self.folderLocaleApi, 'EN') is False:
@@ -290,12 +298,6 @@ class UpdateSQL(ParentAction):
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_rules), self.folderSoftware + self.file_pattern_rules)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_fk + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
                 if status is False:
                     return False
 
@@ -489,20 +491,6 @@ class UpdateSQL(ParentAction):
                                            self.folderUtilsApi + self.file_pattern_rules)
                 if status is False:
                     return False
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_fk + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fk),
-                                           self.folderUtilsApi + self.file_pattern_fk)
-                if status is False:
-                    return False
-            # if self.process_folder(self.folderUtilsApi, self.file_pattern_trg + '/') is False:
-            #     return False
-            # else:
-            #     status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_trg),
-            #                                self.folderUtilsApi + self.file_pattern_trg)
-            #     if status is False:
-            #         return False
         else:
             if self.process_folder(self.folderUtils, self.file_pattern_view + '/') is False:
                 return False
@@ -527,12 +515,6 @@ class UpdateSQL(ParentAction):
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_rules), self.folderUtils + self.file_pattern_rules)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderUtils, self.file_pattern_fk + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
                 if status is False:
                     return False
 
@@ -886,45 +868,50 @@ class UpdateSQL(ParentAction):
         if self.rdb_import_data.isChecked():
             print("rdb_import_data")
             self.load_base_no_ct()
+            self.update_30to31()
+            self.load_views()
             self.load_update_ddl_dml()
             self.execute_import_data()
             self.load_fk()
             self.load_rules()
-            self.load_views()
-            # self.update_views()
             self.load_trg()
             self.execute_last_process()
         elif self.rdb_no_ct.isChecked():
             print(str("rdb_no_ct"))
             self.load_base_no_ct()
+            self.update_30to31()
+            self.load_views()
             self.load_update_ddl_dml()
             self.execute_last_process()
         elif self.rdb_sample.isChecked():
             print(str("rdb_sample"))
             self.load_base()
-            self.update_ddl_dml()
+            self.update_30to31()
             self.load_views()
-            # self.update_views()
+            self.load_update_ddl_dml()
             self.load_trg()
+            self.load_fk()
             self.load_sample_data()
             self.execute_last_process()
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
             self.load_base()
-            self.load_update_ddl_dml()
+            self.update_30to31()
             self.load_views()
-            # self.update_views()
+            self.load_update_ddl_dml()
             self.load_trg()
+            self.load_fk()
             self.load_sample_data()
             self.load_dev_data()
             self.execute_last_process()
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
             self.load_base()
-            self.load_update_ddl_dml()
+            self.update_30to31()
             self.load_views()
-            # self.update_views()
+            self.load_update_ddl_dml()
             self.load_trg()
+            self.load_fk()
             self.execute_last_process()
 
         # Insert information into table inp_project_id and version
@@ -945,9 +932,11 @@ class UpdateSQL(ParentAction):
 
     def implement_api(self):
         self.load_base(True)
+        self.update_30to31(True)
+        self.load_views()
         self.load_update_ddl_dml(True)
-        # self.update_views()
         self.load_trg()
+        self.load_fk()
         self.execute_last_process()
 
     def load_custom_sql_files(self, dialog, widget):
@@ -962,16 +951,13 @@ class UpdateSQL(ParentAction):
         self.load_trg(api)
         self.execute_last_process()
 
-    def reload_update_fk(self, api=False):
+    def reload_fk(self, api=False):
         self.load_fk(api)
 
-    def reload_update_rules(self, api=False):
-        self.load_rules(api)
-
-    def reload_update_fct(self, api=False):
+    def reload_fct(self, api=False):
         self.load_fct(api)
 
-    def reload_update_trg(self, api=False):
+    def reload_trg(self, api=False):
         self.load_trg(api)
 
 
@@ -1119,29 +1105,21 @@ class UpdateSQL(ParentAction):
 
     def schema_file_to_db(self):
 
-        if self.chk_schema_ddl_dml.isChecked():
-            self.update_ddl_dml()
         if self.chk_schema_fk.isChecked():
-            self.reload_update_fk()
-        if self.chk_schema_rules.isChecked():
-            self.reload_update_rules()
+            self.reload_fk()
         if self.chk_schema_funcion.isChecked():
-            self.reload_update_fct()
+            self.reload_fct()
         if self.chk_schema_trigger.isChecked():
-            self.reload_update_trg()
+            self.reload_trg()
 
     def api_file_to_db(self):
 
-        if self.chk_api_ddl_dml.isChecked():
-            self.update_ddl_dml(True)
         if self.chk_api_fk.isChecked():
-            self.reload_update_fk(True)
-        if self.chk_api_rules.isChecked():
-            self.reload_update_rules(True)
+            self.reload_fk(True)
         if self.chk_api_funcion.isChecked():
-            self.reload_update_fct(True)
+            self.reload_fct(True)
         if self.chk_api_trigger.isChecked():
-            self.reload_update_trg(True)
+            self.reload_trg(True)
 
     def open_create_project(self):
 

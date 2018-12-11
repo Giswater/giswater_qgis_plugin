@@ -265,10 +265,22 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="lbl_connection">
+             <property name="text">
+              <string>Connection:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cmb_connection"/>
+           </item>
           </layout>
           <zorder>cmb_project_type</zorder>
           <zorder>horizontalSpacer</zorder>
           <zorder>label</zorder>
+          <zorder>lbl_connection</zorder>
+          <zorder>cmb_connection</zorder>
          </widget>
         </item>
         <item row="1" column="0">
@@ -376,18 +388,12 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QCheckBox" name="chk_schema_ddl_dml">
+            <widget class="QPushButton" name="btn_update_schema">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
              <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
+              <string>Execute</string>
              </property>
             </widget>
            </item>
@@ -400,8 +406,8 @@
            <string>Reload</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_9">
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_33">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_8">
              <property name="font">
               <font>
                <weight>75</weight>
@@ -409,11 +415,11 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload &amp; update rules</string>
+              <string>Reload &amp; update triggers</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="2" column="1">
             <widget class="QCheckBox" name="chk_schema_trigger">
              <property name="text">
               <string/>
@@ -429,39 +435,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="chk_schema_funcion">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="chk_schema_rules">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
+           <item row="1" column="0">
             <widget class="QLabel" name="label_30">
              <property name="font">
               <font>
@@ -471,19 +445,6 @@
              </property>
              <property name="text">
               <string>Reload &amp; update functions</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Reload &amp; update triggers</string>
              </property>
             </widget>
            </item>
@@ -497,6 +458,22 @@
              </property>
              <property name="text">
               <string>Reload &amp; update fk</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="chk_schema_funcion">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>19</width>
+               <height>19</height>
+              </size>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -517,13 +494,6 @@
             </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="btn_schema_update_file_to_db">
-          <property name="text">
-           <string>File to DB</string>
-          </property>
          </widget>
         </item>
        </layout>
@@ -559,36 +529,7 @@
            <string>Reload and Update</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_12">
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="chk_api_ddl_dml">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_34">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Reload &amp; update functions</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
+           <item row="2" column="1">
             <widget class="QCheckBox" name="chk_api_trigger">
              <property name="text">
               <string/>
@@ -604,47 +545,8 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Reload &amp; update triggers</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_35">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Reload &amp; update rules</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Update ddl / dml</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="chk_api_rules">
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="chk_api_fk">
              <property name="text">
               <string/>
              </property>
@@ -659,7 +561,20 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Reload &amp; update triggers</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
             <widget class="QCheckBox" name="chk_api_funcion">
              <property name="text">
               <string/>
@@ -675,7 +590,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item row="0" column="0">
             <widget class="QLabel" name="label_9">
              <property name="font">
               <font>
@@ -688,19 +603,16 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="chk_api_fk">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_34">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
+              <string>Reload &amp; update functions</string>
              </property>
             </widget>
            </item>
@@ -719,6 +631,29 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_5">
+          <property name="title">
+           <string>Update</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_13">
+           <item row="0" column="1">
+            <widget class="QPushButton" name="btn_update_api">
+             <property name="text">
+              <string>Execute</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Update ddl / dml</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
