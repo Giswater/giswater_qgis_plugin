@@ -226,38 +226,48 @@ class ApiCF(ApiParent):
             sql = ("SELECT " + self.schema_name + ".gw_api_getfeatureinsert($${" + body + "}$$)")
         # IF click over canvas
         elif point:
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
-                   + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
-                   + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
+            visible_layer = self.get_visible_layers(as_list=True)
+
+            extras = '"activeLayer":"'+active_layer+'", '
+            extras += '"visibleLayer":'+visible_layer+', '
+            extras += '"coordinates":{"epsg":'+str(self.srid)+', "xcoord":' + str(point.x()) + ',"ycoord":' + str(point.y()) + ', "zoomRatio":1000}'
+            body = self.create_body(extras=extras)
+            # sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
+            #        + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
+            #        + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
+            sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromcoordinates($${" + body + "}$$)")
         # IF come from QPushButtons node1 or node2 from custom form
         elif feature_id:
-            sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"', "
-                   " null, " + str(is_project_editable) + ", 9, 100)")
+            feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
+            body = self.create_body(feature=feature)
+            sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromid($${" + body + "}$$)")
+            # sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"', "
+            #        " null, " + str(is_project_editable) + ", 9, 100)")
 
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
         self.complet_result = row
-        result = row[0]['editData']
+        result = row[0]['body']['data']
         if 'fields' not in result:
             self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
             return False
-        if self.complet_result[0]['form']['template'] == 'GENERIC':
+        if self.complet_result[0]['body']['form']['template'] == 'GENERIC':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result
-        elif self.complet_result[0]['form']['template'] == 'custom feature':
+        elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
             result, dialog = self.open_custom_form(feature_id, self.complet_result, new_feature_id, layer_new_feature)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result
 
     def manage_new_feature(self, complet_result, dialog):
-        result = complet_result[0]['editData']
-        for field in result["fields"]:
+        result = complet_result[0]['body']['data']
+        for field in result['fields']:
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
             if type(widget) is QLineEdit:
@@ -279,7 +289,7 @@ class ApiCF(ApiParent):
         self.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
-        field_id = str(self.complet_result[0]['feature']['idName'])
+        field_id = str(self.complet_result[0]['body']['feature']['idName'])
         result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id)
 
         self.hydro_info_dlg.open()
@@ -319,15 +329,15 @@ class ApiCF(ApiParent):
         utils_giswater.set_qtv_config(self.tbl_rpt)
 
         # Get table name for use as title
-        self.tablename = complet_result[0]['feature']['tableName']
-        pos_ini = complet_result[0]['feature']['tableName'].rfind("_")
-        pos_fi = len(str(complet_result[0]['feature']['tableName']))
+        self.tablename = complet_result[0]['body']['feature']['tableName']
+        pos_ini = complet_result[0]['body']['feature']['tableName'].rfind("_")
+        pos_fi = len(str(complet_result[0]['body']['feature']['tableName']))
         # Get feature type (Junction, manhole, valve, fountain...)
-        self.feature_type = complet_result[0]['feature']['tableName'][pos_ini + 1:pos_fi]
+        self.feature_type = complet_result[0]['body']['feature']['tableName'][pos_ini + 1:pos_fi]
         self.dlg_cf.setWindowTitle(self.feature_type.capitalize())
 
         # Get tableParent and select layer
-        self.table_parent = str(complet_result[0]['feature']['tableParent'])
+        self.table_parent = str(complet_result[0]['body']['feature']['tableParent'])
         self.layer = self.controller.get_layer_by_tablename(self.table_parent)
         if self.layer:
             self.iface.setActiveLayer(self.layer)
@@ -338,7 +348,7 @@ class ApiCF(ApiParent):
         # Remove unused tabs
         tabs_to_show = []
         # tabs_to_show = [tab['tabname'] for tab in complet_result[0]['form']['visibleTabs']]
-        for tab in complet_result[0]['form']['visibleTabs']:
+        for tab in complet_result[0]['body']['form']['visibleTabs']:
             tabs_to_show.append(tab['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
@@ -371,7 +381,7 @@ class ApiCF(ApiParent):
                 action.setEnabled(True)
                 action.setVisible(True)
 
-        actions_to_show = complet_result[0]['form']['actions']
+        actions_to_show = complet_result[0]['body']['form']['actions']
         for x in range(0, len(actions_to_show)):
             action = None
             action = self.dlg_cf.toolBar.findChild(QAction, actions_to_show[x]['actionName'])
@@ -444,12 +454,12 @@ class ApiCF(ApiParent):
 
 
         # Get feature type as geom_type (node, arc, connec)
-        self.geom_type = str(complet_result[0]['feature']['featureType'])
+        self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
         # Get field id name
-        self.field_id = str(complet_result[0]['feature']['idName'])
+        self.field_id = str(complet_result[0]['body']['feature']['idName'])
         self.feature_id = None
-        result = complet_result[0]['editData']
-        for field in result["fields"]:
+        result = complet_result[0]['body']['data']
+        for field in result['fields']:
             label, widget = self.set_widgets(self.dlg_cf, field)
             # Prepare layouts
             # Common layouts
@@ -489,16 +499,16 @@ class ApiCF(ApiParent):
         layout_data_1.addItem(vertical_spacer1)
         vertical_spacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout_data_2.addItem(vertical_spacer2)
-
+        print(result['fields'])
         # Find combo parents:
-        for field in result["fields"]:
+        for field in result['fields']:
             if field['isparent']:
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
         # Set variables
-        self.filter = str(complet_result[0]['feature']['idName']) + " = '" + str(self.feature_id) + "'"
+        self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
 
         if self.layer:
             if self.layer.isEditable():
@@ -623,7 +633,7 @@ class ApiCF(ApiParent):
         utils_giswater.setImage(dlg_sections, 'lbl_section_image', img+".png")
         
         # Set values into QLineEdits
-        for field in section_result[0]['editData']['fields']:
+        for field in section_result[0]['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['column_id'])
             if widget:
                 if 'value' in field:
@@ -1395,16 +1405,16 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB OM"""
     def fill_tab_om(self, geom_type):
         """ Fill tab 'O&M' (event) """
-        self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['feature']['vdefaultValues'], 'to_date_vdefault')
-        self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['feature']['vdefaultValues'], 'from_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['body']['feature']['vdefaultValues'], 'to_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
 
         table_event_geom = "ve_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_geom)
 
-        self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['feature']['vdefaultValues'], 'om_param_type_vdefault')
-        self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['feature']['vdefaultValues'], 'parameter_vdefault')
+        self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['body']['feature']['vdefaultValues'], 'om_param_type_vdefault')
+        self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['body']['feature']['vdefaultValues'], 'parameter_vdefault')
 
 
     def fill_tbl_event(self, widget, table_name, filter_):
@@ -1796,12 +1806,12 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB DOC"""
     def fill_tab_document(self):
         """ Fill tab 'Document' """
-        self.set_vdefault_values(self.dlg_cf.date_document_to, self.complet_result[0]['feature']['vdefaultValues'], 'to_date_vdefault')
-        self.set_vdefault_values(self.dlg_cf.date_document_from, self.complet_result[0]['feature']['vdefaultValues'], 'from_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_document_to, self.complet_result[0]['body']['feature']['vdefaultValues'], 'to_date_vdefault')
+        self.set_vdefault_values(self.dlg_cf.date_document_from, self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
         table_document = "v_ui_doc_x_"+self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         self.set_configuration(self.tbl_document, table_document)
-        self.set_vdefault_values(self.dlg_cf.doc_type, self.complet_result[0]['feature']['vdefaultValues'], 'document_type_vdefault')
+        self.set_vdefault_values(self.dlg_cf.doc_type, self.complet_result[0]['body']['feature']['vdefaultValues'], 'document_type_vdefault')
 
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
@@ -1994,7 +2004,7 @@ class ApiCF(ApiParent):
 
     def get_list(self, complet_result, form_name='', tab_name='', filter_fields=''):
         form = '"formName":"' + form_name + '", "tabName":"' + tab_name + '"'
-        id_name = complet_result[0]['feature']['idName']
+        id_name = complet_result[0]['body']['feature']['idName']
         feature = '"tableName":"' + self.tablename + '", "idName":"'+id_name+'", "id":"'+self.feature_id+'"'
         body = self.create_body(form, feature,  filter_fields)
         sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
@@ -2089,7 +2099,7 @@ class ApiCF(ApiParent):
             index_tab = self.tab_main.currentIndex()
             tab_name = self.tab_main.widget(index_tab).objectName()
             form = '"tabName":"'+tab_name+'"'
-            feature = '"featureType":"'+complet_result[0]['feature']['featureType']+'", '
+            feature = '"featureType":"'+complet_result[0]['body']['feature']['featureType']+'", '
             feature += '"tableName":"' + self.tablename + '", '
             feature += '"idName":"' + self.field_id + '", '
             feature += '"id":"' + self.feature_id + '"'
@@ -2255,7 +2265,7 @@ class ApiCF(ApiParent):
         
         widget = None
         function_name = 'no_function_associated'
-        for field in result["fields"]:
+        for field in result['fields']:
                 if field['action_function'] == 'action_link':
                     function_name = field['widgetfunction']
                     widget = dialog.findChild(HyperLinkLabel, field['widgetname'])

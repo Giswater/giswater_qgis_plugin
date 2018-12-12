@@ -733,11 +733,11 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
-        if complet_result[0]['feature']['geometry'] is None:
+        if complet_result[0]['body']['feature']['geometry'] is None:
             return
-        if complet_result[0]['feature']['geometry']['st_astext'] is None:
+        if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
             return
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['feature']['geometry']['st_astext']))
+        list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
 
         self.resetRubberbands()
@@ -748,7 +748,7 @@ class ApiParent(ParentAction):
             points = self.get_points(list_coord)
             self.draw_polygon(points)
         if zoom:
-            margin = float(complet_result[0]['feature']['zoomCanvasMargin']['mts'])
+            margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
             
@@ -827,7 +827,7 @@ class ApiParent(ParentAction):
         
     def populate_basic_info(self, dialog, result, field_id):
     
-        fields = result[0]['editData']
+        fields = result[0]['body']['data']
         if 'fields' not in fields:
             return
 
