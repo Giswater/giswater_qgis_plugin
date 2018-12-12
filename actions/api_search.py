@@ -331,9 +331,11 @@ class ApiSearch(ApiParent):
 
     def open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
-
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
-               " null, True, 9, 100)")
+        # sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"',"
+        #        " null, True, 9, 100)")
+        feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
+        body = self.create_body(feature=feature)
+        sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromid($${" + body + "}$$)")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
