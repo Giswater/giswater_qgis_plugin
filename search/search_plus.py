@@ -853,26 +853,21 @@ class SearchPlus(QObject):
                " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
                " INNER JOIN " + self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
                " INNER JOIN " + self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
-               " WHERE " + str(self.field_to_search) + " IS NOT NULL"
-               " AND t1.expl_id IN"
+               " WHERE  t1.expl_id IN "
                " (SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user = current_user)"
                " AND t1.state IN "
                " (SELECT state_id FROM " + self.controller.schema_name + ".selector_state WHERE cur_user = current_user)"               
                " ORDER BY " + str(self.field_to_search))
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
-
         list_codes = ['']
         for row in rows:
-            append_to_list = True
             for x in range(0, len(row)):
                 if row[x] is None:
-                    append_to_list = False
-            if append_to_list:
-                list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4])
-
-        return list_codes       
+                    row[x] = ''
+            list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4]+"")
+        return list_codes
         
      
     def network_geom_type_populate(self):
@@ -974,8 +969,10 @@ class SearchPlus(QObject):
             geom_type = row[0].lower()
 
         # Check if the expression is valid
-        expr_filter = self.field_to_search + " = '" + feature_id + "'"
-        expr_filter += " AND " + geom_type+"_id = '" + geom_id + "'"
+
+        expr_filter = "" + geom_type + "_id = '" + geom_id + "'"
+        if feature_id:
+            expr_filter += " AND " + self.field_to_search + " = '" + feature_id + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
