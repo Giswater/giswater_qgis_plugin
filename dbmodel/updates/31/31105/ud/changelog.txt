@@ -1,3 +1,4 @@
 31105-ud
 ----------
 New system parameter code_vd, issue#567
+Bug fix on v_ui_node_x_connection_upstream view, issue#584
