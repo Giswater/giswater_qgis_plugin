@@ -66,7 +66,7 @@ class ApiCatalog(ApiParent):
         result = complet_list[0]['body']['data']
         # if 'fields' not in result:
         #     return
-        for field in result['formFields']:
+        for field in result['fields']:
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
             label.setText(field['label'].capitalize())
@@ -114,7 +114,7 @@ class ApiCatalog(ApiParent):
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
-        for field in result['formFields']:
+        for field in result['fields']:
             if field['column_id'] == 'id':
                 self.populate_combo(id,field)
 
@@ -130,7 +130,7 @@ class ApiCatalog(ApiParent):
         row = self.controller.get_row(sql, log_sql=True)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
-        for field in result['formFields']:
+        for field in result['fields']:
             if field['column_id'] == 'pn':
                 self.populate_combo(pn,field)
             elif field['column_id'] == 'dn':
@@ -139,7 +139,7 @@ class ApiCatalog(ApiParent):
 
     def get_event_combo_parent(self, fields, row, geom_type):
         if fields == 'fields':
-            for field in row["formFields"]:
+            for field in row["fields"]:
                 if field['isparent'] is True:
                     widget = self.dlg_catalog.findChild(QComboBox, field['column_id'])
                     widget.currentIndexChanged.connect(partial(self.fill_child, widget, geom_type))
