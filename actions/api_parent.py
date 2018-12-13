@@ -842,16 +842,16 @@ class ApiParent(ParentAction):
             else:
                 label.setToolTip(field['label'].capitalize())
 
-            if field['widgettype'] == 'linetext':
+            if field['widgettype'] == 'text':
                 widget = self.add_lineedit(field)
                 if widget.objectName() == field_id:
                     self.feature_id = widget.text()
-            elif field['widgettype'] == 'date':
+            elif field['widgettype'] == 'datepickertime':
                 widget = self.add_calendar(dialog, field)
                 widget = self.set_auto_update_dateedit(field, dialog, widget)
             elif field['widgettype'] == 'hyperlink':
                 widget = self.add_hyperlink(dialog, field)
-            elif field['widgettype'] == 'combotext':
+            elif field['widgettype'] == 'typeahead':
                 completer = QCompleter()
                 widget = self.add_comboline(dialog, field, completer)
 

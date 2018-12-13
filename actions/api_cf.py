@@ -578,7 +578,7 @@ class ApiCF(ApiParent):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
-        if field['widgettype'] == 'linetext' or field['widgettype'] == 'combotext':
+        if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
             completer = QCompleter()
             widget = self.add_lineedit(field)
             widget = self.set_widget_size(widget, field)
@@ -593,10 +593,10 @@ class ApiCF(ApiParent):
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
             widget = self.set_auto_update_combobox(field, dialog, widget)
-        elif field['widgettype'] == 'checkbox':
+        elif field['widgettype'] == 'check':
             widget = self.add_checkbox(dialog, field)
-            widget = self.set_auto_update_checkbox(field,dialog, widget)
-        elif field['widgettype'] == 'date':
+            widget = self.set_auto_update_checkbox(field, dialog, widget)
+        elif field['widgettype'] == 'datepickertime':
             widget = self.add_calendar(dialog, field)
             widget = self.set_auto_update_dateedit(field, dialog, widget)
         elif field['widgettype'] == 'button':
@@ -606,10 +606,13 @@ class ApiCF(ApiParent):
             widget = self.add_hyperlink(dialog, field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
-
             widget = self.add_horizontal_spacer(field)
         elif field['widgettype'] == 'vspacer':
             widget = self.add_verical_spacer(field)
+        elif field['widgettype'] == 'textarea':
+            # TODO this make an error because def add_textarea don't exit at the moment
+            widget = self.add_textarea(field)
+
 
         return label, widget
 
@@ -643,7 +646,7 @@ class ApiCF(ApiParent):
         if _json == '' or str(_json) == '{}':
             self.close_dialog(self.dlg_cf)
             return
-        p_table_id = complet_result['feature']['tableName']
+        p_table_id = complet_result['body']['feature']['tableName']
         if self.new_feature_id is not None:
             new_feature = None
             iter = self.layer_new_feature.getFeatures()
@@ -874,7 +877,7 @@ class ApiCF(ApiParent):
 
 
     def set_widget_type(self, field, dialog, widget, completer):
-        if field['widgettype'] == 'combotext':
+        if field['widgettype'] == 'typeahead':
             if 'dv_table' in field:
                 table_name = field['dv_table']
                 model = QStringListModel()
@@ -889,9 +892,9 @@ class ApiCF(ApiParent):
 
     def fill_child(self, dialog, widget):
         
-        combo_parent = widget.objectName()
+        combo_parent = widget.property('column_id')
         combo_id = utils_giswater.get_item_data(dialog, widget)
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('" + str(self.tablename) + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "')")
+        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('" + str(self.tablename) + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
         row = self.controller.get_row(sql, log_sql=True)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
@@ -900,7 +903,7 @@ class ApiCF(ApiParent):
 
     def populate_child(self, combo_child):
         
-        child = self.dlg_cf.findChild(QComboBox, str(combo_child['childName']))
+        child = self.dlg_cf.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
             self.populate_combo(child, combo_child)
 
@@ -2112,7 +2115,7 @@ class ApiCF(ApiParent):
                     self.controller.show_message("No listValues for: " + row[0]['body']['data'], 2)
                 else:
                     for field in complet_list[0]['body']['data']['fields']:
-                        if field['widgettype'] == 'line':
+                        if field['widgettype'] == 'formDivider':
                             for x in range(0, 2):
                                 line = self.add_frame(field, x)
                                 plan_layout.addWidget(line, field['layout_order'], x)

@@ -174,7 +174,7 @@ class ApiCatalog(ApiParent):
         self.populate_combo(widget_id, row[0]['catalog_id'][0])
 
     def populate_child(self, combo_child, result):
-        child = self.dlg_catalog.findChild(QComboBox, str(combo_child['childName']))
+        child = self.dlg_catalog.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
             self.populate_combo(child, combo_child)
 

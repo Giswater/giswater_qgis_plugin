@@ -88,7 +88,7 @@ class ApiSearch(ApiParent):
                 label = QLabel()
                 label.setObjectName('lbl_' + field['label'])
                 label.setText(field['label'].capitalize())
-                if field['widgettype'] == 'combotext':
+                if field['widgettype'] == 'typeahead':
                     completer = QCompleter()
                     widget = self.add_lineedit(field)
                     widget = self.set_completer(widget, completer)
