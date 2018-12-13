@@ -69,7 +69,7 @@ class ManageWorkcatEnd(ParentManage):
         self.dlg_work_end.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
         self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer,  force_downgrade=True))
         self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, self.table_object, self.cur_active_layer,  force_downgrade=True, show_warning=True))
-        self.dlg_work_end.workcat_id_end.currentIndexChanged.connect(partial(self.get_values_from_form, self.dlg_work_end))
+        self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_work_end.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_work_end, self.table_object))
         self.dlg_work_end.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_work_end, self.table_object))
@@ -93,6 +93,9 @@ class ManageWorkcatEnd(ParentManage):
         # Open dialog
         self.open_dialog(self.dlg_work_end, maximize_button=False)
 
+
+    # def filter_by_list(self, widget):
+    #     self.proxy_model.setFilterFixedString(widget.currentText())
 
     def set_edit_arc_downgrade_force(self, value):
         
@@ -150,6 +153,9 @@ class ManageWorkcatEnd(ParentManage):
         if row:
             utils_giswater.setText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
             utils_giswater.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
+        else:
+            utils_giswater.setText(self.dlg_work_end, self.dlg_work_end.descript, '')
+            utils_giswater.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
 
 
     def get_list_selected_id(self, qtable):
@@ -171,7 +177,6 @@ class ManageWorkcatEnd(ParentManage):
 
     def manage_workcat_end_accept(self):
         """ Get elements from all the tables and update his data """
-        
         if self.workcat_id_end == 'null' or self.workcat_id_end is None:
             message = "Please select a workcat id end"
             self.controller.show_warning(message)
