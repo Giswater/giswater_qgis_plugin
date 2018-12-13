@@ -194,7 +194,6 @@ class UpdateSQL(ParentAction):
             # Open dialog
             self.dlg_readsql.show()
 
-
     def load_base(self, api=False):
 
         status = True
@@ -945,10 +944,20 @@ class UpdateSQL(ParentAction):
 
     # CHECKBOX CALLING FUNCTIONS
 
+    def update_31(self, api=False):
+        self.update_30to31(api)
+        self.load_views(api)
+        self.load_update_ddl_dml()
+        self.load_fct()
+        self.load_trg(api)
+        self.load_fk(api)
+        self.execute_last_process()
+
     def update_ddl_dml(self, api=False):
         self.load_update_ddl_dml(api)
         self.load_fct(api)
         self.load_trg(api)
+        self.load_fk(api)
         self.execute_last_process()
 
     def reload_fk(self, api=False):
@@ -1092,9 +1101,7 @@ class UpdateSQL(ParentAction):
 
     def process_folder(self, folderPath, filePattern):
         status = True
-
         try:
-            print("test10")
             print(os.listdir(folderPath + filePattern))
         # except Exception, e: print str(e)
         except Exception as e:
