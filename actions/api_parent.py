@@ -609,7 +609,7 @@ class ApiParent(ParentAction):
         id = 'id'
         table = 'cat_work'
 
-        sql = ('SELECT ' + self.schema_name + '.gw_api_update_comboline($${"id_tofilter":"'+id+'","table":"'+table+'","text_arg":"'+filter+'"}$$)')
+        sql = ('SELECT ' + self.schema_name + '.gw_api_getcomboline($${"id_tofilter":"'+id+'","table":"'+table+'","text_arg":"'+filter+'"}$$)')
         row = self.controller.get_row(sql, log_sql=True)
         list_items = []
 

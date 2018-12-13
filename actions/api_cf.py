@@ -232,17 +232,12 @@ class ApiCF(ApiParent):
             extras += '"visibleLayer":'+visible_layer+', '
             extras += '"coordinates":{"epsg":'+str(self.srid)+', "xcoord":' + str(point.x()) + ',"ycoord":' + str(point.y()) + ', "zoomRatio":1000}'
             body = self.create_body(extras=extras)
-            # sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromcoordinates(" + str(point.x()) + ", "
-            #        + str(point.y())+" ,"+str(self.srid) + ", '"+str(active_layer)+"', '"+str(visible_layers)+"', '"
-            #        + str(is_project_editable)+"', "+str(scale_zoom)+", 9, 100)")
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromcoordinates($${" + body + "}$$)")
         # IF come from QPushButtons node1 or node2 from custom form
         elif feature_id:
             feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
             body = self.create_body(feature=feature)
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromid($${" + body + "}$$)")
-            # sql = ("SELECT " + self.schema_name + ".gw_api_get_infofromid('"+str(table_name)+"', '"+str(feature_id)+"', "
-            #        " null, " + str(is_project_editable) + ", 9, 100)")
 
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
@@ -2145,12 +2140,15 @@ class ApiCF(ApiParent):
     """ NEW WORKCAT"""
     def cf_new_workcat(self, dialog):
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${"
-              "'client':{'device':3, 'infoType':100, 'lang':'ES'},"
-              " 'form':{'formName':'new_workcat', 'tabName':'data', 'editable':'TRUE'}, "
-              "'feature':{'tableName':'ve_arc_pipe', 'idName':'arc_id', 'id':'2001'}, "
-              "'data':{'fields':{'matcat_id':'PVC', 'pn':'16', 'dn':'160'}}}$$)")
+        body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
+        body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
+        body += '"feature":{}, '
+        body += '"data":{}'
+        sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
+
         row = self.controller.get_row(sql, log_sql=True)
+
+        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         self.dlg_new_workcat = ApiBasicInfo()
 
@@ -2160,23 +2158,23 @@ class ApiCF(ApiParent):
         self.dlg_new_workcat.rejected.connect(partial(self.close_dialog, self.dlg_new_workcat))
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, 'cat_work'))
 
-        self.populate_basic_info(self.dlg_new_workcat, row, self.field_id)
+        self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id)
 
         # Open dialog
         self.open_dialog(self.dlg_new_workcat)
-
 
 
     def cf_manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
 
         # Take widgets
-        cat_work_id = self.dlg_new_workcat.findChild(QLineEdit, "cat_work_id")
-        descript = self.dlg_new_workcat.findChild(QLineEdit, "descript")
-        link = self.dlg_new_workcat.findChild(QLineEdit, "link")
-        workid_key_1 = self.dlg_new_workcat.findChild(QLineEdit, "workid_key_1")
-        workid_key_2 = self.dlg_new_workcat.findChild(QLineEdit, "workid_key_2")
-        builtdate = self.dlg_new_workcat.findChild(QgsDateTimeEdit, "builtdate")
+        cat_work_id = self.dlg_new_workcat.findChild(QLineEdit, "data_cat_work_id")
+        descript = self.dlg_new_workcat.findChild(QLineEdit, "data_descript")
+        link = self.dlg_new_workcat.findChild(QLineEdit, "data_link")
+        workid_key_1 = self.dlg_new_workcat.findChild(QLineEdit, "data_workid_key_1")
+        workid_key_2 = self.dlg_new_workcat.findChild(QLineEdit, "data_workid_key_2")
+        builtdate = self.dlg_new_workcat.findChild(QgsDateTimeEdit, "data_builtdate")
+
 
         # Get values from dialog
         values = ""
@@ -2226,7 +2224,7 @@ class ApiCF(ApiParent):
                     sql = ("SELECT id, id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        cmb_workcat_id = self.dlg_cf.findChild(QComboBox, "workcat_id")
+                        cmb_workcat_id = self.dlg_cf.findChild(QComboBox, "data_workcat_id")
                         utils_giswater.set_item_data(cmb_workcat_id, rows, index_to_show=1, combo_clear=True)
                         utils_giswater.set_combo_itemData(cmb_workcat_id, cat_work_id, 1)
                     self.close_dialog(self.dlg_new_workcat)
