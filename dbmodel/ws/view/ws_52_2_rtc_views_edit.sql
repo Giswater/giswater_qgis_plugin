@@ -6,8 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-/*
--- Deprecated from 3.1.105. New code on updates/31/ws/views.sql
+
 CREATE OR REPLACE VIEW v_edit_rtc_hydro_data_x_connec AS
 SELECT
 ext_rtc_hydrometer_x_data.id,
@@ -15,13 +14,13 @@ rtc_hydrometer_x_connec.connec_id,
 ext_rtc_hydrometer_x_data.hydrometer_id,
 ext_rtc_hydrometer.catalog_id,
 ext_rtc_hydrometer_x_data.cat_period_id,
-ext_rct_period.code as cat_period_code,
+ext_cat_period.code as cat_period_code,
 sum,
 custom_sum
 FROM ext_rtc_hydrometer_x_data
 JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::int8=ext_rtc_hydrometer.id::int8
 LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::int8 = ext_rtc_hydrometer.catalog_id::int8
 JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::int8=ext_rtc_hydrometer_x_data.hydrometer_id::int8
-JOIN ext_rct_period ON cat_period_id=ext_rct_period.id
+JOIN ext_cat_period ON cat_period_id=ext_cat_period.id
 ORDER BY 3, 5 DESC ;
-*/
+
