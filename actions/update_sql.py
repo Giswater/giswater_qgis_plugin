@@ -372,7 +372,7 @@ class UpdateSQL(ParentAction):
         print(status)
         return True
 
-    def load_update_ddl_dml(self, api=False):
+    def load_update_ddl_dml(self, api=False, new_project=False):
 
         status = True
 
@@ -382,79 +382,170 @@ class UpdateSQL(ParentAction):
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdatesApi + folder)
                 for sub_folder in sub_folders:
-                    if str(sub_folder) > str(self.version).replace('.','') and str(sub_folder) > '31100':
-                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
-                            print(False)
-                            return False
-                        else:
-                            status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
-                            if status is False:
+                    if new_project:
+                        if str(sub_folder) > '31100':
+                            if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
                                 print(False)
-                                return False
-                        if self.process_folder(
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
-                                '') is False:
-                            print(False)
-                            return False
-                        else:
-                            print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            if status is False:
-                                print(False)
-                                return False
-                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
-                                               '') is False:
-                            if self.process_folder(self.folderLocaleApi, 'EN') is False:
                                 return False
                             else:
-                                status = self.executeFiles(os.listdir(
-                                    self.folderLocaleApi + self.locale),
-                                    self.folderLocaleApi + self.locale + '/', True)
+                                status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
                                 if status is False:
+                                    print(False)
                                     return False
-                        else:
-                            status = self.executeFiles(
-                                os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/'),
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/', True)
-                            if status is False:
+                            if self.process_folder(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    '') is False:
                                 print(False)
                                 return False
+                            else:
+                                print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
+                                                   '') is False:
+                                if self.process_folder(self.folderLocaleApi, 'EN') is False:
+                                    return False
+                                else:
+                                    status = self.executeFiles(os.listdir(
+                                        self.folderLocaleApi + self.locale),
+                                        self.folderLocaleApi + self.locale + '/', True)
+                                    if status is False:
+                                        return False
+                            else:
+                                status = self.executeFiles(
+                                    os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/'),
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/', True)
+                                if status is False:
+                                    print(False)
+                                    return False
+                    else:
+                        if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) > '31100':
+                            if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
+                                print(False)
+                                return False
+                            else:
+                                status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    '') is False:
+                                print(False)
+                                return False
+                            else:
+                                print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                status = self.load_sql(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
+                                    '') is False:
+                                if self.process_folder(self.folderLocaleApi, 'EN') is False:
+                                    return False
+                                else:
+                                    status = self.executeFiles(os.listdir(
+                                        self.folderLocaleApi + self.locale),
+                                        self.folderLocaleApi + self.locale + '/', True)
+                                    if status is False:
+                                        return False
+                            else:
+                                status = self.executeFiles(
+                                    os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/'),
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/', True)
+                                if status is False:
+                                    print(False)
+                                    return False
         else:
             folders = os.listdir(self.folderUpdates + '')
+            self.controller.log_info(str("test10"))
+            self.controller.log_info(str(folders))
             for folder in folders:
+                self.controller.log_info(str(folder))
                 sub_folders = os.listdir(self.folderUpdates + folder)
+                self.controller.log_info(str(sub_folders))
                 for sub_folder in sub_folders:
-                    if str(sub_folder) > str(self.version).replace('.','') and str(sub_folder) > '31100':
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
-                            print(False)
-                            return False
-                        else:
-                            status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
-                            if status is False:
+                    self.controller.log_info(str(sub_folder))
+                    if new_project:
+                        if str(sub_folder) > '31100':
+                            if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                                 print(False)
-                                return False
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
-                            print(False)
-                            return False
-                        else:
-                            status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            if status is False:
+                                # return False
+                            else:
+                                status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                                if status is False:
+                                    print(False)
+                                    # return False
+                            if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
                                 print(False)
-                                return False
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'), '') is False:
-                            if self.process_folder(self.folderLocale, 'EN') is False:
-                                return False
+                                # return False
+                            else:
+                                status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                if status is False:
+                                    print(False)
+                                    # return False
+                            if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'), '') is False:
+                                if self.process_folder(self.folderLocale, 'EN') is False:
+                                    print(False)
+                                    # return False
+                                else:
+                                    status = self.executeFiles(os.listdir(
+                                        self.folderLocale + self.locale),
+                                        self.folderLocale + self.locale + '/', True)
+                                    if status is False:
+                                        print(False)
+                                        # return False
+                            else:
+                                status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/')), self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'))
+                                if status is False:
+                                    print(False)
+                                    # return False
+                    else:
+                        if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) > '31100':
+                            if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
+                                print(False)
+                                # return False
+                            else:
+                                status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                                if status is False:
+                                    print(False)
+                                    # return False
+                            if self.process_folder(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    '') is False:
+                                print(False)
+                                # return False
+                            else:
+                                status = self.load_sql(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                if status is False:
+                                    print(False)
+                                    # return False
+                            if self.process_folder(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
+                                    '') is False:
+                                if self.process_folder(self.folderLocale, 'EN') is False:
+                                    print(False)
+                                    # return False
+                                else:
+                                    status = self.executeFiles(os.listdir(
+                                        self.folderLocale + self.locale),
+                                        self.folderLocale + self.locale + '/', True)
+                                    if status is False:
+                                        print(False)
+                                        # return False
                             else:
                                 status = self.executeFiles(os.listdir(
-                                    self.folderLocale + self.locale),
-                                    self.folderLocale + self.locale + '/', True)
+                                    self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/')),
+                                                           self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
+                                                               self.locale + '/'))
                                 if status is False:
-                                    return False
-                        else:
-                            status = self.executeFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/')), self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'))
-                            if status is False:
-                                print(False)
-                                return False
+                                    print(False)
+                                    # return False
         print(status)
         return True
 
@@ -464,16 +555,16 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_view + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_view), self.folderUtilsApi + self.file_pattern_view)
-                if status is False:
-                    return False
             if self.process_folder(self.folderSoftwareApi, self.file_pattern_view + '/') is False:
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftwareApi + self.file_pattern_view), self.folderSoftwareApi + self.file_pattern_view)
+                if status is False:
+                    return False
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_view), self.folderUtilsApi + self.file_pattern_view)
                 if status is False:
                     return False
             if self.process_folder(self.folderUtilsApi, self.file_pattern_fct + '/') is False:
@@ -491,17 +582,17 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     return False
         else:
+            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
+                if status is False:
+                    return False
             if self.process_folder(self.folderUtils, self.file_pattern_view + '/') is False:
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_view),
                                            self.folderUtils + self.file_pattern_view)
-                if status is False:
-                    return False
-            if self.process_folder(self.folderSoftware, self.file_pattern_view + '/') is False:
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_view), self.folderSoftware + self.file_pattern_view)
                 if status is False:
                     return False
             if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
@@ -521,7 +612,7 @@ class UpdateSQL(ParentAction):
         print(status)
         return True
 
-    def update_30to31(self, api=False):
+    def update_30to31(self, api=False, new_project=False):
         status = True
 
         # Check is api
@@ -530,89 +621,171 @@ class UpdateSQL(ParentAction):
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdatesApi + folder)
                 for sub_folder in sub_folders:
-                    if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) <= '31100':
-                        if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
-                            print(False)
-                            return False
-                        else:
-                            status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
-                            if status is False:
+                    if new_project:
+                        if str(sub_folder) <= '31100':
+                            if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
                                 print(False)
-                                return False
-                        if self.process_folder(
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
-                                '') is False:
-                            print(False)
-                            return False
-                        else:
-                            print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            status = self.load_sql(
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            if status is False:
-                                print(False)
-                                return False
-                        if self.process_folder(
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
-                                '') is False:
-                            if self.process_folder(self.folderLocaleApi, 'EN') is False:
                                 return False
                             else:
-                                status = self.executeFiles(os.listdir(
-                                    self.folderLocaleApi + self.locale),
-                                    self.folderLocaleApi + self.locale + '/', True)
+                                status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
                                 if status is False:
+                                    print(False)
                                     return False
-                        else:
-                            status = self.executeFiles(
-                                os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/'),
-                                self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/', True)
-                            if status is False:
+                            if self.process_folder(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    '') is False:
                                 print(False)
                                 return False
+                            else:
+                                print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                status = self.load_sql(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
+                                    '') is False:
+                                if self.process_folder(self.folderLocaleApi, 'EN') is False:
+                                    return False
+                                else:
+                                    status = self.executeFiles(os.listdir(
+                                        self.folderLocaleApi + self.locale),
+                                        self.folderLocaleApi + self.locale + '/', True)
+                                    if status is False:
+                                        return False
+                            else:
+                                status = self.executeFiles(
+                                    os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/'),
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/', True)
+                                if status is False:
+                                    print(False)
+                                    return False
+                    else:
+                        if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) <= '31100':
+                            if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder, '/utils/') is False:
+                                print(False)
+                                return False
+                            else:
+                                status = self.load_sql(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    '') is False:
+                                print(False)
+                                return False
+                            else:
+                                print(self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                status = self.load_sql(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
+                                    '') is False:
+                                if self.process_folder(self.folderLocaleApi, 'EN') is False:
+                                    return False
+                                else:
+                                    status = self.executeFiles(os.listdir(
+                                        self.folderLocaleApi + self.locale),
+                                        self.folderLocaleApi + self.locale + '/', True)
+                                    if status is False:
+                                        return False
+                            else:
+                                status = self.executeFiles(
+                                    os.listdir(self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/'),
+                                    self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/', True)
+                                if status is False:
+                                    print(False)
+                                    return False
         else:
             folders = os.listdir(self.folderUpdates + '')
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdates + folder)
                 for sub_folder in sub_folders:
-                    if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) <= '31100':
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
-                            print(False)
-                            return False
-                        else:
-                            status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
-                            if status is False:
+                    if new_project:
+                        if str(sub_folder) <= '31100':
+                            if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                                 print(False)
-                                return False
-                        if self.process_folder(
-                                self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/',
-                                '') is False:
-                            print(False)
-                            return False
-                        else:
-                            status = self.load_sql(
-                                self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
-                            if status is False:
-                                print(False)
-                                return False
-                        if self.process_folder(
-                                self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
-                                '') is False:
-                            if self.process_folder(self.folderLocale, 'EN') is False:
                                 return False
                             else:
-                                status = self.executeFiles(os.listdir(
-                                    self.folderLocale + self.locale),
-                                    self.folderLocale + self.locale + '/', True)
+                                status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
                                 if status is False:
+                                    print(False)
                                     return False
-                        else:
-                            status = self.executeFiles(os.listdir(
-                                self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/')),
-                                                       self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
-                                                           self.locale + '/'))
-                            if status is False:
+                            if self.process_folder(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    '') is False:
                                 print(False)
                                 return False
+                            else:
+                                status = self.load_sql(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
+                                    '') is False:
+                                if self.process_folder(self.folderLocale, 'EN') is False:
+                                    return False
+                                else:
+                                    status = self.executeFiles(os.listdir(
+                                        self.folderLocale + self.locale),
+                                        self.folderLocale + self.locale + '/', True)
+                                    if status is False:
+                                        return False
+                            else:
+                                status = self.executeFiles(os.listdir(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/')),
+                                                           self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
+                                                               self.locale + '/'))
+                                if status is False:
+                                    print(False)
+                                    return False
+                    else:
+                        if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) <= '31100':
+                            if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
+                                print(False)
+                                return False
+                            else:
+                                status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    '') is False:
+                                print(False)
+                                return False
+                            else:
+                                status = self.load_sql(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                if status is False:
+                                    print(False)
+                                    return False
+                            if self.process_folder(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
+                                    '') is False:
+                                if self.process_folder(self.folderLocale, 'EN') is False:
+                                    return False
+                                else:
+                                    status = self.executeFiles(os.listdir(
+                                        self.folderLocale + self.locale),
+                                        self.folderLocale + self.locale + '/', True)
+                                    if status is False:
+                                        return False
+                            else:
+                                status = self.executeFiles(os.listdir(
+                                    self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/')),
+                                                           self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
+                                                               self.locale + '/'))
+                                if status is False:
+                                    print(False)
+                                    return False
         print(status)
         return True
 
@@ -620,10 +793,10 @@ class UpdateSQL(ParentAction):
 
         status = True
 
-        if self.process_folder(self.folderExemple, 'user/') is False:
+        if self.process_folder(self.folderExemple, 'user/'+self.project_type) is False:
             return False
         else:
-            status = self.executeFiles(os.listdir(self.folderExemple + 'user/'), self.folderExemple + 'user/')
+            status = self.executeFiles(os.listdir(self.folderExemple + 'user/'+self.project_type), self.folderExemple + 'user/'+self.project_type)
             if status is False:
                 return False
 
@@ -634,10 +807,10 @@ class UpdateSQL(ParentAction):
 
         status = True
 
-        if self.process_folder(self.folderExemple, 'dev/') is False:
+        if self.process_folder(self.folderExemple, 'dev/'+self.project_type) is False:
             return False
         else:
-            status = self.executeFiles(os.listdir(self.folderExemple + 'dev/'), self.folderExemple + 'dev/')
+            status = self.executeFiles(os.listdir(self.folderExemple + 'dev/'+self.project_type), self.folderExemple + 'dev/'+self.project_type)
             if status is False:
                 return False
 
@@ -742,14 +915,6 @@ class UpdateSQL(ParentAction):
 
         # Check is api
         if api:
-            if self.process_folder(self.folderUtilsApi, self.file_pattern_fk) is False:
-                print(False)
-                return False
-            else:
-                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fk), self.folderUtilsApi + self.file_pattern_fk)
-                if status is False:
-                    print(False)
-                    return False
             if self.process_folder(self.folderSoftwareApi, self.file_pattern_fk) is False:
                 print(False)
                 return False
@@ -758,20 +923,29 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     print(False)
                     return False
-        else:
-            if self.process_folder(self.folderUtils, self.file_pattern_fk) is False:
+            if self.process_folder(self.folderUtilsApi, self.file_pattern_fk) is False:
                 print(False)
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk), self.folderUtils + self.file_pattern_fk)
+                status = self.executeFiles(os.listdir(self.folderUtilsApi + self.file_pattern_fk), self.folderUtilsApi + self.file_pattern_fk)
                 if status is False:
                     print(False)
                     return False
+        else:
             if self.process_folder(self.folderSoftware, self.file_pattern_fk) is False:
                 print(False)
                 return False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fk), self.folderSoftware + self.file_pattern_fk)
+                if status is False:
+                    print(False)
+                    return False
+            if self.process_folder(self.folderUtils, self.file_pattern_fk) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fk),
+                                           self.folderUtils + self.file_pattern_fk)
                 if status is False:
                     print(False)
                     return False
@@ -863,13 +1037,15 @@ class UpdateSQL(ParentAction):
     # BUTTONS CALLING FUNCTIONS
 
     def create_project_data_schema(self):
+        # status = []
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         if self.rdb_import_data.isChecked():
             print("rdb_import_data")
+            # status.append(self.load_base_no_ct())
             self.load_base_no_ct()
-            self.update_30to31()
+            self.update_30to31(new_project=True)
             self.load_views()
-            self.load_update_ddl_dml()
+            self.load_update_ddl_dml(new_project=True)
             self.execute_import_data()
             self.load_fk()
             self.load_rules()
@@ -878,16 +1054,16 @@ class UpdateSQL(ParentAction):
         elif self.rdb_no_ct.isChecked():
             print(str("rdb_no_ct"))
             self.load_base_no_ct()
-            self.update_30to31()
+            self.update_30to31(new_project=True)
             self.load_views()
-            self.load_update_ddl_dml()
+            self.load_update_ddl_dml(new_project=True)
             self.execute_last_process()
         elif self.rdb_sample.isChecked():
             print(str("rdb_sample"))
             self.load_base()
-            self.update_30to31()
+            self.update_30to31(new_project=True)
             self.load_views()
-            self.load_update_ddl_dml()
+            self.load_update_ddl_dml(new_project=True)
             self.load_trg()
             self.load_fk()
             self.load_sample_data()
@@ -895,9 +1071,9 @@ class UpdateSQL(ParentAction):
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
             self.load_base()
-            self.update_30to31()
+            self.update_30to31(new_project=True)
             self.load_views()
-            self.load_update_ddl_dml()
+            self.load_update_ddl_dml(new_project=True)
             self.load_trg()
             self.load_fk()
             self.load_sample_data()
@@ -906,9 +1082,10 @@ class UpdateSQL(ParentAction):
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
             self.load_base()
-            self.update_30to31()
+            self.update_30to31(new_project=True)
             self.load_views()
-            self.load_update_ddl_dml()
+            status = self.load_update_ddl_dml(new_project=True)
+
             self.load_trg()
             self.load_fk()
             self.execute_last_process()
@@ -931,9 +1108,9 @@ class UpdateSQL(ParentAction):
 
     def implement_api(self):
         self.load_base(True)
-        self.update_30to31(True)
+        self.update_30to31(True, True)
         self.load_views()
-        self.load_update_ddl_dml(True)
+        self.load_update_ddl_dml(True, True)
         self.load_trg()
         self.load_fk()
         self.execute_last_process()
@@ -1230,7 +1407,6 @@ class UpdateSQL(ParentAction):
                 f_to_read = str(
                     f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
                     str('utf-8-sig'))
-                self.controller.log_info(str(f_to_read))
                 status = self.controller.execute_sql(str(f_to_read))
                 if status is False:
                     print "Error to execute"
@@ -1289,7 +1465,6 @@ class UpdateSQL(ParentAction):
                     f = open(filedir + '/' + file, 'r')
                     if f:
                         f_to_read = str(f.read()).decode(str('utf-8-sig'))
-                        self.controller.log_info(str(f_to_read))
                         self.message_update = self.message_update + '\n' + str(f_to_read)
                     else:
                         return False
