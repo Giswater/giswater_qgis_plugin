@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
 try:
     from qgis.core import Qgis
 except:
@@ -53,6 +55,60 @@ class ApiSearch(ApiParent):
         self.json_search = {}
         self.lbl_visible = False
 
+    def _api_search(self):
+
+        # Dialog
+        self.dlg_search = ApiSearchUi()
+        self.load_settings(self.dlg_search)
+        self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
+        self.dlg_search.lbl_msg.setVisible(False)
+
+        # Make it dockable in left dock widget area
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
+        # self.dlg_search.setFixedHeight(180)
+        body = self.create_body()
+        sql = ("SELECT " + self.schema_name + ".gw_api_getsearch($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        print(complet_list)
+
+        main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
+        first_tab = None
+
+        for tab in complet_list['form'][0]:
+            if first_tab is None:
+                first_tab = tab['tabName']
+            tab_widget = QWidget(main_tab)
+            tab_widget.setObjectName(tab['tabName'])
+            main_tab.addTab(tab_widget, tab['tabHeaderText'])
+            gridlayout = QGridLayout()
+            tab_widget.setLayout(gridlayout)
+            x = 0
+            for field in tab['fields']:
+                label = QLabel()
+                label.setObjectName('lbl_' + field['label'])
+                label.setText(field['label'].capitalize())
+                if field['widgettype'] == 'typeahead':
+                    completer = QCompleter()
+                    widget = self.add_lineedit(field)
+                    widget = self.set_completer(widget, completer)
+                elif field['widgettype'] == 'combo':
+                    widget = self.add_combobox(field)
+
+                gridlayout.addWidget(label, x, 0)
+                gridlayout.addWidget(widget, x, 1)
+                x += 1
+
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            gridlayout.addItem(vertical_spacer1)
+
+        # Open dialog
+        self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_search.show()
+
     def api_search(self):
         
         # Dialog
@@ -65,17 +121,20 @@ class ApiSearch(ApiParent):
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         #self.dlg_search.setFixedHeight(180)
 
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_search(9,'es')")
+
+        body = self.create_body()
+        sql = ("SELECT " + self.schema_name + ".gw_api_getsearch($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return
-        result = row[0]
+            return False
+        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         first_tab = None
 
-        for tab in result["formTabs"]:
+        for tab in complet_list[0]["form"]:
             if first_tab is None:
                 first_tab = tab['tabName']
             tab_widget = QWidget(main_tab)

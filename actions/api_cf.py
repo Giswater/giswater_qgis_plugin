@@ -110,7 +110,6 @@ class ApiCF(ApiParent):
             extras += '"visibleLayers":' + str(visible_layers) + ', '
             extras += '"zoomScale":' + str(scale_zoom) + ', '
             extras += '"srid":' + str(srid)
-
             body = self.create_body(extras=extras)
             # Get layers under mouse clicked
             sql = ("SELECT " + self.schema_name + ".gw_api_getlayersfromcoordinates($${" + body + "}$$)::text")
@@ -119,6 +118,7 @@ class ApiCF(ApiParent):
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 return False
             complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+    
             self.icon_folder = self.plugin_dir + '/icons/'
             main_menu = QMenu()
             for layer in complet_list[0]['body']['data']['layersNames']:
@@ -131,10 +131,7 @@ class ApiCF(ApiParent):
                 else:
                     sub_menu = main_menu.addMenu(layer_name.name())
 
-
                 for feature in layer['ids']:
-                    self.controller.log_info(str(feature['id']))
-
                     action = QAction(str(feature['id']), None)
                     sub_menu.addAction(action)
                     action.triggered.connect(partial(self.set_active_layer, action))
@@ -173,6 +170,7 @@ class ApiCF(ApiParent):
         self.iface.setActiveLayer(layer)
         complet_result = self.open_form(table_name=table_name['table'], feature_id=action.text())
         self.draw(complet_result)
+
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None, layer_new_feature=None):
@@ -878,31 +876,27 @@ class ApiCF(ApiParent):
 
     def set_widget_type(self, field, dialog, widget, completer):
         if field['widgettype'] == 'typeahead':
-            if 'dv_table' in field:
-                table_name = field['dv_table']
+            if 'tableName' in field and 'fieldName' in field:
+                table_name = field['tableName']
+                field_name = field['fieldName']
                 model = QStringListModel()
-                self.populate_lineedit(completer, model, table_name, dialog, widget, 'id')
-                widget.textChanged.connect(partial(self.populate_lineedit, completer, model, table_name, dialog, widget, 'id'))
+                self.populate_lineedit(completer, model, table_name, dialog, widget, field_name)
+                widget.textChanged.connect(partial(
+                    self.populate_lineedit, completer, model, table_name, dialog, widget, field_name))
         return widget
 
 
-
-
-
-
     def fill_child(self, dialog, widget):
-        
         combo_parent = widget.property('column_id')
         combo_id = utils_giswater.get_item_data(dialog, widget)
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('" + str(self.tablename) + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=False)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child)
 
 
     def populate_child(self, combo_child):
-        
         child = self.dlg_cf.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
             self.populate_combo(child, combo_child)

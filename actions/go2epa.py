@@ -846,4 +846,8 @@ class Go2Epa(ParentAction):
         else:
             self.fill_table(table, tablename)
             
-            
+
+    def info_from_epa(self):
+        """ Button xxx: xxxxxxxx """
+        self.controller.log_info(str("WORK WORK"))
+

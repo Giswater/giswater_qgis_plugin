@@ -49,7 +49,9 @@ class Om(ParentAction):
         """ Button 198: execute function: gw_fct_anl_inletflowtrace and refresh map canvas """
         sql = ("SELECT " + self.schema_name + ".gw_fct_anl_inletflowtrace()")
         row = self.controller.get_row(sql, log_sql=True)
+        # TODO: hacer zoom a lo devuelto por la funcion gw_fct_anl_inletflowtrace
         self.refresh_map_canvas()
+
 
 
     def om_add_visit(self):

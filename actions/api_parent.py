@@ -553,13 +553,13 @@ class ApiParent(ParentAction):
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('column_id', field['column_id'])
-        self.populate_combo(widget, field, field['dv_orderby_id'])
+        self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
         return widget
 
         
-    def populate_combo(self, widget, field, order_by_id=False):
+    def populate_combo(self, widget, field):
         # Generate list of items to add into combo
 
         widget.blockSignals(True)
@@ -571,11 +571,8 @@ class ApiParent(ParentAction):
                 elem = [field['comboIds'][i], field['comboNames'][i]]
                 combolist.append(elem)
 
-        records_sorted = sorted(combolist, key=operator.itemgetter(1))
-        if order_by_id:
-            records_sorted = sorted(combolist, key=operator.itemgetter(0))
         # Populate combo
-        for record in records_sorted:
+        for record in combolist:
             widget.addItem(record[1], record)
 
             
