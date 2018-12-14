@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- WARNING : view updated on 3.1.105
 
 CREATE OR REPLACE VIEW v_edit_rtc_hydro_data_x_connec AS
 SELECT

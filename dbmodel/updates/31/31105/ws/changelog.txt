@@ -1,6 +1,6 @@
 31105-ws-existing views
 -----------------------
-Bug fix on view v_om_visit;  TODO: SAME UD & CREATE ISSUE
+Bug fix on view v_om_visit; 
 
 
 31105-ws-other
