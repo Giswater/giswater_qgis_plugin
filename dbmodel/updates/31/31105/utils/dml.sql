@@ -58,7 +58,14 @@ INSERT INTO audit_cat_table VALUES ('v_ui_plan_psector', 'om', null, null, 0, NU
 INSERT INTO audit_cat_table VALUES ('v_ui_workcat_polygon_all', 'om', null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
-
 -- 2018/11/23
 INSERT INTO audit_cat_function VALUES (2538, 'gw_fct_dinlet', 'om', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2540, 'gw_fct_inlet_flowtrace', 'om', NULL, '', '', NULL, NULL, NULL);
+
+-- 2018/12/14
+INSERT INTO audit_cat_function VALUES (2542, 'gw_trg_arc_vnodelink_update', 'edit', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2544, 'gw_trg_link_connecrotation_update', 'edit', NULL, '', '', NULL, NULL, NULL);
+
+INSERT INTO audit_cat_param_user VALUES ('edit_link_connecrotation_update', 'edit', 'Used to rotate label and symbol of connec using the link's angle', 'role_edit');
+
+
