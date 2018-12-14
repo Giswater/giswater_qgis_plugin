@@ -35,11 +35,11 @@ BEGIN
         DELETE FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_var::integer AND node_id=node_id_var;
     END IF;
 
-    PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var::integer, current_user);
+    PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var::integer);
        
         
 -- Return
-     RETURN  SCHEMA_NAME.gw_fct_getmincut(null, null, null, result_id_var::integer, p_device, 'arc', 'lang');
+     RETURN SCHEMA_NAME.gw_fct_getmincut(null, null, null, result_id_var::integer, p_device, 'arc', 'lang');
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 

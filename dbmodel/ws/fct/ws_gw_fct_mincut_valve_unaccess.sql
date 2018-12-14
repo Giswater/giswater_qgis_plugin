@@ -39,7 +39,7 @@ BEGIN
 	END IF;
 	
 	-- Recalculate the mincut
-	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var, current_user);
+	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, result_id_var);
 
 	-- In case of variable om_mincut_valvestat_using_valveunaccess on TRUE and valve closed status on TRUE)
 	IF v_flag IS TRUE THEN

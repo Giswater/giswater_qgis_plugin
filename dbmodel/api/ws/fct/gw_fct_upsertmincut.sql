@@ -34,7 +34,7 @@ DECLARE
     current_user_var character varying(30);
     column_name_var varchar;
     column_type_var varchar;
-    conflict_text text;
+    v_mincut_return json;
     v_publish_user text;
     v_mincut_class int2;
     v_old_planified_interval date;
@@ -152,20 +152,6 @@ BEGIN
         insert_data := gw_fct_json_object_set_key(insert_data, 'anl_feature_type', upper(p_element_type));
     END IF;
 
-/*
-
---    Update state: Check start
-    IF (insert_data->>'mincut_state')::INT = 0 AND insert_data->>'exec_start' != '' THEN
-        insert_data := gw_fct_json_object_set_key(insert_data, 'mincut_state', 1);
-    END IF;
-
---    Update state: Check end
-    IF (insert_data->>'mincut_state')::INT != 0 AND insert_data->>'exec_end' != '' THEN
-        insert_data := gw_fct_json_object_set_key(insert_data, 'mincut_state', 2);
-        insert_data := gw_fct_json_object_set_key(insert_data, 'exec_user', current_user_var);
-    END IF;
-
-*/
 
 --    Update class
     IF p_element_type = 'connec' THEN
@@ -209,59 +195,22 @@ BEGIN
             INSERT INTO anl_mincut_result_hydrometer(result_id, hydrometer_id) VALUES (v_mincut_id, id_arg);
         ELSE
             RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, v_mincut_id, current_user_var;
-            conflict_text := gw_fct_mincut(id_arg, p_element_type, v_mincut_id, current_user_var);
-            RAISE NOTICE 'MinCut: %', conflict_text;
+            v_mincut_return := gw_fct_mincut(id_arg, p_element_type, v_mincut_id);
         END IF;
 
-        v_message := 'El poligon de tall ha estat executat correctament' ;
+        v_message := 'Mincut have been done succesfully' ;
         
     ELSE 
-    /*
-        v_new_planified_interval:=
-    */
-        IF conflict_text = '' or conflict_text is null THEN
-            v_message := 'El poligon de tall ha estat actualitzat correctament' ;
+
+        IF (v_mincut_return->>'mincutOverlap') = '' THEN
+            v_message := 'Mincut have been done succesfully' ;
         ELSE     
-            v_message := 'AVIS IMPORTANT: Hi ha conflictes amb altres poligons de tall';
+            v_message := concat('WARNING: There are ',(v_mincut_return->>'mincutOverlap'),' conflicts with other mincuts');
         END IF;
     
     END IF;
 
---      Check if there is possible conflict with planified data
-    
-/*
-    IF mincut_id_arg IS NOT NULL AND v_mincut_class = 1 AND old_planified_interval != new_planified_interval THEN
-            RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, mincut_id, current_user_var;
-            conflict_text := gw_fct_mincut(id_arg, p_element_type, mincut_id, current_user_var);
-            RAISE NOTICE 'MinCut: %', conflict_text;
-    END IF;   
-*/
-    -- Geometry to zoom
-    WITH mincut_polygon AS ( SELECT st_collect(a.the_geom) AS locations, a.result_id
-				FROM (SELECT result_id,the_geom FROM anl_mincut_result_node
-					UNION
-					SELECT result_id,the_geom FROM anl_mincut_result_arc )a
-				GROUP BY a.result_id)
-			SELECT 
-				CASE
-					WHEN st_geometrytype(st_concavehull(mincut_polygon.locations, 0.99::double precision)) = 'ST_Polygon'::text 
-					THEN st_buffer(st_concavehull(mincut_polygon.locations, 0.99::double precision), 10::double precision)::geometry(Polygon,25831)
-					ELSE st_expand(st_buffer(mincut_polygon.locations, 10::double precision), 1::double precision)::geometry(Polygon,25831)
-				END AS the_geom INTO v_rectgeometry_geom
-				FROM mincut_polygon
-				WHERE result_id=v_mincut_id;
-
-        IF v_rectgeometry_geom IS NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText(St_Envelope (St_Buffer(anl_the_geom,50))) FROM anl_mincut_result_cat WHERE id=$1)row' 
-			INTO v_rectgeometry
-			USING v_mincut_id;
-	ELSE 
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText (st_envelope ($1)))row' 
-			INTO v_rectgeometry
-			USING v_rectgeometry_geom;
-
-	END IF;
-
+   
 --    Control NULL's
     v_message := COALESCE(v_message, '{}');
     v_visible_layers := COALESCE(v_visible_layers, '{}');
@@ -272,7 +221,7 @@ BEGIN
         ', "apiVersion":'|| api_version ||
         ', "infoMessage":"' || v_message ||'"'||
         ', "visibleLayers":' || v_visible_layers ||
-        ', "geometry":' || v_rectgeometry ||
+        ', "geometry":{"st_astext":"' || (v_mincut_return->>'geometry') ||'"}'
         ', "mincut_id":' || v_mincut_id ||
         '}')::json;
 

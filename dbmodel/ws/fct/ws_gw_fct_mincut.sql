@@ -24,7 +24,7 @@ BEGIN
     -- Search path
     SET search_path = SCHEMA_NAME, public;
   	
-	PERFORM gw_fct_mincut (p_feature_id, p_feature_type, p_result_id, current_user);
+	PERFORM gw_fct_mincut (p_feature_id, p_feature_type, p_result_id);
 	
 	-- raise notice
 	IF counter>0 AND total>0 THEN
@@ -48,9 +48,14 @@ $BODY$
 ------------------------------------------
 -- Mincut function (with nornal parameters)
 ------------------------------------------
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer, cur_user_var text)
-  RETURNS text AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer)
+  RETURNS json AS
 $BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', 1)
+*/
+
 DECLARE
     node_1_aux		text;
     node_2_aux		text;
@@ -58,12 +63,12 @@ DECLARE
     exists_id		text;
     polygon_aux		public.geometry;
     polygon_aux2	public.geometry;
-    arc_aux         public.geometry;
-    node_aux        public.geometry;    
+    arc_aux        	 public.geometry;
+    node_aux        	public.geometry;    
     srid_schema		text;
     expl_id_arg         integer;
     macroexpl_id_arg	integer;
-    v_return_text	text;
+    v_return		json;
     cont1 		integer default 0;
     v_publish_user 	text;
     v_muni_id 		integer;
@@ -72,6 +77,8 @@ DECLARE
     v_numconnecs 	integer;
     v_numhydrometer	integer;
     v_debug		Boolean;
+    v_overlap		text;
+    v_geometry 		text;
 
 BEGIN
     -- Search path
@@ -256,27 +263,24 @@ BEGIN
 			IF v_debug THEN
 				RAISE NOTICE '9-Check temporary overlap control against other planified mincuts';
 			END IF;
-			SELECT gw_fct_mincut_result_overlap(result_id_arg, current_user) INTO v_return_text;
-	
+			SELECT gw_fct_mincut_result_overlap(result_id_arg, current_user) INTO v_overlap;	
 		END IF;
 
 		IF v_debug THEN
 			RAISE NOTICE '10-Update mincut selector';
 		END IF;
+		
 		--    Update the selector
-		IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = current_user) > 0 THEN
-			UPDATE anl_mincut_result_selector SET result_id = result_id_arg WHERE cur_user = current_user;
-		ELSE
-			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user, result_id_arg);
-		END IF;
-		--    Update the selector for publish_user
-		-- Get publish user
+		-- current user
+		DELETE FROM anl_mincut_result_selector WHERE result_id = result_id_arg AND cur_user = current_user;
+		INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user, result_id_arg);
+
+		-- publish user
 		SELECT value FROM config_param_system WHERE parameter='api_publish_user' 
 		INTO v_publish_user;
 		IF v_publish_user IS NOT NULL THEN
-			IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = v_publish_user AND result_id=result_id_arg) = 0 THEN
-				INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
-			END IF;
+			DELETE FROM anl_mincut_result_selector WHERE result_id = result_id_arg AND cur_user = current_user;
+			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user, result_id_arg);
 		END IF;	
 		
 		IF v_debug THEN
@@ -304,10 +308,10 @@ BEGIN
 			JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 			JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg;
 			
-			v_return_text = concat('{"arcs":',v_numarcs,', "length":',v_length, ', "connecs":',v_numconnecs,', "hydrometers":',v_numhydrometer,'}');
+			v_return = concat('{"arcs":',v_numarcs,', "length":',v_length, ', "connecs":',v_numconnecs,', "hydrometers":',v_numhydrometer,'}');
 			
 			INSERT INTO audit_log_data (fprocesscat_id, feature_type, feature_id, log_message) 
-			VALUES (29, 'arc', element_id_arg, v_return_text);
+			VALUES (29, 'arc', element_id_arg, v_return);
 		END IF;
 	ELSE
 		-- Insert values on audit_log_data table when case of study of mincut minimum sector analysis (om_mincut_analysis_dminsector=true)
@@ -316,10 +320,19 @@ BEGIN
 		NOT IN (SELECT feature_id FROM audit_log_data WHERE fprocesscat_id=34 AND user_name=current_user);
 	END IF;
 
+	-- calculate the boundary of mincut using arcs and valves
+	EXECUTE ' SELECT st_astext(st_envelope(st_extent(the_geom))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
+		' UNION SELECT the_geom FROM SCHEMA_NAME.anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
+	        INTO v_geometry;
+
+	-- returning
+    	v_return = concat('{"mincutOverlap":"',v_overlap,'", "geometry":"',v_geometry,'"}');
+
 	IF v_debug THEN
 		RAISE NOTICE 'End of process ';
 	END IF;
-	RETURN v_return_text;
+	
+	RETURN v_return;
 
 
 END;
