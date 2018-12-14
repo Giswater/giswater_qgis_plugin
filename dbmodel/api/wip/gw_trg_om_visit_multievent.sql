@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_trg_om_visit_multievent()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_om_visit_multievent()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -95,5 +95,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_trg_om_visit_multievent()
+ALTER FUNCTION SCHEMA_NAME.gw_trg_om_visit_multievent()
   OWNER TO geoadmin;

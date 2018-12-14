@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE TABLE ws_sample.sys_combo_cat
+CREATE TABLE SCHEMA_NAME.sys_combo_cat
 (
   id serial NOT NULL,
   idval text,
@@ -16,7 +16,7 @@ WITH (
 
 
 
-CREATE TABLE ws_sample.sys_combo_values
+CREATE TABLE SCHEMA_NAME.sys_combo_values
 (
   sys_combo_cat_id integer NOT NULL,
   id integer NOT NULL,

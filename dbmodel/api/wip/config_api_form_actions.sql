@@ -1,5 +1,5 @@
 ﻿
-CREATE TABLE ws_sample.config_api_form_actions
+CREATE TABLE SCHEMA_NAME.config_api_form_actions
 (
   id integer NOT NULL,
   formname character varying(50),

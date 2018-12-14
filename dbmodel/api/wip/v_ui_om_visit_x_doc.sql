@@ -1,3 +1,3 @@
-﻿create view ws_sample.v_ui_om_visit_x_doc
+﻿create view SCHEMA_NAME.v_ui_om_visit_x_doc
 as 
-SELECT * FROM ws_sample.doc_x_visit;
+SELECT * FROM SCHEMA_NAME.doc_x_visit;

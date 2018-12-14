@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_widgetjson(
+﻿CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_widgetjson(
     label_arg text,
     name_arg text,
     type_arg text,
@@ -18,7 +18,7 @@ DECLARE
 BEGIN
 
 --	Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	schemas_array := current_schemas(FALSE);
 
 --	Create JSON

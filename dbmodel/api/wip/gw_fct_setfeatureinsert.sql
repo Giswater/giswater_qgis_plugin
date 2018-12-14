@@ -5,19 +5,19 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setfeatureinsert(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setfeatureinsert(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
 visit:
-SELECT ws_sample.gw_api_setfeatureinsert('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_api_setfeatureinsert('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
 	"feature":{"featureType":"arc", "tableName":"ve_visit_multievent_x_arc", "id":null, "idname": "visit_id"}, 
 	"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}')
 
 feature:
-SELECT ws_sample.gw_api_setfeatureinsert($${
+SELECT SCHEMA_NAME.gw_api_setfeatureinsert($${
 "client":{"device":9, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_node_t", "id":"1251521"},
@@ -53,8 +53,8 @@ DECLARE
 
 BEGIN
 	--    Set search path to local schema
-	SET search_path = "ws_sample", public;
-	v_schemaname = 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 	
 	-- Get paramters
 	EXECUTE 'SELECT epsg FROM version' INTO v_epsg;
@@ -158,5 +158,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_api_setfeatureinsert(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_setfeatureinsert(json)
   OWNER TO geoadmin;

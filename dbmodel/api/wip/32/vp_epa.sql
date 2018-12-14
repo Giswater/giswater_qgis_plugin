@@ -1,22 +1,22 @@
-﻿CREATE OR REPLACE VIEW ws_sample.vp_epa_arc AS 
+﻿CREATE OR REPLACE VIEW SCHEMA_NAME.vp_epa_arc AS 
  SELECT arc_id AS nid,
  epa_type,
 	case when epa_type='PIPE' THEN 've_inp_pipe' 
 	     when epa_type='NOT DEFINED' THEN null
 	     end as epatable	
-   FROM ws_sample.arc;
+   FROM SCHEMA_NAME.arc;
 
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO geoadmin;
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO user_dev;
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO qgisserver;
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO xtorret;
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO user_test;
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO rol_dev;
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO abofill;
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO postgres;
-GRANT ALL ON TABLE ws_sample.vp_epa_arc TO role_basic;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO geoadmin;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO user_dev;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO qgisserver;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO xtorret;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO user_test;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO rol_dev;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO abofill;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO postgres;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_arc TO role_basic;
 
-CREATE OR REPLACE VIEW ws_sample.vp_epa_node AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.vp_epa_node AS 
 
  SELECT node_id AS nid,
   epa_type,
@@ -28,16 +28,16 @@ CREATE OR REPLACE VIEW ws_sample.vp_epa_node AS
 		when epa_type='SHORTPIPE' THEN 've_inp_shortpipe' 
 		when epa_type='NOT DEFINED' THEN null
 		end as epatable
-   FROM ws_sample.node;
+   FROM SCHEMA_NAME.node;
 
-ALTER TABLE ws_sample.vp_epa_node
+ALTER TABLE SCHEMA_NAME.vp_epa_node
   OWNER TO geoadmin;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO geoadmin;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO user_dev;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO qgisserver;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO xtorret;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO user_test;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO rol_dev;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO abofill;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO postgres;
-GRANT ALL ON TABLE ws_sample.vp_epa_node TO role_basic;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO geoadmin;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO user_dev;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO qgisserver;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO xtorret;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO user_test;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO rol_dev;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO abofill;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO postgres;
+GRANT ALL ON TABLE SCHEMA_NAME.vp_epa_node TO role_basic;

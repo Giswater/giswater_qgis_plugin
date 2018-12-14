@@ -4,20 +4,20 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlist(p_data json)  RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlist(p_data json)  RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- attribute table using custom filters
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
 
 -- attribute table using canvas filter
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":null, "limit":null},
@@ -25,7 +25,7 @@ SELECT ws_sample.gw_api_getlist($${
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
 -- Visit -> events
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
@@ -33,14 +33,14 @@ SELECT ws_sample.gw_api_getlist($${
     "pageInfo":{"orderby":"tstamp", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
 -- Visit -> files
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_visit_x_doc", "idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
     "pageInfo":{"orderby":"doc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
 -- Arc -> elements
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
@@ -88,8 +88,8 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ws_sample", public;
-    v_schema_name := 'ws_sample';
+    SET search_path = "SCHEMA_NAME", public;
+    v_schema_name := 'SCHEMA_NAME';
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -294,5 +294,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_api_getlist(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_getlist(json)
   OWNER TO geoadmin;

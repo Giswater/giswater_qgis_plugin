@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_trg_om_visit_singlevent()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_om_visit_singlevent()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -67,5 +67,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_trg_om_visit_singlevent()
+ALTER FUNCTION SCHEMA_NAME.gw_trg_om_visit_singlevent()
   OWNER TO geoadmin;

@@ -1,4 +1,4 @@
-﻿CREATE TABLE ws_sample.config_api_list
+﻿CREATE TABLE SCHEMA_NAME.config_api_list
 (
   id serial NOT NULL,
   tablename character varying(50),

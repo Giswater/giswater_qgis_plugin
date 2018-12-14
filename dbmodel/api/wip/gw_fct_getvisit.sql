@@ -4,18 +4,18 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getvisit(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":null},
 "data":{"type":"arc"}}$$)
 
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":1001},
@@ -46,8 +46,8 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ws_sample", public;
-    v_schemaname := 'ws_sample';
+    SET search_path = "SCHEMA_NAME", public;
+    v_schemaname := 'SCHEMA_NAME';
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -65,7 +65,7 @@ BEGIN
 		v_visitclass := 6;
 	END IF;
     ELSE 
-	v_visitclass := (SELECT class_id FROM ws_sample.om_visit WHERE id=v_id::bigint);
+	v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
 	IF v_visitclass IS NULL THEN
 		v_visitclass := 0;
 	END IF;

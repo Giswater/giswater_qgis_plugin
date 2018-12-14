@@ -5,13 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setvisit(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 --INSERT
-SELECT ws_sample.gw_api_setvisit($${
+SELECT SCHEMA_NAME.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":null, "idname":"visit_id"},
@@ -20,7 +20,7 @@ SELECT ws_sample.gw_api_setvisit($${
 	}$$)
 
 --UPDATE
-SELECT ws_sample.gw_api_setvisit($${
+SELECT SCHEMA_NAME.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1159,"idname":"visit_id"},
@@ -41,7 +41,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -100,5 +100,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_api_setvisit(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_setvisit(json)
   OWNER TO geoadmin;

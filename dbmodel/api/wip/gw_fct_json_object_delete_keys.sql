@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample."gw_fct_json_object_delete_keys"("json" json, VARIADIC "keys_to_delete" TEXT[])
+CREATE OR REPLACE FUNCTION SCHEMA_NAME."gw_fct_json_object_delete_keys"("json" json, VARIADIC "keys_to_delete" TEXT[])
   RETURNS json
   LANGUAGE sql
   IMMUTABLE

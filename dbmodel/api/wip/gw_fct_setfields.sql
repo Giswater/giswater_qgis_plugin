@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setfields(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setfields(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -13,7 +13,7 @@ $BODY$
 /* example
 
 -- FEATURE
-SELECT ws_sample.gw_api_setfields($${
+SELECT SCHEMA_NAME.gw_api_setfields($${
 "client":{"device":9, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"node", "tableName":"ve_node_t", "id":"1251521"},
@@ -23,7 +23,7 @@ SELECT ws_sample.gw_api_setfields($${
 "soilcat_id": "soil1", "ownercat_id": "owner1", "workcat_id_end": "22"}}}$$)
 
 -- VISIT
-SELECT ws_sample.gw_api_setfields('
+SELECT SCHEMA_NAME.gw_api_setfields('
  {"client":{"device":3, "infoType":100, "lang":"ES"}, 
  "feature":{"featureType":"arc", "tableName":"ve_visit_multievent_x_arc", "id":1135}, 
  "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":1000, "desperfectes_arc":1, "neteja_arc":3},
@@ -56,8 +56,8 @@ DECLARE
 BEGIN
 
 --    Set search path to local schema
-    SET search_path = "ws_sample", public;
-    v_schemaname = 'ws_sample';
+    SET search_path = "SCHEMA_NAME", public;
+    v_schemaname = 'SCHEMA_NAME';
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -145,5 +145,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_api_setfields(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_setfields(json)
   OWNER TO geoadmin;

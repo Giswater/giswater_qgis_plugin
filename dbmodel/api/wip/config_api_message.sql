@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE TABLE ws_sample.config_api_message
+CREATE TABLE SCHEMA_NAME.config_api_message
 (
   id integer NOT NULL,
   loglevel integer,

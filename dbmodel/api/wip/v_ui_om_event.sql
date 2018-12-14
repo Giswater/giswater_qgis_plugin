@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE VIEW ws_sample.v_ui_om_event AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_om_event AS 
  SELECT *     
-   FROM ws_sample.om_visit_event;
+   FROM SCHEMA_NAME.om_visit_event;
   
