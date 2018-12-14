@@ -161,9 +161,15 @@ BEGIN
 		v_i = cardinality(v_filter_fields) ;
 
 		-- setting new wigdets
+<<<<<<< HEAD
 		v_filter_fields[v_i+1] := gw_api_get_widgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
 		v_filter_fields[v_i+2] := gw_api_get_widgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
 		v_filter_fields[v_i+3] := gw_api_get_widgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
+=======
+		--v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
+		--v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
+		--v_filter_fields[v_i+3] := gw_fct_createwidgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
+>>>>>>> b114297879cd3fd9a8715aa5354e6b359a8e9108
 
 	-- converting to json
 	v_filter_fields_json = array_to_json (v_filter_fields);
