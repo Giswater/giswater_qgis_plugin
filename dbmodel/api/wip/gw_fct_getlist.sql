@@ -13,7 +13,7 @@ $BODY$
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
-"data":{"filterFields":{"arccat_id":"PVC160-PN16", "limit":5},
+"data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
 
 -- attribute table using canvas filter
@@ -29,7 +29,7 @@ SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
-    "canvasExtend":{"x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
+    "canvasExtend":{},
     "pageInfo":{"orderby":"tstamp", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
 -- Visit -> files
@@ -105,6 +105,10 @@ BEGIN
 	v_canvasextend := (p_data ->> 'data')::json->> 'canvasExtend';
 
 
+	IF v_tabname IS NULL THEN
+		v_tabname = 'data';
+	END IF;
+
 --  Creating the list fields
 ----------------------------
 	-- Get idname column
@@ -157,9 +161,9 @@ BEGIN
 		v_i = cardinality(v_filter_fields) ;
 
 		-- setting new wigdets
-		v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
-		v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
-		v_filter_fields[v_i+3] := gw_fct_createwidgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
+		v_filter_fields[v_i+1] := gw_api_get_widgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
+		v_filter_fields[v_i+2] := gw_api_get_widgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
+		v_filter_fields[v_i+3] := gw_api_get_widgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
 
 	-- converting to json
 	v_filter_fields_json = array_to_json (v_filter_fields);

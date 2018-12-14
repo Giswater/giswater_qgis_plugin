@@ -22,6 +22,7 @@ $BODY$
 /*EXAMPLE
 SELECT ws_sample.gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
 SELECT ws_sample.gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT ws_sample.gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 SELECT ws_sample.gw_api_get_formfields('visit_arc_leak', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 
 */

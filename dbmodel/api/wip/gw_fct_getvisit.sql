@@ -19,7 +19,7 @@ SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":1001},
-"data":{}}$$)
+"data":{"type":"arc"}}$$)
 */
 
 DECLARE
@@ -83,13 +83,22 @@ BEGIN
 --  get form fields
     IF v_id IS NULL THEN
 	SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+
+	
 	-- define the text of header
 	v_formheader := 'VISIT';	
     ELSE 
-	SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;	
+	SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
+
+		
 	-- define the text of header
 	v_formheader :=concat('VISIT - ',v_id);	
     END IF;
+
+       v_fields_json = array_to_json (v_fields);
+
+       RAISE NOTICE 'v_fields_json %', v_fields_json;
+
    
 -- building the form     
     IF v_visitclass=0 THEN

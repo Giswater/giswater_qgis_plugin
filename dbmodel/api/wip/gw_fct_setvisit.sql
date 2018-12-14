@@ -23,8 +23,8 @@ SELECT ws_sample.gw_api_setvisit($${
 SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1135,"idname":"visit_id"},
-"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":101121200, "desperfectes_arc":1, "neteja_arc":3},
+"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1159,"idname":"visit_id"},
+"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testsdgsdgsghaghcode", "sediments_arc":101121200, "desperfectes_arc":1, "neteja_arc":3},
 	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
 */

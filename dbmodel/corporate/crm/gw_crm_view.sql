@@ -5,6 +5,34 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+CREATE OR REPLACE VIEW ws.ext_rtc_hydrometer AS 
+ SELECT hydrometer.id,
+    hydrometer.code,
+    hydrometer.connec_id,
+    hydrometer.muni_id,
+    hydrometer.plot_code,
+    hydrometer.priority_id,
+    hydrometer.catalog_id,
+    hydrometer.category_id,
+    hydrometer.state_id,
+    hydrometer.hydro_number,
+    hydrometer.hydro_man_date,
+    hydrometer.crm_number,
+    hydrometer.customer_name,
+    hydrometer.address1,
+    hydrometer.address2,
+    hydrometer.address3,
+    hydrometer.address2_1,
+    hydrometer.address2_2,
+    hydrometer.address2_3,
+    hydrometer.m3_volume,
+    hydrometer.start_date,
+    hydrometer.end_date,
+    hydrometer.update_date,
+    hydrometer.expl_id
+   FROM crm.hydrometer;
+
+
 --views
 FILE ws_52_1_krn_views_edit
 FILE ws_52_2_rtc_views_edit
