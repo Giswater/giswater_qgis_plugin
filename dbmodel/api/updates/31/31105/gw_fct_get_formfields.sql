@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_formfields(
     p_formname character varying,
     p_formtype character varying,
     p_tabname character varying,
@@ -20,10 +20,10 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
-SELECT SCHEMA_NAME.gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT SCHEMA_NAME.gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT SCHEMA_NAME.gw_api_get_formfields('visit_arc_leak', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT ws_sample.gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
+SELECT ws_sample.gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT ws_sample.gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT ws_sample.gw_api_get_formfields('visit_arc_leak', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 
 */
 
@@ -61,7 +61,7 @@ DECLARE
 BEGIN
 
 --   Set search path to local schema
-     SET search_path = "SCHEMA_NAME", public;
+     SET search_path = "ws_sample", public;
 
 --   Get schema name
      schemas_array := current_schemas(FALSE);
@@ -119,12 +119,15 @@ BEGIN
 	LOOP
 		-- setting the typeahead widgets
 		IF (aux_json->>'typeahead') IS NOT NULL THEN
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', ((aux_json->>'typeahead')::json->>'fieldToSearch'));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'threshold', ((aux_json->>'typeahead')::json->>'threshold'));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'noresultsMsg', ((aux_json->>'typeahead')::json->>'noresultsMsg'));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'loadingMsg', ((aux_json->>'typeahead')::json->>'loadingMsg'));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'tableName', ((aux_json->>'typeahead')::json->>'tableName'));
-				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldName', ((aux_json->>'typeahead')::json->>'fieldName'));
-				
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryText', (aux_json->>'dv_querytext'));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'queryTextFilter', (aux_json->>'dv_querytext_filterc'));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'parentId', (aux_json->>'dv_parent_id'));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isNullValue', (aux_json->>'dv_isnullvalue'));
+				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'orderById', (aux_json->>'dv_orderby_id'));
 		END IF;
 
 		-- setting the not updateable fields
@@ -140,7 +143,7 @@ BEGIN
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal:', COALESCE(v_image, '[]'));
 		END IF;
 	
-		-- for (combo/combotext not child) and (parent) widgets
+		-- looking for parents and for combo not parent
 		IF (aux_json->>'isparent')::boolean IS TRUE OR ((aux_json->>'widgettype') = 'combo' AND (aux_json->>'dv_parent_id') IS NULL) THEN
 
 			-- Define the order by column
@@ -198,7 +201,7 @@ BEGIN
 				END IF;
 
 			END IF;
-			
+
 			IF field_value_parent IS NULL THEN
 				IF p_filterfield is not null THEN
 					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', p_filterfield);
@@ -209,7 +212,7 @@ BEGIN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', field_value_parent);
 			END IF;
 
-			-- for chids of that parents
+			-- looking for childs 
 			IF (aux_json->>'isparent')::boolean IS TRUE THEN
 			
 				FOREACH aux_json_child IN ARRAY fields_array
@@ -308,5 +311,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer)
+ALTER FUNCTION ws_sample.gw_api_get_formfields(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer)
   OWNER TO postgres;
