@@ -4,28 +4,28 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlist(p_data json)  RETURNS json AS
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlist(p_data json)  RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- attribute table using custom filters
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
 
 -- attribute table using canvas filter
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
+"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":null, "limit":null},
     "canvasExtend":{"x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
 -- Visit -> events
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
@@ -33,14 +33,14 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
     "pageInfo":{"orderby":"tstamp", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
 -- Visit -> files
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_visit_x_doc", "idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
     "pageInfo":{"orderby":"doc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
 -- Arc -> elements
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
@@ -52,7 +52,7 @@ DECLARE
 	v_filter_fields  json[];
 	v_filter_fields_json json;
 	v_filter_values  json;
-	v_schema_name text;
+	v_ws_sample text;
 	aux_json json;
 	v_result_list json;
 	v_query_result text;
@@ -88,8 +88,8 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
-    v_schema_name := 'SCHEMA_NAME';
+    SET search_path = "ws_sample", public;
+    v_ws_sample := 'ws_sample';
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -123,7 +123,7 @@ BEGIN
 			AND s.nspname = $2
 			ORDER BY a.attnum LIMIT 1'
 			INTO v_idname
-			USING v_tablename, v_schema_name;
+			USING v_tablename, v_ws_sample;
 	END IF;
 
 	-- Get column type
@@ -136,7 +136,7 @@ BEGIN
 	    AND t.relname = $2 
 	    AND s.nspname = $1
 	    ORDER BY a.attnum'
-            USING v_schema_name, v_tablename, v_idname
+            USING v_ws_sample, v_tablename, v_idname
             INTO v_column_type;
 
         -- Getting geometry column
@@ -149,11 +149,11 @@ BEGIN
             AND s.nspname = $2
             AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
             ORDER BY a.attnum' 
-            USING v_tablename, v_schema_name
+            USING v_tablename, v_ws_sample
             INTO v_the_geom;
         
 	-- getting the list of filters fields
-	SELECT gw_api_get_formfields(v_tablename, 'list', v_tabname, null, null, null, null,'INSERT', null, v_device)
+	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device)
 		INTO v_filter_fields;
 
 	-- adding the right widgets
@@ -161,15 +161,9 @@ BEGIN
 		v_i = cardinality(v_filter_fields) ;
 
 		-- setting new wigdets
-<<<<<<< HEAD
-		v_filter_fields[v_i+1] := gw_api_get_widgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
-		v_filter_fields[v_i+2] := gw_api_get_widgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
-		v_filter_fields[v_i+3] := gw_api_get_widgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
-=======
 		--v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
 		--v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
 		--v_filter_fields[v_i+3] := gw_fct_createwidgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
->>>>>>> b114297879cd3fd9a8715aa5354e6b359a8e9108
 
 	-- converting to json
 	v_filter_fields_json = array_to_json (v_filter_fields);
@@ -294,5 +288,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_getlist(json)
+ALTER FUNCTION ws_sample.gw_api_getlist(json)
   OWNER TO geoadmin;

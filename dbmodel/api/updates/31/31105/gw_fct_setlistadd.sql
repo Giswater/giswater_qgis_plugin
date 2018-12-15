@@ -1,16 +1,15 @@
-﻿-- Function: ws_sample.gw_api_setlistdelete(json)
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
--- DROP FUNCTION ws_sample.gw_api_setlistdelete(json);
 
 CREATE OR REPLACE FUNCTION ws_sample.gw_api_setlistadd (p_data json)
   RETURNS json AS
 $BODY$
 
-/* example
-visit:
-SELECT ws_sample.gw_api_setlistadd('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
-		"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1130, "idname": "visit_id"}}')
-*/
+
 
 DECLARE
 --    Variables
