@@ -2,27 +2,21 @@
 
 -- DROP FUNCTION ws_sample.gw_api_getvisit(json);
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getvisit(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlistadd(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT ws_sample.gw_api_getvisit($${
+SELECT ws_sample.gw_api_getlistadd($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "visit_id":null},
-"data":{"type":"arc"}}$$)
-
-SELECT ws_sample.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"form":{},
-"feature":{"featureType":"visit", "visit_id":1001},
-"data":{"type":"arc"}}$$)
+"feature":{"tablename":"v_ui_"},
+"data":{}}$$)
 */
 
 DECLARE
 	v_apiversion text;
-	v_schemaname text;
+	v_tablename text;
 	v_featuretype text;
 	v_visitclass integer;
 	v_id text;
@@ -52,35 +46,12 @@ BEGIN
         INTO v_apiversion;
 
 --  get parameters from input
-    v_device = ((p_data ->>'client')::json->>'device')::integer;
-    v_id = ((p_data ->>'feature')::json->>'visit_id')::integer;
-    v_featuretype = ((p_data ->>'data')::json->>'type');
+    v_tablename = ((p_data ->>'feature')::json->>'tableName')::text;
 
---  get visitclass
-    IF v_id IS NULL THEN
-	v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;
-	IF v_visitclass IS NULL THEN
-		v_visitclass := 6;
-	END IF;
-    ELSE 
-	v_visitclass := (SELECT class_id FROM ws_sample.om_visit WHERE id=v_id::bigint);
-	IF v_visitclass IS NULL THEN
-		v_visitclass := 0;
-	END IF;
-    END IF;
 
---  get formname and tablename
-    v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
-    v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
-
-    RAISE NOTICE 'featuretype:%,  visitclass:%,  v_visit:%,  formname:%,  tablename:%,  device:%',v_featuretype, v_visitclass, v_id, v_formname, v_tablename, v_device;
-
-    v_formactions = '[	{"actionName":"actionAdd","actionTooltip":"Add"},
-			{"actionName":"actionDelete","actionTooltip":"Delete"}]';
-    
 --  get form fields
     IF v_id IS NULL THEN
-	SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+	SELECT gw_api_get_formfields( v_tablename, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 	
 	-- define the text of header
 	v_formheader := 'VISIT';	
@@ -98,21 +69,12 @@ BEGIN
 
    
 -- building the form     
-    IF v_visitclass=0 THEN
-    	v_formtabid = array_to_json('{tabInfo,tabEvent,tabFile}'::text[]);
-	v_formtablabel = array_to_json('{Info,Events,Files}'::text[]);
-	v_formtabtext = array_to_json('{Info,Events,Files}'::text[]);
-	v_formtabtablename = array_to_json('{null,v_ui_om_event,v_ui_om_visit_x_doc}'::text[]);
-	v_formtabidname = array_to_json('{null,id,id}'::text[]);
-
-    ELSE 
     	v_formtabid = array_to_json('{tabInfo,tabFile}'::text[]);
 	v_formtablabel = array_to_json('{Info,Files}'::text[]);
 	v_formtabtext = array_to_json('{Info,Files}'::text[]);
 	v_formtabtablename = array_to_json('{null,v_ui_om_visit_x_doc}'::text[]);
 	v_formtabidname = array_to_json('{null,id}'::text[]);
 	
-    END IF;
     	
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formTabs', v_formtabid);

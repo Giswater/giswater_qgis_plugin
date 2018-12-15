@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_multievent_x_arc AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_arc_insp AS 
  SELECT 
     om_visit_x_arc.visit_id,
     om_visit_x_arc.arc_id,
@@ -38,29 +38,18 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_multievent_x_arc AS
 			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_arc''),(''desperfectes_arc''),(''neteja_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
-ALTER TABLE SCHEMA_NAME.ve_visit_multievent_x_arc
-  OWNER TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_multievent_x_arc TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_multievent_x_arc TO role_basic;
 
--- Trigger: gw_trg_om_visit_multievent on SCHEMA_NAME.ve_visit_multievent_x_arc
-
--- DROP TRIGGER gw_trg_om_visit_multievent ON SCHEMA_NAME.ve_visit_multievent_x_arc;
 
 CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_multievent_x_arc
+  ON SCHEMA_NAME.ve_visit_arc_insp
   FOR EACH ROW
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('arc');
 
 
 
 
--- View: SCHEMA_NAME.ve_visit_multievent_x_node
-
-DROP VIEW SCHEMA_NAME.ve_visit_multievent_x_node;
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_multievent_x_node AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_node_insp AS 
  SELECT 
     om_visit_x_node.visit_id,
     om_visit_x_node.node_id,
@@ -93,27 +82,16 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_multievent_x_node AS
 			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_node''),(''desperfectes_node''),(''neteja_node'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
-ALTER TABLE SCHEMA_NAME.ve_visit_multievent_x_node
-  OWNER TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_multievent_x_node TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_multievent_x_node TO role_basic;
-
--- Trigger: gw_trg_om_visit_multievent on SCHEMA_NAME.ve_visit_multievent_x_node
-
--- DROP TRIGGER gw_trg_om_visit_multievent ON SCHEMA_NAME.ve_visit_multievent_x_node;
 
 CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_multievent_x_node
+  ON SCHEMA_NAME.ve_visit_node_insp
   FOR EACH ROW
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('node');
 
 
--- View: SCHEMA_NAME.ve_visit_multievent_x_connec
 
-DROP VIEW SCHEMA_NAME.ve_visit_multievent_x_connec;
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_multievent_x_connec AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_connec_insp AS 
  SELECT 
     om_visit_x_connec.visit_id,
     om_visit_x_connec.connec_id,
@@ -146,26 +124,15 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_multievent_x_connec AS
 			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_connec''),(''desperfectes_connec''),(''neteja_connec'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
 
-ALTER TABLE SCHEMA_NAME.ve_visit_multievent_x_connec
-  OWNER TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_multievent_x_connec TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_multievent_x_connec TO role_basic;
-
--- Trigger: gw_trg_om_visit_multievent on SCHEMA_NAME.ve_visit_multievent_x_connec
-
--- DROP TRIGGER gw_trg_om_visit_multievent ON SCHEMA_NAME.ve_visit_multievent_x_connec;
 
 CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_multievent_x_connec
+  ON SCHEMA_NAME.ve_visit_connec_insp
   FOR EACH ROW
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('connec');
 
 
 
--- View: SCHEMA_NAME.ve_visit_singlevent_x_arc
-
-DROP VIEW SCHEMA_NAME.ve_visit_singlevent_x_arc;
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_singlevent_x_arc AS 
  SELECT 
@@ -206,27 +173,19 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_singlevent_x_arc AS
      JOIN SCHEMA_NAME.om_visit_class ON om_visit_class.id = om_visit.class_id
   WHERE om_visit_class.ismultievent = false;
 
-ALTER TABLE SCHEMA_NAME.ve_visit_singlevent_x_arc
-  OWNER TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_singlevent_x_arc TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_singlevent_x_arc TO role_basic;
-
--- Trigger: gw_trg_om_visit_singlevent on SCHEMA_NAME.ve_visit_singlevent_x_arc
-
--- DROP TRIGGER gw_trg_om_visit_singlevent ON SCHEMA_NAME.ve_visit_singlevent_x_arc;
 
 CREATE TRIGGER gw_trg_om_visit_singlevent
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON SCHEMA_NAME.ve_visit_singlevent_x_arc
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('singlevent_x_arc');
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('arc');
 
 
 
 
 
 
--- View: SCHEMA_NAME.ve_visit_multievent_x_connec
+-- View: SCHEMA_NAME.ve_visit_connec_insp
 
 
 -- View: SCHEMA_NAME.ve_visit_singlevent_x_connec
@@ -271,23 +230,15 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_singlevent_x_connec AS
      JOIN SCHEMA_NAME.om_visit_class ON om_visit_class.id = om_visit.class_id
   WHERE om_visit_class.ismultievent = false;
 
-ALTER TABLE SCHEMA_NAME.ve_visit_singlevent_x_connec
-  OWNER TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_singlevent_x_connec TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_singlevent_x_connec TO role_basic;
 
--- Trigger: gw_trg_om_visit_singlevent on SCHEMA_NAME.ve_visit_singlevent_x_connec
-
--- DROP TRIGGER gw_trg_om_visit_singlevent ON SCHEMA_NAME.ve_visit_singlevent_x_connec;
 
 CREATE TRIGGER gw_trg_om_visit_singlevent
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON SCHEMA_NAME.ve_visit_singlevent_x_connec
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('singlevent_x_connec');
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('connec');
 
--- View: SCHEMA_NAME.ve_visit_singlevent_x_node
-DROP VIEW SCHEMA_NAME.ve_visit_singlevent_x_node;
+
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_singlevent_x_node AS 
  SELECT 
@@ -328,18 +279,11 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.ve_visit_singlevent_x_node AS
      JOIN SCHEMA_NAME.om_visit_class ON om_visit_class.id = om_visit.class_id
   WHERE om_visit_class.ismultievent = false;
 
-ALTER TABLE SCHEMA_NAME.ve_visit_singlevent_x_node
-  OWNER TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_singlevent_x_node TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.ve_visit_singlevent_x_node TO role_basic;
 
--- Trigger: gw_trg_om_visit_singlevent on SCHEMA_NAME.ve_visit_singlevent_x_node
-
--- DROP TRIGGER gw_trg_om_visit_singlevent ON SCHEMA_NAME.ve_visit_singlevent_x_node;
 
 CREATE TRIGGER gw_trg_om_visit_singlevent
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON SCHEMA_NAME.ve_visit_singlevent_x_node
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('singlevent_x_node');
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('node');
 

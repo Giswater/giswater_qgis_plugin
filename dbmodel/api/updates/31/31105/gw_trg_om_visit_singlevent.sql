@@ -32,16 +32,16 @@ BEGIN
             VALUES (NEW.event_code, NEW.visit_id, NEW.position_id, NEW.position_value, NEW.parameter_id, NEW.value, NEW.value1, NEW.value2, NEW.geom1, NEW.geom2, 
             NEW.geom3, NEW.xcoord, NEW.ycoord, NEW.compass, NEW.tstamp, NEW.text, NEW.index_val, NEW.is_last);
 
-        IF visit_table = 'singlevent_x_arc' THEN
+        IF visit_table = 'arc' THEN
             INSERT INTO  om_visit_x_arc (visit_id,arc_id) VALUES (NEW.visit_id, NEW.arc_id);
 
-        ELSIF visit_table = 'singlevent_x_node' THEN
+        ELSIF visit_table = 'node' THEN
             INSERT INTO  om_visit_x_node (visit_id,node_id) VALUES (NEW.visit_id, NEW.node_id);
 
-        ELSIF visit_table = 'singlevent_x_connec' THEN
+        ELSIF visit_table = 'connec' THEN
             INSERT INTO  om_visit_x_connec (visit_id,connec_id) VALUES (NEW.visit_id, NEW.connec_id);
 
-        ELSIF visit_table = 'singlevent_x_gully' THEN
+        ELSIF visit_table = 'gully' THEN
             INSERT INTO  om_visit_x_gully (visit_id,gully_id) VALUES (NEW.visit_id, NEW.gully_id);
         END IF;
     RETURN NEW;
