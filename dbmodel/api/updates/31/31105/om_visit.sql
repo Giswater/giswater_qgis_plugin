@@ -1,0 +1,1 @@
+﻿ALTER TABLE ws_sample.om_visit ADD COLUMN feature_type text;

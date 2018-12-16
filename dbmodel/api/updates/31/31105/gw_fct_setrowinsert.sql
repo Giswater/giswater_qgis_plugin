@@ -5,15 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setlistdelete(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_setrowinsert (p_data json)
   RETURNS json AS
 $BODY$
 
-/* example
-visit:
-SELECT SCHEMA_NAME.gw_api_setlistdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
-		"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1130, "idname": "visit_id"}}')
-*/
+
 
 DECLARE
 --    Variables
@@ -30,8 +26,8 @@ DECLARE
 
 BEGIN
 	--  Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "ws_sample", public;
+	v_schemaname = 'ws_sample';
 	
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -67,5 +63,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_setfeatureinsert(json)
+ALTER FUNCTION ws_sample.gw_api_setlistdelete(json)
   OWNER TO geoadmin;

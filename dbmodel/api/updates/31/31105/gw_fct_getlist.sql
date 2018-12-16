@@ -9,6 +9,8 @@ $BODY$
 
 /*EXAMPLE:
 
+TOC
+----------
 -- attribute table using custom filters
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
@@ -24,6 +26,8 @@ SELECT ws_sample.gw_api_getlist($${
     "canvasExtend":{"x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
+VISIT
+----------
 -- Visit -> events
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
@@ -39,20 +43,35 @@ SELECT ws_sample.gw_api_getlist($${
 "data":{"filterFields":{"visit_id":232, "limit":10},
     "pageInfo":{"orderby":"doc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
+
+FEATURE FORMS
+-------------
 -- Arc -> elements
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
     "pageInfo":{"orderby":"element_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
+
+
+MANAGER FORMS
+-------------
+-- Lots
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"form":{"buttonName":"lotManager"},
+"feature":{},
+"data":{"filterFields":{"limit":10},
+	"pageInfo":{"pageNumber":1}}}$$)
 */
+
 
 DECLARE
 	v_apiversion text;
 	v_filter_fields  json[];
 	v_filter_fields_json json;
 	v_filter_values  json;
-	v_ws_sample text;
+	v_schemaname text;
 	aux_json json;
 	v_result_list json;
 	v_query_result text;
@@ -84,12 +103,15 @@ DECLARE
 	v_canvasextend json;
 	v_srid integer;
 	v_i integer;
+	v_buttonname text;
+	v_layermanager json;
+	v_featuretype text;
 	
 BEGIN
 
 -- Set search path to local schema
     SET search_path = "ws_sample", public;
-    v_ws_sample := 'ws_sample';
+    v_schemaname := 'ws_sample';
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -101,13 +123,56 @@ BEGIN
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
 	v_tabname := (p_data ->> 'form')::json->> 'tabName';
+	v_buttonname := (p_data ->> 'form')::json->> 'buttonName';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_canvasextend := (p_data ->> 'data')::json->> 'canvasExtend';
-
 
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
 	END IF;
+
+	-- control nulls
+	IF v_tablename IS NULL AND v_buttonname IS NULL THEN
+		RAISE EXCEPTION 'bad configured';
+	END IF;
+
+	IF v_tablename IS NULL AND v_buttonname IS NOT NULL THEN
+		v_tablename = (SELECT (buttonoptions->>'tableName') FROM config_api_button WHERE idval = v_buttonname);
+		v_featuretype = (SELECT (buttonoptions->>'featureType') FROM config_api_button WHERE idval = v_buttonname);
+		v_layermanager = (SELECT (buttonoptions->>'layerManager') FROM config_api_button WHERE idval = v_buttonname);
+	END IF;
+
+-- getting the list of filters fields
+-------------------------------------
+   	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device)
+		INTO v_filter_fields;
+
+	-- adding the right widgets, TODO
+		--identifing the dimension of array
+		--v_i = cardinality(v_filter_fields) ;
+
+		-- setting new wigdets
+		--v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
+		--v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
+		--v_filter_fields[v_i+3] := gw_fct_createwidgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
+
+	-- converting to json
+	v_filter_fields_json = array_to_json (v_filter_fields);
+
+	/* getting value defaults for filters fields, TODO: Use widgettype to put on the audit_cat_param_user the name of the filter
+	FOREACH aux_json IN ARRAY fields_array 
+        LOOP           
+        	--  Index
+		array_index := array_index + 1;
+		field_value :=null;
+
+		v_vdefault:=quote_ident(aux_json->>'widgettype');
+		EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
+			 WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
+			 INTO field_value;
+        END LOOP;  
+        */
+
 
 --  Creating the list fields
 ----------------------------
@@ -123,7 +188,7 @@ BEGIN
 			AND s.nspname = $2
 			ORDER BY a.attnum LIMIT 1'
 			INTO v_idname
-			USING v_tablename, v_ws_sample;
+			USING v_tablename, v_schemaname;
 	END IF;
 
 	-- Get column type
@@ -136,7 +201,7 @@ BEGIN
 	    AND t.relname = $2 
 	    AND s.nspname = $1
 	    ORDER BY a.attnum'
-            USING v_ws_sample, v_tablename, v_idname
+            USING v_schemaname, v_tablename, v_idname
             INTO v_column_type;
 
         -- Getting geometry column
@@ -149,43 +214,9 @@ BEGIN
             AND s.nspname = $2
             AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
             ORDER BY a.attnum' 
-            USING v_tablename, v_ws_sample
+            USING v_tablename, v_schemaname
             INTO v_the_geom;
-        
-	-- getting the list of filters fields
-	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device)
-		INTO v_filter_fields;
 
-	-- adding the right widgets
-		--identifing the dimension of array
-		v_i = cardinality(v_filter_fields) ;
-
-		-- setting new wigdets
-		--v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', '', FALSE, '');
-		--v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'string', null, FALSE, '');
-		--v_filter_fields[v_i+3] := gw_fct_createwidgetjson('Canvas extend', 'extend', 'check', 'string', 'TRUE', FALSE, '');
-
-	-- converting to json
-	v_filter_fields_json = array_to_json (v_filter_fields);
-
-
-	/* getting value defaults for filters fields
-	To do: Use widgettype to put on the audit_cat_param_user the name of the filter
-	FOREACH aux_json IN ARRAY fields_array 
-        LOOP           
-        	--  Index
-		array_index := array_index + 1;
-		field_value :=null;
-
-		v_vdefault:=quote_ident(aux_json->>'widgettype');
-		EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
-			 WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
-			 INTO field_value;
-        END LOOP;  
-        */
-
---  Creating the list value
----------------------------
 	--  get querytext
 	EXECUTE 'SELECT query_text, action_fields FROM config_api_list WHERE tablename = $1 AND device = $2'
 		INTO v_query_result, v_action_column
@@ -267,6 +298,8 @@ BEGIN
 		INTO v_result_list;
 
 --    Control NULL's
+	v_featuretype := COALESCE(v_featuretype, '{}');
+	v_layermanager := COALESCE(v_layermanager, '{}');
 	v_filter_fields := COALESCE(v_filter_fields, '{}');
 	v_result_list := COALESCE(v_result_list, '{}');
 	v_apiversion := COALESCE(v_apiversion, '{}');
@@ -275,8 +308,9 @@ BEGIN
 --    Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"form":{}'||
-		     ',"feature":{"tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'","actionFields":'||v_action_column||'}'||
-		     ',"data":{"filterFields":' || v_filter_fields_json ||
+		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'","actionFields":'||v_action_column||'}'||
+		     ',"data":{"layerManager":' || v_layermanager ||
+			     ',"filterFields":' || v_filter_fields_json ||
 			     ',"listValues":' || v_result_list ||'}}'||
 	    '}')::json;
        

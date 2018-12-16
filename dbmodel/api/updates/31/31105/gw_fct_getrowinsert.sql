@@ -5,20 +5,20 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlistadd(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getrowinsert(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 --configured
-SELECT ws_sample.gw_api_getlistadd($${
+SELECT ws_sample.gw_api_getrowinsert($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"v_edit_man_pipe"},
 "data":{}}$$)
 
 --NOT configured
-SELECT ws_sample.gw_api_getlistadd($${
+SELECT ws_sample.gw_api_getrowinsert($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"arc"},
