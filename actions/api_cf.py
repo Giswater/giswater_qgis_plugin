@@ -241,7 +241,13 @@ class ApiCF(ApiParent):
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
+        if 'results' in row[0]:
+            if row[0]['results'] == 0:
+                self.controller.show_message(row[0]['message']['text'], 2)
+                return False
+
         self.complet_result = row
+
         result = row[0]['body']['data']
         if 'fields' not in result:
             self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
