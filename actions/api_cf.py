@@ -880,15 +880,12 @@ class ApiCF(ApiParent):
         return widget
 
 
-    def set_widget_type(self, field, dialog, widget, completer):
+    def manage_lineedit(self, field, dialog, widget, completer):
         if field['widgettype'] == 'typeahead':
-            if 'tableName' in field and 'fieldName' in field:
-                table_name = field['tableName']
-                field_name = field['fieldName']
-                model = QStringListModel()
-                self.populate_lineedit(completer, model, table_name, dialog, widget, field_name)
-                widget.textChanged.connect(partial(
-                    self.populate_lineedit, completer, model, table_name, dialog, widget, field_name))
+
+            model = QStringListModel()
+            self.populate_lineedit(completer, model, field, dialog, widget)
+            widget.textChanged.connect(partial(self.populate_lineedit, completer, model, field, dialog, widget))
         return widget
 
 
@@ -951,7 +948,7 @@ class ApiCF(ApiParent):
         self.catalog.api_catalog(self.dlg_cf, self.geom_type+'cat_id', self.geom_type)
 
 
-    def populate_lineedit(self, completer, model, tablename, dialog, widget, field_id):
+    def populate_lineedit(self, completer, model, field, dialog, widget):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object.
             WARNING: Each QlineEdit needs their own QCompleter and their own QStringListModel!!!
@@ -959,15 +956,26 @@ class ApiCF(ApiParent):
         if not widget:
             return
 
-        # Set SQL
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_rowslineedit('" + str(tablename) + "', '" +
-               "" + str(field_id) + "', '" + str(utils_giswater.getWidgetText(dialog, widget)) + "')")
-        row = self.controller.get_rows(sql, log_sql=False)
-        result = row[0][0]['data']
-
+        extras = '"queryText":"'+field['queryText']+'", '
+        extras += '"fieldToSearch":"' + str(field['fieldToSearch']) + '", '
+        extras += '"queryTextFilter":" ' + str(field['queryTextFilter']) + '", '
+        extras += '"parentId":"' + str(field['parentId']) + '", '
+        extras += '"valueParent":"' + str(field['selectedId']) + '", '
+        extras += '"textToSearch":"' + str(utils_giswater.getWidgetText(dialog, widget))+'"'
+        body = self.create_body(extras=extras)
+        self.controller.log_info(str(body))
+        # Get layers under mouse clicked
+        sql = ("SELECT " + self.schema_name + ".gw_api_settypeahead($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        # if 'fields' not in result:
+        #     return
         list_items = []
-        for _id in result:
-            list_items.append(_id['id'])
+        for field in complet_list[0]['body']['data']:
+            list_items.append(field['idval'])
         self.set_completer_object_api(completer, model, widget, list_items)
 
     """ MANAGE TABS """
