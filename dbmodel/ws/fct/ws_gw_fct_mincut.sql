@@ -321,7 +321,7 @@ BEGIN
 	END IF;
 
 	-- calculate the boundary of mincut using arcs and valves
-	EXECUTE ' SELECT st_astext(st_envelope(st_extent(the_geom))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
+	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
 		' UNION SELECT the_geom FROM SCHEMA_NAME.anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
 	        INTO v_geometry;
 
