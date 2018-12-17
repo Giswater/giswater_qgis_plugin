@@ -1341,11 +1341,7 @@ class MincutParent(ParentAction, MultipleSelection):
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_node")
         if layer:
             self.iface.legendInterface().setLayerVisible(layer, True)
-            layer.updateExtents()
-            # Zoom to executed mincut
-            self.iface.setActiveLayer(layer)
-            self.iface.zoomToActiveLayer()
-        
+
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
 
@@ -1435,20 +1431,29 @@ class MincutParent(ParentAction, MultipleSelection):
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        cur_user = self.controller.get_project_user()        
         sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
-               " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
+               " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        complet_result = row[0]
 
-        if row:
-            if row[0]:
+        if 'mincutOverlap' in complet_result:
+            if complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
-                self.controller.show_info_box(message, parameter=row[0])
+                self.controller.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
                 message = "Mincut done successfully"
                 self.controller.show_info(message)
+            # Zoom to rectangle (zoom to mincut)
+            polygon = complet_result['geometry']
+            polygon = polygon[9:len(polygon)-2]
+            polygon = polygon.split(',')
+            x1, y1 = polygon[0].split(' ')
+            x2, y2 = polygon[2].split(' ')
+            self.zoom_to_rectangle(x1, y1, x2, y2)
 
-            # Update table 'anl_mincut_result_cat'
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                    " SET mincut_class = 1, "
                    " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", "

@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
 from PyQt4.QtGui import QStringListModel, QCompleter
@@ -19,7 +19,7 @@ import ConfigParser
 from functools import partial
 
 import ctypes
-import utils_giswater    
+import utils_giswater
 
 
 class ParentAction(object):
@@ -794,3 +794,10 @@ class ParentAction(object):
         model = QStringListModel()
         model.setStringList(row)
         self.completer.setModel(model)
+
+
+    def zoom_to_rectangle(self, x1, y1, x2, y2, magin=5):
+        # rect = QgsRectangle(float(x1)+10, float(y1)+10, float(x2)-10, float(y2)-10)
+        rect = QgsRectangle(float(x1)+magin, float(y1)+magin, float(x2)-magin, float(y2)-magin)
+        self.canvas.setExtent(rect)
+        self.canvas.refresh()
