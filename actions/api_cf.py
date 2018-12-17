@@ -588,7 +588,7 @@ class ApiCF(ApiParent):
             widget = self.set_widget_size(widget, field)
             widget = self.set_auto_update_lineedit(field, dialog, widget)
             widget = self.set_data_type(field, widget)
-            widget = self.set_widget_type(field, dialog, widget, completer)
+            widget = self.manage_lineedit(field, dialog, widget, completer)
             if widget.property('column_id') == self.field_id:
                 self.feature_id = widget.text()
                 # Get selected feature
@@ -624,14 +624,16 @@ class ApiCF(ApiParent):
     def open_section_form(self):
         dlg_sections = Sections()
         self.load_settings(dlg_sections)
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_infocrossection('" + self.feature_id + "', 9)")
+        feature = '"id":"'+self.feature_id+'"'
+        body = self.create_body(feature=feature)
+        sql = ("SELECT " + self.schema_name + ".gw_api_getinfocrossection($${" + body + "}$$)")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             return False
         section_result = row
 
         # Set image
-        img = section_result[0]['shapepng']
+        img = section_result[0]['body']['data']['shapepng']
         utils_giswater.setImage(dlg_sections, 'lbl_section_image', img+".png")
         
         # Set values into QLineEdits
