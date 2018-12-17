@@ -796,8 +796,8 @@ class ParentAction(object):
         self.completer.setModel(model)
 
 
-    def zoom_to_rectangle(self, x1, y1, x2, y2, magin=5):
+    def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
         # rect = QgsRectangle(float(x1)+10, float(y1)+10, float(x2)-10, float(y2)-10)
-        rect = QgsRectangle(float(x1)+magin, float(y1)+magin, float(x2)-magin, float(y2)-magin)
+        rect = QgsRectangle(float(x1)-margin, float(y1)-margin, float(x2)+margin, float(y2)+margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()

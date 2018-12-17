@@ -1452,8 +1452,8 @@ class MincutParent(ParentAction, MultipleSelection):
             polygon = polygon.split(',')
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
-            self.zoom_to_rectangle(x1, y1, x2, y2)
-
+            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                    " SET mincut_class = 1, "
                    " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", "
