@@ -671,8 +671,12 @@ class ApiCF(ApiParent):
 
         else:
             my_json = json.dumps(_json)
-            sql = ("SELECT " + self.schema_name + ".gw_api_set_upsertfields('"+str(p_table_id)+"', '"+str(feature_id)+""
-                   "',null, 9, 100, '"+str(my_json)+"')")
+            feature = '"featureType":"'+self.feature_type+'", '
+            feature += '"tableName":"' + p_table_id + '", '
+            feature += '"id":"' + feature_id + '"'
+            extras = '"fields":' + my_json + ''
+            body = self.create_body(feature=feature, extras=extras)
+            sql = ("SELECT " + self.schema_name + ".gw_api_setfields($${" + body + "}$$)")
         row = self.controller.execute_returning(sql, log_sql=True)
         if not row:
             msg = "Fail in: {0}".format(sql)
@@ -2386,4 +2390,5 @@ class ApiCF(ApiParent):
     #
     #     except Exception:
     #         pass
+
 
