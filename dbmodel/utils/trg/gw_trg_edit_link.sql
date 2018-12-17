@@ -263,6 +263,19 @@ BEGIN
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, gully_id_end, null, TRUE,  NEW.state, NEW.the_geom);
 					
 		END IF;
+		
+		-- Update connec or gully state_type
+		IF connec_id_start IS NOT NULL THEN
+			-- Update state_type if edit_connect_update_statetype is TRUE
+			IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
+				UPDATE connec SET state_type = (SELECT ((value::json->>'connec')::json->>'state_type')::int2 FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE connec_id=connec_id_start;
+			END IF;
+		ELSIF gully_id_start IS NOT NULL THEN
+			-- Update state_type if edit_connect_update_statetype is TRUE
+			IF (SELECT ((value::json->>'gully')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
+				UPDATE gully SET state_type = (SELECT ((value::json->>'gully')::json->>'state_type')::int2 FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE gully_id=gully_id_start;
+			END IF;
+		END IF;
 
 		RETURN NEW;
 					

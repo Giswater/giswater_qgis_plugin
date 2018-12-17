@@ -200,11 +200,19 @@ BEGIN
 		INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id) 
 		VALUES (link_id_aux, link_geom, connect_id_aux, feature_type_aux, vnode_id_aux, 'VNODE', userDefined, state_connec, arcrec.expl_id);
 
-		-- Update connec or gully arc_id
+		-- Update connec or gully arc_id and state_type
 		IF feature_type_aux ='CONNEC' THEN          
 			UPDATE connec SET arc_id=arcrec.arc_id WHERE connec_id = connect_id_aux;
+			-- Update state_type if edit_connect_update_statetype is TRUE
+			IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
+				UPDATE connec SET state_type = (SELECT ((value::json->>'connec')::json->>'state_type')::int2 FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE connec_id=connect_id_aux;
+			END IF;
 		ELSIF feature_type_aux ='GULLY' THEN 
 			UPDATE gully SET arc_id=arcrec.arc_id WHERE gully_id = connect_id_aux;
+			-- Update state_type if edit_connect_update_statetype is TRUE
+			IF (SELECT ((value::json->>'gully')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
+				UPDATE gully SET state_type = (SELECT ((value::json->>'gully')::json->>'state_type')::int2 FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') WHERE gully_id=connect_id_aux;
+			END IF;
 		END IF;
 			               
         END IF;

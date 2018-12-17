@@ -38,3 +38,4 @@ New function (2544) gw_trg_link_connecrotation_update, issue#585
 New system parameter sys_custom_views, issue#537 
 New system parameter sys_currency, issue#531
 New system parameter utils_csv2pg_om_visit_parameters, issue#566
+Automatic update state_type on connec/gully when link is created, issue#587
