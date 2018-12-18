@@ -28,6 +28,15 @@ SELECT ws_sample.gw_api_getlist($${
 
 VISIT
 ----------
+-- Visit -> visites
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"om_visit_x_arc" ,"idName":"id"},
+"data":{"filterFields":{"arc_id":2001, "limit":10},
+    "canvasExtend":{},
+    "pageInfo":{"orderby":"visit_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
+
+
 -- Visit -> events
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},

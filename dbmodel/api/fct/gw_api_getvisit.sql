@@ -11,7 +11,8 @@ SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":null},
-"data":{"type":"arc"}}$$)
+"data":{"type":"arc"
+	"id":"2001"}}$$)
 
 SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
@@ -58,6 +59,7 @@ BEGIN
 
 --  get visitclass
     IF v_id IS NULL THEN
+	-- TODO: for new visit enhance the visit type using the feature_id
 	v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;
 	IF v_visitclass IS NULL THEN
 		v_visitclass := 6;

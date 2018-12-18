@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "ws_sample"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -37,6 +37,7 @@ DECLARE
     v_formheader text;
     v_query_text text;
     mincut_act boolean;
+    visit_act boolean;
 
     -- fixed info type parameter(to do)
     --p_info_type integer=200;
@@ -50,7 +51,7 @@ BEGIN
 
 --    Set search path to local schema
 -------------------------------------
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
     schemas_array := current_schemas(FALSE);
 
 --      Get api version
@@ -254,6 +255,23 @@ BEGIN
 		v_formheader = (SELECT formname FROM config_web_layer WHERE tableinfo_id=table_id_arg LIMIT 1);
 	END IF;
 
+
+	--    Control for layer with visit option on info
+	--------------------------------------------------
+	IF v_idname = 'arc_id'::text OR v_idname = 'node_id'::text OR v_idname = 'connec_id'::text OR v_idname = 'gully_id'::text OR v_idname = 'sys_hydrometer_id'::text THEN
+		visit_act = TRUE;
+	ELSE
+		visit_act = FALSE;	
+	END IF;
+
+	IF v_formheader IS NULL THEN
+		v_formheader = (SELECT formname FROM config_web_layer WHERE tableinfo_id=table_id_arg LIMIT 1);
+	END IF;
+
+
+
+
+
 	raise notice' v_formheader %', v_formheader;
 	
 	--    Check generic
@@ -335,6 +353,7 @@ ELSE
         ', "linkPath":' || link_path ||
         ', "editData":' || editable_data ||
         ', "mincut":'    || mincut_act ||
+        ', "visit":'    || visit_act ||
         '}')::json;
 
 END IF;

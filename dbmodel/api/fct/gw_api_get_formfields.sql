@@ -20,10 +20,13 @@ CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_formfields(
 $BODY$
 
 /*EXAMPLE
+
+SELECT ws_sample.gw_api_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+only 32
 SELECT ws_sample.gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
 SELECT ws_sample.gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 SELECT ws_sample.gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT ws_sample.gw_api_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+
 
 */
 
@@ -81,21 +84,13 @@ BEGIN
 
 --   Get fields	
 	IF p_formname!='infoplan' THEN 
-		IF v_bmapsclient is true THEN
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id , column_id as name, concat('||quote_literal(p_tabname)||',''_'', column_id) AS widgetname, widgettype, widgettype as type,
-				widgetdim, datatype AS "dataType" , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
-				concat('||quote_literal(p_tabname)||',''_'',layout_id) as layoutname, layout_order, dv_parent_id, isparent, widgetfunction,  widgetfunction as "changeAction", dv_querytext, dv_querytext_filterc, 
-				action_function, isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
-					INTO fields_array
-					USING p_formname, p_formtype;	
-		ELSE
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype,
-				widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
-				concat('||quote_literal(p_tabname)||',''_'',layout_id) as layoutname, layout_order, dv_parent_id, isparent, widgetfunction, dv_querytext, dv_querytext_filterc, 
-				action_function, isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
-					INTO fields_array
-					USING p_formname, p_formtype;
-		END IF;
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype,
+			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "changeAction",
+			widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
+			concat('||quote_literal(p_tabname)||',''_'',layout_id) as layoutname, layout_order, dv_parent_id, isparent, widgetfunction, dv_querytext, dv_querytext_filterc, 
+			action_function, isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
+				INTO fields_array
+				USING p_formname, p_formtype;
 	ELSE
 		EXECUTE 'SELECT array_agg(row_to_json(b)) FROM (
 			SELECT (row_number()over(ORDER BY 1)) AS layout_order, (row_number()over(ORDER BY 1)) AS orderby,* FROM 

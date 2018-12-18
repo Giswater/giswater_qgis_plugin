@@ -5,26 +5,26 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setvisit(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_setvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 --INSERT
-SELECT SCHEMA_NAME.gw_api_setvisit($${
+SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":null, "idname":"visit_id"},
+"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idname":"visit_id"},
 "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
 	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
 
 --UPDATE
-SELECT SCHEMA_NAME.gw_api_setvisit($${
+SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1159,"idname":"visit_id"},
-"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testsdgsdgsghaghcode", "sediments_arc":101121200, "desperfectes_arc":1, "neteja_arc":3},
+"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1159,"idname":"visit_id"},
+"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":100, "desperfectes_arc":1, "neteja_arc":3},
 	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
 */
@@ -41,7 +41,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -100,5 +100,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_setvisit(json)
+ALTER FUNCTION ws_sample.gw_api_setvisit(json)
   OWNER TO geoadmin;
