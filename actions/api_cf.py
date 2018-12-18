@@ -971,7 +971,7 @@ class ApiCF(ApiParent):
         body = self.create_body(extras=extras)
         self.controller.log_info(str(body))
         # Get layers under mouse clicked
-        sql = ("SELECT " + self.schema_name + ".gw_api_settypeahead($${" + body + "}$$)::text")
+        sql = ("SELECT " + self.schema_name + ".gw_api_gettypeahead($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
