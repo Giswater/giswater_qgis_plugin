@@ -719,8 +719,8 @@ class ParentManage(ParentAction, object):
         if query:
             self.remove_selection()
         # Update list
-        self.list_ids[self.geom_type] = self.ids                        
-        
+        self.list_ids[self.geom_type] = self.ids
+        self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -822,7 +822,7 @@ class ParentManage(ParentAction, object):
         # Remove selection in generic 'v_edit' layers
         if self.plan_om == 'plan':
             self.remove_selection(False)
-                    
+        self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -835,6 +835,14 @@ class ParentManage(ParentAction, object):
         self.controller.execute_sql(sql)
 
 
+    def enable_feature_type(self, dialog):
+        combo = dialog.findChild(QComboBox, 'feature_type')
+        table = dialog.findChild(QTableView, 'tbl_relation')
+        if combo is not None and table is not None:
+            if len(self.ids) > 0:
+                combo.setEnabled(False)
+            else:
+                combo.setEnabled(True)
 
     def insert_feature(self, dialog, table_object, query=False):
         """ Select feature with entered id. Set a model with selected filter.
@@ -895,7 +903,7 @@ class ParentManage(ParentAction, object):
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
-
+        self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
 
 

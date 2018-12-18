@@ -359,7 +359,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.upsert(commit=self.autocommit)
 
 
-    def update_relations(self):
+    def update_relations(self, dialog):
         """Save current selected features in tbl_relations. Steps are:
         A) remove all old relations related with current visit_id.
         B) save new relations get from that listed in tbl_relations."""
@@ -420,6 +420,8 @@ class ManageVisit(ParentManage, QObject):
             # than save the showed records
             db_record.upsert(commit=self.autocommit)
 
+        self.enable_feature_type(dialog)
+
 
     def manage_tab_changed(self, dialog, index):
         """Do actions when tab is exit and entered.
@@ -432,11 +434,11 @@ class ManageVisit(ParentManage, QObject):
             # need to create the relation record that is done only
             # changing tab
             if self.locked_geom_type:
-                self.update_relations()
+                self.update_relations(dialog)
 
         # tab Relation
         if self.current_tab_index == self.tab_index('RelationsTab'):
-            self.update_relations()
+            self.update_relations(dialog)
 
         # manage arriving tab
         # tab Visit
