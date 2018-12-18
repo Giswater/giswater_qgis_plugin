@@ -13,6 +13,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 changelog=Version 3.1.105 (30/12/2018)
+    - Enhancement:Show message if  trying to divide an arc when insert node(UD)
     - Enhancement: Enable to search elements which have NULL code
     - Enhancement: Change widget type of End feature (workcat id end)
     - Minor bug fix getting layer on search plus
