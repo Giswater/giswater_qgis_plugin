@@ -5,6 +5,7 @@ Bug fix on view v_om_visit;
 
 31105-ws-other
 --------------
+Bug on EPANET command file when pattern has more than 18 value on same row of inp file ,issue#590;
 New mincut approach. Zoom to features is managed by database, issue#586;
 New system parameter om_mincut_valvestat_using_valveunaccess, issue#563;
 New system parameter om_mincut_debug, issue#562;

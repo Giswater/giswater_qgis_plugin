@@ -14,7 +14,7 @@ New field ismultifeature on om_visit_parameter, issue#549
 New field isarcdivide on node_type, issue#556
 New table dattrib, issue#561
 New table dattrib_type, issue#561
-New process (33) audit project data schema, issue#537
+New process (33) update project data schema, issue#537
 New process (34) mincut analysis dynamic minimum sector, issue#566
 New process (35) mincut analysis dynamic inlet sector, issue#566
 New function (2510) gw_fct_utils_csv2pg_import_dbprices, issue#566 
@@ -35,6 +35,7 @@ New function (2538) gw_fct_dinlet, issue#566
 New numeration for existing function (2540) gw_fct_inlet_flowtrace, issue#566
 New numeration for existing function (2542) gw_trg_arc_vnodelink_update, issue#585
 New function (2544) gw_trg_link_connecrotation_update, issue#585
+New function (2546) gw_fct_utils_schema_update, issue#537
 New system parameter sys_custom_views, issue#537 
 New system parameter sys_currency, issue#531
 New system parameter utils_csv2pg_om_visit_parameters, issue#566
