@@ -221,7 +221,7 @@ class ManNodeDialog(ParentDialog):
         row = self.controller.get_row(sql)
         if row:
             sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-                " WHERE parameter = 'edit_arc_division_dsbl' AND cur_user = current_user")
+                   " WHERE parameter = 'edit_arc_division_dsbl' AND cur_user = current_user")
             row2 = self.controller.get_row(sql)
             if row2 and str(row2[0].lower()) == 'true':
                 self.controller.plugin_settings_set_value("check_topology_arc", "1")
