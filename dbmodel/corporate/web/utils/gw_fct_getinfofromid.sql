@@ -251,26 +251,14 @@ BEGIN
 		mincut_act = FALSE;	
 	END IF;
 
-	IF v_formheader IS NULL THEN
-		v_formheader = (SELECT formname FROM config_web_layer WHERE tableinfo_id=table_id_arg LIMIT 1);
-	END IF;
-
-
-	--    Control for layer with visit option on info
+	--  TODO: Control for layer with visit option on info
 	--------------------------------------------------
-	IF v_idname = 'arc_id'::text OR v_idname = 'node_id'::text OR v_idname = 'connec_id'::text OR v_idname = 'gully_id'::text OR v_idname = 'sys_hydrometer_id'::text THEN
-		visit_act = TRUE;
-	ELSE
-		visit_act = FALSE;	
-	END IF;
+	visit_act = TRUE;
+	
 
 	IF v_formheader IS NULL THEN
 		v_formheader = (SELECT formname FROM config_web_layer WHERE tableinfo_id=table_id_arg LIMIT 1);
 	END IF;
-
-
-
-
 
 	raise notice' v_formheader %', v_formheader;
 	
