@@ -9,6 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 INSERT INTO dattrib_type VALUES (1, 'dminsector', 'Dynamic mapzone defined as a minimun portion of network limited by operative valves', 'ws');
-INSERT INTO dattrib_type VALUES (2, 'pipehazard', 'Number of hydrometers afected in case of break of pipe', 'ws');
+INSERT INTO dattrib_type VALUES (2, 'pipehazard', 'Number of hydrometers afected in case of break of determinated pipe', 'ws');
 INSERT INTO dattrib_type VALUES (3, 'dinletsector', 'Dynamic mapzone defined as area supplied from the same inlet','ws');
 INSERT INTO dattrib_type VALUES (4, 'dstaticpress', 'In function of inlet, value of the static pressure using inlet eletavion on feature elevation', 'ws');
+INSERT INTO dattrib_type VALUES (5, 'pipehazardlength', 'Length of pipes afected in case of break of determinated pipe', 'ws');
