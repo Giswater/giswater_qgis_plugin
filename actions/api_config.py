@@ -394,7 +394,7 @@ class ApiConfig(ApiParent):
 
         combo_parent = widget.objectName()
         combo_id = utils_giswater.get_item_data(self.dlg_config, widget)
-
+        # TODO cambiar por gw_api_getchilds
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','')")
         row = self.controller.get_row(sql, log_sql=True)
         #TODO::Refactor input and output for function "gw_api_get_combochilds" and refactor "row[0]['fields']"
