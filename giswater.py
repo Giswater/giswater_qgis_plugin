@@ -259,7 +259,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 25, 26, 27, 29, 32, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99, 196, 198, 199):
+                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99, 196, 198):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:

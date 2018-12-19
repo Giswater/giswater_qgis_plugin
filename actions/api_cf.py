@@ -76,6 +76,7 @@ class ApiCF(ApiParent):
         """ Button 37: Own Giswater info """
         # add "listener" to all actions to deactivate api_info
         if self.controller.api_on is not True:
+            self.controller.api_on = True
             actions_list = self.iface.mainWindow().findChildren(QAction)
             for action in actions_list:
                 if action.objectName() != 'go2epa_api_info' and action.objectName() != 'basic_api_info':

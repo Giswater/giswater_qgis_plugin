@@ -134,20 +134,8 @@ class Basic(ParentAction):
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
         self.controller.basic_api_cf = self.api_cf
-        self.controller.api_on = True
         self.api_cf.api_info()
 
-    # def go2epa_api_info(self):
-    #     """ Button 199: Epa INP info """
-    #     self.controller.restore_basic_info()
-    #     if self.controller.epa_api_cf is not None:
-    #         self.controller.restore_epa_info()
-    #         return
-    #
-    #     self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-    #     self.controller.epa_api_cf = self.api_cf
-    #     self.controller.api_on = True
-    #     self.api_cf.api_info()
 
     def close_dialog(self, dlg):
         ParentAction.close_dialog(self, dlg)

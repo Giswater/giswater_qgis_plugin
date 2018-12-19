@@ -857,7 +857,6 @@ class Go2Epa(ParentAction):
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
         self.controller.epa_api_cf = self.api_cf
-        self.controller.api_on = True
         self.api_cf.api_info()
 
 
