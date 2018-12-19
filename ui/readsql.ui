@@ -383,7 +383,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Update ddl / dml</string>
+              <string>Update all</string>
              </property>
             </widget>
            </item>
@@ -415,7 +415,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload &amp; update triggers</string>
+              <string>Reload triggers</string>
              </property>
             </widget>
            </item>
@@ -444,7 +444,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload &amp; update functions</string>
+              <string>Reload functions</string>
              </property>
             </widget>
            </item>
@@ -457,7 +457,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload &amp; update fk</string>
+              <string>Reload fk</string>
              </property>
             </widget>
            </item>
@@ -498,7 +498,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="api">
+      <widget class="QWidget" name="api_manager">
        <attribute name="title">
         <string>Api Manager</string>
        </attribute>
@@ -526,7 +526,7 @@
         <item row="1" column="0" colspan="2">
          <widget class="QGroupBox" name="groupBox_11">
           <property name="title">
-           <string>Reload and Update</string>
+           <string>Reload</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_12">
            <item row="2" column="1">
@@ -570,7 +570,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload &amp; update triggers</string>
+              <string>Reload triggers</string>
              </property>
             </widget>
            </item>
@@ -599,7 +599,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload &amp; update fk</string>
+              <string>Reload fk</string>
              </property>
             </widget>
            </item>
@@ -612,7 +612,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload &amp; update functions</string>
+              <string>Reload functions</string>
              </property>
             </widget>
            </item>
@@ -654,7 +654,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Update ddl / dml</string>
+              <string>Update all</string>
              </property>
             </widget>
            </item>

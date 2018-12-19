@@ -162,7 +162,7 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QComboBox" name="cmb_project_type"/>
+     <widget class="QComboBox" name="cmb_create_project_type"/>
     </item>
     <item row="2" column="1">
      <widget class="QComboBox" name="cmb_locale"/>
