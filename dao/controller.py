@@ -50,7 +50,9 @@ class DaoController():
         self.logged = False 
         self.postgresql_version = None
         self.logger = None
-        self.api_cf = None
+        self.basic_api_cf = None
+        self.epa_api_cf = None
+        self.api_on = None
         self.previous_maptool = None
         if create_logger:
             self.set_logger(logger_name)
@@ -1132,20 +1134,37 @@ class DaoController():
             
         return list_values
 
-
     def restore_info(self, restore_cursor=True):
+        self.restore_basic_info(restore_cursor)
+        self.restore_epa_info(restore_cursor)
+
+
+    def restore_basic_info(self, restore_cursor=True):
         """  Disconnect canvasClicked from Api_CF  and restore cursor"""
         action_info = self.iface.mainWindow().findChild(QAction, 'basic_api_info')
         if action_info.isChecked():
             action_info.setChecked(False)
-        else:
-            print("DELETE THIS ELSE IN restore_info")
         if restore_cursor:
             QApplication.restoreOverrideCursor()
-        if self.api_cf is not None:
-            if hasattr(self.api_cf, 'emit_point'):
-                ep = self.api_cf.emit_point
+
+        if self.basic_api_cf is not None:
+            if hasattr(self.basic_api_cf, 'emit_point'):
+                ep = self.basic_api_cf.emit_point
                 ep.canvasClicked.disconnect()
-            self.api_cf = None
+            self.basic_api_cf = None
 
 
+
+
+    def restore_epa_info(self, restore_cursor=True):
+        action_epa_info = self.iface.mainWindow().findChild(QAction, 'go2epa_api_info')
+        if action_epa_info.isChecked():
+            action_epa_info.setChecked(False)
+        if restore_cursor:
+            QApplication.restoreOverrideCursor()
+
+        if self.epa_api_cf is not None:
+            if hasattr(self.epa_api_cf, 'emit_point'):
+                ep = self.epa_api_cf.emit_point
+                ep.canvasClicked.disconnect()
+            self.epa_api_cf = None

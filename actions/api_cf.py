@@ -16,7 +16,7 @@ except:
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4 import QtCore
     from PyQt4.QtCore import Qt, QDate, QPoint
-    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu
+    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu, QApplication, QSpinBox, QDoubleSpinBox
     from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
     from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget, \
         QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QAbstractItemView
@@ -30,7 +30,7 @@ else:
     from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QStandardItem, QStandardItemModel
     from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, \
         QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QListWidgetItem, \
-        QTabWidget, QAbstractItemView, QMenu
+        QTabWidget, QAbstractItemView, QMenu,  QApplication,QSpinBox, QDoubleSpinBox
     from qgis.PyQt.QtSql import QSqlTableModel
     import urllib.parse as urlparse
 
@@ -45,7 +45,6 @@ import sys
 import webbrowser
 from collections import OrderedDict
 from functools import partial
-from osgeo import ogr
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
@@ -59,8 +58,8 @@ from giswater.ui_manager import ApiCfUi, NewWorkcat, EventFull, LoadDocuments
 from giswater.ui_manager import Sections
 from giswater.ui_manager import ApiBasicInfo
 
-class ApiCF(ApiParent):
 
+class ApiCF(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
@@ -72,17 +71,20 @@ class ApiCF(ApiParent):
         self.new_feature_id = None
         self.layer_new_feature = None
 
+
     def api_info(self):
         """ Button 37: Own Giswater info """
-        # add "listener" to all actions to deactivate basic_api_info
-        actions_list = self.iface.mainWindow().findChildren(QAction)
-        for action in actions_list:
-            if action.objectName() != 'basic_api_info' and self.controller.api_cf is not None:
-                action.triggered.connect(partial(self.controller.restore_info, restore_cursor=True))
-        # Create the appropriate map tool and connect the gotPoint() signal.
+        # add "listener" to all actions to deactivate api_info
+        if self.controller.api_on is not True:
+            actions_list = self.iface.mainWindow().findChildren(QAction)
+            for action in actions_list:
+                if action.objectName() != 'go2epa_api_info' and action.objectName() != 'basic_api_info':
+                    action.triggered.connect(partial(self.controller.restore_info, restore_cursor=True))
+                    
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
+        QApplication.setOverrideCursor(Qt.WhatsThisCursor)
         self.emit_point.canvasClicked.connect(partial(self.init_info))
 
 
@@ -93,6 +95,7 @@ class ApiCF(ApiParent):
 
     def get_point(self, point, button_clicked):
         """ Get coord from clicked point """
+
         if button_clicked == Qt.LeftButton:
             complet_result = self.open_form(point)
             if not complet_result:
@@ -106,7 +109,7 @@ class ApiCF(ApiParent):
             scale_zoom = self.iface.mapCanvas().scale()
             srid = self.controller.plugin_settings_value('srid')
 
-            extras = '"pointClickCoords":{"xcoord":' + str(point.x()) + ',"ycoord":' + str(point.y()) + '}, '
+            extras = '"pointClickCoords":{"xcoord":' + str(point.x()) + ', "ycoord":' + str(point.y()) + '}, '
             extras += '"visibleLayers":' + str(visible_layers) + ', '
             extras += '"zoomScale":' + str(scale_zoom) + ', '
             extras += '"srid":' + str(srid)
@@ -207,11 +210,15 @@ class ApiCF(ApiParent):
         scale_zoom = self.iface.mapCanvas().scale()
         is_project_editable = self.get_editable_project()
 
+        if self.controller.epa_api_cf is not None:
+            extras = '"toolBar":"epa"'
+        else:
+            extras = '"toolBar":"basic"'
+
         # IF insert new feature
         if point and feature_cat:
             self.new_feature_id = new_feature_id
             self.layer_new_feature = layer_new_feature
-            print(self.controller.previous_maptool)
             if self.controller.previous_maptool is not None:
                 self.canvas.setMapTool(self.controller.previous_maptool)
             else:
@@ -219,22 +226,21 @@ class ApiCF(ApiParent):
             layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
             layer.featureAdded.disconnect()
             feature = '"tableName":"' + str(feature_cat.child_layer.lower()) + '"'
-            extras = '"coordinates":{'+str(point) + '}'
+            extras += ', "coordinates":{'+str(point) + '}'
             body = self.create_body(feature=feature, extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_getfeatureinsert($${" + body + "}$$)")
         # IF click over canvas
         elif point:
             visible_layer = self.get_visible_layers(as_list=True)
-
-            extras = '"activeLayer":"'+active_layer+'", '
-            extras += '"visibleLayer":'+visible_layer+', '
-            extras += '"coordinates":{"epsg":'+str(self.srid)+', "xcoord":' + str(point.x()) + ',"ycoord":' + str(point.y()) + ', "zoomRatio":1000}'
+            extras += ', "activeLayer":"'+active_layer+'"'
+            extras += ', "visibleLayer":'+visible_layer+''
+            extras += ', "coordinates":{"epsg":'+str(self.srid)+', "xcoord":' + str(point.x()) + ',"ycoord":' + str(point.y()) + ', "zoomRatio":1000}'
             body = self.create_body(extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromcoordinates($${" + body + "}$$)")
         # IF come from QPushButtons node1 or node2 from custom form
         elif feature_id:
             feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
-            body = self.create_body(feature=feature)
+            body = self.create_body(feature=feature, extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromid($${" + body + "}$$)")
 
         row = self.controller.get_row(sql, log_sql=True)
@@ -253,12 +259,14 @@ class ApiCF(ApiParent):
             self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
             return False
         if self.complet_result[0]['body']['form']['template'] == 'GENERIC':
+            print("GENE")
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result
         elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
+            print("CUSTOM")
             result, dialog = self.open_custom_form(feature_id, self.complet_result, new_feature_id, layer_new_feature)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
@@ -459,6 +467,7 @@ class ApiCF(ApiParent):
         self.feature_id = None
         result = complet_result[0]['body']['data']
         for field in result['fields']:
+
             label, widget = self.set_widgets(self.dlg_cf, field)
             # Prepare layouts
             # Common layouts
@@ -498,7 +507,7 @@ class ApiCF(ApiParent):
         layout_data_1.addItem(vertical_spacer1)
         vertical_spacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout_data_2.addItem(vertical_spacer2)
-        print(result['fields'])
+
         # Find combo parents:
         for field in result['fields']:
             if field['isparent']:
@@ -511,16 +520,16 @@ class ApiCF(ApiParent):
 
         if self.layer:
             if self.layer.isEditable():
-                self.enable_all(result)
+                self.enable_all(self.dlg_cf, result)
             else:
-                self.disable_all(result, False)
+                self.disable_all(self.dlg_cf, result, False)
 
         if action_edit.isVisible():
             # SIGNALS
             self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
             self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
-            self.layer.editingStarted.connect(partial(self.enable_all, result))
-            self.layer.editingStopped.connect(partial(self.disable_all, result, False))
+            self.layer.editingStarted.connect(partial(self.enable_all, self.dlg_cf, result))
+            self.layer.editingStopped.connect(partial(self.disable_all, self.dlg_cf, result, False))
             # Actions
             self.enable_actions(self.dlg_cf, self.layer.isEditable())
             self.layer.editingStarted.connect(partial(self.enable_actions, self.dlg_cf, True))
@@ -616,7 +625,9 @@ class ApiCF(ApiParent):
         elif field['widgettype'] == 'textarea':
             # TODO this make an error because def add_textarea don't exit at the moment
             widget = self.add_textarea(field)
-
+        elif field['widgettype'] in ('spinbox', 'doubleSpinbox'):
+            widget = self.add_spinbox(field)
+            widget = self.set_auto_update_spinbox(field, dialog, widget)
 
         return label, widget
 
@@ -667,7 +678,7 @@ class ApiCF(ApiParent):
             feature = '"tableName":"' + str(p_table_id) + '", "id":"'+str(feature_id)+'"'
             extras = '"fields":'+my_json+''
             body = self.create_body(feature=feature, extras=extras)
-            sql = ("SELECT " + self.schema_name + ".gw_api_setfeatureinsert($${" + body + "}$$)")
+            sql = ("SELECT " + self.schema_name + ".gw_api_setinsert($${" + body + "}$$)")
 
         else:
             my_json = json.dumps(_json)
@@ -702,65 +713,49 @@ class ApiCF(ApiParent):
         return scale_zoom
 
 
-    def disable_all(self, result, enable):
+    def disable_all(self, dialog, result, enable):
         
-        if not self.dlg_is_destroyed:
-            widget_list = self.dlg_cf.findChildren(QWidget)
-            for widget in widget_list:
-                for field in result['fields']:
-                    if widget.objectName() == field['widgetname']:
-                        if type(widget) is QLineEdit:
-                            widget.setReadOnly(not enable)
+        # if not self.dlg_is_destroyed:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            for field in result['fields']:
+                if widget.objectName() == field['widgetname']:
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                        widget.setReadOnly(not enable)
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
+                                             " color: rgb(100, 100, 100)}")
+                    elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                        widget.setEnabled(enable)
+     
+
+    def enable_all(self, dialog, result):
+        
+        # if not self.dlg_is_destroyed:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            for field in result['fields']:
+                if widget.objectName() == field['widgetname']:
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                        widget.setReadOnly(not field['iseditable'])
+                        if not field['iseditable']:
+                            widget.setFocusPolicy(Qt.NoFocus)
                             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
                                                  " color: rgb(100, 100, 100)}")
-                        elif type(widget) is QComboBox:
-                            widget.setEnabled(enable)
-                        elif type(widget) is QCheckBox:
-                            widget.setEnabled(enable)
-                        elif type(widget) is QPushButton:
-                            widget.setEnabled(enable)
-                        elif type(widget) is QgsDateTimeEdit:
-                            widget.setEnabled(enable)
+                        else:
+                            widget.setFocusPolicy(Qt.StrongFocus)
+                            widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255);"
+                                                 " color: rgb(0, 0, 0)}")
+                    elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                        widget.setEnabled(field['iseditable'])
+                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
 
-
-    def enable_all(self, result):
-        
-        if not self.dlg_is_destroyed:
-            widget_list = self.dlg_cf.findChildren(QWidget)
-            for widget in widget_list:
-                for field in result['fields']:
-                    if widget.objectName() == field['widgetname']:
-                        if type(widget) is QLineEdit:
-                            widget.setReadOnly(not field['iseditable'])
-                            if not field['iseditable']:
-                                widget.setFocusPolicy(Qt.NoFocus)
-                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
-                                                     " color: rgb(100, 100, 100)}")
-                            else:
-                                widget.setFocusPolicy(Qt.StrongFocus)
-                                widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255);"
-                                                     " color: rgb(0, 0, 0)}")
-                        elif type(widget) is QComboBox:
-                            widget.setEnabled(field['iseditable'])
-                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
-                        elif type(widget) is QCheckBox:
-                            widget.setEnabled(field['iseditable'])
-                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
-                        elif type(widget) is QPushButton:
-                            widget.setEnabled(field['iseditable'])
-                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
-                        elif type(widget) is QgsDateTimeEdit:
-                            widget.setEnabled(field['iseditable'])
-                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
 
 
     def enable_actions(self, dialog, enabled):
         """ Enable actions according if layer is editable or not"""
         # if dialog.actionEdit.isVisible():
+
         dialog.actionCopyPaste.setEnabled(enabled)
         dialog.actionRotation.setEnabled(enabled)
         dialog.actionCatalog.setEnabled(enabled)
@@ -770,8 +765,7 @@ class ApiCF(ApiParent):
 
     def get_values(self, dialog, widget, _json=None):
         value = None
-
-        if type(widget) is QLineEdit and widget.isReadOnly() is False:
+        if type(widget) in(QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
             value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox and widget.isEnabled():
             value = utils_giswater.get_item_data(dialog, widget, 0)
@@ -898,6 +892,7 @@ class ApiCF(ApiParent):
     def fill_child(self, dialog, widget):
         combo_parent = widget.property('column_id')
         combo_id = utils_giswater.get_item_data(dialog, widget)
+        #TODO cambiar por gw_api_getchilds
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('" + str(self.tablename) + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
         row = self.controller.get_row(sql, log_sql=False)
         for combo_child in row[0]['fields']:
@@ -962,7 +957,7 @@ class ApiCF(ApiParent):
         if not widget:
             return
 
-        extras = '"queryText":"'+field['queryText']+'", '
+        extras = '"queryText":"' + field['queryText'] + '", '
         extras += '"fieldToSearch":"' + str(field['fieldToSearch']) + '", '
         extras += '"queryTextFilter":" ' + str(field['queryTextFilter']) + '", '
         extras += '"parentId":"' + str(field['parentId']) + '", '
@@ -1227,7 +1222,7 @@ class ApiCF(ApiParent):
 
     def fill_tab_relations(self):
         """ Fill tab 'Relations' """
-        print(self.filter)
+
         table_relations = "v_ui_"+self.geom_type+"_x_relations"
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
         self.set_configuration(self.tbl_relations, table_relations)

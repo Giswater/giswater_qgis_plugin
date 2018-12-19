@@ -14,14 +14,14 @@ except:
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer, QDate
     from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
-    from PyQt4.QtGui import QCompleter, QStringListModel, QToolButton, QPushButton, QFrame
+    from PyQt4.QtGui import QCompleter, QStringListModel, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
     from PyQt4.QtSql import QSqlTableModel
     from qgis.gui import QgsMapCanvasSnapper    
 else:
     from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel
     from qgis.PyQt.QtGui import QColor
     from qgis.PyQt.QtWidgets import QAction, QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
-    from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QPushButton, QFrame
+    from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
     from qgis.PyQt.QtSql import QSqlTableModel
     from qgis.PyQt.QtWidgets import QAction
     from qgis.core import QgsWkbTypes    
@@ -30,7 +30,6 @@ from qgis.core import QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 
-import operator
 import os
 import re
 from functools import partial
@@ -216,8 +215,9 @@ class ApiParent(ParentAction):
 
 
     def check_actions(self, action, enabled):
-        if not self.dlg_is_destroyed:
-            action.setChecked(enabled)
+        # print(self.dlg_is_destroyed)
+        # if not self.dlg_is_destroyed:
+        action.setChecked(enabled)
 
 
     def api_action_centered(self, feature, canvas, layer):
@@ -235,7 +235,6 @@ class ApiParent(ParentAction):
 
     def api_action_zoom_out(self, feature, canvas, layer):
         """ Zoom out """
-        self.controller.log_info(str(feature))
         layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
@@ -677,6 +676,27 @@ class ApiParent(ParentAction):
     def add_verical_spacer(self, field=None):
         widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         #widget.setObjectName(field['widgetname'])
+        return widget
+
+    def add_spinbox(self, field):
+        widget = None
+        if 'value' in field:
+            if field['widgettype'] == 'spinbox':
+                widget = QSpinBox()
+            if field['widgettype'] == 'doubleSpinbox':
+                widget = QDoubleSpinBox()
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
+        if 'value' in field:
+            if field['widgettype'] == 'spinbox' and field['value'] != "":
+                widget.setValue(int(field['value']))
+            elif field['widgettype'] == 'doubleSpinbox' and field['value'] != "":
+                widget.setValue(float(field['value']))
+        if 'iseditable' in field:
+            widget.setReadOnly(not field['iseditable'])
+            if not field['iseditable']:
+                widget.setStyleSheet("QDoubleSpinBox { background: rgb(0, 250, 0);"
+                                     " color: rgb(100, 100, 100)}")
         return widget
 
 

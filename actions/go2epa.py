@@ -13,12 +13,12 @@ except:
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import QTime, QDate, Qt
-    from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox
+    from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox, QApplication
     from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
 else:
     from qgis.PyQt.QtCore import QTime, QDate, Qt
     from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator
-    from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox
+    from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox, QApplication
     from qgis.PyQt.QtWidgets import QFileDialog
     
 import os
@@ -35,6 +35,7 @@ from giswater.ui_manager import UDtimes
 from giswater.ui_manager import HydrologySelector
 from giswater.ui_manager import EpaResultCompareSelector
 from giswater.ui_manager import EpaResultManager
+from giswater.actions.api_cf import ApiCF
 from giswater.actions.parent import ParentAction
 
 
@@ -847,7 +848,17 @@ class Go2Epa(ParentAction):
             self.fill_table(table, tablename)
             
 
-    def info_from_epa(self):
-        """ Button xxx: xxxxxxxx """
-        self.controller.log_info(str("WORK WORK"))
+    def go2epa_api_info(self):
+        """ Button 199: Epa INP info """
+        self.controller.restore_basic_info()
+        if self.controller.epa_api_cf is not None:
+            self.controller.restore_epa_info()
+            return
+
+        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.controller.epa_api_cf = self.api_cf
+        self.controller.api_on = True
+        self.api_cf.api_info()
+
+
 
