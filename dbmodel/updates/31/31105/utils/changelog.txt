@@ -7,8 +7,7 @@ New field cat_period_code on v_edit_rtc_hydrometer_x_data, issue#577;
 -----------------
 Bug fix when user has not cofigured any value default and do not choose any value on mandatory fields of custom forms, issue#547
 Bug fix on rule on insert_plan_arc_x_pavement, issue#565
-Alter table ext_cat_period renaming starttime TO start_date;
-Alter table ext_cat_period renaming endtime TO end_date;
+Alter table ext_cat_period renaming starttime TO start_date and ndtime TO end_date
 Alter table ext_rtc_hydrometer_x_data adding column value_date date;
 New field ismultifeature on om_visit_parameter, issue#549
 New field isarcdivide on node_type, issue#556
@@ -40,3 +39,4 @@ New system parameter sys_custom_views, issue#537
 New system parameter sys_currency, issue#531
 New system parameter utils_csv2pg_om_visit_parameters, issue#566
 Automatic update state_type on connec/gully when link is created, issue#587
+Enhance arc division function with automatic update of node.arc_id of disconnecteds nodes, issue#591

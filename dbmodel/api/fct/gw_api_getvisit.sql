@@ -11,14 +11,20 @@ SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":null},
-"data":{"type":"arc"
-	"id":"2001"}}$$)
+"data":{"type":"arc", "id":"2001"}}$$)
 
 SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":1001},
 "data":{"type":"arc"}}$$)
+
+SELECT ws_sample.gw_api_getvisit($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"form":{},
+"feature":{"featureType":"visit", "visit_id":1},
+"data":{"type":"arc"}}$$)
+
 */
 
 DECLARE
@@ -33,14 +39,11 @@ DECLARE
 	v_fields json [];
 	v_fields_json json;
 	v_forminfo json;
-	v_formtabid json;
-	v_formtablabel json;
-	v_formtabtext json;	
-	v_formtabtable json;
 	v_formheader text;
-	v_formtabtablename json;
-	v_formtabidname json;
 	v_formactions json;
+	v_formtabs text;
+	v_tabaux json;
+	v_active boolean;
 
 BEGIN
 
@@ -77,51 +80,54 @@ BEGIN
 
     RAISE NOTICE 'featuretype:%,  visitclass:%,  v_visit:%,  formname:%,  tablename:%,  device:%',v_featuretype, v_visitclass, v_id, v_formname, v_tablename, v_device;
 
-    v_formactions = '[	{"actionName":"actionAdd","actionTooltip":"Add"},
-			{"actionName":"actionDelete","actionTooltip":"Delete"}]';
+    v_formactions = '[	{"actionName":"actionAdd","actionTooltip":"Add"}, {"actionName":"actionDelete","actionTooltip":"Delete"}]';
     
---  get form fields
-    IF v_id IS NULL THEN
-	SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
-	
-	-- define the text of header
-	v_formheader := 'VISIT';	
-    ELSE 
-	SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
-
+--  Create tabs array
+    v_formtabs := '[';
+       
+		-- Data tab
+		IF v_id IS NULL THEN
+			SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 		
-	-- define the text of header
-	v_formheader :=concat('VISIT - ',v_id);	
-    END IF;
-
-       v_fields_json = array_to_json (v_fields);
-
-       RAISE NOTICE 'v_fields_json %', v_fields_json;
-
-   
--- building the form     
-    IF v_visitclass=0 THEN
-    	v_formtabid = array_to_json('{tabInfo,tabEvent,tabFile}'::text[]);
-	v_formtablabel = array_to_json('{Info,Events,Files}'::text[]);
-	v_formtabtext = array_to_json('{Info,Events,Files}'::text[]);
-	v_formtabtablename = array_to_json('{null,v_ui_om_event,v_ui_om_visit_x_doc}'::text[]);
-	v_formtabidname = array_to_json('{null,id,id}'::text[]);
-
-    ELSE 
-    	v_formtabid = array_to_json('{tabInfo,tabFile}'::text[]);
-	v_formtablabel = array_to_json('{Info,Files}'::text[]);
-	v_formtabtext = array_to_json('{Info,Files}'::text[]);
-	v_formtabtablename = array_to_json('{null,v_ui_om_visit_x_doc}'::text[]);
-	v_formtabidname = array_to_json('{null,id}'::text[]);
+			-- define the text of header
+			v_formheader := 'VISIT';	
+		ELSE 
+			SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
+				
+			-- define the text of header
+			v_formheader :=concat('VISIT - ',v_id);	
+		END IF;	
 	
-    END IF;
-    	
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formTabs', v_formtabid);
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'tabLabel', v_formtablabel);
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'tabText', v_formtabtext);
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'tabTableName', v_formtabtablename);
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'tabIdName', v_formtabidname);
+		v_fields_json = array_to_json (v_fields);
+	
+		-- building tab
+		v_tabaux := json_build_object('tabName','tabInfo','tabLabel','Info Basica','tabText','Test text for tab','active',true, 'tableName', null);
+		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+		v_formtabs := v_formtabs || v_tabaux::text;
+
+		-- Events tab
+		IF v_visitclass=0 THEN
+			v_active = true;
+		ELSE 
+			v_active = false;
+		END IF;
+		-- building tab
+		v_tabaux := json_build_object('tabName','tabEvent','tabLabel','Events','tabText','Test text for tab','active',v_active, 'tableName', null);
+		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+		v_formtabs := v_formtabs || ',' || v_tabaux::text;
+
+		-- Files tab
+		-- building tab
+		v_tabaux := json_build_object('tabName','tabFile','tabLabel','Files','tabText','Test text for tab','active',true, 'tableName', 'v_ui_om_visit_x_doc');
+		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+		v_formtabs := v_formtabs  || ',' || v_tabaux::text;
+
+		v_formtabs := (v_formtabs ||']');
+
+--	Create new form
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', 'Nova visita'::text);
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formTabs', v_formtabs::json);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
 
 --  Control NULL's
@@ -132,9 +138,9 @@ BEGIN
   
 --    Return
     RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
-             ',"body":{"form":'||v_forminfo||
-			',"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idname":"visit_id", "id":'||v_id||'}'||
-			',"data":{"fields":' || v_fields_json || '}'||
+             ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idname":"visit_id", "id":'||v_id||'}'||
+		    ', "form":'||v_forminfo||
+		     ',"data":{}'||
 			'}'||
 	    '}')::json;
 END;
