@@ -51,6 +51,7 @@ DECLARE
 	v_tabaux json;
 	v_active boolean;
 	v_featureid varchar ;
+	aux_json json;
 
 BEGIN
 
@@ -70,6 +71,7 @@ BEGIN
 
 	--  get visitclass
 	IF v_id IS NULL THEN
+	
 		-- TODO: for new visit enhance the visit type using the feature_id
 		v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;
 		IF v_visitclass IS NULL THEN
@@ -94,33 +96,29 @@ BEGIN
 		-- Data tab
 		IF v_id IS NULL THEN
 			SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
-		
-			-- define the text of header
-			v_formheader := 'VISIT';	
 
-			-- setting feature id value
+			FOREACH aux_json IN ARRAY v_fields
+			LOOP
+				-- setting feature id value
+				IF (aux_json->>'column_id') = 'arc_id' OR (aux_json->>'column_id')='node_id' OR (aux_json->>'column_id')='connec_id' OR (aux_json->>'column_id') ='gully_id' THEN
+					v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_featureid);
+				END IF;
 
-			-- setting visit id value
-			
+				-- setting visit id value
+				IF (aux_json->>'column_id') = 'visit_id' THEN
+					PERFORM setval('ws_sample.audit_check_project_id_seq', (SELECT max(id)+1 FROM om_visit), true);
+					v_id = nextval('ws_sample.audit_check_project_id_seq');
+					v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_id);	
+				END IF;
+			END LOOP;
 		ELSE 
 			SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
-				
-			-- define the text of header
-			v_formheader :=concat('VISIT - ',v_id);	
 		END IF;	
-
 		v_fields_json = array_to_json (v_fields);
-
-		-- footerButtons
-		--SELECT gw_api_get_formfields( 'v_formname', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
-
-		--v_buttons_json = array_to_json (v_buttons);
-
 		
 		-- building tab
 		v_tabaux := json_build_object('tabName','tabInfo','tabLabel','Info Basica','tabText','Test text for tab','active',true);
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
-		--v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'footerButtons', v_buttons_json);
 		v_formtabs := v_formtabs || v_tabaux::text;
 
 		-- Events tab
@@ -140,6 +138,9 @@ BEGIN
 
 	-- form actions
 	v_formactions = '[{"actionName":"actionAdd","actionTooltip":"Add"}, {"actionName":"actionDelete","actionTooltip":"Delete"}]';
+
+	-- define the text of header
+	v_formheader :=concat('VISIT - ',v_id);	
 
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
