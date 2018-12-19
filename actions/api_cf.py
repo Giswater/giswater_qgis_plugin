@@ -893,10 +893,15 @@ class ApiCF(ApiParent):
     def fill_child(self, dialog, widget):
         combo_parent = widget.property('column_id')
         combo_id = utils_giswater.get_item_data(dialog, widget)
-        #TODO cambiar por gw_api_getchilds
-        sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('" + str(self.tablename) + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "', '')")
-        row = self.controller.get_row(sql, log_sql=False)
-        for combo_child in row[0]['fields']:
+
+        feature = '"featureType":"' + self.feature_type + '", '
+        feature += '"tableName":"' + self.tablename + '", '
+        feature += '"idName":"' + self.field_id + '"'
+        extras = '"comboParent":"'+combo_parent+'", "comboId":"'+combo_id+'"'
+        body = self.create_body(feature=feature, extras=extras)
+        sql = ("SELECT " + self.schema_name + ".gw_api_getchilds($${" + body + "}$$)")
+        row = self.controller.get_row(sql, log_sql=True)
+        for combo_child in row[0]['body']['data']:
             if combo_child is not None:
                 self.populate_child(combo_child)
 
