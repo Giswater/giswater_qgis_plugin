@@ -39,6 +39,7 @@ DECLARE
 	array_agg_gully varchar [];
 	v_arcsearch_nodes float;
     rec_node record;
+    v_newarc varchar;
 
 
 
@@ -113,7 +114,7 @@ BEGIN
 		rec_aux2.the_geom := line2;
 		
 		-- In function of states and user's variables proceed.....
-		IF (state_aux=1 AND state_node_arg=1) OR (state_aux=2 AND state_node_arg=2) THEN 
+		IF (state_aux=1 AND state_node_arg=1) THEN 
 		
 			-- Insert new records into arc table
 			-- downgrade temporary the state_topocontrol to prevent conflicts	
@@ -167,42 +168,54 @@ BEGIN
 				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;		
 			END IF;
 					
-			--INSERT DATA INTO OM_TRACEABILITY
+			-- Insert data into traceability table
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
 			VALUES ('DIVIDE ARC',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
 		
-			--Copy elements from old arc to new arcs
+			-- Update elements from old arc to new arcs
 			FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=arc_id_aux  LOOP
 				INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
 				INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
+				DELETE FROM element_x_arc WHERE arc_id=arc_id_aux;
 			END LOOP;
 		
-			--Copy documents from old arc to the new arcs
+			-- Update documents from old arc to the new arcs
 			FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=arc_id_aux  LOOP
 				INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
 				INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
+				DELETE FROM doc_x_arc WHERE arc_id=arc_id_aux;
+
 			END LOOP;
 		
-			--Copy visits from old arc to the new arcs
+			-- Update visits from old arc to the new arcs
 			FOR rec_aux IN SELECT * FROM om_visit_x_arc WHERE arc_id=arc_id_aux  LOOP
 				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux1.arc_id);
 				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux2.arc_id);
+				DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
+
 			END LOOP;
-	
-			-- delete relations from old arc
-			DELETE FROM element_x_arc WHERE arc_id=arc_id_aux;
-			DELETE FROM doc_x_arc WHERE arc_id=arc_id_aux;
-			DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
-	
+
+			-- Update arc_id on node
+			FOR rec_aux IN SELECT * FROM node WHERE arc_id=arc_id_aux  LOOP
+
+				-- find the new arc id
+				SELECT arc_id INTO v_newarc FROM v_edit_arc AS a 
+				WHERE ST_DWithin(rec_aux.the_geom, a.the_geom, 0.5) AND arc_id !=arc_id_aux ORDER BY ST_Distance(rec_aux.the_geom, a.the_geom) LIMIT 1;
+
+				-- update values
+				UPDATE node SET arc_id=v_newarc WHERE node_id=rec_aux.node_id;
+					
+			END LOOP;
+			
 			-- delete old arc
 			DELETE FROM arc WHERE arc_id=arc_id_aux;
 
+			-- reconnect links
 			PERFORM gw_fct_connect_to_network(array_agg_connec, 'CONNEC');
 			PERFORM gw_fct_connect_to_network(array_agg_gully, 'GULLY');
-
+					
 			
-			
-		ELSIF (state_aux=1 AND state_node_arg=2) AND plan_arc_vdivision_dsbl_aux IS NOT TRUE THEN 
+		ELSIF (state_aux=1 AND state_node_arg=2 AND plan_arc_vdivision_dsbl_aux IS NOT TRUE)  OR (state_aux=2 AND state_node_arg=2)  THEN 
 			rec_aux1.state=2;
 			rec_aux1.state_type=(SELECT value::smallint FROM config_param_user WHERE "parameter"='statetype_plan_vdefault' AND cur_user=current_user);
 			
@@ -214,9 +227,11 @@ BEGIN
 			UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
 			INSERT INTO v_edit_arc SELECT rec_aux1.*;
 			INSERT INTO v_edit_arc SELECT rec_aux2.*;
+			
 			-- force trg topocontrol to prevent conflicts
 			update arc set the_geom=the_geom where arc_id=rec_aux1.arc_id;
 			update arc set the_geom=the_geom where arc_id=rec_aux2.arc_id;
+			
 			-- restore the state_topocontrol variable
 			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
 	
