@@ -48,9 +48,18 @@ SELECT ws_sample.gw_api_getlist($${
 -- Visit -> files
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"tableName":"v_ui_om_visit_x_doc", "idName":"id"},
+"feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
+    "pageInfo":{}}}$$)
+
+
+-- Event -> files
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"featureType":"file"},
+"data":{"filterFields":{"event_id":232, "limit":10},
     "pageInfo":{"orderby":"doc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
+
 
 
 FEATURE FORMS
@@ -243,6 +252,8 @@ BEGIN
 		v_query_result = 'SELECT * FROM '||v_tablename||' WHERE '||v_idname||' IS NOT NULL ';
 	END IF;
 
+	raise notice 'v_query_result % ', v_query_result;
+
 	--  add filters
 	v_filter_values := (p_data ->> 'data')::json->> 'filterFields';
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
@@ -302,9 +313,14 @@ BEGIN
 		v_query_result := v_query_result || ' LIMIT '|| v_offset;
 	END IF;
 
+		raise notice ' v_query_result %', v_query_result;
+
+
 	-- Execute query result
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
+
+	raise notice ' v_result_list %', v_result_list;
 
 --    Control NULL's
 	v_featuretype := COALESCE(v_featuretype, '{}');

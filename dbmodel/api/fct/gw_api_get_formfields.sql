@@ -85,7 +85,7 @@ BEGIN
 --   Get fields	
 	IF p_formname!='infoplan' THEN 
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype,
-			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "changeAction",
+			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "changeAction",action_function AS "clickAction", (CASE WHEN layout_id=0 THEN ''header'' WHEN layout_id=1 THEN ''body'' WHEN layout_id=2 THEN ''footer'' END) AS "layoutName",
 			widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
 			concat('||quote_literal(p_tabname)||',''_'',layout_id) as layoutname, layout_order, dv_parent_id, isparent, widgetfunction, dv_querytext, dv_querytext_filterc, 
 			action_function, isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'

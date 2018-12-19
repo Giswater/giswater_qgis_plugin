@@ -1,18 +1,21 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
+﻿-- Function: ws_sample.gw_api_setrowdelete(json)
 
+-- DROP FUNCTION ws_sample.gw_api_setrowdelete(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setrowdelete(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_setdelete(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
 visit:
-SELECT SCHEMA_NAME.gw_api_setlistdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
-		"feature":{"featureType":"visit", "tableName":"ve_visit_multievent_x_arc", "id":1130, "idname": "visit_id"}}')
+SELECT ws_sample.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+		"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1130, "idname": "visit_id"}}')
+connec:
+SELECT ws_sample.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+		"feature":{"featureType":"connec", "tableName":"v_edit_connec", "id":3008, "idname": "connec_id"}}')
+file:
+SELECT ws_sample.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+		"feature":{"featureType":"file", "tableName":"om_visit_file", "id":2, "idname": "id"}}')
 */
 
 DECLARE
@@ -27,17 +30,19 @@ DECLARE
     v_message text;
     v_result text;
     v_messagelevel integer = 0;
+    v_feature json;
 
 BEGIN
 	--  Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "ws_sample", public;
+	v_schemaname = 'ws_sample';
 	
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
        
 	-- Get input parameters:
+	v_feature := (p_data ->> 'feature');
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
@@ -50,10 +55,10 @@ BEGIN
 	-- if exists
 	IF v_result IS NOT NULL THEN
 		v_querytext := 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
-		SELECT gw_api_getmessage(p_data,20) INTO v_message;
+		SELECT gw_api_getmessage(v_feature,20) INTO v_message;
 		EXECUTE v_querytext ;
 	ELSE
-		SELECT gw_api_getmessage(p_data,30) INTO v_message;
+		SELECT gw_api_getmessage(v_feature,30) INTO v_message;
 	END IF;
 
 --    Return
@@ -67,5 +72,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_setfeatureinsert(json)
+ALTER FUNCTION ws_sample.gw_api_setrowdelete(json)
   OWNER TO geoadmin;

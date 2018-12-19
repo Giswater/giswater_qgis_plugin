@@ -14,7 +14,7 @@ $BODY$
 SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idname":"visit_id"},
+"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName":"visit_id"},
 "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
 	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
@@ -23,7 +23,7 @@ SELECT ws_sample.gw_api_setvisit($${
 SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1159,"idname":"visit_id"},
+"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1159,"idName":"visit_id"},
 "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":100, "desperfectes_arc":1, "neteja_arc":3},
 	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
@@ -58,7 +58,7 @@ BEGIN
 	IF v_id IS NULL THEN
 
 		-- setting the insert
-		SELECT gw_api_setfeatureinsert (v_outputparameter) INTO v_insertresult;
+		SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
 
 		-- getting new id
 		v_id=(((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer;

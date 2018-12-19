@@ -5,26 +5,38 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setfeatureinsert(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_setinsert(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
-visit:
-SELECT SCHEMA_NAME.gw_api_setfeatureinsert('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
-	"feature":{"featureType":"arc", "tableName":"ve_visit_multievent_x_arc", "id":null, "idname": "visit_id"}, 
+-- Indirects
+visit: (query used on setvisit function, not direct from client)
+SELECT ws_sample.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+	"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName": "visit_id"}, 
 	"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
-		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}')
+		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 
+file: (query used on setfileinsert function, not direct from client)
+SELECT ws_sample.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+	"feature":{"featureType":"file","tableName":"om_visit_file", "id":null, "idName": "id"}, 
+	"data":{"fields":{"visit_id":1, "hash":"testhash", "url":"urltest", "filetype":"png"},
+		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
+
+-- directs
 feature:
-SELECT SCHEMA_NAME.gw_api_setfeatureinsert($${
+SELECT ws_sample.gw_api_setinsert($${
 "client":{"device":9, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"tableName":"ve_node_t", "id":"1251521"},
-"data":{"fields":{"macrosector_id": "1", "sector_id": "2", "nodecat_id":"JUNCTION DN63", "dma_id":"2","undelete": "False", "inventory": "False", 
-"epa_type": "JUNCTION", "state": "3", "arc_id": "113854", "publish": "False", "verified": "TO REVIEW",
-"expl_id": "1", "builtdate": "2018/11/29", "muni_id": "2", "workcat_id": "22", "buildercat_id": "builder1", "enddate": "2018/11/29", 
-"soilcat_id": "soil1", "ownercat_id": "owner1", "workcat_id_end": "22", "the_geom":"0101000020E7640000C66DDE79D9961941A771508A59755151"}}}$$)
+"feature":{"featureType":"node", "tableName":"v_edit_node", "id":"1251521", "idName": "node_id"},
+	"data":{"fields":{"macrosector_id": "1", "sector_id": "2", "nodecat_id":"JUNCTION DN63", "dma_id":"2","undelete": "False", "inventory": "False", 
+		"epa_type": "JUNCTION", "state": "1", "arc_id": "113854", "publish": "False", "verified": "TO REVIEW",
+		"expl_id": "1", "builtdate": "2018/11/29", "muni_id": "2", "workcat_id": null, "buildercat_id": "builder1", "enddate": "2018/11/29", 
+		"soilcat_id": "soil1", "ownercat_id": "owner1", "workcat_id_end": "22", "the_geom":"0101000020E7640000C66DDE79D9961941A771508A59755151"},
+		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
+
+any row, any element:
+
 */
 
 DECLARE
@@ -46,15 +58,17 @@ DECLARE
     v_value text;
     v_return text;
     v_schemaname text;
-    v_featuretype text;
+    v_type text;
     v_epsg integer;
     v_newid text;
     v_idname text;
+    v_feature json;
+    v_message json;
 
 BEGIN
 	--    Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "ws_sample", public;
+	v_schemaname = 'ws_sample';
 	
 	-- Get paramters
 	EXECUTE 'SELECT epsg FROM version' INTO v_epsg;
@@ -63,12 +77,12 @@ BEGIN
 		INTO v_apiversion;
        
 	-- Get input parameters:
+	v_feature  := (p_data ->> 'feature');
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
-	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
-	v_idname := (p_data ->> 'feature')::json->> 'idname';
+	v_idname := (p_data ->> 'feature')::json->> 'idName';
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
 
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
@@ -147,8 +161,15 @@ BEGIN
 	-- execute query text
 	EXECUTE v_querytext INTO v_newid;
 
+	-- updating v_feature setting new id
+	v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_newid);
+
+	-- set message
+	SELECT gw_api_getmessage(v_feature::json, 40) INTO v_message;
+	
+
 --    Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"demo message"}, "apiVersion":'|| v_apiversion ||
+    RETURN ('{"status":"Accepted", "message":'|| v_message ||', "apiVersion":'|| v_apiversion ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_newid||'"}}}')::json;    
 
 --    Exception handling
@@ -158,5 +179,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_setfeatureinsert(json)
-  OWNER TO geoadmin;
