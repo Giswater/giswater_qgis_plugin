@@ -1,6 +1,8 @@
-31105-ws-existing views
------------------------
-Bug fix on view v_om_visit; 
+31105-ws-drop and create for existing views
+-------------------------------------------
+v_om_visit, issue#592;
+v_inp_pattern,issue#590;
+
 
 
 31105-ws-other
