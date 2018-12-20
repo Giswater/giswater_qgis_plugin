@@ -1,6 +1,8 @@
-﻿-- Function: ws_sample.gw_api_get_formfields(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer)
-
--- DROP FUNCTION ws_sample.gw_api_get_formfields(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer);
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
 CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_formfields(
     p_formname character varying,
@@ -109,7 +111,6 @@ BEGIN
 
 	FOREACH aux_json IN ARRAY fields_array
 	LOOP
-		RAISE NOTICE '---- %',aux_json;
 		-- setting the typeahead widgets
 		IF (aux_json->>'typeahead') IS NOT NULL THEN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'fieldToSearch', COALESCE(((aux_json->>'typeahead')::json->>'fieldToSearch'), ''));
