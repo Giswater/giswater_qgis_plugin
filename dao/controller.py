@@ -40,7 +40,7 @@ class DaoController():
     
     def __init__(self, settings, plugin_name, iface, logger_name='plugin', create_logger=True):
         """ Class constructor """
-        
+
         self.settings = settings      
         self.plugin_name = plugin_name               
         self.iface = iface               
@@ -50,9 +50,9 @@ class DaoController():
         self.logged = False 
         self.postgresql_version = None
         self.logger = None
-        self.basic_api_cf = None
-        self.epa_api_cf = None
-        self.api_on = None
+        self.basic_api_cf = None  # with this variable we know if the basic_info is active or not
+        self.epa_api_cf = None  # with this variable we know if the epa_info is active or not
+        self.api_on = None  # with this variable we know if the info is active or not and control all action.triggered
         self.previous_maptool = None
         if create_logger:
             self.set_logger(logger_name)

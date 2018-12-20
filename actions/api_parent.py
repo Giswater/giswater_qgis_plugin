@@ -268,9 +268,9 @@ class ApiParent(ParentAction):
                 self.controller.show_warning(message, parameter=pdf_path)
 
                 
-    def api_action_copy_paste(self, dialog, geom_type):
+    def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
-
+        self.controller.restore_info()
         if Qgis.QGIS_VERSION_INT > 29900:
             return
         
@@ -279,7 +279,7 @@ class ApiParent(ParentAction):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         self.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
-        self.emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog))
+        self.emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type))
         self.geom_type = geom_type
 
         # Store user snapping configuration
@@ -331,7 +331,7 @@ class ApiParent(ParentAction):
             break
 
             
-    def api_action_copy_paste_canvas_clicked(self, dialog, point, btn):
+    def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, point, btn):
         """ Slot function when canvas is clicked """
 
         if btn == Qt.RightButton:
@@ -424,10 +424,10 @@ class ApiParent(ParentAction):
                         layer.changeAttributeValue(feature.id(), i, snapped_feature_attr_aux[x])
 
             layer.commitChanges()
-            #TODO: REVISAR
+
             # dialog.refreshFeature()
             for i in range(0, len(fields_aux)):
-                widget = dialog.findChild(QWidget, fields_aux[i])
+                widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
                 if utils_giswater.getWidgetType(dialog, widget) is QLineEdit:
                     utils_giswater.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif utils_giswater.getWidgetType(dialog, widget) is QComboBox:
@@ -446,7 +446,6 @@ class ApiParent(ParentAction):
         try:
             self.snapper_manager.recover_snapping_options()
             self.vertex_marker.hide()
-            self.set_action_identify()
             self.canvas.xyCoordinates.disconnect()
             self.emit_point.canvasClicked.disconnect()
         except:
