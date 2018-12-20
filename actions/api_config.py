@@ -195,7 +195,6 @@ class ApiConfig(ApiParent):
     def construct_form_param_user(self, row, pos):
 
         for field in row[pos]['fields']:
-
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['name'])
