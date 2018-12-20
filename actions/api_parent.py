@@ -15,11 +15,12 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer, QDate
     from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
     from PyQt4.QtGui import QCompleter, QStringListModel, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
+    from PyQt4.QtGui import QIntValidator, QDoubleValidator
     from PyQt4.QtSql import QSqlTableModel
     from qgis.gui import QgsMapCanvasSnapper    
 else:
     from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel
-    from qgis.PyQt.QtGui import QColor
+    from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator
     from qgis.PyQt.QtWidgets import QAction, QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
     from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
     from qgis.PyQt.QtSql import QSqlTableModel
@@ -30,8 +31,11 @@ from qgis.core import QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 
+
+import json
 import os
 import re
+from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
@@ -546,6 +550,67 @@ class ApiParent(ParentAction):
         return widget
 
 
+    def set_data_type(self, field, widget):
+        if 'datatype' in field:
+            if field['datatype'] == 'integer':  # Integer
+                widget.setValidator(QIntValidator())
+            elif field['datatype'] == 'string':  # String
+                function_name = "test"
+                widget.returnPressed.connect(partial(getattr(self, function_name)))
+            elif field['datatype'] == 'date':  # Date
+                pass
+            elif field['datatype'] == 'datetime':  # DateTime
+                pass
+            elif field['datatype'] == 'boolean':  # Boolean
+                pass
+            elif field['datatype'] == 'double':  # Double
+                validator = QDoubleValidator()
+                validator.setRange(-9999999.0, 9999999.0, 3)
+                validator.setNotation(QDoubleValidator().StandardNotation)
+                widget.setValidator(validator)
+        return widget
+
+
+    def manage_lineedit(self, field, dialog, widget, completer):
+        if field['widgettype'] == 'typeahead':
+
+            model = QStringListModel()
+            self.populate_lineedit(completer, model, field, dialog, widget)
+            widget.textChanged.connect(partial(self.populate_lineedit, completer, model, field, dialog, widget))
+        return widget
+
+
+    def populate_lineedit(self, completer, model, field, dialog, widget):
+        """ Set autocomplete of widget @table_object + "_id"
+            getting id's from selected @table_object.
+            WARNING: Each QlineEdit needs their own QCompleter and their own QStringListModel!!!
+        """
+        if not widget:
+            return
+
+        extras = '"queryText":"' + field['queryText'] + '"'
+        extras += ', "fieldToSearch":"' + str(field['fieldToSearch']) + '"'
+        extras += ', "queryTextFilter":"' + str(field['queryTextFilter']) + '"'
+        extras += ', "parentId":"' + str(field['parentId']) + '"'
+        extras += ', "textToSearch":"' + str(utils_giswater.getWidgetText(dialog, widget))+'"'
+        if 'parentValue' in field:
+            extras += ', "parentValue":"' + str(field['selectedId']) + '"'
+        body = self.create_body(extras=extras)
+        # Get layers under mouse clicked
+        sql = ("SELECT " + self.schema_name + ".gw_api_gettypeahead($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        # if 'fields' not in result:
+        #     return
+        list_items = []
+        for field in complet_list[0]['body']['data']:
+            list_items.append(field['idval'])
+        self.set_completer_object_api(completer, model, widget, list_items)
+
+
     def add_combobox(self, field):
     
         widget = QComboBox()
@@ -572,46 +637,6 @@ class ApiParent(ParentAction):
         # Populate combo
         for record in combolist:
             widget.addItem(record[1], record)
-
-            
-    def add_comboline(self, dialog, field, completer):
-        """ Add widgets QLineEdit type """
-        
-        widget = QLineEdit()
-        widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
-        if 'value' in field:
-            widget.setText(field['value'])
-        if 'iseditable' in field:
-            widget.setReadOnly(not field['iseditable'])
-            if not field['iseditable']:
-                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
-                                     " color: rgb(100, 100, 100)}")
-
-        widget.textChanged.connect(partial(self.populate_comboline, dialog, field, widget, completer))
-
-        return widget
-        
-
-    def populate_comboline(self, dialog, field, widget, completer):
-
-        filter = utils_giswater.getWidgetText(dialog, widget)
-
-        #TODO:: Add id_tofilter and table_tosearch into field, and take values.
-        #Get id_tofilter and table_tosearch
-        # id=field['id']
-        # table=field['table']
-        id = 'id'
-        table = 'cat_work'
-
-        sql = ('SELECT ' + self.schema_name + '.gw_api_getcomboline($${"id_tofilter":"'+id+'","table":"'+table+'","text_arg":"'+filter+'"}$$)')
-        row = self.controller.get_row(sql, log_sql=True)
-        list_items = []
-
-        for result in row[0]['data']:
-            list_items.append(result['id'])
-        model = QStringListModel()
-        self.set_completer_object_api(completer, model, widget, list_items)
 
 
     def add_frame(self, field, x=None):
@@ -858,8 +883,12 @@ class ApiParent(ParentAction):
             else:
                 label.setToolTip(field['label'].capitalize())
 
-            if field['widgettype'] == 'text':
+            if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+                completer = QCompleter()
                 widget = self.add_lineedit(field)
+                widget = self.set_widget_size(widget, field)
+                widget = self.set_data_type(field, widget)
+                widget = self.manage_lineedit(field, dialog, widget, completer)
                 if widget.objectName() == field_id:
                     self.feature_id = widget.text()
             elif field['widgettype'] == 'datepickertime':
@@ -867,9 +896,9 @@ class ApiParent(ParentAction):
                 widget = self.set_auto_update_dateedit(field, dialog, widget)
             elif field['widgettype'] == 'hyperlink':
                 widget = self.add_hyperlink(dialog, field)
-            elif field['widgettype'] == 'typeahead':
-                completer = QCompleter()
-                widget = self.add_comboline(dialog, field, completer)
+            # elif field['widgettype'] == 'typeahead':
+            #     completer = QCompleter()
+            #     widget = self.add_comboline(dialog, field, completer)
 
             grid_layout.addWidget(label, field['layout_order'], 0)
             grid_layout.addWidget(widget, field['layout_order'], 1)

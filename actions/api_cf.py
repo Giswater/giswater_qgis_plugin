@@ -539,7 +539,7 @@ class ApiCF(ApiParent):
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(self.start_editing)
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type))
-        action_workcat.triggered.connect(partial(self.cf_new_workcat))
+        action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
 
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.feature, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
@@ -860,36 +860,6 @@ class ApiCF(ApiParent):
         return widget
 
 
-    def set_data_type(self, field, widget):
-        if 'datatype' in field:
-            if field['datatype'] == 'integer':  # Integer
-                widget.setValidator(QIntValidator())
-            elif field['datatype'] == 'string':  # String
-                function_name = "test"
-                widget.returnPressed.connect(partial(getattr(self, function_name)))
-            elif field['datatype'] == 'date':  # Date
-                pass
-            elif field['datatype'] == 'datetime':  # DateTime
-                pass
-            elif field['datatype'] == 'boolean':  # Boolean
-                pass
-            elif field['datatype'] == 'double':  # Double
-                validator = QDoubleValidator()
-                validator.setRange(-9999999.0, 9999999.0, 3)
-                validator.setNotation(QDoubleValidator().StandardNotation)
-                widget.setValidator(validator)
-        return widget
-
-
-    def manage_lineedit(self, field, dialog, widget, completer):
-        if field['widgettype'] == 'typeahead':
-
-            model = QStringListModel()
-            self.populate_lineedit(completer, model, field, dialog, widget)
-            widget.textChanged.connect(partial(self.populate_lineedit, completer, model, field, dialog, widget))
-        return widget
-
-
     def fill_child(self, dialog, widget):
         combo_parent = widget.property('column_id')
         combo_id = utils_giswater.get_item_data(dialog, widget)
@@ -955,34 +925,7 @@ class ApiCF(ApiParent):
         self.catalog.api_catalog(self.dlg_cf, tab_type+"_"+self.geom_type+'cat_id', self.geom_type)
 
 
-    def populate_lineedit(self, completer, model, field, dialog, widget):
-        """ Set autocomplete of widget @table_object + "_id"
-            getting id's from selected @table_object.
-            WARNING: Each QlineEdit needs their own QCompleter and their own QStringListModel!!!
-        """
-        if not widget:
-            return
 
-        extras = '"queryText":"' + field['queryText'] + '", '
-        extras += '"fieldToSearch":"' + str(field['fieldToSearch']) + '", '
-        extras += '"queryTextFilter":" ' + str(field['queryTextFilter']) + '", '
-        extras += '"parentId":"' + str(field['parentId']) + '", '
-        extras += '"valueParent":"' + str(field['selectedId']) + '", '
-        extras += '"textToSearch":"' + str(utils_giswater.getWidgetText(dialog, widget))+'"'
-        body = self.create_body(extras=extras)
-        # Get layers under mouse clicked
-        sql = ("SELECT " + self.schema_name + ".gw_api_gettypeahead($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=False)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        # if 'fields' not in result:
-        #     return
-        list_items = []
-        for field in complet_list[0]['body']['data']:
-            list_items.append(field['idval'])
-        self.set_completer_object_api(completer, model, widget, list_items)
 
     """ MANAGE TABS """
     def tab_activation(self):
@@ -2155,7 +2098,7 @@ class ApiCF(ApiParent):
     """ ****************************  **************************** """
     """ ****************************  **************************** """
     """ NEW WORKCAT"""
-    def cf_new_workcat(self):
+    def cf_new_workcat(self, tab_type):
 
         body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
         body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
@@ -2163,7 +2106,7 @@ class ApiCF(ApiParent):
         body += '"data":{}'
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
 
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=True)
 
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
@@ -2173,7 +2116,7 @@ class ApiCF(ApiParent):
         # Set signals
         self.dlg_new_workcat.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
         self.dlg_new_workcat.rejected.connect(partial(self.close_dialog, self.dlg_new_workcat))
-        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, 'cat_work'))
+        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, 'cat_work', tab_type))
 
         self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id)
 
@@ -2181,7 +2124,7 @@ class ApiCF(ApiParent):
         self.open_dialog(self.dlg_new_workcat)
 
 
-    def cf_manage_new_workcat_accept(self, table_object):
+    def cf_manage_new_workcat_accept(self, table_object, tab_type):
         """ Insert table 'cat_work'. Add cat_work """
 
         # Take widgets
@@ -2241,7 +2184,7 @@ class ApiCF(ApiParent):
                     sql = ("SELECT id, id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        cmb_workcat_id = self.dlg_cf.findChild(QComboBox, "data_workcat_id")
+                        cmb_workcat_id = self.dlg_cf.findChild(QComboBox, tab_type + "_workcat_id")
                         utils_giswater.set_item_data(cmb_workcat_id, rows, index_to_show=1, combo_clear=True)
                         utils_giswater.set_combo_itemData(cmb_workcat_id, cat_work_id, 1)
                     self.close_dialog(self.dlg_new_workcat)

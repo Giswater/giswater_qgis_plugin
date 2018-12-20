@@ -339,7 +339,7 @@ class ApiSearch(ApiParent):
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
-        field_id = str(row[0]['feature']['idName'])
+        field_id = str(row[0]['body']['feature']['idName'])
         self.populate_basic_info(self.hydro_info_dlg, row, field_id)
 
         self.hydro_info_dlg.open()
