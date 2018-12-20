@@ -6,3 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+-- 2018/12/20
+ALTER TABLE ws_sample.inp_pattern_value RENAME factor_19 TO _factor_19;
+ALTER TABLE ws_sample.inp_pattern_value RENAME factor_20 TO _factor_20;
+ALTER TABLE ws_sample.inp_pattern_value RENAME factor_21 TO _factor_21;
+ALTER TABLE ws_sample.inp_pattern_value RENAME factor_22 TO _factor_22;
+ALTER TABLE ws_sample.inp_pattern_value RENAME factor_23 TO _factor_23;
+ALTER TABLE ws_sample.inp_pattern_value RENAME factor_24 TO _factor_24;
