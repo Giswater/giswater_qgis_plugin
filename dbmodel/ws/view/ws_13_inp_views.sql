@@ -432,7 +432,8 @@ tag
 FROM inp_tags
 ORDER BY object;
 
-
+-- Deprecated view. Updated on 3.1.105
+/*
 DROP VIEW IF EXISTS "v_inp_pattern" CASCADE;
 CREATE VIEW "v_inp_pattern" AS
 SELECT id,
@@ -460,10 +461,10 @@ factor_20,
 factor_21,
 factor_22,
 factor_23,
-factor_24
+factor_24,
 FROM inp_pattern_value
 ORDER BY id;
-
+*/
 
 
 DROP VIEW IF EXISTS "v_inp_energy_gl"  CASCADE;
