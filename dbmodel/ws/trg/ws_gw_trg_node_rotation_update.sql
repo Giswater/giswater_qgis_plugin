@@ -11,27 +11,63 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_rotation_update()
 $BODY$
 DECLARE 
     rec_arc Record; 
-    rec_node Record; 
     hemisphere_rotation_bool boolean;
     hemisphere_rotation_aux float;
-    ang_aux float;
-    count int2;
-    azm_aux float;
-    rec_config record;
-    connec_id_aux text;
-    array_agg text[];
+    v_rotation float;
+    arc_id_aux  varchar;
+    arc_geom    public.geometry;
+    state_aux 	integer;
+    intersect_loc	 double precision;
+    
         
 BEGIN 
 
--- The goal of this function is to update automatic rotation node values using the hemisphere values when the variable
--- edit_noderotation_update_dissbl is TRUE
+-- The goal of this function are two goals:
+--1) to update automatic rotation node values using the hemisphere values when the variable edit_noderotation_update_dissbl is TRUE
+--2) when node is disconnected from arcs update rotation taking values from nearest arc if exists
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	-- get parameters;
+
+	SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM node_type JOIN cat_node ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
+	SELECT hemisphere INTO hemisphere_rotation_aux FROM node WHERE node_id=NEW.node_id;
 	
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dissbl' AND cur_user=current_user) IS TRUE THEN 
 
     		UPDATE node SET rotation=NEW.hemisphere WHERE node_id=NEW.node_id;
 					
+	END IF;
+
+	IF (SELECT num_arcs FROM node_type JOIN cat_node ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)=0 THEN
+
+		-- Find closest arc inside tolerance
+		SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
+		WHERE ST_DWithin(NEW.the_geom, a.the_geom, 0.01) ORDER BY ST_Distance(NEW.the_geom, a.the_geom) LIMIT 1;
+
+		IF arc_id_aux IS NOT NULL THEN 
+
+			--  Locate position of the nearest point
+			intersect_loc := ST_LineLocatePoint(arc_geom, NEW.the_geom);
+
+			IF intersect_loc < 1 THEN
+				v_rotation=st_azimuth(ST_LineInterpolatePoint(arc_geom,intersect_loc), ST_LineInterpolatePoint(arc_geom,intersect_loc+0.01)); 
+					IF v_rotation> 3.14159 THEN
+						v_rotation = v_rotation-3.14159;
+					END IF;
+			END IF;
+					
+			IF hemisphere_rotation_bool IS true THEN
+		
+				IF (hemisphere_rotation_aux >180)  THEN
+					UPDATE node set rotation=(v_rotation*(180/3.14159)+90) where node_id=NEW.node_id;
+				ELSE		
+					UPDATE node set rotation=(v_rotation*(180/3.14159)-90) where node_id=NEW.node_id;
+				END IF;
+			ELSE
+				UPDATE node set rotation=(v_rotation*(180/3.14159)-90) where node_id=NEW.node_id;		
+			END IF;				
+		END IF;
 	END IF;
 
 	RETURN NEW;
@@ -41,7 +77,6 @@ $BODY$
   COST 100;
   
 
-
 DROP TRIGGER IF EXISTS gw_trg_node_rotation_update ON "SCHEMA_NAME".node;
-CREATE TRIGGER gw_trg_node_rotation_update  AFTER INSERT OR UPDATE OF hemisphere ON "SCHEMA_NAME".node
+CREATE TRIGGER gw_trg_node_rotation_update  AFTER INSERT OR UPDATE OF hemisphere, the_geom ON "SCHEMA_NAME".node
 FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_node_rotation_update();

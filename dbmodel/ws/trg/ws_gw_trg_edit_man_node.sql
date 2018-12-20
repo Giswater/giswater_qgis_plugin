@@ -265,7 +265,7 @@ BEGIN
 					END IF;
 					
 					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) 
-					from "SCHEMA_NAME".node where node_id=NEW.node_id));
+					from node where node_id=NEW.node_id));
 					INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.pol_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name);
 
 			ELSE
@@ -320,7 +320,7 @@ BEGIN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));			
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from node where node_id=NEW.node_id));			
 				INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.pol_id);
 			ELSE
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);
@@ -440,6 +440,11 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+
+		-- rotation
+		IF NEW.rotation != OLD.rotation THEN
+			UPDATE node SET rotation=NEW.rotation;
+		END IF;
         
 		-- The geom
 		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom) THEN
@@ -476,7 +481,7 @@ BEGIN
 		function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,  
 		buildercat_id=NEW.buildercat_id,builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, 
 		streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode,postnumber=NEW.postnumber,postnumber2=NEW.postnumber2, descript=NEW.descript, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, 
-		label_y=NEW.label_y, label_rotation=NEW.label_rotation, rotation=NEW.rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value
+		label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value
 		WHERE node_id = OLD.node_id;
 		
 		IF man_table ='man_junction' THEN
@@ -585,6 +590,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
 
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_hydrant ON "SCHEMA_NAME".v_edit_man_hydrant;
