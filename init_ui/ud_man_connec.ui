@@ -138,7 +138,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>75</y>
+          <y>100</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -154,7 +154,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ymax">
+       <widget class="QLineEdit" name="connec_depth">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -193,7 +193,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_y_max">
+       <widget class="QLabel" name="label_connec_depth">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -216,7 +216,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Y max:</string>
+         <string>Depth:</string>
         </property>
         <property name="margin">
          <number>3</number>
@@ -226,7 +226,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>75</y>
+          <y>100</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -259,7 +259,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>100</y>
+          <y>125</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -269,7 +269,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>125</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -302,7 +302,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>175</y>
+          <y>200</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -315,7 +315,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>200</y>
+          <y>225</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -348,7 +348,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>175</y>
+          <y>200</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -435,7 +435,7 @@
         <property name="geometry">
          <rect>
           <x>109</x>
-          <y>200</y>
+          <y>225</y>
           <width>161</width>
           <height>22</height>
          </rect>
@@ -822,7 +822,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>150</y>
+          <y>175</y>
           <width>161</width>
           <height>18</height>
          </rect>
@@ -840,7 +840,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>150</y>
+          <y>175</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -879,7 +879,7 @@
         <property name="geometry">
          <rect>
           <x>111</x>
-          <y>125</y>
+          <y>150</y>
           <width>160</width>
           <height>18</height>
          </rect>
@@ -897,7 +897,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>125</y>
+          <y>150</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -983,14 +983,53 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLineEdit" name="connec_length">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>75</y>
+          <width>160</width>
+          <height>18</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_connec_length">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>75</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Length:</string>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_8">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1232,8 +1271,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1926,8 +1965,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2307,7 +2346,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_event_node">
        <attribute name="title">
@@ -2453,29 +2492,6 @@
         </property>
         <property name="text">
          <string>Cat period filter :</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="lbl_hyd_customer_code">
-        <property name="geometry">
-         <rect>
-          <x>265</x>
-          <y>4</y>
-          <width>146</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Hydrometer customer code:</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="cmb_hyd_customer_code">
-        <property name="geometry">
-         <rect>
-          <x>265</x>
-          <y>26</y>
-          <width>121</width>
-          <height>18</height>
-         </rect>
         </property>
        </widget>
       </widget>
@@ -3884,15 +3900,18 @@
   <tabstop>connec_type</tabstop>
   <tabstop>connecat_id</tabstop>
   <tabstop>btn_catalog</tabstop>
+  <tabstop>arc_id</tabstop>
   <tabstop>code</tabstop>
   <tabstop>top_elev</tabstop>
-  <tabstop>ymax</tabstop>
+  <tabstop>connec_depth</tabstop>
+  <tabstop>connec_length</tabstop>
   <tabstop>y1</tabstop>
   <tabstop>y2</tabstop>
   <tabstop>demand</tabstop>
   <tabstop>n_hydrometer</tabstop>
   <tabstop>workcat_id</tabstop>
   <tabstop>builtdate</tabstop>
+  <tabstop>customer_code</tabstop>
   <tabstop>ownercat_id</tabstop>
   <tabstop>buildercat_id</tabstop>
   <tabstop>soilcat_id</tabstop>
@@ -3901,10 +3920,25 @@
   <tabstop>location_type</tabstop>
   <tabstop>workcat_id_end</tabstop>
   <tabstop>enddate</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>macrodma_id</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>macrosector_id</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>state_type</tabstop>
+  <tabstop>uncertain</tabstop>
+  <tabstop>unconnected</tabstop>
+  <tabstop>inventory</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>publish</tabstop>
+  <tabstop>ok</tabstop>
   <tabstop>featurecat_id</tabstop>
   <tabstop>diagonal</tabstop>
   <tabstop>private_connecat_id</tabstop>
   <tabstop>feature_id</tabstop>
+  <tabstop>accessibility</tabstop>
   <tabstop>muni_id</tabstop>
   <tabstop>postcode</tabstop>
   <tabstop>streetaxis_id</tabstop>
@@ -3919,24 +3953,6 @@
   <tabstop>descript</tabstop>
   <tabstop>link</tabstop>
   <tabstop>num_value</tabstop>
-  <tabstop>label_x</tabstop>
-  <tabstop>label_y</tabstop>
-  <tabstop>label_rotation</tabstop>
-  <tabstop>rotation</tabstop>
-  <tabstop>uncertain</tabstop>
-  <tabstop>unconnected</tabstop>
-  <tabstop>inventory</tabstop>
-  <tabstop>undelete</tabstop>
-  <tabstop>publish</tabstop>
-  <tabstop>ok</tabstop>
-  <tabstop>tab_main</tabstop>
-  <tabstop>tbl_document</tabstop>
-  <tabstop>doc_type</tabstop>
-  <tabstop>date_document_from</tabstop>
-  <tabstop>date_document_to</tabstop>
-  <tabstop>doc_id</tabstop>
-  <tabstop>btn_open_doc</tabstop>
-  <tabstop>btn_doc_new</tabstop>
   <tabstop>btn_doc_insert</tabstop>
   <tabstop>btn_doc_delete</tabstop>
   <tabstop>event_id</tabstop>
@@ -3956,6 +3972,26 @@
   <tabstop>btn_insert</tabstop>
   <tabstop>tbl_element</tabstop>
   <tabstop>open_element</tabstop>
+  <tabstop>btn_doc_new</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>tab_scada</tabstop>
+  <tabstop>tbl_hydrometer</tabstop>
+  <tabstop>hydrometer_id</tabstop>
+  <tabstop>btn_add_hydrometer</tabstop>
+  <tabstop>btn_delete_hydrometer</tabstop>
+  <tabstop>open_link</tabstop>
+  <tabstop>tbl_hydrometer_value</tabstop>
+  <tabstop>cat_period_id_filter</tabstop>
+  <tabstop>label_x</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>btn_open_doc</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>label_rotation</tabstop>
+  <tabstop>doc_id</tabstop>
+  <tabstop>label_y</tabstop>
  </tabstops>
  <resources/>
  <connections/>
