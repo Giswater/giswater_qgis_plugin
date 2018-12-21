@@ -891,16 +891,15 @@ class UpdateSQL(ParentAction):
                     print(False)
                     return False
         else:
-            if str(project_type) == 'ws' or str(project_type) == 'ud':
-                if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_fct) is False:
+            if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_fct) is False:
+                print(False)
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct),
+                                           self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct)
+                if status is False:
                     print(False)
                     return False
-                else:
-                    status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct),
-                                               self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct)
-                    if status is False:
-                        print(False)
-                        return False
 
         print(status)
         return True
@@ -1187,6 +1186,8 @@ class UpdateSQL(ParentAction):
     def execute_last_process(self):
 
         # Execute last process function
+        return
+        #TODO:: pasar parametres
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_schema_update()")
         self.controller.execute_sql(sql)
         return
@@ -1271,7 +1272,7 @@ class UpdateSQL(ParentAction):
 
     def rename_project_data_schema(self):
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
-        self.load_fct()
+        self.load_fct(project_type=self.project_type_selected)
         self.execute_last_process()
 
     def update_api(self):
@@ -1316,10 +1317,10 @@ class UpdateSQL(ParentAction):
         self.execute_last_process()
 
     def reload_fk(self, project_type=False):
-        self.load_fk(project_type)
+        self.load_fk(project_type=project_type)
 
     def reload_fct(self, project_type=False):
-        self.load_fct(project_type)
+        self.load_fct(project_type=project_type)
 
     def reload_trg(self, project_type=False):
         self.load_trg(project_type)
@@ -1469,20 +1470,20 @@ class UpdateSQL(ParentAction):
     def schema_file_to_db(self):
 
         if self.chk_schema_fk.isChecked():
-            self.reload_fk()
+            self.reload_fk(self.project_type_selected)
         if self.chk_schema_funcion.isChecked():
-            self.reload_fct()
+            self.reload_fct(self.project_type_selected)
         if self.chk_schema_trigger.isChecked():
-            self.reload_trg()
+            self.reload_trg(self.project_type_selected)
 
     def api_file_to_db(self):
 
         if self.chk_api_fk.isChecked():
-            self.reload_fk()
+            self.reload_fk('api')
         if self.chk_api_funcion.isChecked():
-            self.reload_fct()
+            self.reload_fct('api')
         if self.chk_api_trigger.isChecked():
-            self.reload_trg()
+            self.reload_trg('api')
 
     def open_create_project(self):
 
@@ -1505,7 +1506,7 @@ class UpdateSQL(ParentAction):
 
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
         #TODO:fer el listener del boto + taule -> temp_csv2pg
-        self.btn_push_file  = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
+        self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
         if self.dev_user != 'TRUE':
             self.rdb_no_ct.setEnabled(False)
