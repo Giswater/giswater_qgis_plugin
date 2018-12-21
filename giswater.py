@@ -516,6 +516,7 @@ class Giswater(QObject):
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
         connection_status = self.controller.set_database_connection()
+        self.set_info_button()
         if not connection_status:
             message = self.controller.last_error
             if show_warning:
@@ -558,11 +559,8 @@ class Giswater(QObject):
 
         # Manage layers
         if not self.manage_layers():
-            self.set_info_button()
             return
-        else:
-            self.set_info_button()
-              
+
         # Manage layer names of the tables present in table 'sys_feature_cat'
         self.manage_layer_names()   
         
