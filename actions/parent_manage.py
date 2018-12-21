@@ -1036,7 +1036,7 @@ class ParentManage(ParentAction, object):
         widget_id = table_object + "_id"
         if table_object == "element":
             field_object_id = table_object + "_id"
-        if table_object == "om_visit":
+        if table_object == "v_ui_om_visit":
             widget_id = "visit_id"
         elif "v_ui_om_visitman_x_" in table_object:
             field_object_id = "visit_id"
@@ -1054,7 +1054,7 @@ class ParentManage(ParentAction, object):
         elif table_object == "element":
             self.manage_element(new_element_id=False)
             utils_giswater.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
-        elif table_object == "om_visit":
+        elif table_object == "v_ui_om_visit":
             self.manage_visit(visit_id=selected_object_id)
         elif "v_ui_om_visitman_x_" in table_object:
             self.manage_visit(visit_id=selected_object_id)

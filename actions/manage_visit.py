@@ -549,7 +549,7 @@ class ManageVisit(ParentManage, QObject):
 
         if geom_type is None:
             # Set a model with selected filter. Attach that model to selected table
-            table_object = "om_visit"
+            table_object = "v_ui_om_visit"
             expr_filter = ""
             self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
             self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
