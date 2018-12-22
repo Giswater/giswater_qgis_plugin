@@ -192,8 +192,8 @@ BEGIN
 		END IF;
 		
 		
-		--Arc id (in case of dissable arc divide on node insert)
-		IF (SELECT "value" FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND "cur_user"="current_user"() LIMIT 1)::boolean=TRUE THEN
+		--Arc id ,for those nodes that are not connected (node_type.isarcdivide = FALSE)
+		IF (SELECT isarcdivide FROM cat_node JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::boolean IS FALSE THEN 
 			NEW.arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom,0.001) LIMIT 1);
 		END IF;
 		

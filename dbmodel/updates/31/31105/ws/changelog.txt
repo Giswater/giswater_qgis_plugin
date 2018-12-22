@@ -6,6 +6,7 @@ v_inp_pattern,issue#590;
 
 31105-ws-other
 --------------
+Bug on insert nodes when node_type.isarcdivide is false and uservar=edit_arc_division_dsbl= is true capturing arc_id, issue#596;
 Bug on EPANET command file when pattern has more than 18 value on same row of inp file ,issue#590;
 New mincut approach. Zoom to features is managed by database, issue#586;
 New system parameter om_mincut_valvestat_using_valveunaccess, issue#563;
@@ -14,5 +15,4 @@ New user parameter om_mincut_analysis_dminsector, issue#561;
 New user parameter om_mincut_analysis_pipehazard, issue#561;
 New user parameter om_mincut_analysis_dinletsector, issue#561;
 New views v_arc_dattrib, v_node_dattrib, v_connec_dattrib, issue#561;
-
 
