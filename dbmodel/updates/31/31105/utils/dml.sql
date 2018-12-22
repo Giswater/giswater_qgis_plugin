@@ -71,5 +71,5 @@ INSERT INTO audit_cat_param_user VALUES ('edit_link_connecrotation_update', 'edi
 -- 2018/12/17
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('edit_connect_update_statetype', '{"connec":{"status":"FALSE", "state_type":"11"}, "gully":{"status":"FALSE", "state_type":"11"}}', 'json', 'edit', 'If TRUE, when you connect an element to the network, its state_type will be updated to value of the json');
 
-
-
+-- 2018/12/22
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_visit_parameters', '{"AutoNewWorkcat"="FALSE"}', 'json', 'om', 'Visit parameters. AutoNewWorkcat IF TRUE, automatic workcat is created with same id that visit');

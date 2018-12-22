@@ -7,6 +7,7 @@ New field cat_period_code on v_edit_rtc_hydrometer_x_data, issue#577;
 -----------------
 Bug fix when user has not cofigured any value default and do not choose any value on mandatory fields of custom forms, issue#547
 Bug fix on rule on insert_plan_arc_x_pavement, issue#565
+Enable the possibility to put the same code for visit and for workcat, issue#595
 Alter table ext_cat_period renaming starttime TO start_date and ndtime TO end_date
 Alter table ext_rtc_hydrometer_x_data adding column value_date date;
 New field ismultifeature on om_visit_parameter, issue#549
@@ -35,8 +36,11 @@ New numeration for existing function (2540) gw_fct_inlet_flowtrace, issue#566
 New numeration for existing function (2542) gw_trg_arc_vnodelink_update, issue#585
 New function (2544) gw_trg_link_connecrotation_update, issue#585
 New function (2546) gw_fct_utils_schema_update, issue#537
+New function (2548) gw_trg_om_visit, issue#595
 New system parameter sys_custom_views, issue#537 
 New system parameter sys_currency, issue#531
 New system parameter utils_csv2pg_om_visit_parameters, issue#566
+New system parameter edit_connect_update_statetype, issue#587
+New system parameter om_visit_parameters, issue#595
 Automatic update state_type on connec/gully when link is created, issue#587
 Enhance arc division function with automatic update of node.arc_id of disconnecteds nodes, issue#591
