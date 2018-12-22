@@ -52,15 +52,15 @@ INSERT INTO config_web_tabs VALUES (102, 'F31', 'tabAddress', 'Carrerer', 'Carre
 
 
 --inserts on config_web_layer_child (dinamyc insert)
-INSERT INTO config_web_layer_child
+INSERT INTO ud.config_web_layer_child
 SELECT cat_feature.id, tablename FROM ud.cat_feature JOIN ud.sys_feature_cat ON system_id=sys_feature_cat.id;
 
-
+delete from ws_traspas.config_web_tableinfo_x_inforole
 --inserts on config_web_tableinfo_x_inforole (dinamyc insert)
-insert into ud.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
-select tableinfo_id, 100, tableinfo_id  FROM ud.config_web_layer where tableinfo_id is not null ;
+insert into ws_traspas.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
+select tableinfo_id, 0, tableinfo_id  FROM ws_traspas.config_web_layer where tableinfo_id is not null ;
 
-insert into ud.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
-select tableinfo_id, 100, tableinfo_id  FROM ud.config_web_layer_child;
+insert into ws_traspas.config_web_tableinfo_x_inforole (tableinfo_id, inforole_id,tableinforole_id)
+select tableinfo_id, 0, tableinfo_id  FROM ws_traspas.config_web_layer_child;
 
 
