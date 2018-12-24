@@ -17,7 +17,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
     -- automatic creation of workcat
-    IF (SELECT (value::json->>AutoNewWorkcat) FROM config_param_system WHERE parameter='om_visit_parameters') THEN
+    IF (SELECT (value::json->>'AutoNewWorkcat') FROM config_param_system WHERE parameter='om_visit_parameters') THEN
 		INSERT INTO cat_work (id) VALUES (NEW.id);
     END IF;
 

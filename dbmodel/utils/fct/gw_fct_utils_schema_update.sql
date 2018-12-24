@@ -11,13 +11,11 @@ $BODY$
 
 /*EXAMPLE
 SELECT ws_sample.gw_fct_utils_schema_update($${
-"client":{"lang":"ES"},
-"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType"="WS", "epsg":25831}}$$)
-
+"client":{"lang":"ES"}, "data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "epsg":"25831"}}$$)
 
 SELECT ws_sample.gw_fct_utils_schema_update($${
 "client":{"lang":"ES"},
-"data":{"isNewProject":"FALSE", "gwVersion":"3.1.105", "projectType"="WS", "epsg":25831}}$$)
+"data":{"isNewProject":"FALSE", "gwVersion":"3.1.105", "projectType":"WS", "epsg":25831}}$$)
 */
 
 DECLARE 
@@ -49,34 +47,37 @@ BEGIN
 	IF v_isnew IS TRUE THEN
 
 		-- inserting version table
-		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, v_projecttype, (select version()),(select postgis_version()), v_language, v_epsg);		
+		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, v_projecttype, (select version()),(select postgis_version()), v_language, v_epsg);	
+		v_message='Project sucessfully created';
 	ELSE
 		-- check project consistency
 		IF v_projecttype = 'WS' THEN
 	
 			-- look for inp_pattern_value bug (+18 values are not possible)
-			IF (SELECT distinct (concat (factor_19, factor_20, factor_21, factor_22, factor_23, factor_24)) FROM inp_pattern_value LIMIT 1) IS NOT NULL THEN
-				INSERT INTO audit_log_project (fprocesscat_id, table_id, log_message) 
-				VALUES (33, 'inp_pattern_value', '{"version":"'||v_gwversion||'", "message":"There are some values on columns form 19 to 24. It must be deleted because it causes a bug on EPANET"}');
-				v_priority=1;
+			IF 	(SELECT id FROM ws_sample.inp_pattern_value where 
+				(factor_19 is not null or factor_20 is not null or factor_21 is not null or factor_22 is not null or factor_23 is not null or factor_24 is not null) LIMIT 1) THEN
+					INSERT INTO audit_log_project (fprocesscat_id, table_id, log_message) 
+					VALUES (33, 'inp_pattern_value', '{"version":"'||v_gwversion||'", "message":"There are some values on columns form 19 to 24. It must be deleted because it causes a bug on EPANET"}');
+					v_priority=1;
 			END IF;
 			
 		ELSIF v_projecttype = 'UD' THEN
 
 		END IF;
-
 		-- inserting version table
 		SELECT * INTO v_version FROM version LIMIT 1;	
-		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, v_version.wsoftware, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
-	END IF;
-	
-	-- get return message
-	IF v_priority=0 THEN
-		v_message='Project updated sucessfully';
-	ELSIF v_priority=1 THEN
-		v_message=concat($$Project updated but there are some warnings. Take a look on audit_log_project table: SELECT (log_message::json->>'message') FROM audit_log_project WHERE fprocesscat_id=33 and (log_message::json->>'version')='$$, v_gwversion, '''');
-	ELSIF v_priority=2 THEN
-		v_message='Project updated failed';
+		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) 
+		VALUES (v_gwversion, v_version.wsoftware, (select version()), (select postgis_version()), v_version.language, v_version.epsg);
+
+		-- get return message
+		IF v_priority=0 THEN
+			v_message='Project sucessfully updated';
+		ELSIF v_priority=1 THEN
+			v_message=concat($$Project updated but there are some warnings. Take a look on audit_log_project table: SELECT (log_message::json->>'message') FROM audit_log_project WHERE fprocesscat_id=33 and (log_message::json->>'version')='$$, v_gwversion, '''');
+		ELSIF v_priority=2 THEN
+			v_message='Project is not updated. There are one or more errors';
+		END IF;
+		
 	END IF;
 
 	--    Control NULL's
