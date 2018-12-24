@@ -295,6 +295,10 @@ class ParentDialog(QDialog):
         if row:
             self.iface.activeLayer().startEditing()
 
+        # Close database connection        
+        self.controller.close_db()         
+        del self.controller              
+
 
     def parse_commit_error_message(self):       
         """ Parse commit error message to make it more readable """
@@ -351,9 +355,14 @@ class ParentDialog(QDialog):
         if close:
             self.dialog.parent().setVisible(False)
 
+        # Close database connection         
+        self.controller.close_db()       
+        del self.controller  
+
 
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
+        
         screens = ctypes.windll.user32
         screen_x = screens.GetSystemMetrics(78)
         screen_y = screens.GetSystemMetrics(79)
@@ -2234,7 +2243,7 @@ class ParentDialog(QDialog):
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
                " WHERE t2.name = '" + str(utils_giswater.getWidgetText(dialog, exploitation)) + "'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
             utils_giswater.fillComboBox(dialog, dma, list_items, allow_nulls=False)
@@ -2252,7 +2261,7 @@ class ParentDialog(QDialog):
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.dma_id = t2.dma_id "
                " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=True)
         if not row:
             return
 
@@ -2327,7 +2336,7 @@ class ParentDialog(QDialog):
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + str(self.id) + "';")
-        row = self.controller.get_row(sql, log_info=False, log_sql=True)
+        row = self.controller.get_row(sql, log_info=False)
         if not row:
             self.tab_main.removeTab(6) 
             self.tab_scada_removed = 1

@@ -22,8 +22,28 @@ class PgDao():
             status = False
         return status
 
+    
+    def close_db(self):
+        """ Close database connection """
+        
+        try:
+            status = True
+            if self.cursor:
+                self.cursor.close()
+            if self.conn:
+                self.conn.close()
+            del self.cursor
+            del self.conn
+        except Exception, e:
+            self.last_error = e            
+            status = False
+            
+        return status
+        
+
     def get_conn_encoding(self):
         return self.conn.encoding
+
 
     def set_params(self, host, port, dbname, user, password):
         """ Set database parameters """

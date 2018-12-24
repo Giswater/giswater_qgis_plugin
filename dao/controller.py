@@ -38,6 +38,15 @@ class DaoController():
             self.set_logger(logger_name)
                 
         
+    def close_db(self):
+        """ Close database connection """
+                    
+        if self.dao:
+            if not self.dao.close_db():
+                self.log_info(str(self.last_error))
+            del self.dao
+        
+        
     def set_giswater(self, giswater):
         self.giswater = giswater
                 
