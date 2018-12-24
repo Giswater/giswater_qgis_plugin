@@ -65,11 +65,19 @@ INSERT INTO audit_cat_function VALUES (2540, 'gw_fct_inlet_flowtrace', 'om', NUL
 -- 2018/12/14
 INSERT INTO audit_cat_function VALUES (2542, 'gw_trg_arc_vnodelink_update', 'edit', NULL, '', '', NULL, NULL, NULL);
 INSERT INTO audit_cat_function VALUES (2544, 'gw_trg_link_connecrotation_update', 'edit', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2546, 'gw_fct_admin_schema_update', 'edit', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2548, 'gw_trg_om_visit', 'om', NULL, '', '', NULL, NULL, NULL);
 
 INSERT INTO audit_cat_param_user VALUES ('edit_link_connecrotation_update', 'edit', 'Used to rotate label and symbol of connec using the links angle', 'role_edit');
+
 
 -- 2018/12/17
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('edit_connect_update_statetype', '{"connec":{"status":"FALSE", "state_type":"11"}, "gully":{"status":"FALSE", "state_type":"11"}}', 'json', 'edit', 'If TRUE, when you connect an element to the network, its state_type will be updated to value of the json');
 
 -- 2018/12/22
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_visit_parameters', '{"AutoNewWorkcat"="FALSE"}', 'json', 'om', 'Visit parameters. AutoNewWorkcat IF TRUE, automatic workcat is created with same id that visit');
+
+-- 2018/12/24
+INSERT INTO audit_cat_function VALUES (2550, 'gw_fct_admin_schema_droprelations', 'admin', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2550, 'gw_fct_admin_role_permissions', 'admin', NULL, '', '', NULL, NULL, NULL);
+

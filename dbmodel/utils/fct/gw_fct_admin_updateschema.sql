@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2546
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_schema_update(p_data json) RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_updateschema(p_data json) RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_schema_update($${
+SELECT SCHEMA_NAME.gw_fct_admin_schema_update($${
 "client":{"lang":"ES"}, "data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "epsg":"25831"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_utils_schema_update($${
+SELECT SCHEMA_NAME.gw_fct_admin_schema_update($${
 "client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "gwVersion":"3.1.105", "projectType":"WS", "epsg":25831}}$$)
 */
@@ -41,15 +41,19 @@ BEGIN
 	v_isnew := (p_data ->> 'data')::json->> 'isNewProject';
 
 	-- update permissions	
-	PERFORM gw_fct_utils_role_permissions();
+	PERFORM gw_fct_admin_role_permissions();
 	
 	-- last proccess
 	IF v_isnew IS TRUE THEN
+	
+		-- clean schema of all tables/views/triggers not used in this version
+		PERFORM gw_fct_admin_updateschema_drops();		
 
 		-- inserting version table
 		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, v_projecttype, (select version()),(select postgis_version()), v_language, v_epsg);	
 		v_message='Project sucessfully created';
-	ELSE
+		
+	ELSIF v_isnew IS FALSE THEN
 		-- check project consistency
 		IF v_projecttype = 'WS' THEN
 	

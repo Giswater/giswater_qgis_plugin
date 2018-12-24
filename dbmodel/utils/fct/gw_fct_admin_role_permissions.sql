@@ -4,10 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2502
+--FUNCTION CODE: 2552
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_role_permissions();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_role_permissions() RETURNS void AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_role_permissions();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_role_permissions() RETURNS void AS
 $BODY$
 
 DECLARE 
@@ -67,12 +67,14 @@ BEGIN
 		END LOOP;
 	
 		-- Grant specificic permissions for functions
+		/* todo
 		FOR v_tablerecord IN SELECT * FROM audit_cat_function WHERE project_type=v_project_type
 		LOOP
 			v_function_name=concat(v_tablerecord.function_name,'(',v_tablerecord.input_params,')');
-			v_query_text:= 'GRANT ALL ON FUNCTION '||v_tablerecord.id||' TO '||v_function_name||';';
+			v_query_text:= 'GRANT ALL ON FUNCTION '||v_tablerecord.id||' TO '||v_tablerecord.sys_role_id||';';
 			EXECUTE v_query_text;
 		END LOOP;
+		*/
 
 	END IF;
 
