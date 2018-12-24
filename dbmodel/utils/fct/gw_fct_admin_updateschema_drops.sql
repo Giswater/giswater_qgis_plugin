@@ -23,6 +23,17 @@ BEGIN
 	-- Get project type
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
+	-- both projects (WS/UD)	
+	-- tables
+		DROP TABLE version CASCADE;
+		DELETE FROM audit_cat_table WHERE id='version';
+
+		-- views
+
+		
+		-- functions & function triggers
+	
+	-- ws projects
 	IF project_type_aux='WS' THEN
 	
 		-- tables
@@ -36,7 +47,7 @@ BEGIN
 		-- functions & function triggers
 		
 		
-	
+	-- ud projects
 	ELSIF project_type_aux='UD' THEN
 		-- tables
 		
@@ -44,11 +55,8 @@ BEGIN
 		
 		-- triggers
 		
-		-- functions
-		
-		-- audit cat table
-
-	
+		-- functions & function triggers
+			
 	END IF;
 		
 RETURN v_count;
