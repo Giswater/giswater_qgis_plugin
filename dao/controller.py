@@ -69,6 +69,14 @@ class DaoController():
         self.log_info("Logger initialized")   
         
                 
+    def close_logger(self):
+        """ Close logger file """
+        
+        if self.logger:
+            self.logger.close_logger()
+            del self.logger        
+        
+                
     def tr(self, message, context_name=None):
         """ Translate @message looking it in @context_name """
         

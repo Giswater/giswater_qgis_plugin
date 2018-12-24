@@ -297,6 +297,10 @@ class ParentDialog(QDialog):
 
         # Close database connection        
         self.controller.close_db()         
+        
+        # Close logger file
+        self.controller.close_logger()
+                      
         del self.controller              
 
 
@@ -357,6 +361,10 @@ class ParentDialog(QDialog):
 
         # Close database connection         
         self.controller.close_db()       
+        
+        # Close logger file
+        self.controller.close_logger()
+        
         del self.controller  
 
 
