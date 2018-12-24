@@ -34,6 +34,7 @@ This version of Giswater is provided by Giswater Association
 		IF TG_OP = 'INSERT' THEN   
 			-- Arc ID
 			IF (NEW.arc_id IS NULL) THEN
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.arc_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
 
