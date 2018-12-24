@@ -52,7 +52,7 @@ class ManNodeDialog(ParentDialog):
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.dlg_is_destroyed = False
-        self.controller.manage_translation('ud_man_node', dialog) 
+        #self.controller.manage_translation('ud_man_node', dialog) 
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             

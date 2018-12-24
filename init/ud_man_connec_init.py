@@ -47,7 +47,7 @@ class ManConnecDialog(ParentDialog):
         super(ManConnecDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.dlg_is_destroyed = False
-        self.controller.manage_translation('ud_man_connec', dialog) 
+        #self.controller.manage_translation('ud_man_connec', dialog) 
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
