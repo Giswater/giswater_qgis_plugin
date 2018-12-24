@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2546
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_schema_update(p_data json) RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_schema_update(p_data json) RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_utils_schema_update($${
+SELECT SCHEMA_NAME.gw_fct_utils_schema_update($${
 "client":{"lang":"ES"}, "data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "epsg":"25831"}}$$)
 
-SELECT ws_sample.gw_fct_utils_schema_update($${
+SELECT SCHEMA_NAME.gw_fct_utils_schema_update($${
 "client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "gwVersion":"3.1.105", "projectType":"WS", "epsg":25831}}$$)
 */
@@ -31,7 +31,7 @@ DECLARE
 
 BEGIN 
 	-- search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get input parameters
 	v_gwversion := (p_data ->> 'data')::json->> 'gwVersion';
@@ -54,7 +54,7 @@ BEGIN
 		IF v_projecttype = 'WS' THEN
 	
 			-- look for inp_pattern_value bug (+18 values are not possible)
-			IF 	(SELECT id FROM ws_sample.inp_pattern_value where 
+			IF 	(SELECT id FROM SCHEMA_NAME.inp_pattern_value where 
 				(factor_19 is not null or factor_20 is not null or factor_21 is not null or factor_22 is not null or factor_23 is not null or factor_24 is not null) LIMIT 1) THEN
 					INSERT INTO audit_log_project (fprocesscat_id, table_id, log_message) 
 					VALUES (33, 'inp_pattern_value', '{"version":"'||v_gwversion||'", "message":"There are some values on columns form 19 to 24. It must be deleted because it causes a bug on EPANET"}');

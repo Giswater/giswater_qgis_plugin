@@ -52,7 +52,7 @@ BEGIN
 	
 		-- Node ID	
 		IF (NEW.node_id IS NULL) THEN
-			--PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 	
