@@ -1,11 +1,11 @@
-﻿CREATE OR REPLACE FUNCTION ws_sample.gw_api_getinfofromlist(p_data json)
+﻿CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getinfofromlist(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- lot
-SELECT ws_sample.gw_api_getinfofromlist($${
+SELECT SCHEMA_NAME.gw_api_getinfofromlist($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{},
 		"feature":{"featureType":"lot", "id":"1"},
@@ -27,7 +27,7 @@ DECLARE
 BEGIN
 
 	--  Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'

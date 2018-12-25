@@ -1,0 +1,110 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+This file explains the sql's structure of this folder
+
+
+-- Folders structure
+--------------------------------
+
+api
+corporate
+dev
+example
+i18n
+tools
+ud
+updates
+utils
+ws
+
+subfolder structure of ud/ws/utils folder
+	- ddl
+	- ddlrule
+	- ddlview
+	- dml
+	- fct
+	- ftrg
+	- tablect
+	- trg
+	
+--- Instructions to update sql's
+--------------------------------
+
+1) FUNCTION AND TRIGGER FUNCTION:  
+	They must be unique amb must be located on (fct) and (ftrg) folders. 
+	In case of different behaviuour from different versions IF on code will be used
+	Use one file for each function/trigger
+	
+2) VIEWS:
+	Use ddlview.sql file located on ws/ud/utils update folders
+	DROP CASCADE is forbidden. If it's need, time to wait for next major release
+	
+3)  TABLES, DML, RULES, TRIGGERS, CONSTRAINTS:
+	Use below files located on ws/ud/utils update folders
+		ddl.sql
+		dml.sql
+		ddlrule.sql
+		tablect.sql
+		trg.sql	
+4) I18N 
+	It's specific case of dml
+	Use below files located on EN/ES/CA/PT folders
+		ud.sql
+		ws.sql
+		utils.sql
+5) API: 
+	Same case of ud/ws without ws/ud folders
+	No ws/ud folders means that no specific ws/ud sql file will be located on API folder
+	In case of specific API table/view/function use update files of ws or ud to work with
+	
+6) OTHER PROJECT TYPES
+	If you are looking to use Giswater sql project creation and update structure of specific project
+	- Define list of other project types on config.file
+	- Create folder with same name defined on config.file and use this subfolder structure:
+		example
+		i18n
+		updates
+		ddl
+		ddlrule
+		ddlview
+		dml
+		fct
+		ftrg
+		tablect
+		trg
+	- Same behaviour of WS/UD will be done with the unique difference of the location of folders
+
+7) TO DEPRECATE ANY RELATION OF DDBB
+	To deprecate function / trigger / table / view or sequence 
+	- UPDATE audit_cat_table / audit_cat_function / audit_cat_sequence  SET isdeprectaded=TRUE
+	
+	
+	
+-- Workflows
+----------------------------	
+
+1) CREATE EMPTY PROJECT
+
+2) CREATE EMPTY PROJECT WITHOUT CONSTRAINTS AND TRIGGERS
+
+3) CREATE PROJECT WITH SAMPLE DATA
+
+4) CREATE PROJECT WITH SAMPLE FOR DEV
+
+5) CREATE PROJECT USING INP FILE
+
+6) PROJECT UPDATE
+
+7) CREATE API
+
+8) API UPDATE
+
+9) LAST PROCESS FUNCTION
+	- Grant permissions to all relations using audit_cat_* tables
+	- Enable foreing keys with utils schema if exists
+	- Drop deprecated table/views/functions/sequences ONLY for new projects

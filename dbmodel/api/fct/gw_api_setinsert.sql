@@ -5,27 +5,27 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setinsert(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setinsert(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
 -- Indirects
 visit: (query used on setvisit function, not direct from client)
-SELECT ws_sample.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
 	"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName": "visit_id"}, 
 	"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 
 file: (query used on setfileinsert function, not direct from client)
-SELECT ws_sample.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
 	"feature":{"featureType":"file","tableName":"om_visit_file", "id":null, "idName": "id"}, 
 	"data":{"fields":{"visit_id":1, "hash":"testhash", "url":"urltest", "filetype":"png"},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 
 -- directs
 feature:
-SELECT ws_sample.gw_api_setinsert($${
+SELECT SCHEMA_NAME.gw_api_setinsert($${
 "client":{"device":9, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"node", "tableName":"v_edit_node", "id":"1251521", "idName": "node_id"},
@@ -67,8 +67,8 @@ DECLARE
 
 BEGIN
 	--    Set search path to local schema
-	SET search_path = "ws_sample", public;
-	v_schemaname = 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 	
 	-- Get paramters
 	EXECUTE 'SELECT epsg FROM version' INTO v_epsg;

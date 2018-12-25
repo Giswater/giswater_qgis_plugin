@@ -5,18 +5,18 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getchilds(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getchilds(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_api_getchilds($${
+SELECT SCHEMA_NAME.gw_api_getchilds($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"arc", "tableName":"ve_arc_pipe", "idName":"arc_id"},
 "data":{"comboParent":"state", "comboId":"1"}}$$)
 
-SELECT ws_sample.gw_api_getchilds($${
+SELECT SCHEMA_NAME.gw_api_getchilds($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"arc", "tableName":"ve_arc_pipe", "idName":"arc_id"},
@@ -51,7 +51,7 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get schema name
 	schemas_array := current_schemas(FALSE);

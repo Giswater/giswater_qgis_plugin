@@ -5,12 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getmessage(p_data json, p_message integer)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getmessage(p_data json, p_message integer)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT ws_sample.gw_api_getmessage($${"featureType":"visit", "idName":"visit_id", "id":"2001"}$$, 30)
+SELECT SCHEMA_NAME.gw_api_getmessage($${"featureType":"visit", "idName":"visit_id", "id":"2001"}$$, 30)
 */
 
 DECLARE
@@ -20,7 +20,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     SELECT * INTO v_record FROM config_api_message WHERE id=p_message;
     
@@ -42,5 +42,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_api_getlist(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_getlist(json)
   OWNER TO geoadmin;

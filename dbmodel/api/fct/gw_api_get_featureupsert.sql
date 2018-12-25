@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_featureupsert(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_featureupsert(
     p_table_id character varying,
     p_id character varying,
     p_reduced_geometry geometry,
@@ -19,10 +19,10 @@ DECLARE
 
 /*EXAMPLE
 arc with no nodes
-SELECT ws_sample.gw_api_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341', 9, 100,'INSERT', true)
+SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341', 9, 100,'INSERT', true)
 arc with nodes
-SELECT ws_sample.gw_api_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141', 9, 100,'INSERT', true)
-SELECT ws_sample.gw_api_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,'UPDATE', true)
+SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141', 9, 100,'INSERT', true)
+SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,'UPDATE', true)
 */
 
 	v_columntype character varying;
@@ -88,7 +88,7 @@ BEGIN
 -- get basic parameters
 -----------------------
      --  set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
      --  get schema name
     schemas_array := current_schemas(FALSE);

@@ -5,20 +5,20 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getrowinsert(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getrowinsert(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 --configured
-SELECT ws_sample.gw_api_getrowinsert($${
+SELECT SCHEMA_NAME.gw_api_getrowinsert($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"v_edit_man_pipe"},
 "data":{}}$$)
 
 --NOT configured
-SELECT ws_sample.gw_api_getrowinsert($${
+SELECT SCHEMA_NAME.gw_api_getrowinsert($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"arc"},
@@ -41,8 +41,8 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
-	v_schemaname = 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -127,5 +127,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_api_getvisit(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_getvisit(json)
   OWNER TO geoadmin;

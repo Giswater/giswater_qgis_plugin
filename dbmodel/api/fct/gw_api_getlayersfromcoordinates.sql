@@ -5,12 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlayersfromcoordinates(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlayersfromcoordinates(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT ws_sample.gw_api_getlayersfromcoordinates($${
+SELECT SCHEMA_NAME.gw_api_getlayersfromcoordinates($${
 "client":{"device":9, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{},
@@ -65,7 +65,7 @@ BEGIN
 
     
 --  Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
 
 --  get api version

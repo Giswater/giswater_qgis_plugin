@@ -12,6 +12,8 @@ Alter table ext_cat_period renaming starttime TO start_date and ndtime TO end_da
 Alter table ext_rtc_hydrometer_x_data adding column value_date date;
 New field ismultifeature on om_visit_parameter, issue#549
 New field isarcdivide on node_type, issue#556
+New field isdeprecated on audit_cat_function
+New field isdeprecated on audit_cat_table
 New table dattrib, issue#561
 New table dattrib_type, issue#561
 New process (33) update project data schema, issue#537

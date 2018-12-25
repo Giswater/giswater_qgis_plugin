@@ -5,14 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getsearch(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getsearch(p_data json)
   RETURNS json AS
 $BODY$
 
 -- TODO: Implementar el threshold per a tots els widgets igual que està en la 3.1
 
 /*EXAMPLE
-SELECT ws_sample.gw_api_getsearch($${
+SELECT SCHEMA_NAME.gw_api_getsearch($${
 "client":{"device":3, "infoType":100, "lang":"ES"}
 }$$)
 */
@@ -54,7 +54,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  get api values
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'

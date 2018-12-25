@@ -4,11 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE OR REPLACE FUNCTION "ws_sample"."gw_api_setfileinsert"(p_data json) RETURNS pg_catalog.json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_api_setfileinsert"(p_data json) RETURNS pg_catalog.json AS 
 $BODY$
 
 /*
-SELECT ws_sample.gw_api_setfileinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT SCHEMA_NAME.gw_api_setfileinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
 	"feature":{"featureType":"file", "tableName":"om_visit_file", "id":null, "idName": "id"}, 
 	"data":{"fields":{"visit_id":1, "hash":"testhash", "url":"urltest", "filetype":"png"},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)	
@@ -26,7 +26,7 @@ DECLARE
 BEGIN
 
 	-- set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
     
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'

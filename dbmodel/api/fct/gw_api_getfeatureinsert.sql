@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getfeatureinsert(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getfeatureinsert(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -14,7 +14,7 @@ $BODY$
 DEFINITION:
 Function called wheh new geometry is inserted to control topological geometry
 EXAMPLE:
-SELECT ws_sample.gw_api_getfeatureinsert($${
+SELECT SCHEMA_NAME.gw_api_getfeatureinsert($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe"},
@@ -33,7 +33,7 @@ DECLARE
 
 BEGIN
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 
 	v_device := ((p_data ->>'client')::json->>'device')::integer;
@@ -52,7 +52,7 @@ BEGIN
 	END IF;
 	
 	-- Call gw_api_getinfofromid
-	RETURN ws_sample.gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"True"},"feature":{"tableName":"'
+	RETURN SCHEMA_NAME.gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"True"},"feature":{"tableName":"'
 			,v_tablename,'","inputGeometry":"',v_input_geometry,'"},"data":{}}')::json);
 
 --    Exception handling

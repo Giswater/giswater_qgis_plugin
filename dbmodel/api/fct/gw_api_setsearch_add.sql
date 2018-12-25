@@ -6,17 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setsearch_add(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setsearch_add(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_api_setsearch_add($${
+SELECT SCHEMA_NAME.gw_api_setsearch_add($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"tabName": "address"},
 		"data":{"add_street":{"text":"Calle d'Antoni Gaudí"}, "add_postnumber":{"text":"8"}}
 		}$$)
-SELECT "ws_sample".gw_api_setsearch_add($${
+SELECT "SCHEMA_NAME".gw_api_setsearch_add($${
 		"client":{"device":9, "infoType":100, "lang":"ES"}, 
 		"form":{"tabName":"address"}, "feature":{}, 
 		"data":{"filterFields":{}, "pageInfo":{}, "add_muni":{"id":"1", "name":"Sant Boi del Llóbregat"}, 
@@ -54,7 +54,7 @@ DECLARE
 BEGIN
 
 --    Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --      get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -72,18 +72,18 @@ BEGIN
 IF v_tab = 'address' THEN
 
 	-- Parameters of the street layer
-	SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM ws_sample.config_param_system WHERE parameter='api_search_street';
-	SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM ws_sample.config_param_system WHERE parameter='api_search_street';
-	SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM ws_sample.config_param_system WHERE parameter='api_search_street';
-	SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM ws_sample.config_param_system WHERE parameter='api_search_street';
-	SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_id_field FROM ws_sample.config_param_system WHERE parameter='api_search_street';
+	SELECT ((value::json)->>'sys_table_id') INTO v_street_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
+	SELECT ((value::json)->>'sys_id_field') INTO v_street_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
+	SELECT ((value::json)->>'sys_search_field') INTO v_street_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
+	SELECT ((value::json)->>'sys_parent_field') INTO v_street_muni_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
+	SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
 
 	-- Parameters of the postnumber layer
-	SELECT ((value::json)->>'sys_table_id') INTO v_address_layer FROM ws_sample.config_param_system WHERE parameter='api_search_postnumber';
-	SELECT ((value::json)->>'sys_id_field') INTO v_address_id_field FROM ws_sample.config_param_system WHERE parameter='api_search_postnumber';
-	SELECT ((value::json)->>'sys_search_field') INTO v_address_display_field FROM ws_sample.config_param_system WHERE parameter='api_search_postnumber';
-	SELECT ((value::json)->>'sys_parent_field') INTO v_address_street_id_field FROM ws_sample.config_param_system WHERE parameter='api_search_postnumber';
-	SELECT ((value::json)->>'sys_geom_field') INTO v_address_geom_id_field FROM ws_sample.config_param_system WHERE parameter='api_search_postnumber';
+	SELECT ((value::json)->>'sys_table_id') INTO v_address_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+	SELECT ((value::json)->>'sys_id_field') INTO v_address_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+	SELECT ((value::json)->>'sys_search_field') INTO v_address_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+	SELECT ((value::json)->>'sys_parent_field') INTO v_address_street_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+	SELECT ((value::json)->>'sys_geom_field') INTO v_address_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
 
 
 	--Text to search

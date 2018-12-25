@@ -5,12 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setgo2epa(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setgo2epa(p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT ws_sample.gw_api_setgo2epa($${
+SELECT SCHEMA_NAME.gw_api_setgo2epa($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{},
@@ -36,7 +36,7 @@ DECLARE
 BEGIN
 
 -- set search path
-    set search_path='ws_sample';
+    set search_path='SCHEMA_NAME';
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -108,5 +108,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_api_setgo2epa(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_setgo2epa(json)
   OWNER TO geoadmin;

@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_json_object_set_key(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_json_object_set_key(
     json json,
     key_to_set text,
     value_to_set anyelement)

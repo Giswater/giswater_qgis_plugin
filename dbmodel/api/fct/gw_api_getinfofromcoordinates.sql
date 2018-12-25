@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getinfofromcoordinates(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getinfofromcoordinates(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT ws_sample.gw_api_getinfofromcoordinates($${
+SELECT SCHEMA_NAME.gw_api_getinfofromcoordinates($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{},
 		"feature":{},
@@ -19,7 +19,7 @@ SELECT ws_sample.gw_api_getinfofromcoordinates($${
 			"visibleLayer":["ve_node","ve_arc"],
 			"toolBar":"basic",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
-SELECT ws_sample.gw_api_getinfofromcoordinates($${
+SELECT SCHEMA_NAME.gw_api_getinfofromcoordinates($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{},
 		"feature":{},
@@ -61,7 +61,7 @@ DECLARE
 BEGIN
 
 --  Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
 
 --  get api version
@@ -195,7 +195,7 @@ BEGIN
             INTO v_iseditable;
 	RAISE NOTICE '----------------%',v_toolbar;
 --   Call and return gw_api_getinfofromid
-	RETURN ws_sample.gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
+	RETURN SCHEMA_NAME.gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
 	'"},"feature":{"tableName":"',v_layer,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'"}}')::json);
 
 --    Exception handling

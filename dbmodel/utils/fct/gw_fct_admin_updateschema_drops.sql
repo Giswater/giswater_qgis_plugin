@@ -12,51 +12,37 @@ $BODY$
 
 
 DECLARE
-	project_type_aux text;
+	v_schemaname text;
 	
 BEGIN
-
-	-- Search path
+	-- search path
 	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'ws_sample';
 
+	-- Drop sequences
+	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS TRUE
+	LOOP
+		v_query_text:= 'DROP VIEW IF EXISTS '||v_tablerecord.id||';';
+		EXECUTE v_query_text;
+	END LOOP;
 
-	-- Get project type
-	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	-- Drop views and tables
+	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS TRUE
+	LOOP
+		IF v_tablerecord.id IN (SELECT tablename FROM information_schema.views WHERE table_schema=v_schemaname) 
+			v_query_text:= 'DROP VIEW IF EXISTS '||v_tablerecord.id||';';
+			EXECUTE v_query_text;
+		ELSE
 	
-	-- both projects (WS/UD)	
-		-- tables
-		
-
-		-- views
-
-		
-		-- functions & function triggers
-	
-	-- ws projects
-	IF project_type_aux='WS' THEN
-	
-		-- tables
-		DROP TABLE inp_value_opti_units CASCADE;
-		DELETE FROM audit_cat_table WHERE id='inp_value_opti_units';
-
-		-- views
-		DROP VIEW v_inp_mixing CASCADE;
-		DELETE FROM audit_cat_table WHERE id='v_inp_mixing';
-		
-		-- functions & function triggers
-		
-		
-	-- ud projects
-	ELSIF project_type_aux='UD' THEN
-		-- tables
-		
-		-- views
-		
-		-- triggers
-		
-		-- functions & function triggers
+		v_query_text:= 'DROP TABLE IF EXISTS '||v_tablerecord.id||';';
+		EXECUTE v_query_text;
 			
-	END IF;
+	-- Drop functions
+	FOR v_tablerecord IN SELECT * FROM audit_cat_function WHERE isdeprecated IS TRUE
+	LOOP
+		v_query_text:= 'DROP FUNCTION IF EXISTS '||v_tablerecord.id||';';
+		EXECUTE v_query_text;
+	END LOOP;
 		
 RETURN;
 	

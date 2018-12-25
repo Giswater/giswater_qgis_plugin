@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_formfields(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
     p_formname character varying,
     p_formtype character varying,
     p_tabname character varying,
@@ -20,11 +20,11 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT ws_sample.gw_api_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT SCHEMA_NAME.gw_api_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 only 32
-SELECT ws_sample.gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
-SELECT ws_sample.gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT ws_sample.gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT SCHEMA_NAME.gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
+SELECT SCHEMA_NAME.gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT SCHEMA_NAME.gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 
 
 */
@@ -63,7 +63,7 @@ DECLARE
 BEGIN
 
 --   Set search path to local schema
-     SET search_path = "ws_sample", public;
+     SET search_path = "SCHEMA_NAME", public;
 
 --   Get schema name
      schemas_array := current_schemas(FALSE);
@@ -305,5 +305,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_api_get_formfields(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer)
+ALTER FUNCTION SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, character varying, integer)
   OWNER TO postgres;

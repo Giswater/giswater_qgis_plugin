@@ -6,19 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setsearch(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setsearch(p_data json)
   RETURNS json AS
 $BODY$
 
 /*example
-SELECT ws_sample.gw_api_setsearch($${
+SELECT SCHEMA_NAME.gw_api_setsearch($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"tabName": "network"},
 		"feature":{},
 		"data":{"net_type": {"id": "ve_arc", "name": "Arcs"}, "network_net_code": {"text": "2"}}}$$)
 
 
-SELECT ws_sample.gw_api_setsearch($${
+SELECT SCHEMA_NAME.gw_api_setsearch($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"tabName": "address"},
 		"feature":{},
@@ -148,7 +148,7 @@ DECLARE
 BEGIN
 
 --   Set search path to local schema
-     SET search_path = "ws_sample", public;
+     SET search_path = "SCHEMA_NAME", public;
 
 --   Set api version
      EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'

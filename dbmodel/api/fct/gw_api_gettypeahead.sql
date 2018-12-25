@@ -5,14 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_gettypeahead(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_gettypeahead(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- with parent
-SELECT ws_sample.gw_api_gettypeahead($${
+SELECT SCHEMA_NAME.gw_api_gettypeahead($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe"},
@@ -24,7 +24,7 @@ SELECT ws_sample.gw_api_gettypeahead($${
 	"textToSearch":"FC"}}$$)
 
 -- without parent
-SELECT ws_sample.gw_api_gettypeahead($${
+SELECT SCHEMA_NAME.gw_api_gettypeahead($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe"},
@@ -46,7 +46,7 @@ DECLARE
 BEGIN
 
     --  Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	
     -- 	get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
