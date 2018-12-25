@@ -57,3 +57,10 @@ CREATE INDEX ext_rtc_hydrometer_x_data_index_cat_period_id ON ext_rtc_hydrometer
 -- 2018/12/25
 ALTER TABLE audit_cat_table ADD COLUMN isdrepecated boolean DEFAULT FALSE;
 ALTER TABLE audit_cat_function ADD COLUMN isdrepecated boolean DEFAULT FALSE;
+
+
+TABLE audit_cat_sequence
+(
+  id text PRIMARY KEY,
+  isdeprecated boolean DEFAULT false
+);

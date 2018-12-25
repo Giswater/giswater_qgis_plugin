@@ -16,6 +16,7 @@ New field isdeprecated on audit_cat_function
 New field isdeprecated on audit_cat_table
 New table dattrib, issue#561
 New table dattrib_type, issue#561
+New table audit_cat_sequence, 
 New process (33) update project data schema, issue#537
 New process (34) mincut analysis dynamic minimum sector, issue#566
 New process (35) mincut analysis dynamic inlet sector, issue#566
