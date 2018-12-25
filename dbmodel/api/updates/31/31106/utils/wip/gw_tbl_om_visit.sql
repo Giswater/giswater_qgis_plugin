@@ -1,0 +1,1 @@
+﻿ALTER TABLE SCHEMA_NAME.om_visit ADD COLUMN feature_type text;

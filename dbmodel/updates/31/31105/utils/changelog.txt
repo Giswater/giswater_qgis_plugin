@@ -35,10 +35,11 @@ New function (2538) gw_fct_dinlet, issue#566
 New numeration for existing function (2540) gw_fct_inlet_flowtrace, issue#566
 New numeration for existing function (2542) gw_trg_arc_vnodelink_update, issue#585
 New function (2544) gw_trg_link_connecrotation_update, issue#585
-New function (2546) gw_fct_admin_schema_update, issue#537
+New function (2546) gw_fct_admin_schema_lastprocess, issue#537
 New function (2548) gw_trg_om_visit, issue#595
-New function (2550) gw_fct_admin_schema_droprelations, 
+New function (2550) gw_fct_admin_updateschema_drops, 
 New function (2552) gw_fct_admin_role_permissions, 
+New function (2554) gw_fct_admin_schema_utils_fk, 
 New system parameter sys_custom_views, issue#537 
 New system parameter sys_currency, issue#531
 New system parameter utils_csv2pg_om_visit_parameters, issue#566

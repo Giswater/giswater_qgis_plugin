@@ -78,6 +78,7 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_visit_parameters', '{"AutoNewWorkcat"="FALSE"}', 'json', 'om', 'Visit parameters. AutoNewWorkcat IF TRUE, automatic workcat is created with same id that visit');
 
 -- 2018/12/24
-INSERT INTO audit_cat_function VALUES (2550, 'gw_fct_admin_schema_droprelations', 'admin', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2550, 'gw_fct_admin_role_permissions', 'admin', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2550, 'gw_fct_admin_updateschema_drops', 'admin', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2552, 'gw_fct_admin_role_permissions', 'admin', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function VALUES (2554, 'gw_fct_admin_schema_utils_fk', 'admin', NULL, '', '', NULL, NULL, NULL);
 

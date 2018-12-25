@@ -310,7 +310,13 @@ CREATE TABLE "inp_pattern_value" (
 "factor_15" numeric(12,4),
 "factor_16" numeric(12,4),
 "factor_17" numeric(12,4),
-"factor_18" numeric(12,4)
+"factor_18" numeric(12,4),
+"factor_19" numeric(12,4),
+"factor_20" numeric(12,4),
+"factor_21" numeric(12,4),
+"factor_22" numeric(12,4),
+"factor_23" numeric(12,4),
+"factor_24" numeric(12,4)
 );
 
 

@@ -24,9 +24,8 @@ BEGIN
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
 	-- both projects (WS/UD)	
-	-- tables
-		DROP TABLE version CASCADE;
-		DELETE FROM audit_cat_table WHERE id='version';
+		-- tables
+		
 
 		-- views
 
@@ -41,7 +40,7 @@ BEGIN
 		DELETE FROM audit_cat_table WHERE id='inp_value_opti_units';
 
 		-- views
-		DROP TABLE v_inp_mixing CASCADE;
+		DROP VIEW v_inp_mixing CASCADE;
 		DELETE FROM audit_cat_table WHERE id='v_inp_mixing';
 		
 		-- functions & function triggers
@@ -59,7 +58,7 @@ BEGIN
 			
 	END IF;
 		
-RETURN v_count;
+RETURN;
 	
 END;
 $BODY$
