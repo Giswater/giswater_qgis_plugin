@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>489</width>
+    <width>422</width>
     <height>626</height>
    </rect>
   </property>
@@ -444,7 +444,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload functions</string>
+              <string>Reload functions &amp; function triggers               </string>
              </property>
             </widget>
            </item>
@@ -457,7 +457,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload fk</string>
+              <string>Reload constraints</string>
              </property>
             </widget>
            </item>
@@ -599,7 +599,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload fk</string>
+              <string>Reload constraints</string>
              </property>
             </widget>
            </item>
@@ -612,7 +612,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload functions</string>
+              <string>Reload functions &amp; trigger functions      </string>
              </property>
             </widget>
            </item>
