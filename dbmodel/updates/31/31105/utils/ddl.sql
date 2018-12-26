@@ -59,8 +59,6 @@ ALTER TABLE audit_cat_table ADD COLUMN isdrepecated boolean DEFAULT FALSE;
 ALTER TABLE audit_cat_function ADD COLUMN isdrepecated boolean DEFAULT FALSE;
 
 
-TABLE audit_cat_sequence
-(
+CREATE TABLE audit_cat_sequence (
   id text PRIMARY KEY,
-  isdeprecated boolean DEFAULT false
-);
+  isdeprecated boolean DEFAULT false );

@@ -37,32 +37,44 @@ subfolder structure of ud/ws/utils folder
 
 1) FUNCTION AND TRIGGER FUNCTION:  
 	They must be unique amb must be located on (fct) and (ftrg) folders. 
+	Mandatory to modify the original definition
 	In case of different behaviuour from different versions IF on code will be used
 	Use one file for each function/trigger
 	
 2) VIEWS:
-	Use ddlview.sql file located on ws/ud/utils update folders
+	Use ddlview.sql file located on ws/ud/utils update folders. 
+	Forbbiden to modify the original definition.keep the original defition but put a comment there 'view updated on 3.x.xxxx'
 	DROP CASCADE is forbidden. If it's need, time to wait for next major release
 	
-3)  TABLES, DML, RULES, TRIGGERS, CONSTRAINTS:
+	
+3)  TABLES, RULES, TRIGGERS, CONSTRAINTS:
+	Forbbiden to modify the original definition. keep the original defition but put a comment there 'definiton updated on 3.x.xxxx'
 	Use below files located on ws/ud/utils update folders
 		ddl.sql
 		dml.sql
 		ddlrule.sql
 		tablect.sql
 		trg.sql	
-4) I18N 
+4) DML
+	Forbbiden to modify the original definition.
+	Use below files located on ws/ud/utils update folders
+		ddl.sql
+		dml.sql
+		ddlrule.sql
+		tablect.sql
+		trg.sql	
+5) I18N 
 	It's specific case of dml
 	Use below files located on EN/ES/CA/PT folders
 		ud.sql
 		ws.sql
 		utils.sql
-5) API: 
+6) API: 
 	Same case of ud/ws without ws/ud folders
 	No ws/ud folders means that no specific ws/ud sql file will be located on API folder
 	In case of specific API table/view/function use update files of ws or ud to work with
 	
-6) OTHER PROJECT TYPES
+7) OTHER PROJECT TYPES
 	If you are looking to use Giswater sql project creation and update structure of specific project
 	- Define list of other project types on config.file
 	- Create folder with same name defined on config.file and use this subfolder structure:
@@ -79,7 +91,7 @@ subfolder structure of ud/ws/utils folder
 		trg
 	- Same behaviour of WS/UD will be done with the unique difference of the location of folders
 
-7) TO DEPRECATE ANY RELATION OF DDBB
+8) TO DEPRECATE ANY RELATION OF DDBB
 	To deprecate function / trigger / table / view or sequence 
 	- UPDATE audit_cat_table / audit_cat_function / audit_cat_sequence  SET isdeprectaded=TRUE
 	

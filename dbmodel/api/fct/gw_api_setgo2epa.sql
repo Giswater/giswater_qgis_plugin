@@ -108,5 +108,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_setgo2epa(json)
-  OWNER TO geoadmin;

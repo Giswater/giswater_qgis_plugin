@@ -165,5 +165,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_getvisit(json)
-  OWNER TO geoadmin;
