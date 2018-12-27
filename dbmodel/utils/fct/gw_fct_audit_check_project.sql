@@ -54,7 +54,7 @@ BEGIN
 
 	/* setting values user (>3.2)
 	-- if is first time for user
-	IF user is not on config_param user THEN   
+	IF (SELECT cur_user FROM config_param user WHERE cur_user=current_user LIMIT 1) IS NULL THEN   
 		-- set values of user
 		PERFORM gw_fct_admin_role_resetuserprofile('"user":"'||current_user||'", "values":{}');
 	END IF;

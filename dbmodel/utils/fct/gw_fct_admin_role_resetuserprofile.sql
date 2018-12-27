@@ -14,7 +14,7 @@ $BODY$
 -- reset values
 SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{}}$$)
 
--- taking values from user another user
+-- taking values from another user
 SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{"copyFromUserSameRole":"postgres"}}$$)
 
 -- Setting specific values (todo)
