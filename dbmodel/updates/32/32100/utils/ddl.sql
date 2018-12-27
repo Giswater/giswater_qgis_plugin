@@ -350,6 +350,8 @@ ALTER TABLE audit_cat_param_user ADD COLUMN feature_dv_parent_value text;
 ALTER TABLE audit_cat_param_user ADD COLUMN isautoupdate boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN datatype character varying(30);
 ALTER TABLE audit_cat_param_user ADD COLUMN widgettype character varying(30);
+ALTER TABLE audit_cat_param_user ADD COLUMN ischeckeditable boolean;
+ALTER TABLE audit_cat_param_user ADD COLUMN widgetcontrols json;
 ALTER TABLE audit_cat_param_user ADD COLUMN vdefault text;
 
 ALTER TABLE cat_arc ADD COLUMN  dn integer;
@@ -382,7 +384,6 @@ ALTER TABLE config_param_system ADD COLUMN layout_order integer;
 ALTER TABLE config_param_system ADD COLUMN project_type character varying;
 ALTER TABLE config_param_system ADD COLUMN dv_isparent boolean;
 ALTER TABLE config_param_system ADD COLUMN isautoupdate boolean;
-ALTER TABLE config_param_system ADD COLUMN ischeckeditable boolean;
 ALTER TABLE config_param_system ADD COLUMN datatype character varying;
 ALTER TABLE config_param_system ADD COLUMN widgettype character varying;
 ALTER TABLE config_param_system ADD COLUMN tooltip text;

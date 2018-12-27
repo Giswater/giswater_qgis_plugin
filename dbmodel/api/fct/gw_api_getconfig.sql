@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getconfig(p_data json)
   RETURNS json AS
 $BODY$
@@ -74,10 +73,15 @@ BEGIN
     SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND formtab='tabUser';
     IF rec_tab.formtab IS NOT NULL THEN
 
+	-- if ischeckeditable is false then ismandatory is true. First time for user value is forced
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		SELECT label, audit_cat_param_user.id as name,  datatype, widgettype, layout_id, layout_order, row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,
-		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked, value, project_type, ischeckeditable
+		SELECT label, audit_cat_param_user.id as name, value, datatype, widgettype, layout_id, layout_order, TRUE AS iseditable,
+		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ischeckeditable, 
+		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked,
+		(CASE WHEN ischeckeditable IS FALSE THEN TRUE ELSE FALSE END) AS ismandatory,
+		(CASE WHEN (widgetcontrols->>''minValue'') IS NOT NULL THEN widgetcontrols->>''minValue'' ELSE NULL END) AS minvalue,
+		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue
 		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 		AND formname ='||quote_literal(lower(v_formname))||'
@@ -85,6 +89,8 @@ BEGIN
 		AND isenabled IS TRUE
 		ORDER by orderby)a'
 			INTO fields_array ;
+
+			raise notice 'fields_array %', fields_array;
 
 	--  Combo rows
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
@@ -179,26 +185,30 @@ BEGIN
 
     END IF;
 
+
 -- Admin tab
 --------------
     SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND formtab='tabAdmin' ;
-    IF rec_tab.formtab IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN 
 
-	-- Get fields for admin enabled
-	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
-		widgettype, datatype, layout_id, layout_order, orderby, tooltip, TRUE AS iseditable
-		FROM config_param_system WHERE isenabled=TRUE ORDER BY orderby) a'
-		INTO fields_array;
+    -- only form config forme (epaoptions not need admin tab)
+    IF v_formname='config' THEN 
+    
+	IF rec_tab.formtab IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN 
 
-    ELSE 
-	-- Get fields for admin disabled (only to show)
-	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
-		widgettype, datatype, layout_id, layout_order, orderby, tooltip, FALSE AS iseditable
-		FROM config_param_system WHERE isenabled=TRUE ORDER BY orderby) a'
-		INTO fields_array;
+		-- Get fields for admin enabled
+		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
+			widgettype, datatype, layout_id, layout_order, orderby, tooltip, TRUE AS iseditable
+			FROM config_param_system WHERE isenabled=TRUE ORDER BY orderby) a'
+			INTO fields_array;
 
-    END IF;
- 
+	ELSE 
+		-- Get fields for admin disabled (only to show)
+		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
+			widgettype, datatype, layout_id, layout_order, orderby, tooltip, FALSE AS iseditable
+			FROM config_param_system WHERE isenabled=TRUE ORDER BY orderby) a'
+			INTO fields_array;
+	END IF;
+
 	-- Convert to json
 	fields := array_to_json(fields_array);
         fields := COALESCE(fields, '[]');    
@@ -209,12 +219,14 @@ BEGIN
         v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabHeaderText', rec_tab.headertext);
 
         v_formtabs := v_formtabs ||','|| v_tabadmin::text;
+        
+    END IF;
    
---    Finish the construction of v_formtabs
+--  Finish the construction of v_formtabs
     v_formtabs := v_formtabs ||']';
 
 --  Construction of groupbox - formlayouts
-	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layout_id AS "layout", label FROM config_api_form_groupbox WHERE formname=$1 AND layout_id IN 
+    EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT layout_id AS "layout", label FROM config_api_form_groupbox WHERE formname=$1 AND layout_id IN 
 			(SELECT layout_id FROM audit_cat_param_user WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 			UNION SELECT layout_id FROM config_param_system WHERE ''role_admin'' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member'')))
 		ORDER BY layout_id) a'

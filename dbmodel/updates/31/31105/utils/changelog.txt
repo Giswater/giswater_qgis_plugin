@@ -20,6 +20,8 @@ New table audit_cat_sequence,
 New process (33) update project data schema, issue#537
 New process (34) mincut analysis dynamic minimum sector, issue#566
 New process (35) mincut analysis dynamic inlet sector, issue#566
+New numeration for existing function (2540) gw_fct_inlet_flowtrace, issue#566
+New numeration for existing function (2542) gw_trg_arc_vnodelink_update, issue#585
 New function (2510) gw_fct_utils_csv2pg_import_dbprices, issue#566 
 New function (2512) gw_fct_utils_csv2pg_import_omvisit, issue#566
 New function (2514) gw_fct_utils_csv2pg_import_elements, issue#566
@@ -35,14 +37,13 @@ New function (2532) gw_fct_utils_csv2pg_import_epa_inp, issue#536
 New function (2534) gw_fct_repair_link, issue#568
 New function (2536) gw_fct_utils_csv2pg_import_epa_rpt, issue#536
 New function (2538) gw_fct_dinlet, issue#566
-New numeration for existing function (2540) gw_fct_inlet_flowtrace, issue#566
-New numeration for existing function (2542) gw_trg_arc_vnodelink_update, issue#585
 New function (2544) gw_trg_link_connecrotation_update, issue#585
 New function (2546) gw_fct_admin_schema_lastprocess, issue#537
 New function (2548) gw_trg_om_visit, issue#595
 New function (2550) gw_fct_admin_updateschema_drops, 
 New function (2552) gw_fct_admin_role_permissions, 
 New function (2554) gw_fct_admin_schema_utils_fk, 
+New function (2556) gw_fct_admin_role_resetuserprofile, 
 New system parameter sys_custom_views, issue#537 
 New system parameter sys_currency, issue#531
 New system parameter utils_csv2pg_om_visit_parameters, issue#566

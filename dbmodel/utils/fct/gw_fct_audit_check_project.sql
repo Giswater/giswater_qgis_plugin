@@ -52,10 +52,16 @@ BEGIN
 	  INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT value FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer, current_user);
 	END IF;
 
+	/* setting values user (>3.2)
+	-- if is first time for user
+	IF user is not on config_param user THEN   
+		-- set values of user
+		PERFORM gw_fct_admin_role_resetuserprofile('"user":"'||current_user||'", "values":{}');
+	END IF;
+	*/
 
 	-- Reset sequences
-	
-	--urn
+	/*
 	IF project_type_aux='WS' THEN
 		SELECT GREATEST (
 		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
@@ -77,6 +83,8 @@ BEGIN
 	IF max_aux IS NOT null THEN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||max_aux||', true)';
 	END IF;
+	
+	*/
 	
 	-- Special cases (doc_seq)
 	SELECT max(id::integer) FROM doc WHERE id ~ '^\d+$' into max_aux;
