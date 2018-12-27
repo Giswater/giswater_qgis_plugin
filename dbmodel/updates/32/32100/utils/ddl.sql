@@ -382,6 +382,7 @@ ALTER TABLE config_param_system ADD COLUMN layout_order integer;
 ALTER TABLE config_param_system ADD COLUMN project_type character varying;
 ALTER TABLE config_param_system ADD COLUMN dv_isparent boolean;
 ALTER TABLE config_param_system ADD COLUMN isautoupdate boolean;
+ALTER TABLE config_param_system ADD COLUMN ischeckeditable boolean;
 ALTER TABLE config_param_system ADD COLUMN datatype character varying;
 ALTER TABLE config_param_system ADD COLUMN widgettype character varying;
 ALTER TABLE config_param_system ADD COLUMN tooltip text;

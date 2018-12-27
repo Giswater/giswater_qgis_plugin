@@ -77,7 +77,7 @@ BEGIN
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		SELECT label, audit_cat_param_user.id as name,  datatype, widgettype, layout_id, layout_order, row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,
-		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked, value, project_type
+		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked, value, project_type, ischeckeditable
 		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 		AND formname ='||quote_literal(lower(v_formname))||'
@@ -184,11 +184,21 @@ BEGIN
     SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND formtab='tabAdmin' ;
     IF rec_tab.formtab IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN 
 
-	-- Get fields
-	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, widgettype, datatype, layout_id, layout_order, orderby, tooltip 
+	-- Get fields for admin enabled
+	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
+		widgettype, datatype, layout_id, layout_order, orderby, tooltip, TRUE AS iseditable
 		FROM config_param_system WHERE isenabled=TRUE ORDER BY orderby) a'
 		INTO fields_array;
 
+    ELSE 
+	-- Get fields for admin disabled (only to show)
+	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
+		widgettype, datatype, layout_id, layout_order, orderby, tooltip, FALSE AS iseditable
+		FROM config_param_system WHERE isenabled=TRUE ORDER BY orderby) a'
+		INTO fields_array;
+
+    END IF;
+ 
 	-- Convert to json
 	fields := array_to_json(fields_array);
         fields := COALESCE(fields, '[]');    
@@ -199,10 +209,7 @@ BEGIN
         v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabHeaderText', rec_tab.headertext);
 
         v_formtabs := v_formtabs ||','|| v_tabadmin::text;
-
-
-     END IF;
-    
+   
 --    Finish the construction of v_formtabs
     v_formtabs := v_formtabs ||']';
 
