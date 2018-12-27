@@ -10,7 +10,6 @@ This file explains the sql's structure of this folder
 
 -- Folders structure
 --------------------------------
-
 api
 corporate
 dev
@@ -34,29 +33,33 @@ subfolder structure of ud/ws/utils folder
 	
 --- Instructions to update sql's
 --------------------------------
-
 1) FUNCTION AND TRIGGER FUNCTION:  
-	They must be unique amb must be located on (fct) and (ftrg) folders. 
-	Mandatory to modify the original definition
-	In case of different behaviuour from different versions IF on code will be used
-	Use one file for each function/trigger
+	To modify the original definition is mandatory. They must be unique amb must be located on (fct) and (ftrg) folders. 
+	In case of different code for different versions 'IF' on code will be used
+	Use always one file for each function/trigger
 	
 2) VIEWS:
-	Use ddlview.sql file located on ws/ud/utils update folders. 
-	Forbbiden to modify the original definition.keep the original defition but put a comment there 'view updated on 3.x.xxxx'
-	DROP CASCADE is forbidden. If it's need, time to wait for next major release
+	To modify the original definition is forbbiden. keep the original defition bu putting comment there like 'definiton updated on 3.x.xxxx'
+	Use ddlview.sql file located on ws/ud/utils update folders.
+	DROP IS NO FORBIDDEN but use it only if it's needed.
+	DROP CASCADE IS FORBIDDEN. If it's need, time to wait for next major release.
+	Identify any change on any view on the chapter views of changelog.txt file
 	
 	
 3)  TABLES, RULES, TRIGGERS, CONSTRAINTS:
-	Forbbiden to modify the original definition. keep the original defition but put a comment there 'definiton updated on 3.x.xxxx'
+	To modify the original definition is forbbiden. keep the original defition bu putting comment there like 'definiton updated on 3.x.xxxx'
 	Use below files located on ws/ud/utils update folders
 		ddl.sql
 		dml.sql
 		ddlrule.sql
 		tablect.sql
 		trg.sql	
+	DROP IS FORBIDDEN for all. If same function / trigger / table / view or sequence becomes deprecated we must use:
+		UPDATE audit_cat_table / audit_cat_function / audit_cat_sequence  SET isdeprectaded=TRUE
+	
+	
 4) DML
-	Forbbiden to modify the original definition.
+	To modify the original definition is forbbiden. keep the original defition bu putting comment there like 'definiton updated on 3.x.xxxx'
 	Use below files located on ws/ud/utils update folders
 		ddl.sql
 		dml.sql
@@ -64,15 +67,16 @@ subfolder structure of ud/ws/utils folder
 		tablect.sql
 		trg.sql	
 5) I18N 
+	To modify the original definition is forbbiden. keep the original defition but put a comment there 'definiton updated on 3.x.xxxx'
 	It's specific case of dml
 	Use below files located on EN/ES/CA/PT folders
 		ud.sql
 		ws.sql
 		utils.sql
 6) API: 
-	Same case of ud/ws without ws/ud folders
+	Same as ud/ws projects but without ws/ud folders
 	No ws/ud folders means that no specific ws/ud sql file will be located on API folder
-	In case of specific API table/view/function use update files of ws or ud to work with
+	In case of specific ws/ud API table/view/function use update files of ws/ud to work with
 	
 7) OTHER PROJECT TYPES
 	If you are looking to use Giswater sql project creation and update structure of specific project
@@ -91,31 +95,25 @@ subfolder structure of ud/ws/utils folder
 		trg
 	- Same behaviour of WS/UD will be done with the unique difference of the location of folders
 
-8) TO DEPRECATE ANY RELATION OF DDBB
-	To deprecate function / trigger / table / view or sequence 
-	- UPDATE audit_cat_table / audit_cat_function / audit_cat_sequence  SET isdeprectaded=TRUE
+
+-- Changelog file
+-----------------------------
+	- Use it to register any change on sqls.
+	- Issue is mandatory. If not exits, create new one on Github.
+	- If we need to drop whitout cascade some view, changelog has two parts in order to identify as best as possible that special AND UNIQUE CASE OF DROPS
 	
 	
 	
 -- Workflows
 ----------------------------	
-
 1) CREATE EMPTY PROJECT
-
 2) CREATE EMPTY PROJECT WITHOUT CONSTRAINTS AND TRIGGERS
-
 3) CREATE PROJECT WITH SAMPLE DATA
-
 4) CREATE PROJECT WITH SAMPLE FOR DEV
-
 5) CREATE PROJECT USING INP FILE
-
 6) PROJECT UPDATE
-
 7) CREATE API
-
 8) API UPDATE
-
 9) LAST PROCESS FUNCTION
 	- Grant permissions to all relations using audit_cat_* tables
 	- Enable foreing keys with utils schema if exists
