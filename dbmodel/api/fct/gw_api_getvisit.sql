@@ -129,15 +129,19 @@ BEGIN
 			v_formtabs := v_formtabs || ',' || v_tabaux::text;
 		END IF;
 
-		-- Files tab
+	-- Files tab
 		-- building tab
-		v_tabaux := json_build_object('tabName','tabFile','tabLabel','Files','tabText','Test text for tab','active',false, 'list','{"tableName":"om_visit_file", "idName":"id"}');
+		SELECT gw_api_get_formfields( 'visitform_filetab', 'visit', 'file', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
+		v_fields_json = array_to_json (v_fields);
+
+		v_tabaux := json_build_object('tabName','tabFile','tabLabel','Files','tabText','Test text for tab','active',false, 'list','{"tableName":"om_visit_file", "idName":"id"}'::json);
+		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		v_formtabs := v_formtabs  || ',' || v_tabaux::text;
 
 		v_formtabs := (v_formtabs ||']');
 
 	-- form actions
-	v_formactions = '[{"actionName":"actionAdd","actionTooltip":"Add"}, {"actionName":"actionDelete","actionTooltip":"Delete"}]';
+	v_formactions = '[{"actionName":"actionAdd","actionTooltip":"Add", "actionFunction":"setFileInsert"}, {"actionName":"actionDelete","actionTooltip":"Delete", "actionFunction":"setDelete"}]';
 
 	-- define the text of header
 	v_formheader :=concat('VISIT - ',v_id);	
