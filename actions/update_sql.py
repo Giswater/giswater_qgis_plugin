@@ -1273,6 +1273,11 @@ class UpdateSQL(ParentAction):
 
     def create_project_data_schema(self):
         # status = []
+        if str(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_name)) == 'null':
+            msg = "The 'Project_name' field is required."
+            result = self.controller.show_info_box(msg, "Info")
+            return
+
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
         if self.rdb_import_data.isChecked():
