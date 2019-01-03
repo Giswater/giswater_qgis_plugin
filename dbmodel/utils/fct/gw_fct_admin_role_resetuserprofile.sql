@@ -73,7 +73,7 @@ BEGIN
 	
 		-- config_param_user, getting role parameters where ischeckeditable is false (forced to user always)
 		INSERT INTO config_param_user (parameter, value, cur_user) 
-		SELECT parameter, value, v_user FROM ws_sample.config_param_user JOIN ws_sample.audit_cat_param_user ON audit_cat_param_user.id=parameter 
+		SELECT parameter, value, v_user FROM config_param_user JOIN audit_cat_param_user ON audit_cat_param_user.id=parameter 
 		WHERE ischeckeditable IS FALSE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'))
 
 		-- selectors
