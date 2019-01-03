@@ -33,6 +33,7 @@ from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.move_node import MoveNodeMapTool
 from map_tools.replace_node import ReplaceNodeMapTool
+from map_tools.open_visit import OpenVisit
 from models.plugin_toolbar import PluginToolbar
 from models.sys_feature_cat import SysFeatureCat
 from search.search_plus import SearchPlus
@@ -163,8 +164,8 @@ class Giswater(QObject):
         if icon is None:
             action = QAction(text, action_group) 
         else:
-            action = QAction(icon, text, action_group)  
-            
+            action = QAction(icon, text, action_group)
+        action.setObjectName(function_name)
         # Button add_node or add_arc: add drop down menu to button in toolbar
         if self.schema_exists and (index_action == '01' or index_action == '02'):
             action = self.manage_dropdown_menu(action, index_action)
@@ -230,7 +231,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 36, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 86, 61, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
+                                 50, 86, 64, 65, 66, 67, 68, 81, 82, 83, 84, 99):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
         else:
@@ -266,6 +267,8 @@ class Giswater(QObject):
             map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 57:
             map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
+        elif int(index_action) == 61:
+            map_tool = OpenVisit(self.iface, self.settings, action, index_action)
         elif int(index_action) == 71:
             map_tool = CadAddCircle(self.iface, self.settings, action, index_action)
         elif int(index_action) == 72:
@@ -288,11 +291,11 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)
 
         toolbar_id = "om_ws"
-        list_actions = ['26', '27', '64', '65', '84']
+        list_actions = ['26', '27', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions) 
             
         toolbar_id = "om_ud"
-        list_actions = ['43', '56', '57', '64', '65', '84']
+        list_actions = ['43', '56', '57', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)                           
         
         toolbar_id = "edit"
@@ -902,9 +905,10 @@ class Giswater(QObject):
         self.set_map_tool('map_tool_change_node_type')        
         self.set_map_tool('map_tool_dimensioning')               
         self.set_map_tool('cad_add_circle')        
-        self.set_map_tool('cad_add_point')        
-                
-        
+        self.set_map_tool('cad_add_point')
+        self.set_map_tool('map_tool_open_visit')
+
+
     def set_map_tool(self, map_tool_name):
         """ Set objects for map tools classes """  
 
