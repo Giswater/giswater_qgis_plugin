@@ -13,6 +13,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 changelog=Version 3.1.105 (30/12/2018)
+    - Added new info button for visits
     - Enhancement: Populate om visit manager with correct view
     - Enhancement: activate or deactivate the combo depending on the selection
     - Enhancement: Show message if  trying to divide an arc when insert node (UD)

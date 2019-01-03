@@ -74,8 +74,6 @@ class OpenVisit(ParentMapTool):
             manage_visit.manage_visit(visit_id=visit_id)
 
 
-
-
     def activate(self):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
@@ -91,6 +89,11 @@ class OpenVisit(ParentMapTool):
 
         # Set active layer to 'v_edit_om_visit'
         self.layer_visit = self.controller.get_layer_by_tablename("v_edit_om_visit")
+        if self.layer_visit is None:
+            message = "Layer not found"
+            self.controller.show_message(message, message_level=2, parameter='v_edit_om_visit')
+            self.cancel_map_tool()
+            return
         self.iface.setActiveLayer(self.layer_visit)
 
         # Change cursor
