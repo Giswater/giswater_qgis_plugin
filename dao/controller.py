@@ -872,12 +872,13 @@ class DaoController():
         """ Get water software from table 'version' """
         
         project_type = None
-        sql = ("SELECT lower(wsoftware)"
-               " FROM " + self.schema_name + ".version ORDER BY id ASC LIMIT 1")
-        row = self.get_row(sql)
-        if row:
-            project_type = row[0]
-            
+        if self.schema_name is not None:
+            sql = ("SELECT lower(wsoftware)"
+                   " FROM " + self.schema_name + ".version ORDER BY id ASC LIMIT 1")
+            row = self.get_row(sql)
+            if row:
+                project_type = row[0]
+
         return project_type
     
       

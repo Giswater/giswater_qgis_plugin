@@ -8,14 +8,15 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import sys
+import re
 from functools import partial
 from sqlite3 import OperationalError
 
 import utils_giswater
 from giswater.actions.parent import ParentAction
 from giswater.ui_manager import Readsql, InfoShowInfo
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit
-from PyQt4.QtCore import QSettings
+from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication
+from PyQt4.QtCore import QSettings, Qt
 
 from ui_manager import ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo
 
@@ -35,6 +36,11 @@ class UpdateSQL(ParentAction):
         self.project_type = controller.get_project_type()
 
     def init_sql(self):
+        #TODO:: Choose best option
+        # self.setWaitCursor()
+        # self.setArrowCursor()
+        # self.calc(10000, 2000)
+        # self.newProgressDialog()
         """ Button 100: Execute SQL. Info show info """
         role_admin = self.controller.check_role_user("role_admin")
 
@@ -93,16 +99,18 @@ class UpdateSQL(ParentAction):
             self.schema = None
 
 
-            # Get version
-            sql = ("SELECT giswater from " + self.schema_name + ".version")
-            row = self.controller.get_row(sql)
-            self.version = row[0]
-            self.version_metadata = self.settings.value('general/version')
+            # Get version if not new project
+            self.version = None
+            if self.schema_name is not None:
+                sql = ("SELECT giswater from " + self.schema_name + ".version")
+                row = self.controller.get_row(sql)
+                self.version = row[0]
+                self.version_metadata = self.settings.value('general/version')
 
 
-            if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
-                self.btn_update_schema.setEnabled(False)
-                self.btn_update_api.setEnabled(False)
+                if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
+                    self.btn_update_schema.setEnabled(False)
+                    self.btn_update_api.setEnabled(False)
             if self.dev_user != 'TRUE':
                 utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
                 utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
@@ -110,6 +118,9 @@ class UpdateSQL(ParentAction):
                 self.project_types = self.settings.value('system_variables/project_types')
             else:
                 self.project_types = self.settings.value('system_variables/project_types_dev')
+
+            # Declare sql directory
+            self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + '\sql'
 
             #Populate combo types
 
@@ -132,11 +143,10 @@ class UpdateSQL(ParentAction):
             self.file_pattern_ddlview = "ddlview"
             self.file_pattern_ddlrule = "ddlrule"
 
-            # Declare sql directory
-            self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + '\sql'
 
             # Declare all directorys
-            self.folderSoftware = self.sql_dir + '/' + self.project_type + '/'
+            if self.schema_name is not None:
+                self.folderSoftware = self.sql_dir + '/' + self.project_type + '/'
             self.folderLocale = self.sql_dir + '\i18n/' + str(self.locale) + '/'
             self.folderUtils = self.sql_dir + '\utils/'
             self.folderUpdates = self.sql_dir + '\updates/'
@@ -168,8 +178,10 @@ class UpdateSQL(ParentAction):
 
 
             #Put current info into software version info widget
-            self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
-                                               'DataBase version: ' + self.version)
+            if self.version is None:
+                self.version = '0'
+                self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
+                                                   'DataBase version: ' + self.version)
 
             #Populate combo connections
             s = QSettings()
@@ -401,8 +413,7 @@ class UpdateSQL(ParentAction):
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddlrule), self.folderUtils + self.file_pattern_ddlrule)
                 if status is False:
-                    return False	
-				
+                    return False
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                     return False
@@ -472,7 +483,7 @@ class UpdateSQL(ParentAction):
                 sub_folders = os.listdir(self.folderUpdates + folder)
                 for sub_folder in sub_folders:
                     if new_project:
-                        if self.read_all_updates:
+                        if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                                     print(False)
@@ -597,7 +608,7 @@ class UpdateSQL(ParentAction):
                 sub_folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + folder)
                 for sub_folder in sub_folders:
                     if new_project:
-                        if self.read_all_updates:
+                        if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.sql_dir + '/' + str(project_type) + '\updates/' + folder + '/' + sub_folder,
                                                        '') is False:
@@ -1095,7 +1106,7 @@ class UpdateSQL(ParentAction):
             sub_folders = os.listdir(self.folderUpdatesApi + folder)
             for sub_folder in sub_folders:
                 if new_api:
-                    if self.read_all_updates:
+                    if self.read_all_updates == 'TRUE':
                         if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/', '') is False:
                             print(False)
                             return False
@@ -1251,8 +1262,7 @@ class UpdateSQL(ParentAction):
                             if status is False:
                                 print(False)
                                 return False
-							
-				
+
     """ Functions execute process """
 
     def execute_import_data(self):
@@ -1260,12 +1270,22 @@ class UpdateSQL(ParentAction):
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_import_epa_inp()")
         self.controller.execute_sql(sql)
 
-		
-    def execute_last_process(self):
+    def execute_last_process(self, new_project=False):
         # Execute last process function
-        return
         #TODO:: pasar parametres
-        sql = ("SELECT " + self.schema_name + ".gw_fct_admin_schema_lastprocess()")
+        extras = '"isNewProject":' + str('TRUE') + ', '
+        extras += '"gwVersion":' + str('3.1.105') + ', '
+        extras += '"projectType":' + str(self.project_type)
+        extras += '"epsg":' + str('25831')
+        if new_project is True:
+            extras += '"title":' + str(self.title)
+            extras += '"author":' + str(self.author)
+            extras += '"date":' + str(self.date)
+
+        client = '"client":{"device":9, "lang":"ES"}, '
+        data = '"data":{' + extras + '}'
+        body = "" + client + data
+        sql = ("SELECT " + self.schema_name + ".gw_fct_admin_schema_lastprocess($${" + body + "}$$)::text")
         self.controller.execute_sql(sql)
         return
 
@@ -1273,8 +1293,21 @@ class UpdateSQL(ParentAction):
 
     def create_project_data_schema(self):
         # status = []
-        if str(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_name)) == 'null':
+        self.title = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_title)
+        self.author = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_author)
+        self.date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
+        project_name = str(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_name))
+
+        if project_name == 'null':
             msg = "The 'Project_name' field is required."
+            result = self.controller.show_info_box(msg, "Info")
+            return
+        elif any(c.isupper() for c in project_name) is True:
+            msg = "The 'Project_name' field require only lower caracters"
+            result = self.controller.show_info_box(msg, "Info")
+            return
+        elif (bool(re.match('^[a-z0-9_]*$', project_name))) is False:
+            msg = "The 'Project_name' field have invalid character"
             result = self.controller.show_info_box(msg, "Info")
             return
 
@@ -1290,7 +1323,7 @@ class UpdateSQL(ParentAction):
             self.update_31to39(new_project=True, project_type=project_type)
             self.execute_import_data()
             self.api(project_type=project_type)
-            self.execute_last_process()
+            self.execute_last_process(new_project=True)
         elif self.rdb_no_ct.isChecked():
             print(str("rdb_no_ct"))
             self.load_base_no_ct(project_type=project_type)
@@ -1298,7 +1331,7 @@ class UpdateSQL(ParentAction):
             self.load_views(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
-            self.execute_last_process()
+            self.execute_last_process(new_project=True)
         elif self.rdb_sample.isChecked():
             print(str("rdb_sample"))
             self.load_base(project_type=project_type)
@@ -1308,7 +1341,7 @@ class UpdateSQL(ParentAction):
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
             self.load_sample_data(project_type=project_type)
-            self.execute_last_process()
+            self.execute_last_process(new_project=True)
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
             self.load_base(project_type=project_type)
@@ -1319,7 +1352,7 @@ class UpdateSQL(ParentAction):
             self.api(project_type=project_type)
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
-            self.execute_last_process()
+            self.execute_last_process(new_project=True)
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
             self.load_base(project_type=project_type)
@@ -1328,19 +1361,17 @@ class UpdateSQL(ParentAction):
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
-            self.execute_last_process()
+            self.execute_last_process(new_project=True)
 
-        # Insert information into table inp_project_id and version
-        schemaName = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.project_name)
-        title = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.project_title)
-        author = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_author)
-        date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
+        if str(self.controller.last_error) is None:
+            msg = "The project has been created correctly."
+            result = self.controller.show_info_box(msg, "Info")
 
-        #integrated into sql function last process
-        #sql = "INSERT INTO "+schemaName+".inp_project_id VALUES ('"+title+"', '"+author+"', '"+date+"')"
-        #self.controller.execute_sql(sql)
-
-        self.close_dialog(self.dlg_readsql_create_project)
+            # Close dialog when process has been execute correctly
+            self.close_dialog(self.dlg_readsql_create_project)
+        else:
+            msg = "Some error has occurred while the process was running."
+            result = self.controller.show_info_box(msg, "Info")
 
     def rename_project_data_schema(self):
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
@@ -1569,7 +1600,7 @@ class UpdateSQL(ParentAction):
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
 
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
-        #TODO:fer el listener del boto + taule -> temp_csv2pg
+        #TODO:fer el listener del boto + taula -> temp_csv2pg
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
         if self.dev_user != 'TRUE':
@@ -1601,7 +1632,6 @@ class UpdateSQL(ParentAction):
 
         self.filter_srid_value = '25831'
 
-        project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.cmb_create_project_type)
         # Set listeners
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_create_project))
@@ -1658,6 +1688,7 @@ class UpdateSQL(ParentAction):
                 status = self.controller.execute_sql(str(f_to_read))
                 if status is False:
                     print "Error to execute"
+                    print('Message: ' + str(self.controller.last_error))
                     self.dao.rollback()
                     return False
 
@@ -1675,6 +1706,7 @@ class UpdateSQL(ParentAction):
                     f = open(filedir + '/' + file, 'r')
                     if f:
                         f_to_read = str(f.read()).decode(str('utf-8-sig'))
+                        f_to_read = f_to_read + '\n' + '\n'
                         self.message_update = self.message_update + '\n' + str(f_to_read)
                     else:
                         return False
@@ -1685,14 +1717,70 @@ class UpdateSQL(ParentAction):
                     return False
         return True
 
+    #TODO:: Remove functions if we dont use it
+    def progresDialog(self, value):
+        dlg_progress = QProgressDialog()
+        dlg_progress.setWindowTitle("Progress Read SQL")
+        dlg_progress.setLabelText("Reading sql files...")
+        bar = QProgressBar(dlg_progress)
+        bar.setTextVisible(True)
+        bar.setValue(value)
+        dlg_progress.setBar(bar)
+        dlg_progress.setMinimumWidth(300)
+        dlg_progress.show()
+        return dlg_progress, bar
+
+    def calc(self, x, y):
+        dialog, bar = self.progresDialog(0)
+        bar.setValue(0)
+        bar.setMaximum(100)
+        sum = 0
+        progress = 0
+        for i in range(x):
+            for j in range(y):
+                k = i + j
+                sum += k
+            i += 1
+            progress = (float(i) / float(x)) * 100
+            bar.setValue(progress)
+        print sum
+
+    def newProgressDialog(self):
+        widget = self.iface.messageBar().createMessage("Progress Read SQL",
+                                                       " Reading sql files...")
+        prgBar = QProgressBar()
+        prgBar.setAlignment(Qt.AlignLeft | Qt.AlignCenter)
+        prgBar.setValue(0)
+        prgBar.setMaximum(1000)
+        widget.layout().addWidget(prgBar)
+        self.iface.messageBar().pushWidget(widget, self.iface.messageBar().INFO)
+
+        i = 0
+        while i < 1000:
+            i += 0.0001
+            prgBar.setValue(i)
+
+        self.iface.messageBar().clearWidgets()
+        self.iface.mapCanvas().refresh()
+
+    def setWaitCursor(self):
+        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+        
+    def setArrowCursor(self):
+        QApplication.instance().setOverrideCursor(Qt.ArrowCursor)
+
+    #TODO::::::::::::::::::::::::::::::::::::::::
+
     """ Take current project type changed """
 
     def change_create_project_type(self, widget):
         self.create_project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql_create_project, widget)
+        self.folderSoftware = self.sql_dir + '/' + self.create_project_type_selected + '/'
         print(self.create_project_type_selected)
 
     def change_project_type(self, widget):
         self.project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql, widget)
+        self.folderSoftware = self.sql_dir + '/' + self.project_type_selected + '/'
         print(self.project_type_selected)
 
     """ Info basic """
