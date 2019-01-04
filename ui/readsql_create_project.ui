@@ -15,119 +15,44 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="1">
-     <widget class="QComboBox" name="cmb_create_project_type"/>
-    </item>
-    <item row="2" column="1">
-     <widget class="QComboBox" name="cmb_locale"/>
-    </item>
-    <item row="20" column="3">
-     <widget class="QPushButton" name="btn_push_file">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
+    <item row="21" column="3">
+     <widget class="QPushButton" name="btn_close">
       <property name="text">
-       <string>...</string>
+       <string>Close</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Locale:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
-     <widget class="QLineEdit" name="project_title"/>
-    </item>
-    <item row="22" column="2">
+    <item row="21" column="2">
      <widget class="QPushButton" name="btn_accept">
       <property name="text">
        <string>Accept</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="lbl_project_name">
+    <item row="5" column="0">
+     <widget class="QLabel" name="lbl_author">
       <property name="layoutDirection">
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="text">
-       <string>Project name:</string>
+       <string>Author:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="2">
-     <widget class="QLabel" name="label_6">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>(optional)</string>
       </property>
      </widget>
     </item>
     <item row="6" column="1">
      <widget class="QLineEdit" name="date"/>
     </item>
-    <item row="5" column="2">
-     <widget class="QLabel" name="label_5">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>(optional)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0">
-     <widget class="QLabel" name="lbl_date">
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
-      </property>
-      <property name="text">
-       <string>Date:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
+    <item row="4" column="1">
+     <widget class="QLineEdit" name="project_title"/>
     </item>
     <item row="3" column="1">
      <widget class="QLineEdit" name="project_name"/>
     </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Project Type:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
     <item row="20" column="0" colspan="3">
      <widget class="QLineEdit" name="data_file"/>
-    </item>
-    <item row="22" column="3">
-     <widget class="QPushButton" name="btn_close">
-      <property name="text">
-       <string>Close</string>
-      </property>
-     </widget>
     </item>
     <item row="18" column="0" colspan="4">
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -177,26 +102,32 @@
       </item>
      </layout>
     </item>
-    <item row="5" column="1">
-     <widget class="QLineEdit" name="author">
+    <item row="6" column="2">
+     <widget class="QLabel" name="label_6">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="text">
+       <string>(optional)</string>
+      </property>
      </widget>
     </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="lbl_author">
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
+    <item row="2" column="1">
+     <widget class="QComboBox" name="cmb_locale"/>
+    </item>
+    <item row="5" column="2">
+     <widget class="QLabel" name="label_5">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <property name="text">
-       <string>Author:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <string>(optional)</string>
       </property>
      </widget>
     </item>
@@ -207,6 +138,75 @@
       </property>
       <property name="text">
        <string>Project title:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLineEdit" name="author">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Locale:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="20" column="3">
+     <widget class="QPushButton" name="btn_push_file">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="lbl_date">
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Date:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="cmb_create_project_type"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="lbl_project_name">
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Project name:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Project Type:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -250,9 +250,6 @@
        </item>
       </layout>
      </widget>
-    </item>
-    <item row="21" column="0" colspan="4">
-     <widget class="QTableView" name="tbl_inp"/>
     </item>
    </layout>
   </widget>
