@@ -157,6 +157,20 @@ class UpdateSQL(ParentAction):
             self.folderUpdatesApi = self.sql_dir + '/api/updates/'
             self.folderApi = self.sql_dir + '/api/'
 
+            # Populate combo connections
+            s = QSettings()
+            s.beginGroup("PostgreSQL/connections")
+            connections = s.childGroups()
+            list_connections = []
+            for con in connections:
+                elem = [con, con]
+                list_connections.append(elem)
+
+            s.endGroup()
+            utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
+            if self.controller.logged:
+                utils_giswater.set_combo_itemData(self.cmb_connection, str(self.controller.layer_source['db']), 1)
+
             # Set Listeners
             self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
             self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
@@ -175,6 +189,7 @@ class UpdateSQL(ParentAction):
             self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, self.cmb_project_type))
             self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
             self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
+            self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
 
 
             #Put current info into software version info widget
@@ -183,28 +198,9 @@ class UpdateSQL(ParentAction):
                 self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
                                                    'DataBase version: ' + self.version)
 
-            #Populate combo connections
-            s = QSettings()
-            s.beginGroup("PostgreSQL/connections")
-            connections = s.childGroups()
-            list_connections = []
-            for con in connections:
-                elem = [con, con]
-                list_connections.append(elem)
-
-            s.endGroup()
-
-            utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
-            if self.controller.logged:
-                utils_giswater.set_combo_itemData(self.cmb_connection, str(self.controller.layer_source['db']), 1)
-                self.cmb_connection.setEnabled(False)
-            else:
-                return
-                #TODO:: Set listener on combo index changed.
-                # self.dlg_readsql.cmb_connection.currentIndexChanged.connect(partial(self.controller.set_database_connection()))
-
             # Open dialog
             self.dlg_readsql.show()
+
 
     """ Declare all read sql process """
 
@@ -493,11 +489,11 @@ class UpdateSQL(ParentAction):
                                     if status is False:
                                         print(False)
                                         # return False
-                                if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
+                                if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + project_type + '/','') is False:
                                     print(False)
                                     # return False
                                 else:
-                                    status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                    status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/' + project_type + '/')
                                     if status is False:
                                         print(False)
                                         # return False
@@ -529,13 +525,13 @@ class UpdateSQL(ParentAction):
                                         print(False)
                                         # return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                        self.folderUpdates + folder + '/' + sub_folder + '/' + project_type + '/',
                                         '') is False:
                                     print(False)
                                     # return False
                                 else:
                                     status = self.load_sql(
-                                        self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                        self.folderUpdates + folder + '/' + sub_folder + '/' + project_type + '/')
                                     if status is False:
                                         print(False)
                                         # return False
@@ -761,13 +757,13 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + project_type + '/',
                                     '') is False:
                                 print(False)
                                 return False
                             else:
                                 status = self.load_sql(
-                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + project_type + '/')
                                 if status is False:
                                     print(False)
                                     return False
@@ -908,21 +904,20 @@ class UpdateSQL(ParentAction):
 
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
-            if self.process_folder(self.folderExemple, 'user/'+self.project_type) is False:
+            if self.process_folder(self.folderExemple, 'user/'+project_type) is False:
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderExemple + 'user/'+self.project_type), self.folderExemple + 'user/'+self.project_type)
+                status = self.executeFiles(os.listdir(self.folderExemple + 'user/'+project_type), self.folderExemple + 'user/'+project_type)
                 if status is False:
                     return False
         else:
-            if str(project_type) == 'ws' or str(project_type) == 'ud':
-                if self.process_folder(self.sql_dir + '/' + str(project_type) + '\example/user/', '') is False:
+            if self.process_folder(self.sql_dir + '/' + str(project_type) + '\example/user/', '') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '\example/user/'),
+                                           self.sql_dir + '/' + str(project_type) + '\example/user/')
+                if status is False:
                     return False
-                else:
-                    status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '\example/user/'),
-                                               self.sql_dir + '/' + str(project_type) + '\example/user/')
-                    if status is False:
-                        return False
 
         print(status)
         return True
@@ -931,21 +926,20 @@ class UpdateSQL(ParentAction):
 
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
-            if self.process_folder(self.folderExemple, 'dev/'+self.project_type) is False:
+            if self.process_folder(self.folderExemple, 'dev/'+project_type) is False:
                 return False
             else:
-                status = self.executeFiles(os.listdir(self.folderExemple + 'dev/'+self.project_type), self.folderExemple + 'dev/'+self.project_type)
+                status = self.executeFiles(os.listdir(self.folderExemple + 'dev/'+project_type), self.folderExemple + 'dev/'+project_type)
                 if status is False:
                     return False
         else:
-            if str(project_type) == 'ws' or str(project_type) == 'ud':
-                if self.process_folder(self.sql_dir + '/' + str(project_type) + '\example/dev/', '') is False:
+            if self.process_folder(self.sql_dir + '/' + str(project_type) + '\example/dev/', '') is False:
+                return False
+            else:
+                status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '\example/dev/'),
+                                           self.sql_dir + '/' + str(project_type) + '\example/dev/')
+                if status is False:
                     return False
-                else:
-                    status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '\example/dev/'),
-                                               self.sql_dir + '/' + str(project_type) + '\example/dev/')
-                    if status is False:
-                        return False
 
         print(status)
         return True
@@ -1270,17 +1264,22 @@ class UpdateSQL(ParentAction):
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_import_epa_inp()")
         self.controller.execute_sql(sql)
 
-    def execute_last_process(self, new_project=False):
+    def execute_last_process(self, new_project=False, schema_name=False):
+        #TODO:: Treure return
+        return
+        if new_project:
+            self.project_type = schema_name
         # Execute last process function
-        #TODO:: pasar parametres
-        extras = '"isNewProject":' + str('TRUE') + ', '
-        extras += '"gwVersion":' + str('3.1.105') + ', '
-        extras += '"projectType":' + str(self.project_type)
+        extras = '"isNewProject":"' + str('TRUE') + '", '
+        extras += '"gwVersion":"' + str('3.1.105') + '", '
+        extras += '"projectType":' + str(self.project_type) + ', '
         extras += '"epsg":' + str('25831')
         if new_project is True:
-            extras += '"title":' + str(self.title)
-            extras += '"author":' + str(self.author)
+            extras += ', ' + '"title":' + str(self.title) + ', '
+            extras += '"author":' + str(self.author) + ', '
             extras += '"date":' + str(self.date)
+
+            self.schema_name = schema_name
 
         client = '"client":{"device":9, "lang":"ES"}, '
         data = '"data":{' + extras + '}'
@@ -1361,7 +1360,7 @@ class UpdateSQL(ParentAction):
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
-            self.execute_last_process(new_project=True)
+            self.execute_last_process(new_project=True, schema_name=project_name)
 
         if str(self.controller.last_error) is None:
             msg = "The project has been created correctly."
@@ -1420,6 +1419,28 @@ class UpdateSQL(ParentAction):
     def reload_trg(self, project_type=False):
         self.load_trg(project_type)
 
+    """ Create new connection when change combo connections """
+    def event_change_connection(self):
+
+        connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
+
+        credentials = {'db': None, 'schema': None, 'table': None,
+                       'host': None, 'port': None, 'user': None, 'password': None}
+
+        settings = QSettings()
+        settings.beginGroup("PostgreSQL/connections/" + connection_name)
+
+        credentials['host'] = settings.value('host')
+        credentials['port'] = settings.value('port')
+        credentials['db'] = settings.value('database')
+        credentials['user'] = settings.value('username')
+        credentials['password'] = settings.value('password')
+
+        settings.endGroup()
+
+        self.logged = self.controller.connect_to_database(credentials['host'], credentials['port'],
+                                               credentials['db'], credentials['user'],
+                                               credentials['password'])
 
     """ Other functions """
 
