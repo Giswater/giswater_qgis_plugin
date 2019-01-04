@@ -290,4 +290,9 @@ class Om(ParentAction):
         except:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
+
+
+
+    def om_add_basic_visit(self):
+        self.controller.log_info(str("TESST"))
             
