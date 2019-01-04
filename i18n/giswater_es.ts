@@ -108,7 +108,7 @@
     </message> 
     <message>
         <source>61_text</source>
-        <translation>Gestor del catalogo de trabajo</translation>
+        <translation>Informacion de la visita</translation>
     </message>
     <message>
         <source>66_text</source>

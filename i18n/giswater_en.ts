@@ -119,7 +119,7 @@
     </message> 
     <message>
         <source>61_text</source>
-        <translation>Worcat manager</translation>
+        <translation>Visit info</translation>
     </message>
     <message>
         <source>66_text</source>
