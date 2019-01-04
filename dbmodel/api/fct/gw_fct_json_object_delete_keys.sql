@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2624
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME."gw_fct_json_object_delete_keys"("json" json, VARIADIC "keys_to_delete" TEXT[])
   RETURNS json

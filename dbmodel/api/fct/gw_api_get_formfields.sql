@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2562
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
     p_formname character varying,
     p_formtype character varying,

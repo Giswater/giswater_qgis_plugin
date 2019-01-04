@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 2612
+
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_api_setfileinsert"(p_data json) RETURNS pg_catalog.json AS 
 $BODY$
 
