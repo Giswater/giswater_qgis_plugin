@@ -1442,6 +1442,8 @@ class UpdateSQL(ParentAction):
                                                credentials['db'], credentials['user'],
                                                credentials['password'])
 
+        self.populate_data_shcema_name(self.cmb_project_type)
+
     """ Other functions """
 
     def show_info(self):
