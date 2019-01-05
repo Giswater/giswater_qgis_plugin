@@ -73,13 +73,12 @@ BEGIN
     SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND formtab='tabUser';
     IF rec_tab.formtab IS NOT NULL THEN
 
-	-- if ischeckeditable is false then ismandatory is true. First time for user value is forced
+	-- if ismandatory is true. First time for user value is forced
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		SELECT label, audit_cat_param_user.id as name, value, datatype, widgettype, layout_id, layout_order, TRUE AS iseditable,
-		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ischeckeditable, 
+		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, 
 		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked,
-		(CASE WHEN ischeckeditable IS FALSE THEN TRUE ELSE FALSE END) AS ismandatory,
 		(CASE WHEN (widgetcontrols->>''minValue'') IS NOT NULL THEN widgetcontrols->>''minValue'' ELSE NULL END) AS minvalue,
 		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue
 		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 

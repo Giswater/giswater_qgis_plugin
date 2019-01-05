@@ -125,8 +125,6 @@ CREATE TABLE config_api_form_actions
 (  id integer NOT NULL,
   formname character varying(50),
   formaction text,
-  actiontooltip text,
-  sys_role text,
   project_type character varying,
   CONSTRAINT config_api_actions_pkey PRIMARY KEY (id)
 );
@@ -350,7 +348,7 @@ ALTER TABLE audit_cat_param_user ADD COLUMN feature_dv_parent_value text;
 ALTER TABLE audit_cat_param_user ADD COLUMN isautoupdate boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN datatype character varying(30);
 ALTER TABLE audit_cat_param_user ADD COLUMN widgettype character varying(30);
-ALTER TABLE audit_cat_param_user ADD COLUMN ischeckeditable boolean;
+ALTER TABLE audit_cat_param_user ADD COLUMN ismandatory boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN widgetcontrols json;
 ALTER TABLE audit_cat_param_user ADD COLUMN vdefault text;
 

@@ -2,30 +2,30 @@
 
 -- DROP FUNCTION SCHEMA_NAME.gw_api_getvisit(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getvisit(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT SCHEMA_NAME.gw_api_getvisit($${
+SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":null},
 "data":{"type":"arc", "id":"2001"}}$$)
 
-SELECT SCHEMA_NAME.gw_api_getvisit($${
+SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":null},
 "data":{"type":"", "id":""}}$$)
 
-SELECT SCHEMA_NAME.gw_api_getvisit($${
+SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":1001},
 "data":{"type":"arc"}}$$)
 
-SELECT SCHEMA_NAME.gw_api_getvisit($${
+SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "visit_id":1},
@@ -56,8 +56,8 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname := 'SCHEMA_NAME';
+	SET search_path = "ws_sample", public;
+	v_schemaname := 'ws_sample';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -71,14 +71,13 @@ BEGIN
 
 	--  get visitclass
 	IF v_id IS NULL THEN
-	
 		-- TODO: for new visit enhance the visit type using the feature_id
 		v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;
 		IF v_visitclass IS NULL THEN
 			v_visitclass := 6;
 		END IF;
 	ELSE 
-		v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
+		v_visitclass := (SELECT class_id FROM ws_sample.om_visit WHERE id=v_id::bigint);
 		IF v_visitclass IS NULL THEN
 			v_visitclass := 0;
 		END IF;
@@ -106,8 +105,8 @@ BEGIN
 
 				-- setting visit id value
 				IF (aux_json->>'column_id') = 'visit_id' THEN
-					PERFORM setval('SCHEMA_NAME.audit_check_project_id_seq', (SELECT max(id)+1 FROM om_visit), true);
-					v_id = nextval('SCHEMA_NAME.audit_check_project_id_seq');
+					PERFORM setval('ws_sample.audit_check_project_id_seq', (SELECT max(id)+1 FROM om_visit), true);
+					v_id = nextval('ws_sample.audit_check_project_id_seq');
 					v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_id);	
 				END IF;
 			END LOOP;
@@ -131,13 +130,17 @@ BEGIN
 
 		-- Files tab
 		-- building tab
-		v_tabaux := json_build_object('tabName','tabFile','tabLabel','Files','tabText','Test text for tab','active',false, 'list','{"tableName":"om_visit_file", "idName":"id"}');
+		SELECT gw_api_get_formfields( 'visitform_filetab', 'visit', 'file', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
+		v_fields_json = array_to_json (v_fields);
+
+		v_tabaux := json_build_object('tabName','tabFile','tabLabel','Files','tabText','Test text for tab','active',false, 'list', '{"tableName":"om_visit_file", "idName":"id"}'::json);
+		-- not good: improved strategy to manage actions activating form action from tab:  v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		v_formtabs := v_formtabs  || ',' || v_tabaux::text;
 
 		v_formtabs := (v_formtabs ||']');
 
 	-- form actions
-	v_formactions = '[{"actionName":"actionAdd","actionTooltip":"Add"}, {"actionName":"actionDelete","actionTooltip":"Delete"}]';
+	v_formactions = '[{"actionName":"actionLink","actionTooltip":"Open File"},{"actionName":"actionAdd","actionTooltip":"Add file"}, {"actionName":"actionDelete","actionTooltip":"Delete file"}]';
 
 	-- define the text of header
 	v_formheader :=concat('VISIT - ',v_id);	

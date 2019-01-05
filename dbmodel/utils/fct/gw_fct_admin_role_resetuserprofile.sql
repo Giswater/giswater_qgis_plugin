@@ -71,10 +71,10 @@ BEGIN
 	-- setting values wihtout user sample
 	ELSE
 	
-		-- config_param_user, getting role parameters where ischeckeditable is false (forced to user always)
+		-- config_param_user, getting role parameters where ismandatory is true (forced always)
 		INSERT INTO config_param_user (parameter, value, cur_user) 
 		SELECT parameter, value, v_user FROM ws_sample.config_param_user JOIN ws_sample.audit_cat_param_user ON audit_cat_param_user.id=parameter 
-		WHERE ischeckeditable IS FALSE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'))
+		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'))
 
 		-- selectors
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, v_user FROM selector_expl;

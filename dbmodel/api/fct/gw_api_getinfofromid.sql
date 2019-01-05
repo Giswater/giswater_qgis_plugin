@@ -273,14 +273,14 @@ BEGIN
          
 --        Get tabs for form
 --------------------------------
-        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formtab as "tabName", headertext as "tabHeaderText", tooltip as "tabTooltip", idname as "idName", tablename as "tableName" FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formtab as "tabName", headertext as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
             INTO form_tabs
             USING v_tablename;
 
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
         IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
 		-- Get form_tabs
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formtab as "tabName", headertext as "tabHeaderText", tooltip as "tabTooltip", idname as "idName", tablename as "tableName" FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formtab as "tabName", headertext as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
 			INTO form_tabs
 			USING v_table_parent;
 	END IF;
@@ -288,7 +288,7 @@ BEGIN
 
 --        Get actions and tooltip for the layer
 --------------------------------
-        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName", actiontooltip as "actionTooltip" FROM config_api_form_actions WHERE formname = $1 
+        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName" FROM config_api_form_actions WHERE formname = $1 
 		AND (project_type =''utils'' or project_type='||quote_literal(LOWER(v_project_type))||')
 		order by id desc) a'
 		INTO v_form_actions
@@ -297,7 +297,7 @@ BEGIN
 	-- IF actions and tooltip are null's and layer it's child layer --> parent form_tabs is used
         IF v_form_actions IS NULL AND v_table_parent IS NOT NULL THEN
 		-- Get form_tabs
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName", actiontooltip as "actionTooltip" FROM config_api_form_actions WHERE formname = $1 
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName" FROM config_api_form_actions WHERE formname = $1 
 			AND (project_type =''utils'' or project_type='||quote_literal(LOWER(v_project_type))||')
 			order by id desc) a'
 			INTO v_form_actions
