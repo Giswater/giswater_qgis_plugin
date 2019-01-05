@@ -17,7 +17,7 @@ DECLARE
 BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'ws_sample';
+	v_schemaname = 'SCHEMA_NAME';
 
 	-- Drop sequences
 	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS TRUE

@@ -51,7 +51,11 @@ BEGIN
 			intersect_loc := ST_LineLocatePoint(arc_geom, NEW.the_geom);
 
 			IF intersect_loc < 1 THEN
-				v_rotation=st_azimuth(ST_LineInterpolatePoint(arc_geom,intersect_loc), ST_LineInterpolatePoint(arc_geom,intersect_loc+0.01)); 
+				IF intersect_loc > 0.5 THEN
+					v_rotation=st_azimuth(ST_LineInterpolatePoint(arc_geom,intersect_loc), ST_LineInterpolatePoint(arc_geom,intersect_loc-0.01)); 
+				ELSE
+					v_rotation=st_azimuth(ST_LineInterpolatePoint(arc_geom,intersect_loc), ST_LineInterpolatePoint(arc_geom,intersect_loc+0.01)); 
+				END IF;
 					IF v_rotation> 3.14159 THEN
 						v_rotation = v_rotation-3.14159;
 					END IF;

@@ -1,4 +1,12 @@
-﻿-- Function: SCHEMA_NAME.gw_api_getvisit(json)
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 2604
+
+-- Function: SCHEMA_NAME.gw_api_getvisit(json)
 
 -- DROP FUNCTION SCHEMA_NAME.gw_api_getvisit(json);
 
@@ -128,13 +136,14 @@ BEGIN
 			v_formtabs := v_formtabs || ',' || v_tabaux::text;
 		END IF;
 
-		-- Files tab
+	-- Files tab
 		-- building tab
 		SELECT gw_api_get_formfields( 'visitform_filetab', 'visit', 'file', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
 		v_fields_json = array_to_json (v_fields);
 
 		v_tabaux := json_build_object('tabName','tabFile','tabLabel','Files','tabText','Test text for tab','active',false, 'list', '{"tableName":"om_visit_file", "idName":"id"}'::json);
 		-- not good: improved strategy to manage actions activating form action from tab:  v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+
 		v_formtabs := v_formtabs  || ',' || v_tabaux::text;
 
 		v_formtabs := (v_formtabs ||']');

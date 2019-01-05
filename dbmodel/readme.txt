@@ -34,20 +34,20 @@ subfolder structure of ud/ws/utils folder
 --- Instructions to update sql's
 --------------------------------
 1) FUNCTION AND TRIGGER FUNCTION:  
-	To modify the original definition is mandatory. They must be unique amb must be located on (fct) and (ftrg) folders. 
+	It's mandatory to modify the original definition. They must be unique and must be located on (fct) and (ftrg) folders. 
 	In case of different code for different versions 'IF' on code will be used
 	Use always one file for each function/trigger
 	
 2) VIEWS:
-	To modify the original definition is forbbiden. keep the original defition bu putting comment there like 'definiton updated on 3.x.xxxx'
+	It's forbidden to modify the original definition. Keep the original defition but put a comment there like 'definiton updated on 3.x.xxxx'
 	Use ddlview.sql file located on ws/ud/utils update folders.
-	DROP IS NO FORBIDDEN but use it only if it's needed.
-	DROP CASCADE IS FORBIDDEN. If it's need, time to wait for next major release.
+	DROP IS NOT FORBIDDEN but use it only if it's needed.
+	DROP CASCADE IS FORBIDDEN. If it's needed, take time and wait for next major release.
 	Identify any change on any view on the chapter views of changelog.txt file
 	
 	
 3)  TABLES, RULES, TRIGGERS, CONSTRAINTS:
-	To modify the original definition is forbbiden. keep the original defition bu putting comment there like 'definiton updated on 3.x.xxxx'
+	It's forbidden to modify the original definition. Keep the original defition but put a comment there like 'definiton updated on 3.x.xxxx'
 	Use below files located on ws/ud/utils update folders
 		ddl.sql
 		dml.sql
@@ -59,7 +59,7 @@ subfolder structure of ud/ws/utils folder
 	
 	
 4) DML
-	To modify the original definition is forbbiden. keep the original defition bu putting comment there like 'definiton updated on 3.x.xxxx'
+	It's forbidden to modify the original definition. Keep the original defition but put a comment there like 'definiton updated on 3.x.xxxx'
 	Use below files located on ws/ud/utils update folders
 		ddl.sql
 		dml.sql
@@ -67,7 +67,7 @@ subfolder structure of ud/ws/utils folder
 		tablect.sql
 		trg.sql	
 5) I18N 
-	To modify the original definition is forbbiden. keep the original defition but put a comment there 'definiton updated on 3.x.xxxx'
+	It's forbidden to modify the original definition. Keep the original defition but put a comment there 'definiton updated on 3.x.xxxx'
 	It's specific case of dml
 	Use below files located on EN/ES/CA/PT folders
 		ud.sql
