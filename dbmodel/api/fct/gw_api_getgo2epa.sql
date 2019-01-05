@@ -60,7 +60,7 @@ BEGIN
 --    Return
     RETURN ('{"status":"Accepted", "apiVersion":'||api_version||
              ',"body":{"message":{"priority":1, "text":"This is a test message"}'||
-			',"form":{"formName":"", "formHeaderText":"", "formBodyText":""'||
+			',"form":{"formName":"", "formLabel":"", "formText":""'||
   				',"formGroupBox":'||v_formgroupbox_json||'}'||
 			',"data":{"fields":' || v_fields_json ||
 				'}'||

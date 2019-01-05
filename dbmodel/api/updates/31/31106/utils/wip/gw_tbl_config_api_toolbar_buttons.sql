@@ -1,4 +1,4 @@
-﻿CREATE TABLE SCHEMA_NAME.config_api_button
+﻿CREATE TABLE SCHEMA_NAME.config_api_toolbar_buttons
 (
   id integer NOT NULL,
   idval character varying(30),

@@ -1,12 +1,14 @@
 ﻿
-CREATE TABLE SCHEMA_NAME.config_api_form_actions
+CREATE TABLE SCHEMA_NAME.config_api_form_tabs
 (
-  id integer NOT NULL,
+  id integer PRIMARY KEY,
   formname character varying(50),
-  formaction text,
-  project_type character varying,
-  CONSTRAINT config_api_actions_pkey PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
+  tabname text,
+  tablabel text,
+  tabtext text,
+  sys_role text,
+  tooltip text,
+  tabfunction json,
+  tabactions json,
+  CONSTRAINT config_web_tabs_pkey PRIMARY KEY (id)
 );

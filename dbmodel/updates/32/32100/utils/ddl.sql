@@ -170,18 +170,6 @@ CREATE TABLE config_api_form_groupbox
 );
 
 
-CREATE TABLE config_api_form_tabs
-(  id integer NOT NULL,
-  formname character varying(50),
-  formtab text,
-  headertext text,
-  bodytext text,
-  sys_role text,
-  tablename text,
-  idname text,
-  tooltip text,
-  CONSTRAINT config_web_tabs_pkey PRIMARY KEY (id)
-);
 
 
 CREATE TABLE config_api_layer

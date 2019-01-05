@@ -5,6 +5,7 @@
   query_text text,
   device smallint,
   actionfields json,
+  listtype character varying(30),
   CONSTRAINT config_api_list_pkey PRIMARY KEY (id)
 )
 WITH (

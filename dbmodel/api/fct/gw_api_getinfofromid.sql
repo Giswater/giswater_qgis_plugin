@@ -290,7 +290,7 @@ BEGIN
 --------------------------------
         EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName" FROM config_api_form_actions WHERE formname = $1 
 		AND (project_type =''utils'' or project_type='||quote_literal(LOWER(v_project_type))||')
-		order by id desc) a'
+		order by orderby desc) a'
 		INTO v_form_actions
 		USING v_tablename;
 
@@ -299,7 +299,7 @@ BEGIN
 		-- Get form_tabs
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName" FROM config_api_form_actions WHERE formname = $1 
 			AND (project_type =''utils'' or project_type='||quote_literal(LOWER(v_project_type))||')
-			order by id desc) a'
+			order by orderby desc) a'
 			INTO v_form_actions
 			USING v_table_parent;
 	END IF;

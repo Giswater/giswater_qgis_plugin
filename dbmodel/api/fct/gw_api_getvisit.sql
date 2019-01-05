@@ -54,12 +54,16 @@ DECLARE
 	v_fields_json json;
 	v_forminfo json;
 	v_formheader text;
-	v_formactions json;
+	v_formactions text;
 	v_formtabs text;
 	v_tabaux json;
 	v_active boolean;
 	v_featureid varchar ;
 	aux_json json;
+	v_tab record;
+	v_bottom json [];
+	v_bottom_json json;
+	v_projecttype varchar;
 
 BEGIN
 
@@ -70,6 +74,9 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
+
+	-- get project type
+	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
 
 	--  get parameters from input
 	v_device = ((p_data ->>'client')::json->>'device')::integer;
@@ -124,8 +131,9 @@ BEGIN
 		v_fields_json = array_to_json (v_fields);
 		
 		-- building tab
-		v_tabaux := json_build_object('tabName','tabInfo','tabLabel','Info Basica','tabText','Test text for tab','active',true);
-		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabData';
+		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',false);
+				v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		v_formtabs := v_formtabs || v_tabaux::text;
 
 		-- Events tab
@@ -138,21 +146,28 @@ BEGIN
 
 	-- Files tab
 		-- building tab
-		SELECT gw_api_get_formfields( 'visitform_filetab', 'visit', 'file', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
-		v_fields_json = array_to_json (v_fields);
-
-		v_tabaux := json_build_object('tabName','tabFile','tabLabel','Files','tabText','Test text for tab','active',false, 'list', '{"tableName":"om_visit_file", "idName":"id"}'::json);
-		-- not good: improved strategy to manage actions activating form action from tab:  v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabFiles';
+		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',false);
+		--'{"name":"gwGetList()", "parameters"{"tableName":"om_visit"_file"}}'::json, 'actions', '{"sg":"sag"}'::jso);
 
 		v_formtabs := v_formtabs  || ',' || v_tabaux::text;
 
 		v_formtabs := (v_formtabs ||']');
 
-	-- form actions
-	v_formactions = '[{"actionName":"actionLink","actionTooltip":"Open File"},{"actionName":"actionAdd","actionTooltip":"Add file"}, {"actionName":"actionDelete","actionTooltip":"Delete file"}]';
-
-	-- define the text of header
+	-- header form
 	v_formheader :=concat('VISIT - ',v_id);	
+
+	-- actions form (ignored on devices =1,2,3)
+        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName" FROM config_api_form_actions WHERE formname = ''visit''
+		AND (project_type =''utils'' or project_type='||quote_literal(LOWER(v_projecttype))||')
+		order by orderby desc) a'
+		INTO v_formactions;
+	v_formactions = array_to_json (v_formactions::text[]);
+
+	-- bottom form
+	SELECT gw_api_get_formfields( 'generic', 'editbuttons', 'bottom', null, null, null, null, 'INSERT', null, v_device) INTO v_bottom;
+	v_bottom_json = array_to_json (v_bottom);
+
 
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
@@ -165,13 +180,15 @@ BEGIN
 	v_apiversion := COALESCE(v_apiversion, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
 	v_id := COALESCE(v_id, '{}');
+	v_bottom_json := COALESCE(v_bottom_json, '{}');
+
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idname":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
-		     ',"data":{}'||
-			'}'||
+		     ',"data":{}}'||
+	     ',"bottom":'|| v_bottom_json ||
 	    '}')::json;
 END;
 $BODY$

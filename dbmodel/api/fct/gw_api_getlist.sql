@@ -6,7 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2592
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlist(p_data json)  RETURNS json AS
+-- Function: ws_sample.gw_api_getlist(json)
+
+-- DROP FUNCTION ws_sample.gw_api_getlist(json);
+
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlist(p_data json)
+  RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
@@ -14,14 +19,14 @@ $BODY$
 TOC
 ----------
 -- attribute table using custom filters
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
     "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
 
 -- attribute table using canvas filter
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":null, "limit":null},
@@ -31,7 +36,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 VISIT
 ----------
 -- Visit -> visites
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_x_arc" ,"idName":"id"},
 "data":{"filterFields":{"arc_id":2001, "limit":10},
@@ -40,7 +45,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 
 
 -- Visit -> events
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
@@ -48,7 +53,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
     "pageInfo":{"orderby":"tstamp", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
 
 -- Visit -> files
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
@@ -56,7 +61,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 
 
 -- Event -> files
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"file"},
 "data":{"filterFields":{"event_id":232, "limit":10},
@@ -67,7 +72,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 FEATURE FORMS
 -------------
 -- Arc -> elements
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
@@ -77,10 +82,9 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 MANAGER FORMS
 -------------
 -- Lots
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"buttonName":"lotManager"},
-"feature":{},
 "data":{"filterFields":{"limit":10},
 	"pageInfo":{"pageNumber":1}}}$$)
 */
@@ -111,7 +115,6 @@ DECLARE
 	text text;
 	i integer=1;
 	v_tabname text;
-	v_action_column json;
 	v_tablename text;
 	v_formactions json;
 	v_x1 float;
@@ -126,12 +129,13 @@ DECLARE
 	v_buttonname text;
 	v_layermanager json;
 	v_featuretype text;
+	v_actions text;
 	
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
-    v_schemaname := 'SCHEMA_NAME';
+    SET search_path = "ws_sample", public;
+    v_schemaname := 'ws_sample';
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -157,9 +161,9 @@ BEGIN
 	END IF;
 
 	IF v_tablename IS NULL AND v_buttonname IS NOT NULL THEN
-		v_tablename = (SELECT (buttonoptions->>'tableName') FROM config_api_button WHERE idval = v_buttonname);
-		v_featuretype = (SELECT (buttonoptions->>'featureType') FROM config_api_button WHERE idval = v_buttonname);
-		v_layermanager = (SELECT (buttonoptions->>'layerManager') FROM config_api_button WHERE idval = v_buttonname);
+		v_tablename = (SELECT (((buttonoptions->>'function')::json->>'parameters')::json->>'tableName') FROM config_api_toolbar_buttons WHERE idval = v_buttonname);
+		v_featuretype = (SELECT (((buttonoptions->>'function')::json->>'parameters')::json->>'featureType') FROM config_api_toolbar_buttons WHERE idval = v_buttonname);
+		v_layermanager = (SELECT (((buttonoptions->>'function')::json->>'parameters')::json->>'layerManager') FROM config_api_toolbar_buttons WHERE idval = v_buttonname);
 	END IF;
 
 -- getting the list of filters fields
@@ -238,14 +242,14 @@ BEGIN
             INTO v_the_geom;
 
 	--  get querytext
-	EXECUTE 'SELECT query_text, action_fields FROM config_api_list WHERE tablename = $1 AND device = $2'
-		INTO v_query_result, v_action_column
+	EXECUTE 'SELECT query_text, actionfields FROM config_api_list WHERE tablename = $1 AND device = $2'
+		INTO v_query_result, v_actions
 		USING v_tablename, v_device;
 
 	-- if v_device is not configured on config_api_list table
 	IF v_query_result IS NULL THEN
-		EXECUTE 'SELECT query_text, action_fields  FROM config_api_list WHERE tablename = $1 LIMIT 1'
-			INTO v_query_result, v_action_column
+		EXECUTE 'SELECT query_text, actionfields  FROM config_api_list WHERE tablename = $1 LIMIT 1'
+			INTO v_query_result, v_actions
 			USING v_tablename;
 	END IF;
 
@@ -330,12 +334,12 @@ BEGIN
 	v_filter_fields := COALESCE(v_filter_fields, '{}');
 	v_result_list := COALESCE(v_result_list, '{}');
 	v_apiversion := COALESCE(v_apiversion, '{}');
-	v_action_column := COALESCE(v_action_column, '{}');
+	v_actions := COALESCE(v_actions, '{}');
 
 --    Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"form":{}'||
-		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'","actionFields":'||v_action_column||'}'||
+		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'", "actions":'||v_actions||'}'||
 		     ',"data":{"layerManager":' || v_layermanager ||
 			     ',"filterFields":' || v_filter_fields_json ||
 			     ',"listValues":' || v_result_list ||'}}'||
@@ -349,4 +353,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+
 
