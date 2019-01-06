@@ -6,18 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2570
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getconfig(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getconfig(p_data json)
   RETURNS json AS
 $BODY$
 DECLARE
 
 /*EXAMPLE:
-SELECT SCHEMA_NAME.gw_api_getconfig($${
+SELECT ws_sample.gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"epaoptions"},
 "feature":{},"data":{}}$$)
 
-SELECT SCHEMA_NAME.gw_api_getconfig($${
+SELECT ws_sample.gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"config"},
 "feature":{},"data":{}}$$)
@@ -54,7 +54,7 @@ SELECT SCHEMA_NAME.gw_api_getconfig($${
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -71,8 +71,8 @@ BEGIN
 
 -- basic_tab
 -------------------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND formtab='tabUser';
-    IF rec_tab.formtab IS NOT NULL THEN
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND tabname='tabUser';
+    IF rec_tab.tabname IS NOT NULL THEN
 
 	-- if ismandatory is true. First time for user value is forced
 	-- Get all parameters from audit_cat param_user
@@ -174,7 +174,7 @@ BEGIN
         -- Add tab name to json
         tabUser := ('{"fields":' || fields || '}')::json;
         tabUser := gw_fct_json_object_set_key(tabUser, 'tabName', 'tabUser'::TEXT);
-        tabUser := gw_fct_json_object_set_key(tabUser, 'tabHeaderText', rec_tab.headertext);
+        tabUser := gw_fct_json_object_set_key(tabUser, 'tabLabel', rec_tab.tablabel);
         tabUser := gw_fct_json_object_set_key(tabUser, 'active', v_active::TEXT);
 
         -- Create tabs array
@@ -188,12 +188,12 @@ BEGIN
 
 -- Admin tab
 --------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND formtab='tabAdmin' ;
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND tabname='tabAdmin' ;
 
     -- only form config forme (epaoptions not need admin tab)
     IF v_formname='config' THEN 
     
-	IF rec_tab.formtab IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN 
+	IF rec_tab.tabname IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN 
 
 		-- Get fields for admin enabled
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
@@ -216,7 +216,7 @@ BEGIN
         -- Add tab name to json
         v_tabadmin := ('{"fields":' || fields || '}')::json;
         v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabName', 'tabAdmin'::TEXT);
-        v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabHeaderText', rec_tab.headertext);
+        v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabLabel', rec_tab.tablabel);
 
         v_formtabs := v_formtabs ||','|| v_tabadmin::text;
         

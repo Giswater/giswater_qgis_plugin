@@ -6,56 +6,57 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2582
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getinfofromid(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getinfofromid(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 UPSERT FEATURE 
 arc no nodes extremals
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
 		"data":{}}$$)
 arc with nodes extremals
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
 		"data":{}}$$)
 INFO BASIC
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "id":"2001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_node_junction", "id":"1001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_connec_wjoin", "id":"3001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_element", "id":"125101"},
 		"data":{}}$$)
 
+
 INFO EPA
 -- epa not defined
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2220"},
 		"data":{"toolBar":"epa"}}$$)
 
 -- epa defined
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2001"},
@@ -126,7 +127,7 @@ BEGIN
 --  Get,check and set parameteres
 ----------------------------
 --    	Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 	schemas_array := current_schemas(FALSE);
 
 -- 	get input parameters
@@ -273,14 +274,14 @@ BEGIN
          
 --        Get tabs for form
 --------------------------------
-        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formtab as "tabName", headertext as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", tablabel as "tabLabel", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
             INTO form_tabs
             USING v_tablename;
 
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
         IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
 		-- Get form_tabs
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formtab as "tabName", headertext as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", tablabel as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
 			INTO form_tabs
 			USING v_table_parent;
 	END IF;

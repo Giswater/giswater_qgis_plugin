@@ -62,10 +62,10 @@ FEATURE FORMS
 -------------
 -- Arc -> elements
 SELECT ws_sample.gw_api_getlist($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
+"client":{"device":9, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
-    "pageInfo":{"orderBy":"element_id", "orderType":"DESC", "currentPage":3}}}$$)
+    "pageInfo":{"orderBy":"element_id", "orderType":"DESC", "currentPage":null}}}$$)
 
 
 MANAGER FORMS
@@ -216,7 +216,7 @@ BEGIN
 
 	-- if v_device is not configured on config_api_list table
 	IF v_query_result IS NULL THEN
-		EXECUTE 'SELECT query_text, FROM config_api_list WHERE tablename = $1 LIMIT 1'
+		EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 LIMIT 1'
 			INTO v_query_result
 			USING v_tablename;
 	END IF;
@@ -226,7 +226,7 @@ BEGIN
 		v_query_result = 'SELECT * FROM '||v_tablename||' WHERE '||v_idname||' IS NOT NULL ';
 	END IF;
 
-	raise notice 'v_query_result % ', v_query_result;
+	raise notice 'v_query_result: % ', v_query_result;
 
 	--  add filters
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
@@ -274,11 +274,15 @@ BEGIN
 		END IF;
 		
 	END IF;
-	
+
 	-- calculating last page
-	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
-		INTO v_lastpage;
-	
+	IF v_limit IS NOT NULL THEN
+		EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
+			INTO v_lastpage;
+	ELSE
+		v_limit = 1;
+	END IF;
+		
 	-- add limit
 	IF v_limit IS NOT NULL THEN
 		v_query_result := v_query_result || ' LIMIT '|| v_limit;
@@ -295,13 +299,13 @@ BEGIN
 		v_query_result := v_query_result || ' OFFSET '|| v_offset;
 	END IF;
 
-		raise notice ' v_query_result %', v_query_result;
+	raise notice ' v_query_result %', v_query_result;
 
 	-- Execute query result
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
 
-		raise notice ' v_result_list %', v_result_list;	
+	raise notice ' v_result_list %', v_result_list;	
 
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
@@ -321,7 +325,7 @@ BEGIN
 
 		-- adding spacer
 		IF v_device=9 THEN
-			v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', null, FALSE, '');
+			v_filter_fields[v_i+1] := gw_fct_createwidgetjson('Text', 'spacer', 'spacer', 'string', null, FALSE, '');
 			v_i=v_i+1;
 		END IF;
 
