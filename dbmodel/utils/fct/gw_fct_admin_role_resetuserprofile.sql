@@ -73,7 +73,7 @@ BEGIN
 	
 		-- config_param_user, getting role parameters where ismandatory is true (forced always)
 		INSERT INTO config_param_user (parameter, value, cur_user) 
-		SELECT parameter, value, v_user FROM ws_sample.config_param_user JOIN ws_sample.audit_cat_param_user ON audit_cat_param_user.id=parameter 
+		SELECT parameter, value, v_user FROM SCHEMA_NAME.config_param_user JOIN SCHEMA_NAME.audit_cat_param_user ON audit_cat_param_user.id=parameter 
 		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'))
 
 		-- selectors

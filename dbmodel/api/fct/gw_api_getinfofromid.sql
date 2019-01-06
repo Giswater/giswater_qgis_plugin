@@ -6,41 +6,41 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2582
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getinfofromid(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getinfofromid(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 UPSERT FEATURE 
 arc no nodes extremals
-SELECT ws_sample.gw_api_getinfofromid($${
+SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
 		"data":{}}$$)
 arc with nodes extremals
-SELECT ws_sample.gw_api_getinfofromid($${
+SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
 		"data":{}}$$)
 INFO BASIC
-SELECT ws_sample.gw_api_getinfofromid($${
+SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "id":"2001"},
 		"data":{}}$$)
-SELECT ws_sample.gw_api_getinfofromid($${
+SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_node_junction", "id":"1001"},
 		"data":{}}$$)
-SELECT ws_sample.gw_api_getinfofromid($${
+SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_connec_wjoin", "id":"3001"},
 		"data":{}}$$)
-SELECT ws_sample.gw_api_getinfofromid($${
+SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_element", "id":"125101"},
@@ -49,14 +49,14 @@ SELECT ws_sample.gw_api_getinfofromid($${
 
 INFO EPA
 -- epa not defined
-SELECT ws_sample.gw_api_getinfofromid($${
+SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2220"},
 		"data":{"toolBar":"epa"}}$$)
 
 -- epa defined
-SELECT ws_sample.gw_api_getinfofromid($${
+SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2001"},
@@ -127,7 +127,7 @@ BEGIN
 --  Get,check and set parameteres
 ----------------------------
 --    	Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	schemas_array := current_schemas(FALSE);
 
 -- 	get input parameters

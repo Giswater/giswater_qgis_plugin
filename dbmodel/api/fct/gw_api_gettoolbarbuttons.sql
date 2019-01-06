@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2628
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_gettoolbarbuttons(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_gettoolbarbuttons(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT ws_sample.gw_api_gettoolbarbuttons($${
+SELECT SCHEMA_NAME.gw_api_gettoolbarbuttons($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"clientbuttons":["lotManager", "visit"]}}$$)
 */
@@ -28,7 +28,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -51,7 +51,7 @@ BEGIN
 	v_clientbuttons := reverse(v_clientbuttons);
 
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT idval as "buttonName", buttonoptions as  "buttonOptions" 
-		FROM ws_sample.config_api_toolbar_buttons WHERE (project_type =''utils'' or project_type='||quote_literal(LOWER(v_projectype))||')
+		FROM SCHEMA_NAME.config_api_toolbar_buttons WHERE (project_type =''utils'' or project_type='||quote_literal(LOWER(v_projectype))||')
 		AND idval = any('''||v_clientbuttons||'''::text[]) ) a'
 		INTO v_buttons;
 

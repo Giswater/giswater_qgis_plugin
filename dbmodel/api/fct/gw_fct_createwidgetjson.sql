@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2630
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_createwidgetjson(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(
     label_arg text,
     name_arg text,
     type_arg text,
@@ -28,7 +28,7 @@ DECLARE
 BEGIN
 
 --	Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	schemas_array := current_schemas(FALSE);
 
 
@@ -66,14 +66,14 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text)
+ALTER FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text)
   OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO public;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO geoadmin;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO xtorret;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO user_test;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO user_dev;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO rol_dev;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO qgisserver;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO role_basic;
-GRANT EXECUTE ON FUNCTION ws_sample.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO barbara;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO public;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO geoadmin;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO xtorret;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO user_test;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO user_dev;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO rol_dev;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO qgisserver;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO role_basic;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO barbara;

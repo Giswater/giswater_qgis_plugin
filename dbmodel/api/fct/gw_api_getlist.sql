@@ -6,11 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2592
 
--- Function: ws_sample.gw_api_getlist(json)
+-- Function: SCHEMA_NAME.gw_api_getlist(json)
 
--- DROP FUNCTION ws_sample.gw_api_getlist(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_api_getlist(json);
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlist(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlist(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -19,14 +19,14 @@ $BODY$
 TOC
 ----------
 -- attribute table using custom filters
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
     "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
 
 -- attribute table using canvas filter
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":null, "limit":null},
@@ -36,7 +36,7 @@ SELECT ws_sample.gw_api_getlist($${
 VISIT
 ----------
 -- Visit -> visites
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_x_arc" ,"idName":"id"},
 "data":{"filterFields":{"arc_id":2001, "limit":10, "canvasCheck":false},
@@ -44,14 +44,14 @@ SELECT ws_sample.gw_api_getlist($${
 
 
 -- Visit -> events
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- Visit -> files
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{"filetype":"doc","limit":10},
@@ -61,7 +61,7 @@ SELECT ws_sample.gw_api_getlist($${
 FEATURE FORMS
 -------------
 -- Arc -> elements
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":9, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
@@ -71,7 +71,7 @@ SELECT ws_sample.gw_api_getlist($${
 MANAGER FORMS
 -------------
 -- Lots
-SELECT ws_sample.gw_api_getlist($${
+SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"buttonName":"lotManager"},
 "data":{"filterFields":{"limit":10},
@@ -126,8 +126,8 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ws_sample", public;
-    v_schemaname := 'ws_sample';
+    SET search_path = "SCHEMA_NAME", public;
+    v_schemaname := 'SCHEMA_NAME';
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
