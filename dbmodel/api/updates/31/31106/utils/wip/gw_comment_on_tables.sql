@@ -1,7 +1,7 @@
 ﻿COMMENT ON TABLE ws_sample.config_api_toolbar_buttons IS 
 'INSTRUCIONS TO WORK WITH THIS TABLE:
 With this table buttons on toolbar are configured.
-The function gw_api_getbuttons is called when session is started passing the list of project buttons. 
+The function gw_api_gettoolbarbuttons is called when session is started passing the list of project buttons. 
 In function of role of user, buttons are parameters are passed to client';
 
 
