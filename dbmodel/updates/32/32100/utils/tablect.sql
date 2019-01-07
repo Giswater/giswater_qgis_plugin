@@ -9,10 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --DROP CONSTRAINT
-ALTER TABLE config_api_form_fields DROP CONSTRAINT config_api_form_fields_pkey2;
-
-ALTER TABLE config_api_visit DROP CONSTRAINT config_api_visit_fkey;
-ALTER TABLE config_api_visit DROP CONSTRAINT config_api_visit_formname_key;
 
 ALTER TABLE om_visit_class_x_parameter DROP CONSTRAINT om_visit_class_x_parameter_class_fkey;
 
@@ -24,10 +20,7 @@ ALTER TABLE rpt_selector_hourly_compare DROP CONSTRAINT time_compare_cur_user_un
 DROP INDEX shortcut_unique;
 
 --ADD CONSTRAINT
-ALTER TABLE config_api_form_fields ADD CONSTRAINT config_api_form_fields_pkey2 UNIQUE(formname, formtype, column_id);
 
-ALTER TABLE config_api_visit ADD CONSTRAINT config_api_visit_formname_key UNIQUE(formname);
-ALTER TABLE config_api_visit  ADD CONSTRAINT config_api_visit_fkey FOREIGN KEY (visitclass_id) 
 REFERENCES om_visit_class (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE om_visit_class_x_parameter ADD CONSTRAINT om_visit_class_x_parameter_class_fkey FOREIGN KEY (class_id)

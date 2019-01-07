@@ -12,17 +12,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -----------------------
 /*
 DROP TABLE IF EXISTS config;
-DROP TABLE IF EXISTS "config_web_composer_scale";
-DROP TABLE IF EXISTS "config_web_fields";
-DROP TABLE IF EXISTS "config_web_fields_cat_datatype";
-DROP TABLE IF EXISTS "config_web_fields_cat_type";
-DROP TABLE IF EXISTS "config_web_forms";
-DROP TABLE IF EXISTS "config_web_layer";
-DROP TABLE IF EXISTS "config_web_layer_cat_form";
-DROP TABLE IF EXISTS "config_web_layer_cat_formtab";
-DROP TABLE IF EXISTS "config_web_layer_child";
-DROP TABLE IF EXISTS "config_web_tableinfo_x_inforole";
-DROP TABLE IF EXISTS "config_web_tabs";
 
 DROP TABLE IF EXISTS ext_cat_hydrometer_priority;
 DROP TABLE IF EXISTS ext_cat_hydrometer_type;
@@ -61,175 +50,6 @@ DROP TABLE IF EXISTS selector_composer;
 */
 
 -----------------------
--- create sequences
------------------------
-
-CREATE SEQUENCE config_api_form_layout_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-CREATE SEQUENCE config_api_tableinfo_x_inforole_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-CREATE SEQUENCE config_api_visit_cat_multievent_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-    
-
-
------------------------
--- create api config tables
------------------------
-
-
-CREATE TABLE config_api_cat_datatype
-(  id character varying(30) NOT NULL,
-  descript text,
-  CONSTRAINT config_api_cat_datatype_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE config_api_cat_formtab
-(  id character varying(30) NOT NULL,
-  descript text,
-  CONSTRAINT config_api_cat_formtab_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE config_api_cat_formtemplate
-(  id character varying(30) NOT NULL,
-  descript text,
-  CONSTRAINT config_api_cat_form_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE config_api_cat_widgettype
-(  id character varying(30) NOT NULL,
-  descript text,
-  CONSTRAINT config_api_cat_widgettype_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE config_api_form_actions
-(  id integer NOT NULL,
-  formname character varying(50),
-  formaction text,
-  project_type character varying,
-  CONSTRAINT config_api_actions_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE config_api_form_fields
-(  id serial NOT NULL,
-  formname character varying(50) NOT NULL,
-  formtype character varying(50) NOT NULL,
-  column_id character varying(30) NOT NULL,
-  layout_id integer,
-  layout_order integer,
-  isenabled boolean,
-  datatype character varying(30),
-  widgettype character varying(30),
-  label text,
-  widgetdim integer,
-  tooltip text,
-  placeholder text,
-  field_length integer,
-  num_decimals integer,
-  ismandatory boolean,
-  isparent boolean,
-  iseditable boolean,
-  isautoupdate boolean,
-  dv_querytext text,
-  dv_orderby_id boolean,
-  dv_isnullvalue boolean,
-  dv_parent_id text,
-  dv_querytext_filterc text,
-  widgetfunction text,
-  action_function text,
-  isreload boolean,
-  CONSTRAINT config_api_form_fields_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE config_api_form_groupbox
-(  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.config_api_form_layout_id_seq'::regclass),
-  formname character varying(50) NOT NULL,
-  layout_id integer,
-  label text,
-  CONSTRAINT config_api_form_layout_pkey PRIMARY KEY (id)
-);
-
-
-
-
-CREATE TABLE config_api_layer
-(  layer_id text NOT NULL,
-  is_parent boolean,
-  tableparent_id text,
-  is_editable boolean,
-  tableinfo_id text,
-  formtemplate text,
-  headertext text,
-  orderby integer,
-  link_id text,
-  is_tiled boolean,
-  CONSTRAINT config_web_layer_pkey PRIMARY KEY (layer_id)
-);
-
-
-CREATE TABLE config_api_layer_child
-(  featurecat_id character varying(30) NOT NULL,
-  tableinfo_id text,
-  CONSTRAINT config_api_layer_child_pkey PRIMARY KEY (featurecat_id)
-);
-
-CREATE TABLE config_api_list
-(  id serial NOT NULL,
-  tablename character varying(50),
-  query_text text,
-  device smallint,
-  action_fields json,
-  CONSTRAINT config_api_list_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE config_api_message
-(  id integer NOT NULL,
-  loglevel integer,
-  message text,
-  hintmessage text,
-  CONSTRAINT config_api_message_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE config_api_tableinfo_x_infotype
-(  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.config_api_tableinfo_x_inforole_id_seq'::regclass),
-  tableinfo_id character varying(50),
-  infotype_id integer,
-  tableinfotype_id text,
-  CONSTRAINT config_api_tableinfo_x_inforole_pkey PRIMARY KEY (id)
-);
-
-
-
-CREATE TABLE config_api_visit
-(  visitclass_id serial NOT NULL,
-  formname character varying(30),
-  tablename character varying(30),
-  CONSTRAINT config_api_visit_pkey PRIMARY KEY (visitclass_id)
-);
-
-
------------------------
 -- create inp tables
 -----------------------
 CREATE TABLE inp_typevalue
@@ -258,13 +78,28 @@ CREATE TABLE om_visit_class
 );
 
 
+/* created in 3.106
 CREATE TABLE om_visit_class_x_parameter
-(  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.config_api_visit_cat_multievent_id_seq'::regclass),
+(  id serial,
   class_id integer NOT NULL,
   parameter_id character varying(50) NOT NULL,
-  CONSTRAINT config_api_visit_cat_multievent_pkey PRIMARY KEY (class_id, parameter_id)
+  CONSTRAINT om_visit_class_x_parameter PRIMARY KEY (class_id, parameter_id)
 );
 
+CREATE TABLE sys_combo_cat
+( id serial NOT NULL,
+  idval text,
+  CONSTRAINT sys_combo_cat_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE sys_combo_values
+( sys_combo_cat_id integer NOT NULL,
+  id integer NOT NULL,
+  idval text,
+  descript text,
+  CONSTRAINT sys_combo_pkey PRIMARY KEY (sys_combo_cat_id, id)
+);
+*/
 
 CREATE TABLE om_visit_typevalue
 ( typevalue character varying(50) NOT NULL,
@@ -282,19 +117,7 @@ CREATE TABLE rpt_selector_hourly_compare
   CONSTRAINT rpt_selector_result_hourly_compare_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE sys_combo_cat
-( id serial NOT NULL,
-  idval text,
-  CONSTRAINT sys_combo_cat_pkey PRIMARY KEY (id)
-);
 
-CREATE TABLE sys_combo_values
-( sys_combo_cat_id integer NOT NULL,
-  id integer NOT NULL,
-  idval text,
-  descript text,
-  CONSTRAINT sys_combo_pkey PRIMARY KEY (sys_combo_cat_id, id)
-);
 
 
 CREATE TABLE audit_cat_table_x_column
@@ -320,25 +143,27 @@ CREATE TABLE value_type
 
 -----------------------
 -- create new fields
------------------------
+----------------------
+
+--created in 3.106
 ALTER TABLE audit_cat_param_user ADD COLUMN formname text;
-ALTER TABLE audit_cat_param_user ADD COLUMN label text;
-ALTER TABLE audit_cat_param_user ADD COLUMN dv_querytext text;
-ALTER TABLE audit_cat_param_user ADD COLUMN dv_parent_id text;
-ALTER TABLE audit_cat_param_user ADD COLUMN isenabled boolean;
-ALTER TABLE audit_cat_param_user ADD COLUMN layout_id integer;
-ALTER TABLE audit_cat_param_user ADD COLUMN layout_order integer;
-ALTER TABLE audit_cat_param_user ADD COLUMN project_type character varying(30);
-ALTER TABLE audit_cat_param_user ADD COLUMN isparent boolean;
-ALTER TABLE audit_cat_param_user ADD COLUMN dv_querytext_filterc text;
-ALTER TABLE audit_cat_param_user ADD COLUMN feature_field_id text;
-ALTER TABLE audit_cat_param_user ADD COLUMN feature_dv_parent_value text;
-ALTER TABLE audit_cat_param_user ADD COLUMN isautoupdate boolean;
-ALTER TABLE audit_cat_param_user ADD COLUMN datatype character varying(30);
-ALTER TABLE audit_cat_param_user ADD COLUMN widgettype character varying(30);
+--ALTER TABLE audit_cat_param_user ADD COLUMN label text;
+--ALTER TABLE audit_cat_param_user ADD COLUMN dv_querytext text;
+--ALTER TABLE audit_cat_param_user ADD COLUMN dv_parent_id text;
+--ALTER TABLE audit_cat_param_user ADD COLUMN isenabled boolean;
+--ALTER TABLE audit_cat_param_user ADD COLUMN layout_id integer;
+--ALTER TABLE audit_cat_param_user ADD COLUMN layout_order integer;
+--ALTER TABLE audit_cat_param_user ADD COLUMN project_type character varying(30);
+--ALTER TABLE audit_cat_param_user ADD COLUMN isparent boolean;
+--ALTER TABLE audit_cat_param_user ADD COLUMN dv_querytext_filterc text;
+--ALTER TABLE audit_cat_param_user ADD COLUMN feature_field_id text;
+--ALTER TABLE audit_cat_param_user ADD COLUMN feature_dv_parent_value text;
+--ALTER TABLE audit_cat_param_user ADD COLUMN isautoupdate boolean;
+--ALTER TABLE audit_cat_param_user ADD COLUMN datatype character varying(30);
+--ALTER TABLE audit_cat_param_user ADD COLUMN widgettype character varying(30);
 ALTER TABLE audit_cat_param_user ADD COLUMN ismandatory boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN widgetcontrols json;
-ALTER TABLE audit_cat_param_user ADD COLUMN vdefault text;
+--ALTER TABLE audit_cat_param_user ADD COLUMN vdefault text;
 
 ALTER TABLE cat_arc ADD COLUMN  dn integer;
 ALTER TABLE cat_arc ADD COLUMN  pn integer;
@@ -388,7 +213,8 @@ ALTER TABLE om_visit ADD COLUMN suspendendcat_id integer;
 ALTER TABLE om_visit_cat ADD COLUMN extusercat_id integer;
 ALTER TABLE om_visit_cat ADD COLUMN duration text;
 
-ALTER TABLE om_visit_parameter ADD COLUMN  short_descript character varying(30);
+--created in 3.106
+--ALTER TABLE om_visit_parameter ADD COLUMN  short_descript character varying(30);
 
 ALTER TABLE sys_feature_type ADD COLUMN  icon character varying(30);
 
