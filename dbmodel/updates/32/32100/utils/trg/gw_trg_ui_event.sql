@@ -41,18 +41,4 @@ $BODY$
   
 
   
-DROP TRIGGER IF EXISTS gw_trg_ui_event_x_node ON "SCHEMA_NAME".ve_ui_event_x_node;
-CREATE TRIGGER gw_trg_ui_event_x_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_ui_event_x_node
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_event(om_visit_event);
 
-DROP TRIGGER IF EXISTS gw_trg_ui_event_x_arc ON "SCHEMA_NAME".ve_ui_event_x_arc;
-CREATE TRIGGER gw_trg_ui_event_x_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_ui_event_x_arc
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_event(om_visit_event);
-
-DROP TRIGGER IF EXISTS gw_trg_ui_event_x_connec ON "SCHEMA_NAME".ve_ui_event_x_connec;
-CREATE TRIGGER gw_trg_ui_event_x_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_ui_event_x_connec
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_event(om_visit_event);
-
-DROP TRIGGER IF EXISTS gw_trg_ui_event ON "SCHEMA_NAME".ve_ui_event;
-CREATE TRIGGER gw_trg_ui_event INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_ui_event
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_event(om_visit_event);

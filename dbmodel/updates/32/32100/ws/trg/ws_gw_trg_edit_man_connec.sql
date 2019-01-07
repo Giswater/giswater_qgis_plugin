@@ -359,14 +359,3 @@ $BODY$
   COST 100;
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_connec_greentap ON "SCHEMA_NAME".ve_connec_greentap;
-CREATE TRIGGER gw_trg_edit_connec_greentap INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_connec_greentap FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('GREENTAP');
-
-DROP TRIGGER IF EXISTS gw_trg_edit_connec_wjoin ON "SCHEMA_NAME".ve_connec_wjoin;
-CREATE TRIGGER gw_trg_edit_connec_wjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_connec_wjoin FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('WJOIN');
-
-DROP TRIGGER IF EXISTS gw_trg_edit_connec_tap ON "SCHEMA_NAME".ve_connec_tap;
-CREATE TRIGGER gw_trg_edit_connec_tap INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_connec_tap FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('TAP');
-
-DROP TRIGGER IF EXISTS gw_trg_edit_connec_fountain ON "SCHEMA_NAME".ve_connec_fountain;
-CREATE TRIGGER gw_trg_edit_connec_fountain INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_connec_fountain FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('FOUNTAIN');

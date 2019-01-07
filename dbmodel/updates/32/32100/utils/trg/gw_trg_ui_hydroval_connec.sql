@@ -40,9 +40,3 @@ $BODY$
   COST 100;
 
 
-DROP TRIGGER IF EXISTS gw_trg_ui_hydroval_connec ON "SCHEMA_NAME".ve_ui_hydroval_x_connec;
-CREATE TRIGGER gw_trg_ui_hydroval_connec INSTEAD OF UPDATE ON "SCHEMA_NAME".ve_ui_hydroval_x_connec FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_hydroval_connec();
-
-
-DROP TRIGGER IF EXISTS gw_trg_edit_rtc_hydro_data ON "SCHEMA_NAME".ve_rtc_hydro_data_x_connec;
-CREATE TRIGGER gw_trg_edit_rtc_hydro_data  INSTEAD OF UPDATE ON SCHEMA_NAME.ve_rtc_hydro_data_x_connec FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_ui_hydroval_connec();

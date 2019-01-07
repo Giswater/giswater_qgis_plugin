@@ -406,19 +406,3 @@ This version of Giswater is provided by Giswater Association
 
 
 
-
-	DROP TRIGGER IF EXISTS gw_trg_edit_arc_pumppipe ON "SCHEMA_NAME".ve_arc_pumppipe;
-	CREATE TRIGGER gw_trg_edit_arc_pumppipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_arc_pumppipe FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('PUMP-PIPE');     
-
-	DROP TRIGGER IF EXISTS gw_trg_edit_arc_conduit ON "SCHEMA_NAME".ve_arc_conduit;
-	CREATE TRIGGER gw_trg_edit_arc_conduit INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_arc_conduit FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('CONDUIT');   
-
-	DROP TRIGGER IF EXISTS gw_trg_edit_arc_siphon ON "SCHEMA_NAME".ve_arc_siphon;
-	CREATE TRIGGER gw_trg_edit_arc_siphon INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_arc_siphon FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('SIPHON'); 
-
-	DROP TRIGGER IF EXISTS gw_trg_edit_arc_varc ON "SCHEMA_NAME".ve_arc_varc;
-	CREATE TRIGGER gw_trg_edit_arc_varc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_arc_varc FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('VARC'); 
-
-	DROP TRIGGER IF EXISTS gw_trg_edit_arc_waccel ON "SCHEMA_NAME".ve_arc_waccel;
-	CREATE TRIGGER gw_trg_edit_arc_waccel INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_arc_waccel FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('WACCEL'); 
-		  

@@ -79,15 +79,3 @@ $BODY$
   
   
 
-  
-DROP TRIGGER IF EXISTS gw_trg_om_visit_singlevent ON "SCHEMA_NAME".ve_visit_singlevent_x_arc;
-CREATE TRIGGER gw_trg_om_visit_singlevent INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_visit_singlevent_x_arc
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit_singlevent(singlevent_x_arc);
-
-DROP TRIGGER IF EXISTS gw_trg_om_visit_singlevent ON "SCHEMA_NAME".ve_visit_singlevent_x_node;
-CREATE TRIGGER gw_trg_om_visit_singlevent INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_visit_singlevent_x_node
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit_singlevent(singlevent_x_node);
-
-DROP TRIGGER IF EXISTS gw_trg_om_visit_singlevent ON "SCHEMA_NAME".ve_visit_singlevent_x_connec;
-CREATE TRIGGER gw_trg_om_visit_singlevent INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_visit_singlevent_x_connec
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit_singlevent(singlevent_x_connec);
