@@ -70,9 +70,9 @@ INSERT INTO price_value_unit VALUES ('t');
 
 -- Records of value_priority
 -- ----------------------------
-INSERT INTO value_priority VALUES ('HIGH PRIORITY');
-INSERT INTO value_priority VALUES ('NORMAL PRIORITY');
-INSERT INTO value_priority VALUES ('LOW PRIORITY');
+INSERT INTO value_priority VALUES ('HIGH_PRIORITY');
+INSERT INTO value_priority VALUES ('NORMAL_PRIORITY');
+INSERT INTO value_priority VALUES ('LOW_PRIORITY');
 
 -- Records of plan_result_type
 -- ----------------------------
