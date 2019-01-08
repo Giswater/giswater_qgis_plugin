@@ -15,6 +15,9 @@ This version of Giswater is provided by Giswater Association
 
 	CREATE VIEW ws.ext_municipality AS SELECT * 
 	FROM utils.municipality;
+	
+	CREATE VIEW ws.ext_type_street AS SELECT * 
+	FROM utils.type_street;
 
 	CREATE OR REPLACE VIEW ws.ext_plot AS SELECT id,plot_code,muni_id,postcode,streetaxis_id,postnumber,complement,placement,square,observ,text,the_geom,ws_expl_id AS expl_id 
 	FROM utils.plot;
@@ -28,6 +31,9 @@ This version of Giswater is provided by Giswater Association
 			
 	CREATE OR REPLACE VIEW ud.ext_municipality AS 
 	SELECT * FROM utils.municipality;
+
+	CREATE VIEW ud.ext_type_street AS SELECT * 
+	FROM utils.type_street;
 
 	CREATE OR REPLACE VIEW ud.ext_plot AS SELECT id,plot_code,muni_id,postcode,streetaxis_id,postnumber,complement,placement,square,observ,text,the_geom,ud_expl_id AS expl_id 
 	FROM utils.plot;

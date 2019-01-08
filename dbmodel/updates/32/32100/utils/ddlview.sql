@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ud, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -----------------------
@@ -76,26 +76,6 @@ DROP VIEW IF EXISTS v_edit_element;
 */
 
 
------------------------
--- create parent views
------------------------
-DROP VIEW IF EXISTS vp_arc;
-CREATE OR REPLACE VIEW vp_arc AS 
- SELECT ve_arc.arc_id AS nid,
-    ve_arc.arc_type AS custom_type
-   FROM ve_arc;
-
-DROP VIEW IF EXISTS vp_connec;
-CREATE OR REPLACE VIEW vp_connec AS 
- SELECT ve_connec.connec_id AS nid,
-    ve_connec.connec_type AS custom_type
-   FROM ve_connec;
-
-DROP VIEW IF EXISTS vp_node;
-CREATE OR REPLACE VIEW vp_node AS 
- SELECT ve_node.node_id AS nid,
-    ve_node.node_type AS custom_type
-   FROM ve_node;
 
 -----------------------
 -- create views

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ud", public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 -----------------------
 -- remove all the views that are refactored in the v3.2
 -----------------------
@@ -336,6 +336,33 @@ CREATE OR REPLACE VIEW ve_gully AS
      LEFT JOIN gully_type ON gully.gully_type::text = gully_type.id::text;
 
 
+
+-----------------------
+-- create parent views
+-----------------------
+DROP VIEW IF EXISTS vp_arc;
+CREATE OR REPLACE VIEW vp_arc AS 
+ SELECT ve_arc.arc_id AS nid,
+    ve_arc.arc_type AS custom_type
+   FROM ve_arc;
+
+DROP VIEW IF EXISTS vp_connec;
+CREATE OR REPLACE VIEW vp_connec AS 
+ SELECT ve_connec.connec_id AS nid,
+    ve_connec.connec_type AS custom_type
+   FROM ve_connec;
+
+DROP VIEW IF EXISTS vp_node;
+CREATE OR REPLACE VIEW vp_node AS 
+ SELECT ve_node.node_id AS nid,
+    ve_node.node_type AS custom_type
+   FROM ve_node;
+
+DROP VIEW IF EXISTS vp_gully;
+CREATE OR REPLACE VIEW vp_gully AS 
+ SELECT ve_gully.arc_id AS nid,
+    ve_gully.gully_type AS custom_type
+   FROM ve_gully;
 
 -----------------------
 -- create child views
@@ -2546,15 +2573,6 @@ JOIN v_node ON v_node.node_id=subcatchment.node_id
        ((subcatchment.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"()) AND
        ((subcatchment.hydrology_id)=(inp_selector_hydrology.hydrology_id) AND inp_selector_hydrology.cur_user="current_user"());
 
-
- -----------------------
--- create parent views
------------------------
-DROP VIEW IF EXISTS vp_gully;
-CREATE OR REPLACE VIEW vp_gully AS 
- SELECT ve_gully.arc_id AS nid,
-    ve_gully.gully_type AS custom_type
-   FROM ve_gully;
 
 
 -----------------------
