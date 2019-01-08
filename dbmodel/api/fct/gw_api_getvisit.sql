@@ -22,6 +22,13 @@ SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit", "visit_id":null},
 "form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
+"data":{"type":"connec", "id":"3001"}}$$)
+
+
+SELECT ws_sample.gw_api_getvisit($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"featureType":"visit", "visit_id":null},
+"form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
 "data":{"type":"", "id":""}}$$)
 
 SELECT ws_sample.gw_api_getvisit($${
@@ -89,6 +96,7 @@ DECLARE
 	v_layermanager json;
 	v_filterfields json;
 	v_data json;
+	isnewvisit boolean;
 
 BEGIN
 
@@ -119,13 +127,19 @@ BEGIN
 		-- TODO: for new visit enhance the visit type using the feature_id
 		v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;
 		IF v_visitclass IS NULL THEN
-			v_visitclass := 6;
+			v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
 		END IF;
 	ELSE 
 		v_visitclass := (SELECT class_id FROM ws_sample.om_visit WHERE id=v_id::bigint);
 		IF v_visitclass IS NULL THEN
 			v_visitclass := 0;
 		END IF;
+	END IF;
+
+	-- getting visit id
+	IF v_id IS NULL THEN
+		v_id := ((SELECT max(id)+1 FROM om_visit)+1);
+		isnewvisit = true;
 	END IF;
 
 	--  get formname and tablename
@@ -142,7 +156,7 @@ BEGIN
 		
 		--filling tab (only if it's active)
 		IF v_activedatatab THEN
-			IF v_id IS NULL THEN
+			IF isnewvisit IS NULL THEN
 
 				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
@@ -156,8 +170,6 @@ BEGIN
 	
 					-- setting visit id value
 					IF (aux_json->>'column_id') = 'visit_id' THEN
-						PERFORM setval('ws_sample.audit_check_project_id_seq', (SELECT max(id)+1 FROM om_visit), true);
-						v_id = nextval('ws_sample.audit_check_project_id_seq');
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_id);	
 					END IF;
 				END LOOP;
