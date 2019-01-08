@@ -1381,6 +1381,7 @@ class UpdateSQL(ParentAction):
             self.execute_last_process(new_project=True, schema_name=project_name)
             self.setArrowCursor()
 
+        #Show message if precess execute correctly
         if str(self.controller.last_error) is None:
             msg = "The project has been created correctly."
             result = self.controller.show_info_box(msg, "Info")
@@ -1388,7 +1389,7 @@ class UpdateSQL(ParentAction):
             # Close dialog when process has been execute correctly
             self.close_dialog(self.dlg_readsql_create_project)
         else:
-            msg = "Some error has occurred while the process was running."
+            msg = "Some error has occurred while the create process was running."
             result = self.controller.show_info_box(msg, "Info")
 
     def rename_project_data_schema(self):
@@ -1438,7 +1439,18 @@ class UpdateSQL(ParentAction):
         self.load_tablect(project_type=project_type)
         self.api(project_type=project_type)
         self.execute_last_process()
+        self.setArrowCursor()
 
+        # Show message if precess execute correctly
+        if str(self.controller.last_error) is None:
+            msg = "The update has been executed correctly."
+            result = self.controller.show_info_box(msg, "Info")
+
+            # Close dialog when process has been execute correctly
+            self.close_dialog(self.dlg_readsql_create_project)
+        else:
+            msg = "Some error has occurred while the update process was running."
+            result = self.controller.show_info_box(msg, "Info")
 
     def reload_tablect(self, project_type=False):
         self.load_tablect(project_type=project_type)
@@ -1632,6 +1644,16 @@ class UpdateSQL(ParentAction):
             self.reload_trg(self.project_type_selected)
             self.setArrowCursor()
 
+        # Show message if precess execute correctly
+        if str(self.controller.last_error) is None:
+            msg = "The reload has been executed correctly."
+            result = self.controller.show_info_box(msg, "Info")
+
+            # Close dialog when process has been execute correctly
+            self.close_dialog(self.dlg_readsql_create_project)
+        else:
+            msg = "Some error has occurred while the reload process was running."
+            result = self.controller.show_info_box(msg, "Info")
 
     def api_file_to_db(self):
 
@@ -1648,6 +1670,16 @@ class UpdateSQL(ParentAction):
             self.reload_trg('api')
             self.setArrowCursor()
 
+        # Show message if precess execute correctly
+        if str(self.controller.last_error) is None:
+            msg = "The reload has been executed correctly."
+            result = self.controller.show_info_box(msg, "Info")
+
+            # Close dialog when process has been execute correctly
+            self.close_dialog(self.dlg_readsql_create_project)
+        else:
+            msg = "Some error has occurred while the reload process was running."
+            result = self.controller.show_info_box(msg, "Info")
 
     def open_create_project(self):
 
