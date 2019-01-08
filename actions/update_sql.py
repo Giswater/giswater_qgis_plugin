@@ -64,6 +64,8 @@ class UpdateSQL(ParentAction):
             #Get pluguin version
             self.pluguin_version = self.get_plugin_version()
 
+            self.project_data_schema_version = '0'
+
             # Get widgets from form
             self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
             self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
@@ -188,6 +190,7 @@ class UpdateSQL(ParentAction):
             self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
             self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, self.cmb_project_type))
             self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
+            self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
             self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
             self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
 
@@ -196,11 +199,11 @@ class UpdateSQL(ParentAction):
             if self.version is None:
                 self.version = '0'
                 self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
-                                                   'DataBase version: ' + self.version)
+                                                   'DataBase version: ' + self.version + '\n \n' +
+                                                   'Project data schema version:' + self.project_data_schema_version)
 
             # Open dialog
             self.dlg_readsql.show()
-
 
     """ Declare all read sql process """
 
@@ -1601,33 +1604,43 @@ class UpdateSQL(ParentAction):
     def set_info_project(self):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
-        sql = "SELECT title, author, date FROM " + schema_name + ".inp_project_id"
-        row = self.controller.get_row(sql)
-        if row is not None:
-            utils_giswater.setWidgetText(self.dlg_readsql,
-                                         self.dlg_readsql.project_schema_title, str(row[0]))
-            utils_giswater.setWidgetText(self.dlg_readsql,
-                                         self.dlg_readsql.project_schema_author, str(row[1]))
-            utils_giswater.setWidgetText(self.dlg_readsql,
-                                         self.dlg_readsql.project_schema_last_update, str(row[2]))
-        else:
+        if schema_name is None:
             utils_giswater.setWidgetText(self.dlg_readsql,
                                          self.dlg_readsql.project_schema_title, '')
             utils_giswater.setWidgetText(self.dlg_readsql,
                                          self.dlg_readsql.project_schema_author, '')
             utils_giswater.setWidgetText(self.dlg_readsql,
                                          self.dlg_readsql.project_schema_last_update, '')
+            schema_name = 'Nothing to select'
+            self.project_data_schema_version = "Version not found"
+        else:
+            sql = "SELECT title, author, date FROM " + schema_name + ".inp_project_id"
+            row = self.controller.get_row(sql)
+            if row is None:
+                utils_giswater.setWidgetText(self.dlg_readsql,
+                                             self.dlg_readsql.project_schema_title, '')
+                utils_giswater.setWidgetText(self.dlg_readsql,
+                                             self.dlg_readsql.project_schema_author, '')
+                utils_giswater.setWidgetText(self.dlg_readsql,
+                                             self.dlg_readsql.project_schema_last_update, '')
+            else:
+                utils_giswater.setWidgetText(self.dlg_readsql,
+                                             self.dlg_readsql.project_schema_title, str(row[0]))
+                utils_giswater.setWidgetText(self.dlg_readsql,
+                                             self.dlg_readsql.project_schema_author, str(row[1]))
+                utils_giswater.setWidgetText(self.dlg_readsql,
+                                             self.dlg_readsql.project_schema_last_update, str(row[2]))
+            sql = "SELECT giswater FROM " + schema_name + ".version"
+            row = self.controller.get_row(sql)
+            if row is not None:
+                self.project_data_schema_version = str(row[0])
 
-        self.project_data_schema_version = "Version not found"
-        sql = "SELECT giswater FROM " + schema_name + ".version"
-        row = self.controller.get_row(sql)
-        if row[0]is not None:
-            self.project_data_schema_version = str(row[0])
         if self.version is None:
             self.version = '0'
         self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
                                            'DataBase version: ' + self.version + '\n \n' +
-                                           'Project data schema version:' + self.project_data_schema_version)
+                                           'Schema name: ' + schema_name + '\n' +
+                                           'Schema version: ' + self.project_data_schema_version)
 
     def process_folder(self, folderPath, filePattern):
         status = True
