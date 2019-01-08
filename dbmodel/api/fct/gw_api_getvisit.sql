@@ -58,11 +58,12 @@ SELECT ws_sample.gw_api_getvisit($${
 -- not first time
 SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"featureType":"visit", "visit_id":1135},
+"feature":{"visit_id":1135},
 "form":{"tabData":{"active":false},
 	"tabFiles":{"active":true, 
-		    "feature":{"tableName":"om_visit_file"},
-		    "data":{"filterFields":{"filetype":"doc","limit":10},"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}},
+		    "tabFeature":{"tabTableName":"om_visit_file"},
+		    "tabData":{"filterFields":{"filetype":"doc","limit":10},
+			       "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}},
 "data":{"type":"arc"}}$$)
 */
 
@@ -178,9 +179,10 @@ BEGIN
 			END IF;	
 
 			v_fields_json = array_to_json (v_fields);
-		END IF;
 
-		v_fields_json := COALESCE(v_fields_json, '{}');		
+			v_fields_json := COALESCE(v_fields_json, '{}');		
+
+		END IF;
 
 		-- building tab
 		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabData';
@@ -214,12 +216,18 @@ BEGIN
 			v_list := gw_fct_json_object_set_key(v_list, 'client', v_client);
 
 			-- setting visit_id on json
-			v_filterfields := ((v_list->>'data')::json->>'filterFields')::json;
+			v_filterfields := ((v_list->>'tabData')::json->>'filterFields')::json;
 			v_filterfields := gw_fct_json_object_set_key(v_filterfields, 'visit_id', v_id);
 			v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
-			v_list := gw_fct_json_object_set_key(v_list, 'data', v_data);
+			v_list := gw_fct_json_object_set_key(v_list, 'tabData', v_data);
 
-			-- calling getlist function
+			--refactor tabNames without tab on json
+			v_list := replace (v_list::text, 'tabFeature', 'feature');
+			v_list := replace (v_list::text, 'tabTableName', 'tableName');
+			v_list := replace (v_list::text, 'tabFeature', 'feature');
+			v_list := replace (v_list::text, 'tabData', 'data');
+
+			-- calling getlist function with modified json
 			SELECT gw_api_getlist (v_list) INTO v_fields_json;
 			
 			-- getting pageinfo and list values
