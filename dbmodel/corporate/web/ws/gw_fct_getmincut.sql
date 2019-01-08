@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -123,11 +123,8 @@ BEGIN
 
 --		Update the selector
 		--current user
-		IF (SELECT COUNT(*) FROM anl_mincut_result_selector WHERE cur_user = current_user_var) > 0 THEN
-			UPDATE anl_mincut_result_selector SET result_id = mincut_id_arg WHERE cur_user = current_user_var;
-		ELSE
-			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user_var, mincut_id_arg);
-		END IF;
+		DELETE FROM anl_mincut_result_selector WHERE cur_user=current_user_var AND result_id = mincut_id_arg;
+		INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user_var, mincut_id_arg);
 		
 		-- publish user
 		SELECT value FROM config_param_system WHERE parameter='api_publish_user' INTO v_publish_user;
