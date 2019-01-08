@@ -1314,7 +1314,7 @@ class UpdateSQL(ParentAction):
 
         if self.rdb_import_data.isChecked():
             print("rdb_import_data")
-            # status.append(self.load_base_no_ct())
+            self.setWaitCursor()
             self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -1323,20 +1323,24 @@ class UpdateSQL(ParentAction):
             self.execute_import_data()
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True)
+            self.setArrowCursor()
         elif self.rdb_no_ct.isChecked():
             print(str("rdb_no_ct"))
+            self.setWaitCursor()
             self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True)
+            self.setArrowCursor()
         elif self.rdb_sample.isChecked():
             print(str("rdb_sample"))
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
                 msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
+                    self.setWaitCursor()
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
                     self.load_base(project_type=project_type)
                     self.update_30to31(new_project=True, project_type=project_type)
@@ -1346,12 +1350,14 @@ class UpdateSQL(ParentAction):
                     self.api(project_type=project_type)
                     self.load_sample_data(project_type=project_type)
                     self.execute_last_process(new_project=True)
+                    self.setArrowCursor()
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
                 msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
+                    self.setWaitCursor()
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
                     self.load_base(project_type=project_type)
                     self.update_30to31(new_project=True, project_type=project_type)
@@ -1362,8 +1368,10 @@ class UpdateSQL(ParentAction):
                     self.load_sample_data(project_type=project_type)
                     self.load_dev_data(project_type=project_type)
                     self.execute_last_process(new_project=True)
+                    self.setArrowCursor()
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
+            self.setWaitCursor()
             self.load_base(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -1371,6 +1379,7 @@ class UpdateSQL(ParentAction):
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name)
+            self.setArrowCursor()
 
         if str(self.controller.last_error) is None:
             msg = "The project has been created correctly."
@@ -1383,33 +1392,44 @@ class UpdateSQL(ParentAction):
             result = self.controller.show_info_box(msg, "Info")
 
     def rename_project_data_schema(self):
+        self.setWaitCursor()
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
         self.load_fct_ftrg(project_type=self.project_type_selected)
         self.execute_last_process()
+        self.setArrowCursor()
 
     def update_api(self):
+        self.setWaitCursor()
         self.api(False)
+        self.setArrowCursor()
 
     def implement_api(self):
+        self.setWaitCursor()
         self.api(True)
+        self.setArrowCursor()
 
     def load_custom_sql_files(self, dialog, widget):
         folder_path = utils_giswater.getWidgetText(dialog, widget)
+        self.setWaitCursor()
         self.load_sql(folder_path)
+        self.setArrowCursor()
 
     #TODO:Rename this function => Update all versions from changelog file.
     def update(self, project_type):
         msg = "Estas seguro que quieres actualizar las foreing keys, funciones y trigers a los de la ultima version?"
         result = self.controller.ask_question(msg, "Info")
         if result:
+            self.setWaitCursor()
             self.load_updates(project_type)
             self.reload_tablect(project_type)
             self.reload_fct_ftrg(project_type)
             self.reload_trg(project_type)
+            self.setArrowCursor()
 
     """ Checkbox calling functions """
 
     def load_updates(self, project_type):
+        self.setWaitCursor()
         self.update_30to31(project_type=project_type)
         self.load_views(project_type=project_type)
         self.update_31to39(project_type=project_type)
@@ -1598,20 +1618,36 @@ class UpdateSQL(ParentAction):
     def schema_file_to_db(self):
 
         if self.chk_schema_fk.isChecked():
+            self.setWaitCursor()
             self.reload_tablect(self.project_type_selected)
+            self.setArrowCursor()
+
         if self.chk_schema_funcion.isChecked():
+            self.setWaitCursor()
             self.reload_fct_ftrg(self.project_type_selected)
+            self.setArrowCursor()
+
         if self.chk_schema_trigger.isChecked():
+            self.setWaitCursor()
             self.reload_trg(self.project_type_selected)
+            self.setArrowCursor()
+
 
     def api_file_to_db(self):
 
         if self.chk_api_fk.isChecked():
+            self.setWaitCursor()
             self.reload_tablect('api')
+            self.setArrowCursor()
         if self.chk_api_funcion.isChecked():
+            self.setWaitCursor()
             self.reload_fct_ftrg('api')
+            self.setArrowCursor()
         if self.chk_api_trigger.isChecked():
+            self.setWaitCursor()
             self.reload_trg('api')
+            self.setArrowCursor()
+
 
     def open_create_project(self):
 
