@@ -566,13 +566,13 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                     # return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/',
                                     '') is False:
                                 print(False)
                                 # return False
                             else:
                                 status = self.load_sql(
-                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/')
                                 if status is False:
                                     print(False)
                                     # return False
@@ -796,13 +796,13 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/',
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/',
                                     '') is False:
                                 print(False)
                                 return False
                             else:
                                 status = self.load_sql(
-                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                                    self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/')
                                 if status is False:
                                     print(False)
                                     return False
@@ -1706,7 +1706,7 @@ class UpdateSQL(ParentAction):
         if i18n:
             print('utils.sql')
             self.read_execute_file(filedir, '/utils.sql', schema_name, filter_srid_value)
-            print(str(self.project_type) + '.sql')
+            print(str(self.project_type_selected) + '.sql')
             self.read_execute_file(filedir, '/' + str(self.project_type_selected) + '.sql', schema_name, filter_srid_value)
         else:
             for file in filelist:
