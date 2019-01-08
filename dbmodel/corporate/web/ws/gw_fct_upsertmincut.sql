@@ -194,7 +194,7 @@ BEGIN
         ELSIF v_mincut_class = 3 THEN
             INSERT INTO anl_mincut_result_hydrometer(result_id, hydrometer_id) VALUES (v_mincut_id, id_arg);
         ELSE
-            RAISE NOTICE 'Call to gw_fct_mincut: %, %, %, %', id_arg, p_element_type, v_mincut_id;
+            RAISE NOTICE 'Call to gw_fct_mincut: %, %, %', id_arg, p_element_type, v_mincut_id;
             v_mincut_return := gw_fct_mincut(id_arg, p_element_type, v_mincut_id);
         END IF;
 
