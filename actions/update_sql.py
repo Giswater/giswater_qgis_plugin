@@ -1592,29 +1592,42 @@ class UpdateSQL(ParentAction):
         filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
         if filter_value is 'null':
             filter_value = ''
-        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(filter_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
+        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "
+        sql += '"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(filter_value)
+        sql += "%' ORDER BY substr(srtext, 1, 6), srid"
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
 
     def set_info_project(self):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
         sql = "SELECT title, author, date FROM " + schema_name + ".inp_project_id"
         row = self.controller.get_row(sql)
-        print(row)
-        if row is None:
+        if row is not None:
+            utils_giswater.setWidgetText(self.dlg_readsql,
+                                         self.dlg_readsql.project_schema_title, str(row[0]))
+            utils_giswater.setWidgetText(self.dlg_readsql,
+                                         self.dlg_readsql.project_schema_author, str(row[1]))
+            utils_giswater.setWidgetText(self.dlg_readsql,
+                                         self.dlg_readsql.project_schema_last_update, str(row[2]))
+        else:
             utils_giswater.setWidgetText(self.dlg_readsql,
                                          self.dlg_readsql.project_schema_title, '')
             utils_giswater.setWidgetText(self.dlg_readsql,
                                          self.dlg_readsql.project_schema_author, '')
             utils_giswater.setWidgetText(self.dlg_readsql,
                                          self.dlg_readsql.project_schema_last_update, '')
-            return
-        utils_giswater.setWidgetText(self.dlg_readsql,
-                                     self.dlg_readsql.project_schema_title, str(row[0]))
-        utils_giswater.setWidgetText(self.dlg_readsql,
-                                     self.dlg_readsql.project_schema_author, str(row[1]))
-        utils_giswater.setWidgetText(self.dlg_readsql,
-                                     self.dlg_readsql.project_schema_last_update, str(row[2]))
+
+        self.project_data_schema_version = "Version not found"
+        sql = "SELECT giswater FROM " + schema_name + ".version"
+        row = self.controller.get_row(sql)
+        if row[0]is not None:
+            self.project_data_schema_version = str(row[0])
+        if self.version is None:
+            self.version = '0'
+        self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
+                                           'DataBase version: ' + self.version + '\n \n' +
+                                           'Project data schema version:' + self.project_data_schema_version)
 
     def process_folder(self, folderPath, filePattern):
         status = True
@@ -1813,7 +1826,7 @@ class UpdateSQL(ParentAction):
                     f = open(filedir + '/' + file, 'r')
                     if f:
                         f_to_read = str(f.read()).decode(str('utf-8-sig'))
-                        f_to_read = f_to_read + '\n' + '\n'
+                        f_to_read = f_to_read + '\n \n'
                         self.message_update = self.message_update + '\n' + str(f_to_read)
                     else:
                         return False
