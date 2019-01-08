@@ -10,7 +10,9 @@ RETURNS pg_catalog.json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_upsertmincut(420, 418995.41052735,4576657.3129692,25831,3,'{}','arc','es')
+SELECT SCHEMA_NAME.gw_fct_upsertmincut(477,419203.72254917,4576479.7842369,25831,3,$${"work_order":null,"mincut_state":"0","mincut_type":"Real","anl_cause":"Accidental","assigned_to":"1","anl_descript":null,"anl_tstamp":"2019-01-08 11:50:41",
+"forecast_start":null,"forecast_end":null,"muni_id":"Sant Boi del Llobregat","postcode":"08830","streetaxis_id":"1-10100C","postnumber":null,"exec_start":null,"exec_descript":null,"exec_from_plot":null,"exec_depth":null,
+"exec_user":null,"exec_appropiate":"false","exec_end":null}$$,'arc','2021')
 */
 
 
@@ -44,6 +46,7 @@ DECLARE
     v_visible_layers text;
     v_rectgeometry json;
     v_rectgeometry_geom public.geometry;
+    v_geometry_return text;
 
 
     
@@ -72,9 +75,10 @@ BEGIN
     IF RIGHT (p_element_type,1)=':' THEN
         p_element_type := reverse(substring(reverse(p_element_type) from 2 for 99));
     END IF;
-    
+
 --    Perform INSERT in case of new mincut
     IF v_mincut_id ISNULL THEN
+
 
         --    Get mincut class
         IF p_element_type='arc' THEN 
@@ -103,8 +107,7 @@ BEGIN
                 USING point_geom;
         ELSE
                 v_geometry:= point_geom;
-        END IF;    
-        
+        END IF;     
      
         -- Insert mincut
         EXECUTE 'INSERT INTO anl_mincut_result_cat (anl_the_geom) VALUES ($1) RETURNING id'
@@ -122,6 +125,7 @@ BEGIN
 		END IF;
 
     ELSE
+
         --getting old values
         SELECT * INTO v_old_values FROM anl_mincut_result_cat where id=v_mincut_id;
         
@@ -188,6 +192,7 @@ BEGIN
 
 --    specific tasks
     IF mincut_id_arg ISNULL THEN
+
     
         IF v_mincut_class = 2 THEN
             INSERT INTO anl_mincut_result_connec(result_id, connec_id, the_geom) VALUES (v_mincut_id, id_arg, point_geom);
@@ -210,18 +215,23 @@ BEGIN
     
     END IF;
 
-   
+    v_geometry_return = (v_mincut_return->>'geometry')::text;
+    
 --    Control NULL's
+    api_version := COALESCE(api_version, '{}');
     v_message := COALESCE(v_message, '{}');
     v_visible_layers := COALESCE(v_visible_layers, '{}');
-    api_version := COALESCE(api_version, '{}');
+    v_geometry_return := COALESCE(v_geometry_return, '{}');
+    v_mincut_id := COALESCE(v_mincut_id, 0);
+
+    raise notice ' v_mincut_return %', v_mincut_return;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
         ', "infoMessage":"' || v_message ||'"'||
         ', "visibleLayers":' || v_visible_layers ||
-        ', "geometry":{"st_astext":"' || (v_mincut_return->>'geometry') ||'"}'
+        ', "geometry":{"st_astext":"' || v_geometry_return ||'"}'
         ', "mincut_id":' || v_mincut_id ||
         '}')::json;
 
