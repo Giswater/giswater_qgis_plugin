@@ -17,6 +17,15 @@ INSERT INTO om_visit_class VALUES (4, 'Avaria connec', NULL, true, false, false,
 INSERT INTO om_visit_class VALUES (5, 'Inspecció i neteja tram', NULL, true, false, true, 'ARC', 'role_om');
 INSERT INTO om_visit_class VALUES (6, 'Inspecció i neteja node', NULL, true, false, true, 'NODE', 'role_om');
 
+-----------------------
+-- Records of inp_options
+-----------------------
+UPDATE inp_options SET quality='NONE_QUAL' WHERE quality='NONE';
+
+
+--UPDATE inp_report SET status='YES_YNF' WHERE status='YES';
+
+UPDATE inp_times SET statistic='NONE_TIMES' WHERE statistic='NONE';
 
 -----------------------
 -- Records of inp_typevalue

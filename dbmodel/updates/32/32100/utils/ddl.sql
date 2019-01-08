@@ -167,7 +167,6 @@ ALTER TABLE audit_cat_param_user ADD COLUMN widgetcontrols json;
 
 ALTER TABLE cat_arc ADD COLUMN  dn integer;
 ALTER TABLE cat_arc ADD COLUMN  pn integer;
-ALTER TABLE cat_arc ADD COLUMN  shape character varying(30);
 
 ALTER TABLE cat_connec ADD COLUMN dn integer;
 ALTER TABLE cat_connec ADD COLUMN  pn integer;

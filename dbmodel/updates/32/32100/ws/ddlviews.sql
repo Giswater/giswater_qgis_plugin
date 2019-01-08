@@ -244,6 +244,27 @@ CREATE VIEW ve_node AS
 
 
 -----------------------
+-- create parent views
+-----------------------
+DROP VIEW IF EXISTS vp_arc;
+CREATE OR REPLACE VIEW vp_arc AS 
+ SELECT ve_arc.arc_id AS nid,
+    ve_arc.arc_type AS custom_type
+   FROM ve_arc;
+
+DROP VIEW IF EXISTS vp_connec;
+CREATE OR REPLACE VIEW vp_connec AS 
+ SELECT ve_connec.connec_id AS nid,
+    ve_connec.connec_type AS custom_type
+   FROM ve_connec;
+
+DROP VIEW IF EXISTS vp_node;
+CREATE OR REPLACE VIEW vp_node AS 
+ SELECT ve_node.node_id AS nid,
+    ve_node.node_type AS custom_type
+   FROM ve_node;
+   
+-----------------------
 -- create child views
 -----------------------
 DROP VIEW IF EXISTS  ve_arc_varc;
@@ -3187,7 +3208,12 @@ CREATE VIEW SCHEMA_NAME.ve_node_wtp AS
     v_node.inventory,
     v_node.macrodma_id,
     v_node.expl_id,
-    
+    v_node.hemisphere,
+    v_node.num_value,
+    man_wtp.name
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_wtp ON v_node.node_id::text = man_wtp.node_id::text;
+
 
 -----------------------
 -- polygon views

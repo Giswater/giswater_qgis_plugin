@@ -50,7 +50,7 @@ ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_headloss_fkey";
 ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_setting_fkey";
 ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_reaction_fkey";
 ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_f_factor_fkey";
-ALTER TABLE "inp_source" DROP CONSTRAINT IF EXISTS "inp_source_source_type_fkey" ;
+ALTER TABLE "inp_source" DROP CONSTRAINT IF EXISTS "inp_source_sourc_type_fkey" ;
 ALTER TABLE "inp_tank" DROP CONSTRAINT IF EXISTS "inp_tank_curve_id_fkey";
 ALTER TABLE "inp_times" DROP CONSTRAINT IF EXISTS "inp_times_statistic_fkey";
 ALTER TABLE "inp_valve" DROP CONSTRAINT IF EXISTS "inp_valve_valv_type_fkey";
@@ -166,7 +166,7 @@ ALTER TABLE "inp_report" ADD CONSTRAINT "inp_report_setting_fkey" FOREIGN KEY ("
 ALTER TABLE "inp_report" ADD CONSTRAINT "inp_report_reaction_fkey" FOREIGN KEY ("reaction") REFERENCES "inp_typevalue" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_report" ADD CONSTRAINT "inp_report_f_factor_fkey" FOREIGN KEY ("f_factor") REFERENCES "inp_typevalue" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "inp_source" ADD CONSTRAINT "inp_source_source_type_fkey" FOREIGN KEY ("source_type") REFERENCES "inp_typevalue" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_source" ADD CONSTRAINT "inp_source_sourc_type_fkey" FOREIGN KEY ("sourc_type") REFERENCES "inp_typevalue" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_times" ADD CONSTRAINT "inp_times_statistic_fkey" FOREIGN KEY ("statistic") REFERENCES "inp_typevalue" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -182,7 +182,7 @@ ALTER TABLE inp_energy_el ADD CONSTRAINT inp_energy_el_parameter_check CHECK ( p
 ALTER TABLE inp_energy_gl ADD CONSTRAINT inp_energy_gl_parameter_check CHECK ( parameter IN ('EFFIC','PATTERN','PRICE'));
 ALTER TABLE inp_energy_gl ADD CONSTRAINT inp_energy_gl_energ_type_check CHECK ( energ_type IN ('DEMAND CHARGE','GLOBAL'));
 ALTER TABLE inp_mixing ADD CONSTRAINT inp_mixing_mix_type_check CHECK ( mix_type IN ('2COMP','FIFO','LIFO','MIXED'));
-ALTER TABLE inp_source ADD CONSTRAINT inp_source_source_type_check CHECK ( sourc_type IN ('CONCEN','FLOWPACED','MASS','SETPOINT'));
+ALTER TABLE inp_source ADD CONSTRAINT inp_source_sourc_type_check CHECK ( sourc_type IN ('CONCEN','FLOWPACED','MASS','SETPOINT'));
 ALTER TABLE inp_shortpipe ADD CONSTRAINT inp_shortpipe_status_check CHECK ( status IN ('CLOSED_PIPE','CV_PIPE','OPEN_PIPE'));
 ALTER TABLE inp_pump ADD CONSTRAINT inp_pumpe_status_check CHECK ( status IN ('CLOSED_PUMP','OPEN_PUMP'));
 ALTER TABLE inp_pipe ADD CONSTRAINT inp_pipe_status_check CHECK ( status IN ('CLOSED_PIPE','CV_PIPE','OPEN_PIPE'));
@@ -214,7 +214,7 @@ ALTER TABLE inp_report ADD CONSTRAINT inp_report_length_check CHECK ( length IN 
 ALTER TABLE inp_report ADD CONSTRAINT inp_report_diameter_check CHECK ( diameter IN ('NO','YES'));
 ALTER TABLE inp_report ADD CONSTRAINT inp_report_flow_check CHECK ( flow IN ('NO','YES'));
 ALTER TABLE inp_report ADD CONSTRAINT inp_report_velocity_check CHECK ( velocity IN ('NO','YES'));
-ALTER TABLE inp_report ADD CONSTRAINT inp_report_headloss_check CHECK ( headloss IN ('NO','YES'));
+ALTER TABLE inp_report ADD CONSTRAINT inp_report_headloss_check CHECK ( headloss IN ('C-M','D-W','H-W'));
 ALTER TABLE inp_report ADD CONSTRAINT inp_report_setting_check CHECK ( setting IN ('NO','YES'));
 ALTER TABLE inp_report ADD CONSTRAINT inp_report_reaction_check CHECK ( reaction IN ('NO','YES'));
 ALTER TABLE inp_report ADD CONSTRAINT inp_report_f_factor_check CHECK ( f_factor IN ('NO','YES'));
