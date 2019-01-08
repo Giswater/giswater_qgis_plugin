@@ -6,11 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2592
 
--- Function: SCHEMA_NAME.gw_api_getlist(json)
-
--- DROP FUNCTION SCHEMA_NAME.gw_api_getlist(json);
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlist(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlist(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -56,11 +52,12 @@ SELECT ws_sample.gw_api_getlist($${
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{},
 	"pageInfo":{}}}$$)
+	
 -- not first call
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_file"},
-"data":{"filterFields":{"filetype":"doc","limit":10},
+"data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 
@@ -79,7 +76,7 @@ MANAGER FORMS
 -- Lots
 SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"form":{"buttonName":"lotManager"},
+"feature":{"tableName":"om_visit_lot"},
 "data":{"filterFields":{"limit":10},
 	"pageInfo":{"currentPage":null}}}$$)
 */
@@ -128,7 +125,7 @@ DECLARE
 	v_layermanager json;
 	v_featuretype text;
 	v_pageinfo json;
-	
+	v_vdefault text;
 BEGIN
 
 -- Set search path to local schema
@@ -147,6 +144,7 @@ BEGIN
 	v_tabname := (p_data ->> 'form')::json->> 'tabName';
 	v_buttonname := (p_data ->> 'form')::json->> 'buttonName';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
+	v_featuretype:= (p_data ->> 'feature')::json->> 'featureType';
 	v_canvasextend := (p_data ->> 'data')::json->> 'canvasExtend';
 	v_canvascheck := ((p_data ->> 'data')::json->> 'canvasExtend')::json->>'canvasCheck';
 	v_orderby := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'orderBy';
@@ -154,23 +152,14 @@ BEGIN
 	v_ordertype := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'orderType';
 	v_currentpage := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'currentPage';
 
-
-
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
 	END IF;
 
 	-- control nulls
-	IF v_tablename IS NULL AND v_buttonname IS NULL THEN
-		RAISE EXCEPTION 'The config table is bad configured';
+	IF v_tablename IS NULL THEN
+		RAISE EXCEPTION 'The config table is bad configured. v_tablename is null';
 	END IF;
-
-	IF v_tablename IS NULL AND v_buttonname IS NOT NULL THEN
-		v_tablename = (SELECT (((buttonoptions->>'function')::json->>'parameters')::json->>'tableName') FROM config_api_toolbar_buttons WHERE idval = v_buttonname);
-		v_featuretype = (SELECT (((buttonoptions->>'function')::json->>'parameters')::json->>'featureType') FROM config_api_toolbar_buttons WHERE idval = v_buttonname);
-		v_layermanager = (SELECT (((buttonoptions->>'function')::json->>'parameters')::json->>'layerManager') FROM config_api_toolbar_buttons WHERE idval = v_buttonname);
-	END IF;
-
 
 --  Creating the list fields
 ----------------------------
@@ -317,67 +306,97 @@ BEGIN
    	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device)
 		INTO v_filter_fields;
 
-	-- adding common widgets
+	--  setting values of filter fields
+	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
+	i=1;
+	IF v_text IS NOT NULL THEN
+		FOREACH text IN ARRAY v_text
+		LOOP
+			-- get value
+			SELECT v_text [i] into v_json_field;
+			v_value:= (SELECT (v_json_field ->> 'value')) ;
 
-		-- adding spacer
-		IF v_device=9 THEN
-			-- getting cardinality
-			v_i = cardinality(v_filter_fields) ;
-			-- setting new element
-			v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', null, FALSE, '');
+			-- get value (vdefault)
+			IF v_value IS NULL THEN
+				v_vdefault:=quote_ident(v_filter_fields[i]->>'column_id');
+				IF v_vdefault IS NOT NULL THEN
+					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
+						WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
+						INTO v_value;
+				END IF;
+			END IF;
+
+			-- set value (from v_value)
+			IF v_filter_fields[i] IS NOT NULL THEN
+				
+				IF (v_filter_fields[i]->>'widgettype')='combo' THEN
+					v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
+				ELSE
+					v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
+				END IF;
+			END IF;
+
+			raise notice 'v_value % v_filter_fields %', v_value, v_filter_fields[i];
+
+			i=i+1;			
+		END LOOP;
+	END IF;
+
+	raise notice 'v_filter_fields %', v_filter_fields;
+	
+	-- adding common filter fields
+	-- adding spacer
+	IF v_device=9 THEN
+		-- getting cardinality
+		v_i = cardinality(v_filter_fields) ;
+		-- setting new element
+		v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', null, FALSE, '');
+	END IF;
+
+	-- adding line text of limit
+	IF v_limit IS NULL THEN 
+		v_limit=20; 
+	END IF;
+
+	-- getting cardinality
+	v_i = cardinality(v_filter_fields);
+	-- setting new element
+	v_filter_fields[v_i+1] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'integer', null, FALSE, v_limit::text);
+
+	-- adding check of canvas extend
+	IF v_the_geom IS NOT NULL THEN
+		IF v_canvascheck IS NULL THEN 
+			v_canvascheck = FALSE; 
 		END IF;
-
-		-- adding line text of limit
-		IF v_limit IS NULL THEN v_limit=20; END IF;
 		-- getting cardinality
 		v_i = cardinality(v_filter_fields);
 		-- setting new element
-		v_filter_fields[v_i+1] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'integer', null, FALSE, v_limit::text);
+		v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Canvas extend', 'canvasextend', 'check', 'boolean', null, FALSE, v_canvascheck::text);
+	END IF;
 
-		-- adding check of canvas extend
-		IF v_the_geom IS NOT NULL THEN
-			IF v_canvascheck IS NULL THEN v_canvascheck = FALSE; END IF;
-			-- getting cardinality
-			v_i = cardinality(v_filter_fields);
-			-- setting new element
-			v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Canvas extend', 'canvasextend', 'check', 'boolean', null, FALSE, v_canvascheck::text);
-		END IF;
+	-- adding the widget of list
+	-- getting cardinality
+	v_i = cardinality(v_filter_fields) ;
 
-		-- adding the widget of list
-		-- getting cardinality
-		v_i = cardinality(v_filter_fields) ;
+	-- setting new element
+	IF v_device =9 THEN
+		v_filter_fields[v_i+1] := json_build_object('widgettype','iconList','datatype','icon','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+	ELSE
+		v_filter_fields[v_i+1] := json_build_object('type','iconList','dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+	END IF;
 
-		-- setting new element
-		IF v_device =9 THEN
-			v_filter_fields[v_i+1] := json_build_object('widgettype','iconList','datatype','icon','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
-		ELSE
-			v_filter_fields[v_i+1] := json_build_object('type','iconList','dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
-		END IF;
+	raise notice 'v_filter_fields %', v_filter_fields;
+
 
 	-- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
 
-	/* getting value defaults for filters fields, TODO: Use widgettype to put on the audit_cat_param_user the name of the filter
-	FOREACH aux_json IN ARRAY fields_array 
-        LOOP           
-        	--  Index
-		array_index := array_index + 1;
-		field_value :=null;
-
-		v_vdefault:=quote_ident(aux_json->>'widgettype');
-		EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
-			 WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
-			 INTO field_value;
-        END LOOP;  
-        */
-
 --    Control NULL's
-	v_featuretype := COALESCE(v_featuretype, '{}');
-	v_layermanager := COALESCE(v_layermanager, '{}');
-	v_fields_json := COALESCE(v_fields_json, '{}');
-	v_filter_fields := COALESCE(v_filter_fields, '{}');
-	v_result_list := COALESCE(v_result_list, '{}');
 	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_featuretype := COALESCE(v_featuretype, '');
+	v_tablename := COALESCE(v_tablename, '');
+	v_idname := COALESCE(v_idname, '');	
+	v_fields_json := COALESCE(v_fields_json, '{}');
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
 
 --    Return
@@ -386,7 +405,6 @@ BEGIN
 		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'"}'||
 		     ',"data":{"fields":' || v_fields_json ||
 			     ',"pageInfo":' || v_pageinfo ||
-			     ',"layerManager":' || v_layermanager ||
 			     '}'||
 		       '}'||
 	    '}')::json;

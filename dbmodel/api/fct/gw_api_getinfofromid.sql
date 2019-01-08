@@ -119,6 +119,7 @@ DECLARE
 	v_canvasmargin  double precision;
 	v_canvasmargin_text text ;
 	v_toolbar text;
+	v_layermanager json;
    
 BEGIN
 
@@ -285,16 +286,16 @@ BEGIN
 	END IF;
 
 
---        Get actions
----------------------
-        EXECUTE 'SELECT actions FROM config_api_form_actions WHERE formname = $1 AND project_type='||quote_literal(LOWER(v_project_type))
-		INTO v_formactions
+--        Getting actions and layer manager
+------------------------------------------
+        EXECUTE 'SELECT actions,  layermanager FROM config_api_form_actions WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
+		INTO v_formactions, v_layermanager
 		USING v_tablename;
 
 	-- IF actions and tooltip are null's and layer it's child layer --> parent form_tabs is used
         IF v_formactions IS NULL AND v_table_parent IS NOT NULL THEN
-		EXECUTE 'SELECT actions FROM config_api_form_actions WHERE formname = $1 AND project_type='||quote_literal(LOWER(v_project_type))
-			INTO v_formactions
+		EXECUTE 'SELECT actions,  layermanager FROM config_api_form_actions WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
+			INTO v_formactions, v_layermanager
 			USING v_table_parent;
 		END IF;
 

@@ -86,6 +86,9 @@ DECLARE
 	v_activefilestab boolean;
 	v_client json;
 	v_pageinfo json;
+	v_layermanager json;
+	v_filterfields json;
+	v_data json;
 
 BEGIN
 
@@ -103,7 +106,7 @@ BEGIN
 	--  get parameters from input
 	v_client = (p_data ->>'client')::json;
 	v_device = ((p_data ->>'client')::json->>'device')::integer;
-	v_id = ((p_data ->>'feature')::json->>'visit_id')::integer;
+	v_id = ((p_data ->>'feature')::json->>'id')::integer;
 	v_featureid = ((p_data ->>'data')::json->>'id');
 	v_featuretype = ((p_data ->>'data')::json->>'type');
 	v_list =((p_data ->>'form')::json->>'tabFiles')::json;
@@ -111,7 +114,8 @@ BEGIN
 	v_activefilestab = (((p_data ->>'form')::json->>'tabFiles')::json->>'active')::boolean;
 
 	--  get visitclass
-	IF v_id IS NULL THEN
+	IF v_id IS NULL OR (SELECT id FROM ws_sample.om_visit WHERE id=v_id::bigint) IS NULL THEN
+	
 		-- TODO: for new visit enhance the visit type using the feature_id
 		v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;
 		IF v_visitclass IS NULL THEN
@@ -158,26 +162,31 @@ BEGIN
 					END IF;
 				END LOOP;
 				ELSE 
-				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'UPDATE', null, v_device) INTO v_fields;
+				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 			END IF;	
 
 			v_fields_json = array_to_json (v_fields);
-			raise notice 'v_fields_json %', v_fields_json;
 		END IF;
-		
+
+		v_fields_json := COALESCE(v_fields_json, '{}');		
+
 		-- building tab
-		
-		v_fields_json := COALESCE(v_fields_json, '{}');
-	
 		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabData';
+		
+		-- switch actionAddFile for actionAddPhoto on device =1,2
+		IF v_device=1 OR v_device=2 THEN
+			v_tab.tabactions := (replace (v_tab.tabactions::text, 'actionAddFile', 'actionAddPhoto'));
+		END IF;
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
 			'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		v_formtabs := v_formtabs || v_tabaux::text;
 
+
 		-- Events tab
 		-------------
 		IF v_visitclass=0 THEN
+		
 			-- building tab
 			v_tabaux := json_build_object('tabName','tabEvent','tabLabel','Events','tabText','Test text for tab','active',false);
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
@@ -189,12 +198,19 @@ BEGIN
 		--filling tab (only if it's active)
 		IF v_activefilestab THEN
 
-			--adding device on the json to call getlist
+			--setting device on json
 			v_list := gw_fct_json_object_set_key(v_list, 'client', v_client);
-			
+
+			-- setting visit_id on json
+			v_filterfields := ((v_list->>'data')::json->>'filterFields')::json;
+			v_filterfields := gw_fct_json_object_set_key(v_filterfields, 'visit_id', v_id);
+			v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
+			v_list := gw_fct_json_object_set_key(v_list, 'data', v_data);
+
+			-- calling getlist function
 			SELECT gw_api_getlist (v_list) INTO v_fields_json;
 			
-			-- getting filters and list values
+			-- getting pageinfo and list values
 			v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
 			v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
 			
@@ -204,10 +220,17 @@ BEGIN
 
 		-- building tab
 		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabFiles';
+		
+		-- switch actionAddFile for actionAddPhoto on device =1,2
+		IF v_device=1 OR v_device=2 THEN
+			v_tab.tabactions := (replace (v_tab.tabactions::text, 'actionAddFile', 'actionAddPhoto'));
+		END IF;
+	
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
 			'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active', v_activefilestab);
-		-- setting fields
- 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+			
+		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+ 		
  		-- setting pageInfo
  		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'pageInfo', v_pageinfo);
 		v_formtabs := v_formtabs  || ',' || v_tabaux::text;
@@ -218,10 +241,11 @@ BEGIN
 	-- header form
 	v_formheader :=concat('VISIT - ',v_id);	
 
-	-- actions form
-	EXECUTE 'SELECT actions FROM config_api_form_actions WHERE formname = ''visit'' AND project_type='||quote_literal(LOWER(v_projecttype))
-		INTO v_formactions;
-		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
+	-- actions and layermanager
+	EXECUTE 'SELECT actions, layermanager FROM config_api_form WHERE formname = ''visit'' AND projecttype ='||quote_literal(LOWER(v_projecttype))
+			INTO v_formactions, v_layermanager;
+
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
 		
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
@@ -233,12 +257,13 @@ BEGIN
 	v_id := COALESCE(v_id, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
+	v_layermanager := COALESCE(v_layermanager, '{}');
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idname":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
-		    ', "data":{"layerManager":""}}'||
+		    ', "data":{"layerManager":'||v_layermanager||'}}'||
 		    '}')::json;
 END;
 $BODY$
