@@ -150,7 +150,7 @@ class UpdateSQL(ParentAction):
             self.folderLocale = self.sql_dir + '\i18n/' + str(self.locale) + '/'
             self.folderUtils = self.sql_dir + '\utils/'
             self.folderUpdates = self.sql_dir + '\updates/'
-            self.folderExemple = self.sql_dir, '\example/'
+            self.folderExemple = self.sql_dir + '\example/'
             self.folderPath = ''
 
             # Declare all directorys api
@@ -279,8 +279,7 @@ class UpdateSQL(ParentAction):
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddlrule), self.folderUtils + self.file_pattern_ddlrule)
                 if status is False:
-                    return False	
-				
+                    return False
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                     return False
@@ -1312,6 +1311,7 @@ class UpdateSQL(ParentAction):
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
+
         if self.rdb_import_data.isChecked():
             print("rdb_import_data")
             # status.append(self.load_base_no_ct())
@@ -1333,25 +1333,35 @@ class UpdateSQL(ParentAction):
             self.execute_last_process(new_project=True)
         elif self.rdb_sample.isChecked():
             print(str("rdb_sample"))
-            self.load_base(project_type=project_type)
-            self.update_30to31(new_project=True, project_type=project_type)
-            self.load_views(project_type=project_type)
-            self.load_trg(project_type=project_type)
-            self.update_31to39(new_project=True, project_type=project_type)
-            self.api(project_type=project_type)
-            self.load_sample_data(project_type=project_type)
-            self.execute_last_process(new_project=True)
+            if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
+                msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
+                result = self.controller.ask_question(msg, "Info Message")
+                if result:
+                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
+                    self.load_base(project_type=project_type)
+                    self.update_30to31(new_project=True, project_type=project_type)
+                    self.load_views(project_type=project_type)
+                    self.load_trg(project_type=project_type)
+                    self.update_31to39(new_project=True, project_type=project_type)
+                    self.api(project_type=project_type)
+                    self.load_sample_data(project_type=project_type)
+                    self.execute_last_process(new_project=True)
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
-            self.load_base(project_type=project_type)
-            self.update_30to31(new_project=True, project_type=project_type)
-            self.load_views(project_type=project_type)
-            self.load_trg(project_type=project_type)
-            self.update_31to39(new_project=True, project_type=project_type)
-            self.api(project_type=project_type)
-            self.load_sample_data(project_type=project_type)
-            self.load_dev_data(project_type=project_type)
-            self.execute_last_process(new_project=True)
+            if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
+                msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
+                result = self.controller.ask_question(msg, "Info Message")
+                if result:
+                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
+                    self.load_base(project_type=project_type)
+                    self.update_30to31(new_project=True, project_type=project_type)
+                    self.load_views(project_type=project_type)
+                    self.load_trg(project_type=project_type)
+                    self.update_31to39(new_project=True, project_type=project_type)
+                    self.api(project_type=project_type)
+                    self.load_sample_data(project_type=project_type)
+                    self.load_dev_data(project_type=project_type)
+                    self.execute_last_process(new_project=True)
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
             self.load_base(project_type=project_type)
@@ -1482,11 +1492,11 @@ class UpdateSQL(ParentAction):
                         if status is False:
                             print(False)
                             return False
-                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/','') is False:
+                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/','') is False:
                         print(False)
                         return False
                     else:
-                        status = self.readFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/'),self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type + '/')
+                        status = self.readFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/'),self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/')
                         if status is False:
                             print(False)
                             return False
@@ -1684,7 +1694,12 @@ class UpdateSQL(ParentAction):
         if not filelist:
             return
         if self.schema is None:
-            schema_name = self.schema_name.replace('"','')
+            if self.schema_name is None:
+                schema_name = utils_giswater.getWidgetText(self.dlg_readsql,
+                                                           self.dlg_readsql.project_schema_name)
+                schema_name = schema_name.replace('"', '')
+            else:
+                schema_name = self.schema_name.replace('"','')
         else:
             schema_name = self.schema.replace('"', '')
         filter_srid_value = str(self.filter_srid_value).replace('"', '')
@@ -1692,7 +1707,7 @@ class UpdateSQL(ParentAction):
             print('utils.sql')
             self.read_execute_file(filedir, '/utils.sql', schema_name, filter_srid_value)
             print(str(self.project_type) + '.sql')
-            self.read_execute_file(filedir, '/' + str(self.project_type) + '.sql', schema_name, filter_srid_value)
+            self.read_execute_file(filedir, '/' + str(self.project_type_selected) + '.sql', schema_name, filter_srid_value)
         else:
             for file in filelist:
                 print(filedir + '/' + file)
@@ -1709,6 +1724,7 @@ class UpdateSQL(ParentAction):
                     f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
                     str('utf-8-sig'))
                 status = self.controller.execute_sql(str(f_to_read))
+
                 if status is False:
                     print "Error to execute"
                     print('Message: ' + str(self.controller.last_error))
@@ -1716,8 +1732,8 @@ class UpdateSQL(ParentAction):
                     return False
 
         except Exception as e:
-            print "Command skipped. Unexpected error"
-            print (e)
+            print "Error to execute"
+            print('Message: ' + str(self.controller.last_error))
             self.dao.rollback()
             return False
 
