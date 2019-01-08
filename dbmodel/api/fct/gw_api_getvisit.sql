@@ -59,7 +59,6 @@ SELECT ws_sample.gw_api_getvisit($${
 "data":{"type":"arc"}}$$)
 */
 
-
 DECLARE
 	v_apiversion text;
 	v_schemaname text;
@@ -219,15 +218,10 @@ BEGIN
 	-- header form
 	v_formheader :=concat('VISIT - ',v_id);	
 
-	-- actions form (ignored on devices =1,2,3)
-	IF v_device=9 THEN
-	
-		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT formaction as "actionName" FROM config_api_form_actions WHERE formname = ''visit''
-			AND (project_type =''utils'' or project_type='||quote_literal(LOWER(v_projecttype))||')
-			order by orderby desc) a'
-			INTO v_formactions;
+	-- actions form
+	EXECUTE 'SELECT actions FROM config_api_form_actions WHERE formname = ''visit'' AND project_type='||quote_literal(LOWER(v_projecttype))
+		INTO v_formactions;
 		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
-	END IF;
 		
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);

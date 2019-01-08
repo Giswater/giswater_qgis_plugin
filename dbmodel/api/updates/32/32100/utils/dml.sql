@@ -36,37 +36,10 @@ INSERT INTO config_api_cat_widgettype VALUES ('combotext', NULL);
 INSERT INTO config_api_cat_widgettype VALUES ('hyperlink', NULL);
 
 
-INSERT INTO config_api_form_actions VALUES (22, 've_node', 'actionCatalog', 'utils');
-INSERT INTO config_api_form_actions VALUES (23, 've_arc', 'actionCatalog', 'utils');
-INSERT INTO config_api_form_actions VALUES (24, 've_connec', 'actionCatalog', 'utils');
-INSERT INTO config_api_form_actions VALUES (25, 've_node', 'actionWorkcat', 'utils');
-INSERT INTO config_api_form_actions VALUES (26, 've_arc', 'actionWorkcat',  'utils');
-INSERT INTO config_api_form_actions VALUES (27, 've_connec', 'actionWorkcat', 'utils');
-INSERT INTO config_api_form_actions VALUES (28, 've_arc', 'actionSection', 'utils');
-INSERT INTO config_api_form_actions VALUES (16, 've_arc', 'actionHelp', 'ud');
-INSERT INTO config_api_form_actions VALUES (9, 've_node', 'actionInterpolate', 'ud');
-INSERT INTO config_api_form_actions VALUES (8, 've_node', 'actionHelp', 'ud');
-INSERT INTO config_api_form_actions VALUES (29, 've_arc', 'actionAdd', 'utils');
-INSERT INTO config_api_form_actions VALUES (30, 've_arc', 'actionInfo', 'utils');
-INSERT INTO config_api_form_actions VALUES (31, 've_arc', 'actionDelete', 'utils');
-INSERT INTO config_api_form_actions VALUES (1, 've_node', 'actionZoom',  'utils');
-INSERT INTO config_api_form_actions VALUES (21, 've_connec', 'actionLink', 'utils');
-INSERT INTO config_api_form_actions VALUES (20, 've_connec', 'actionZoomOut', 'utils');
-INSERT INTO config_api_form_actions VALUES (18, 've_connec', 'actionCentered', 'utils');
-INSERT INTO config_api_form_actions VALUES (17, 've_connec', 'actionZoom', 'utils');
-INSERT INTO config_api_form_actions VALUES (15, 've_arc', 'actionCopyPaste', 'utils');
-INSERT INTO config_api_form_actions VALUES (14, 've_arc', 'actionLink', 'utils');
-INSERT INTO config_api_form_actions VALUES (13, 've_arc', 'actionZoomOut', 'utils');
-INSERT INTO config_api_form_actions VALUES (11, 've_arc', 'actionCentered',  'utils');
-INSERT INTO config_api_form_actions VALUES (10, 've_arc', 'actionZoom', 'utils');
-INSERT INTO config_api_form_actions VALUES (6, 've_node', 'actionLink', 'utils');
-INSERT INTO config_api_form_actions VALUES (5, 've_node', 'actionRotation',  'utils');
-INSERT INTO config_api_form_actions VALUES (3, 've_node', 'actionZoomOut',  'utils');
-INSERT INTO config_api_form_actions VALUES (2, 've_node', 'actionCentered',  'utils');
-INSERT INTO config_api_form_actions VALUES (4, 've_node', 'actionCopyPaste', 'utils');
-INSERT INTO config_api_form_actions VALUES (7, 've_node', 'actionEdit', 'utils');
-INSERT INTO config_api_form_actions VALUES (12, 've_arc', 'actionEdit', 'utils');
-INSERT INTO config_api_form_actions VALUES (19, 've_connec', 'actionEdit', 'utils');
+INSERT INTO ws_sample.config_api_form_actions VALUES (20, 've_arc', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionSection"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
+INSERT INTO ws_sample.config_api_form_actions VALUES (30, 've_connec', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
+INSERT INTO ws_sample.config_api_form_actions VALUES (10, 've_node', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionRotation"},{"actionName":"actionInterpolate"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
+
 
 
 INSERT INTO config_api_form_groupbox VALUES (12, 'go2epa', 1, 'Pre-process options');

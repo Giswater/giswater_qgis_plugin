@@ -15,7 +15,7 @@ $BODY$
 SELECT ws_sample.gw_api_getgeometry($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"arc", "id":"2001"},
+"feature":{"featureType":"arc", "tableName":"v_edit_arc", "id":"2001"},
 "data":{}}$$)
 
 
@@ -24,27 +24,14 @@ SELECT ws_sample.gw_api_getgeometry($${
 DECLARE
 	v_apiversion text;
 	v_schemaname text;
-	v_featuretype text;
-	v_visitclass integer;
-	v_id text;
-	v_device integer;
-	v_formname text;
-	v_tablename text;
-	v_fields json [];
-	v_fields_json json;
-	v_forminfo json;
-	v_formheader text;
-	v_formactions text;
-	v_formtabs text;
-	v_tabaux json;
-	v_active boolean;
-	v_featureid varchar ;
-	aux_json json;
-	v_tab record;
-	v_bottom json [];
-	v_bottom_json json;
 	v_projecttype varchar;
+	v_id text;
+	v_tablename text;
+	v_idname text;
 	v_feature json;
+	v_columntype text;
+	v_geometry text;
+
 
 BEGIN
 
@@ -60,27 +47,69 @@ BEGIN
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
 
 	--  get parameters from input
-	v_device = ((p_data ->>'client')::json->>'device')::integer;
 	v_id = ((p_data ->>'feature')::json->>'id')::integer;
-	v_featuretype = ((p_data ->>'feature')::json->>'featureType')::varchar;
-	v_feature = ((p_data ->>'feature')::json;
+	v_tablename = ((p_data ->>'feature')::json->>'tableName')::varchar;
+	v_idname = ((p_data ->>'feature')::json->>'idName')::integer;
+	v_feature = ((p_data ->>'feature');
 
-	-- getting geometry
 	
+	--  get id column
+	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+		INTO v_idname
+		USING v_tablename;
 	
+	IF v_idname ISNULL THEN
+        EXECUTE '
+        SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+        AND t.relname = $1 
+        AND s.nspname = $2
+        ORDER BY a.attnum LIMIT 1'
+        INTO v_idname
+        USING v_tablename, v_schemaname;
+    END IF;
+
+    -- get id column type
+    EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+	JOIN pg_class t on a.attrelid = t.oid
+	JOIN pg_namespace s on t.relnamespace = s.oid
+	WHERE a.attnum > 0 
+	AND NOT a.attisdropped
+	AND a.attname = $3
+	AND t.relname = $2 
+	AND s.nspname = $1
+	ORDER BY a.attnum'
+		USING v_schemaname, v_tablename, v_idname
+		INTO v_columntype;
+
+	-- get geometry_column
+    EXECUTE 'SELECT attname FROM pg_attribute a        
+        JOIN pg_class t on a.attrelid = t.oid
+        JOIN pg_namespace s on t.relnamespace = s.oid
+        WHERE a.attnum > 0 
+        AND NOT a.attisdropped
+        AND t.relname = $1
+        AND s.nspname = $2
+        AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+        ORDER BY a.attnum' 
+        INTO v_the_geom
+        USING v_tablename, v_schemaname;
+           
+	-- get geometry
+	IF v_the_geom IS NOT NULL THEN
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||v_the_geom||') FROM '||v_tablename||' WHERE '||v_idname||' = CAST('||quote_nullable(v_id)||' AS '||v_columntype||'))row'
+		INTO v_geometry;
+	END IF;
 	
-	--  Control NULL's
-	v_fields_json := COALESCE(v_fields_json, '{}');
+	-- Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
-	v_tablename := COALESCE(v_tablename, '{}');
-	v_id := COALESCE(v_id, '{}');
-	v_bottom_json := COALESCE(v_bottom_json, '{}');
+	v_feature := COALESCE(v_feature, '{}');
+	v_geometry := COALESCE(v_geometry, "");
 
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"feature":'||v_feature||
-					 ',"data":{"geometry":v}}'||
+					 ',"data":{"geometry":"'||v_geometry||'}}"'||
 	    '}')::json;
 END;
 $BODY$

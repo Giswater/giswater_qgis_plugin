@@ -6,41 +6,41 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2582
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getinfofromid(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getinfofromid(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 UPSERT FEATURE 
 arc no nodes extremals
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
 		"data":{}}$$)
 arc with nodes extremals
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141" },
 		"data":{}}$$)
 INFO BASIC
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc_pipe", "id":"2001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_node_junction", "id":"1001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_connec_wjoin", "id":"3001"},
 		"data":{}}$$)
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_element", "id":"125101"},
@@ -49,14 +49,14 @@ SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 
 INFO EPA
 -- epa not defined
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2220"},
 		"data":{"toolBar":"epa"}}$$)
 
 -- epa defined
-SELECT SCHEMA_NAME.gw_api_getinfofromid($${
+SELECT ws_sample.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
 		"feature":{"tableName":"ve_arc", "id":"2001"},
@@ -73,16 +73,14 @@ DECLARE
 	v_editable boolean;
 	v_device integer;
 	v_infotype integer;
-
 	v_forminfo json;
 	v_form_tabs_info json;    
 	v_action_info json;
 	form_tabs json[];
 	form_tablabel varchar[];
 	form_tabtext varchar[];
-	v_form_actions json[];
 	v_form_actiontooltip varchar[];
-	v_form_actions_json json;
+	v_formactions json;
 	v_form_actiontooltip_json json;
 	form_tabs_json json;
 	form_tablabel_json json;
@@ -127,7 +125,7 @@ BEGIN
 --  Get,check and set parameteres
 ----------------------------
 --    	Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 	schemas_array := current_schemas(FALSE);
 
 -- 	get input parameters
@@ -178,11 +176,6 @@ BEGIN
             
 	RAISE NOTICE 'Form number: %', v_forminfo;
 
--- Get id column
-	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-		INTO v_idname
-		USING v_tablename;
-
 -- Get feature type
 	EXECUTE 'SELECT type FROM cat_feature WHERE  parent_layer = $1 LIMIT 1'
 		INTO v_featuretype
@@ -204,6 +197,11 @@ BEGIN
 
 	--    Control NULL's
 	v_vdefault_array := COALESCE(v_vdefault_array, '[]'); 
+	
+	-- Get id column
+	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+		INTO v_idname
+		USING v_tablename;
 	
     -- For views it suposse pk is the first column
     IF v_idname ISNULL THEN
@@ -287,24 +285,18 @@ BEGIN
 	END IF;
 
 
---        Get actions and tooltip for the layer
---------------------------------
-        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName" FROM config_api_form_actions WHERE formname = $1 
-		AND (project_type =''utils'' or project_type='||quote_literal(LOWER(v_project_type))||')
-		order by orderby desc) a'
-		INTO v_form_actions
+--        Get actions
+---------------------
+        EXECUTE 'SELECT actions FROM config_api_form_actions WHERE formname = $1 AND project_type='||quote_literal(LOWER(v_project_type))
+		INTO v_formactions
 		USING v_tablename;
 
 	-- IF actions and tooltip are null's and layer it's child layer --> parent form_tabs is used
-        IF v_form_actions IS NULL AND v_table_parent IS NOT NULL THEN
-		-- Get form_tabs
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT formaction as "actionName" FROM config_api_form_actions WHERE formname = $1 
-			AND (project_type =''utils'' or project_type='||quote_literal(LOWER(v_project_type))||')
-			order by orderby desc) a'
-			INTO v_form_actions
+        IF v_formactions IS NULL AND v_table_parent IS NOT NULL THEN
+		EXECUTE 'SELECT actions FROM config_api_form_actions WHERE formname = $1 AND project_type='||quote_literal(LOWER(v_project_type))
+			INTO v_formactions
 			USING v_table_parent;
-	END IF;
-
+		END IF;
 
 
 --        Check if it is parent table 
@@ -408,15 +400,13 @@ BEGIN
 	---------------------
 	form_tabs_json := array_to_json(form_tabs);
 	
-	-- Actions
-	v_form_actions_json := array_to_json(v_form_actions);
     
 	-- General info
 	
 	-- Get message
 
 	-- Form info
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'actions', v_form_actions_json);
+	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'actions', v_formactions);
 	
 	-- Form Tabs info
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'visibleTabs', form_tabs_json);
