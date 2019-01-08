@@ -19,39 +19,45 @@ $BODY$
 TOC
 ----------
 -- attribute table using custom filters
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
-    "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
+        "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- attribute table using canvas filter
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},
-"data":{"filterFields":{"arccat_id":null, "limit":null},
-    "canvasExtend":{"canvascheck":true, "x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
-    "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "offsset":"10", "currentPage":1}}}$$)
+"data":{"canvasExtend":{"canvascheck":true, "x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
+        "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":1}}}$$)
 
 VISIT
 ----------
 -- Visit -> visites
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_x_arc" ,"idName":"id"},
-"data":{"filterFields":{"arc_id":2001, "limit":10, "canvasCheck":false},
+"data":{"filterFields":{"arc_id":2001, "limit":10},
     "pageInfo":{"orderBy":"visit_id", "orderType":"DESC", "offsset":"10", "currentPage":null}}}$$)
 
 
 -- Visit -> events
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
 "data":{"filterFields":{"visit_id":232, "limit":10},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- Visit -> files
-SELECT SCHEMA_NAME.gw_api_getlist($${
+-- first call
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"om_visit_file"},
+"data":{"filterFields":{},
+	"pageInfo":{}}}$$)
+-- not first call
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{"filetype":"doc","limit":10},
@@ -61,17 +67,17 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 FEATURE FORMS
 -------------
 -- Arc -> elements
-SELECT SCHEMA_NAME.gw_api_getlist($${
-"client":{"device":9, "infoType":100, "lang":"ES"},
+SELECT ws_sample.gw_api_getlist($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
-    "pageInfo":{"orderBy":"element_id", "orderType":"DESC", "currentPage":null}}}$$)
+    "pageInfo":{"orderBy":"element_id", "orderType":"DESC", "currentPage":3}}}$$)
 
 
 MANAGER FORMS
 -------------
 -- Lots
-SELECT SCHEMA_NAME.gw_api_getlist($${
+SELECT ws_sample.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"buttonName":"lotManager"},
 "data":{"filterFields":{"limit":10},
@@ -82,7 +88,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 DECLARE
 	v_apiversion text;
 	v_filter_fields  json[];
-	v_filter_fields_json json;
+	v_fields_json json;
 	v_filter_values  json;
 	v_schemaname text;
 	aux_json json;
@@ -126,8 +132,8 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
-    v_schemaname := 'SCHEMA_NAME';
+    SET search_path = "ws_sample", public;
+    v_schemaname := 'ws_sample';
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -226,8 +232,6 @@ BEGIN
 		v_query_result = 'SELECT * FROM '||v_tablename||' WHERE '||v_idname||' IS NOT NULL ';
 	END IF;
 
-	raise notice 'v_query_result: % ', v_query_result;
-
 	--  add filters
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
 
@@ -275,23 +279,22 @@ BEGIN
 		
 	END IF;
 
+	IF v_limit IS NULL THEN
+		v_limit = 10;
+	END IF;
+	
 	-- calculating last page
-	IF v_limit IS NOT NULL THEN
-		EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
-			INTO v_lastpage;
-	ELSE
-		v_limit = 1;
-	END IF;
-		
+	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
+		INTO v_lastpage;
+	
 	-- add limit
-	IF v_limit IS NOT NULL THEN
-		v_query_result := v_query_result || ' LIMIT '|| v_limit;
-	END IF;
+	v_query_result := v_query_result || ' LIMIT '|| v_limit;
 
 	-- calculating current page
 	IF v_currentpage IS NULL THEN 
 		v_currentpage=1;
 	END IF;
+	
 	v_offset := (v_currentpage-1)*v_limit;
 
 	-- add offset
@@ -299,19 +302,14 @@ BEGIN
 		v_query_result := v_query_result || ' OFFSET '|| v_offset;
 	END IF;
 
-	raise notice ' v_query_result %', v_query_result;
-
 	-- Execute query result
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
 
-	raise notice ' v_result_list %', v_result_list;	
+		raise notice ' v_result_list %', v_result_list;	
 
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
-
-     raise notice 'v_pageinfo %', v_pageinfo;
-
 
    
 -- getting the list of filters fields
@@ -320,27 +318,44 @@ BEGIN
 		INTO v_filter_fields;
 
 	-- adding common widgets
-		--identifing the dimension of array
-		v_i = cardinality(v_filter_fields) ;
 
 		-- adding spacer
 		IF v_device=9 THEN
-			v_filter_fields[v_i+1] := gw_fct_createwidgetjson('Text', 'spacer', 'spacer', 'string', null, FALSE, '');
-			v_i=v_i+1;
+			-- getting cardinality
+			v_i = cardinality(v_filter_fields) ;
+			-- setting new element
+			v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', null, FALSE, '');
 		END IF;
 
 		-- adding line text of limit
 		IF v_limit IS NULL THEN v_limit=20; END IF;
+		-- getting cardinality
+		v_i = cardinality(v_filter_fields);
+		-- setting new element
 		v_filter_fields[v_i+1] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'integer', null, FALSE, v_limit::text);
 
 		-- adding check of canvas extend
 		IF v_the_geom IS NOT NULL THEN
 			IF v_canvascheck IS NULL THEN v_canvascheck = FALSE; END IF;
+			-- getting cardinality
+			v_i = cardinality(v_filter_fields);
+			-- setting new element
 			v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Canvas extend', 'canvasextend', 'check', 'boolean', null, FALSE, v_canvascheck::text);
 		END IF;
 
+		-- adding the widget of list
+		-- getting cardinality
+		v_i = cardinality(v_filter_fields) ;
+
+		-- setting new element
+		IF v_device =9 THEN
+			v_filter_fields[v_i+1] := json_build_object('widgettype','iconList','datatype','icon','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+		ELSE
+			v_filter_fields[v_i+1] := json_build_object('type','iconList','dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+		END IF;
+
 	-- converting to json
-	v_filter_fields_json = array_to_json (v_filter_fields);
+	v_fields_json = array_to_json (v_filter_fields);
 
 	/* getting value defaults for filters fields, TODO: Use widgettype to put on the audit_cat_param_user the name of the filter
 	FOREACH aux_json IN ARRAY fields_array 
@@ -359,6 +374,7 @@ BEGIN
 --    Control NULL's
 	v_featuretype := COALESCE(v_featuretype, '{}');
 	v_layermanager := COALESCE(v_layermanager, '{}');
+	v_fields_json := COALESCE(v_fields_json, '{}');
 	v_filter_fields := COALESCE(v_filter_fields, '{}');
 	v_result_list := COALESCE(v_result_list, '{}');
 	v_apiversion := COALESCE(v_apiversion, '{}');
@@ -368,12 +384,10 @@ BEGIN
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"form":{}'||
 		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'"}'||
-		     ',"data":{"filterFields":' || v_filter_fields_json ||
+		     ',"data":{"fields":' || v_fields_json ||
 			     ',"pageInfo":' || v_pageinfo ||
-			     ',"listValues":' || v_result_list ||
 			     ',"layerManager":' || v_layermanager ||
 			     '}'||
-			    
 		       '}'||
 	    '}')::json;
        

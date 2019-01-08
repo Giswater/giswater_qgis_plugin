@@ -11,18 +11,18 @@ $BODY$
 
 /*EXAMPLE:
 -- attribute table using custom filters
-SELECT SCHEMA_NAME.gw_api_getattributetable($${
+SELECT ws_sample.gw_api_getattributetable($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
-"data":{"filterFields":{"arccat_id":"PVC160-PN16", "limit":5},
-    "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "limit":"10", "offsset":"10", "pageNumber":3}}}$$)
+"data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
+        "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- attribute table using canvas filter
-SELECT SCHEMA_NAME.gw_api_getattributetable($${ "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
-"data":{"filterFields":{"arccat_id":null, "limit":null},
-    "canvasExtend":{"x1coord":1,"y1coord":1,"x2coord":999999,"y2coord":9999999},
-    "pageInfo":{"orderby":"arc_id", "orderType":"DESC", "offsset":"10", "pageNumber":3}}}$$)
+SELECT ws_sample.gw_api_getattributetable($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},
+"data":{"canvasExtend":{"canvascheck":true, "x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
+        "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":1}}}$$)
 */
 
 DECLARE
