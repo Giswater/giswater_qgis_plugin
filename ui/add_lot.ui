@@ -20,11 +20,11 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
-        <widget class="QWidget" name="VisitTab">
+        <widget class="QWidget" name="LotTab">
          <attribute name="title">
-          <string>Visit</string>
+          <string>Lot</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0">
           <item>
@@ -201,7 +201,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QDateTimeEdit" name="startdate">
+             <widget class="QDateEdit" name="startdate">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -279,7 +279,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QDateTimeEdit" name="enddate">
+             <widget class="QDateEdit" name="enddate">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -663,6 +663,11 @@
            </widget>
           </item>
          </layout>
+        </widget>
+        <widget class="QWidget" name="VisitsTab">
+         <attribute name="title">
+          <string>Visits</string>
+         </attribute>
         </widget>
        </widget>
       </item>

@@ -13,10 +13,10 @@ from datetime import datetime
 from functools import partial
 
 import utils_giswater
-from giswater.actions.parent import ParentAction
-from giswater.actions.add_lot import ManageLot
+from giswater.actions.add_lot import AddNewLot
 from giswater.actions.manage_visit import ManageVisit
 from giswater.actions.manage_new_psector import ManageNewPsector
+from giswater.actions.parent import ParentAction
 from giswater.ui_manager import Psector_management
 from giswater.ui_manager import SelectorDate
 
@@ -26,7 +26,7 @@ class Om(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.manage_lot = ManageLot(iface, settings, controller, plugin_dir)
+        self.new_lot = AddNewLot(iface, settings, controller, plugin_dir)
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
 
@@ -296,8 +296,10 @@ class Om(ParentAction):
 
 
     def om_add_lot(self):
-        #self.manage_visit.manage_visit(basic=True)
-        self.manage_lot.manage_lot()
+        """ Button 74: Add new lot """
+        self.new_lot.manage_lot()
 
     def om_lot_management(self):
-        self.controller.log_info(str("TEST"))
+        """ Button 75: Lot management """
+        self.new_lot.lot_manager()
+

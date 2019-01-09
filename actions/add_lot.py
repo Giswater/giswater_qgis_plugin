@@ -6,27 +6,22 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-from PyQt4.QtCore import  QDate
-from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QComboBox, QAction
-
+from PyQt4.QtCore import QDate
+from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QComboBox, QAction, QAbstractItemView
 from functools import partial
 
 import utils_giswater
-
+from datetime import datetime
 from giswater.actions.parent_manage import ParentManage
 from giswater.ui_manager import AddLot
+from giswater.ui_manager import VisitManagement
 
 
-class ManageLot(ParentManage):
-
-    # event emitted when a new Visit is added when GUI is closed/accepted
-    #visit_added = pyqtSignal(int)
+class AddNewLot(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
-        #QObject.__init__(self)
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
-
         self.ids = []
 
 
@@ -39,13 +34,14 @@ class ManageLot(ParentManage):
             return row[0]+1
 
 
-    def manage_lot(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None):
+
+
+
+    def manage_lot(self, lot_id=None, is_new=True):
         # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
         self.autocommit = True
         self.remove_ids = False
-        # bool to distinguish if we entered to edit an existing Visit or creating a new one
-        self.it_is_new_visit = (not visit_id)
-
+        self.is_new_lot = is_new
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -82,12 +78,12 @@ class ManageLot(ParentManage):
         self.set_selectionbehavior(self.dlg_lot)
 
         # Fill QWidgets of the form
-        self.fill_fields(visit_id=visit_id)
-
-        if visit_id is None:
-            visit_id = self.get_next_id('om_visit_lot', 'id')
-
-        utils_giswater.setWidgetText(self.dlg_lot, self.lot_id, visit_id)
+        self.fill_fields()
+        # TODO populate Qtable visits
+        new_lot_id = lot_id
+        if lot_id is None:
+            new_lot_id = self.get_next_id('om_visit_lot', 'id')
+        utils_giswater.setWidgetText(self.dlg_lot, self.lot_id, new_lot_id)
 
         self.geom_type = self.feature_type.currentText().lower()
         viewname = "v_edit_" + self.geom_type
@@ -95,12 +91,16 @@ class ManageLot(ParentManage):
 
         self.event_feature_type_selected(self.dlg_lot)
         self.clear_selection()
+
+        if lot_id is not None:
+            self.set_values(lot_id)
+
+        self.enable_feature_type(self.dlg_lot)
         # Set signals
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, self.tbl_relation, layer_name=None))
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.dlg_lot, self.tbl_relation, False, False))
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
-        #self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.clear_selection))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer, self.dlg_lot, self.feature_type, layer_name=None))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot, self.tbl_relation, False))
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
@@ -190,15 +190,23 @@ class ManageLot(ParentManage):
         keys = keys[:-2]
         values = values[:-2]
 
-        sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
-               " VALUES (" + values + ") RETURNING id")
-        row = self.controller.execute_returning(sql, log_sql=True)
+        if self.is_new_lot is True:
+            sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
+                   " VALUES (" + values + ") RETURNING id")
+            row = self.controller.execute_returning(sql, log_sql=True)
+            _id = row[0]
+        else:
+            _id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
+
+        sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
+               " WHERE lot_id = '"+_id+"'")
+        self.controller.execute_sql(sql, log_sql=False)
 
         id_list = self.get_table_values(self.tbl_relation, lot['feature_type'])
         sql = ""
         for x in range(0, len(id_list)):
             sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type']+"(lot_id, arc_id, status)"
-                    " VALUES('" + str(row[0]) + "', '" + str(id_list[x]) + "', '0'); \n")
+                    " VALUES('" + str(_id) + "', '" + str(id_list[x]) + "', '0'); \n")
         self.controller.execute_sql(sql, log_sql=True)
 
     def get_table_values(self, qtable, geom_type):
@@ -237,28 +245,28 @@ class ManageLot(ParentManage):
 
 
 
-        table_name = 'om_visit_lot_x_' + self.geom_type
-        sql = ("SELECT {0}_id FROM {1}.{2} WHERE lot_id = '{3}'".format(
-            self.geom_type, self.schema_name, table_name, int(self.lot_id.text())))
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
-        if not rows or not rows[0]:
-            return
-        ids = [x[0] for x in rows]
-
-        # select list of related features
-        # Set 'expr_filter' with features that are in the list
-        expr_filter = '"{}_id" IN ({})'.format(self.geom_type, ','.join(ids))
-
-        # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-        if not is_valid:
-            return
-
-        # do selection allowing the tbl_relation to be linked to canvas selectionChanged
-        self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(dialog, self.tbl_relation)
-        self.select_features_by_ids(self.geom_type, expr)
-        self.disconnect_signal_selection_changed()
+        # table_name = 'om_visit_lot_x_' + self.geom_type
+        # sql = ("SELECT {0}_id FROM {1}.{2} WHERE lot_id = '{3}'".format(
+        #     self.geom_type, self.schema_name, table_name, int(self.lot_id.text())))
+        # rows = self.controller.get_rows(sql, commit=self.autocommit)
+        # if not rows or not rows[0]:
+        #     return
+        # ids = [x[0] for x in rows]
+        #
+        # # select list of related features
+        # # Set 'expr_filter' with features that are in the list
+        # expr_filter = '"{}_id" IN ({})'.format(self.geom_type, ','.join(ids))
+        #
+        # # Check expression
+        # (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+        # if not is_valid:
+        #     return
+        #
+        # # do selection allowing the tbl_relation to be linked to canvas selectionChanged
+        # self.disconnect_signal_selection_changed()
+        # self.connect_signal_selection_changed(dialog, self.tbl_relation)
+        # self.select_features_by_ids(self.geom_type, expr)
+        # self.disconnect_signal_selection_changed()
 
 
     def clear_selection(self, remove_groups=True):
@@ -358,7 +366,7 @@ class ManageLot(ParentManage):
         self.enable_feature_type(dialog)
 
 
-    def fill_fields(self, visit_id=None):
+    def fill_fields(self):
         """ Fill combo boxes of the form """
         # Visit tab
         # Set current date and time
@@ -398,6 +406,33 @@ class ManageLot(ParentManage):
             utils_giswater.set_item_data(self.dlg_lot.feature_type, feature_type, 1)
 
 
+    def set_values(self, lot_id):
+        sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot "
+               " WHERE id ='"+str(lot_id)+"'")
+        row = self.controller.get_row(sql, log_sql=True)
+        if row is not None:
+            utils_giswater.setWidgetText(self.dlg_lot, 'txt_idval', row['idval'])
+            utils_giswater.setCalendarDate(self.dlg_lot, 'startdate', row['startdate'])
+            utils_giswater.setCalendarDate(self.dlg_lot, 'enddate', row['enddate'])
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, row['visitclass_id'], 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, row['assigned_to'], 0)
+            utils_giswater.setWidgetText(self.dlg_lot, 'descript', row['descript'])
+            utils_giswater.setChecked(self.dlg_lot, 'chk_active', row['active'])
+            utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, row['feature_type'], 0)
+        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
+
+        table_name = self.schema_name + ".v_edit_" + str(feature_type)
+        #TODO necesito las ids de cada tabla
+        filter = "arc_id = '2020'"
+        self.controller.log_info(str(filter))
+        self.fill_table_object(self.tbl_relation, table_name, filter)
+        self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, table_name)
+
+        list_ids = self.get_table_values(self.tbl_relation, feature_type)
+        for id_ in list_ids:
+            if id_ not in self.ids:
+                self.ids.append(id_)
+
     def set_completers(self):
         """ Set autocompleters of the form """
 
@@ -417,4 +452,103 @@ class ManageLot(ParentManage):
         self.completer.setModel(model)
 
 
+    def lot_manager(self):
+        """ Button 75: Lot manager """
 
+        # Create the dialog
+        self.dlg_man = VisitManagement()
+        self.load_settings(self.dlg_man)
+        # save previous dialog and set new one.
+        # previous dialog will be set exiting the current one
+        # self.previous_dialog = utils_giswater.dialog()
+        self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        # Set a model with selected filter. Attach that model to selected table
+        table_object = "om_visit_lot"
+        expr_filter = ""
+        self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
+        self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+
+
+        # manage save and rollback when closing the dialog
+        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
+        self.dlg_man.accepted.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+
+        # Set dignals
+        self.dlg_man.tbl_visit.doubleClicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+
+        # set timeStart and timeEnd as the min/max dave values get from model
+        current_date = QDate.currentDate()
+        sql = ("SELECT MIN(startdate), MAX(enddate)"
+               " FROM {}.{}".format(self.schema_name, 'om_visit'))
+        row = self.controller.get_row(sql, log_info=False, commit=self.autocommit)
+        if row:
+            if row[0]:
+                self.dlg_man.date_event_from.setDate(row[0])
+            if row[1]:
+                self.dlg_man.date_event_to.setDate(row[1])
+            else:
+                self.dlg_man.date_event_to.setDate(current_date)
+
+        # set date events
+        self.dlg_man.date_event_from.dateChanged.connect(
+            partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+        self.dlg_man.date_event_to.dateChanged.connect(
+            partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+
+        # Open form
+        self.open_dialog(self.dlg_man, dlg_name="visit_management")
+
+    def open_lot(self, dialog, widget, table_object):
+        """ Open object form with selected record of the table """
+
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        selected_object_id = widget.model().record(row).value('id')
+
+        # Close this dialog and open selected object
+        dialog.close()
+
+        # set previous dialog
+        # if hasattr(self, 'previous_dialog'):
+        self.controller.log_info(str(selected_object_id))
+        self.manage_lot(selected_object_id)
+
+    def filter_lot(self, dialog, widget_table, widget_txt, table_object, expr_filter):
+        """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
+        object_id = utils_giswater.getWidgetText(dialog, widget_txt)
+        visit_start = dialog.date_event_from.date()
+        visit_end = dialog.date_event_to.date()
+        if visit_start > visit_end:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
+
+        # Create interval dates
+        format_low = 'yyyy-MM-dd 00:00:00.000'
+        format_high = 'yyyy-MM-dd 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            visit_start.toString(format_low), visit_end.toString(format_high))
+
+        if table_object == "om_visit":
+            expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
+            if object_id != 'null':
+                expr_filter += " AND ext_code::TEXT ILIKE '%" + str(object_id) + "%'"
+        else:
+            expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
+            if object_id != 'null':
+                expr_filter += " AND visit_id::TEXT ILIKE '%" + str(object_id) + "%'"
+
+        # Refresh model with selected filter
+        widget_table.model().setFilter(expr_filter)
+        widget_table.model().select()
