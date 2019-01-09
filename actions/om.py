@@ -14,6 +14,7 @@ from functools import partial
 
 import utils_giswater
 from giswater.actions.parent import ParentAction
+from giswater.actions.add_lot import ManageLot
 from giswater.actions.manage_visit import ManageVisit
 from giswater.actions.manage_new_psector import ManageNewPsector
 from giswater.ui_manager import Psector_management
@@ -25,6 +26,7 @@ class Om(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.manage_lot = ManageLot(iface, settings, controller, plugin_dir)
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
 
@@ -293,6 +295,9 @@ class Om(ParentAction):
 
 
 
-    def om_add_basic_visit(self):
-        self.controller.log_info(str("TESST"))
-            
+    def om_add_lot(self):
+        #self.manage_visit.manage_visit(basic=True)
+        self.manage_lot.manage_lot()
+
+    def om_lot_management(self):
+        self.controller.log_info(str("TEST"))

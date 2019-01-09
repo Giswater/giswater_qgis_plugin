@@ -74,6 +74,14 @@
         <translation>Visit manager</translation>
     </message>
     <message>
+        <source>74_text</source>
+        <translation>Add new lot</translation>
+    </message>
+    <message>
+        <source>75_text</source>
+        <translation>Lot manager</translation>
+    </message>
+    <message>
         <source>81_text</source>
         <translation>New psector</translation>
     </message>

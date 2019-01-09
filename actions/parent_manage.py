@@ -844,7 +844,7 @@ class ParentManage(ParentAction, object):
             else:
                 combo.setEnabled(True)
 
-    def insert_feature(self, dialog, table_object, query=False):
+    def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
@@ -852,7 +852,8 @@ class ParentManage(ParentAction, object):
         self.disconnect_signal_selection_changed()
 
         # Clear list of ids
-        self.ids = []
+        if remove_ids:
+            self.ids = []
         field_id = self.geom_type + "_id"
 
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
