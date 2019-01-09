@@ -26,6 +26,13 @@ class AddElement(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('add_lot.ui')
+class AddLot(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('add_picture.ui')
 class AddPicture(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
