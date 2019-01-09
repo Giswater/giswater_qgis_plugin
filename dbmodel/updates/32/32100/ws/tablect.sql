@@ -115,6 +115,9 @@ ALTER TABLE inp_times DROP CONSTRAINT IF EXISTS inp_times_f_statistic_check;
 ALTER TABLE inp_pump_additional DROP CONSTRAINT IF EXISTS inp_pump_additional_pattern_check;
 
 
+ALTER TABLE inp_pump_importinp DROP CONSTRAINT inp_pump_importinp_curve_id_fkey;
+ALTER TABLE inp_valve_importinp DROP CONSTRAINT inp_valve_importinp_to_arc_fkey;
+ALTER TABLE inp_valve_importinp DROP CONSTRAINT inp_valve_importinp_curve_id_fkey;
 
 --DROP UNIQUE
 ALTER TABLE "inp_pump_additional" DROP CONSTRAINT IF EXISTS "inp_pump_additional_unique";
@@ -225,3 +228,13 @@ ALTER TABLE inp_pump_additional ADD CONSTRAINT inp_pump_additional_pattern_check
 
 -- ADD UNIQUE
 ALTER TABLE "inp_pump_additional" ADD CONSTRAINT "inp_pump_additional_unique" UNIQUE (node_id, order_id);
+
+
+ALTER TABLE inp_pump_importinp ADD CONSTRAINT inp_pump_importinp_curve_id_fkey FOREIGN KEY (curve_id)
+REFERENCES inp_curve_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_valve_importinp ADD CONSTRAINT inp_valve_importinp_curve_id_fkey FOREIGN KEY (curve_id)
+REFERENCES inp_curve_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE inp_valve_importinp ADD CONSTRAINT inp_valve_importinp_to_arc_fkey FOREIGN KEY (to_arc)
+REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
