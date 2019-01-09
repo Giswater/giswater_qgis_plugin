@@ -39,6 +39,7 @@ class ParentManage(ParentAction, object):
         self.lazy_widget = None
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
+        self.remove_ids = True
 
     def reset_lists(self):
         """ Reset list of selected records """
@@ -770,7 +771,9 @@ class ParentManage(ParentAction, object):
 
         self.disconnect_signal_selection_changed()
         field_id = geom_type + "_id"
-        self.ids = []
+
+        if self.remove_ids:
+            self.ids = []
 
         # Iterate over all layers of the group
         for layer in self.layers[self.geom_type]:

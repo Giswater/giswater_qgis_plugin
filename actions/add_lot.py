@@ -6,32 +6,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
-from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView, QStringListModel
-from PyQt4.QtGui import QTextEdit, QPushButton, QComboBox, QTabWidget, QAction
-import os
-import sys
-import subprocess
-import webbrowser
+from PyQt4.QtCore import  QDate
+from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QComboBox, QAction
+
 from functools import partial
 
-
 import utils_giswater
-from giswater.dao.om_visit_event import OmVisitEvent
-from giswater.dao.om_visit import OmVisit
-from giswater.dao.om_visit_x_arc import OmVisitXArc
-from giswater.dao.om_visit_x_connec import OmVisitXConnec
-from giswater.dao.om_visit_x_node import OmVisitXNode
-from giswater.dao.om_visit_x_gully import OmVisitXGully
-from giswater.dao.om_visit_parameter import OmVisitParameter
-from giswater.ui_manager import AddVisit
-from giswater.ui_manager import AddLot
-from giswater.ui_manager import EventStandard
-from giswater.ui_manager import EventUDarcStandard
-from giswater.ui_manager import EventUDarcRehabit
-from giswater.ui_manager import VisitManagement
+
 from giswater.actions.parent_manage import ParentManage
-from giswater.actions.manage_document import ManageDocument
+from giswater.ui_manager import AddLot
 
 
 class ManageLot(ParentManage):
@@ -57,9 +40,9 @@ class ManageLot(ParentManage):
 
 
     def manage_lot(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None):
-
         # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
         self.autocommit = True
+        self.remove_ids = False
         # bool to distinguish if we entered to edit an existing Visit or creating a new one
         self.it_is_new_visit = (not visit_id)
 
@@ -111,15 +94,15 @@ class ManageLot(ParentManage):
         self.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
 
         self.event_feature_type_selected(self.dlg_lot)
-
+        self.clear_selection()
         # Set signals
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, self.tbl_relation, layer_name=None))
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.dlg_lot, self.tbl_relation, False, False))
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
-        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.clear_selection))
+        #self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.clear_selection))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer, self.dlg_lot, self.feature_type, layer_name=None))
-        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot, self.tbl_relation))
+        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot, self.tbl_relation, False))
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
