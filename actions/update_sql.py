@@ -100,6 +100,8 @@ class UpdateSQL(ParentAction):
             self.filter_srid_value = self.controller.plugin_settings_value('srid')
             self.schema = None
 
+            # Get metadata version
+            self.version_metadata = self.get_plugin_version()
 
             # Get version if not new project
             self.version = None
@@ -107,9 +109,6 @@ class UpdateSQL(ParentAction):
                 sql = ("SELECT giswater from " + self.schema_name + ".version")
                 row = self.controller.get_row(sql)
                 self.version = row[0]
-                self.version_metadata = self.settings.value('general/version')
-
-
                 if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
                     self.btn_update_schema.setEnabled(False)
                     self.btn_update_api.setEnabled(False)
