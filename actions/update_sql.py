@@ -1435,6 +1435,18 @@ class UpdateSQL(ParentAction):
         self.load_sql(folder_path)
         self.setArrowCursor()
 
+        # Show message if precess execute correctly
+        if self.error_count == 0:
+            msg = "The process has been executed correctly."
+            result = self.controller.show_info_box(msg, "Info")
+
+        else:
+            msg = "Some error has occurred while the process was running."
+            result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
+
     #TODO:Rename this function => Update all versions from changelog file.
     def update(self, project_type):
         msg = "Estas seguro que quieres actualizar las foreing keys, funciones y trigers a los de la ultima version?"
