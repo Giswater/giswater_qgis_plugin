@@ -769,7 +769,6 @@ class ParentManage(ParentAction, object):
         """ Slot function for signal 'canvas.selectionChanged' """
 
         self.disconnect_signal_selection_changed()
-
         field_id = geom_type + "_id"
         self.ids = []
 
@@ -848,7 +847,6 @@ class ParentManage(ParentAction, object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
-
         self.disconnect_signal_selection_changed()
 
         # Clear list of ids
@@ -870,7 +868,8 @@ class ParentManage(ParentAction, object):
                 for feature in features:
                     # Append 'feature_id' into the list
                     selected_id = feature.attribute(field_id)
-                    self.ids.append(selected_id)
+                    if selected_id not in self.ids:
+                        self.ids.append(selected_id)
             if feature_id not in self.ids:
                 # If feature id doesn't exist in list -> add
                 self.ids.append(str(feature_id))
@@ -977,7 +976,6 @@ class ParentManage(ParentAction, object):
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         if object_id != 'null':
             expr = field_object_id + "::text ILIKE '%" + str(object_id) + "%'"
-            self.controller.log_info(str(expr))
             # Refresh model with selected filter
             widget_table.model().setFilter(expr)
             widget_table.model().select()

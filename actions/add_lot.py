@@ -113,19 +113,75 @@ class ManageLot(ParentManage):
         self.event_feature_type_selected(self.dlg_lot)
 
         # Set signals
-        #self.feature_type.currentIndexChanged.connect(partial(self.set_completer_feature_id, self.dlg_lot.feature_id, self.geom_type, viewname))
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, self.tbl_relation, layer_name=None))
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_feature, self.dlg_lot, self.tbl_relation, False, False))
-        self.dlg_lot.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot))
-        self.dlg_lot.rejected.connect(partial(self.close_dialog, self.dlg_lot))
+        self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
+        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.clear_selection))
+        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer, self.dlg_lot, self.feature_type, layer_name=None))
+        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot, self.tbl_relation))
+        self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
+        self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
+        self.dlg_lot.btn_accept.clicked.connect(partial(self.manage_rejected))
 
         # Set autocompleters of the form
         self.set_completers()
 
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+
+    def manage_rejected(self):
+        self.disconnect_signal_selection_changed()
+        self.close_dialog(self.dlg_lot)
+
+
+    def remove_selection(self, dialog, qtable):
+        self.disconnect_signal_selection_changed()
+        # Get selected rows
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+
+        field_id = self.geom_type + "_id"
+        del_id = []
+        inf_text = ""
+
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_feature = qtable.model().record(row).value(field_id)
+            inf_text += str(id_feature) + ", "
+            del_id.append(id_feature)
+        inf_text = inf_text[:-2]
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = self.controller.ask_question(message, title, inf_text)
+        if answer:
+            for el in del_id:
+                self.ids.remove(el)
+        else:
+            return
+
+        expr_filter = None
+        expr = None
+        if len(self.ids) > 0:
+
+            # Set expression filter with features in the list
+            expr_filter = "\"" + field_id + "\" IN ("
+            for i in range(len(self.ids)):
+                expr_filter += "'" + str(self.ids[i]) + "', "
+            expr_filter = expr_filter[:-2] + ")"
+
+            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            if not is_valid:
+                self.controller.log_info(str("INVALID EXPRESSION"))
+                return
+
+        self.select_features_by_ids(self.geom_type, expr)
+        self.reload_table(dialog, qtable, self.geom_type, expr_filter)
+        self.enable_feature_type(dialog)
 
 
     def save_lot(self):
@@ -154,14 +210,13 @@ class ManageLot(ParentManage):
         sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
                " VALUES (" + values + ") RETURNING id")
         row = self.controller.execute_returning(sql, log_sql=True)
-        self.controller.log_info(str(row))
+
         id_list = self.get_table_values(self.tbl_relation, lot['feature_type'])
         sql = ""
         for x in range(0, len(id_list)):
             sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type']+"(lot_id, arc_id, status)"
                     " VALUES('" + str(row[0]) + "', '" + str(id_list[x]) + "', '0'); \n")
         self.controller.execute_sql(sql, log_sql=True)
-        #self.close_dialog(self.dlg_lot)
 
     def get_table_values(self, qtable, geom_type):
         # "arc_id" IN ('2020', '2021')
@@ -171,7 +226,6 @@ class ManageLot(ParentManage):
         for i in range(0, model.rowCount()):
             i = model.index(i, column_index)
             id_list.append(i.data())
-
         return id_list
 
 
@@ -224,8 +278,46 @@ class ManageLot(ParentManage):
         self.disconnect_signal_selection_changed()
 
 
-    def open_expression(self, dialog, widget, qtable=None, layer_name=None):
-        # Get current layer
+    def clear_selection(self, remove_groups=True):
+        """ Remove all previous selections """
+
+        layer = self.controller.get_layer_by_tablename("v_edit_arc")
+        if layer:
+            layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        if layer:
+            layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename("v_edit_connec")
+        if layer:
+            layer.removeSelection()
+        layer = self.controller.get_layer_by_tablename("v_edit_element")
+        if layer:
+            layer.removeSelection()
+
+        if self.project_type == 'ud':
+            layer = self.controller.get_layer_by_tablename("v_edit_gully")
+            if layer:
+                layer.removeSelection()
+
+        try:
+            if remove_groups:
+                for layer in self.layers['arc']:
+                    layer.removeSelection()
+                for layer in self.layers['node']:
+                    layer.removeSelection()
+                for layer in self.layers['connec']:
+                    layer.removeSelection()
+                for layer in self.layers['gully']:
+                    layer.removeSelection()
+                for layer in self.layers['element']:
+                    layer.removeSelection()
+        except:
+            pass
+
+        self.canvas.refresh()
+
+
+    def set_active_layer(self,  dialog, widget, layer_name=None):
         self.current_layer = self.iface.activeLayer()
         # Set active layer
         if layer_name is None:
@@ -233,9 +325,11 @@ class ManageLot(ParentManage):
 
         viewname = layer_name
         self.layer_lot = self.controller.get_layer_by_tablename(viewname)
-
         self.iface.setActiveLayer(self.layer_lot)
         self.iface.legendInterface().setLayerVisible(self.layer_lot, True)
+
+    def open_expression(self, dialog, widget, qtable=None, layer_name=None):
+        self.set_active_layer(dialog, widget, layer_name)
         self.disconnect_signal_selection_changed()
         self.iface.mainWindow().findChild(QAction, 'mActionSelectByExpression').triggered.connect(
             partial(self.selection_changed_by_expr, dialog, qtable, self.layer_lot, self.geom_type))
@@ -252,10 +346,8 @@ class ManageLot(ParentManage):
         field_id = geom_type + "_id"
         # Iterate over layer
         if layer.selectedFeatureCount() > 0:
-            self.controller.log_info(str("TEST 10"))
             # Get selected features of the layer
             features = layer.selectedFeatures()
-            self.controller.log_info(str(features))
             for feature in features:
                 # Append 'feature_id' into the list
                 selected_id = feature.attribute(field_id)
@@ -281,11 +373,6 @@ class ManageLot(ParentManage):
             expr_filter = expr_filter[:-2] + ")"
         self.reload_table(dialog, qtable, self.geom_type, expr_filter)
         self.enable_feature_type(dialog)
-        # (is_valid, expr) = self.check_expression(expr_filter)
-        # if not is_valid:
-        #     return None
-        # self.controller.log_info(str("TEST 12test10"))
-        # #self.select_features_by_ids(self.geom_type, expr)
 
 
     def fill_fields(self, visit_id=None):
@@ -346,20 +433,5 @@ class ManageLot(ParentManage):
         model.setStringList(values)
         self.completer.setModel(model)
 
-    def manage_rejected(self):
-        """Do all action when closed the dialog with Cancel or X.
-        e.g. all necessary rollbacks and cleanings."""
-
-        if hasattr(self, 'xyCoordinates_conected'):
-            if self.xyCoordinates_conected:
-                self.canvas.xyCoordinates.disconnect()
-                self.xyCoordinates_conected = False
-        self.canvas.setMapTool(self.previous_map_tool)
-        # removed current working visit. This should cascade removing of all related records
-        if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
-            self.current_visit.delete()
-
-        # Remove all previous selections
-        self.remove_selection()
 
 
