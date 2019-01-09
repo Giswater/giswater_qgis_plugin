@@ -162,7 +162,7 @@ BEGIN
 	INSERT INTO cat_node VALUES ('EPARESERVOIR-DEF', 'EPARESERVOIR', 'EPAMAT');
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=10
+	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=11
 	LOOP
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -184,7 +184,7 @@ BEGIN
 		
 		--inserting values on editable view
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv2pg where source='||quote_literal(v_rec_table.target)||' 
-		AND csv2pgcat_id=10 AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
+		AND csv2pgcat_id=11 AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
 
 	--	raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;		
