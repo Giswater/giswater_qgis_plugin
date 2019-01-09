@@ -88,6 +88,9 @@ class UpdateSQL(ParentAction):
 
             self.message_update = ''
 
+            #Declare error counter variable
+            self.error_count = 0
+
             # Get locale of QGIS application
             self.locale = QSettings().value('locale/userLocale').lower()
             if self.locale == 'es_es':
@@ -1384,7 +1387,7 @@ class UpdateSQL(ParentAction):
             self.setArrowCursor()
 
         #Show message if precess execute correctly
-        if str(self.controller.last_error) is None:
+        if self.error_count == 0:
             msg = "The project has been created correctly."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1393,6 +1396,9 @@ class UpdateSQL(ParentAction):
         else:
             msg = "Some error has occurred while the create process was running."
             result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
 
     def rename_project_data_schema(self):
         self.setWaitCursor()
@@ -1444,7 +1450,7 @@ class UpdateSQL(ParentAction):
         self.setArrowCursor()
 
         # Show message if precess execute correctly
-        if str(self.controller.last_error) is None:
+        if self.error_count == 0:
             msg = "The update has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1453,6 +1459,9 @@ class UpdateSQL(ParentAction):
         else:
             msg = "Some error has occurred while the update process was running."
             result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
 
     def reload_tablect(self, project_type=False):
         self.load_tablect(project_type=project_type)
@@ -1670,7 +1679,7 @@ class UpdateSQL(ParentAction):
             self.setArrowCursor()
 
         # Show message if precess execute correctly
-        if str(self.controller.last_error) is None:
+        if self.error_count == 0:
             msg = "The reload has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1679,6 +1688,9 @@ class UpdateSQL(ParentAction):
         else:
             msg = "Some error has occurred while the reload process was running."
             result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
 
     def api_file_to_db(self):
 
@@ -1696,7 +1708,7 @@ class UpdateSQL(ParentAction):
             self.setArrowCursor()
 
         # Show message if precess execute correctly
-        if str(self.controller.last_error) is None:
+        if self.error_count == 0:
             msg = "The reload has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1705,6 +1717,9 @@ class UpdateSQL(ParentAction):
         else:
             msg = "Some error has occurred while the reload process was running."
             result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
 
     def open_create_project(self):
 
@@ -1819,12 +1834,14 @@ class UpdateSQL(ParentAction):
                 status = self.controller.execute_sql(str(f_to_read))
 
                 if status is False:
+                    self.error_count = self.error_count + 1
                     print "Error to execute"
                     print('Message: ' + str(self.controller.last_error))
                     self.dao.rollback()
                     return False
 
         except Exception as e:
+            self.error_count = self.error_count + 1
             print "Error to execute"
             print('Message: ' + str(self.controller.last_error))
             self.dao.rollback()
