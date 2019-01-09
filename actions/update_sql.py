@@ -1441,15 +1441,29 @@ class UpdateSQL(ParentAction):
         result = self.controller.ask_question(msg, "Info")
         if result:
             self.setWaitCursor()
-            self.load_updates(project_type)
+            self.load_updates(project_type, update_changelog=True)
             self.reload_tablect(project_type)
             self.reload_fct_ftrg(project_type)
             self.reload_trg(project_type)
             self.setArrowCursor()
 
+        # Show message if precess execute correctly
+        if self.error_count == 0:
+            msg = "The update has been executed correctly."
+            result = self.controller.show_info_box(msg, "Info")
+
+            # Close dialog when process has been execute correctly
+            self.close_dialog(self.dlg_readsql_show_info)
+        else:
+            msg = "Some error has occurred while the update process was running."
+            result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
+
     """ Checkbox calling functions """
 
-    def load_updates(self, project_type):
+    def load_updates(self, project_type, update_changelog=False):
         self.setWaitCursor()
         self.update_30to31(project_type=project_type)
         self.load_views(project_type=project_type)
@@ -1461,17 +1475,18 @@ class UpdateSQL(ParentAction):
         self.execute_last_process()
         self.setArrowCursor()
 
-        # Show message if precess execute correctly
-        if self.error_count == 0:
-            msg = "The update has been executed correctly."
-            result = self.controller.show_info_box(msg, "Info")
+        if update_changelog is False:
+            # Show message if precess execute correctly
+            if self.error_count == 0:
+                msg = "The update has been executed correctly."
+                result = self.controller.show_info_box(msg, "Info")
 
-        else:
-            msg = "Some error has occurred while the update process was running."
-            result = self.controller.show_info_box(msg, "Info")
+            else:
+                msg = "Some error has occurred while the update process was running."
+                result = self.controller.show_info_box(msg, "Info")
 
-        # Reset count error variable to 0
-        self.error_count = 0
+            # Reset count error variable to 0
+            self.error_count = 0
 
     def reload_tablect(self, project_type=False):
         self.load_tablect(project_type=project_type)
