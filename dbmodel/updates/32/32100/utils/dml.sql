@@ -54,3 +54,10 @@ INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, qgis_m
 INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, qgis_message, data_type, label, dv_querytext, dv_parent_id, isenabled, layout_id, layout_order, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, datatype, widgettype, vdefault, ischeckeditable, widgetcontrols) VALUES ('vnode_update_tolerance', 'config', NULL, 'role_edit', NULL, 'text', 'Vnode update tolerance:', NULL, NULL, true, 8, 9, 'utils', false, NULL, NULL, NULL, false, 'float', 'spinbox', '0.1', false, '{"minValue":0.01, "maxValue":1}');
 INSERT INTO audit_cat_param_user (id, formname, description, sys_role_id, qgis_message, data_type, label, dv_querytext, dv_parent_id, isenabled, layout_id, layout_order, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, datatype, widgettype, vdefault, ischeckeditable, widgetcontrols) VALUES ('node2arc', 'config', NULL, 'role_edit', NULL, 'text', 'Node2arc:', NULL, NULL, true, 8, 10, 'utils', false, NULL, NULL, NULL, false, 'float', 'spinbox', '0.1', false, '{"minValue":0.01, "maxValue":1}');
 */
+
+-----------------------
+-- sys_csv2pg_cat
+-----------------------
+INSERT INTO sys_csv2pg_cat VALUES (9, 'Export inp', 'Export inp', null, 'role_epa');
+INSERT INTO sys_csv2pg_cat VALUES (10, 'Import rpt', 'Import rpt', null, 'role_epa');
+INSERT INTO sys_csv2pg_cat VALUES (11, 'Import inp', 'Import inp', null, 'role_admin');

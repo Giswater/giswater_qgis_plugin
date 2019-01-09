@@ -63,8 +63,7 @@ BEGIN
 
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(p_path)||' WITH (NULL '''', FORMAT TEXT)';	
-		UPDATE temp_csv2pg SET csv2pgcat_id=12 WHERE csv2pgcat_id IS NULL AND user_name=current_user;
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data(11,'||quote_literal(p_path)||' )';
 	END IF;
 
 	-- MAPZONES
@@ -81,7 +80,7 @@ BEGIN
 
 	
 	-- HARMONIZE THE SOURCE TABLE
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id_aux order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=11 order by id
 	LOOP
 		-- massive refactor of source field (getting target)
 		IF rpt_rec.csv1 LIKE '[%' THEN
