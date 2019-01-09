@@ -1412,6 +1412,18 @@ class UpdateSQL(ParentAction):
         self.api(False)
         self.setArrowCursor()
 
+        # Show message if precess execute correctly
+        if self.error_count == 0:
+            msg = "Api has been updated correctly."
+            result = self.controller.show_info_box(msg, "Info")
+
+        else:
+            msg = "Some error has occurred while the api updated process was running."
+            result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
+
     def implement_api(self):
         self.setWaitCursor()
         self.api(True)
@@ -1454,8 +1466,6 @@ class UpdateSQL(ParentAction):
             msg = "The update has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
-            # Close dialog when process has been execute correctly
-            self.close_dialog(self.dlg_readsql_create_project)
         else:
             msg = "Some error has occurred while the update process was running."
             result = self.controller.show_info_box(msg, "Info")
@@ -1683,8 +1693,6 @@ class UpdateSQL(ParentAction):
             msg = "The reload has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
-            # Close dialog when process has been execute correctly
-            self.close_dialog(self.dlg_readsql_create_project)
         else:
             msg = "Some error has occurred while the reload process was running."
             result = self.controller.show_info_box(msg, "Info")
@@ -1712,8 +1720,6 @@ class UpdateSQL(ParentAction):
             msg = "The reload has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
-            # Close dialog when process has been execute correctly
-            self.close_dialog(self.dlg_readsql_create_project)
         else:
             msg = "Some error has occurred while the reload process was running."
             result = self.controller.show_info_box(msg, "Info")
