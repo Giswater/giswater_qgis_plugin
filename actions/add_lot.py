@@ -27,7 +27,7 @@ class AddNewLot(ParentManage):
 
     def get_next_id(self, table_name, pk):
         sql = ("SELECT max("+pk+"::integer) FROM " + self.schema_name + "."+table_name+";")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=False)
         if not row or not row[0]:
             return 0
         else:
@@ -187,7 +187,7 @@ class AddNewLot(ParentManage):
         if self.is_new_lot is True:
             sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
                    " VALUES (" + values + ") RETURNING id")
-            row = self.controller.execute_returning(sql, log_sql=True)
+            row = self.controller.execute_returning(sql, log_sql=False)
             _id = row[0]
         else:
             _id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
@@ -201,7 +201,7 @@ class AddNewLot(ParentManage):
         for x in range(0, len(id_list)):
             sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type']+"(lot_id, arc_id, status)"
                     " VALUES('" + str(_id) + "', '" + str(id_list[x]) + "', '0'); \n")
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql, log_sql=False)
 
     def get_table_values(self, qtable, geom_type):
         # "arc_id" IN ('2020', '2021')
@@ -232,35 +232,6 @@ class AddNewLot(ParentManage):
         fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
         self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
 
-        # set the callback to setup all events later
-        # its not possible to setup listener in this moment beacouse set_table_model without
-        # a valid expression parameter return a None model => no events can be triggered
-        #self.lazy_configuration(self.tbl_relation, self.config_relation_table)
-
-
-
-        # table_name = 'om_visit_lot_x_' + self.geom_type
-        # sql = ("SELECT {0}_id FROM {1}.{2} WHERE lot_id = '{3}'".format(
-        #     self.geom_type, self.schema_name, table_name, int(self.lot_id.text())))
-        # rows = self.controller.get_rows(sql, commit=self.autocommit)
-        # if not rows or not rows[0]:
-        #     return
-        # ids = [x[0] for x in rows]
-        #
-        # # select list of related features
-        # # Set 'expr_filter' with features that are in the list
-        # expr_filter = '"{}_id" IN ({})'.format(self.geom_type, ','.join(ids))
-        #
-        # # Check expression
-        # (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-        # if not is_valid:
-        #     return
-        #
-        # # do selection allowing the tbl_relation to be linked to canvas selectionChanged
-        # self.disconnect_signal_selection_changed()
-        # self.connect_signal_selection_changed(dialog, self.tbl_relation)
-        # self.select_features_by_ids(self.geom_type, expr)
-        # self.disconnect_signal_selection_changed()
 
 
     def clear_selection(self, remove_groups=True):
@@ -356,6 +327,7 @@ class AddNewLot(ParentManage):
             for i in range(len(self.ids)):
                 expr_filter += "'" + str(self.ids[i]) + "', "
             expr_filter = expr_filter[:-2] + ")"
+
         self.reload_table(dialog, qtable, self.geom_type, expr_filter)
         self.enable_feature_type(dialog)
 
@@ -395,7 +367,7 @@ class AddNewLot(ParentManage):
                " FROM " + self.schema_name + ".sys_feature_type"
                " WHERE net_category = 1"
                " ORDER BY id")
-        feature_type = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
+        feature_type = self.controller.get_rows(sql, log_sql=False, commit=self.autocommit)
         if feature_type:
             utils_giswater.set_item_data(self.dlg_lot.feature_type, feature_type, 1)
 
@@ -403,7 +375,7 @@ class AddNewLot(ParentManage):
     def set_values(self, lot_id):
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot "
                " WHERE id ='"+str(lot_id)+"'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=False)
         if row is not None:
             utils_giswater.setWidgetText(self.dlg_lot, 'txt_idval', row['idval'])
             utils_giswater.setCalendarDate(self.dlg_lot, 'startdate', row['startdate'])
