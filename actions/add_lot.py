@@ -34,9 +34,6 @@ class AddNewLot(ParentManage):
             return row[0]+1
 
 
-
-
-
     def manage_lot(self, lot_id=None, is_new=True):
         # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
         self.autocommit = True
@@ -48,10 +45,7 @@ class AddNewLot(ParentManage):
         self.layers['arc'] = [self.controller.get_layer_by_tablename('v_edit_arc')]
         self.layers['node'] = [self.controller.get_layer_by_tablename('v_edit_node')]
         self.layers['connec'] = [self.controller.get_layer_by_tablename('v_edit_connec')]
-        # self.layers['arc'] = self.controller.get_group_layers('arc')
-        # self.layers['node'] = self.controller.get_group_layers('node')
-        # self.layers['connec'] = self.controller.get_group_layers('connec')
-        # self.layers['element'] = self.controller.get_group_layers('element')
+
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
             self.layers['gully'] = self.controller.get_group_layers('gully')
@@ -477,7 +471,7 @@ class AddNewLot(ParentManage):
         # Set dignals
         self.dlg_man.tbl_visit.doubleClicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit))
         self.dlg_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit))
-        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_man.tbl_visit))
         self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, expr_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
@@ -502,6 +496,22 @@ class AddNewLot(ParentManage):
 
         # Open form
         self.open_dialog(self.dlg_man, dlg_name="visit_management")
+
+    def delete_lot(self, qtable):
+        selected_list = qtable.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        for x in range(0, len(selected_list)):
+            row = selected_list[x].row()
+            _id = qtable.model().record(row).value('id')
+            feature_type = qtable.model().record(row).value('feature_type')
+            sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + " "
+                   " WHERE lot_id = '" + _id + "'; \n "
+                   "DELETE FROM " + self.schema_name + ".om_visit_lot "
+                   " WHERE id ='"+str(_id)+"'")
+            self.controller.execute_sql(sql, log_sql=False)
 
     def open_lot(self, dialog, widget):
         """ Open object form with selected record of the table """
