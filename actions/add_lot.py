@@ -475,16 +475,17 @@ class AddNewLot(ParentManage):
         self.dlg_man.accepted.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit, table_object))
 
         # Set dignals
-        self.dlg_man.tbl_visit.doubleClicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+        self.dlg_man.tbl_visit.doubleClicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit))
+        self.dlg_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit))
         self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+        self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, expr_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
         sql = ("SELECT MIN(startdate), MAX(enddate)"
-               " FROM {}.{}".format(self.schema_name, 'om_visit'))
-        row = self.controller.get_row(sql, log_info=False, commit=self.autocommit)
+               " FROM {}.{}".format(self.schema_name, table_object))
+        row = self.controller.get_row(sql, log_info=True, commit=self.autocommit)
+
         if row:
             if row[0]:
                 self.dlg_man.date_event_from.setDate(row[0])
@@ -495,14 +496,14 @@ class AddNewLot(ParentManage):
 
         # set date events
         self.dlg_man.date_event_from.dateChanged.connect(
-            partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+            partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter,  expr_filter))
         self.dlg_man.date_event_to.dateChanged.connect(
-            partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+            partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter,  expr_filter))
 
         # Open form
         self.open_dialog(self.dlg_man, dlg_name="visit_management")
 
-    def open_lot(self, dialog, widget, table_object):
+    def open_lot(self, dialog, widget):
         """ Open object form with selected record of the table """
 
         selected_list = widget.selectionModel().selectedRows()
@@ -521,14 +522,14 @@ class AddNewLot(ParentManage):
 
         # set previous dialog
         # if hasattr(self, 'previous_dialog'):
-        self.controller.log_info(str(selected_object_id))
         self.manage_lot(selected_object_id)
 
-    def filter_lot(self, dialog, widget_table, widget_txt, table_object, expr_filter):
+    def filter_lot(self, dialog, widget_table, widget_txt, expr_filter):
         """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
+
         if visit_start > visit_end:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
@@ -540,14 +541,9 @@ class AddNewLot(ParentManage):
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
-        if table_object == "om_visit":
-            expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
-            if object_id != 'null':
-                expr_filter += " AND ext_code::TEXT ILIKE '%" + str(object_id) + "%'"
-        else:
-            expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
-            if object_id != 'null':
-                expr_filter += " AND visit_id::TEXT ILIKE '%" + str(object_id) + "%'"
+        expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0} or enddate is null)".format(interval))
+        if object_id != 'null':
+            expr_filter += " AND idval::TEXT ILIKE '%" + str(object_id) + "%'"
 
         # Refresh model with selected filter
         widget_table.model().setFilter(expr_filter)

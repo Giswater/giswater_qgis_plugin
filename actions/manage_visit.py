@@ -627,7 +627,6 @@ class ManageVisit(ParentManage, QObject):
         widget_table.model().select()
 
 
-
     def fill_combos(self, visit_id=None):
         """ Fill combo boxes of the form """
 
