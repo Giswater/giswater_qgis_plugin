@@ -28,6 +28,7 @@ changelog=Version 3.1.105 (30/12/2018)
     - Temporarily canceled the call to the get_last_gsw_file function
     - Enhancement: Change zoom to node after mincut
     - Enhancement: Now show code in combo hydrometer info and now filter by hydrometer customer code
+    - Add new button Read SQL
 
 
 # Tags are comma separated with spaces allowed

@@ -34,6 +34,8 @@ class DaoController():
         self.logged = False 
         self.postgresql_version = None
         self.logger = None
+        self.schema_name = None
+        self.dao = None
         if create_logger:
             self.set_logger(logger_name)
                 
@@ -127,14 +129,18 @@ class DaoController():
         self.last_error = None      
         self.log_codes = {}
         
-        self.layer_source = self.get_layer_source_from_credentials()
+        self.layer_source, not_version = self.get_layer_source_from_credentials()
+
         if self.layer_source is None:
             return False
             
         # Connect to database
         self.logged = self.connect_to_database(self.layer_source['host'], self.layer_source['port'], 
-                                               self.layer_source['db'], self.layer_source['user'], self.layer_source['password']) 
-                       
+                                               self.layer_source['db'], self.layer_source['user'],
+                                               self.layer_source['password'])
+
+        if not_version is True:
+            return False
         return self.logged    
     
     
@@ -142,31 +148,50 @@ class DaoController():
 
         # Get database parameters from layer 'version'
         layer = self.get_layer_by_tablename("version")
-        if not layer:
-            self.last_error = self.tr("Layer not found") + ": 'version'"        
-            return None
-        
-        layer_source = self.get_layer_source(layer)    
-        self.schema_name = layer_source['schema']
-        conn_info = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).connectionInfo()
-           
-        attempts = 1           
-        logged = self.connect_to_database(layer_source['host'], layer_source['port'], 
-                                          layer_source['db'], layer_source['user'], layer_source['password'])  
-        while not logged:
-            attempts+=1
-            if attempts <= 2:   
-                (success, layer_source['user'], layer_source['password']) = QgsCredentials.instance().get(conn_info, layer_source['user'], layer_source['password'])                                                    
-                logged = self.connect_to_database(layer_source['host'], layer_source['port'], 
-                                                  layer_source['db'], layer_source['user'], layer_source['password'])  
-            else:              
-                return None          
-        
-        # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
-        QgsCredentials.instance().put(conn_info, layer_source['user'], layer_source['password'])
-            
-        return layer_source    
-    
+
+        settings = QSettings()
+        settings.beginGroup("PostgreSQL/connections")
+
+        if layer is not None:
+            not_version = False
+            credentials = self.get_layer_source(layer)
+            self.schema_name = credentials['schema']
+            conn_info = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).connectionInfo()
+
+            attempts = 1
+            logged = self.connect_to_database(credentials['host'], credentials['port'],
+                                              credentials['db'], credentials['user'], credentials['password'])
+            while not logged:
+                attempts+=1
+                if attempts <= 2:
+                    (success, credentials['user'], credentials['password']) = QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
+                    logged = self.connect_to_database(credentials['host'], credentials['port'],
+                                                      credentials['db'], credentials['user'], credentials['password'])
+                else:
+                    return None
+
+            # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
+            QgsCredentials.instance().put(conn_info, credentials['user'], credentials['password'])
+        elif settings is not None:
+            not_version = True
+            default_connection = settings.value('selected')
+            settings.endGroup()
+            credentials = {'db': None, 'schema': None, 'table': None,
+                           'host': None, 'port': None, 'user': None, 'password': None}
+
+            settings.beginGroup("PostgreSQL/connections/" + default_connection)
+            credentials['host'] = settings.value('host')
+            credentials['port'] = settings.value('port')
+            credentials['db'] = settings.value('database')
+            credentials['user'] = settings.value('username')
+            credentials['password'] = settings.value('password')
+            settings.endGroup()
+
+        else:
+            not_version = False
+            self.last_error = self.tr("Layer not found") + ": 'version'"
+            return None, not_version
+        return credentials, not_version
     
     def connect_to_database(self, host, port, db, user, pwd):
         """ Connect to database with selected parameters """
@@ -864,12 +889,13 @@ class DaoController():
         """ Get water software from table 'version' """
         
         project_type = None
-        sql = ("SELECT lower(wsoftware)"
-               " FROM " + self.schema_name + ".version ORDER BY id ASC LIMIT 1")
-        row = self.get_row(sql)
-        if row:
-            project_type = row[0]
-            
+        if self.schema_name is not None:
+            sql = ("SELECT lower(wsoftware)"
+                   " FROM " + self.schema_name + ".version ORDER BY id ASC LIMIT 1")
+            row = self.get_row(sql)
+            if row:
+                project_type = row[0]
+
         return project_type
     
       
