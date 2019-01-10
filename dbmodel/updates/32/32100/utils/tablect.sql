@@ -10,8 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --DROP CONSTRAINT
 
-ALTER TABLE om_visit_class_x_parameter DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_class_fkey;
-
 ALTER TABLE rpt_selector_compare DROP CONSTRAINT IF EXISTS rpt_selector_compare_result_id_cur_user_unique ;
 
 ALTER TABLE rpt_selector_hourly_compare DROP CONSTRAINT IF EXISTS time_compare_cur_user_unique;
@@ -20,9 +18,6 @@ DROP INDEX IF EXISTS shortcut_unique;
 
 --ADD CONSTRAINT
 
-
-ALTER TABLE om_visit_class_x_parameter ADD CONSTRAINT om_visit_class_x_parameter_class_fkey FOREIGN KEY (class_id) 
-REFERENCES om_visit_class (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE rpt_selector_compare ADD CONSTRAINT rpt_selector_compare_result_id_cur_user_unique UNIQUE(result_id, cur_user);
 

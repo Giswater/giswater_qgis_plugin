@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Fk 11
 -- ----------------------------
-
+--fk, which are related to inp_value_* and inp_typevalue_* are modified on version 3.2 (updates)
 --DROP
 --INP
 ALTER TABLE inp_selector_dscenario DROP CONSTRAINT IF EXISTS dscenario_id_cur_user_unique;

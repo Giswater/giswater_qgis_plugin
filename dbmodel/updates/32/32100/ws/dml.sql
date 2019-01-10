@@ -156,3 +156,13 @@ INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, fields, reve
 INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, fields, reverse_pg2csvcat_id) VALUES (10, 9, 'vi_patterns', '[PATTERNS]', 'csv1, csv2', 11);
 INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, fields, reverse_pg2csvcat_id) VALUES (14, 9, 'vi_energy', '[ENERGY]', 'csv1, csv2', 11);
 
+
+
+-----------------------
+-- Records of inp_options
+-----------------------
+UPDATE inp_options SET quality='NONE_QUAL' WHERE quality='NONE';
+
+--UPDATE inp_report SET status='YES_YNF' WHERE status='YES'; -- text is too long to fit into field length
+
+UPDATE inp_times SET statistic='NONE_TIMES' WHERE statistic='NONE';

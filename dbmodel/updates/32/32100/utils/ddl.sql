@@ -49,98 +49,6 @@ DROP TABLE IF EXISTS "man_addfields_cat_widgettype";
 DROP TABLE IF EXISTS selector_composer;
 */
 
------------------------
--- create inp tables
------------------------
-CREATE TABLE inp_typevalue
-(  typevalue character varying(50) NOT NULL,
-  id character varying(30) NOT NULL,
-  idval character varying(30),
-  descript text,
-  CONSTRAINT inp_typevalue_pkey PRIMARY KEY (typevalue, id)
-);
-
-
-
------------------------
--- create om tables
------------------------
-CREATE TABLE om_visit_class
-(  id serial NOT NULL,
-  idval character varying(30),
-  descript text,
-  active boolean DEFAULT true,
-  ismultifeature boolean,
-  ismultievent boolean,
-  feature_type text,
-  sys_role_id character varying(30),
-  CONSTRAINT om_visit_class_pkey PRIMARY KEY (id)
-);
-
-
-/* created in 3.106
-CREATE TABLE om_visit_class_x_parameter
-(  id serial,
-  class_id integer NOT NULL,
-  parameter_id character varying(50) NOT NULL,
-  CONSTRAINT om_visit_class_x_parameter PRIMARY KEY (class_id, parameter_id)
-);
-
-CREATE TABLE sys_combo_cat
-( id serial NOT NULL,
-  idval text,
-  CONSTRAINT sys_combo_cat_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE sys_combo_values
-( sys_combo_cat_id integer NOT NULL,
-  id integer NOT NULL,
-  idval text,
-  descript text,
-  CONSTRAINT sys_combo_pkey PRIMARY KEY (sys_combo_cat_id, id)
-);
-*/
-
-CREATE TABLE om_visit_typevalue
-( typevalue character varying(50) NOT NULL,
-  id character varying(30) NOT NULL,
-  idval character varying(30),
-  descript text,
-  CONSTRAINT om_visit_typevalue_pkey PRIMARY KEY (typevalue, id)
-);
-
-
-CREATE TABLE rpt_selector_hourly_compare
-( id serial NOT NULL,
-  "time" character varying(100) NOT NULL,
-  cur_user text NOT NULL,
-  CONSTRAINT rpt_selector_result_hourly_compare_pkey PRIMARY KEY (id)
-);
-
-
-
-
-CREATE TABLE audit_cat_table_x_column
-( id text,
-  table_id text NOT NULL,
-  column_id text NOT NULL,
-  column_type text,
-  ordinal_position smallint,
-  description text,
-  sys_role_id character varying(30),
-  CONSTRAINT audit_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
-);
-
-
-CREATE TABLE value_type
-(  typevalue character varying(50) NOT NULL,
-  id character varying(30) NOT NULL,
-  idval character varying(100),
-  descript text,
-  CONSTRAINT value_type_pkey PRIMARY KEY (typevalue, id)
-);
-
-
 drop TABLE if exists temp_csv2pg;
 CREATE TABLE temp_csv2pg (
 id serial PRIMARY KEY,
@@ -212,28 +120,83 @@ CREATE TABLE sys_csv2pg_config
 );
 
 -----------------------
+-- create inp tables
+-----------------------
+CREATE TABLE inp_typevalue
+(  typevalue character varying(50) NOT NULL,
+  id character varying(30) NOT NULL,
+  idval character varying(30),
+  descript text,
+  CONSTRAINT inp_typevalue_pkey PRIMARY KEY (typevalue, id)
+);
+
+
+
+-----------------------
+-- create om tables
+-----------------------
+CREATE TABLE om_visit_class
+(  id serial NOT NULL,
+  idval character varying(30),
+  descript text,
+  active boolean DEFAULT true,
+  ismultifeature boolean,
+  ismultievent boolean,
+  feature_type text,
+  sys_role_id character varying(30),
+  CONSTRAINT om_visit_class_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE om_visit_typevalue
+( typevalue character varying(50) NOT NULL,
+  id character varying(30) NOT NULL,
+  idval character varying(30),
+  descript text,
+  CONSTRAINT om_visit_typevalue_pkey PRIMARY KEY (typevalue, id)
+);
+
+
+CREATE TABLE rpt_selector_hourly_compare
+( id serial NOT NULL,
+  "time" character varying(100) NOT NULL,
+  cur_user text NOT NULL,
+  CONSTRAINT rpt_selector_result_hourly_compare_pkey PRIMARY KEY (id)
+);
+
+
+
+
+CREATE TABLE audit_cat_table_x_column
+( id text,
+  table_id text NOT NULL,
+  column_id text NOT NULL,
+  column_type text,
+  ordinal_position smallint,
+  description text,
+  sys_role_id character varying(30),
+  CONSTRAINT audit_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
+);
+
+
+CREATE TABLE value_type
+(  typevalue character varying(50) NOT NULL,
+  id character varying(30) NOT NULL,
+  idval character varying(100),
+  descript text,
+  CONSTRAINT value_type_pkey PRIMARY KEY (typevalue, id)
+);
+
+
+
+-----------------------
 -- create new fields
 ----------------------
 
---created in 3.106
 ALTER TABLE audit_cat_param_user ADD COLUMN formname text;
---ALTER TABLE audit_cat_param_user ADD COLUMN label text;
---ALTER TABLE audit_cat_param_user ADD COLUMN dv_querytext text;
---ALTER TABLE audit_cat_param_user ADD COLUMN dv_parent_id text;
---ALTER TABLE audit_cat_param_user ADD COLUMN isenabled boolean;
---ALTER TABLE audit_cat_param_user ADD COLUMN layout_id integer;
---ALTER TABLE audit_cat_param_user ADD COLUMN layout_order integer;
---ALTER TABLE audit_cat_param_user ADD COLUMN project_type character varying(30);
---ALTER TABLE audit_cat_param_user ADD COLUMN isparent boolean;
---ALTER TABLE audit_cat_param_user ADD COLUMN dv_querytext_filterc text;
---ALTER TABLE audit_cat_param_user ADD COLUMN feature_field_id text;
---ALTER TABLE audit_cat_param_user ADD COLUMN feature_dv_parent_value text;
---ALTER TABLE audit_cat_param_user ADD COLUMN isautoupdate boolean;
---ALTER TABLE audit_cat_param_user ADD COLUMN datatype character varying(30);
---ALTER TABLE audit_cat_param_user ADD COLUMN widgettype character varying(30);
 ALTER TABLE audit_cat_param_user ADD COLUMN ismandatory boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN widgetcontrols json;
---ALTER TABLE audit_cat_param_user ADD COLUMN vdefault text;
+
 
 ALTER TABLE cat_arc ADD COLUMN  dn integer;
 ALTER TABLE cat_arc ADD COLUMN  pn integer;
@@ -281,9 +244,6 @@ ALTER TABLE om_visit ADD COLUMN suspendendcat_id integer;
 
 ALTER TABLE om_visit_cat ADD COLUMN extusercat_id integer;
 ALTER TABLE om_visit_cat ADD COLUMN duration text;
-
---created in 3.106
---ALTER TABLE om_visit_parameter ADD COLUMN  short_descript character varying(30);
 
 ALTER TABLE sys_feature_type ADD COLUMN  icon character varying(30);
 

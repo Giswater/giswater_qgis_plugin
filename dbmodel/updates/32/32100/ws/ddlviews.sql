@@ -47,6 +47,65 @@ DROP VIEW IF EXISTS v_edit_man_wtp;
 
 */
 
+--old views with new fields
+DROP VIEW IF EXISTS v_anl_connec;
+CREATE VIEW v_anl_connec AS 
+ SELECT anl_connec.id,
+    anl_connec.connec_id,
+    anl_connec.connecat_id,
+    anl_connec.state,
+    anl_connec.connec_id_aux,
+    anl_connec.connecat_id_aux,
+    anl_connec.state_aux,
+    sys_fprocess_cat.fprocess_i18n AS fprocess,
+    exploitation.name AS expl_name,
+    anl_connec.the_geom
+   FROM selector_expl,
+    anl_connec
+     JOIN exploitation ON anl_connec.expl_id = exploitation.expl_id
+     JOIN sys_fprocess_cat ON anl_connec.fprocesscat_id = sys_fprocess_cat.id
+  WHERE anl_connec.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_connec.cur_user::name = "current_user"();
+
+
+DROP VIEW IF EXISTS v_rtc_hydrometer;
+CREATE VIEW v_rtc_hydrometer AS 
+ SELECT rtc_hydrometer.hydrometer_id,
+    rtc_hydrometer_x_connec.connec_id,
+    connec.customer_code AS connec_customer_code,
+    connec.expl_id,
+    connec.arc_id,
+    value_state.name AS state,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    ext_rtc_hydrometer.hydrometer_category,
+    ext_rtc_hydrometer.house_number,
+    ext_rtc_hydrometer.id_number,
+    ext_rtc_hydrometer.cat_hydrometer_id,
+    ext_rtc_hydrometer.hydrometer_number,
+    ext_rtc_hydrometer.identif,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class AS hydrometer_class,
+    ext_cat_hydrometer.ulmc,
+    ext_cat_hydrometer.voltman_flow,
+    ext_cat_hydrometer.multi_jet_flow,
+    ext_cat_hydrometer.dnom,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link
+   FROM rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+     JOIN exploitation ON exploitation.expl_id = connec.expl_id
+     JOIN value_state ON value_state.id = connec.state;
+
+
 -----------------------
 -- create views ve
 -----------------------
@@ -3639,65 +3698,6 @@ CREATE VIEW ve_ui_mincut_result_cat AS
      LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = anl_mincut_result_cat.mincut_state;
 
 
-
-
---old views with new fields
-DROP VIEW IF EXISTS v_anl_connec;
-CREATE VIEW v_anl_connec AS 
- SELECT anl_connec.id,
-    anl_connec.connec_id,
-    anl_connec.connecat_id,
-    anl_connec.state,
-    anl_connec.connec_id_aux,
-    anl_connec.connecat_id_aux,
-    anl_connec.state_aux,
-    sys_fprocess_cat.fprocess_i18n AS fprocess,
-    exploitation.name AS expl_name,
-    anl_connec.the_geom
-   FROM selector_expl,
-    anl_connec
-     JOIN exploitation ON anl_connec.expl_id = exploitation.expl_id
-     JOIN sys_fprocess_cat ON anl_connec.fprocesscat_id = sys_fprocess_cat.id
-  WHERE anl_connec.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_connec.cur_user::name = "current_user"();
-
-
-DROP VIEW IF EXISTS v_rtc_hydrometer;
-CREATE VIEW v_rtc_hydrometer AS 
- SELECT rtc_hydrometer.hydrometer_id,
-    rtc_hydrometer_x_connec.connec_id,
-    connec.customer_code AS connec_customer_code,
-    connec.expl_id,
-    connec.arc_id,
-    value_state.name AS state,
-    exploitation.name AS expl_name,
-    ext_rtc_hydrometer.code AS hydrometer_customer_code,
-    ext_rtc_hydrometer.hydrometer_category,
-    ext_rtc_hydrometer.house_number,
-    ext_rtc_hydrometer.id_number,
-    ext_rtc_hydrometer.cat_hydrometer_id,
-    ext_rtc_hydrometer.hydrometer_number,
-    ext_rtc_hydrometer.identif,
-    ext_cat_hydrometer.madeby,
-    ext_cat_hydrometer.class AS hydrometer_class,
-    ext_cat_hydrometer.ulmc,
-    ext_cat_hydrometer.voltman_flow,
-    ext_cat_hydrometer.multi_jet_flow,
-    ext_cat_hydrometer.dnom,
-        CASE
-            WHEN (( SELECT config_param_system.value
-               FROM config_param_system
-              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
-            ELSE concat(( SELECT config_param_system.value
-               FROM config_param_system
-              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link)
-        END AS hydrometer_link
-   FROM rtc_hydrometer
-     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
-     JOIN exploitation ON exploitation.expl_id = connec.expl_id
-     JOIN value_state ON value_state.id = connec.state;
 
 
 -----------------------

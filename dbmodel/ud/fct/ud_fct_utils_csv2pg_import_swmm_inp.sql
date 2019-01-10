@@ -47,8 +47,7 @@ BEGIN
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(p_path)||' WITH (NULL '''', FORMAT TEXT)';	
-		UPDATE temp_csv2pg SET csv2pgcat_id=12 WHERE csv2pgcat_id IS NULL AND user_name=current_user;
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data(11,'||quote_literal(p_path)||' )';
 	END IF;
 	
 	-- MAPZONES
@@ -125,6 +124,7 @@ BEGIN
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id_aux order by id
 	LOOP
 		-- massive refactor of source field (getting target)
+		--Fill in the fields source with the name of the target in order to refactor and read data correctly
 		IF rpt_rec.csv1 LIKE '[%' THEN
 			v_target=rpt_rec.csv1;
 		END IF;
@@ -133,6 +133,10 @@ BEGIN
 			
 		END IF;
 		-- refactor of [OPTIONS] target
+		--Target in order to insert them to the tables using editable views, which have different values concatenated into one field. 
+		--Those values are later separated using the trigger in order to put it in corresponding fields if necessary.
+		--Concatenation is made using ';' when the values need the separation in the next step (trigger) and by ' ' when they are inserted into the same field.
+
 		IF rpt_rec.source ='[TEMPERATURE]' AND rpt_rec.csv3 is not null THEN 
 			IF rpt_rec.csv1 LIKE 'TIMESERIES' OR rpt_rec.csv1 LIKE 'FILE' OR rpt_rec.csv1 LIKE 'SNOWMELT' THEN
 				UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
@@ -222,7 +226,7 @@ BEGIN
 	END LOOP;
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=10 order by id
+	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=11 order by id
 	LOOP
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -236,13 +240,16 @@ BEGIN
 		
 		--inserting values on editable view
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv2pg where source like '||quote_literal(concat('%',v_rec_table.target,'%'))||' 
-		AND csv2pgcat_id=10 AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
+		AND csv2pgcat_id=11 AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
 
 		raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;
 	END LOOP;
 		
 	--Arc geometry
+	--Insert geometry of the start point (node1) from node to the array, add vertices defined in inp file if exist, add geometry of an 
+	--end point (node2) from node to the array and create a line out all points.
+
 	FOR v_data IN SELECT * FROM arc  LOOP
 
 		--Insert start point, add vertices if exist, add end point
@@ -260,6 +267,7 @@ BEGIN
 	end loop;
 	
 	-- Subcatchments geometry
+	--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
 	FOR v_data IN SELECT * FROM subcatchment WHERE subc_id='30130' LOOP
 	
 		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id_aux and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
@@ -273,6 +281,7 @@ BEGIN
 	END LOOP;
 		
 	-- Mapzones geometry
+	--Create the same geometry of all mapzones by making the Convex Hull over all the existing arcs
 	EXECUTE 'SELECT ST_Multi(ST_ConvexHull(ST_Collect(the_geom))) FROM arc;'
 	into v_extend_val;
 	update exploitation SET the_geom=v_extend_val;

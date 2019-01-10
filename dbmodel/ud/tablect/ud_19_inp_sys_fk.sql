@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+--the fk, which are related to inp_value_* and inp_typevalue_* are modified on version 3.2 (updates)
 --DROP
 --INP
 
