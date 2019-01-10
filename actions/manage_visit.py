@@ -352,6 +352,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.ext_code = self.ext_code.text()
         self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
         self.current_visit.descript = utils_giswater.getWidgetText(self.dlg_add_visit, 'descript', False, False)
+        self.current_visit.is_done = utils_giswater.isChecked(self.dlg_add_visit, 'is_done')
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
             
