@@ -1264,24 +1264,22 @@ class UpdateSQL(ParentAction):
     """ Functions execute process """
 
     def execute_import_data(self):
+        #TODO:: This functions are comment at the moment. We dont enable this function until 3.2
+        return
         # Execute import data
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_import_epa_inp()")
         self.controller.execute_sql(sql)
 
-    def execute_last_process(self, new_project=False, schema_name=False):
-        #TODO:: Treure return
-        return
-        if new_project:
-            self.project_type = schema_name
+    def execute_last_process(self, new_project=False, schema_name=False, schema_type=''):
         # Execute last process function
         extras = '"isNewProject":"' + str('TRUE') + '", '
         extras += '"gwVersion":"' + str('3.1.105') + '", '
-        extras += '"projectType":' + str(self.project_type) + ', '
+        extras += '"projectType":"' + str(schema_type) + '", '
         extras += '"epsg":' + str('25831')
         if new_project is True:
-            extras += ', ' + '"title":' + str(self.title) + ', '
-            extras += '"author":' + str(self.author) + ', '
-            extras += '"date":' + str(self.date)
+            extras += ', ' + '"title":"' + str(self.title) + '", '
+            extras += '"author":"' + str(self.author) + '", '
+            extras += '"date":"' + str(self.date) + '"'
 
             self.schema_name = schema_name
 
@@ -1300,6 +1298,7 @@ class UpdateSQL(ParentAction):
         self.author = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_author)
         self.date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
         project_name = str(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_name))
+        schema_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_create_project_type)
 
         if project_name == 'null':
             msg = "The 'Project_name' field is required."
@@ -1313,6 +1312,17 @@ class UpdateSQL(ParentAction):
             msg = "The 'Project_name' field have invalid character"
             result = self.controller.show_info_box(msg, "Info")
             return
+        if self.title == 'null':
+            msg = "The 'Title' field is required."
+            result = self.controller.show_info_box(msg, "Info")
+            return
+        sql = ("SELECT schema_name, schema_name FROM information_schema.schemata")
+        rows = self.controller.get_rows(sql)
+        for row in rows:
+            if str(project_name) == str(row[0]):
+                msg = "This 'Project_name' is already exist."
+                result = self.controller.show_info_box(msg, "Info")
+                return
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
@@ -1327,7 +1337,7 @@ class UpdateSQL(ParentAction):
             self.update_31to39(new_project=True, project_type=project_type)
             self.execute_import_data()
             self.api(project_type=project_type)
-            self.execute_last_process(new_project=True)
+            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.setArrowCursor()
         elif self.rdb_no_ct.isChecked():
             print(str("rdb_no_ct"))
@@ -1337,7 +1347,7 @@ class UpdateSQL(ParentAction):
             self.load_views(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
-            self.execute_last_process(new_project=True)
+            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.setArrowCursor()
         elif self.rdb_sample.isChecked():
             print(str("rdb_sample"))
@@ -1354,8 +1364,10 @@ class UpdateSQL(ParentAction):
                     self.update_31to39(new_project=True, project_type=project_type)
                     self.api(project_type=project_type)
                     self.load_sample_data(project_type=project_type)
-                    self.execute_last_process(new_project=True)
+                    self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
                     self.setArrowCursor()
+                else:
+                    return
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
@@ -1372,7 +1384,7 @@ class UpdateSQL(ParentAction):
                     self.api(project_type=project_type)
                     self.load_sample_data(project_type=project_type)
                     self.load_dev_data(project_type=project_type)
-                    self.execute_last_process(new_project=True)
+                    self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
                     self.setArrowCursor()
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
@@ -1383,7 +1395,7 @@ class UpdateSQL(ParentAction):
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
-            self.execute_last_process(new_project=True, schema_name=project_name)
+            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.setArrowCursor()
 
         #Show message if precess execute correctly

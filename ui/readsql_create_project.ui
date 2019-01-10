@@ -68,6 +68,9 @@
       </item>
       <item>
        <widget class="QRadioButton" name="rdb_import_data">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Import INP data</string>
         </property>
