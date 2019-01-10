@@ -375,22 +375,37 @@ class AddNewLot(ParentManage):
     def set_values(self, lot_id):
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot "
                " WHERE id ='"+str(lot_id)+"'")
-        row = self.controller.get_row(sql, log_sql=False)
-        if row is not None:
-            utils_giswater.setWidgetText(self.dlg_lot, 'txt_idval', row['idval'])
-            utils_giswater.setCalendarDate(self.dlg_lot, 'startdate', row['startdate'])
-            utils_giswater.setCalendarDate(self.dlg_lot, 'enddate', row['enddate'])
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, row['visitclass_id'], 0)
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, row['assigned_to'], 0)
-            utils_giswater.setWidgetText(self.dlg_lot, 'descript', row['descript'])
-            utils_giswater.setChecked(self.dlg_lot, 'chk_active', row['active'])
-            utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, row['feature_type'], 0)
+        lot = self.controller.get_row(sql, log_sql=False)
+        if lot is not None:
+            utils_giswater.setWidgetText(self.dlg_lot, 'txt_idval', lot['idval'])
+            utils_giswater.setCalendarDate(self.dlg_lot, 'startdate', lot['startdate'])
+            utils_giswater.setCalendarDate(self.dlg_lot, 'enddate', lot['enddate'])
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, lot['visitclass_id'], 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['assigned_to'], 0)
+            utils_giswater.setWidgetText(self.dlg_lot, 'descript', lot['descript'])
+            utils_giswater.setChecked(self.dlg_lot, 'chk_active', lot['active'])
+            utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
 
-        table_name = self.schema_name + ".v_edit_" + str(feature_type)
-        #TODO necesito las ids de cada tabla
-        filter = "arc_id = '2020'"
-        self.controller.log_info(str(filter))
+        sql = ("SELECT " + str(feature_type) + "_id FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + " "
+               " WHERE lot_id ='"+str(lot['id'])+"'")
+        rows = self.controller.get_rows(sql, log_sql=True)
+        self.controller.log_info(str(rows))
+
+        ids = "('0', "
+        for row in rows:
+            ids += "'"+str(row[0])+"', "
+        ids = ids[:-2]+")"
+        table_name = "v_edit_" + str(feature_type)
+        sql = ("SELECT "+str(feature_type)+"_id FROM " + self.schema_name + "." + table_name + " "
+               " WHERE "+str(feature_type)+"_id IN "+str(ids)+"")
+        rows = self.controller.get_rows(sql, log_sql=True)
+
+        filter = str(feature_type) + "_id IN('0', "
+        for row in rows:
+            filter += "'"+str(row[0])+"', "
+        filter = filter[:-2]+")"
+
         self.fill_table_object(self.tbl_relation, table_name, filter)
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, table_name)
 
