@@ -46,13 +46,6 @@ BEGIN
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
 
-	-- fk from utils schema
-	PERFORM gw_fct_admin_schema_utils_fk();
-
-	
-	-- update permissions	
-	PERFORM gw_fct_admin_role_permissions();
-
 
 	-- last proccess
 	IF v_isnew IS TRUE THEN
@@ -68,6 +61,9 @@ BEGIN
 		
 		-- inserting on inp_project table
 		INSERT INTO inp_project_id VALUES (v_title, v_author, v_date);
+		
+		-- fk from utils schema
+		PERFORM gw_fct_admin_schema_utils_fk();  -- this is the posiition to use it because of we need values on version table to workwith
 		
 	ELSIF v_isnew IS FALSE THEN
 		-- check project consistency
@@ -99,6 +95,10 @@ BEGIN
 		END IF;
 		
 	END IF;
+	
+	-- update permissions	
+	PERFORM gw_fct_admin_role_permissions();
+
 
 	--    Control NULL's
 	v_message := COALESCE(v_message, '');

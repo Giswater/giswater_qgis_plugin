@@ -666,7 +666,3 @@ UPDATE audit_cat_param_user SET description = 'Default value for psector state t
 UPDATE audit_cat_param_user SET description = 'If true, allows to force arcs downgrade although they have other connected elements' WHERE id='edit_arc_downgrade_force';
 UPDATE audit_cat_param_user SET description = 'If true, when a connec is downgraded, associated link and vnode are also downgraded' WHERE id='edit_connect_force_downgrade_linkvnode';
 UPDATE audit_cat_param_user SET description = 'If true, the automatic rotation calculation on the nodes is disabled. Used for an absolute manual update of rotation field ' WHERE id='edit_noderotation_update_dissbl';
-
-
---temporal insert of version data in order to use fk function for ws
-INSERT INTO version VALUES (1,'3.0.100','WS','PostgreSQL 9.5.10, compiled by Visual C++ build 1800, 64-bit','''',now(),'en',25831);
