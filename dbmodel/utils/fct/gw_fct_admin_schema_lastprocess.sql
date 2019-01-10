@@ -1,12 +1,9 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
+﻿-- Function: aa1.gw_fct_admin_schema_lastprocess(json)
 
---FUNCTION CODE: 2546
+-- DROP FUNCTION aa1.gw_fct_admin_schema_lastprocess(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_lastprocess(p_data json) RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_lastprocess(p_data json)
+  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -49,24 +46,28 @@ BEGIN
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
 
-	-- update permissions	
-	PERFORM gw_fct_admin_role_permissions();
-	
 	-- fk from utils schema
 	PERFORM gw_fct_admin_schema_utils_fk();
+
+	
+	-- update permissions	
+	PERFORM gw_fct_admin_role_permissions();
+
 
 	-- last proccess
 	IF v_isnew IS TRUE THEN
 	
 		-- clean schema of all tables/views/triggers not used in this version
-		PERFORM gw_fct_admin_updateschema_drops();		
+		IF v_gwversion > '3.2' THEN
+			PERFORM gw_fct_admin_updateschema_drops();	
+		END IF;	
 
 		-- inserting version table
-		--INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, v_projecttype, (select version()),(select postgis_version()), v_language, v_epsg);	
-		--v_message='Project sucessfully created';
+		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, v_projecttype, (select version()),(select postgis_version()), v_language, v_epsg);	
+		v_message='Project sucessfully created';
 		
 		-- inserting on inp_project table
-		--INSERT INTO inp_project_id VALUES (v_title, v_author, v_date);
+		INSERT INTO inp_project_id VALUES (v_title, v_author, v_date);
 		
 	ELSIF v_isnew IS FALSE THEN
 		-- check project consistency
@@ -108,4 +109,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
+ALTER FUNCTION SCHEMA_NAME.gw_fct_admin_schema_lastprocess(json)
+  OWNER TO postgres;
