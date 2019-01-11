@@ -31,7 +31,7 @@ DECLARE
 	v_feature json;
 	v_columntype text;
 	v_geometry text;
-
+	v_the_geom text;
 
 BEGIN
 
@@ -50,7 +50,7 @@ BEGIN
 	v_id = ((p_data ->>'feature')::json->>'id')::integer;
 	v_tablename = ((p_data ->>'feature')::json->>'tableName')::varchar;
 	v_idname = ((p_data ->>'feature')::json->>'idName')::integer;
-	v_feature = ((p_data ->>'feature');
+	v_feature = (p_data ->>'feature');
 
 	
 	--  get id column
@@ -103,7 +103,7 @@ BEGIN
 	-- Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
 	v_feature := COALESCE(v_feature, '{}');
-	v_geometry := COALESCE(v_geometry, "");
+	v_geometry := COALESCE(v_geometry, '');
 
   
 	-- Return

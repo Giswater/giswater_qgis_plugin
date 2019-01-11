@@ -27,6 +27,7 @@ DECLARE
 --  Variables
 	v_copyfromuser text;
 	v_projecttype text;
+	v_user text;
   
 BEGIN
 
@@ -74,7 +75,7 @@ BEGIN
 		-- config_param_user, getting role parameters where ismandatory is true (forced always)
 		INSERT INTO config_param_user (parameter, value, cur_user) 
 		SELECT parameter, value, v_user FROM SCHEMA_NAME.config_param_user JOIN SCHEMA_NAME.audit_cat_param_user ON audit_cat_param_user.id=parameter 
-		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'))
+		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'));
 
 		-- selectors
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, v_user FROM selector_expl;
