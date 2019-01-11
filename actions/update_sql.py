@@ -6,6 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication
+from PyQt4.QtCore import QSettings, Qt
+
 import os
 import sys
 import re
@@ -14,11 +17,7 @@ from sqlite3 import OperationalError
 
 import utils_giswater
 from giswater.actions.parent import ParentAction
-from giswater.ui_manager import Readsql, InfoShowInfo
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication
-from PyQt4.QtCore import QSettings, Qt
-
-from ui_manager import ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo
+from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo
 
 
 class UpdateSQL(ParentAction):
@@ -48,36 +47,36 @@ class UpdateSQL(ParentAction):
 
         if self.project_type is not None:
             self.info_show_info()
-        else:
-            # Create the dialog and signals
-            self.dlg_readsql = Readsql()
-            self.load_settings(self.dlg_readsql)
-            self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
+            return
+            
+        # Create the dialog and signals
+        self.dlg_readsql = Readsql()
+        self.load_settings(self.dlg_readsql)
+        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
 
-            #Check if user have dev permisions
-            self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
-            self.read_all_updates = self.settings.value('system_variables/read_all_updates').upper()
+        # Check if user have dev permisions
+        self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
+        self.read_all_updates = self.settings.value('system_variables/read_all_updates').upper()
 
-            #Get pluguin version
-            self.pluguin_version = self.get_plugin_version()
+        # Get plugin version
+        self.plugin_version = self.get_plugin_version()
+        self.project_data_schema_version = '0'
 
-            self.project_data_schema_version = '0'
+        # Get widgets from form
+        self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
+        self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
+        self.btn_update_api = self.dlg_readsql.findChild(QPushButton, 'btn_update_api')
 
-            # Get widgets from form
-            self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
-            self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
-            self.btn_update_api = self.dlg_readsql.findChild(QPushButton, 'btn_update_api')
-
-            # Checkbox SCHEMA & API
-            self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
-            self.chk_schema_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_fk')
-            self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
-            self.chk_schema_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_trigger')
-            self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
-            self.chk_api_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_api_fk')
-            self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
-            self.chk_api_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_api_trigger')
-            self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
+        # Checkbox SCHEMA & API
+        self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
+        self.chk_schema_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_fk')
+        self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
+        self.chk_schema_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_trigger')
+        self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
+        self.chk_api_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_api_fk')
+        self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
+        self.chk_api_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_api_trigger')
+        self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
         btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
         self.set_icon(btn_info, '73')
@@ -85,53 +84,51 @@ class UpdateSQL(ParentAction):
         self.message_update = ''
 
         #Declare error counter variable
-            self.error_count = 0
+        self.error_count = 0
 
-            # Get locale of QGIS application
-            self.locale = QSettings().value('locale/userLocale').lower()
-            if self.locale == 'es_es':
-                self.locale = 'ES'
-            elif self.locale == 'es_ca':
-                self.locale = 'CA'
-            elif self.locale == 'en_us':
-                self.locale = 'EN'
+        # Get locale of QGIS application
+        self.locale = QSettings().value('locale/userLocale').lower()
+        if self.locale == 'es_es':
+            self.locale = 'ES'
+        elif self.locale == 'es_ca':
+            self.locale = 'CA'
+        elif self.locale == 'en_us':
+            self.locale = 'EN'
 
-            self.filter_srid_value = self.controller.plugin_settings_value('srid')
-            self.schema = None
+        self.filter_srid_value = self.controller.plugin_settings_value('srid')
+        self.schema = None
 
-            # Get metadata version
-            self.version_metadata = self.get_plugin_version()
+        # Get metadata version
+        self.version_metadata = self.get_plugin_version()
 
-            # Get version if not new project
-            self.version = None
-            if self.schema_name is not None:
-                sql = ("SELECT giswater from " + self.schema_name + ".version")
-                row = self.controller.get_row(sql)
-                self.version = row[0]
-                if self.version.replace('.','') >= self.pluguin_version.replace('.',''):
-                    self.btn_update_schema.setEnabled(False)
-                    self.btn_update_api.setEnabled(False)
-            if self.dev_user != 'TRUE':
-                utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
-                utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
-                utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
-                self.project_types = self.settings.value('system_variables/project_types')
-            else:
-                self.project_types = self.settings.value('system_variables/project_types_dev')
+        # Get version if not new project
+        self.version = None
+        if self.schema_name is not None:
+            sql = ("SELECT giswater from " + self.schema_name + ".version")
+            row = self.controller.get_row(sql)
+            self.version = row[0]
+            if self.version.replace('.','') >= self.plugin_version.replace('.',''):
+                self.btn_update_schema.setEnabled(False)
+                self.btn_update_api.setEnabled(False)
+        if self.dev_user != 'TRUE':
+            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
+            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
+            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
+            self.project_types = self.settings.value('system_variables/project_types')
+        else:
+            self.project_types = self.settings.value('system_variables/project_types_dev')
 
-            # Declare sql directory
-            self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + '\sql'
+        # Declare sql directory
+        self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + '\sql'
+        if not os.path.exists(self.sql_dir):
+            self.controller.show_message("The sql folder was not found in the Giwsater repository.", 1)
+            return        
 
-            if not os.path.exists(self.sql_dir):
-                self.controller.show_message("The sql folder was not found in the Giwsater repository.", 1)
-                return
-
-            #Populate combo types
-
-            self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
-            for type in self.project_types:
-                self.cmb_project_type.addItem(str(type))
-            self.change_project_type(self.cmb_project_type)
+        # Populate combo types
+        self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
+        for type in self.project_types:
+            self.cmb_project_type.addItem(str(type))
+        self.change_project_type(self.cmb_project_type)
 
         self.populate_data_shcema_name(self.cmb_project_type)
         self.set_info_project()
@@ -139,71 +136,70 @@ class UpdateSQL(ParentAction):
         # Declare all file variables
         self.file_pattern_tablect = "tablect"
         self.file_pattern_ddl = "ddl"
-            self.file_pattern_dml = "dml"
-            self.file_pattern_fct = "fct"
-            self.file_pattern_trg = "trg"
-            self.file_pattern_ftrg = "ftrg"
+        self.file_pattern_dml = "dml"
+        self.file_pattern_fct = "fct"
+        self.file_pattern_trg = "trg"
+        self.file_pattern_ftrg = "ftrg"
         self.file_pattern_ddlview = "ddlview"
         self.file_pattern_ddlrule = "ddlrule"
 
         # Declare all directorys
         if self.schema_name is not None and self.project_type is not None:
             self.folderSoftware = self.sql_dir + '/' + self.project_type + '/'
-            self.folderLocale = self.sql_dir + '\i18n/' + str(self.locale) + '/'
-            self.folderUtils = self.sql_dir + '\utils/'
-            self.folderUpdates = self.sql_dir + '\updates/'
-            self.folderExemple = self.sql_dir + '\example/'
-            self.folderPath = ''
+        self.folderLocale = self.sql_dir + '\i18n/' + str(self.locale) + '/'
+        self.folderUtils = self.sql_dir + '\utils/'
+        self.folderUpdates = self.sql_dir + '\updates/'
+        self.folderExemple = self.sql_dir + '\example/'
+        self.folderPath = ''
 
-            # Declare all directorys api
-            self.folderUpdatesApi = self.sql_dir + '/api/updates/'
-            self.folderApi = self.sql_dir + '/api/'
+        # Declare all directorys api
+        self.folderUpdatesApi = self.sql_dir + '/api/updates/'
+        self.folderApi = self.sql_dir + '/api/'
 
-            # Populate combo connections
-            s = QSettings()
-            s.beginGroup("PostgreSQL/connections")
-            connections = s.childGroups()
-            list_connections = []
-            for con in connections:
-                elem = [con, con]
-                list_connections.append(elem)
+        # Populate combo connections
+        s = QSettings()
+        s.beginGroup("PostgreSQL/connections")
+        connections = s.childGroups()
+        list_connections = []
+        for con in connections:
+            elem = [con, con]
+            list_connections.append(elem)
 
-            s.endGroup()
-            utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
-            if self.controller.logged:
-                utils_giswater.set_combo_itemData(self.cmb_connection, str(self.controller.layer_source['db']), 1)
+        s.endGroup()
+        utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
+        if self.controller.logged:
+            utils_giswater.set_combo_itemData(self.cmb_connection, str(self.controller.layer_source['db']), 1)
 
-            # Set Listeners
-            self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
-            self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
-            self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
+        # Set Listeners
+        self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
+        self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
+        self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
 
-            #TODO:: QGIS project file (hidden)
-            # self.dlg_readsql.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "path_folder"))
+        #TODO:: QGIS project file (hidden)
+        # self.dlg_readsql.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "path_folder"))
 
-            self.dlg_readsql.btn_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
-            self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, self.project_type_selected))
-            self.dlg_readsql.btn_update_api.clicked.connect(partial(self.update_api))
-            self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
-            self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
-            btn_info.clicked.connect(partial(self.show_info))
-            self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
-            self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, self.cmb_project_type))
-            self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
-            self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
-            self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
-            self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
+        self.dlg_readsql.btn_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
+        self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, self.project_type_selected))
+        self.dlg_readsql.btn_update_api.clicked.connect(partial(self.update_api))
+        self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
+        self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
+        btn_info.clicked.connect(partial(self.show_info))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
+        self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, self.cmb_project_type))
+        self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
+        self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
+        self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
+        self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
 
+        # Put current info into software version info widget
+        if self.version is None:
+            self.version = '0'
+            self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
+                                               'Database version: ' + self.version + '\n \n' +
+                                               'Project data schema version:' + self.project_data_schema_version)
 
-            #Put current info into software version info widget
-            if self.version is None:
-                self.version = '0'
-                self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
-                                                   'DataBase version: ' + self.version + '\n \n' +
-                                                   'Project data schema version:' + self.project_data_schema_version)
-
-            # Open dialog
-            self.dlg_readsql.show()
+        # Open dialog
+        self.dlg_readsql.show()
 
             
     """ Declare all read sql process """
@@ -235,7 +231,7 @@ class UpdateSQL(ParentAction):
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ftrg), self.folderUtils + self.file_pattern_ftrg)
                 if status is False:
-                    return False					
+                    return False
             if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
                 return False
             else:
@@ -1028,7 +1024,7 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     print(False)
                     return False
-					
+
         print(status)
         return True
 
@@ -1446,12 +1442,10 @@ class UpdateSQL(ParentAction):
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.setArrowCursor()
 
-        #Show message if precess execute correctly
+        # Show message if process executed correctly
         if self.error_count == 0:
             msg = "The project has been created correctly."
             result = self.controller.show_info_box(msg, "Info")
-
-            # Close dialog when process has been execute correctly
             self.close_dialog(self.dlg_readsql_create_project)
         else:
             msg = "Some error has occurred while the create process was running."
@@ -1716,7 +1710,9 @@ class UpdateSQL(ParentAction):
             self.data_file.setEnabled(False)
             self.btn_push_file.setEnabled(False)
 
-    def populate_data_shcema_name(self, widget):
+            
+    def populate_data_schema_name(self, widget):
+    
         # Get filter
         filter = str(utils_giswater.getWidgetText(self.dlg_readsql, widget))
         # Populate Project data schema Name
@@ -1775,8 +1771,8 @@ class UpdateSQL(ParentAction):
 
         if self.version is None:
             self.version = '0'
-        self.software_version_info.setText('Pluguin version: ' + self.pluguin_version + '\n' +
-                                           'DataBase version: ' + self.version + '\n \n' +
+        self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
+                                           'Database version: ' + self.version + '\n \n' +
                                            'Schema name: ' + schema_name + '\n' +
                                            'Schema version: ' + self.project_data_schema_version)
 
@@ -1872,7 +1868,7 @@ class UpdateSQL(ParentAction):
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
         #TODO:fer el listener del boto + taula -> temp_csv2pg
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
-
+                
         if self.dev_user != 'TRUE':
             self.rdb_no_ct.setEnabled(False)
             self.rdb_sample_dev.setEnabled(False)
