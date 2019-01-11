@@ -330,7 +330,11 @@
             </widget>
            </item>
            <item row="1" column="0" colspan="2">
-            <widget class="QTextEdit" name="software_version_info"/>
+            <widget class="QTextEdit" name="software_version_info">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

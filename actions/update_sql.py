@@ -1382,37 +1382,39 @@ class UpdateSQL(ParentAction):
                 msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
-                    self.setWaitCursor()
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
-                    self.load_base(project_type=project_type)
-                    self.update_30to31(new_project=True, project_type=project_type)
-                    self.load_views(project_type=project_type)
-                    self.load_trg(project_type=project_type)
-                    self.update_31to39(new_project=True, project_type=project_type)
-                    self.api(project_type=project_type)
-                    self.load_sample_data(project_type=project_type)
-                    self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
-                    self.setArrowCursor()
                 else:
                     return
+            self.setWaitCursor()
+            self.load_base(project_type=project_type)
+            self.update_30to31(new_project=True, project_type=project_type)
+            self.load_views(project_type=project_type)
+            self.load_trg(project_type=project_type)
+            self.update_31to39(new_project=True, project_type=project_type)
+            self.api(project_type=project_type)
+            self.load_sample_data(project_type=project_type)
+            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+            self.setArrowCursor()
         elif self.rdb_sample_dev.isChecked():
             print(str("rdb_sample_dev"))
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
                 msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
-                    self.setWaitCursor()
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
-                    self.load_base(project_type=project_type)
-                    self.update_30to31(new_project=True, project_type=project_type)
-                    self.load_views(project_type=project_type)
-                    self.load_trg(project_type=project_type)
-                    self.update_31to39(new_project=True, project_type=project_type)
-                    self.api(project_type=project_type)
-                    self.load_sample_data(project_type=project_type)
-                    self.load_dev_data(project_type=project_type)
-                    self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
-                    self.setArrowCursor()
+                else:
+                    return
+            self.setWaitCursor()
+            self.load_base(project_type=project_type)
+            self.update_30to31(new_project=True, project_type=project_type)
+            self.load_views(project_type=project_type)
+            self.load_trg(project_type=project_type)
+            self.update_31to39(new_project=True, project_type=project_type)
+            self.api(project_type=project_type)
+            self.load_sample_data(project_type=project_type)
+            self.load_dev_data(project_type=project_type)
+            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+            self.setArrowCursor()
         elif self.rdb_data.isChecked():
             print(str("rdb_data"))
             self.setWaitCursor()
