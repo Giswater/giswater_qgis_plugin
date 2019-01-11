@@ -44,16 +44,7 @@ CREATE TABLE SCHEMA_NAME.config_api_form_fields
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE SCHEMA_NAME.config_api_form_fields
-  OWNER TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.config_api_form_fields TO geoadmin;
-GRANT ALL ON TABLE SCHEMA_NAME.config_api_form_fields TO postgres;
-GRANT ALL ON TABLE SCHEMA_NAME.config_api_form_fields TO user_dev;
-GRANT ALL ON TABLE SCHEMA_NAME.config_api_form_fields TO rol_dev;
-GRANT ALL ON TABLE SCHEMA_NAME.config_api_form_fields TO qgisserver;
-GRANT ALL ON TABLE SCHEMA_NAME.config_api_form_fields TO xtorret;
-GRANT ALL ON TABLE SCHEMA_NAME.config_api_form_fields TO user_test;
-GRANT ALL ON TABLE SCHEMA_NAME.config_api_form_fields TO role_basic;
+
 
 
 

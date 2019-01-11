@@ -66,14 +66,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text)
-  OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO public;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO geoadmin;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO xtorret;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO user_test;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO user_dev;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO rol_dev;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO qgisserver;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO role_basic;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_createwidgetjson(text, text, text, text, text, boolean, text) TO barbara;

@@ -6,38 +6,38 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2604
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getvisit(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 --tab visit
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit", "visit_id":null},
 "form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
 "data":{"type":"arc", "id":"2001"}}$$)
 
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit", "visit_id":null},
 "form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
 "data":{"type":"connec", "id":"3001"}}$$)
 
 
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit", "visit_id":null},
 "form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
 "data":{"type":"", "id":""}}$$)
 
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit", "visit_id":1001},
 "form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
 "data":{"type":"arc"}}$$)
 
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit", "visit_id":1},
 "form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
@@ -46,7 +46,7 @@ SELECT ws_sample.gw_api_getvisit($${
 
 --tab files
 -- first time
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit", "visit_id":1135},
 "form":{"tabData":{"active":false},
@@ -56,7 +56,7 @@ SELECT ws_sample.gw_api_getvisit($${
 "data":{"type":"arc"}}$$)
 
 -- not first time
-SELECT ws_sample.gw_api_getvisit($${
+SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"visit_id":1135},
 "form":{"tabData":{"active":false},
@@ -102,8 +102,8 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
-	v_schemaname := 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -123,7 +123,7 @@ BEGIN
 	v_activefilestab = (((p_data ->>'form')::json->>'tabFiles')::json->>'active')::boolean;
 
 	--  get visitclass
-	IF v_id IS NULL OR (SELECT id FROM ws_sample.om_visit WHERE id=v_id::bigint) IS NULL THEN
+	IF v_id IS NULL OR (SELECT id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint) IS NULL THEN
 	
 		-- TODO: for new visit enhance the visit type using the feature_id
 		v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;
@@ -131,7 +131,7 @@ BEGIN
 			v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
 		END IF;
 	ELSE 
-		v_visitclass := (SELECT class_id FROM ws_sample.om_visit WHERE id=v_id::bigint);
+		v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
 		IF v_visitclass IS NULL THEN
 			v_visitclass := 0;
 		END IF;

@@ -11,14 +11,14 @@ $BODY$
 
 /*EXAMPLE:
 -- attribute table using custom filters
-SELECT ws_sample.gw_api_getattributetable($${
+SELECT SCHEMA_NAME.gw_api_getattributetable($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
 "data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- attribute table using canvas filter
-SELECT ws_sample.gw_api_getattributetable($${
+SELECT SCHEMA_NAME.gw_api_getattributetable($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},
 "data":{"canvasExtend":{"canvascheck":true, "x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},

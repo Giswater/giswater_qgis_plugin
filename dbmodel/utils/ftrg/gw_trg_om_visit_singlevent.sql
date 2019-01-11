@@ -67,5 +67,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_trg_om_visit_singlevent()
-  OWNER TO geoadmin;

@@ -59,6 +59,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_updatevisit(bigint, character varying, character varying)
-  OWNER TO geoadmin;
+
 
