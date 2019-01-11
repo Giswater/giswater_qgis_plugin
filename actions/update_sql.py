@@ -49,7 +49,7 @@ class UpdateSQL(ParentAction):
             role_admin = True
 
 
-        if role_admin is None:
+        if self.schema_name is not None:
             self.info_show_info()
         else:
             # Create the dialog and signals
