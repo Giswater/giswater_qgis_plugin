@@ -561,7 +561,7 @@ class UpdateSQL(ParentAction):
                                         print(False)
                                         # return False
                     else:
-                        if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) > '31100':
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100':
                             if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                                 print(False)
                                 # return False
@@ -669,7 +669,7 @@ class UpdateSQL(ParentAction):
                                         print(False)
                                         # return False
                     else:
-                        if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) > '31100':
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100':
                             if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                                 print(False)
                                 # return False
@@ -791,7 +791,7 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                     return False
                     else:
-                        if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) <= '31100':
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                                 print(False)
                                 return False
@@ -869,7 +869,7 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                     return False
                     else:
-                        if str(sub_folder) > str(self.version).replace('.', '') and str(sub_folder) <= '31100':
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + folder + '/' + sub_folder, '') is False:
                                 print(False)
                                 return False
@@ -1212,7 +1212,7 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                     return False
                 else:
-                    if str(sub_folder) > str(self.version).replace('.', ''):
+                    if str(sub_folder) > str(self.project_data_schema_version).replace('.', ''):
                         if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/', '') is False:
                             print(False)
                             return False
@@ -1272,7 +1272,10 @@ class UpdateSQL(ParentAction):
 
     def execute_last_process(self, new_project=False, schema_name=False, schema_type=''):
         # Execute last process function
-        extras = '"isNewProject":"' + str('TRUE') + '", '
+        if new_project is True:
+            extras = '"isNewProject":"' + str('TRUE') + '", '
+        else:
+            extras = '"isNewProject":"' + str('FALSE') + '", '
         extras += '"gwVersion":"' + str('3.1.105') + '", '
         extras += '"projectType":"' + str(schema_type) + '", '
         extras += '"epsg":' + str('25831')
@@ -1281,7 +1284,7 @@ class UpdateSQL(ParentAction):
             extras += '"author":"' + str(self.author) + '", '
             extras += '"date":"' + str(self.date) + '"'
 
-            self.schema_name = schema_name
+        self.schema_name = schema_name
 
         client = '"client":{"device":9, "lang":"ES"}, '
         data = '"data":{' + extras + '}'
@@ -1416,7 +1419,7 @@ class UpdateSQL(ParentAction):
         self.setWaitCursor()
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
         self.load_fct_ftrg(project_type=self.project_type_selected)
-        self.execute_last_process()
+        self.execute_last_process(schema_name=self.schema)
         self.setArrowCursor()
 
     def update_api(self):
@@ -1488,6 +1491,9 @@ class UpdateSQL(ParentAction):
     """ Checkbox calling functions """
 
     def load_updates(self, project_type, update_changelog=False):
+        #Get current schema selected
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
         self.setWaitCursor()
         self.update_30to31(project_type=project_type)
         self.load_views(project_type=project_type)
@@ -1496,7 +1502,7 @@ class UpdateSQL(ParentAction):
         self.load_trg(project_type=project_type)
         self.load_tablect(project_type=project_type)
         self.api(project_type=project_type)
-        self.execute_last_process()
+        self.execute_last_process(schema_name=schema_name)
         self.setArrowCursor()
 
         if update_changelog is False:
@@ -1554,6 +1560,7 @@ class UpdateSQL(ParentAction):
         self.load_settings(self.dlg_readsql_show_info)
 
         info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
+        self.message_update = ''
 
         self.read_info_version()
 
@@ -1573,7 +1580,7 @@ class UpdateSQL(ParentAction):
         for folder in folders:
             sub_folders = os.listdir(self.folderUpdates + folder)
             for sub_folder in sub_folders:
-                if str(sub_folder) > str(self.version).replace('.',''):
+                if str(sub_folder) > str(self.project_data_schema_version).replace('.',''):
 
                     if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
                         print(False)
