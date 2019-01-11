@@ -1909,18 +1909,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Get exploitation code: 'expl_id'
         expl_id = utils_giswater.get_item_data(dialog, dialog.address_exploitation)
-        
-        # Select features of @layer applying @expr
-        layer = self.layers['expl_layer']
-        expr_filter = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return        
-        self.select_features_by_expr(layer, expr)
-
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)      
-        layer.removeSelection()        
 
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"

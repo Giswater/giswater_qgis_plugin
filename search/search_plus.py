@@ -61,8 +61,8 @@ class SearchPlus(QObject):
         # Set signals
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
             (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-            (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
+        # self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
+        #     (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
         
         # self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
         #     (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
@@ -151,7 +151,7 @@ class SearchPlus(QObject):
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
             self.iface.legendInterface().setLayerVisible(layer, True)
-            self.iface.actionZoomToSelected().trigger()
+            #self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 
 
