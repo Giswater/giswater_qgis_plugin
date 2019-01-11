@@ -110,7 +110,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set signals
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)        
         self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
-        self.dlg_mincut.dlg_closed.connect(self.mincut_close)
+        self.dlg_mincut.dlg_rejected.connect(self.mincut_close)
         self.dlg_mincut.btn_start.clicked.connect(self.real_start)
         self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
@@ -215,7 +215,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mincut_close(self):
         
-        Mincut.closeMainWin = True
+        self.dlg_mincut.closeMainWin = True
+        self.dlg_mincut.mincutCanceled = True
 
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
@@ -236,12 +237,12 @@ class MincutParent(ParentAction, MultipleSelection):
         # Close dialog, save dialog position, and disconnect snapping
         self.close_dialog(self.dlg_mincut)
         self.disconnect_snapping()
+        self.refresh_map_canvas()
         
     
     def disconnect_snapping(self, action_pan=True):
         """ Select 'Pan' as current map tool and disconnect snapping """
-        
-        Mincut.closeMainWin = True
+
         try:
             self.canvas.xyCoordinates.disconnect()             
             self.emit_point.canvasClicked.disconnect()
@@ -502,10 +503,16 @@ class MincutParent(ParentAction, MultipleSelection):
                             self.controller.show_info_box(message, "See layers", parameter=views)
                             self.dlg_mincut.close()
                 else:
+                    self.dlg_mincut.closeMainWin = True
+                    self.dlg_mincut.mincutCanceled = False
                     self.dlg_mincut.close()
             else:
+                self.dlg_mincut.closeMainWin = True
+                self.dlg_mincut.mincutCanceled = False
                 self.dlg_mincut.close()
         else:
+            self.dlg_mincut.closeMainWin = True
+            self.dlg_mincut.mincutCanceled = False
             self.dlg_mincut.close()
         self.iface.actionPan().trigger()
 
@@ -1268,7 +1275,8 @@ class MincutParent(ParentAction, MultipleSelection):
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
 
-        Mincut.closeMainWin = True
+        self.dlg_mincut.closeMainWin = True
+        self.dlg_mincut.canceled = False
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
