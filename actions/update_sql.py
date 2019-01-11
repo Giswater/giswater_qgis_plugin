@@ -549,13 +549,13 @@ class UpdateSQL(ParentAction):
                                         # return False
                                 if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
                                         self.locale + '/'), '') is False:
-                                    if self.process_folder(self.folderLocale, 'EN') is False:
+                                    if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                                         print(False)
                                         # return False
                                     else:
                                         status = self.executeFiles(os.listdir(
-                                            self.folderLocale + self.locale),
-                                            self.folderLocale + self.locale + '/', True)
+                                            self.sql_dir + '\i18n/' + 'EN'),
+                                            self.sql_dir + '\i18n/' + 'EN', True)
                                         if status is False:
                                             print(False)
                                             # return False
@@ -592,13 +592,13 @@ class UpdateSQL(ParentAction):
                             if self.process_folder(
                                     self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                     '') is False:
-                                if self.process_folder(self.folderLocale, 'EN') is False:
+                                if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                                     print(False)
                                     # return False
                                 else:
                                     status = self.executeFiles(os.listdir(
-                                        self.folderLocale + self.locale),
-                                        self.folderLocale + self.locale + '/', True)
+                                        self.sql_dir + '\i18n/' + 'EN'),
+                                        self.sql_dir + '\i18n/' + 'EN', True)
                                     if status is False:
                                         print(False)
                                         # return False
@@ -704,13 +704,13 @@ class UpdateSQL(ParentAction):
                             if self.process_folder(
                                     self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                     '') is False:
-                                if self.process_folder(self.folderLocale, 'EN') is False:
+                                if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                                     print(False)
                                     # return False
                                 else:
                                     status = self.executeFiles(os.listdir(
-                                        self.folderLocale + self.locale),
-                                        self.folderLocale + self.locale + '/', True)
+                                        self.sql_dir + '\i18n/' + 'EN'),
+                                        self.sql_dir + '\i18n/' + 'EN', True)
                                     if status is False:
                                         print(False)
                                         # return False
@@ -790,12 +790,12 @@ class UpdateSQL(ParentAction):
                             if self.process_folder(
                                     self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                     '') is False:
-                                if self.process_folder(self.folderLocale, 'EN') is False:
+                                if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
                                     return False
                                 else:
                                     status = self.executeFiles(os.listdir(
-                                        self.folderLocale + 'EN'),
-                                        self.folderLocale + 'EN' + '/', True)
+                                        self.sql_dir + '\i18n/' + 'EN'),
+                                        self.sql_dir + '\i18n/' + 'EN', True)
                                     if status is False:
                                         return False
                             else:
@@ -830,12 +830,12 @@ class UpdateSQL(ParentAction):
                             if self.process_folder(
                                     self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                     '') is False:
-                                if self.process_folder(self.folderLocale, 'EN') is False:
+                                if self.process_folder(self.sql_dir + '\i18n/' + 'EN') is False:
                                     return False
                                 else:
                                     status = self.executeFiles(os.listdir(
-                                        self.folderLocale + self.locale),
-                                        self.folderLocale + self.locale + '/', True)
+                                        self.sql_dir + '\i18n/' + 'EN'),
+                                        self.sql_dir + '\i18n/' + 'EN', True)
                                     if status is False:
                                         return False
                             else:
@@ -1842,16 +1842,13 @@ class UpdateSQL(ParentAction):
             self.cmb_create_project_type.addItem(str(type))
         self.change_create_project_type(self.cmb_create_project_type)
 
-        # Populate combo with all locales
-        self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
-        locales = os.listdir(self.sql_dir + '\i18n/')
-        for locale in locales:
-            self.cmb_locale.addItem(locale)
-
         # enable_disable data file widgets
         self.enable_datafile()
 
         self.filter_srid_value = '25831'
+
+        #Get combo locale
+        self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
 
         # Set listeners
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
@@ -1860,6 +1857,11 @@ class UpdateSQL(ParentAction):
         self.cmb_locale.currentIndexChanged.connect(partial(self.update_locale))
         self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
         self.filter_srid.textChanged.connect(partial(self.filter_srid_changed))
+
+        # Populate combo with all locales
+        locales = os.listdir(self.sql_dir + '\i18n/')
+        for locale in locales:
+            self.cmb_locale.addItem(locale)
 
 
         # Open dialog
