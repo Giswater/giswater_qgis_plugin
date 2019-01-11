@@ -126,6 +126,10 @@ class UpdateSQL(ParentAction):
             # Declare sql directory
             self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + '\sql'
 
+            if not os.path.exists(self.sql_dir):
+                self.controller.show_message("The sql folder was not found in the Giwsater repository.", 1)
+                return
+
             #Populate combo types
 
             self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
@@ -478,6 +482,10 @@ class UpdateSQL(ParentAction):
         status = True
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
+            if not os.path.exists(self.folderUpdates):
+                self.controller.show_message("The update folder was not found in sql folder.", 1)
+                self.error_count = self.error_count + 1
+                return
             folders = os.listdir(self.folderUpdates + '')
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdates + folder)
@@ -603,6 +611,10 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                     # return False
         else:
+            if not os.path.exists(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + ''):
+                self.controller.show_message("The project_type folder was not found in sql folder.", 1)
+                self.error_count = self.error_count + 1
+                return
             folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + '')
             for folder in folders:
                 sub_folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + folder)
@@ -746,6 +758,10 @@ class UpdateSQL(ParentAction):
         status = True
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
+            if not os.path.exists(self.folderUpdates):
+                self.controller.show_message("The update folder was not found in sql folder.", 1)
+                self.error_count = self.error_count + 1
+                return
             folders = os.listdir(self.folderUpdates + '')
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdates + folder)
@@ -831,6 +847,10 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                     return False
         else:
+            if not os.path.exists(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + ''):
+                self.controller.show_message("The project_type folder was not found in sql folder.", 1)
+                self.error_count = self.error_count + 1
+                return
             folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + '')
             for folder in folders:
                 sub_folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + folder)
@@ -1099,6 +1119,10 @@ class UpdateSQL(ParentAction):
             if status is False:
                 print(False)
                 return False
+        if not os.path.exists(self.folderUpdatesApi):
+            self.controller.show_message("The api folder was not found in sql folder.", 1)
+            self.error_count = self.error_count + 1
+            return
         folders = os.listdir(self.folderUpdatesApi + '')
         for folder in folders:
             sub_folders = os.listdir(self.folderUpdatesApi + folder)
@@ -1575,7 +1599,9 @@ class UpdateSQL(ParentAction):
 
     def read_info_version(self):
         status = True
-
+        if not os.path.exists(self.folderUpdates):
+            self.controller.show_message("The updates folder was not found in sql folder.", 1)
+            return
         folders = os.listdir(self.folderUpdates + '')
         for folder in folders:
             sub_folders = os.listdir(self.folderUpdates + folder)
