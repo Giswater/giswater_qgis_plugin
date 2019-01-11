@@ -370,9 +370,11 @@ class DaoController():
         msg_box.setDefaultButton(QMessageBox.No)        
         msg_box.exec_()
                           
+                          
     def get_conn_encoding(self):
         return self.dao.get_conn_encoding()
 
+        
     def get_row(self, sql, log_info=True, log_sql=False, commit=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
@@ -402,10 +404,13 @@ class DaoController():
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
-            if self.last_error:                  
-                self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
+            if self.last_error:
+                text = "Undefined error"
+                if '-1' in self.log_codes:
+                    text = self.log_codes[-1]
+                self.show_warning_detail(text, str(self.dao.last_error))
             elif self.last_error is None and log_info:
-                self.log_info("Any record found", parameter=sql, stack_level_increase=1)                        		
+                self.log_info("Any record found", parameter=sql, stack_level_increase=1)
 
         return rows  
     
@@ -420,7 +425,10 @@ class DaoController():
         if not result:
             if log_error:
                 self.log_info(sql, stack_level_increase=1)
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
+            text = "Undefined error"
+            if '-1' in self.log_codes:
+                text = self.log_codes[-1]
+            self.show_warning_detail(text, str(self.dao.last_error))
             return False
         else:
             if search_audit:
@@ -440,7 +448,10 @@ class DaoController():
         if not value:
             if log_error:
                 self.log_info(sql, stack_level_increase=1)
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))
+            text = "Undefined error"
+            if '-1' in self.log_codes:
+                text = self.log_codes[-1]
+            self.show_warning_detail(text, str(self.dao.last_error))
             return False
         else:
             if search_audit:
@@ -496,7 +507,10 @@ class DaoController():
         result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
+            text = "Undefined error"
+            if '-1' in self.log_codes:
+                text = self.log_codes[-1]
+            self.show_warning_detail(text, str(self.dao.last_error))
             return False
 
         return True
@@ -545,7 +559,10 @@ class DaoController():
         result = self.dao.execute_sql(sql, commit=commit)
         self.last_error = self.dao.last_error         
         if not result:
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
+            text = "Undefined error"
+            if '-1' in self.log_codes:
+                text = self.log_codes[-1]
+            self.show_warning_detail(text, str(self.dao.last_error))
             return False
 
         return True
