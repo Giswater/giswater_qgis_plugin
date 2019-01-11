@@ -564,7 +564,7 @@ class UpdateSQL(ParentAction):
                                         self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
                                             self.locale + '/')),
                                                                self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
-                                                                   self.locale + '/'))
+                                                                   self.locale + '/'), True)
                                     if status is False:
                                         print(False)
                                         # return False
@@ -1892,9 +1892,9 @@ class UpdateSQL(ParentAction):
             schema_name = self.schema.replace('"', '')
         filter_srid_value = str(self.filter_srid_value).replace('"', '')
         if i18n:
-            print('utils.sql')
+            print(filedir + '/' + 'utils.sql')
             self.read_execute_file(filedir, '/utils.sql', schema_name, filter_srid_value)
-            print(str(self.project_type_selected) + '.sql')
+            print(filedir + '/' + str(self.project_type_selected) + '.sql')
             self.read_execute_file(filedir, '/' + str(self.project_type_selected) + '.sql', schema_name, filter_srid_value)
         else:
             for file in filelist:
