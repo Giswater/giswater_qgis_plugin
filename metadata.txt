@@ -13,6 +13,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 changelog=Version 3.1.105 (30/12/2018)
+    - Bug fix: enabled mincut class actions when open existing mincut without class
     - Bug fix: Mincut canceled when close window from X corner
     - Added checkbox 'is_done' into add visit form
     - Added new info button for visits

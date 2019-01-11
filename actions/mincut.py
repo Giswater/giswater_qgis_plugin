@@ -1691,14 +1691,12 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("SELECT mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
-        if row:
+        mincut_class_status = None
+        if row[0]:
             mincut_class_status = str(row[0])
-        else:
-            msg = "Class status doesnt exist, check data base!"
-            self.controller.show_warning(msg)
-            return
+
         self.set_visible_mincut_layers()
-  
+
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
         if self.current_state == '0':
@@ -1748,7 +1746,11 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.action_custom_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(False)
-                
+            if mincut_class_status is None:
+                self.action_mincut.setDisabled(False)
+                self.action_custom_mincut.setDisabled(True)
+                self.action_add_connec.setDisabled(False)
+                self.action_add_hydrometer.setDisabled(False)
         # Current_state == '1': In progress
         elif self.current_state == '1':
 
@@ -2349,7 +2351,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.dlg_mincut.depth.setDisabled(True)
             self.dlg_mincut.appropiate.setDisabled(True)
             self.dlg_mincut.real_description.setDisabled(True)
-            self.dlg_mincut.btn_start.setDisabled(False)
+            self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(True)        
             # Actions
             self.action_mincut.setDisabled(False)
