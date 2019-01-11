@@ -6,40 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2604
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getvisit(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-<<<<<<< Updated upstream
---tab visit
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"featureType":"visit", "visit_id":null},
-"form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
-"data":{"type":"arc", "id":"2001"}}$$)
-
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"featureType":"visit", "visit_id":null},
-"form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
-"data":{"type":"connec", "id":"3001"}}$$)
-
-
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"featureType":"visit", "visit_id":null},
-"form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
-"data":{"type":"", "id":""}}$$)
-
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"featureType":"visit", "visit_id":1001},
-"form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
-"data":{"type":"arc"}}$$)
-
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-=======
 --tab data new visit
 SELECT ws_sample.gw_api_getvisit($${
 "client":{"device":3,"infoType":100,"lang":"es"},
@@ -72,7 +43,6 @@ SELECT ws_sample.gw_api_getvisit($${
 
 --insertfile action with insert visit
 SELECT ws_sample.gw_api_getvisit($${
->>>>>>> Stashed changes
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id","id":1},
 "form":{"tabData":{"active":true},
@@ -84,40 +54,16 @@ SELECT ws_sample.gw_api_getvisit($${
             "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}}$$)
 
 
-<<<<<<< Updated upstream
---tab files
--- first time
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-=======
 -- deletefile action
 SELECT ws_sample.gw_api_getvisit($${
->>>>>>> Stashed changes
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"id":1135},
 "form":{"tabData":{"active":false},
-<<<<<<< Updated upstream
-	"tabFiles":{"active":true, 
-		    "feature":{"tableName":"om_visit_file"},
-		    "data":{}}},
-"data":{"type":"arc"}}$$)
-
--- not first time
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"visit_id":1135},
-"form":{"tabData":{"active":false},
-	"tabFiles":{"active":true, 
-		    "tabFeature":{"tabTableName":"om_visit_file"},
-		    "tabData":{"filterFields":{"filetype":"doc","limit":10},
-			       "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}},
-"data":{"type":"arc"}}$$)
-=======
     "tabFiles":{"active":true}},
 "data":{"relatedFeature":{"type":"arc"},
     "filterFields":{"filetype":"doc","limit":10},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
     "deleteFile": {"feature":{"id":1127}}}}$$)
->>>>>>> Stashed changes
 */
 
 DECLARE
@@ -164,8 +110,8 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname := 'SCHEMA_NAME';
+	SET search_path = "ws_sample", public;
+	v_schemaname := 'ws_sample';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -187,7 +133,7 @@ BEGIN
 
 
 	--  get visitclass
-	IF v_id IS NULL OR (SELECT id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint) IS NULL THEN
+	IF v_id IS NULL OR (SELECT id FROM ws_sample.om_visit WHERE id=v_id::bigint) IS NULL THEN
 	
 		-- TODO: for new visit enhance the visit type using the feature_id
 		v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;
@@ -195,7 +141,7 @@ BEGIN
 			v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
 		END IF;
 	ELSE 
-		v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
+		v_visitclass := (SELECT class_id FROM ws_sample.om_visit WHERE id=v_id::bigint);
 		IF v_visitclass IS NULL THEN
 			v_visitclass := 0;
 		END IF;
@@ -404,3 +350,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+
+
