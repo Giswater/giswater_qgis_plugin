@@ -60,7 +60,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 "data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
-SELECT ws_sample.gw_api_getlist($$
+SELECT SCHEMA_NAME.gw_api_getlist($$
 {"client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idname":"visit_id","id":10002},
 "form":{"tabData":{"active":false}, "tabFiles":{"active":true}},

@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "ws_sample"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, v_visitability boolean, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, v_visitability boolean, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -52,7 +52,7 @@ BEGIN
 
 --    Set search path to local schema
 -------------------------------------
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
     schemas_array := current_schemas(FALSE);
 
 --      Get api version
