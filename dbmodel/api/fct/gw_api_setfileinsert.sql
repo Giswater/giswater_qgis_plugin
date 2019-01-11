@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2612
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_api_setfileinsert"(p_data json) RETURNS pg_catalog.json AS 
+CREATE OR REPLACE FUNCTION "ws_sample"."gw_api_setfileinsert"(p_data json) RETURNS pg_catalog.json AS 
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_api_setfileinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
-	"feature":{"featureType":"file", "tableName":"om_visit_file", "id":null, "idName": "id"}, 
-	"data":{"fields":{"visit_id":1, "hash":"testhash", "url":"urltest", "filetype":"png"},
+SELECT ws_sample.gw_api_setfileinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+	"feature":{"featureType":"file", "tableName":"om_visit_file", "id":10004, "idName": "id"}, 
+	"data":{"fields":{"visit_id":10004, "hash":"testhash", "url":"urltest", "filetype":"png"},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)	
 */
 
@@ -28,7 +28,7 @@ DECLARE
 BEGIN
 
 	-- set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
     
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -36,7 +36,7 @@ BEGIN
 	
 	-- set output parameter
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
-	
+
 	-- set insert
 	SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
 
@@ -57,8 +57,8 @@ BEGIN
 		', "body": {"feature":{"id":"'||v_id||'"}}}')::json;    
 
 	--  Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-		RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN 
+--		RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_apiversion ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

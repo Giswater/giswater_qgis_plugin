@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, p_id varchar, formtodisplay text) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "ws_sample"."gw_fct_getinfoform"(table_id varchar, lang varchar, p_id varchar, formtodisplay text) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -28,7 +28,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
     
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -94,7 +94,7 @@ ORDER BY a.attnum'
         
 --getting values
 EXECUTE 'SELECT (row_to_json(a)) FROM 
-    (SELECT * FROM '||table_id||' WHERE '||table_pkey||' = CAST($1 AS '||column_type||'))a'
+    (SELECT * FROM '||table_id||' WHERE '||quote_ident(table_pkey)||' = CAST($1 AS '||column_type||'))a'
         INTO values_array
         USING p_id;
 

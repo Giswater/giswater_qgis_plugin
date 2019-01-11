@@ -6,24 +6,24 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2608
 
--- Function: SCHEMA_NAME.gw_api_setrowdelete(json)
+-- Function: ws_sample.gw_api_setrowdelete(json)
 
--- DROP FUNCTION SCHEMA_NAME.gw_api_setrowdelete(json);
+-- DROP FUNCTION ws_sample.gw_api_setrowdelete(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setdelete(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_setdelete(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
 visit:
-SELECT SCHEMA_NAME.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
-		"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1130, "idname": "visit_id"}}')
+SELECT ws_sample.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+		"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1130, "idName": "visit_id"}}')
 connec:
-SELECT SCHEMA_NAME.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
-		"feature":{"featureType":"connec", "tableName":"v_edit_connec", "id":3008, "idname": "connec_id"}}')
+SELECT ws_sample.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+		"feature":{"featureType":"connec", "tableName":"v_edit_connec", "id":3008, "idName": "connec_id"}}')
 file:
-SELECT SCHEMA_NAME.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
-		"feature":{"featureType":"file", "tableName":"om_visit_file", "id":2, "idname": "id"}}')
+SELECT ws_sample.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+		"feature":{"featureType":"file", "tableName":"om_visit_file", "id":2, "idName": "id"}}')
 */
 
 DECLARE
@@ -42,8 +42,8 @@ DECLARE
 
 BEGIN
 	--  Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "ws_sample", public;
+	v_schemaname = 'ws_sample';
 	
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -54,7 +54,7 @@ BEGIN
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
 	v_tablename := (p_data ->> 'feature')::json->> 'tableName';
 	v_id := (p_data ->> 'feature')::json->> 'id';
-	v_idname := (p_data ->> 'feature')::json->> 'idname';
+	v_idname := (p_data ->> 'feature')::json->> 'idName';
 
 	-- check if feature exists
 	v_querytext := 'SELECT * FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);

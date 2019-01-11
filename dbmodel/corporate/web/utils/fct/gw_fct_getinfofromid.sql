@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "ws_sample"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, v_visitability boolean, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -38,6 +38,7 @@ DECLARE
     v_query_text text;
     mincut_act boolean;
     visit_act boolean;
+    v_visitability boolean;
 
     -- fixed info type parameter(to do)
     --p_info_type integer=200;
@@ -51,7 +52,7 @@ BEGIN
 
 --    Set search path to local schema
 -------------------------------------
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
     schemas_array := current_schemas(FALSE);
 
 --      Get api version
@@ -244,18 +245,18 @@ BEGIN
 	END IF;
 	
 	--    Control for layer with mincut option on info
-	--------------------------------------------------
 	IF v_idname = 'arc_id'::text OR v_idname = 'node_id'::text OR v_idname = 'connec_id'::text OR v_idname = 'gully_id'::text OR v_idname = 'sys_hydrometer_id'::text THEN
 		mincut_act = TRUE;
 	ELSE
 		mincut_act = FALSE;	
 	END IF;
 
-	--  TODO: Control for layer with visit option on info
-	--------------------------------------------------
-	visit_act = TRUE;
-	
+	-- enhance visitability
+	IF v_visitability IS NULL THEN 
+		v_visitability := TRUE;
+	END IF;
 
+	-- Setting form header
 	IF v_formheader IS NULL THEN
 		v_formheader = (SELECT formname FROM config_web_layer WHERE tableinfo_id=table_id_arg LIMIT 1);
 	END IF;
@@ -263,7 +264,6 @@ BEGIN
 	raise notice' v_formheader %', v_formheader;
 	
 	--    Check generic
-	-------------------
 	IF form_info ISNULL THEN
 		v_formheader:='GENERIC';
 		form_info := json_build_object('formName','F16','formId',v_formheader);
@@ -274,12 +274,10 @@ BEGIN
 	END IF;
 
 	--    Add default tab
-	---------------------
 	form_tabs_json := array_to_json(array_append(form_tabs, 'tabInfo'));
 	form_tabtext_json := array_to_json(array_append(form_tabtext, ''));
 
 	--    Join json
-	---------------
 	v_formheader:=concat(v_formheader,' - ',id);
 	form_info := gw_fct_json_object_set_key(form_info, 'formName', v_formheader);
 	form_info := gw_fct_json_object_set_key(form_info, 'formTabs', form_tabs_json);
@@ -340,8 +338,8 @@ ELSE
         ', "geometry":' || v_geometry ||
         ', "linkPath":' || link_path ||
         ', "editData":' || editable_data ||
-        ', "mincut":'    || mincut_act ||
-        ', "visit":'    || visit_act ||
+        ', "mincut":'   || mincut_act ||
+        ', "visitability":'    || v_visitability ||
         '}')::json;
 
 END IF;

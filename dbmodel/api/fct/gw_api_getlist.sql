@@ -60,6 +60,14 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 "data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
+SELECT ws_sample.gw_api_getlist($$
+{"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idname":"visit_id","id":10002},
+"form":{"tabData":{"active":false}, "tabFiles":{"active":true}},
+"data":{"relatedFeature":{"type":"arc"},
+	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
+	"filterFields":{"filetype":"doc","limit":10,"visit_id":"10002"}}}$$)
+
 
 FEATURE FORMS
 -------------
@@ -151,6 +159,8 @@ BEGIN
 	v_filter_values := (p_data ->> 'data')::json->> 'filterFields';
 	v_ordertype := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'orderType';
 	v_currentpage := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'currentPage';
+
+	raise notice 'v_filter_values %', v_filter_values;
 
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';

@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2622
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setvisit(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_setvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 --INSERT
-SELECT SCHEMA_NAME.gw_api_setvisit($${
+SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName":"visit_id"},
@@ -21,7 +21,7 @@ SELECT SCHEMA_NAME.gw_api_setvisit($${
 	}$$)
 
 --UPDATE
-SELECT SCHEMA_NAME.gw_api_setvisit($${
+SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1159,"idName":"visit_id"},
@@ -42,7 +42,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -53,10 +53,13 @@ BEGIN
     v_feature = p_data ->>'feature';
 
 -- set output parameter
+
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
-	
+
 	--upsert visit
 	IF v_id IS NULL THEN
+	
+		RAISE NOTICE 'v_outputparameter  asgdeg asdeg qasedg ds gdas %', v_outputparameter;
 
 		-- setting the insert
 		SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
