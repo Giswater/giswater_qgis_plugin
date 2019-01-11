@@ -13,7 +13,6 @@ import os
 import sys
 import re
 from functools import partial
-from sqlite3 import OperationalError
 
 import utils_giswater
 from giswater.actions.parent import ParentAction
@@ -130,7 +129,7 @@ class UpdateSQL(ParentAction):
             self.cmb_project_type.addItem(str(type))
         self.change_project_type(self.cmb_project_type)
 
-        self.populate_data_shcema_name(self.cmb_project_type)
+        self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
 
         # Declare all file variables
@@ -185,7 +184,7 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
         btn_info.clicked.connect(partial(self.show_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_shcema_name, self.cmb_project_type))
+        self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_schema_name, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
@@ -1304,6 +1303,7 @@ class UpdateSQL(ParentAction):
 
         
     def execute_last_process(self, new_project=False, schema_name=False, schema_type=''):
+    
         # Execute last process function
         if new_project is True:
             extras = '"isNewProject":"' + str('TRUE') + '", '
@@ -1331,7 +1331,6 @@ class UpdateSQL(ParentAction):
 
     def create_project_data_schema(self):
     
-        # status = []
         self.title = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_title)
         self.author = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_author)
         self.date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
@@ -1542,7 +1541,7 @@ class UpdateSQL(ParentAction):
 
     def load_updates(self, project_type, update_changelog=False):
     
-        #Get current schema selected
+        # Get current schema selected
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         self.setWaitCursor()
@@ -1561,7 +1560,6 @@ class UpdateSQL(ParentAction):
             if self.error_count == 0:
                 msg = "The update has been executed correctly."
                 result = self.controller.show_info_box(msg, "Info")
-
             else:
                 msg = "Some error has occurred while the update process was running."
                 result = self.controller.show_info_box(msg, "Info")
@@ -1573,9 +1571,11 @@ class UpdateSQL(ParentAction):
     def reload_tablect(self, project_type=False):
         self.load_tablect(project_type=project_type)
 
+        
     def reload_fct_ftrg(self, project_type=False):
         self.load_fct_ftrg(project_type=project_type)
 
+        
     def reload_trg(self, project_type=False):
         self.load_trg(project_type)
 
@@ -1603,9 +1603,9 @@ class UpdateSQL(ParentAction):
                                                credentials['db'], credentials['user'],
                                                credentials['password'])
 
-        self.populate_data_shcema_name(self.cmb_project_type)
+        self.populate_data_schema_name(self.cmb_project_type)
 
-        
+
     """ Other functions """
 
     def show_info(self):
