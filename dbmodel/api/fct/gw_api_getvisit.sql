@@ -11,13 +11,32 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getvisit(p_data json)
 $BODY$
 
 /*EXAMPLE:
---tab data new visit
+--new call
 SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3,"infoType":100,"lang":"es"},
-"feature":{"featureType":"visit", "visit_id":null},
 "form":{},
 "data":{"relatedFeature":{"type":"arc", "id":"2080"},
-	"filterFields":{},"pageInfo":null}}$$)
+	"fields":{},"pageInfo":null}}$$)
+
+--insertfile action with insert visit (visit null or visit not existing yet on database)
+SELECT SCHEMA_NAME.gw_api_getvisit($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id", "id":null},
+"form":{"tabData":{"active":true}, "tabFiles":{"active":false}},
+"data":{"relatedFeature":{"type":"arc", "id":"2001"},
+    "fields":{"class_id":"1","arc_id":"2001","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},
+    "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
+    "newFile": {"fileFields":{"visit_id":null, "hash":"testhash", "url":"urltest", "filetype":"png"},
+            "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}}$$)
+
+-- change from tab data to tab files (upserting data on tabData)
+SELECT SCHEMA_NAME.gw_api_getvisit($${
+"client":{"device":3,"infoType":100,"lang":"es"},
+"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id","id":1001},
+"form":{"tabData":{"active":false}, "tabFiles":{"active":true}},
+"data":{"relatedFeature":{"type":"arc", "id":"2080"},
+        "fields":{"class_id":"1","arc_id":"2001","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},
+	"pageInfo":null}}$$)
 
 --tab files
 SELECT SCHEMA_NAME.gw_api_getvisit($${
@@ -28,31 +47,6 @@ SELECT SCHEMA_NAME.gw_api_getvisit($${
 	"filterFields":{"filetype":"doc","limit":10},
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}
 	}}$$)
-
---insertfile action with insert visit (visit null or visit not existing yet on database)
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id","id":},
-"form":{"tabData":{"active":true},
-    "tabFiles":{"active":false}},
-"data":{"relatedFeature":{"type":"arc", "id":"2001"},
-    "fields":{"class_id":"1","arc_id":"2001","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},
-    "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
-    "newFile": {"fileFields":{"visit_id":, "hash":"testhash", "url":"urltest", "filetype":"png"},
-            "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}}$$)
-
---insertfile action with insert visit
-SELECT SCHEMA_NAME.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id","id":1},
-"form":{"tabData":{"active":true},
-    "tabFiles":{"active":false}},
-"data":{"relatedFeature":{"type":"arc", "id":"2001"},
-    "fields":{"class_id":"1","arc_id":"2001","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},
-    "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
-    "newFile": {"fileFields":{"visit_id":1, "hash":"testhash", "url":"urltest", "filetype":"png"},
-            "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}}$$)
-
 
 -- deletefile action
 SELECT SCHEMA_NAME.gw_api_getvisit($${
@@ -268,8 +262,16 @@ BEGIN
 			--filling tab (only if it's active)
 			IF v_activefilestab THEN
 
+				-- cheching setvisit (on tab change)
+				v_fields_json := ((p_data->>'data')::json->>'fields')::json;
+				IF v_fields_json IS NOT NULL THEN
+					-- calling setvisit function
+					SELECT gw_api_setvisit (p_data) INTO v_return;
+					v_message = (v_return->>'message');
+				END IF;
+
 				-- getting filterfields
-				v_filterfields := ((p_data->>'data')::json->>'fields')::json;
+				v_filterfields := ((p_data->>'data')::json->>'filterFields')::json;
 				v_filterfields := gw_fct_json_object_set_key(v_filterfields, 'visit_id', v_id);
 
 				-- setting filterfields
