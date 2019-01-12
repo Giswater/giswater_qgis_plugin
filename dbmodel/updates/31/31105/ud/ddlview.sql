@@ -139,7 +139,7 @@ UNION
     om_visit.enddate AS visit_end,
     om_visit.user_name,
     om_visit.is_done,
-    om_visit_x_connec.connec_id AS feature_id,
+    om_visit_x_gully.gully_id AS feature_id,
     'CONNEC'::text as feature_type,
     om_visit.the_geom
    FROM selector_state,
