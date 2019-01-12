@@ -44,6 +44,44 @@ New function (2550) gw_fct_admin_updateschema_drops,
 New function (2552) gw_fct_admin_role_permissions, 
 New function (2554) gw_fct_admin_schema_utils_fk, 
 New function (2556) gw_fct_admin_role_resetuserprofile, 
+New function (2558)	gw_api_get_featureinfo
+New function (2560)	gw_api_get_featureupsert
+New function (2562)	gw_api_get_formfields
+New function (2564)	gw_api_get_widgetjson
+New function (2566)	gw_api_getattributetable
+New function (2568)	gw_api_getcatalog
+New function (2570)	gw_api_getconfig
+New function (2572)	gw_api_getchilds
+New function (2574)	gw_api_getfeatureinsert
+New function (2576)	gw_api_getgo2epa
+New function (2578)	gw_api_getinfocrossection
+New function (2580)	gw_api_getinfofromcoordinates
+New function (2582)	gw_api_getinfofromid
+New function (2584)	gw_api_getinfofromlist
+New function (2586)	gw_api_getinfoplan
+New function (2588)	gw_api_getinsertfeature
+New function (2590)	gw_api_getlayersfromcoordinates
+New function (2592)	gw_api_getlist
+New function (2594)	gw_api_getmessage
+New function (2596)	gw_api_getpermissions
+New function (2598)	gw_api_getrowinsert
+New function (2600)	gw_api_getsearch
+New function (2602)	gw_api_gettypeahead
+New function (2604)	gw_api_getvisit
+New function (2606)	gw_api_setconfig
+New function (2608)	gw_api_setdelete
+New function (2610)	gw_api_setfields
+New function (2612)	gw_api_setfileinsert
+New function (2614)	gw_api_setgo2epa
+New function (2616)	gw_api_setinsert
+New function (2618)	gw_api_setsearch
+New function (2620)	gw_api_setsearch_add
+New function (2622)	gw_api_setvisit
+New function (2624)	gw_fct_json_object_delete_keys
+New function (2626)	gw_fct_json_object_set_key
+New function (2628)	gw_api_gettoolbarbuttons
+New function (2630)	gw_api_getgeometry
+New function (2632)	gw_trg_visit_update_enddate
 New system parameter sys_custom_views, issue#537 
 New system parameter sys_currency, issue#531
 New system parameter utils_csv2pg_om_visit_parameters, issue#566

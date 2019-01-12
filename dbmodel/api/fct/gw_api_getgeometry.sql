@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2632
+--FUNCTION CODE: 2630
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getgeometry(p_data json)
