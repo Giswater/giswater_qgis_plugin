@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2632
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_trg_visit_update_enddate()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_visit_update_enddate()
   RETURNS trigger AS
 $BODY$
 DECLARE 

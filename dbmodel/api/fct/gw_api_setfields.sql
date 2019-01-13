@@ -121,7 +121,7 @@ BEGIN
 		USING v_schemaname, v_field
 		INTO column_type;
 
-		raise notice '% % % % % %'  , v_field, v_tablename, column_type, v_idname, v_id, column_type_id;
+		--RAISE NOTICE '--- UPDATE FIELDS using v_field % v_tablename % column_type % v_idname % v_id % column_type_id % ---'  , v_field, v_tablename, column_type, v_idname, v_id, column_type_id;
 
 	IF v_field='state' THEN
 		PERFORM gw_fct_state_control(v_featuretype, v_id, v_value::integer, 'UPDATE');
@@ -130,6 +130,9 @@ BEGIN
 	--    Value update
 	sql_query := 'UPDATE ' || quote_ident(v_tablename) || ' SET ' || quote_ident(v_field) || ' = CAST(' || quote_nullable(v_value) || ' AS ' 
 	|| column_type || ') WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';
+
+	--RAISE NOTICE ' --- UPDATE FIELDS USING QUERY % ---', sql_query;
+	
 	EXECUTE sql_query;
 	
    END LOOP;

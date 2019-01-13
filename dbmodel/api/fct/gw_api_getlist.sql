@@ -130,7 +130,6 @@ DECLARE
 	v_srid integer;
 	v_i integer;
 	v_buttonname text;
-	v_layermanager json;
 	v_featuretype text;
 	v_pageinfo json;
 	v_vdefault text;

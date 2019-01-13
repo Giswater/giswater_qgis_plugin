@@ -55,12 +55,11 @@ BEGIN
 -- set output parameter
 
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
+	
 
 	--upsert visit
-	IF v_id IS NULL THEN
+	IF (SELECT id FROM om_visit WHERE id=v_id) IS NULL THEN
 	
-		RAISE NOTICE 'v_outputparameter  asgdeg asdeg qasedg ds gdas %', v_outputparameter;
-
 		-- setting the insert
 		SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
 
@@ -75,16 +74,25 @@ BEGIN
 
 		-- getting message
 		SELECT gw_api_getmessage(v_feature, 40) INTO v_message;
+
+		RAISE NOTICE '--- INSERT NEW VISIT gw_api_setinsert WHITH MESSAGE: % ---', v_message;
+
 	ELSE 
+
 		--setting the update
 		PERFORM gw_api_setfields (v_outputparameter);
 		UPDATE om_visit SET enddate=now() WHERE id=v_id;
 
 		-- getting message
 		SELECT gw_api_getmessage(v_feature, 50) INTO v_message;
+
+		RAISE NOTICE '--- UPDATE VISIT gw_api_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
+
 	END IF;
 
 	-- update event with device parameters
+
+	RAISE NOTICE 'UPDATE EVENT USING deviceTrace %', ((p_data ->>'data')::json->>'deviceTrace');
 	UPDATE om_visit_event SET xcoord=(((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float,
 				  ycoord=(((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float,
 				  compass=(((p_data ->>'data')::json->>'deviceTrace')::json->>'compass')::float

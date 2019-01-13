@@ -5,12 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ws_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-drop trigger if exists gw_trg_visit_update_enddate ON ws_sample.om_visit;
-CREATE TRIGGER gw_trg_visit_update_enddate AFTER INSERT OR UPDATE OF is_done ON ws_sample.om_visit
-FOR EACH ROW EXECUTE PROCEDURE ws_sample.gw_trg_visit_update_enddate('visit');
+drop trigger if exists gw_trg_visit_update_enddate ON SCHEMA_NAME.om_visit;
+CREATE TRIGGER gw_trg_visit_update_enddate AFTER INSERT OR UPDATE OF is_done ON SCHEMA_NAME.om_visit
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_update_enddate('visit');
 
-drop trigger if exists gw_trg_visit_update_enddate ON ws_sample.om_visit_event;
-CREATE TRIGGER gw_trg_visit_update_enddate BEFORE INSERT OR UPDATE ON ws_sample.om_visit_event 
-FOR EACH ROW EXECUTE PROCEDURE ws_sample.gw_trg_visit_update_enddate('event');
+drop trigger if exists gw_trg_visit_update_enddate ON SCHEMA_NAME.om_visit_event;
+CREATE TRIGGER gw_trg_visit_update_enddate BEFORE INSERT OR UPDATE ON SCHEMA_NAME.om_visit_event 
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_update_enddate('event');

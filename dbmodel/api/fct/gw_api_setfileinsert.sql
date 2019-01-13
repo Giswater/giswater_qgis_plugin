@@ -37,6 +37,8 @@ BEGIN
 	-- set output parameter
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
 
+	RAISE NOTICE '--- CALL gw_api_setinsert USING v_outputparameter: % ---', v_outputparameter;
+
 	-- set insert
 	SELECT gw_api_setinsert (v_outputparameter) INTO v_insertresult;
 
@@ -51,6 +53,8 @@ BEGIN
 
 	-- get message
 	v_message = (v_insertresult->>'message')::json;
+
+	RAISE NOTICE '--- RETURTING FROM gw_api_setfileinsert WITH MESSAGE: % ---', v_message;
 
 	--    Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||

@@ -49,10 +49,10 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
             UPDATE om_visit SET id=NEW.visit_id, visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, startdate=NEW.startdate, enddate=NEW.enddate, user_name=NEW.user_name,
             webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
-            suspendendcat_id=NEW.suspendendcat_id;
+            suspendendcat_id=NEW.suspendendcat_id WHERE id=NEW.visit_id;
             UPDATE om_visit_event SET event_code=NEW.event_code, visit_id=NEW.visit_id, position_id=NEW.position_id, position_value=NEW.position_value, 
             parameter_id=NEW.parameter_id, value=NEW.value, value1=NEW.value1, value2=NEW.value2, geom1=NEW.geom1, geom2=NEW.geom2, geom3=NEW.geom3,
-            xcoord=NEW.xcoord, ycoord=NEW.ycoord, compass=NEW.compass, tstamp=NEW.tstamp, text=NEW.text , index_val=NEW.index_val, is_last=NEW.is_last;
+            xcoord=NEW.xcoord, ycoord=NEW.ycoord, compass=NEW.compass, tstamp=NEW.tstamp, text=NEW.text , index_val=NEW.index_val, is_last=NEW.is_last WHERE id=NEW.event_id;
 
     RETURN NEW;
     ELSIF TG_OP = 'DELETE' THEN

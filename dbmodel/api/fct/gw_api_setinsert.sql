@@ -98,7 +98,8 @@ BEGIN
 		SELECT v_text [i] into v_jsonfield;
 		v_field:= (SELECT (v_jsonfield ->> 'key')) ;
 		v_value := (SELECT (v_jsonfield ->> 'value')) ; -- getting v_value in order to prevent null values
-		IF v_value !='null' OR v_value !='NULL' THEN 
+				
+		IF v_value !='null' OR v_value !='NULL' OR v_value IS NOT NULL THEN 
 
 			--building the query text
 			IF i=1 THEN
@@ -106,9 +107,9 @@ BEGIN
 			ELSIF i>1 THEN
 				v_querytext := concat (v_querytext, ', ', quote_ident(v_field));
 			END IF;
-
-			i=i+1;
+				
 		END IF;
+		i=i+1;
 	END LOOP;
 	
 	-- query text, step3
@@ -147,17 +148,15 @@ BEGIN
 			ELSIF i>1 THEN
 				v_querytext := concat (v_querytext, ', ',  quote_literal(v_value),'::',v_columntype);
 			END IF;
-
-			i=i+1;
 		END IF;
-	END LOOP;
+		i=i+1;
 
-	RAISE NOTICE 'v_querytext %', v_querytext;
+	END LOOP;
 
 	-- query text, final step
 	v_querytext := concat (v_querytext,' ) RETURNING ',quote_ident(v_idname));
-	
-	RAISE NOTICE 'v_querytext %', v_querytext;
+
+	RAISE NOTICE '--- Insert new file with query:: % ---', v_querytext;
 	
 	-- execute query text
 	EXECUTE v_querytext INTO v_newid;
@@ -168,6 +167,7 @@ BEGIN
 	-- set message
 	SELECT gw_api_getmessage(v_feature::json, 40) INTO v_message;
 	
+	RAISE NOTICE '--- Returning from (gw_api_setinsert) with this message :: % ---', v_message;
 
 --    Return
     RETURN ('{"status":"Accepted", "message":'|| v_message ||', "apiVersion":'|| v_apiversion ||

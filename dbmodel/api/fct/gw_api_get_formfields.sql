@@ -136,7 +136,7 @@ BEGIN
 		-- for image widgets
 		IF (aux_json->>'widgettype')='image' THEN
 		      	EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
-			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal:', COALESCE(v_image, '[]'));
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 		END IF;
 	
 		-- looking for parents and for combo not parent
