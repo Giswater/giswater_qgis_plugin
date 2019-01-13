@@ -6,15 +6,26 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-from PyQt4.QtCore import QDate
+
+from PyQt4.QtCore import QDate, Qt
+from PyQt4.QtCore import QModelIndex
+from PyQt4.QtGui import QBrush
+from PyQt4.QtGui import QColor
 from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QComboBox, QAction, QAbstractItemView
 from functools import partial
+
+from PyQt4.QtGui import QPalette
+from PyQt4.QtGui import QStyledItemDelegate
+from PyQt4.QtGui import QTableWidgetItem
+from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
 
 import utils_giswater
 from datetime import datetime
 from giswater.actions.parent_manage import ParentManage
 from giswater.ui_manager import AddLot
 from giswater.ui_manager import VisitManagement
+
+from actions.CustomModel import CustomSqlModel
 
 
 class AddNewLot(ParentManage):
@@ -104,7 +115,10 @@ class AddNewLot(ParentManage):
 
         # Set autocompleters of the form
         self.set_completers()
-
+        self.test()
+        # p = self.dlg_lot.tbl_relation.palette()
+        # p.setColor(QPalette.Base, QColor("yellow"))
+        # self.dlg_lot.tbl_relation.setPalette(p)
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
@@ -112,6 +126,46 @@ class AddNewLot(ParentManage):
         self.disconnect_signal_selection_changed()
         self.close_dialog(self.dlg_lot)
 
+    def test(self):
+        self.controller.log_info(str("QWEWERWERWERWRE"))
+        """ Return column index searching by column name """
+        # column_index = False
+        # for x in range(0, self.tbl_relation.model().rowCount()):
+        #     if self.tbl_relation.model().headerData(x, Qt.Horizontal) == 'arc_id':
+        #         column_index = x
+        #         self.controller.log_info(str(column_index))
+        #
+        # model = self.tbl_relation.model()
+        # for x in range(0, model.rowCount()):
+        #     # GET i as index (cell)
+        #     i = model.index(x, column_index)
+        #
+        #     self.controller.log_info(str(i))
+        column_index = utils_giswater.get_col_index_by_col_name(self.tbl_relation, 'arc_id')
+        model = self.tbl_relation.model()
+        id_list = []
+        for i in range(0, model.rowCount()):
+            indexA = model.index(i, column_index)
+
+            self.controller.log_info(str(indexA.data()))
+            self.controller.log_info(str(type(indexA)))
+            # value = model.data(index, 0)
+            # self.controller.log_info(str("T0:")+str(value))
+            # value = model.data(index, 1)
+            # self.controller.log_info(str("T1:")+str(value))
+            # value = model.data(index, 2)
+            # self.controller.log_info(str("T2:")+str(value))
+            # value = model.data(index, 3)
+            # self.controller.log_info(str("T3:")+str(value))
+            if str(indexA.data()) > '2000':
+                model.setData(model.index(i, 1), QBrush(Qt.red), Qt.DecorationRole)
+
+    def data(self, index, item, role):
+
+        if role == Qt.BackgroundRole:
+            if QSqlQueryModel.data(self, index(item.row(), 3), Qt.DisplayRole):
+                return QBrush(Qt.yellow)
+        return QSqlQueryModel.data(self, item, role)
 
     def remove_selection(self, dialog, qtable):
         self.disconnect_signal_selection_changed()
@@ -193,7 +247,7 @@ class AddNewLot(ParentManage):
             _id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
 
         sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
-               " WHERE lot_id = '"+_id+"'")
+               " WHERE lot_id = '"+str(_id)+"'")
         self.controller.execute_sql(sql, log_sql=False)
 
         id_list = self.get_table_values(self.tbl_relation, lot['feature_type'])
@@ -406,14 +460,33 @@ class AddNewLot(ParentManage):
             filter += "'"+str(row[0])+"', "
         filter = filter[:-2]+")"
 
-        self.fill_table_object(self.tbl_relation, table_name, filter)
+        self.fill_custom_model(self.tbl_relation, table_name, filter)
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, table_name)
 
         list_ids = self.get_table_values(self.tbl_relation, feature_type)
         for id_ in list_ids:
             if id_ not in self.ids:
                 self.ids.append(id_)
+    def fill_custom_model(self, widget, table_name, expr_filter=None):
+        """ Set a model with selected filter. Attach that model to selected table """
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+        # Set model
 
+        model = CustomSqlModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.sort(0, 1)
+        if expr_filter:
+            model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
     def set_completers(self):
         """ Set autocompleters of the form """
 
@@ -545,3 +618,5 @@ class AddNewLot(ParentManage):
         # Refresh model with selected filter
         widget_table.model().setFilter(expr_filter)
         widget_table.model().select()
+
+

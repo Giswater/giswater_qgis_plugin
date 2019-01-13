@@ -22,6 +22,8 @@ import utils_giswater
 from giswater.actions.parent import ParentAction
 from giswater.actions.multiple_selection import MultipleSelection
 
+from actions.CustomModel import CustomSqlModel
+
 
 class ParentManage(ParentAction, object):
 
