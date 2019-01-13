@@ -149,24 +149,13 @@ class AddNewLot(ParentManage):
 
             self.controller.log_info(str(indexA.data()))
             self.controller.log_info(str(type(indexA)))
-            # value = model.data(index, 0)
-            # self.controller.log_info(str("T0:")+str(value))
-            # value = model.data(index, 1)
-            # self.controller.log_info(str("T1:")+str(value))
-            # value = model.data(index, 2)
-            # self.controller.log_info(str("T2:")+str(value))
-            # value = model.data(index, 3)
-            # self.controller.log_info(str("T3:")+str(value))
-            if str(indexA.data()) > '2000':
-                model.setData(model.index(i, 1), QBrush(Qt.red), Qt.DecorationRole)
 
-    def data(self, index, item, role):
+            # if str(indexA.data()) > '2000':
+            model.setData(model.index(i, 1), QBrush(Qt.darkBlue), Qt.BackgroundRole)
 
-        if role == Qt.BackgroundRole:
-            if QSqlQueryModel.data(self, index(item.row(), 3), Qt.DisplayRole):
-                return QBrush(Qt.yellow)
-        return QSqlQueryModel.data(self, item, role)
+            model.setHeaderData(0, Qt.Horizontal, QBrush(Qt.darkGreen),  Qt.BackgroundRole)
 
+        self.tbl_relation.show()
     def remove_selection(self, dialog, qtable):
         self.disconnect_signal_selection_changed()
         # Get selected rows
@@ -467,6 +456,8 @@ class AddNewLot(ParentManage):
         for id_ in list_ids:
             if id_ not in self.ids:
                 self.ids.append(id_)
+
+
     def fill_custom_model(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
         if self.schema_name not in table_name:
@@ -487,6 +478,8 @@ class AddNewLot(ParentManage):
 
         # Attach model to table view
         widget.setModel(model)
+
+
     def set_completers(self):
         """ Set autocompleters of the form """
 
