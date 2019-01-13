@@ -8,21 +8,22 @@ class CustomSqlModel(QSqlTableModel):
     def __init__(self, parent=None):
         QSqlTableModel.__init__(self, parent=parent)
     #
-    # def data(self, QModelIndex, role):
-    #
-    #     if role == QtCore.Qt.BackgroundRole:
-    #         # if QModelIndex.row() in [1, 3]:
-    #         #     return QtGui.QBrush(QtCore.Qt.yellow)
-    #         # else:
-    #         #     return QtGui.QBrush(QtCore.Qt.red)
-    #
-    #         value = QModelIndex.data()
-    #         print(value)
-    #         if value in (2020, 135):
-    #             return QtGui.QBrush(QtCore.Qt.yellow)
-    #         else:
-    #             return QtGui.QBrush(QtCore.Qt.red)
-    #     return QSqlTableModel.data(self, QModelIndex, role)
+    def data(self, QModelIndex, role):
+
+        if role == QtCore.Qt.BackgroundRole:
+            # if QModelIndex.row() in [1, 3]:
+            #     return QtGui.QBrush(QtCore.Qt.yellow)
+            # else:
+            #     return QtGui.QBrush(QtCore.Qt.red)
+
+            value = QModelIndex.data()
+            print(value)
+            print(type(value))
+            if value in ('2020', '135'):
+                return QtGui.QBrush(QtCore.Qt.yellow)
+            else:
+                return QtGui.QBrush(QtCore.Qt.red)
+        return QSqlTableModel.data(self, QModelIndex, role)
 
     # def setData(self, QModelIndex, p_object, role=None):
     #     if role == QtCore.Qt.BackgroundRole:
