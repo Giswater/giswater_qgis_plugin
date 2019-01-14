@@ -346,7 +346,7 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
-        self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
+        self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path))
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path,
             self.controller.plugin_settings_value('psector_rapport_path'))

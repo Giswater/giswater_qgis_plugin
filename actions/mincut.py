@@ -587,6 +587,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog add_connec
         self.dlg_connec = Mincut_add_connec()
+        self.dlg_connec.setWindowTitle("Connec management")
         self.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
