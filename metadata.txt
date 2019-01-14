@@ -12,7 +12,8 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 # End of mandatory metadata
 
 # Uncomment the following line and add your changelog:
-changelog=Version 3.1.105 (30/12/2018)
+changelog=Version 3.1.105 (18/01/2019)
+    - Recovered the informative label for plan_psector -> add_price
     - Bug fix, set correct values into go2epa ws_options
     - Canceled zoom to exploitation
     - Bug fix: enabled mincut class actions when open existing mincut without class
