@@ -300,11 +300,13 @@ BEGIN
 		v_query_result := v_query_result || ' OFFSET '|| v_offset;
 	END IF;
 
+	RAISE NOTICE '--- QUERY LIST % ---', v_query_result;
+
 	-- Execute query result
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
 
-		raise notice ' v_result_list %', v_result_list;	
+	RAISE NOTICE '--- RESULT LIST % ---', v_result_list;
 
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);

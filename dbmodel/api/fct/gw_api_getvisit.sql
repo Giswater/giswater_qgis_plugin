@@ -65,6 +65,8 @@ DECLARE
 	v_featuretype text;
 	v_visitclass integer;
 	v_id text;
+	v_idname text;
+	v_columntype text;
 	v_device integer;
 	v_formname text;
 	v_tablename text;
@@ -100,6 +102,9 @@ DECLARE
 	v_message2 text;
 	v_return json;
 	v_currentactivetab text;
+	v_values json;
+	array_index integer DEFAULT 0;
+	v_fieldvalue text;
 
 BEGIN
 
@@ -125,19 +130,21 @@ BEGIN
 	v_addfile = ((p_data ->>'data')::json->>'newFile')::json;
 	v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
 	v_currentactivetab = (((p_data ->>'form')::json->>'navigation')::json->>'currentActiveTab')::text;
+	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
 
 	--  get visitclass
-	IF v_id IS NULL OR (SELECT id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint) IS NULL THEN
+	IF v_visitclass IS NULL THEN 
+		IF v_id IS NULL OR (SELECT id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint) IS NULL THEN
 	
-		-- TODO: for new visit enhance the visit type using the feature_id
-		v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
-		IF v_visitclass IS NULL THEN
-			v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
-		END IF;
-	ELSE 
-		v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
-		IF v_visitclass IS NULL THEN
-			v_visitclass := 0;
+			v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
+			IF v_visitclass IS NULL THEN
+				v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
+			END IF;
+		ELSE 
+			v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
+			IF v_visitclass IS NULL THEN
+				v_visitclass := 0;
+			END IF;
 		END IF;
 	END IF;
 	
@@ -153,7 +160,36 @@ BEGIN
 	v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
 
-	RAISE NOTICE '--- VISIT PARAMETERS: newvisitform: % featuretype: %,  visitclass: %,  v_visit: %,  formname: %,  tablename: %,  device: % ---',isnewvisit, v_featuretype, v_visitclass, v_id, v_formname, v_tablename, v_device;
+	-- Get id column
+	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+		INTO v_idname
+		USING v_tablename;
+	
+	-- For views it suposse pk is the first column
+	IF v_idname ISNULL THEN
+		EXECUTE '
+		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+		AND t.relname = $1 
+		AND s.nspname = $2
+		ORDER BY a.attnum LIMIT 1'
+		INTO v_idname
+		USING v_tablename, v_schemaname;
+	END IF;
+
+	-- Get id column type
+	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+		JOIN pg_class t on a.attrelid = t.oid
+		JOIN pg_namespace s on t.relnamespace = s.oid
+		WHERE a.attnum > 0 
+		AND NOT a.attisdropped
+		AND a.attname = $3
+		AND t.relname = $2 
+		AND s.nspname = $1
+		ORDER BY a.attnum'
+			USING v_schemaname, v_tablename, v_idname
+			INTO v_columntype;
+
+	RAISE NOTICE '--- VISIT PARAMETERS: newvisitform: % featuretype: %,  visitclass: %,  v_visit: %,  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',isnewvisit, v_featuretype, v_visitclass, v_id, v_formname, v_tablename, v_idname, v_columntype, v_device;
 
 	-- upserting data on tabData
 	IF v_currentactivetab = 'tabData' THEN
@@ -163,7 +199,6 @@ BEGIN
 		v_message = (v_return->>'message');
 
 		RAISE NOTICE '--- UPSERT VISIT CALLING gw_api_setvisit WITH MESSAGE: % ---', v_message;
-
 		
 	END IF;
 
@@ -237,7 +272,7 @@ BEGIN
 					
 					-- setting visitclass value
 					IF (aux_json->>'column_id') = 'class_id' THEN
-						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitclass);
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitclass::text);
 						RAISE NOTICE ' --- SETTING visitclass VALUE % ---',v_visitclass ;
 	
 					END IF;
@@ -245,7 +280,31 @@ BEGIN
 					
 				END LOOP;
 			ELSE 
+				
 				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
+
+				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT % ---',v_fields ;
+
+				-- getting values from feature
+				EXECUTE 'SELECT (row_to_json(a)) FROM 
+					(SELECT * FROM '||v_tablename||' WHERE '||v_idname||' = CAST($1 AS '||v_columntype||'))a'
+					INTO v_values
+					USING v_id;
+	
+				raise notice 'v_values %', v_values;
+				
+				-- setting values
+				FOREACH aux_json IN ARRAY v_fields 
+				LOOP          
+					array_index := array_index + 1;
+					v_fieldvalue := (v_values->>(aux_json->>'column_id'));
+		
+					IF (aux_json->>'widgettype')='combo' THEN 
+						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
+					ELSE 
+						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_fieldvalue, ''));
+					END IF;
+				END LOOP;			
 			END IF;	
 
 			v_fields_json = array_to_json (v_fields);
@@ -292,11 +351,13 @@ BEGIN
 			IF v_activefilestab THEN
 
 				-- getting filterfields
-				v_filterfields := ((p_data->>'data')::json->>'filterFields')::json;
-				v_filterfields := gw_fct_json_object_set_key(v_filterfields, 'visit_id', v_id);
+				IF v_currentactivetab = 'tabFiles' THEN
+					v_filterfields := ((p_data->>'data')::json->>'fields')::json;
+				END IF;
 
 				-- setting filterfields
 				v_data := (p_data->>'data');
+				v_filterfields := gw_fct_json_object_set_key(v_filterfields, 'visit_id', v_id);
 				v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
 				p_data := gw_fct_json_object_set_key(p_data, 'data', v_data);
 
@@ -311,7 +372,7 @@ BEGIN
 			
 				RAISE NOTICE '--- CALLING gw_api_getlist USING p_data: % ---', p_data;
 				SELECT gw_api_getlist (p_data) INTO v_fields_json;
-			
+
 				-- getting pageinfo and list values
 				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
 				v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
