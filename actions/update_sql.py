@@ -102,8 +102,8 @@ class UpdateSQL(ParentAction):
 
         # Get version if not new project
         self.version = None
-        if self.schema_name is not None:
-            sql = ("SELECT giswater from " + self.schema_name + ".version")
+        if self.controller.schema_name is not None:
+            sql = ("SELECT giswater from " + self.controller.schema_name + ".version")
             row = self.controller.get_row(sql)
             self.version = row[0]
             if self.version.replace('.','') >= self.plugin_version.replace('.',''):
