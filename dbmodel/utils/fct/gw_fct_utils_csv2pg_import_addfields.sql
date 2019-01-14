@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2516
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2_import_addfields(csv2pgcat_id_aux integer, label_aux text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_addfields(csv2pgcat_id_aux integer, label_aux text)
 RETURNS integer AS
 $BODY$
 DECLARE
