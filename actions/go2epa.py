@@ -173,7 +173,7 @@ class Go2Epa(ParentAction):
         self.dlg_wsoptions.tolerance.setValidator(QDoubleValidator())
         self.dlg_wsoptions.demand_multiplier.setValidator(QDoubleValidator())
 
-        self.dlg_wsoptions.chk_enabled.setChecked(True)
+        self.dlg_wsoptions.rtc_enabled.setChecked(True)
 
         # Set values from widgets of type QComboBox
         sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
@@ -216,7 +216,7 @@ class Go2Epa(ParentAction):
         utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.rtc_coefficient, rows, False)
 
         # TODO
-        if self.dlg_wsoptions.valve_mode.currentText() == "MINCUT RESULTS":
+        if self.dlg_wsoptions.valve_mode.currentText() != "MINCUT RESULTS":
             self.dlg_wsoptions.valve_mode_mincut_result.setEnabled(False)
 
         if self.dlg_wsoptions.hydraulics.currentText() == "":
@@ -230,7 +230,7 @@ class Go2Epa(ParentAction):
         else:
             self.dlg_wsoptions.node_id.setEnabled(True)
 
-        if utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.chk_enabled):
+        if utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled):
             self.dlg_wsoptions.rtc_period_id.setEnabled(True)
             self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
             
@@ -241,8 +241,8 @@ class Go2Epa(ParentAction):
         self.dlg_wsoptions.quality.currentIndexChanged.connect(
             partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.quality, self.dlg_wsoptions.node_id, "TRACE"))
         self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, "MINCUT RESULTS"))
-        self.dlg_wsoptions.chk_enabled.stateChanged.connect(self.enable_per_coef)
+            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, ("EPA TABLES", "INVENTORY VALUES")))
+        self.dlg_wsoptions.rtc_enabled.stateChanged.connect(self.enable_per_coef)
 
         self.dlg_wsoptions.btn_accept.clicked.connect(
             partial(self.update_table, 'inp_options', self.dlg_wsoptions))
@@ -270,13 +270,13 @@ class Go2Epa(ParentAction):
 
     def enable_per_coef(self):
         """ Enable or dissable cbx """
-        self.dlg_wsoptions.rtc_period_id.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.chk_enabled))
-        self.dlg_wsoptions.rtc_coefficient.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.chk_enabled))
+        self.dlg_wsoptions.rtc_period_id.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled))
+        self.dlg_wsoptions.rtc_coefficient.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled))
 
 
     def enable_linetext(self, dialog, widget1, widget2, text):
         """ Enable or disable txt """
-        if utils_giswater.getWidgetText(dialog, widget1) == text:
+        if utils_giswater.getWidgetText(dialog, widget1) in text:
             utils_giswater.setWidgetEnabled(dialog, widget2, False)
         else:
             utils_giswater.setWidgetEnabled(dialog, widget2, True)
@@ -738,7 +738,7 @@ class Go2Epa(ParentAction):
                     utils_giswater.setTimeEdit(dialog, widget, time)
                     utils_giswater.setText(dialog, column_name + "_day", days)
                 else:
-                    utils_giswater.setWidgetText(dialog, widget, row[column_name])
+                    utils_giswater.setWidgetText(dialog, widget, str(row[column_name]))
 
             columns.append(column_name)
             
