@@ -1541,6 +1541,9 @@ class UpdateSQL(ParentAction):
 
         info_updates.setText(self.message_update)
 
+        if str(self.message_update) == '':
+            self.dlg_readsql_show_info.btn_update.setEnabled(False)
+
         #Set listeners
         self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_show_info))
         self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
