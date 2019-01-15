@@ -851,7 +851,7 @@ class UpdateSQL(ParentAction):
                             if self.process_folder(
                                     self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                     '') is False:
-                                if self.process_folder(self.sql_dir + '\i18n/' + 'EN') is False:
+                                if self.process_folder(self.sql_dir + '\i18n/' + 'EN', '') is False:
                                     print(False)
                                 else:
                                     status = self.executeFiles(os.listdir(
@@ -1293,7 +1293,7 @@ class UpdateSQL(ParentAction):
         self.controller.execute_sql(sql)
 
         
-    def execute_last_process(self, new_project=False, schema_name=False, schema_type=''):
+    def execute_last_process(self, new_project=False, schema_name=False, schema_type='', locale=False):
     
         # Execute last process function
         if new_project is True:
@@ -1311,7 +1311,11 @@ class UpdateSQL(ParentAction):
         self.schema_name = schema_name
 
         #Get current locale
-        locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale)
+        if locale:
+            locale = ''
+        else:
+            locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project,
+                                                  self.dlg_readsql_create_project.cmb_locale)
 
         client = '"client":{"device":9, "lang":"'+locale+'"}, '
         data = '"data":{' + extras + '}'
@@ -1453,7 +1457,7 @@ class UpdateSQL(ParentAction):
         self.setWaitCursor()
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
         self.load_fct_ftrg(project_type=self.project_type_selected)
-        self.execute_last_process(schema_name=self.schema)
+        self.execute_last_process(schema_name=self.schema, locale=True)
         self.setArrowCursor()
 
         
@@ -1540,13 +1544,13 @@ class UpdateSQL(ParentAction):
 
         self.setWaitCursor()
         self.update_30to31(project_type=project_type)
-        self.load_views(project_type=project_type)
+        # self.load_views(project_type=project_type)
         self.update_31to39(project_type=project_type)
         self.load_fct_ftrg(project_type=project_type)
         self.load_trg(project_type=project_type)
         self.load_tablect(project_type=project_type)
         self.api(project_type=project_type)
-        self.execute_last_process(schema_name=schema_name)
+        self.execute_last_process(schema_name=schema_name, locale=True)
         self.setArrowCursor()
 
         if update_changelog is False:
