@@ -11,7 +11,13 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getfilters(
     lang character varying)
   RETURNS json AS
 $BODY$
+
+/*example
+SELECT SCHEMA_NAME.gw_fct_getfilters(false, 3, 'en');
+*/
+
 DECLARE
+
 
 --	Variables
 	selected_json json;	
@@ -19,6 +25,7 @@ DECLARE
 	formTabs_explotations json;
 	formTabs_networkStates json;
 	formTabs_hydroStates json;
+	formTabs_lotSelector json;
 	formTabs text;
 	json_array json[];
 	api_version json;
@@ -26,6 +33,7 @@ DECLARE
 	v_active boolean=true;
 	v_firsttab boolean=false;
 	v_istiled_filterstate varchar;
+	
 
 BEGIN
 
@@ -193,6 +201,41 @@ BEGIN
 		v_firsttab := TRUE;
 		v_active :=FALSE;
 	END IF;
+
+-- Tab lot selector
+	SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F33' AND formtab='tabLotSelector' ;
+	IF rec_tab IS NOT NULL THEN
+
+		-- control if user has permisions
+		 IF 'role_om_lot' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+
+			-- Get hydrometer states, selected and unselected
+			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				SELECT idval AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , false AS disabled
+				FROM om_visit_lot WHERE id IN (SELECT lot_id FROM selector_lot WHERE cur_user=' || quote_literal(current_user) || ')
+				UNION
+				SELECT idval AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , false AS disabled
+				FROM om_visit_lot WHERE id NOT IN (SELECT lot_id FROM selector_lot WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY name) a'
+				INTO formTabs_lotSelector;
+
+			-- Add tab name to json
+			formTabs_lotSelector := ('{"fields":' || formTabs_lotSelector || '}')::json;
+			formTabs_lotSelector := gw_fct_json_object_set_key(formTabs_lotSelector, 'tabName', 'selector_lot'::TEXT);
+			formTabs_lotSelector := gw_fct_json_object_set_key(formTabs_lotSelector, 'tabLabel', rec_tab.tablabel::TEXT);
+			formTabs_lotSelector := gw_fct_json_object_set_key(formTabs_lotSelector, 'tabIdName', 'lot_id'::TEXT);
+			formTabs_lotSelector := gw_fct_json_object_set_key(formTabs_lotSelector, 'active', false);
+
+			-- Create tabs array
+			IF v_firsttab THEN 
+				formTabs := formTabs || ',' || formTabs_lotSelector::text;
+			ELSE 
+				formTabs := formTabs || formTabs_lotSelector::text;
+			END IF;
+			v_firsttab := TRUE;
+			v_active :=FALSE;
+		END IF;
+	END IF;
+
 
 -- Finish the construction of the tabs array
 	formTabs := formTabs ||']';

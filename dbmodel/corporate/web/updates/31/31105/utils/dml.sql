@@ -18,3 +18,12 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 
 -- 2018/12/06
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('api_bmaps_client', 'FALSE', 'boolean', 'System', 'Utils');
+
+
+-- 2019/01/14
+INSERT INTO config_web_layer_cat_formtab VALUES ('tabLotSelector'
+INSERT INTO config_web_tabs (id, layer_id, formtab, tablabel, tabtext)  VALUES ((SELECT max(id)+1 FROM config_web_tabs), 'F33', 'tabLotSelector', 'Lots', 'Selector de lots')
+
+
+CREATE ROLE role_om_lot NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+GRANT role_om TO role_om_lot;

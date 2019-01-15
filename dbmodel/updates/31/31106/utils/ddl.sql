@@ -80,7 +80,7 @@ CREATE TABLE om_visit_lot(
   visitcat_id integer,
   descript text,
   active boolean DEFAULT true,
-  extusercat_id integer,
+  team_id integer,
   duration text,
   feature_type text);
   
@@ -103,11 +103,20 @@ CREATE TABLE om_visit_lot_x_arc(
   status integer,
   constraint om_visit_lot_x_connec_pkey PRIMARY KEY (lot_id, connec_id));
 
+  
+  CREATE TABLE selector_lot(
+  id serial PRIMARY KEY,
+  lot_id integer ,
+  cur_user text ,
+  CONSTRAINT selector_lot_lot_id_cur_user_unique UNIQUE (lot_id, cur_user));
 
-CREATE TABLE selector_lot(
-  id serial PRIMARY KEY ,
-  lot_id integer,
-  cur_user text,
-  CONSTRAINT selector_lot_lot_id_cur_user_unique UNIQUE (lot_id, cur_user)
-);
+
+  ALTER TABLE om_visit ADD column lot_id integer;
+
+  CREATE TABLE cat_team(
+  id serial PRIMARY KEY,
+  idval text,
+  descript text,
+  active boolean DEFAULT true);
+
 
