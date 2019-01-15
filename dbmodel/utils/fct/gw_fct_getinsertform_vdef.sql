@@ -6,12 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2508
 
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinsertform_vdef(
     p_feature_cat text,
     p_x double precision,
     p_y double precision)
   RETURNS json AS
 $BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_getinsertform_vdef('WJOIN',2,2)
+*/
+
 DECLARE
 
 --    Variables
@@ -46,10 +52,11 @@ DECLARE
 	v_tablecat  varchar;
 	v_cat_vdef varchar;
 	v_type_vdef varchar;
-
+	v_inventory varchar;
+        v_publish varchar;
+        v_uncertain varchar;
 	
 BEGIN
-
 	--    Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -205,7 +212,10 @@ BEGIN
 	
 	v_state_type:= (SELECT row_to_json(a) FROM (SELECT name FROM value_state_type WHERE id=v_state_type::integer)a);
 
- 
+	v_inventory := (SELECT row_to_json(a) FROM (SELECT "value"::boolean FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault' LIMIT 1)a);
+	v_publish := (SELECT row_to_json(a) FROM (SELECT "value"::boolean FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault' LIMIT 1)a);
+	v_uncertain := (SELECT row_to_json(a) FROM (SELECT "value"::boolean FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault' LIMIT 1)a);
+
 --    Control NULL's
     v_feature_id := COALESCE(v_feature_id, '{}');
     v_sector_id := COALESCE(v_sector_id, '{}');
@@ -217,6 +227,9 @@ BEGIN
     v_type := COALESCE(v_type, '{}');
     v_state := COALESCE(v_state, '{}');
     v_state_type := COALESCE(v_state_type, '{}');
+    v_inventory := COALESCE(v_inventory, '(}');
+    v_publish := COALESCE(v_publish, '{}');
+    v_uncertain := COALESCE(v_uncertain, '{}');
     
 
 --    Return
@@ -230,6 +243,10 @@ BEGIN
 	', "type":' || v_type ||
         ', "state":' || v_state ||
         ', "state_type":' || v_state_type ||        
+        ', "inventory":' || v_inventory || 
+        ', "publish":' || v_publish || 
+        ', "uncertain":' || v_uncertain || 
+
         '}')::json;
 
 --   Exception handling
