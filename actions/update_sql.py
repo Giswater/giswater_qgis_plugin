@@ -1402,8 +1402,8 @@ class UpdateSQL(ParentAction):
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
-            self.load_sample_data(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+            self.load_sample_data(project_type=project_type)
             self.setArrowCursor()
                     
         elif self.rdb_sample_dev.isChecked():
@@ -1422,9 +1422,9 @@ class UpdateSQL(ParentAction):
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
+            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
-            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.setArrowCursor()
                     
         elif self.rdb_data.isChecked():
