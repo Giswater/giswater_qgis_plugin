@@ -320,17 +320,19 @@ class ManageNewPsector(ParentManage):
 
     def update_total(self, dialog, qtable):
         """ Show description of product plan/om _psector as label """
-        
-        selected_list = qtable.model()
-        if selected_list is None:
-            return
-        total = 0
-        psector_id = utils_giswater.getWidgetText(dialog, 'psector_id')
-        for x in range(0, selected_list.rowCount()):
-            if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
-                if str(qtable.model().record(x).value('total_budget')) != 'NULL':
-                    total += float(qtable.model().record(x).value('total_budget'))
-        utils_giswater.setText(dialog, 'lbl_total', str(total))
+        try:
+            selected_list = qtable.model()
+            if selected_list is None:
+                return
+            total = 0
+            psector_id = utils_giswater.getWidgetText(dialog, 'psector_id')
+            for x in range(0, selected_list.rowCount()):
+                if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
+                    if str(qtable.model().record(x).value('total_budget')) != 'NULL':
+                        total += float(qtable.model().record(x).value('total_budget'))
+            utils_giswater.setText(dialog, 'lbl_total', str(total))
+        except:
+            pass
 
 
     def open_dlg_rapports(self, previous_dialog):#, self.dlg_plan_psector
