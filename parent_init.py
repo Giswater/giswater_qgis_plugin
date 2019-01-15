@@ -32,7 +32,7 @@ import subprocess
 
 import utils_giswater
 from dao.controller import DaoController
-from ui_manager import AddSum, NewWorkcat
+from ui_manager import AddSum
 from ui_manager import CFWScatalog
 from ui_manager import CFUDcatalog
 from ui_manager import LoadDocuments
@@ -45,7 +45,6 @@ from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
 from map_tools.snapping_utils import SnappingConfigManager
 from actions.manage_visit import ManageVisit
-from utils_.widget_manager import WidgetManager
 
 
 class ParentDialog(QDialog):

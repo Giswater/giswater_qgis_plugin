@@ -468,7 +468,6 @@ class ManageVisit(ParentManage, QObject):
         sql = ("SELECT id, descript"
                " FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
-               " AND ismultifeature = true "
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
