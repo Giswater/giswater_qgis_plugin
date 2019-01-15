@@ -56,7 +56,7 @@ BEGIN
 		END IF;	
 
 		-- inserting version table
-		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, v_projecttype, (select version()),(select postgis_version()), v_language, v_epsg);	
+		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg);	
 		v_message='Project sucessfully created';
 		
 		-- inserting on inp_project table
