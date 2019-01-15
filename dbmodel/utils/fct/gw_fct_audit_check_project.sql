@@ -61,7 +61,6 @@ BEGIN
 	*/
 
 	-- Reset sequences
-	/*
 	IF project_type_aux='WS' THEN
 		SELECT GREATEST (
 		(SELECT max(node_id::int8) FROM node WHERE node_id ~ '^\d+$'),
@@ -84,7 +83,6 @@ BEGIN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.urn_id_seq'','||max_aux||', true)';
 	END IF;
 	
-	*/
 	
 	-- Special cases (doc_seq)
 	SELECT max(id::integer) FROM doc WHERE id ~ '^\d+$' into max_aux;
