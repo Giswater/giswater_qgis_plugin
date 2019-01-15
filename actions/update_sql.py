@@ -1544,7 +1544,6 @@ class UpdateSQL(ParentAction):
 
         self.setWaitCursor()
         self.update_30to31(project_type=project_type)
-        # self.load_views(project_type=project_type)
         self.update_31to39(project_type=project_type)
         self.load_fct_ftrg(project_type=project_type)
         self.load_trg(project_type=project_type)
@@ -1901,6 +1900,10 @@ class UpdateSQL(ParentAction):
         self.cmb_locale.currentIndexChanged.connect(partial(self.update_locale))
         self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
         self.filter_srid.textChanged.connect(partial(self.filter_srid_changed))
+
+        # Set default values
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.project_name, 'projectname')
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.project_title, 'projecttitle')
 
         # Populate combo with all locales
         locales = os.listdir(self.sql_dir + '\i18n/')
