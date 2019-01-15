@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+DROP VIEW IF EXISTS v_ui_om_visit_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_node AS 
  SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
@@ -47,6 +47,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_node AS
     ORDER BY om_visit_x_node.node_id;
 
 
+DROP VIEW IF EXISTS v_ui_om_visit_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_arc AS 
 SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
@@ -88,7 +89,7 @@ SELECT om_visit_event.id AS event_id,
     ORDER BY om_visit_x_arc.arc_id;
 
 
-
+DROP VIEW IF EXISTS v_ui_om_visit_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_connec AS 
 SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
@@ -131,20 +132,8 @@ SELECT om_visit_event.id AS event_id,
 
     
   
-SELECT DISTINCT ON (v_ui_om_visit_x_node.visit_id) v_ui_om_visit_x_node.visit_id,
-    v_ui_om_visit_x_node.code,
-    om_visit_cat.name AS visitcat_name,
-    v_ui_om_visit_x_node.node_id,
-    date_trunc('second'::text, v_ui_om_visit_x_node.visit_start) AS visit_start,
-    date_trunc('second'::text, v_ui_om_visit_x_node.visit_end) AS visit_end,
-    v_ui_om_visit_x_node.user_name,
-    v_ui_om_visit_x_node.is_done,
-    v_ui_om_visit_x_node.feature_type,
-    v_ui_om_visit_x_node.form_type
-    FROM v_ui_om_visit_x_node
-    JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_node.visitcat_id;
   
-
+DROP VIEW IF EXISTS v_ui_om_visitman_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_arc AS 
 SELECT DISTINCT ON (v_ui_om_visit_x_arc.visit_id) v_ui_om_visit_x_arc.visit_id,
     v_ui_om_visit_x_arc.code,
@@ -160,6 +149,7 @@ SELECT DISTINCT ON (v_ui_om_visit_x_arc.visit_id) v_ui_om_visit_x_arc.visit_id,
     JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_arc.visitcat_id;
 
 
+DROP VIEW IF EXISTS v_ui_om_visitman_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_node AS 
 SELECT DISTINCT ON (v_ui_om_visit_x_node.visit_id) v_ui_om_visit_x_node.visit_id,
     v_ui_om_visit_x_node.code,
@@ -175,7 +165,7 @@ SELECT DISTINCT ON (v_ui_om_visit_x_node.visit_id) v_ui_om_visit_x_node.visit_id
     JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_node.visitcat_id;
 
 
-
+DROP VIEW IF EXISTS v_ui_om_visitman_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_connec AS 
  SELECT DISTINCT ON (v_ui_om_visit_x_connec.visit_id) v_ui_om_visit_x_connec.visit_id,
     v_ui_om_visit_x_connec.code,
@@ -191,7 +181,7 @@ CREATE OR REPLACE VIEW v_ui_om_visitman_x_connec AS
     JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_connec.visitcat_id;
 
 
-
+DROP VIEW IF EXISTS v_om_psector_x_arc CASCADE;
 CREATE VIEW "v_om_psector_x_arc" AS 
  SELECT 
  	row_number() OVER (ORDER BY om_rec_result_arc.arc_id) AS rid,
@@ -254,7 +244,7 @@ UNION
   
   
   
-
+DROP VIEW IF EXISTS v_om_psector_x_node CASCADE;
 CREATE VIEW "v_om_psector_x_node" AS 
 SELECT
 row_number() OVER (ORDER BY om_rec_result_node.node_id) AS rid,
@@ -310,7 +300,7 @@ AND om_reh_result_node.result_id=om_psector.result_id
 ORDER BY 2;
   
   
-  
+DROP VIEW IF EXISTS v_om_psector_x_other CASCADE;
 CREATE VIEW "v_om_psector_x_other" AS 
 SELECT
 om_psector_x_other.id,
@@ -329,7 +319,7 @@ WHERE om_psector_selector.cur_user = "current_user"()::text
 ORDER BY psector_id;
 
 
-
+DROP VIEW IF EXISTS v_om_current_psector CASCADE;
 CREATE VIEW "v_om_current_psector" AS 
 SELECT om_psector.psector_id,
 om_psector.name,
@@ -386,8 +376,7 @@ LEFT JOIN (select sum(total_budget)as suma,psector_id from v_om_psector_x_other 
 WHERE om_psector_selector.cur_user = "current_user"()::text;
 	
 
-
-
+DROP VIEW IF EXISTS v_om_current_psector_budget CASCADE;
 CREATE OR REPLACE VIEW "v_om_current_psector_budget" AS
 SELECT     row_number() OVER (ORDER BY a.arc_id) AS rid, 
 om_psector.psector_id, 'arc'::text as feature_type, arccat_id as featurecat_id, a.arc_id as feature_id, length::numeric(12,2) AS measurement, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget::numeric(12,2)
@@ -432,7 +421,8 @@ FROM v_om_psector_x_other
 order by 1,2,3;
 
 
-CREATE OR REPLACE VIEW "v_om_current_psector_budget_detail_reh" AS
+DROP VIEW IF EXISTS v_om_current_psector_budget_detail_rec CASCADE;
+CREATE OR REPLACE VIEW "v_om_current_psector_budget_detail_rec" AS
 SELECT om_reh_result_arc.id, om_psector.psector_id, om_psector_x_arc.arc_id, arccat_id, init_condition, end_condition, parameter_id, work_id, loc_condition, pcompost_id, measurement::numeric(12,2), cost::numeric(12,2), budget::numeric(12,2)
 FROM om_reh_result_arc
 JOIN om_psector_x_arc ON om_psector_x_arc.arc_id=om_reh_result_arc.arc_id
@@ -443,6 +433,7 @@ AND om_psector_selector.cur_user = "current_user"()::text
 order by 2,4,3,1;
 
 
+DROP VIEW IF EXISTS v_om_current_psector_budget_detail_rec CASCADE;
 CREATE OR REPLACE VIEW "v_om_current_psector_budget_detail_rec" AS
 SELECT om_rec_result_arc.id, om_psector.psector_id, om_psector_x_arc.arc_id, arccat_id,  soilcat_id,   y1,   y2,  arc_cost mlarc_cost,  m3mlexc,  exc_cost AS mlexc_cost,  m2mltrenchl,
 trenchl_cost AS mltrench_cost,  m2mlbottom AS m2mlbase,  base_cost AS mlbase_cost  ,  m2mlpav,  pav_cost AS mlpav_cost,
@@ -457,13 +448,13 @@ AND om_psector_selector.cur_user = "current_user"()::text
 order by 2,4,3,1;
  
   
-
+DROP VIEW IF EXISTS v_om_psector CASCADE;
 CREATE VIEW "v_om_psector" AS 
 SELECT *
 FROM om_psector;
 
   
-  
+DROP VIEW IF EXISTS v_ui_om_result_cat CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_result_cat AS 
  SELECT om_result_cat.result_id,
     om_result_cat.name,
@@ -476,7 +467,7 @@ CREATE OR REPLACE VIEW v_ui_om_result_cat AS
    FROM om_result_cat
    JOIN plan_result_type ON id=result_type;
 
-
+DROP VIEW IF EXISTS v_ui_om_visit CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit AS 
  SELECT om_visit.id,
     om_visit_cat.name as visit_catalog,

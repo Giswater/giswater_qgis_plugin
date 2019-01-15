@@ -59,7 +59,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
 
   
   
-
+drop view IF EXISTS v_ui_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_ui_hydrometer AS 
  SELECT v_rtc_hydrometer.hydrometer_id AS sys_hydrometer_id,
     v_rtc_hydrometer.connec_id AS sys_connec_id,
@@ -81,7 +81,8 @@ FROM rtc_hydrometer_x_connec
 JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 group by rtc_hydrometer_x_connec.connec_id;
 
-	 
+
+DROP VIEW IF EXISTS v_rtc_hydrometer_period CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
  SELECT ext_rtc_hydrometer.id as hydrometer_id,
     ext_cat_period.id AS period_id,
@@ -142,7 +143,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS
      JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
      RIGHT JOIN rpt_inp_arc ON rpt_inp_arc.arc_id = v_edit_connec.arc_id;
 
-
+  DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
  SELECT 
     v_rtc_hydrometer_x_arc.hydrometer_id,

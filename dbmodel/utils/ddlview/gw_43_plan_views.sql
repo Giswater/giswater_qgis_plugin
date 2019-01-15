@@ -11,6 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_plan_psector views
 --------------------------------
 
+DROP VIEW IF EXISTS v_plan_psector_x_arc CASCADE;
 CREATE VIEW "v_plan_psector_x_arc" AS 
 SELECT 
 	row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
@@ -37,6 +38,7 @@ SELECT
   
   
   
+DROP VIEW IF EXISTS v_plan_psector_x_node CASCADE;
 CREATE VIEW "v_plan_psector_x_node" AS 
 SELECT
 row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
@@ -60,6 +62,7 @@ order by 2;
 
   
 
+DROP VIEW IF EXISTS v_plan_psector_x_other CASCADE;
 CREATE VIEW "v_plan_psector_x_other" AS 
 SELECT
 plan_psector_x_other.id,
@@ -77,6 +80,7 @@ order by 2;
 
 
 
+DROP VIEW IF EXISTS v_plan_psector CASCADE;
 CREATE VIEW "v_plan_psector" AS 
 SELECT plan_psector.psector_id,
 plan_psector.name,
@@ -125,7 +129,8 @@ FROM selector_psector, plan_psector
     WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 	
 
-	
+
+DROP VIEW IF EXISTS v_plan_current_psector CASCADE;	
 CREATE VIEW "v_plan_current_psector" AS 
 SELECT plan_psector.psector_id,
 plan_psector.name,
@@ -176,6 +181,7 @@ FROM plan_psector
 	
 	
 	
+DROP VIEW IF EXISTS v_plan_current_psector_budget CASCADE;
 CREATE OR REPLACE VIEW "v_plan_current_psector_budget" AS
 SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
 psector_id,'arc'::text as feature_type, arccat_id featurecat_id, v_plan_arc.arc_id as feature_id, length, (total_budget/length)::numeric(14,2) as unitary_cost, total_budget
@@ -196,6 +202,7 @@ order by 1,2,4;
 
 
 
+DROP VIEW IF EXISTS v_plan_current_psector_budget_detail CASCADE;
 CREATE OR REPLACE VIEW "v_plan_current_psector_budget_detail" AS
 SELECT   v_plan_arc.arc_id, psector_id, arccat_id,  soilcat_id,   y1,   y2,  arc_cost mlarc_cost,  m3mlexc,  exc_cost AS mlexc_cost,  m2mltrenchl,
 trenchl_cost AS mltrench_cost,  m2mlbottom AS m2mlbase,  base_cost AS mlbase_cost  ,  m2mlpav,  pav_cost AS mlpav_cost,

@@ -116,7 +116,7 @@ CREATE OR REPLACE VIEW v_om_visit AS
   ORDER BY a.visit_id;
 	
 	
-
+DROP VIEW IF EXISTS v_ui_om_visitman_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_gully AS 
 SELECT DISTINCT ON (v_ui_om_visit_x_gully.visit_id) v_ui_om_visit_x_gully.visit_id,
     v_ui_om_visit_x_gully.ext_code,

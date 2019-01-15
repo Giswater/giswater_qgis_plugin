@@ -8,6 +8,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- Updated on 3.1.105
 ------------------------------------
+
+DROP VIEW IF EXISTS v_edit_rtc_hydro_data_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_edit_rtc_hydro_data_x_connec AS
 SELECT *
 FROM ext_rtc_hydrometer_x_data

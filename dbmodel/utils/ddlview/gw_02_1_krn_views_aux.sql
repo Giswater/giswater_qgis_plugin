@@ -11,7 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- STATE VIEWS
 --------------
 
-
+DROP VIEW IF EXISTS v_state_dimensions CASCADE;
 CREATE VIEW v_state_dimensions AS
 SELECT 
 	dimensions.id

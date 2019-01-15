@@ -7,6 +7,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
+DROP VIEW IF EXISTS v_audit_check_project CASCADE;
 CREATE OR REPLACE VIEW v_audit_check_project AS 
  SELECT *
   FROM audit_check_project

@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+DROP VIEW IF EXISTS "v_rtc_hydrometer" CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
  SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
@@ -57,6 +58,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
      WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text;
  
 
+DROP VIEW IF EXISTS "v_ui_hydrometer" CASCADE;
 CREATE OR REPLACE VIEW v_ui_hydrometer AS 
  SELECT v_rtc_hydrometer.hydrometer_id AS sys_hydrometer_id,
     v_rtc_hydrometer.connec_id AS sys_connec_id,
@@ -68,6 +70,7 @@ CREATE OR REPLACE VIEW v_ui_hydrometer AS
    FROM v_rtc_hydrometer; 
      
 
+DROP VIEW IF EXISTS "v_rtc_hydrometer_x_connec" CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec AS
 SELECT 
 rtc_hydrometer_x_connec.connec_id,
@@ -77,7 +80,7 @@ JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.
 group by rtc_hydrometer_x_connec.connec_id;
 
 	
-
+DROP VIEW IF EXISTS "v_edit_man_wjoin" CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_wjoin AS 
 SELECT 
 connec.connec_id,
@@ -148,7 +151,7 @@ FROM connec
 	LEFT JOIN sector ON connec.sector_id=sector.sector_id;
 	
 	 
-	 
+DROP VIEW IF EXISTS "v_edit_man_tap" CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_tap AS 
 SELECT
 connec.connec_id,
@@ -225,7 +228,8 @@ FROM connec
 	JOIN man_tap ON man_tap.connec_id = connec.connec_id;
 	
 	 
-	 
+  
+DROP VIEW IF EXISTS "v_edit_man_fountain" CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_fountain AS 
 SELECT 
 connec.connec_id,
@@ -305,8 +309,8 @@ FROM connec
 	JOIN man_fountain ON man_fountain.connec_id = connec.connec_id;
 
 
-
-
+  
+DROP VIEW IF EXISTS "v_edit_man_fountain_pol" CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_fountain_pol AS 
 SELECT 
 man_fountain.pol_id,
@@ -316,8 +320,8 @@ FROM connec
 	JOIN man_fountain ON man_fountain.connec_id = connec.connec_id
 	JOIN polygon ON polygon.pol_id=man_fountain.pol_id;
 
-	
 	 
+DROP VIEW IF EXISTS "v_edit_man_greentap" CASCADE;	 
 CREATE OR REPLACE VIEW v_edit_man_greentap AS 
 SELECT 
 connec.connec_id,

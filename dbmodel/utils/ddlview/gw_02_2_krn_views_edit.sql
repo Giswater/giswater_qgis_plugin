@@ -12,6 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --    GIS EDITING VIEWS
 ----------------------------
 
+DROP VIEW IF EXISTS v_edit_cad_auxcircle CASCADE;
 CREATE VIEW v_edit_cad_auxcircle AS SELECT
 id ,
 geom_polygon
@@ -19,7 +20,7 @@ FROM temp_table
 WHERE user_name=current_user
 AND fprocesscat_id=28;
 
-
+DROP VIEW IF EXISTS v_edit_cad_auxpoint CASCADE;
 CREATE VIEW v_edit_cad_auxpoint AS SELECT
 id ,
 geom_point
@@ -27,7 +28,7 @@ FROM temp_table
 WHERE user_name=current_user
 AND fprocesscat_id=27;
   
-
+DROP VIEW IF EXISTS v_edit_macrodma CASCADE;
 CREATE VIEW v_edit_macrodma AS SELECT
 	macrodma_id,
 	name,
@@ -39,7 +40,7 @@ FROM selector_expl, macrodma
 WHERE ((macrodma.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
-
+DROP VIEW IF EXISTS v_edit_dma CASCADE;
 CREATE VIEW v_edit_dma AS SELECT
 	dma_id,
 	name,
@@ -53,7 +54,7 @@ WHERE ((dma.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
     
 
- 
+ DROP VIEW IF EXISTS v_edit_macrosector CASCADE;
 CREATE VIEW v_edit_macrosector AS SELECT DISTINCT on (macrosector_id)
 	macrosector.macrosector_id,
 	macrosector.name,
@@ -66,7 +67,7 @@ WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
 AND inp_selector_sector.cur_user="current_user"());  
 
  
- 
+DROP VIEW IF EXISTS v_edit_sector CASCADE;
 CREATE VIEW v_edit_sector AS SELECT
 	sector.sector_id,
 	sector.name,
@@ -79,7 +80,7 @@ WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
 AND inp_selector_sector.cur_user="current_user"());
 
 
-
+DROP VIEW IF EXISTS v_edit_dimensions CASCADE;
 CREATE OR REPLACE VIEW v_edit_dimensions AS 
  SELECT dimensions.id,
     dimensions.distance,

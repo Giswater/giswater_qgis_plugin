@@ -33,7 +33,7 @@ SELECT
 	AND selector_state.cur_user=current_user;
 
 
-DROP VIEW IF EXISTS v_state_arc CASCADE;;
+DROP VIEW IF EXISTS v_state_arc CASCADE;
 CREATE VIEW v_state_arc AS
 SELECT 
 	arc_id
@@ -56,7 +56,7 @@ UNION SELECT
 	
 
 
-DROP VIEW IF EXISTS v_state_node CASCADE;;
+DROP VIEW IF EXISTS v_state_node CASCADE;
 CREATE VIEW v_state_node AS
 SELECT 
 	node_id
@@ -84,7 +84,7 @@ UNION
 	
 		
 
-
+DROP VIEW IF EXISTS v_state_connec CASCADE;
 CREATE OR REPLACE VIEW v_state_connec AS 
  SELECT connec.connec_id
    FROM selector_state,

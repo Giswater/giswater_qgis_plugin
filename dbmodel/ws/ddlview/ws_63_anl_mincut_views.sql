@@ -133,7 +133,7 @@ WHERE anl_mincut_result_selector.result_id::text = anl_mincut_result_valve.resul
 AND anl_mincut_result_selector.cur_user="current_user"();
 
 
-DROP VIEW IF EXISTS "v_anl_mincut_result_connec";
+DROP VIEW IF EXISTS "v_anl_mincut_result_connec" CASCADE;
 CREATE OR REPLACE VIEW "v_anl_mincut_result_connec" AS 
 SELECT
 anl_mincut_result_connec.id,
@@ -149,7 +149,7 @@ WHERE ((anl_mincut_result_selector.result_id::text) = (anl_mincut_result_connec.
 AND anl_mincut_result_selector.cur_user="current_user"();
 
 
-DROP VIEW IF EXISTS "v_anl_mincut_result_polygon";
+DROP VIEW IF EXISTS "v_anl_mincut_result_polygon" CASCADE;
 CREATE OR REPLACE VIEW "v_anl_mincut_result_polygon" AS 
 SELECT
 anl_mincut_result_polygon.id,
@@ -164,7 +164,7 @@ AND anl_mincut_result_selector.cur_user="current_user"();
 
 
 
-DROP VIEW IF EXISTS "v_anl_mincut_result_hydrometer";
+DROP VIEW IF EXISTS "v_anl_mincut_result_hydrometer" CASCADE;
 CREATE OR REPLACE VIEW "v_anl_mincut_result_hydrometer" AS 
 SELECT
 anl_mincut_result_hydrometer.id,
@@ -181,7 +181,7 @@ WHERE ((anl_mincut_result_selector.result_id::text) = (anl_mincut_result_hydrome
 AND anl_mincut_result_selector.cur_user="current_user"() ;
 
 
-DROP VIEW IF EXISTS "v_ui_mincut_hydrometer";
+DROP VIEW IF EXISTS "v_ui_mincut_hydrometer" CASCADE;
 CREATE OR REPLACE VIEW "v_ui_mincut_hydrometer" AS 
 SELECT
 anl_mincut_result_hydrometer.id,
@@ -222,7 +222,7 @@ JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::int8=anl_
 
 
 
-DROP VIEW IF EXISTS "v_ui_mincut_connec";
+DROP VIEW IF EXISTS "v_ui_mincut_connec" CASCADE;
 CREATE OR REPLACE VIEW "v_ui_mincut_connec" AS 
 SELECT
 anl_mincut_result_connec.id,
@@ -265,7 +265,7 @@ JOIN anl_mincut_cat_type ON mincut_type=anl_mincut_cat_type.id;
 -- MINCUT MANAGER VIEW
 -- ----------------------------
 
-DROP VIEW IF EXISTS "v_ui_anl_mincut_result_cat";
+DROP VIEW IF EXISTS "v_ui_anl_mincut_result_cat" CASCADE;
 CREATE OR REPLACE VIEW "v_ui_anl_mincut_result_cat" AS
 SELECT
 anl_mincut_result_cat.id,
@@ -307,7 +307,7 @@ LEFT JOIN anl_mincut_cat_state ON anl_mincut_cat_state.id = mincut_state;
 -- MINCUT RESULT AUDIT VIEW
 -- ----------------------------
 
-DROP VIEW IF EXISTS "v_anl_mincut_result_audit";
+DROP VIEW IF EXISTS "v_anl_mincut_result_audit" CASCADE;
 CREATE OR REPLACE VIEW "v_anl_mincut_result_audit" AS 
  SELECT audit_log_data.id,
     audit_log_data.feature_id,

@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME" , public, pg_catalog;
 
 
+DROP VIEW IF EXISTS v_anl_node CASCADE;
 CREATE OR REPLACE VIEW v_anl_node AS 
 SELECT
 anl_node.id,
@@ -29,6 +30,7 @@ FROM selector_audit, anl_node
 	AND anl_node.cur_user="current_user"();
 
 
+DROP VIEW IF EXISTS v_anl_connec CASCADE;
 CREATE OR REPLACE VIEW v_anl_connec AS 
 SELECT
 anl_connec.id,
@@ -50,6 +52,7 @@ FROM selector_audit, anl_connec
 
 
 
+DROP VIEW IF EXISTS v_anl_arc CASCADE;
 CREATE OR REPLACE VIEW v_anl_arc AS 
 SELECT
 anl_arc.id,
@@ -68,6 +71,7 @@ FROM selector_audit, anl_arc
 	AND anl_arc.cur_user="current_user"();
 
 
+DROP VIEW IF EXISTS v_anl_arc_point CASCADE;
 CREATE OR REPLACE VIEW v_anl_arc_point AS 
 SELECT
 anl_arc.id,
@@ -87,6 +91,7 @@ FROM selector_audit, anl_arc
 	
 
 	
+DROP VIEW IF EXISTS v_anl_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_anl_arc_x_node AS 
 SELECT
 anl_arc_x_node.id,
@@ -106,6 +111,7 @@ FROM selector_audit, anl_arc_x_node
 
 	
 	
+DROP VIEW IF EXISTS v_anl_arc_x_node_point CASCADE;
 CREATE OR REPLACE VIEW v_anl_arc_x_node_point AS 
 SELECT
 anl_arc_x_node.id,

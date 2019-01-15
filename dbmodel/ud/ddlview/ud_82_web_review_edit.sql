@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP VIEW IF EXISTS v_edit_review_arc;
+DROP VIEW IF EXISTS v_edit_review_arc CASCADE;
 CREATE VIEW  v_edit_review_arc AS SELECT
 review_arc.arc_id,
 review_arc.y1,
@@ -28,7 +28,7 @@ FROM review_arc, selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_arc.expl_id=selector_expl.expl_id;
 
 
-DROP VIEW IF EXISTS v_edit_review_audit_arc;
+DROP VIEW IF EXISTS v_edit_review_audit_arc CASCADE;
 CREATE VIEW v_edit_review_audit_arc AS SELECT
 review_audit_arc.id,
 arc_id,
@@ -61,7 +61,7 @@ WHERE selector_expl.cur_user="current_user"() AND review_audit_arc.expl_id=selec
 AND review_status_id!=0;
 
 
-DROP VIEW IF EXISTS v_edit_review_node;
+DROP VIEW IF EXISTS v_edit_review_node CASCADE;
 CREATE VIEW  v_edit_review_node AS SELECT
 node_id,
 top_elev,
@@ -81,7 +81,7 @@ FROM review_node, selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_node.expl_id=selector_expl.expl_id;
 
 
-DROP VIEW IF EXISTS v_edit_review_audit_node;
+DROP VIEW IF EXISTS v_edit_review_audit_node CASCADE;
 CREATE VIEW  v_edit_review_audit_node AS SELECT
 review_audit_node.id,
 node_id,
@@ -114,7 +114,7 @@ WHERE selector_expl.cur_user="current_user"() AND review_audit_node.expl_id=sele
 AND review_status_id!=0;
 
 
-DROP VIEW IF EXISTS v_edit_review_connec;
+DROP VIEW IF EXISTS v_edit_review_connec CASCADE;
 CREATE VIEW  v_edit_review_connec AS SELECT
 review_connec.connec_id, 
 review_connec.y1, 
@@ -134,7 +134,7 @@ FROM review_connec,selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_connec.expl_id=selector_expl.expl_id;
 
 
-DROP VIEW IF EXISTS v_edit_review_audit_connec;
+DROP VIEW IF EXISTS v_edit_review_audit_connec CASCADE;
 CREATE VIEW v_edit_review_audit_connec AS SELECT
 review_audit_connec.id,
 connec_id, 
@@ -167,7 +167,7 @@ WHERE selector_expl.cur_user="current_user"() AND review_audit_connec.expl_id=se
 AND review_status_id!=0;
 
 
-DROP VIEW IF EXISTS v_edit_review_gully;
+DROP VIEW IF EXISTS v_edit_review_gully CASCADE;
 CREATE VIEW  v_edit_review_gully AS SELECT
 review_gully.gully_id, 
 review_gully.top_elev, 
@@ -196,7 +196,7 @@ FROM review_gully,selector_expl
 WHERE selector_expl.cur_user="current_user"() AND review_gully.expl_id=selector_expl.expl_id;
 
 
-DROP VIEW IF EXISTS v_edit_review_audit_gully;
+DROP VIEW IF EXISTS v_edit_review_audit_gully CASCADE;
 CREATE VIEW v_edit_review_audit_gully AS SELECT
 review_audit_gully.id,
 gully_id, 

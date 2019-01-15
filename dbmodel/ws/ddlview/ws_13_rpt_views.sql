@@ -139,7 +139,7 @@ AND rpt_selector_result.cur_user="current_user"()
 ORDER BY 9,2;
 
 
-
+DROP VIEW IF EXISTS "v_rpt_arc_hourly"CASCADE;
 CREATE OR REPLACE VIEW v_rpt_arc_hourly AS
 SELECT rpt_arc.id,
 arc.arc_id,
@@ -161,7 +161,7 @@ ORDER BY time, arc.arc_id;
 
  
 
-
+DROP VIEW IF EXISTS "v_rpt_node_hourly"CASCADE;
 CREATE OR REPLACE VIEW v_rpt_node_hourly AS
 SELECT rpt_node.id,
 node.node_id,
@@ -269,7 +269,7 @@ GROUP BY node.node_id,  node_type, nodecat_id, rpt_selector_compare.result_id, n
 ORDER BY node.node_id;
 
 
-
+DROP VIEW IF EXISTS "v_rpt_comp_arc_hourly" CASCADE;
 CREATE OR REPLACE VIEW v_rpt_comp_arc_hourly AS
 SELECT rpt_arc.id,
 arc.arc_id,
@@ -290,6 +290,7 @@ AND rpt_selector_hourly.cur_user = "current_user"()::text
 ORDER BY time, arc.arc_id;
 
 
+DROP VIEW IF EXISTS "v_rpt_comp_node_hourly" CASCADE;
 CREATE OR REPLACE VIEW v_rpt_comp_node_hourly AS
 SELECT rpt_node.id,
 node.node_id,

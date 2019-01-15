@@ -118,7 +118,7 @@ AND selector_state.cur_user = "current_user"()::text;
 
 
 
-DROP VIEW IF EXISTS v_ui_node_x_connection_downstream;
+DROP VIEW IF EXISTS v_ui_node_x_connection_downstream CASCADE;
 CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS 
  SELECT row_number() OVER (ORDER BY v_edit_arc.node_2) AS rid,
     v_edit_arc.node_2 AS node_id,
@@ -142,7 +142,7 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS
 
 	 
 
-DROP VIEW IF EXISTS "v_ui_node_x_connection_upstream";
+DROP VIEW IF EXISTS "v_ui_node_x_connection_upstream" CASCADE;
 CREATE OR REPLACE VIEW "v_ui_node_x_connection_upstream" AS 
  SELECT row_number() OVER (ORDER BY v_edit_arc.node_1)+1000000 AS rid,
     v_edit_arc.node_1 AS node_id,
@@ -273,7 +273,7 @@ CREATE MATERIALIZED VIEW v_ui_workcat_polygon_aux AS
 
 
 
-DROP VIEW IF EXISTS v_ui_workcat_x_feature;
+DROP VIEW IF EXISTS v_ui_workcat_x_feature CASCADE;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature AS 
 	SELECT row_number() OVER (ORDER BY arc.arc_id) + 1000000 AS rid,
     arc.feature_type,
@@ -337,7 +337,7 @@ UNION
 
 
  
-DROP VIEW IF EXISTS v_ui_workcat_x_feature_end ;
+DROP VIEW IF EXISTS v_ui_workcat_x_feature_end CASCADE;
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end AS 
  SELECT row_number() OVER (ORDER BY arc_id) + 1000000 AS rid,
     'ARC'::varchar as feature_type,
@@ -401,6 +401,7 @@ UNION
   
   
 
+DROP VIEW IF EXISTS v_rtc_scada CASCADE;
 CREATE OR REPLACE VIEW v_rtc_scada AS 
  SELECT ext_rtc_scada.scada_id,
     rtc_scada_node.node_id,

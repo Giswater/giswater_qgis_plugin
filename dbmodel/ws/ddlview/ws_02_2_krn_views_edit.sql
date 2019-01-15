@@ -11,7 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 ----------------------------
 
 
-DROP VIEW IF EXISTS v_edit_node;
+DROP VIEW IF EXISTS v_edit_node CASCADE;
 CREATE OR REPLACE VIEW v_edit_node AS
 SELECT 
 node_id, 
@@ -77,7 +77,7 @@ FROM v_node
 	LEFT JOIN cat_node ON v_node.nodecat_id = cat_node.id;
 
 
-DROP VIEW IF EXISTS v_edit_arc;
+DROP VIEW IF EXISTS v_edit_arc CASCADE;
 CREATE OR REPLACE VIEW v_edit_arc AS
 SELECT 
 arc_id,
@@ -141,7 +141,7 @@ FROM v_arc
 
 	
 
-DROP VIEW IF EXISTS v_edit_connec;
+DROP VIEW IF EXISTS v_edit_connec CASCADE;
 CREATE OR REPLACE VIEW v_edit_connec AS 
 SELECT 
 connec.connec_id,
@@ -281,6 +281,7 @@ FROM  connec
    
   
 
+DROP VIEW IF EXISTS v_edit_element CASCADE;
 CREATE VIEW v_edit_element AS SELECT
 	element.element_id,
 	code,
@@ -320,68 +321,9 @@ JOIN element_type ON element_type.id=elementtype_id
 	WHERE ((element.expl_id)=(selector_expl.expl_id)
 	AND selector_expl.cur_user="current_user"());	
 	
-	
-	
-CREATE OR REPLACE VIEW v_edit_man_pipe AS
-SELECT 
-v_arc.arc_id,
-code,
-node_1,
-node_2,
-arccat_id, 
-arctype_id AS "cat_arctype_id",
-matcat_id AS "matcat_id",
-pnom AS "cat_pnom",
-dnom AS "cat_dnom",
-epa_type,
-sector_id, 
-macrosector_id,
-state,
-state_type,
-annotation,
-observ,
-"comment",
-gis_length,
-custom_length,
-dma_id,
-presszonecat_id,
-soilcat_id,
-function_type,
-category_type,
-fluid_type,
-location_type,
-workcat_id,
-workcat_id_end,
-buildercat_id,
-builtdate,
-enddate,
-ownercat_id,
-muni_id,
-postcode,
-streetaxis_id,
-postnumber,
-postcomplement,
-postcomplement2,
-streetaxis2_id,
-postnumber2,
-descript,
-link,
-verified,
-the_geom,
-undelete,
-label_x,
-label_y,
-label_rotation,
-publish,
-inventory,
-macrodma_id,
-expl_id,
-num_value
-FROM v_arc
-	JOIN man_pipe ON man_pipe.arc_id=v_arc.arc_id;
 
 
-
+DROP VIEW IF EXISTS v_edit_man_varc CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_varc AS
 SELECT 
 v_arc.arc_id,
@@ -441,7 +383,7 @@ FROM v_arc
 	JOIN man_varc ON man_varc.arc_id=v_arc.arc_id;
 
 
-	
+DROP VIEW IF EXISTS v_edit_man_pipe CASCADE;		
 CREATE OR REPLACE VIEW v_edit_man_pipe AS
 SELECT 
 v_arc.arc_id,
@@ -501,7 +443,7 @@ FROM v_arc
 	JOIN man_pipe ON man_pipe.arc_id=v_arc.arc_id;
 
 
-
+DROP VIEW IF EXISTS ve_arc_pipe CASCADE;	
 CREATE OR REPLACE VIEW ve_arc_pipe AS
 SELECT 
 v_arc.arc_id,
@@ -561,7 +503,7 @@ FROM v_arc
 	JOIN man_varc ON man_varc.arc_id=v_arc.arc_id;
 	
 	
-	
+DROP VIEW IF EXISTS v_edit_man_hydrant CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_hydrant AS 
 SELECT 
 v_node.node_id,
@@ -626,7 +568,8 @@ man_hydrant.valve
 FROM v_node
     JOIN man_hydrant ON man_hydrant.node_id = v_node.node_id;  
 
-	
+
+DROP VIEW IF EXISTS v_edit_man_junction CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_junction AS 
 SELECT 
 v_node.node_id,
@@ -689,7 +632,7 @@ FROM v_node
 	JOIN man_junction ON v_node.node_id = man_junction.node_id;
 
   
-
+DROP VIEW IF EXISTS v_edit_man_manhole CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_manhole AS 
 SELECT 
 v_node.node_id,
@@ -753,7 +696,7 @@ FROM v_node
 	JOIN man_manhole ON v_node.node_id = man_manhole.node_id;
 
 
-
+DROP VIEW IF EXISTS v_edit_man_meter CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_meter AS 
 SELECT 
 v_node.node_id,
@@ -815,7 +758,8 @@ num_value
 FROM v_node 
 	JOIN man_meter ON man_meter.node_id = v_node.node_id;
 
-	
+
+DROP VIEW IF EXISTS v_edit_man_pump CASCADE;		
 CREATE OR REPLACE VIEW v_edit_man_pump AS 
 SELECT 
 v_node.node_id,
@@ -885,7 +829,8 @@ man_pump.pump_number
 FROM v_node
 	JOIN man_pump ON man_pump.node_id = v_node.node_id;
 
-	
+
+DROP VIEW IF EXISTS v_edit_man_reduction CASCADE;		
 CREATE OR REPLACE VIEW v_edit_man_reduction AS 
 SELECT 
 v_node.node_id,
@@ -950,6 +895,7 @@ FROM v_node
 	JOIN man_reduction ON man_reduction.node_id = v_node.node_id;
 	
 
+DROP VIEW IF EXISTS v_edit_man_source CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_source AS 
 SELECT 
 v_node.node_id,
@@ -1012,7 +958,8 @@ man_source.name
 FROM v_node
 	JOIN man_source ON v_node.node_id = man_source.node_id;
  
-	
+
+DROP VIEW IF EXISTS v_edit_man_valve CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_valve AS 
 SELECT 
 v_node.node_id,
@@ -1089,7 +1036,8 @@ man_valve.cat_valve2
 FROM v_node
 	JOIN man_valve ON man_valve.node_id = v_node.node_id;
 
-	 
+
+DROP VIEW IF EXISTS v_edit_man_waterwell CASCADE;		 
 CREATE OR REPLACE VIEW v_edit_man_waterwell AS 
 SELECT
 v_node.node_id,
@@ -1152,7 +1100,8 @@ man_waterwell.name
 FROM v_node
 	JOIN man_waterwell ON v_node.node_id = man_waterwell.node_id;
 	
-   
+  
+DROP VIEW IF EXISTS v_edit_man_tank CASCADE;	 
 CREATE OR REPLACE VIEW v_edit_man_tank AS 
 SELECT 
 v_node.node_id,
@@ -1220,7 +1169,8 @@ man_tank.name
 FROM v_node
 	JOIN man_tank ON man_tank.node_id = v_node.node_id;
 	
-	
+
+DROP VIEW IF EXISTS v_edit_man_tank_pol CASCADE;		
 CREATE OR REPLACE VIEW v_edit_man_tank_pol AS 
 SELECT 
 man_tank.pol_id,
@@ -1293,7 +1243,7 @@ num_value
 FROM v_node
 	JOIN man_filter ON v_node.node_id = man_filter.node_id;
 	
-	
+DROP VIEW IF EXISTS v_edit_man_register CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_register AS 
 SELECT 
 v_node.node_id,
@@ -1357,7 +1307,7 @@ FROM v_node
 	JOIN man_register ON v_node.node_id = man_register.node_id;
 	
 
-	
+DROP VIEW IF EXISTS v_edit_man_register_pol CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_register_pol AS 
 SELECT 
 man_register.pol_id,
@@ -1368,7 +1318,7 @@ FROM v_node
 	JOIN polygon ON polygon.pol_id = man_register.pol_id;
 	
 	
-	
+DROP VIEW IF EXISTS v_edit_man_netwjoin CASCADE;		
 CREATE OR REPLACE VIEW v_edit_man_netwjoin AS 
 SELECT 
 v_node.node_id,
@@ -1434,7 +1384,7 @@ FROM v_node
 	JOIN man_netwjoin ON v_node.node_id = man_netwjoin.node_id;
 
 	
-	
+DROP VIEW IF EXISTS v_edit_man_flexunion CASCADE;		
 CREATE OR REPLACE VIEW v_edit_man_flexunion AS 
 SELECT 
 v_node.node_id,
@@ -1496,7 +1446,8 @@ num_value
 FROM v_node
 	JOIN man_flexunion ON v_node.node_id = man_flexunion.node_id;
 	
-	
+
+DROP VIEW IF EXISTS v_edit_man_wtp CASCADE;		
 CREATE OR REPLACE VIEW v_edit_man_wtp AS 
 SELECT 
 v_node.node_id,
@@ -1559,7 +1510,7 @@ man_wtp.name
 FROM v_node
 	JOIN man_wtp ON v_node.node_id = man_wtp.node_id;
 	
-	
+DROP VIEW IF EXISTS v_edit_man_expansiontank CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_expansiontank AS 
 SELECT 
 v_node.node_id,
@@ -1622,7 +1573,7 @@ FROM v_node
 	JOIN man_expansiontank ON v_node.node_id = man_expansiontank .node_id;
 	
 	
-
+DROP VIEW IF EXISTS v_edit_man_netsamplepoint CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_netsamplepoint AS 
 SELECT 
 v_node.node_id,
@@ -1686,7 +1637,7 @@ FROM v_node
 	JOIN man_netsamplepoint ON v_node.node_id = man_netsamplepoint .node_id;
 	
 	
-
+DROP VIEW IF EXISTS v_edit_man_netelement CASCADE;	
 CREATE OR REPLACE VIEW v_edit_man_netelement AS 
 SELECT 
 v_node.node_id,
@@ -1750,7 +1701,7 @@ FROM v_node
 	JOIN man_netelement ON v_node.node_id = man_netelement .node_id;
 	
 
-	
+DROP VIEW IF EXISTS v_edit_link CASCADE;		
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
     link.feature_type,
@@ -1784,7 +1735,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
   AND link.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text;
 
 
-  
+DROP VIEW IF EXISTS v_edit_vnode CASCADE;	  
 CREATE VIEW v_edit_vnode AS SELECT
 vnode_id,
 vnode_type,
@@ -1801,7 +1752,7 @@ FROM selector_expl, selector_state, vnode
 
 
 	
-
+DROP VIEW IF EXISTS v_edit_pond CASCADE;	
 CREATE VIEW v_edit_pond AS 
 SELECT
 pond_id,
@@ -1816,7 +1767,7 @@ LEFT JOIN dma ON pond.dma_id = dma.dma_id
 WHERE ((pond.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
-
+DROP VIEW IF EXISTS v_edit_pool CASCADE;	
 CREATE VIEW v_edit_pool AS 
 SELECT
 pool_id,
@@ -1832,7 +1783,7 @@ WHERE ((pool.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
 
-
+DROP VIEW IF EXISTS v_edit_samplepoint CASCADE;	
 CREATE VIEW v_edit_samplepoint AS SELECT
 	samplepoint.sample_id,
 	code,
@@ -1869,7 +1820,7 @@ WHERE ((samplepoint.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
 
-
+DROP VIEW IF EXISTS v_value_cat_connec CASCADE;	
 CREATE OR REPLACE VIEW v_value_cat_connec AS 
  SELECT cat_connec.id,
     cat_connec.connectype_id AS connec_type,
@@ -1878,7 +1829,7 @@ CREATE OR REPLACE VIEW v_value_cat_connec AS
      JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text;
 
 
- 
+DROP VIEW IF EXISTS v_value_cat_node CASCADE;	
 CREATE OR REPLACE VIEW v_value_cat_node AS 
  SELECT cat_node.id,
     cat_node.nodetype_id,

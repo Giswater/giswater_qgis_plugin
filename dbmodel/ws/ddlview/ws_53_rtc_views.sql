@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+DROP VIEW IF EXISTS v_ui_arc_x_relations CASCADE;
 CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
 SELECT 
 row_number() OVER (ORDER BY node_id)+1000000 AS rid,
@@ -40,7 +40,7 @@ JOIN v_edit_arc ON v_edit_arc.arc_id=v_edit_connec.arc_id
 where v_edit_connec.arc_id is not null;
 
 
-
+DROP VIEW IF EXISTS v_ui_scada_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_scada_x_node AS 
 SELECT
 ext_rtc_scada_x_value.id,
@@ -105,7 +105,7 @@ CREATE OR REPLACE VIEW v_rtc_dma_parameter_period AS
   JOIN ext_rtc_scada_dma_period ON ext_rtc_scada_dma_period.cat_period_id = v_rtc_dma_hydrometer_period.period_id;
 
 
-
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
  SELECT rtc_hydrometer_x_connec.hydrometer_id,
     rtc_hydrometer_x_connec.connec_id,
@@ -116,7 +116,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS
      JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
      RIGHT JOIN rpt_inp_arc ON rpt_inp_arc.arc_id = v_edit_connec.arc_id;
 
-
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
  SELECT 
     v_rtc_hydrometer_x_arc.hydrometer_id,
@@ -153,7 +153,7 @@ UNION
      LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id = v_rtc_dma_parameter_period.period_id;
 
  
-
+DROP VIEW IF EXISTS v_rtc_scada CASCADE;
 CREATE OR REPLACE VIEW v_rtc_scada AS 
 SELECT ext_rtc_scada.scada_id,
 rtc_scada_node.node_id,
@@ -163,7 +163,7 @@ FROM ext_rtc_scada
 JOIN rtc_scada_node ON rtc_scada_node.scada_id = ext_rtc_scada.scada_id;
 
 
-
+DROP VIEW IF EXISTS v_rtc_scada_data CASCADE;
 CREATE OR REPLACE VIEW v_rtc_scada_data AS SELECT
 ext_rtc_scada_x_data.scada_id,
 rtc_scada_node.node_id,
@@ -175,7 +175,7 @@ ext_rtc_scada_x_data.cat_period_id
 FROM ext_rtc_scada_x_data JOIN rtc_scada_node ON rtc_scada_node.scada_id=ext_rtc_scada_x_data.scada_id;
 
 
-
+DROP VIEW IF EXISTS v_rtc_scada_value CASCADE;
 CREATE OR REPLACE VIEW v_rtc_scada_value AS SELECT
 ext_rtc_scada_x_value.scada_id,
 rtc_scada_node.node_id,

@@ -8,7 +8,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-DROP VIEW IF EXISTS v_anl_flow_arc;
+DROP VIEW IF EXISTS v_anl_flow_arc CASCADE;
 CREATE OR REPLACE VIEW v_anl_flow_arc AS 
 SELECT
 anl_flow_arc.id,
@@ -24,7 +24,7 @@ FROM selector_expl, anl_flow_arc
 
 
 
-DROP VIEW IF EXISTS v_anl_flow_node;
+DROP VIEW IF EXISTS v_anl_flow_node CASCADE;
 CREATE OR REPLACE VIEW v_anl_flow_node AS 
 SELECT
 anl_flow_node.id,
@@ -41,7 +41,7 @@ FROM selector_expl, anl_flow_node
 
 
 
-DROP VIEW IF EXISTS v_anl_flow_connec;
+DROP VIEW IF EXISTS v_anl_flow_connec CASCADE;
 CREATE OR REPLACE VIEW v_anl_flow_connec AS 
 SELECT
 anl_flow_arc.id
@@ -58,7 +58,7 @@ FROM selector_expl, anl_flow_arc
 	
 
 
-DROP VIEW IF EXISTS v_anl_flow_hydrometer;
+DROP VIEW IF EXISTS v_anl_flow_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_anl_flow_hydrometer AS 
 SELECT
 anl_flow_arc.id,

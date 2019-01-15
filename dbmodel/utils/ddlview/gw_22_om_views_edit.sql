@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-  
+DROP VIEW IF EXISTS v_edit_om_visit CASCADE;
 CREATE VIEW v_edit_om_visit AS SELECT
 	om_visit.id,
 	visitcat_id,
@@ -22,7 +22,7 @@ WHERE ((om_visit.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
 
-
+DROP VIEW IF EXISTS v_edit_om_psector CASCADE;
 CREATE OR REPLACE VIEW v_edit_om_psector AS 
 SELECT om_psector.psector_id,
     om_psector.name,
@@ -46,7 +46,7 @@ SELECT om_psector.psector_id,
 FROM selector_expl, om_psector
 WHERE om_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
-
+DROP VIEW IF EXISTS v_edit_om_psector_x_other CASCADE;
 CREATE OR REPLACE VIEW v_edit_om_psector_x_other AS 
  SELECT 
     om_psector_x_other.id,

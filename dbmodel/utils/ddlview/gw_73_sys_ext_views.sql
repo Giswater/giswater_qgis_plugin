@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+DROP VIEW IF EXISTS v_ext_streetaxis CASCADE;
 CREATE VIEW v_ext_streetaxis AS SELECT
 ext_streetaxis.id,
 code,
@@ -23,6 +24,7 @@ AND selector_expl.cur_user="current_user"());
 
 
 
+DROP VIEW IF EXISTS v_ext_address CASCADE;
 CREATE VIEW v_ext_address AS SELECT
 ext_address.id,
 muni_id,
@@ -38,6 +40,7 @@ AND selector_expl.cur_user="current_user"());
 
 
 
+DROP VIEW IF EXISTS v_ext_plot CASCADE;
 CREATE VIEW v_ext_plot AS SELECT
 ext_plot.id,
 plot_code,

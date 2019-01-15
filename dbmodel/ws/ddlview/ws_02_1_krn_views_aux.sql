@@ -102,7 +102,7 @@ SELECT
 -------------------------------------------------------
 ----------------------------------------------------
 
-DROP VIEW IF EXISTS v_node CASCADE;;
+DROP VIEW IF EXISTS v_node CASCADE;
 CREATE VIEW v_node AS SELECT
 node.node_id, 
 code,
@@ -169,7 +169,7 @@ FROM node
 	LEFT JOIN sector ON node.sector_id = sector.sector_id;
 
 
-DROP VIEW IF EXISTS vu_node CASCADE;;
+DROP VIEW IF EXISTS vu_node CASCADE;
 CREATE VIEW vu_node AS SELECT
 node.node_id, 
 code,

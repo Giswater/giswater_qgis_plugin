@@ -514,7 +514,7 @@ JOIN element_type ON element_type.id=elementtype_id
 	
 	
 	
-DROP VIEW IF EXISTS v_edit_link;
+DROP VIEW IF EXISTS v_edit_link CASCADE;
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
     link.feature_type,
