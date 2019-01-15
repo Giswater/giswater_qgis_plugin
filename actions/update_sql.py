@@ -1642,30 +1642,11 @@ class UpdateSQL(ParentAction):
             for sub_folder in sub_folders:
                 if str(sub_folder) > str(self.project_data_schema_version).replace('.',''):
 
-                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '/utils/') is False:
+                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder, '') is False:
                         print(False)
                     else:
                         status = self.readFiles(
-                            os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/utils/'),self.folderUpdates + folder + '/' + sub_folder + '/utils/')
-                        if status is False:
-                            print(False)
-                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/','') is False:
-                        print(False)
-                    else:
-                        status = self.readFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/'),self.folderUpdates + folder + '/' + sub_folder + '/' + self.project_type_selected + '/')
-                        if status is False:
-                            print(False)
-                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + self.locale,'') is False:
-                        if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/EN', '') is False:
-                            print(False)
-                        else:
-                            status = self.readFiles(os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/i18n/EN' ),self.folderUpdates + folder + '/' + sub_folder + '/i18n/EN' )
-                            if status is False:
-                                print(False)
-                    else:
-                        status = self.readFiles(
-                            os.listdir(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + self.locale),
-                            self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + self.locale)
+                            os.listdir(self.folderUpdates + folder + '/' + sub_folder + ''), self.folderUpdates + folder + '/' + sub_folder + '')
                         if status is False:
                             print(False)
                 else:
@@ -1984,23 +1965,21 @@ class UpdateSQL(ParentAction):
 
             
     def readFiles(self, filelist, filedir):
-    
-        for file in filelist:
-            print(filedir + file)
-            if ".txt" in file:
-                try:
-                    f = open(filedir + '/' + file, 'r')
-                    if f:
-                        f_to_read = str(f.read()).decode(str('utf-8-sig'))
-                        f_to_read = f_to_read + '\n \n'
-                        self.message_update = self.message_update + '\n' + str(f_to_read)
-                    else:
-                        return False
-                except Exception as e:
-                    print "Command skipped. Unexpected error"
-                    print (e)
-                    self.dao.rollback()
+
+        if "changelog.txt" in filelist:
+            try:
+                f = open(filedir + '/changelog.txt', 'r')
+                if f:
+                    f_to_read = str(f.read()).decode(str('utf-8-sig'))
+                    f_to_read = f_to_read + '\n \n'
+                    self.message_update = self.message_update + '\n' + str(f_to_read)
+                else:
                     return False
+            except Exception as e:
+                print "Command skipped. Unexpected error"
+                print (e)
+                self.dao.rollback()
+                return False
         return True
 
         
