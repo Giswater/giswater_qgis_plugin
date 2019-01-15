@@ -34,14 +34,14 @@ INSERT INTO "value_yesno" VALUES ('SI');
 -- Records of event om_visit_parameter_type table
 -- ----------------------------
 INSERT INTO om_visit_parameter_type VALUES ('INSPECCIO', '');
-INSERT INTO om_visit_parameter_type VALUES ('REHABILITACIÓ', '');
+INSERT INTO om_visit_parameter_type VALUES ('DESPERFECTES', '');
 INSERT INTO om_visit_parameter_type VALUES ('RECONSTRUIR', '');
 INSERT INTO om_visit_parameter_type VALUES ('ALTRES', '');
 
 -- Records of event om_visit_parameter table
 -- ----------------------------
-INSERT INTO om_visit_parameter VALUES ('RAT1', NULL, 'REPARACIO', 'ARC', 'TEXT', NULL, 'Reparació del arc parametre 1', 'event_ud_arc_rehabit', 'a');
-INSERT INTO om_visit_parameter VALUES ('RAT2', NULL, 'REPARACIO', 'ARC', 'TEXT', NULL, 'Reparació del arc parametre 2', 'event_ud_arc_rehabit', 'b');
+INSERT INTO om_visit_parameter VALUES ('RAT1', NULL, 'DESPERFECTES', 'ARC', 'TEXT', NULL, 'Reparació del arc parametre 1', 'event_ud_arc_rehabit', 'a');
+INSERT INTO om_visit_parameter VALUES ('RAT2', NULL, 'DESPERFECTES', 'ARC', 'TEXT', NULL, 'Reparació del arc parametre 2', 'event_ud_arc_rehabit', 'b');
 INSERT INTO om_visit_parameter VALUES ('IAT1', NULL, 'INSPECCIO', 'ARC', 'TEXT', NULL, 'Inspeccio del arc parametre 1', 'event_ud_arc_standard', 'c');
 INSERT INTO om_visit_parameter VALUES ('IAT2', NULL, 'INSPECCIO', 'ARC', 'TEXT', NULL, 'Inspeccio del arc parametre 2', 'event_ud_arc_standard', 'f');
 INSERT INTO om_visit_parameter VALUES ('ICT1', NULL, 'INSPECCIO', 'CONNEC', 'TEXT', NULL, 'Inspeccio del connec parametre 1', 'event_standard', 'd');
