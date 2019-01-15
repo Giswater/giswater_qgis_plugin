@@ -1,7 +1,8 @@
+***UTILS****
+
 31105-utils-existing views
 --------------------------
 New field cat_period_code on v_edit_rtc_hydrometer_x_data, issue#577;
-
 
 31105-utils-other
 -----------------
@@ -92,3 +93,48 @@ New api functions
 (2626) gw_fct_json_object_set_key
 (2628) gw_api_gettoolbarbuttons
 (2630) gw_api_getgeometry
+
+
+***WS***
+
+31105-ws-drop and create for existing views
+-------------------------------------------
+v_om_visit, issue#592;
+v_inp_pattern,issue#590;
+
+31105-ws-other
+--------------
+Bug on insert nodes when node_type.isarcdivide is false and uservar=edit_arc_division_dsbl= is true capturing arc_id, issue#596;
+Bug on EPANET command file when pattern has more than 18 value on same row of inp file ,issue#590;
+New mincut approach. Zoom to features is managed by database, issue#586;
+New system parameter om_mincut_valvestat_using_valveunaccess, issue#563;
+New system parameter om_mincut_debug, issue#562;
+New user parameter om_mincut_analysis_dminsector, issue#561;
+New user parameter om_mincut_analysis_pipehazard, issue#561;
+New user parameter om_mincut_analysis_dinletsector, issue#561;
+New views v_arc_dattrib, v_node_dattrib, v_connec_dattrib, issue#561;
+Update symbol rotation when node is disconnected from the network, issue#594;
+
+
+***UD***
+
+31105-ud-existing views
+-----------------------
+Bug fix on view v_om_visit; 
+
+
+31105-ud-other
+---------------
+New system parameter code_vd, issue#567
+Bug fix on v_ui_node_x_connection_upstream view, issue#584
+
+
+***i18n***
+
+31105-i18n
+----------
+New datrib_type value dminsector, issue#566
+New datrib_type value pipehazard, issue#566
+New datrib_type value dinletsector, issue#566
+New datrib_type value dstaticpress, issue#560
+New datrib_type value pipehazardlength, issue#566
