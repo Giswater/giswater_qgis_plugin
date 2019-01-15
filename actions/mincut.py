@@ -749,6 +749,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set dialog Mincut_add_hydrometer
         self.dlg_hydro = Mincut_add_hydrometer()
         self.load_settings(self.dlg_hydro)
+        self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
         # self.dlg_hydro.btn_snapping.setEnabled(False)
         

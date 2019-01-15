@@ -138,10 +138,11 @@ class ParentDialog(QDialog):
         else:
             point = self.canvas.mouseLastXY()
             point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), point.x(), point.y())
-
             table_name = self.controller.get_layer_source_table_name(self.layer)
-            id_table = self.feature_cat[table_name].id
+            if table_name not in self.feature_cat:
+                return
 
+            id_table = self.feature_cat[table_name].id
             sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('" + str(id_table) + "', '"+str(point[0])+"', '"+str(point[1])+"')")
             row = self.controller.get_row(sql, log_sql=True)
             if not row:
