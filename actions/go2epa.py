@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QTime, QDate, Qt
-from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox
+from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox, QComboBox
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
 
 import os
@@ -176,44 +176,45 @@ class Go2Epa(ParentAction):
         self.dlg_wsoptions.rtc_enabled.setChecked(True)
 
         # Set values from widgets of type QComboBox
-        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
+        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.units, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.units, rows)
 
-        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
+        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.headloss, rows, False)
-        sql = "SELECT pattern_id FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.pattern, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.headloss, rows)
 
-        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
+        sql = "SELECT pattern_id, pattern_id FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.unbalanced, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.pattern, rows)
 
-        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
+        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.hydraulics, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.unbalanced, rows)
 
-        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
+        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.quality, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.hydraulics, rows)
 
-        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_valvemode ORDER BY id"
+        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.quality, rows)
 
-        sql = "SELECT id FROM "+self.schema_name+".anl_mincut_result_cat ORDER BY id"
+        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_valvemode ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.valve_mode_mincut_result, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.valve_mode, rows)
 
-        sql = "SELECT id FROM "+self.schema_name+".ext_cat_period ORDER BY id"
+        sql = "SELECT id::text, id::text FROM "+self.schema_name+".anl_mincut_result_cat ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.rtc_period_id, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.valve_mode_mincut_result, rows)
 
-        sql = "SELECT id FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
+        sql = "SELECT id, code FROM "+self.schema_name+".ext_cat_period ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_wsoptions, self.dlg_wsoptions.rtc_coefficient, rows, False)
+        utils_giswater.set_item_data(self.dlg_wsoptions.rtc_period_id, rows, 1)
+
+        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_wsoptions.rtc_coefficient, rows)
 
         # TODO
         if self.dlg_wsoptions.valve_mode.currentText() != "MINCUT RESULTS":
@@ -457,6 +458,8 @@ class Go2Epa(ParentAction):
                     elif widget_type is QSpinBox:
                         x = dialog.findChild(QSpinBox, str(column_name))
                         value = x.value()
+                    elif widget_type is QComboBox:
+                        value = utils_giswater.get_item_data(dialog, widget)
                     else:
                         value = utils_giswater.getWidgetText(dialog, widget)
                     if value == 'null':
@@ -721,11 +724,12 @@ class Go2Epa(ParentAction):
             if row[column_name] is not None:
                 if widget_type is QCheckBox:
                     utils_giswater.setChecked(dialog, widget, row[column_name])
+                elif widget_type is QComboBox:
+                    utils_giswater.set_combo_itemData(widget, row[column_name], 0)
                 elif widget_type is QDateEdit:
                     dateaux = row[column_name].replace('/', '-')
                     date = QDate.fromString(dateaux, 'dd-MM-yyyy')
                     utils_giswater.setCalendarDate(dialog, widget, date)
-
                 elif widget_type is QTimeEdit:
                     timeparts = str(row[column_name]).split(':')
                     if len(timeparts) < 3:
