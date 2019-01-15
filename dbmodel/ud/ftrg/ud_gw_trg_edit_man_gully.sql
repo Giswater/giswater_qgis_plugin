@@ -131,19 +131,18 @@ BEGIN
         IF (NEW.soilcat_id IS NULL) THEN
             NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
-		
-
+	
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;  
 
-		--Inventory
-		IF (NEW.inventory IS NULL) THEN
-			NEW.inventory :='TRUE';
-		END IF; 
-		
+		--Inventory	
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
+		--Publish
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');		
+        		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);

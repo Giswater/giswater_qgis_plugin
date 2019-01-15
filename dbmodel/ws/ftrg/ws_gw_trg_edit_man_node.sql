@@ -164,11 +164,6 @@ BEGIN
             NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 		
-		--Inventory
-		IF (NEW.inventory IS NULL) THEN
-			NEW.inventory :='TRUE';
-		END IF; 
-		
 		-- State
         IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
@@ -178,6 +173,12 @@ BEGIN
 		IF (NEW.state_type IS NULL) THEN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='statetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
+
+		--Inventory	
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+
+		--Publish
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
 		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN

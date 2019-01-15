@@ -150,10 +150,11 @@ BEGIN
 				NEW.code=NEW.connec_id;
 			END IF;
 
-		--Inventory
-		IF (NEW.inventory IS NULL) THEN
-			NEW.inventory :='TRUE';
-		END IF; 
+		--Inventory	
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+
+		--Publish
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');		
 		
 	    -- LINK
 	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean= TRUE THEN

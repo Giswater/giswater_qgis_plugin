@@ -148,13 +148,14 @@ BEGIN
 				END IF;	
 			END IF;
 		END IF;
+	
+		--Inventory	
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
-			
-		--Inventory
-		IF (NEW.inventory IS NULL) THEN
-			NEW.inventory :='TRUE';
-		END IF; 
+		--Publish
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');		
 		
+		-- code autofill
 		SELECT code_autofill INTO code_autofill_bool FROM node_type WHERE id=NEW.node_type;
 		
 		-- Workcat_id

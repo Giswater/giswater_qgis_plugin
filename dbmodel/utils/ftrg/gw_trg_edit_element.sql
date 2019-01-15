@@ -35,14 +35,12 @@ BEGIN
 		IF (NEW.verified IS NULL) THEN
 			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-		
 	
 		-- State
 		IF (NEW.state IS NULL) THEN
 			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
 		END IF;
 	
-
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"());
@@ -54,13 +52,17 @@ BEGIN
 			END IF;
 		END IF;		
 
-		
 		-- Enddate
 		IF (NEW.state > 0) THEN
 			NEW.enddate := NULL;
 		END IF;
 
-		
+		--Inventory	
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+
+		--Publish
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+
 		-- Element id 
 		IF (NEW.element_id IS NULL) THEN
 			NEW.element_id:= (SELECT nextval('urn_id_seq'));

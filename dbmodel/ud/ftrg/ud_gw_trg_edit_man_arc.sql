@@ -143,11 +143,11 @@ This version of Giswater is provided by Giswater Association
 				END IF;
 			END IF;
 
-			--Inventory
-			IF (NEW.inventory IS NULL) THEN
-				NEW.inventory :='TRUE';
-			END IF; 
-			
+			--Inventory	
+			NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+
+			--Publish
+			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');		       	
 			
 			-- Workcat_id
 			IF (NEW.workcat_id IS NULL) THEN
