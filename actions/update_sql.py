@@ -1301,7 +1301,7 @@ class UpdateSQL(ParentAction):
         else:
             extras = '"isNewProject":"' + str('FALSE') + '", '
         extras += '"gwVersion":"' + str('3.1.105') + '", '
-        extras += '"projectType":"' + str(schema_type).upper() + '", '
+        extras += '"projectType":"' + str(schema_type) + '", '
         extras += '"epsg":' + str('25831')
         if new_project is True:
             extras += ', ' + '"title":"' + str(self.title) + '", '
@@ -1310,10 +1310,7 @@ class UpdateSQL(ParentAction):
 
         self.schema_name = schema_name
 
-        #Get current locale
-        locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale)
-
-        client = '"client":{"device":9, "lang":"'+locale+'"}, '
+        client = '"client":{"device":9, "lang":"ES"}, '
         data = '"data":{' + extras + '}'
         body = "" + client + data
         sql = ("SELECT " + self.schema_name + ".gw_fct_admin_schema_lastprocess($${" + body + "}$$)::text")
