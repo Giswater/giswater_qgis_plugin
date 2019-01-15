@@ -53,6 +53,7 @@ New system parameter edit_connect_update_statetype, issue#587
 New system parameter om_visit_parameters, issue#595
 New system parameter edit_publish_sysvdefaut, issue#600
 New system parameter edit_inventory_sysvdefaut, issue#600 
+New system parameter edit_uncertain_sysvdefaut, issue#600 
 Automatic update state_type on connec/gully when link is created, issue#587
 Enhance arc division function with automatic update of node.arc_id of disconnecteds nodes, issue#591
 Set urn value before insert urn feature #597 

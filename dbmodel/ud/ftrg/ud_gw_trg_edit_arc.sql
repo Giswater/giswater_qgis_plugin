@@ -150,6 +150,9 @@ BEGIN
 		--Publish
 		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
 		
+		--Uncertain
+		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');
+		
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);

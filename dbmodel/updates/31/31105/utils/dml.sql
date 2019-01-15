@@ -86,8 +86,10 @@ INSERT INTO audit_cat_function VALUES (2554, 'gw_fct_admin_schema_utils_fk', 'ad
 INSERT INTO audit_cat_table VALUES ('audit_cat_sequence', 'admin', null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
--- 2018/12/17
+-- 2019/01/15
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('edit_publish_sysvdefault', 'TRUE', 'boolean', 'edit', 'System default value for publish');
 
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('edit_inventory_sysvdefault', 'TRUE', 'boolean', 'edit', 'System default value for publish');
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('edit_inventory_sysvdefault', 'TRUE', 'boolean', 'edit', 'System default value for inventory');
+
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('edit_uncertain_sysvdefault', 'FALSE', 'boolean', 'edit', 'System default value for uncertain');
 
