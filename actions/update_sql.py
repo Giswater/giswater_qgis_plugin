@@ -171,7 +171,6 @@ class UpdateSQL(ParentAction):
 
         # Set Listeners
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
-        self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
 
         #TODO:: QGIS project file (hidden)

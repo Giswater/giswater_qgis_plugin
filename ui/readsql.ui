@@ -81,13 +81,6 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="2">
-            <widget class="QPushButton" name="btn_delete">
-             <property name="text">
-              <string>Delete</string>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="1">
             <widget class="QLineEdit" name="project_schema_author">
              <property name="enabled">
@@ -95,13 +88,6 @@
              </property>
              <property name="text">
               <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QPushButton" name="btn_copy">
-             <property name="text">
-              <string>Copy</string>
              </property>
             </widget>
            </item>
@@ -126,16 +112,6 @@
              </property>
              <property name="margin">
               <number>3</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QPushButton" name="btn_schema_rename">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>Rename</string>
              </property>
             </widget>
            </item>
@@ -217,6 +193,20 @@
              </property>
              <property name="margin">
               <number>3</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="btn_copy">
+             <property name="text">
+              <string>Copy</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QPushButton" name="btn_delete">
+             <property name="text">
+              <string>Delete</string>
              </property>
             </widget>
            </item>
