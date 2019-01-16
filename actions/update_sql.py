@@ -188,6 +188,7 @@ class UpdateSQL(ParentAction):
         self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
+        self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
 
         # Put current info into software version info widget
         if self.version is None:
@@ -1351,9 +1352,12 @@ class UpdateSQL(ParentAction):
         extras += '"projectType":"' + str(schema_type).upper() + '", '
         extras += '"epsg":' + str('25831')
         if new_project is True:
-            extras += ', ' + '"title":"' + str(self.title) + '", '
-            extras += '"author":"' + str(self.author) + '", '
-            extras += '"date":"' + str(self.date) + '"'
+            if str(self.title) != 'null':
+                extras += ', ' + '"title":"' + str(self.title) + '"'
+            if str(self.author) != 'null':
+                extras += ', ' + '"author":"' + str(self.author) + '"'
+            if str(self.date) != 'null':
+                extras += ', ' + '"date":"' + str(self.date) + '"'
 
         self.schema_name = schema_name
 
