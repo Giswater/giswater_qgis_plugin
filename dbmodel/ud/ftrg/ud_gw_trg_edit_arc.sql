@@ -163,7 +163,7 @@ BEGIN
 				END IF;		
 			END IF;
 		END IF;
-
+		
 		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
@@ -175,6 +175,10 @@ BEGIN
 			END IF;
 		END IF;
 
+		-- LINK
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+	       NEW.link=NEW.arc_id;
+	    END IF;
 
 		
         -- FEATURE INSERT

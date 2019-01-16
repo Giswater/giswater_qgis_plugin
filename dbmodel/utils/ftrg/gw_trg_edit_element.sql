@@ -75,6 +75,10 @@ BEGIN
 			NEW.code=NEW.element_id;
 		END IF;
 
+		-- LINK
+	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+	       NEW.link=NEW.element_id;
+	    END IF;
 		
 
 		-- FEATURE INSERT      
