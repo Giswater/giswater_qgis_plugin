@@ -100,11 +100,11 @@ class AddNewLot(ParentManage):
         self.enable_feature_type(self.dlg_lot)
         # Set signals
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
-        self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, self.tbl_relation, layer_name=None))
+        self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, layer_name=None))
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_row))
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
-        # self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer, self.dlg_lot, self.feature_type, layer_name=None))
-        # self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot, self.tbl_relation))
+        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer, self.dlg_lot, self.feature_type, layer_name=None))
+        self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot))
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
@@ -295,7 +295,7 @@ class AddNewLot(ParentManage):
         return id_list
 
 
-    def open_expression(self, dialog, widget, qtable=None, layer_name=None):
+    def open_expression(self, dialog, widget, layer_name=None):
         self.set_active_layer(dialog, widget, layer_name)
         self.disconnect_signal_selection_changed()
         self.iface.mainWindow().findChild(QAction, 'mActionSelectByExpression').triggered.connect(
@@ -402,24 +402,18 @@ class AddNewLot(ParentManage):
         self.iface.legendInterface().setLayerVisible(self.layer_lot, True)
 
 
-    def selection_init(self, dialog, table_object):
+    def selection_init(self, dialog):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
-        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
-                                             parent_manage=self, table_object=table_object, dialog=dialog)
-        self.previous_map_tool = self.canvas.mapTool()
-        self.canvas.setMapTool(multiple_selection)
         self.disconnect_signal_selection_changed()
+        self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed(dialog)
-        cursor = self.get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor)
 
     def connect_signal_selection_changed(self, dialog):
         """ Connect signal selectionChanged """
 
         try:
             self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog,  self.layer_lot, self.geom_type))
-            #self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type))
+
         except Exception:
             pass
 
@@ -547,29 +541,32 @@ class AddNewLot(ParentManage):
         """ Button 75: Lot manager """
 
         # Create the dialog
-        self.dlg_man = VisitManagement()
-        self.load_settings(self.dlg_man)
+        self.dlg_lot_man = VisitManagement()
+        self.load_settings(self.dlg_lot_man)
+        self.dlg_lot_man.setWindowTitle("Lot management")
+        self.dlg_lot_man.lbl_filter.setText('Filter by idval: ')
+        self.dlg_lot_man.btn_open.setText('Open lot')
+        self.dlg_lot_man.btn_delete.setText('Delete lot')
         # save previous dialog and set new one.
         # previous dialog will be set exiting the current one
         # self.previous_dialog = utils_giswater.dialog()
-        self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_lot_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set a model with selected filter. Attach that model to selected table
         table_object = "om_visit_lot"
-        expr_filter = ""
-        self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+        self.fill_table_object(self.dlg_lot_man.tbl_visit, self.schema_name + "." + table_object)
+        self.set_table_columns(self.dlg_lot_man, self.dlg_lot_man.tbl_visit, table_object)
 
 
         # manage save and rollback when closing the dialog
-        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.accepted.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+        self.dlg_lot_man.rejected.connect(partial(self.close_dialog, self.dlg_lot_man))
+        self.dlg_lot_man.accepted.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, table_object))
 
         # Set dignals
-        self.dlg_man.tbl_visit.doubleClicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit))
-        self.dlg_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_man, self.dlg_man.tbl_visit))
-        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_man.tbl_visit))
-        self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, expr_filter))
+        self.dlg_lot_man.tbl_visit.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit))
+        self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit))
+        self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_visit))
+        self.dlg_lot_man.txt_filter.textChanged.connect(partial(self.filter_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, self.dlg_lot_man.txt_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
@@ -579,20 +576,20 @@ class AddNewLot(ParentManage):
 
         if row:
             if row[0]:
-                self.dlg_man.date_event_from.setDate(row[0])
+                self.dlg_lot_man.date_event_from.setDate(row[0])
             if row[1]:
-                self.dlg_man.date_event_to.setDate(row[1])
+                self.dlg_lot_man.date_event_to.setDate(row[1])
             else:
-                self.dlg_man.date_event_to.setDate(current_date)
+                self.dlg_lot_man.date_event_to.setDate(current_date)
 
         # set date events
-        self.dlg_man.date_event_from.dateChanged.connect(
-            partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter,  expr_filter))
-        self.dlg_man.date_event_to.dateChanged.connect(
-            partial(self.filter_lot, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter,  expr_filter))
+        self.dlg_lot_man.date_event_from.dateChanged.connect(
+            partial(self.filter_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, self.dlg_lot_man.txt_filter))
+        self.dlg_lot_man.date_event_to.dateChanged.connect(
+            partial(self.filter_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, self.dlg_lot_man.txt_filter))
 
         # Open form
-        self.open_dialog(self.dlg_man, dlg_name="visit_management")
+        self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
 
     def delete_lot(self, qtable):
         selected_list = qtable.selectionModel().selectedRows()
@@ -605,10 +602,12 @@ class AddNewLot(ParentManage):
             _id = qtable.model().record(row).value('id')
             feature_type = qtable.model().record(row).value('feature_type')
             sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + " "
-                   " WHERE lot_id = '" + _id + "'; \n "
+                   " WHERE lot_id = '" + str(_id) + "'; \n "
                    "DELETE FROM " + self.schema_name + ".om_visit_lot "
                    " WHERE id ='"+str(_id)+"'")
             self.controller.execute_sql(sql, log_sql=False)
+        self.filter_lot(self.dlg_lot_man, self.dlg_lot_man.tbl_visit, self.dlg_lot_man.txt_filter)
+
 
     def open_lot(self, dialog, widget):
         """ Open object form with selected record of the table """
@@ -632,8 +631,8 @@ class AddNewLot(ParentManage):
         # if hasattr(self, 'previous_dialog'):
         self.manage_lot(selected_object_id, feature_type=feature_type)
 
-    def filter_lot(self, dialog, widget_table, widget_txt, expr_filter):
-        """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
+    def filter_lot(self, dialog, widget_table, widget_txt):
+        """ Filter om_visit in self.dlg_lot_man.tbl_visit based on (id AND text AND between dates)"""
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
@@ -649,7 +648,7 @@ class AddNewLot(ParentManage):
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
-        expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0} or enddate is null)".format(interval))
+        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0} or enddate is null)".format(interval))
         if object_id != 'null':
             expr_filter += " AND idval::TEXT ILIKE '%" + str(object_id) + "%'"
 
