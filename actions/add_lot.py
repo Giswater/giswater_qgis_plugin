@@ -23,6 +23,7 @@ from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
 
 import utils_giswater
 from datetime import datetime
+from giswater.actions.multiple_selection import MultipleSelection
 from giswater.actions.parent_manage import ParentManage
 from giswater.ui_manager import AddLot
 from giswater.ui_manager import VisitManagement
@@ -38,7 +39,7 @@ class AddNewLot(ParentManage):
         self.ids = []
 
 
-    def manage_lot(self, lot_id=None, is_new=True):
+    def manage_lot(self, lot_id=None, is_new=True, feature_type=None):
         # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
         self.autocommit = True
         self.remove_ids = False
@@ -91,6 +92,8 @@ class AddNewLot(ParentManage):
         self.clear_selection()
 
         if lot_id is not None:
+            utils_giswater.setWidgetText(self.dlg_lot, self.feature_type, feature_type.upper())
+            self.geom_type = self.feature_type.currentText().lower()
             self.set_values(lot_id)
             self.populate_table(lot_id)
             self.update_id_list()
@@ -101,7 +104,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_row))
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
         # self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer, self.dlg_lot, self.feature_type, layer_name=None))
-        # self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot, self.tbl_relation, False))
+        # self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot, self.tbl_relation))
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
@@ -296,11 +299,11 @@ class AddNewLot(ParentManage):
         self.set_active_layer(dialog, widget, layer_name)
         self.disconnect_signal_selection_changed()
         self.iface.mainWindow().findChild(QAction, 'mActionSelectByExpression').triggered.connect(
-            partial(self.selection_changed_by_expr, dialog, qtable, self.layer_lot, self.geom_type))
+            partial(self.selection_changed_by_expr, dialog, self.layer_lot, self.geom_type))
         self.iface.mainWindow().findChild(QAction, 'mActionSelectByExpression').trigger()
 
 
-    def selection_changed_by_expr(self, dialog,  qtable, layer, geom_type):
+    def selection_changed_by_expr(self, dialog, layer, geom_type):
         # "arc_id" = '2020'
         self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog,  layer, geom_type))
 
@@ -363,28 +366,8 @@ class AddNewLot(ParentManage):
                 self.ids.append(feature_id)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def manage_rejected(self):
-        self.disconnect_signal_selection_changed()
-        self.close_dialog(self.dlg_lot)
-
     def remove_selection(self, dialog, qtable):
-        #self.disconnect_signal_selection_changed()
+        self.disconnect_signal_selection_changed()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
         # Get selected rows
         index_list = qtable.selectionModel().selectedRows()
@@ -406,6 +389,49 @@ class AddNewLot(ParentManage):
             model.takeRow(row)
 
         self.enable_feature_type(dialog)
+
+    def set_active_layer(self,  dialog, widget, layer_name=None):
+        self.current_layer = self.iface.activeLayer()
+        # Set active layer
+        if layer_name is None:
+            layer_name = 'v_edit_' + utils_giswater.get_item_data(dialog, widget, 0).lower()
+
+        viewname = layer_name
+        self.layer_lot = self.controller.get_layer_by_tablename(viewname)
+        self.iface.setActiveLayer(self.layer_lot)
+        self.iface.legendInterface().setLayerVisible(self.layer_lot, True)
+
+
+    def selection_init(self, dialog, table_object):
+        """ Set canvas map tool to an instance of class 'MultipleSelection' """
+
+        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
+                                             parent_manage=self, table_object=table_object, dialog=dialog)
+        self.previous_map_tool = self.canvas.mapTool()
+        self.canvas.setMapTool(multiple_selection)
+        self.disconnect_signal_selection_changed()
+        self.connect_signal_selection_changed(dialog)
+        cursor = self.get_cursor_multiple_selection()
+        self.canvas.setCursor(cursor)
+
+    def connect_signal_selection_changed(self, dialog):
+        """ Connect signal selectionChanged """
+
+        try:
+            self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog,  self.layer_lot, self.geom_type))
+            #self.canvas.selectionChanged.connect(partial(self.selection_changed, dialog, table_object, self.geom_type))
+        except Exception:
+            pass
+
+
+
+
+
+    def manage_rejected(self):
+        self.disconnect_signal_selection_changed()
+        self.close_dialog(self.dlg_lot)
+
+
 
 
 
@@ -443,13 +469,13 @@ class AddNewLot(ParentManage):
             _id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
 
         sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
-               " WHERE lot_id = '"+str(_id)+"'")
-        self.controller.execute_sql(sql, log_sql=False)
+               " WHERE lot_id = '"+str(_id)+"';")
 
         id_list = self.get_table_values(self.tbl_relation, lot['feature_type'])
-        sql = ""
+
         for x in range(0, len(id_list)):
-            sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type']+"(lot_id, arc_id, status)"
+            sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
+                    "(lot_id, "+lot['feature_type']+"_id, status)"
                     " VALUES('" + str(_id) + "', '" + str(id_list[x]) + "', '0'); \n")
         self.controller.execute_sql(sql, log_sql=False)
 
@@ -462,16 +488,7 @@ class AddNewLot(ParentManage):
 
 
 
-    def set_active_layer(self,  dialog, widget, layer_name=None):
-        self.current_layer = self.iface.activeLayer()
-        # Set active layer
-        if layer_name is None:
-            layer_name = 'v_edit_' + utils_giswater.get_item_data(dialog, widget, 0).lower()
 
-        viewname = layer_name
-        self.layer_lot = self.controller.get_layer_by_tablename(viewname)
-        self.iface.setActiveLayer(self.layer_lot)
-        self.iface.legendInterface().setLayerVisible(self.layer_lot, True)
 
 
 
@@ -606,13 +623,14 @@ class AddNewLot(ParentManage):
 
         # Get object_id from selected row
         selected_object_id = widget.model().record(row).value('id')
+        feature_type = widget.model().record(row).value('feature_type')
 
         # Close this dialog and open selected object
         dialog.close()
 
         # set previous dialog
         # if hasattr(self, 'previous_dialog'):
-        self.manage_lot(selected_object_id)
+        self.manage_lot(selected_object_id, feature_type=feature_type)
 
     def filter_lot(self, dialog, widget_table, widget_txt, expr_filter):
         """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
