@@ -41,12 +41,6 @@ class UpdateSQL(ParentAction):
         # Get last database connection from controller
         self.last_connection = self.get_last_connection()
 
-        role_admin = self.controller.check_role_user("role_admin")
-
-        # Manage user 'postgres'
-        if self.controller.user in ('postgres', 'gisadmin'):
-            role_admin = True
-
         if self.project_type is not None:
             self.info_show_info()
             return
