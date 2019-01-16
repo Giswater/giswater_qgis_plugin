@@ -38,6 +38,9 @@ class UpdateSQL(ParentAction):
     def init_sql(self):
         """ Button 100: Execute SQL. Info show info """
         
+        # Get last database connection from controller
+        self.last_connection = self.get_last_connection()
+
         role_admin = self.controller.check_role_user("role_admin")
 
         # Manage user 'postgres'
@@ -196,6 +199,9 @@ class UpdateSQL(ParentAction):
             self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
                                                'Database version: ' + self.version + '\n \n' +
                                                'Project data schema version:' + self.project_data_schema_version)
+
+        # Set last connection for default
+        utils_giswater.setWidgetText(self.dlg_readsql, self.cmb_connection, str(self.last_connection))
 
         # Open dialog
         self.dlg_readsql.show()
@@ -1654,6 +1660,21 @@ class UpdateSQL(ParentAction):
 
         self.populate_data_schema_name(self.cmb_project_type)
 
+        self.set_last_connection(connection_name)
+
+
+    def set_last_connection(self, connection_name):
+        settings = QSettings()
+        settings.beginGroup("PostgreSQL/connections")
+        settings.setValue('selected', connection_name)
+        settings.endGroup()
+
+    def get_last_connection(self):
+        settings = QSettings()
+        settings.beginGroup("PostgreSQL/connections")
+        connection_name = settings.value('selected')
+        settings.endGroup()
+        return connection_name
 
     """ Other functions """
 
