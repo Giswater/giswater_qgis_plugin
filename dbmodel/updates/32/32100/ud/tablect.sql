@@ -8,12 +8,16 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+-- incorporate constraints not defined on 3.1
+--------------------------------------------
+ALTER TABLE gully ALTER COLUMN state SET NOT NULL;
+ALTER TABLE gully ALTER COLUMN state_type SET NOT NULL;
+
+
 --DROP
 --INP
-
 ALTER TABLE "raingage" DROP CONSTRAINT IF EXISTS "raingage_form_type_fkey";
 ALTER TABLE "raingage" DROP CONSTRAINT IF EXISTS "raingage_rgage_type_fkey" ;
-
 
 ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_routeto_fkey";
 

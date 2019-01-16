@@ -7,16 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE node ALTER COLUMN state_type SET NOT NULL;
-ALTER TABLE arc ALTER COLUMN state_type SET NOT NULL;
-ALTER TABLE connec ALTER COLUMN state_type SET NOT NULL;
-ALTER TABLE element ALTER COLUMN state_type SET NOT NULL;
-
-ALTER TABLE node ALTER COLUMN state SET NOT NULL;
-ALTER TABLE arc ALTER COLUMN state SET NOT NULL;
-ALTER TABLE connec ALTER COLUMN state SET NOT NULL;
-ALTER TABLE element ALTER COLUMN state SET NOT NULL;
-
 ALTER TABLE  om_visit_class_x_parameter  DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_class_fkey;
 ALTER TABLE  om_visit_class_x_parameter DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_parameter_fkey;
 ALTER TABLE  om_visit_file DROP CONSTRAINT IF EXISTS om_visit_file_visit_id_fkey;
