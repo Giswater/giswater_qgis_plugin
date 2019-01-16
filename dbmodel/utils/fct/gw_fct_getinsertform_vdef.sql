@@ -227,7 +227,7 @@ BEGIN
     v_type := COALESCE(v_type, '{}');
     v_state := COALESCE(v_state, '{}');
     v_state_type := COALESCE(v_state_type, '{}');
-    v_inventory := COALESCE(v_inventory, '(}');
+    v_inventory := COALESCE(v_inventory, '{}');
     v_publish := COALESCE(v_publish, '{}');
     v_uncertain := COALESCE(v_uncertain, '{}');
     
