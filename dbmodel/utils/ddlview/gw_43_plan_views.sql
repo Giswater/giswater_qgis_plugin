@@ -11,6 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_plan_psector views
 --------------------------------
 
+-- view updated on 3.1.105
 DROP VIEW IF EXISTS v_plan_psector_x_arc CASCADE;
 CREATE VIEW "v_plan_psector_x_arc" AS 
 SELECT 
@@ -37,7 +38,7 @@ SELECT
 	order by 2;
   
   
-  
+-- view updated on 3.1.105
 DROP VIEW IF EXISTS v_plan_psector_x_node CASCADE;
 CREATE VIEW "v_plan_psector_x_node" AS 
 SELECT

@@ -33,3 +33,52 @@ JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::int8=ext_
 JOIN ext_cat_period ON cat_period_id=ext_cat_period.id
 ORDER BY 3, 5 DESC ;
 
+
+
+CREATE OR REPLACE VIEW "v_plan_psector_x_arc" AS 
+SELECT 
+	row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+    plan_psector_x_arc.psector_id,
+    plan_psector.psector_type,
+    v_plan_arc.arc_id,
+    v_plan_arc.arccat_id,
+    v_plan_arc.cost_unit,
+    v_plan_arc.cost::numeric(14,2) AS cost,
+    v_plan_arc.length,
+    v_plan_arc.budget,
+    v_plan_arc.other_budget,
+    v_plan_arc.total_budget,
+    v_plan_arc.state,
+     plan_psector.expl_id,
+    plan_psector.atlas_id,
+    v_plan_arc.the_geom
+   FROM selector_psector, v_plan_arc
+    JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+    JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
+    WHERE selector_psector.cur_user = "current_user"()::text AND selector_psector.psector_id = plan_psector_x_arc.psector_id 
+	AND doable = true
+	order by 2;
+  
+  
+CREATE OR REPLACE VIEW "v_plan_psector_x_node" AS 
+SELECT
+row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
+plan_psector_x_node.psector_id,
+plan_psector.psector_type,
+v_plan_node.node_id,
+v_plan_node.nodecat_id,
+v_plan_node.cost::numeric(12,2),
+v_plan_node.measurement,
+v_plan_node.budget as total_budget,
+v_plan_node."state",
+v_plan_node.expl_id,
+plan_psector.atlas_id,
+v_plan_node.the_geom
+FROM selector_psector, v_plan_node
+JOIN plan_psector_x_node ON plan_psector_x_node.node_id = v_plan_node.node_id
+JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id
+WHERE selector_psector.cur_user="current_user"() AND selector_psector.psector_id=plan_psector_x_node.psector_id
+	AND doable = true
+order by 2;
+
+
