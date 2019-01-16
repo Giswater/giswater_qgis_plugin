@@ -23,3 +23,6 @@ FOREIGN KEY (visit_id) REFERENCES om_visit (id) MATCH SIMPLE ON UPDATE CASCADE O
 
 ALTER TABLE selector_lot ADD CONSTRAINT selector_workcat_workcat_id_fkey 
 FOREIGN KEY (lot_id) REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE om_visit_file ADD CONSTRAINT selector_workcat_workcat_id_fkey 
+FOREIGN KEY (filetype, fextension) REFERENCES om_visit_lot (filetype, fextension) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

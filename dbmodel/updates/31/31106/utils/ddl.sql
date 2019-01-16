@@ -68,6 +68,7 @@ CREATE TABLE om_visit_file(
   xcoord float,
   ycoord float,
   compass double precision,
+  fextension varchar(16),
   tstamp timestamp(6) without time zone DEFAULT now()
 );
 
@@ -118,5 +119,14 @@ CREATE TABLE om_visit_lot_x_arc(
   idval text,
   descript text,
   active boolean DEFAULT true);
+  
+  
+  CREATE TABLE om_visit_filetype_x_extension
+(
+  filetype varchar (30),
+  fextension varchar (16),
+  CONSTRAINT om_visit_filetype_x_extension_pkey PRIMARY KEY (filetype, fextension)
+);
+
 
 
