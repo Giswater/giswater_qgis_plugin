@@ -57,6 +57,7 @@ New system parameter edit_uncertain_sysvdefaut, issue#600
 Automatic update state_type on connec/gully when link is created, issue#587
 Enhance arc division function with automatic update of node.arc_id of disconnecteds nodes, issue#591
 Set urn value before insert urn feature #597 
+Add edit_automatic_insert_link on gw_trg_edit_element, issue#601
 
 New api functions 
 (2558) gw_api_get_featureinfo
@@ -130,6 +131,7 @@ Bug fix on view v_om_visit;
 ---------------
 New system parameter code_vd, issue#567
 Bug fix on v_ui_node_x_connection_upstream view, issue#584
+Add edit_automatic_insert_link on ud_gw_trg_edit_arc, issue#601
 
 
 ***i18n***
