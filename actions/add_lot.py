@@ -97,6 +97,10 @@ class AddNewLot(ParentManage):
             self.set_values(lot_id)
             self.populate_table(lot_id)
             self.update_id_list()
+            # sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + ""
+            #        " WHERE lot_id ='" + str(lot_id) + "'")
+            # rows = self.controller.get_rows(sql)
+            # self.populate_combos(self.tbl_relation, rows)
         self.enable_feature_type(self.dlg_lot)
         # Set signals
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
@@ -371,12 +375,12 @@ class AddNewLot(ParentManage):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
         # Get selected rows
         index_list = qtable.selectionModel().selectedRows()
-        index = index_list[0]
 
         if len(index_list) == 0:
             message = "Any record selected"
             self.controller.show_info_box(message)
             return
+        index = index_list[0]
         model = qtable.model()
 
 
@@ -416,19 +420,6 @@ class AddNewLot(ParentManage):
 
         except Exception:
             pass
-
-
-
-
-
-    def manage_rejected(self):
-        self.disconnect_signal_selection_changed()
-        self.close_dialog(self.dlg_lot)
-
-
-
-
-
 
 
     def save_lot(self):
@@ -474,20 +465,54 @@ class AddNewLot(ParentManage):
         self.controller.execute_sql(sql, log_sql=False)
 
 
+    def set_completers(self):
+        """ Set autocompleters of the form """
+
+        # Adding auto-completion to a QLineEdit - lot_id
+        self.completer = QCompleter()
+        self.dlg_lot.lot_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
+        rows = self.controller.get_rows(sql, commit=self.autocommit)
+        values = []
+        if rows:
+            for row in rows:
+                values.append(str(row[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
 
 
+    def manage_rejected(self):
+        self.disconnect_signal_selection_changed()
+        self.close_dialog(self.dlg_lot)
 
+    def populate_combos(self, qtable, rows):
+        """ Set one column of a QtableView as QComboBox with values from database. """
 
+        for x in range(0, len(rows)):
+            combo = QComboBox()
+            # sql = "SELECT DISTINCT(work_id) FROM " + self.schema_name + "." + tableleft + " ORDER BY work_id"
+            # row = self.controller.get_rows(sql)
+            # utils.fillComboBox(combo, row, False)
+            # row = rows[x]
 
+            rows = [('0', 'cero'), ('1', 'uno'), ('2', 'dos')]
+            utils_giswater.set_item_data(combo, rows, 1)
 
+            # priority = row[7]
+            # utils.setSelectedItem(combo, str(priority))
+            i = qtable.model().index(x, 2)
 
+            qtable.setIndexWidget(i, combo)
+            combo.setStyleSheet("background:#E6E6E6")
+            combo.currentIndexChanged.connect(partial(self.update_combobox_values, qtable, combo, x))
 
-
-
-
-
-
-
+    def update_combobox_values(self, qtable, combo, x):
+        """ Insert combobox.currentText into widget (QTableView) """
+        index = qtable.model().index(x, 2)
+        qtable.model().setData(index, combo.currentText())
 
 
 
@@ -518,23 +543,7 @@ class AddNewLot(ParentManage):
     #     widget.setModel(model)
 
 
-    def set_completers(self):
-        """ Set autocompleters of the form """
 
-        # Adding auto-completion to a QLineEdit - lot_id
-        self.completer = QCompleter()
-        self.dlg_lot.lot_id.setCompleter(self.completer)
-        model = QStringListModel()
-
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".om_visit"
-        rows = self.controller.get_rows(sql, commit=self.autocommit)
-        values = []
-        if rows:
-            for row in rows:
-                values.append(str(row[0]))
-
-        model.setStringList(values)
-        self.completer.setModel(model)
 
 
     def lot_manager(self):
