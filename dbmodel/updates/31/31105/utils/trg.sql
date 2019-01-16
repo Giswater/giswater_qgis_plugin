@@ -14,3 +14,7 @@ FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_update_enddate('visit');
 drop trigger if exists gw_trg_visit_update_enddate ON SCHEMA_NAME.om_visit_event;
 CREATE TRIGGER gw_trg_visit_update_enddate BEFORE INSERT OR UPDATE ON SCHEMA_NAME.om_visit_event 
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_update_enddate('event');
+
+DROP TRIGGER IF EXISTS gw_trg_ui_visit ON "SCHEMA_NAME".v_ui_om_visit;
+CREATE TRIGGER gw_trg_ui_visit INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visit FOR EACH ROW EXECUTE PROCEDURE 
+"SCHEMA_NAME".gw_trg_ui_visit();
