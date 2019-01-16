@@ -7,20 +7,29 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE  SCHEMA_NAME.om_visit_class_x_parameter  DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_class_fkey;
-ALTER TABLE  SCHEMA_NAME.om_visit_class_x_parameter DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_parameter_fkey;
-ALTER TABLE  SCHEMA_NAME.om_visit_file DROP CONSTRAINT IF EXISTS om_visit_file_visit_id_fkey;
+ALTER TABLE node ALTER COLUMN state_type SET NOT NULL;
+ALTER TABLE arc ALTER COLUMN state_type SET NOT NULL;
+ALTER TABLE connec ALTER COLUMN state_type SET NOT NULL;
+ALTER TABLE element ALTER COLUMN state_type SET NOT NULL;
+
+ALTER TABLE node ALTER COLUMN state SET NOT NULL;
+ALTER TABLE arc ALTER COLUMN state SET NOT NULL;
+ALTER TABLE connec ALTER COLUMN state SET NOT NULL;
+ALTER TABLE element ALTER COLUMN state SET NOT NULL;
+
+ALTER TABLE  om_visit_class_x_parameter  DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_class_fkey;
+ALTER TABLE  om_visit_class_x_parameter DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_parameter_fkey;
+ALTER TABLE  om_visit_file DROP CONSTRAINT IF EXISTS om_visit_file_visit_id_fkey;
 ALTER TABLE  selector_lot DROP CONSTRAINT IF EXISTS selector_workcat_workcat_id_fkey;
 
-ALTER TABLE ONLY SCHEMA_NAME.om_visit_class_x_parameter ADD CONSTRAINT om_visit_class_x_parameter_class_fkey 
-FOREIGN KEY (class_id) REFERENCES SCHEMA_NAME.om_visit_class(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE ONLY om_visit_class_x_parameter ADD CONSTRAINT om_visit_class_x_parameter_class_fkey 
+FOREIGN KEY (class_id) REFERENCES om_visit_class(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE ONLY SCHEMA_NAME.om_visit_class_x_parametern ADD CONSTRAINT om_visit_class_x_parameter_parameter_fkey 
-FOREIGN KEY (parameter_id) REFERENCES SCHEMA_NAME.om_visit_parameter(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE ONLY om_visit_class_x_parametern ADD CONSTRAINT om_visit_class_x_parameter_parameter_fkey 
+FOREIGN KEY (parameter_id) REFERENCES om_visit_parameter(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE ONLY SCHEMA_NAME.om_visit_file ADD CONSTRAINT om_visit_file_visit_id_fkey 
-FOREIGN KEY (visit_id) REFERENCES SCHEMA_NAME.om_visit (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
+ALTER TABLE ONLY om_visit_file ADD CONSTRAINT om_visit_file_visit_id_fkey 
+FOREIGN KEY (visit_id) REFERENCES om_visit (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE selector_lot ADD CONSTRAINT selector_workcat_workcat_id_fkey 
-FOREIGN KEY (lot_id) REFERENCES SCHEMA_NAME.om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+FOREIGN KEY (lot_id) REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
