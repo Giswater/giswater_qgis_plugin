@@ -150,6 +150,12 @@ class ParentDialog(QDialog):
 
             # if 'feature_id' in values:
             #     utils_giswater.setWidgetText(self.dialog, self.geom_type + "_id", str(values['feature_id']))
+            if 'value' in values['inventory']:
+                utils_giswater.setChecked(self.dialog, 'inventory', values['inventory']['value'])
+            if 'value' in values['publish']:
+                utils_giswater.setChecked(self.dialog, 'publish', values['publish']['value'])
+            if 'value' in values['uncertain']:
+                utils_giswater.setChecked(self.dialog, 'uncertain', values['uncertain']['value'])
             if 'name' in values['muni_id']:
                 utils_giswater.setWidgetText(self.dialog, 'muni_id', values['muni_id']['name'])
             if 'name' in values['sector_id']:
