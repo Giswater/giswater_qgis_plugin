@@ -1948,10 +1948,6 @@ class UpdateSQL(ParentAction):
         self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
         self.filter_srid.textChanged.connect(partial(self.filter_srid_changed))
 
-        # Set default values
-        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.project_name, 'projectname')
-        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.project_title, 'projecttitle')
-
         # Populate combo with all locales
         locales = os.listdir(self.sql_dir + '\i18n/')
         for locale in locales:
