@@ -7,28 +7,22 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO config_param_user VALUES (1, 'state_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (4, 'builtdate_vdefault', '2017-12-05', current_user);
 INSERT INTO config_param_user VALUES (19, 'gratecat_vdefault', 'S/I', current_user);
 INSERT INTO config_param_user VALUES (3, 'verified_vdefault', 'VERIFIED', current_user);
 INSERT INTO config_param_user VALUES (6, 'arccat_vdefault', 'CON-CC040', current_user);
 INSERT INTO config_param_user VALUES (8, 'connecat_vdefault', 'PVC-CC025_D', current_user);
 INSERT INTO config_param_user VALUES (9, 'elementcat_vdefault', 'COVER70', current_user);
-INSERT INTO config_param_user VALUES (10, 'exploitation_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (16, 'nodecat_vdefault', 'C_MANHOLE-BR100', current_user);
 INSERT INTO config_param_user VALUES (18, 'gullycat_vdefault', 'EMB1', current_user);
-INSERT INTO config_param_user VALUES (17, 'municipality_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (20, 'visitcat_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (21, 'om_param_type_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (24, 'sector_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (25, 'psector_scale_vdefault', '1000', current_user);
 INSERT INTO config_param_user VALUES (26, 'psector_rotation_vdefault', '0', current_user);
 INSERT INTO config_param_user VALUES (27, 'psector_gexpenses_vdefault', '19', current_user);
 INSERT INTO config_param_user VALUES (28, 'psector_vat_vdefault', '21', current_user);
 INSERT INTO config_param_user VALUES (29, 'psector_other_vdefault', '4', current_user);
 INSERT INTO config_param_user VALUES (30, 'psector_type_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (31, 'dma_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (33, 'pavement_vdefault', 'Asphalt', current_user);
-INSERT INTO config_param_user VALUES (5, 'enddate_vdefault', '2018-11-29', current_user);
 INSERT INTO config_param_user VALUES (34, 'virtual_polygon_vdefault', 'Temporal Polygon Layer', current_user);
 INSERT INTO config_param_user VALUES (35, 'virtual_point_vdefault', 'Temporal Point Layer', current_user);
 INSERT INTO config_param_user VALUES (36, 'virtual_line_vdefault', 'Temporal Line Layer', current_user);
@@ -36,7 +30,6 @@ INSERT INTO config_param_user VALUES (37, 'epa_outfall_type_vdefault', 'NORMAL',
 INSERT INTO config_param_user VALUES (38, 'epa_conduit_q0_vdefault', '0', current_user);
 INSERT INTO config_param_user VALUES (39, 'epa_junction_y0_vdefault', '0', current_user);
 INSERT INTO config_param_user VALUES (40, 'epa_rgage_scf_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (41, 'statetype_end_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (42, 'psector_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (32, 'statetype_vdefault', '2', current_user);
 INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'work1', current_user);

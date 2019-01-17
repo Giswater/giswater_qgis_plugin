@@ -40,43 +40,43 @@ INSERT INTO cat_feature VALUES ('NETINIT', 'NETINIT', 'NODE');
 
 -- Records of node type system table
 -- ----------------------------
-INSERT INTO node_type VALUES ('CHAMBER', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
-INSERT INTO node_type VALUES ('CIRC-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('HIGHPOINT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('REGISTER', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('CHANGE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('VIRTUAL_NODE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('WEIR', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction');
-INSERT INTO node_type VALUES ('JUMP', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction');
-INSERT INTO node_type VALUES ('RECT-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('SANDBOX', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('WWTP', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction');
-INSERT INTO node_type VALUES ('VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction');
-INSERT INTO node_type VALUES ('SEWER-STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
-INSERT INTO node_type VALUES ('OWERFLOW-STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
-INSERT INTO node_type VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall');
-INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction');
-INSERT INTO node_type VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction');
-INSERT INTO node_type VALUES ('PUMP-STATION', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
-INSERT INTO node_type VALUES ('NETINIT', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
+INSERT INTO node_type VALUES ('CHAMBER', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('CIRC-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('HIGHPOINT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('REGISTER', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('CHANGE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('VIRTUAL_NODE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('WEIR', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('JUMP', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('RECT-MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('SANDBOX', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('WWTP', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('SEWER-STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('OWERFLOW-STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('NETELEMENT', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('PUMP-STATION', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('NETINIT', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction', TRUE, TRUE, 1, TRUE);
 
 -- Records of arc type system table
 -- ----------------------------
-INSERT INTO arc_type VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit');
-INSERT INTO arc_type VALUES ('SIPHON', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit');
-INSERT INTO arc_type VALUES ('WACCEL', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit');
-INSERT INTO arc_type VALUES ('VARC', 'VARC', 'VIRTUAL', 'man_varc', 'inp_virtual');
-INSERT INTO arc_type VALUES ('PUMP-PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit');
+INSERT INTO arc_type VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', TRUE, TRUE);
+INSERT INTO arc_type VALUES ('SIPHON', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit', TRUE, TRUE);
+INSERT INTO arc_type VALUES ('WACCEL', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit', TRUE, TRUE);
+INSERT INTO arc_type VALUES ('VARC', 'VARC', 'VIRTUAL', 'man_varc', 'inp_virtual', TRUE, TRUE);
+INSERT INTO arc_type VALUES ('PUMP-PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', TRUE, TRUE);
 
 -- Records of connec_type
 -- ----------------------------
-INSERT INTO connec_type VALUES ('CONNEC', 'CONNEC', 'man_connec');
+INSERT INTO connec_type VALUES ('CONNEC', 'CONNEC', 'man_connec', TRUE, TRUE);
 
 -- Records of gully_type
 -- ----------------------------
-INSERT INTO gully_type VALUES ('GULLY', 'GULLY', 'man_gully');
-INSERT INTO gully_type VALUES ('PGULLY', 'GULLY', 'man_gully');
+INSERT INTO gully_type VALUES ('GULLY', 'GULLY', 'man_gully', TRUE, TRUE);
+INSERT INTO gully_type VALUES ('PGULLY', 'GULLY', 'man_gully', TRUE, TRUE);
 
 -- Records of element type system table
 -- ----------------------------

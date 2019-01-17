@@ -41,45 +41,45 @@ INSERT INTO cat_feature VALUES ('INICI', 'NETINIT', 'NODE');
 
 -- Records of node type system table
 -- ----------------------------
-INSERT INTO node_type VALUES ('CAMBRA', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
-INSERT INTO node_type VALUES ('POU_CIRCULAR', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('PUNT_ALT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('REGISTRE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('CANVI_SECCIO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('NODE_FICTICI', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('PRESA', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction');
-INSERT INTO node_type VALUES ('SALT', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction');
-INSERT INTO node_type VALUES ('POU_RECTANGULAR', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('ARQUETA_SORRERA', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction');
-INSERT INTO node_type VALUES ('EDAR', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction');
-INSERT INTO node_type VALUES ('VALVULA', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction');
-INSERT INTO node_type VALUES ('DIPOSIT', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
-INSERT INTO node_type VALUES ('DIPOSIT_DESBORDAMENT', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage');
-INSERT INTO node_type VALUES ('DESGUAS', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall');
-INSERT INTO node_type VALUES ('EMBORNAL_TOPO', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction');
-INSERT INTO node_type VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction');
-INSERT INTO node_type VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction');
-INSERT INTO node_type VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage');
-INSERT INTO node_type VALUES ('INICI', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction');
+INSERT INTO node_type VALUES ('CAMBRA', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('POU_CIRCULAR', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('PUNT_ALT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('REGISTRE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('CANVI_SECCIO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('NODE_FICTICI', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('PRESA', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('SALT', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('POU_RECTANGULAR', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('ARQUETA_SORRERA', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('EDAR', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('VALVULA', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('DIPOSIT', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('DIPOSIT_DESBORDAMENT', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('DESGUAS', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('EMBORNAL_TOPO', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('UNIO', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'STORAGE', 'man_chamber', 'inp_storage', TRUE, TRUE, 2, TRUE);
+INSERT INTO node_type VALUES ('INICI', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction', TRUE, TRUE, 2, TRUE);
 
 
 
 -- Records of arc type system table
 -- ----------------------------
-INSERT INTO arc_type VALUES ('CONDUCTE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit',true);
-INSERT INTO arc_type VALUES ('IMPULSIO', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit',true);
-INSERT INTO arc_type VALUES ('SIFO', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit',true);
-INSERT INTO arc_type VALUES ('RAPID', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit',true);
-INSERT INTO arc_type VALUES ('FICTICI', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet',true);
+INSERT INTO arc_type VALUES ('CONDUCTE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', TRUE, TRUE);
+INSERT INTO arc_type VALUES ('IMPULSIO', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', TRUE, TRUE);
+INSERT INTO arc_type VALUES ('SIFO', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit', TRUE, TRUE);
+INSERT INTO arc_type VALUES ('RAPID', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit', TRUE, TRUE);
+INSERT INTO arc_type VALUES ('FICTICI', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet', TRUE, TRUE);
 
 -- Records of connec_type
 -- ----------------------------
-INSERT INTO connec_type VALUES ('ESCOMESA', 'CONNEC', 'man_connec',true);
+INSERT INTO connec_type VALUES ('ESCOMESA', 'CONNEC', 'man_connec', TRUE, TRUE);
 
 -- Records of gully_type
 -- ----------------------------
-INSERT INTO gully_type VALUES ('EMBORNAL', 'GULLY', 'man_gully',true);
-INSERT INTO gully_type VALUES ('REIXA', 'GULLY', 'man_gully',true);
+INSERT INTO gully_type VALUES ('EMBORNAL', 'GULLY', 'man_gully', TRUE, TRUE);
+INSERT INTO gully_type VALUES ('REIXA', 'GULLY', 'man_gully', TRUE, TRUE);
 
 -- Records of element type system table
 -- ----------------------------
