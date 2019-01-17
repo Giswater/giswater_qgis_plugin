@@ -1911,7 +1911,7 @@ class UpdateSQL(ParentAction):
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
 
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
-        #TODO:fer el listener del boto + taula -> temp_csv2pg
+        #TODO:: do and call listener for buton + table -> temp_csv2pg
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
                 
         if self.dev_user != 'TRUE':
@@ -1930,7 +1930,8 @@ class UpdateSQL(ParentAction):
         self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
         for type in self.project_types:
             self.cmb_create_project_type.addItem(str(type))
-        self.change_create_project_type(self.cmb_create_project_type)
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type))
+        self.change_project_type(self.cmb_create_project_type)
 
         # enable_disable data file widgets
         self.enable_datafile()
@@ -2046,59 +2047,7 @@ class UpdateSQL(ParentAction):
                 return False
         return True
 
-        
-    #TODO:: Remove functions if we dont use it
-    def progresDialog(self, value):
-    
-        dlg_progress = QProgressDialog()
-        dlg_progress.setWindowTitle("Progress Read SQL")
-        dlg_progress.setLabelText("Reading sql files...")
-        bar = QProgressBar(dlg_progress)
-        bar.setTextVisible(True)
-        bar.setValue(value)
-        dlg_progress.setBar(bar)
-        dlg_progress.setMinimumWidth(300)
-        dlg_progress.show()
-        return dlg_progress, bar
 
-        
-    def calc(self, x, y):
-    
-        dialog, bar = self.progresDialog(0)
-        bar.setValue(0)
-        bar.setMaximum(100)
-        sum = 0
-        progress = 0
-        for i in range(x):
-            for j in range(y):
-                k = i + j
-                sum += k
-            i += 1
-            progress = (float(i) / float(x)) * 100
-            bar.setValue(progress)
-        print sum
-
-        
-    def newProgressDialog(self):
-    
-        widget = self.iface.messageBar().createMessage("Progress Read SQL",
-                                                       " Reading sql files...")
-        prgBar = QProgressBar()
-        prgBar.setAlignment(Qt.AlignLeft | Qt.AlignCenter)
-        prgBar.setValue(0)
-        prgBar.setMaximum(1000)
-        widget.layout().addWidget(prgBar)
-        self.iface.messageBar().pushWidget(widget, self.iface.messageBar().INFO)
-
-        i = 0
-        while i < 1000:
-            i += 0.0001
-            prgBar.setValue(i)
-
-        self.iface.messageBar().clearWidgets()
-        self.iface.mapCanvas().refresh()
-
-        
     def setWaitCursor(self):
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
         
@@ -2106,17 +2055,9 @@ class UpdateSQL(ParentAction):
     def setArrowCursor(self):
         QApplication.instance().setOverrideCursor(Qt.ArrowCursor)
 
-        
-    #TODO::::::::::::::::::::::::::::::::::::::::
 
     """ Take current project type changed """
 
-    def change_create_project_type(self, widget):
-        self.create_project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql_create_project, widget)
-        self.folderSoftware = self.sql_dir + '/' + self.create_project_type_selected + '/'
-        print(self.create_project_type_selected)
-
-        
     def change_project_type(self, widget):
         self.project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql, widget)
         self.folderSoftware = self.sql_dir + '/' + self.project_type_selected + '/'
