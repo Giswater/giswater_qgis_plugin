@@ -4,18 +4,30 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:XXXX
+--FUNCTION CODE:2634
 
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_refresh_mat_view()
+RETURNS integer SECURITY DEFINER AS 
+$BODY$
 
+/*EXAMPLE
+select ws_sample.gw_fct_refresh_mat_view()
+*/
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_refresh_mat_view()
-RETURNS integer SECURITY DEFINER AS $BODY$
+DECLARE
+	v_viewname text;
+	v_schemaname text;
+
 BEGIN
+	--  Search path
+    SET search_path = "ws_sample", public;
+	v_schemaname = 'ws_sample';
 
---  Search path
-    SET search_path = "SCHEMA_NAME", public;
-
-	REFRESH MATERIALIZED VIEW v_ui_workcat_polygon_aux;
+    -- Rename process
+	FOR v_viewname IN SELECT matviewname from pg_matviews where schemaname = v_schemaname
+	LOOP
+		EXECUTE 'REFRESH MATERIALIZED VIEW '||v_viewname;
+	END LOOP;
 	
 	RETURN 1;
 	

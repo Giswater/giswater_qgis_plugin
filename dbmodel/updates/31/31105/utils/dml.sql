@@ -77,7 +77,7 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_visit_parameters', '{"AutoNewWorkcat":"FALSE"}', 'json', 'om', 'Visit parameters. AutoNewWorkcat IF TRUE, automatic workcat is created with same id that visit');
 
 -- 2018/12/24
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2550, 'gw_fct_admin_updateschema_drops', 'role_admin',FALSE, 'Function that eliminates deprecated sequences, views, tables and functions');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2550, 'gw_fct_admin_schema_dropdeprecated_rel', 'role_admin',FALSE, 'Function that eliminates deprecated sequences, views, tables and functions');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2552, 'gw_fct_admin_role_permissions', 'role_admin', FALSE, 'Function that assignes roles to database');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2554, 'gw_fct_admin_schema_utils_fk', 'role_admin', FALSE, 'Function that creates foreign keys for utils schema');
 
@@ -92,40 +92,42 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('edit_uncertain_sysvdefault', 'FALSE', 'boolean', 'edit', 'System default value for uncertain');
 
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2558, 'gw_api_get_featureinfo', 'role_basic', FALSE, NULL);
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2560, 'gw_api_get_featureupsert', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2558, 'gw_api_get_featureinfo', 'role_basic', FALSE, 'Function to provide information aboute feature');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2560, 'gw_api_get_featureupsert', 'role_basic', FALSE, 'Function to upsert features');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2562, 'gw_api_get_formfields', 'role_basic', FALSE,  'Get fields of a form');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2564, 'gw_api_get_widgetjson', 'role_basic', FALSE, 'Get widget type of a field');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2566, 'gw_api_getattributetable', 'role_basic', FALSE, 'Get atrribute tcatalog of a feature');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2570, 'gw_api_getconfig', 'role_basic', FALSE, 'Get configs fields and data');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2572, 'gw_api_getchilds', 'role_basic', FALSE, 'Get child view fields and data');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2574, 'gw_api_getfeatureinsert', 'role_basic', FALSE, NULL);
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2576, 'gw_api_getgo2epa', 'role_basic', FALSE, NULL);
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2578, 'gw_api_getinfocrossection', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2574, 'gw_api_getfeatureinsert', 'role_basic', FALSE, 'Function to insert features');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2576, 'gw_api_getgo2epa', 'role_basic', FALSE, 'Function called to get the epa forms');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2578, 'gw_api_getinfocrossection', 'role_basic', FALSE, 'Function called to get info of crossection for arc features');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2580, 'gw_api_getinfofromcoordinates', 'role_basic', FALSE, 'Get information by feature coordinates');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2582, 'gw_api_getinfofromid', 'role_basic', FALSE, 'Get information by feature id');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2584, 'gw_api_getinfofromlist', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2584, 'gw_api_getinfofromlist', 'role_basic', FALSE, 'Function to get info from lists');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2586, 'gw_api_getinfoplan', 'role_basic', FALSE, 'Get information about plan cost');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2588, 'gw_api_getinsertfeature', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2588, 'gw_api_getinsertfeature', 'role_basic', FALSE, 'Function to insert features');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2590, 'gw_api_getlayersfromcoordinates', 'role_basic', FALSE,  'Get information about layer by coordinates');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2592, 'gw_api_getlist', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2592, 'gw_api_getlist', 'role_basic', FALSE, 'Function to call lists');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2594, 'gw_api_getmessage', 'role_basic', FALSE, 'Get message');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2596, 'gw_api_getpermissions', 'role_basic', FALSE, 'Get information about permissions');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2598, 'gw_api_getrowinsert', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2598, 'gw_api_getrowinsert', 'role_basic', FALSE, 'Function called to get eow insert' );
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2600, 'gw_api_getsearch', 'role_basic', FALSE, 'Get search form fields');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2602, 'gw_api_gettypeahead', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2602, 'gw_api_gettypeahead', 'role_basic', FALSE, 'Function called to fill typeahead widgets');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2604, 'gw_api_getvisit', 'role_basic', FALSE, 'Get visit form fiels');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2606, 'gw_api_setconfig', 'role_basic', FALSE, 'Set new config values');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2608, 'gw_api_setdelete', 'role_basic', FALSE, 'Set delete feature');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2610, 'gw_api_setfields', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2610, 'gw_api_setfields', 'role_basic', FALSE, 'Function called to set fields on feature');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2612, 'gw_api_setfileinsert', 'role_basic', FALSE, 'Set insert visit file');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2614, 'gw_api_setgo2epa', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2614, 'gw_api_setgo2epa', 'role_basic', FALSE, 'Function called to execute changes on go2epa forms');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2616, 'gw_api_setinsert', 'role_basic', FALSE, 'Set insert feature');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2618, 'gw_api_setsearch', 'role_basic', FALSE, 'Search elements by defined fields');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2620, 'gw_api_setsearch_add', 'role_basic', FALSE, 'Search address by defined fields');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2622, 'gw_api_setvisit', 'role_basic', FALSE, 'Set new visit values');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2624, 'gw_fct_json_object_delete_keys', 'role_basic', FALSE, NULL);
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2626, 'gw_fct_json_object_set_key', 'role_basic', FALSE, NULL);
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2628, 'gw_api_gettoolbarbuttons', 'role_basic', FALSE, NULL);
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2630, 'gw_api_getgeometry', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2624, 'gw_fct_json_object_delete_keys', 'role_basic', FALSE, 'Auxiliar function with goal to delete json keys');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2626, 'gw_fct_json_object_set_key', 'role_basic', FALSE, 'Auxiliar function with goal to delete json keys');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2628, 'gw_api_gettoolbarbuttons', 'role_basic', FALSE, 'Function called to define toolbar on client projects');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2630, 'gw_api_getgeometry', 'role_basic', FALSE, 'Function called to pass geometry to client projects');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2632, 'gw_trg_visit_update_enddate', 'role_basic', FALSE, 'Function that sets the visits enddate to current date');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2634, 'gw_fct_refresh_mat_view', 'role_basic', FALSE, 'Function that sets the visits enddate to current date');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2636, 'gw_fct_admin_schema_renameviews', 'role_basic', FALSE, 'Function that sets the visits enddate to current date');

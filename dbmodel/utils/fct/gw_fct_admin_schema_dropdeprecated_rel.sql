@@ -2,7 +2,7 @@
 
 -- DROP FUNCTION aa1.gw_fct_admin_updateschema_drops();
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_updateschema_drops()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_dropdeprecated_rel()
   RETURNS void AS
 $BODY$
 

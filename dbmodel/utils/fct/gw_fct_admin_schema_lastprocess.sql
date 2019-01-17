@@ -52,7 +52,7 @@ BEGIN
 	
 		-- clean schema of all tables/views/triggers not used in this version
 		IF v_gwversion > '3.2' THEN
-			PERFORM gw_fct_admin_updateschema_drops();	
+			PERFORM gw_fct_admin_schema_dropdeprecated_rel();	
 		END IF;	
 
 		-- inserting version table
