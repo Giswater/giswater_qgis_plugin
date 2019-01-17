@@ -1943,7 +1943,7 @@ class UpdateSQL(ParentAction):
         # Set listeners
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_create_project))
-        self.cmb_create_project_type.currentIndexChanged.connect(partial(self.change_create_project_type, self.cmb_create_project_type))
+        self.cmb_create_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_create_project_type))
         self.cmb_locale.currentIndexChanged.connect(partial(self.update_locale))
         self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
         self.filter_srid.textChanged.connect(partial(self.filter_srid_changed))
@@ -1952,6 +1952,8 @@ class UpdateSQL(ParentAction):
         locales = os.listdir(self.sql_dir + '\i18n/')
         for locale in locales:
             self.cmb_locale.addItem(locale)
+            if locale == 'EN':
+                utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
 
 
         # Open dialog
