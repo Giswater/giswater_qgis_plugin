@@ -21,6 +21,7 @@ This version of Giswater is provided by Giswater Association
 		count_aux integer;
 		promixity_buffer_aux double precision;
 		edit_enable_arc_nodes_update_aux boolean;
+		code_autofill_bool boolean;
 		
 	BEGIN
 
@@ -165,11 +166,19 @@ This version of Giswater is provided by Giswater Association
 			-- Soilcat_id
 			IF (NEW.soilcat_id IS NULL) THEN
 				NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+			END IF;
 
 			--Builtdate
 			IF (NEW.builtdate IS NULL) THEN
 				NEW.builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+
+			
+			--Copy id to code field
+			SELECT code_autofill INTO code_autofill_bool FROM arc_type WHERE id=NEW.arc_type;
+			
+			IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.code=NEW.arc_id;
 			END IF;
 			
 			-- LINK

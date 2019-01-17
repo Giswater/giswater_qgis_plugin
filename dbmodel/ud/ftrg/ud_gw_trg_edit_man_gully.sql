@@ -11,9 +11,11 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_gully()  RETURNS trigge
 DECLARE 
     v_sql varchar;
 	gully_geometry varchar;
-    gully_id_seq int8;
+	gully_id_seq int8;
 	count_aux integer;
 	promixity_buffer_aux double precision;
+	code_autofill_bool boolean;
+
 
 
 BEGIN
@@ -136,6 +138,13 @@ BEGIN
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;  
+
+		SELECT code_autofill INTO code_autofill_bool FROM gully_type WHERE id=NEW.gully_type;
+
+		--Copy id to code field
+		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.gully_id;
+		END IF;
 
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
