@@ -135,17 +135,6 @@ CREATE TABLE inp_typevalue
 -----------------------
 -- create om tables
 -----------------------
-CREATE TABLE om_visit_class
-(  id serial NOT NULL,
-  idval character varying(30),
-  descript text,
-  active boolean DEFAULT true,
-  ismultifeature boolean,
-  ismultievent boolean,
-  feature_type text,
-  sys_role_id character varying(30),
-  CONSTRAINT om_visit_class_pkey PRIMARY KEY (id)
-);
 
 
 CREATE TABLE om_visit_typevalue
@@ -238,9 +227,6 @@ ALTER TABLE ext_rtc_hydrometer ADD COLUMN instalation_date date;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydrometer_number integer;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN state smallint;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN connec_customer_code character varying(30);
-
-ALTER TABLE om_visit ADD COLUMN class_id integer;
-ALTER TABLE om_visit ADD COLUMN suspendendcat_id integer;
 
 ALTER TABLE om_visit_cat ADD COLUMN extusercat_id integer;
 ALTER TABLE om_visit_cat ADD COLUMN duration text;

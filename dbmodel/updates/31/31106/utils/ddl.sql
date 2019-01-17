@@ -50,6 +50,18 @@ WITH (
 
 ---OM TABLES
 
+CREATE TABLE om_visit_class
+( id serial NOT NULL,
+  idval character varying(30),
+  descript text,
+  active boolean DEFAULT true,
+  ismultifeature boolean,
+  ismultievent boolean,
+  feature_type text,
+  sys_role_id character varying(30),
+  CONSTRAINT om_visit_class_pkey PRIMARY KEY (id)
+);
+
 ALTER TABLE om_visit ADD COLUMN feature_type text;
 ALTER TABLE om_visit_parameter ADD COLUMN short_descript varchar(30);
 
@@ -132,5 +144,6 @@ ALTER TABLE om_visit_lot_x_arc ADD COLUMN observations TEXT;
 ALTER TABLE om_visit_lot_x_node ADD COLUMN observations TEXT;
 ALTER TABLE om_visit_lot_x_connec ADD COLUMN observations TEXT;
 
-
+ALTER TABLE om_visit ADD COLUMN class_id integer;
+ALTER TABLE om_visit ADD COLUMN suspendendcat_id integer;
 
