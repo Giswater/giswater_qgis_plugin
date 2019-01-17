@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2522
   
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_csv2pgcat_id integer, p_path text)
   RETURNS integer AS
 
 /*EXAMPLE
@@ -63,7 +63,7 @@ BEGIN
 
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data(11,'||quote_literal(p_path)||' )';
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(p_csv2pgcat_id)||','||quote_literal(p_path)||' )';
 	END IF;
 
 	-- MAPZONES
@@ -81,7 +81,7 @@ BEGIN
 	
 	
 	-- HARMONIZE THE SOURCE TABLE
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=11 order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id order by id
 	LOOP
 		-- massive refactor of source field (getting target)
 		IF rpt_rec.csv1 LIKE '[%' THEN
@@ -90,7 +90,7 @@ BEGIN
 		UPDATE temp_csv2pg SET source=v_target WHERE rpt_rec.id=temp_csv2pg.id;
 	END LOOP;
 
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=11 order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id order by id
 	LOOP
 		raise notice 'v_target,%,%', rpt_rec.source,rpt_rec.id;
 		-- refactor of [OPTIONS] target
@@ -190,7 +190,7 @@ BEGIN
 	INSERT INTO cat_node VALUES ('EPARESERVOIR-DEF', 'EPARESERVOIR', 'EPAMAT');
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=11
+	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=p_csv2pgcat_id
 	LOOP
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -217,7 +217,7 @@ BEGIN
 		raise notice 'v_query_fields %,%', v_query_fields,v_rec_table.fields;
 		
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv2pg where source='||quote_literal(v_rec_table.target)||' 
-		AND csv2pgcat_id=11 AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
+		AND csv2pgcat_id='||p_csv2pgcat_id||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
 
 		raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;		
@@ -228,7 +228,7 @@ BEGIN
 	LOOP
 		--Insert start point, add vertices if exist, add end point
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
-		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=11 and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
+		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
 		LOOP	
 			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
 			geom_array=array_append(geom_array,v_point_geom);

@@ -368,8 +368,8 @@ CREATE OR REPLACE VIEW vp_gully AS
 -- create child views
 -----------------------
 
-DROP VIEW IF EXISTS ud.ve_node_chamber;
-CREATE OR REPLACE VIEW ud.ve_node_chamber AS 
+DROP VIEW IF EXISTS ve_node_chamber;
+CREATE OR REPLACE VIEW ve_node_chamber AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -440,19 +440,19 @@ CREATE OR REPLACE VIEW ud.ve_node_chamber AS
     a.chamber_param_1,
     a.chamber_param_2,
     a.chamber_param_3
-   FROM ud.v_node
-     JOIN ud.man_chamber ON man_chamber.node_id::text = v_node.node_id::text
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_chamber ON man_chamber.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.chamber_param_1,ct.chamber_param_2, ct.chamber_param_3
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM ud.man_addfields_value JOIN ud.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CHAMBER''
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CHAMBER''
                     ORDER  BY 1,2'::text, ' VALUES (''3''),(''4''),(''5'')'::text) 
                     ct(feature_id character varying, chamber_param_1 text, chamber_param_2 text, chamber_param_3 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'CHAMBER'::text;
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_weir;
-CREATE OR REPLACE VIEW ud.ve_node_weir AS 
+DROP VIEW IF EXISTS ve_node_weir;
+CREATE OR REPLACE VIEW ve_node_weir AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -520,13 +520,13 @@ CREATE OR REPLACE VIEW ud.ve_node_weir AS
     man_chamber.bottom_channel,
     man_chamber.accessibility,
     man_chamber.name
-   FROM ud.v_node
-     JOIN ud.man_chamber ON man_chamber.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_chamber ON man_chamber.node_id::text = v_node.node_id::text
       WHERE node_type = 'WEIR';
 
 
-DROP VIEW IF EXISTS ud.ve_node_pumpstation;
-CREATE OR REPLACE VIEW ud.ve_node_pumpstation AS 
+DROP VIEW IF EXISTS ve_node_pumpstation;
+CREATE OR REPLACE VIEW ve_node_pumpstation AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -594,14 +594,14 @@ CREATE OR REPLACE VIEW ud.ve_node_pumpstation AS
     man_chamber.bottom_channel,
     man_chamber.accessibility,
     man_chamber.name
-   FROM ud.v_node
-     JOIN ud.man_chamber ON man_chamber.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_chamber ON man_chamber.node_id::text = v_node.node_id::text
      WHERE node_type = 'PUMP-STATION';
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_register;
-CREATE OR REPLACE VIEW ud.ve_node_register AS 
+DROP VIEW IF EXISTS ve_node_register;
+CREATE OR REPLACE VIEW ve_node_register AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -659,13 +659,13 @@ CREATE OR REPLACE VIEW ud.ve_node_register AS
     v_node.macrodma_id,
     v_node.expl_id,
     v_node.num_value
-   FROM ud.v_node
-     JOIN ud.man_junction ON man_junction.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_junction ON man_junction.node_id::text = v_node.node_id::text
      WHERE node_type = 'REGISTER';
 
 
-DROP VIEW IF EXISTS ud.ve_node_change;
-CREATE OR REPLACE VIEW ud.ve_node_change AS 
+DROP VIEW IF EXISTS ve_node_change;
+CREATE OR REPLACE VIEW ve_node_change AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -723,13 +723,13 @@ CREATE OR REPLACE VIEW ud.ve_node_change AS
     v_node.macrodma_id,
     v_node.expl_id,
     v_node.num_value
-   FROM ud.v_node
-     JOIN ud.man_junction ON man_junction.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_junction ON man_junction.node_id::text = v_node.node_id::text
      WHERE node_type = 'CHANGE';
 
 
-DROP VIEW IF EXISTS ud.ve_node_vnode;
-CREATE OR REPLACE VIEW ud.ve_node_vnode AS 
+DROP VIEW IF EXISTS ve_node_vnode;
+CREATE OR REPLACE VIEW ve_node_vnode AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -787,13 +787,13 @@ CREATE OR REPLACE VIEW ud.ve_node_vnode AS
     v_node.macrodma_id,
     v_node.expl_id,
     v_node.num_value
-   FROM ud.v_node
-     JOIN ud.man_junction ON man_junction.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_junction ON man_junction.node_id::text = v_node.node_id::text
      WHERE node_type = 'VNODE';
 
 
-DROP VIEW IF EXISTS ud.ve_node_junction;
-CREATE OR REPLACE VIEW ud.ve_node_junction AS 
+DROP VIEW IF EXISTS ve_node_junction;
+CREATE OR REPLACE VIEW ve_node_junction AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -851,13 +851,13 @@ CREATE OR REPLACE VIEW ud.ve_node_junction AS
     v_node.macrodma_id,
     v_node.expl_id,
     v_node.num_value
-   FROM ud.v_node
-     JOIN ud.man_junction ON man_junction.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_junction ON man_junction.node_id::text = v_node.node_id::text
      WHERE node_type = 'JUNCTION';
 
 
-DROP VIEW IF EXISTS ud.ve_node_highpoint;
-CREATE OR REPLACE VIEW ud.ve_node_highpoint AS 
+DROP VIEW IF EXISTS ve_node_highpoint;
+CREATE OR REPLACE VIEW ve_node_highpoint AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -915,14 +915,14 @@ CREATE OR REPLACE VIEW ud.ve_node_highpoint AS
     v_node.macrodma_id,
     v_node.expl_id,
     v_node.num_value
-   FROM ud.v_node
-     JOIN ud.man_junction ON man_junction.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_junction ON man_junction.node_id::text = v_node.node_id::text
      WHERE node_type = 'HIGHPOINT';
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_circmanhole;
-CREATE OR REPLACE VIEW ud.ve_node_circmanhole AS 
+DROP VIEW IF EXISTS ve_node_circmanhole;
+CREATE OR REPLACE VIEW ve_node_circmanhole AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -990,18 +990,18 @@ CREATE OR REPLACE VIEW ud.ve_node_circmanhole AS
     a.circmanhole_param_1,
     a.circmanhole_param_2,
     a.circmanhole_param_3
-   FROM ud.v_node
-     JOIN ud.man_manhole ON man_manhole.node_id::text = v_node.node_id::text
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_manhole ON man_manhole.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.circmanhole_param_1,ct.circmanhole_param_2, ct.circmanhole_param_3
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM ud.man_addfields_value JOIN ud.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CIRC-MANHOLE''
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CIRC-MANHOLE''
                     ORDER  BY 1,2'::text, ' VALUES (''10''),(''11''),(''12'')'::text) 
                     ct(feature_id character varying, circmanhole_param_1 text, circmanhole_param_2 text, circmanhole_param_3 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'CIRC-MANHOLE'::text;
 
 
-DROP VIEW IF EXISTS ud.ve_node_rectmanhole;
-CREATE OR REPLACE VIEW ud.ve_node_rectmanhole AS 
+DROP VIEW IF EXISTS ve_node_rectmanhole;
+CREATE OR REPLACE VIEW ve_node_rectmanhole AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1068,19 +1068,19 @@ CREATE OR REPLACE VIEW ud.ve_node_rectmanhole AS
     man_manhole.accessibility,
     a.rectmanhole_param_1,
     a.rectmanhole_param_2
-   FROM ud.v_node
-     JOIN ud.man_manhole ON man_manhole.node_id::text = v_node.node_id::text
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_manhole ON man_manhole.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.rectmanhole_param_1,ct.rectmanhole_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM ud.man_addfields_value JOIN ud.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''RECT-MANHOLE''
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''RECT-MANHOLE''
                     ORDER  BY 1,2'::text, ' VALUES (''22''),(''23'')'::text) 
                     ct(feature_id character varying, rectmanhole_param_1 text, rectmanhole_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'RECT-MANHOLE'::text;
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_netelement;
-CREATE OR REPLACE VIEW ud.ve_node_netelement AS 
+DROP VIEW IF EXISTS ve_node_netelement;
+CREATE OR REPLACE VIEW ve_node_netelement AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1139,14 +1139,14 @@ CREATE OR REPLACE VIEW ud.ve_node_netelement AS
     v_node.expl_id,
     v_node.num_value,
     man_netelement.serial_number
-   FROM ud.v_node
-     JOIN ud.man_netelement ON man_netelement.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_netelement ON man_netelement.node_id::text = v_node.node_id::text
      WHERE node_type = 'NETELEMENT';
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_netgully;
-CREATE OR REPLACE VIEW ud.ve_node_netgully AS 
+DROP VIEW IF EXISTS ve_node_netgully;
+CREATE OR REPLACE VIEW ve_node_netgully AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1210,14 +1210,14 @@ CREATE OR REPLACE VIEW ud.ve_node_netgully AS
     man_netgully.units,
     man_netgully.groove,
     man_netgully.siphon
-   FROM ud.v_node
-     JOIN ud.man_netgully ON man_netgully.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_netgully ON man_netgully.node_id::text = v_node.node_id::text
      WHERE node_type = 'NETGULLY';
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_sandbox;
-CREATE OR REPLACE VIEW ud.ve_node_sandbox AS 
+DROP VIEW IF EXISTS ve_node_sandbox;
+CREATE OR REPLACE VIEW ve_node_sandbox AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1282,14 +1282,14 @@ CREATE OR REPLACE VIEW ud.ve_node_sandbox AS
     man_netinit.accessibility,
     man_netinit.name,
     man_netinit.sander_depth
-   FROM ud.v_node
-     JOIN ud.man_netinit ON man_netinit.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_netinit ON man_netinit.node_id::text = v_node.node_id::text
      WHERE node_type = 'SANDBOX';
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_outfall;
-CREATE OR REPLACE VIEW ud.ve_node_outfall AS 
+DROP VIEW IF EXISTS ve_node_outfall;
+CREATE OR REPLACE VIEW ve_node_outfall AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1348,15 +1348,15 @@ CREATE OR REPLACE VIEW ud.ve_node_outfall AS
     v_node.expl_id,
     v_node.num_value,
     man_outfall.name
-   FROM ud.v_node
-     JOIN ud.man_outfall ON man_outfall.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_outfall ON man_outfall.node_id::text = v_node.node_id::text
      WHERE node_type = 'OUFALL';
 
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_overflowstorage;
-CREATE OR REPLACE VIEW ud.ve_node_overflowstorage AS 
+DROP VIEW IF EXISTS ve_node_overflowstorage;
+CREATE OR REPLACE VIEW ve_node_overflowstorage AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1423,14 +1423,14 @@ CREATE OR REPLACE VIEW ud.ve_node_overflowstorage AS
     man_storage.min_height,
     man_storage.accessibility,
     man_storage.name
-   FROM ud.v_node
-     JOIN ud.man_storage ON man_storage.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_storage ON man_storage.node_id::text = v_node.node_id::text
      WHERE node_type = 'OWERFLOW-STORAGE';
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_sewerstorage;
-CREATE OR REPLACE VIEW ud.ve_node_sewerstorage AS 
+DROP VIEW IF EXISTS ve_node_sewerstorage;
+CREATE OR REPLACE VIEW ve_node_sewerstorage AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1499,19 +1499,19 @@ CREATE OR REPLACE VIEW ud.ve_node_sewerstorage AS
     man_storage.name,
     a.sewerstorage_param_1,
     a.sewerstorage_param_2
-   FROM ud.v_node
-     JOIN ud.man_storage ON man_storage.node_id::text = v_node.node_id::text
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_storage ON man_storage.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.sewerstorage_param_1,ct.sewerstorage_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM ud.man_addfields_value JOIN ud.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''SEWER-STORAGE''
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''SEWER-STORAGE''
                     ORDER  BY 1,2'::text, ' VALUES (''24''),(''25'')'::text) 
                     ct(feature_id character varying, sewerstorage_param_1 text, sewerstorage_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'SEWER-STORAGE'::text;
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_valve;
-CREATE OR REPLACE VIEW ud.ve_node_valve AS 
+DROP VIEW IF EXISTS ve_node_valve;
+CREATE OR REPLACE VIEW ve_node_valve AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1572,19 +1572,19 @@ CREATE OR REPLACE VIEW ud.ve_node_valve AS
     man_valve.name,
     a.valve_param_1,
     a.valve_param_2
-   FROM ud.v_node
-     JOIN ud.man_valve ON man_valve.node_id::text = v_node.node_id::text
+   FROM SCHEMA_NAME.v_node
+     JOIN SCHEMA_NAME.man_valve ON man_valve.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.valve_param_1,ct.valve_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM ud.man_addfields_value JOIN ud.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''VALVE''
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''VALVE''
                     ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) 
                     ct(feature_id character varying, valve_param_1 text, valve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.node_type::text = 'VALVE'::text;
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_jump;
-CREATE OR REPLACE VIEW ud.ve_node_jump AS 
+DROP VIEW IF EXISTS ve_node_jump;
+CREATE OR REPLACE VIEW ve_node_jump AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1648,14 +1648,14 @@ CREATE OR REPLACE VIEW ud.ve_node_jump AS
     man_wjump.prot_surface,
     man_wjump.accessibility,
     man_wjump.name
-   FROM ud.v_node
-     JOIN ud.man_wjump ON man_wjump.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_wjump ON man_wjump.node_id::text = v_node.node_id::text
      WHERE node_type = 'JUMP';
 
 
 
-DROP VIEW IF EXISTS ud.ve_node_wwtp;
-CREATE OR REPLACE VIEW ud.ve_node_wwtp AS 
+DROP VIEW IF EXISTS ve_node_wwtp;
+CREATE OR REPLACE VIEW ve_node_wwtp AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.top_elev,
@@ -1715,15 +1715,15 @@ CREATE OR REPLACE VIEW ud.ve_node_wwtp AS
     v_node.num_value,
     man_wwtp.pol_id,
     man_wwtp.name
-   FROM ud.v_node
-     JOIN ud.man_wwtp ON man_wwtp.node_id::text = v_node.node_id::text
+   FROM v_node
+     JOIN man_wwtp ON man_wwtp.node_id::text = v_node.node_id::text
      WHERE node_type = 'WWTP';
 
 
 --arc
 
-DROP VIEW IF EXISTS ud.ve_arc_pumppipe;
-CREATE OR REPLACE VIEW ud.ve_arc_pumppipe AS 
+DROP VIEW IF EXISTS ve_arc_pumppipe;
+CREATE OR REPLACE VIEW ve_arc_pumppipe AS 
  SELECT v_arc_x_node.arc_id,
     v_arc_x_node.code,
     v_arc_x_node.node_1,
@@ -1794,15 +1794,15 @@ CREATE OR REPLACE VIEW ud.ve_arc_pumppipe AS
     v_arc_x_node.macrodma_id,
     v_arc_x_node.expl_id,
     v_arc_x_node.num_value
-   FROM ud.v_arc_x_node
-     JOIN ud.man_conduit ON man_conduit.arc_id::text = v_arc_x_node.arc_id::text
+   FROM v_arc_x_node
+     JOIN man_conduit ON man_conduit.arc_id::text = v_arc_x_node.arc_id::text
      WHERE arc_type = 'PUMP-PIPE';
 
 
 
 
-DROP VIEW IF EXISTS ud.ve_arc_conduit;
-CREATE OR REPLACE VIEW ud.ve_arc_conduit AS 
+DROP VIEW IF EXISTS ve_arc_conduit;
+CREATE OR REPLACE VIEW ve_arc_conduit AS 
  SELECT v_arc_x_node.arc_id,
     v_arc_x_node.code,
     v_arc_x_node.node_1,
@@ -1875,19 +1875,19 @@ CREATE OR REPLACE VIEW ud.ve_arc_conduit AS
     v_arc_x_node.num_value,
     a.conduit_param_1,
     a.conduit_param_2
-   FROM ud.v_arc_x_node
-     JOIN ud.man_conduit ON man_conduit.arc_id::text = v_arc_x_node.arc_id::text
+   FROM SCHEMA_NAME.v_arc_x_node
+     JOIN SCHEMA_NAME.man_conduit ON man_conduit.arc_id::text = v_arc_x_node.arc_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.conduit_param_1,ct.conduit_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM ud.man_addfields_value JOIN ud.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CONDUIT''
+                    FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CONDUIT''
                     ORDER  BY 1,2'::text, ' VALUES (''30''),(''31'')'::text) 
                     ct(feature_id character varying, conduit_param_1 text, conduit_param_2 text)) a ON a.feature_id::text = v_arc_x_node.arc_id::text
                     WHERE v_arc_x_node.arc_type::text = 'CONDUIT'::text;
 
 
 
-DROP VIEW IF EXISTS ud.ve_arc_siphon;
-CREATE OR REPLACE VIEW ud.ve_arc_siphon AS 
+DROP VIEW IF EXISTS ve_arc_siphon;
+CREATE OR REPLACE VIEW ve_arc_siphon AS 
  SELECT v_arc_x_node.arc_id,
     v_arc_x_node.code,
     v_arc_x_node.node_1,
@@ -1959,15 +1959,15 @@ CREATE OR REPLACE VIEW ud.ve_arc_siphon AS
     v_arc_x_node.expl_id,
     v_arc_x_node.num_value,
     man_siphon.name
-   FROM ud.v_arc_x_node
-     JOIN ud.man_siphon ON man_siphon.arc_id::text = v_arc_x_node.arc_id::text
+   FROM v_arc_x_node
+     JOIN man_siphon ON man_siphon.arc_id::text = v_arc_x_node.arc_id::text
      WHERE arc_type = 'SIPHON';
 
 
 
 
-DROP VIEW IF EXISTS ud.ve_arc_varc;
-CREATE OR REPLACE VIEW ud.ve_arc_varc AS 
+DROP VIEW IF EXISTS ve_arc_varc;
+CREATE OR REPLACE VIEW ve_arc_varc AS 
  SELECT v_arc_x_node.arc_id,
     v_arc_x_node.code,
     v_arc_x_node.node_1,
@@ -2038,13 +2038,13 @@ CREATE OR REPLACE VIEW ud.ve_arc_varc AS
     v_arc_x_node.macrodma_id,
     v_arc_x_node.expl_id,
     v_arc_x_node.num_value
-   FROM ud.v_arc_x_node
-     JOIN ud.man_varc ON man_varc.arc_id::text = v_arc_x_node.arc_id::text
+   FROM v_arc_x_node
+     JOIN man_varc ON man_varc.arc_id::text = v_arc_x_node.arc_id::text
      WHERE arc_type = 'VARC';
 
 
-DROP VIEW IF EXISTS ud.ve_arc_waccel;
-CREATE OR REPLACE VIEW ud.ve_arc_waccel AS 
+DROP VIEW IF EXISTS ve_arc_waccel;
+CREATE OR REPLACE VIEW ve_arc_waccel AS 
  SELECT v_arc_x_node.arc_id,
     v_arc_x_node.node_1,
     v_arc_x_node.node_2,
@@ -2120,8 +2120,8 @@ CREATE OR REPLACE VIEW ud.ve_arc_waccel AS
     man_waccel.prot_surface,
     man_waccel.name,
     man_waccel.accessibility
-   FROM ud.v_arc_x_node
-     JOIN ud.man_waccel ON man_waccel.arc_id::text = v_arc_x_node.arc_id::text
+   FROM v_arc_x_node
+     JOIN man_waccel ON man_waccel.arc_id::text = v_arc_x_node.arc_id::text
      WHERE arc_type = 'WACCEL';
 
 
@@ -2578,7 +2578,7 @@ JOIN v_node ON v_node.node_id=subcatchment.node_id
 -----------------------
 -- inp views
 -----------------------
-/*
+
 DROP VIEW IF EXISTS vi_title CASCADE;
 CREATE OR REPLACE VIEW vi_title AS 
  SELECT inp_project_id.title,
@@ -2591,9 +2591,9 @@ CREATE OR REPLACE VIEW vi_options AS
  SELECT a.description as parameter,
  CASE WHEN inp_typevalue.idval is not null then inp_typevalue.idval
  else b.value end as value
-   FROM ud.audit_cat_param_user a
-     LEFT JOIN ud.config_param_user b ON a.id = b.parameter::text
-     LEFT JOIN ud.inp_typevalue ON  inp_typevalue.id=b.value and inp_typevalue.typevalue LIKE 'inp_value_options%'
+   FROM audit_cat_param_user a
+     LEFT JOIN config_param_user b ON a.id = b.parameter::text
+     LEFT JOIN inp_typevalue ON  inp_typevalue.id=b.value and inp_typevalue.typevalue LIKE 'inp_value_options%'
   WHERE a.context = 'inp_options'::text AND b.cur_user::name = "current_user"();
 
 
@@ -2601,8 +2601,8 @@ DROP VIEW IF EXISTS vi_report CASCADE;
 CREATE OR REPLACE VIEW vi_report AS 
  SELECT a.description as parameter,
     b.value
-   FROM ud.audit_cat_param_user a
-     LEFT JOIN ud.config_param_user b ON a.id = b.parameter::text
+   FROM audit_cat_param_user a
+     LEFT JOIN config_param_user b ON a.id = b.parameter::text
   WHERE a.context = 'inp_report'::text AND b.cur_user::name = "current_user"();
   
 
@@ -3562,4 +3562,4 @@ CREATE OR REPLACE VIEW vi_polygons AS
  SELECT
  temp_table.text_column
  FROM temp_table
- WHERE fprocesscat_id=17;*/
+ WHERE fprocesscat_id=17;
