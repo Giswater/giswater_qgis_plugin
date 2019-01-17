@@ -12,7 +12,7 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_api_setfileinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
 	"feature":{"featureType":"file", "tableName":"om_visit_file", "id":10004, "idName": "id"}, 
-	"data":{"fields":{"visit_id":10004, "hash":"testhash", "url":"urltest", "filetype":"png"},
+	"data":{"fields":{"visit_id":10004, "hash":"testhash", "url":"urltest", "fextension":"png","idval":"file1"},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)	
 */
 
@@ -24,6 +24,9 @@ DECLARE
 	v_insertresult json;
 	v_message json;
 	v_feature json;
+	v_data json;
+	v_filetype text;
+	v_fextension text;
 
 BEGIN
 
@@ -35,7 +38,14 @@ BEGIN
 		INTO v_apiversion;
 	
 	-- set output parameter
-	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
+	v_fextension = (((p_data)->>'data')::json->>'fields')::json->>'fextension';
+	v_filetype = (SELECT filetype FROM om_visit_filetype_x_extension WHERE fextension=v_fextension);
+
+	raise notice 'v_fextension % v_filetype %', v_fextension, v_filetype;
+	
+	v_data = (p_data)->>'data';
+	v_data = gw_fct_json_object_set_key(v_data, 'filetype', (v_filetype));
+	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',v_data,'}')::json;
 
 	RAISE NOTICE '--- CALL gw_api_setinsert USING v_outputparameter: % ---', v_outputparameter;
 

@@ -159,7 +159,7 @@ BEGIN
 				
 				-- Enable null values
 				IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
-					v_array = array_prepend('0',v_array);
+					v_array = array_prepend('',v_array);
 				END IF;
 				combo_json = array_to_json(v_array);
 				v_combo_id = combo_json;
@@ -227,11 +227,7 @@ BEGIN
 						END IF;	
 								
 						-- Enable null values
-						IF (aux_json_child->>'dv_isnullvalue')::boolean IS TRUE THEN
-							v_dv_querytext_child = concat ('SELECT id, idval FROM value_type WHERE typevalue=''nullvalue'' UNION ',(aux_json_child->>'dv_querytext'));
-						ELSE 
-							v_dv_querytext_child=(aux_json_child->>'dv_querytext');
-						END IF;
+						v_dv_querytext_child=(aux_json_child->>'dv_querytext');
 						
 						-- Get combo id's
 						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN		
@@ -244,7 +240,7 @@ BEGIN
 						
 						-- Enable null values
 						IF (aux_json_child->>'dv_isnullvalue')::boolean IS TRUE THEN 
-							v_array_child = array_prepend('0',v_array_child);
+							v_array_child = array_prepend('',v_array_child);
 						END IF;
 						combo_json_child = array_to_json(v_array_child);
 						
@@ -264,7 +260,6 @@ BEGIN
 							v_array_child = array_prepend('',v_array_child);
 						END IF;
 						combo_json_child = array_to_json(v_array_child);
-
 
 
 						combo_json_child := COALESCE(combo_json_child, '[]');
