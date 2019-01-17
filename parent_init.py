@@ -1405,7 +1405,9 @@ class ParentDialog(QDialog):
         utils_giswater.set_item_data(self.cat_period_id_filter, rows, 1)
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
-               "FROM " + self.schema_name + ".v_rtc_hydrometer ORDER BY hydrometer_customer_code")
+               " FROM " + self.schema_name + ".v_rtc_hydrometer "
+               " WHERE connec_id = '"+str(self.id)+"' "
+               " ORDER BY hydrometer_customer_code")
         rows = [('', '')]
         rows.extend(self.controller.get_rows(sql, log_sql=True))
         utils_giswater.set_item_data(self.cmb_hyd_customer_code, rows, 1)
