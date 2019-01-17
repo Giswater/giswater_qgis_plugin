@@ -533,12 +533,12 @@ class UpdateSQL(ParentAction):
                                         print(False)
                                 if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
                                         self.locale + '/'), '') is False:
-                                    if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
+                                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '\i18n/', 'EN') is False:
                                         print(False)
                                     else:
                                         status = self.executeFiles(os.listdir(
-                                            self.sql_dir + '\i18n/' + 'EN'),
-                                            self.sql_dir + '\i18n/' + 'EN', True)
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN'),
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN', True)
                                         if status is False:
                                             print(False)
                                 else:
@@ -570,12 +570,12 @@ class UpdateSQL(ParentAction):
                                 if self.process_folder(
                                         self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                         '') is False:
-                                    if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
+                                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '\i18n/', 'EN') is False:
                                         print(False)
                                     else:
                                         status = self.executeFiles(os.listdir(
-                                            self.sql_dir + '\i18n/' + 'EN'),
-                                            self.sql_dir + '\i18n/' + 'EN', True)
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN'),
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN', True)
                                         if status is False:
                                             print(False)
                                 else:
@@ -605,12 +605,12 @@ class UpdateSQL(ParentAction):
                                 if self.process_folder(
                                         self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                         '') is False:
-                                    if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
+                                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '\i18n/', 'EN') is False:
                                         print(False)
                                     else:
                                         status = self.executeFiles(os.listdir(
-                                            self.sql_dir + '\i18n/' + 'EN'),
-                                            self.sql_dir + '\i18n/' + 'EN', True)
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN'),
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN', True)
                                         if status is False:
                                             print(False)
                                 else:
@@ -702,12 +702,12 @@ class UpdateSQL(ParentAction):
                                 if self.process_folder(
                                         self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                         '') is False:
-                                    if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
+                                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '\i18n/', 'EN') is False:
                                         print(False)
                                     else:
                                         status = self.executeFiles(os.listdir(
-                                            self.sql_dir + '\i18n/' + 'EN'),
-                                            self.sql_dir + '\i18n/' + 'EN', True)
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN'),
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN', True)
                                         if status is False:
                                             print(False)
                                 else:
@@ -737,12 +737,12 @@ class UpdateSQL(ParentAction):
                                 if self.process_folder(
                                         self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                         '') is False:
-                                    if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
+                                    if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '\i18n/', 'EN') is False:
                                         print(False)
                                     else:
                                         status = self.executeFiles(os.listdir(
-                                            self.sql_dir + '\i18n/' + 'EN'),
-                                            self.sql_dir + '\i18n/' + 'EN', True)
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN'),
+                                            self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN', True)
                                         if status is False:
                                             print(False)
                                 else:
@@ -816,12 +816,12 @@ class UpdateSQL(ParentAction):
                             if self.process_folder(
                                     self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                     '') is False:
-                                if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
+                                if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '\i18n/', 'EN') is False:
                                     print(False)
                                 else:
                                     status = self.executeFiles(os.listdir(
-                                        self.sql_dir + '\i18n/' + 'EN'),
-                                        self.sql_dir + '\i18n/' + 'EN', True)
+                                        self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN'),
+                                        self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN', True)
                                     if status is False:
                                         print(False)
                             else:
@@ -851,12 +851,12 @@ class UpdateSQL(ParentAction):
                             if self.process_folder(
                                     self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(self.locale + '/'),
                                     '') is False:
-                                if self.process_folder(self.sql_dir + '\i18n/' + 'EN', '') is False:
+                                if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN', '') is False:
                                     print(False)
                                 else:
                                     status = self.executeFiles(os.listdir(
-                                        self.sql_dir + '\i18n/' + 'EN'),
-                                        self.sql_dir + '\i18n/' + 'EN', True)
+                                        self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN'),
+                                        self.folderUpdates + folder + '/' + sub_folder + '\i18n/' + 'EN', True)
                                     if status is False:
                                         print(False)
                             else:
