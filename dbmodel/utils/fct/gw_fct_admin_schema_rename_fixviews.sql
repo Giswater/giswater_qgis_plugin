@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2636
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_admin_schema_rename_fixviews(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_rename_fixviews(p_data json)
   RETURNS void AS
 $BODY$
 
@@ -14,8 +14,8 @@ $BODY$
 The goal of this function is fix bug of postgres when schema is renamed because the QUERYS in crosstab function are not automaticly updated
 
 EXAMPLE
-SELECT ws_sample.gw_fct_admin_schema_rename_fixviews($${ 
-"data":{"currentSchemaName":"ws_sample","oldSchemaName":"ws_sample"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_schema_rename_fixviews($${ 
+"data":{"currentSchemaName":"SCHEMA_NAME","oldSchemaName":"SCHEMA_NAME"}}$$)
 */
 
 DECLARE 
@@ -27,7 +27,7 @@ DECLARE
 BEGIN 
 
 	-- Search path
-    SET search_path = ws_sample, public;
+    SET search_path = SCHEMA_NAME, public;
 	
 	-- get input data
 	v_oldschemaname := ((p_data->>'data')::json)->>'oldSchemaName'::text;

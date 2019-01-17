@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2634
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_refresh_mat_view()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_refresh_mat_view()
 RETURNS integer SECURITY DEFINER AS 
 $BODY$
 
 /*EXAMPLE
-select ws_sample.gw_fct_refresh_mat_view()
+select SCHEMA_NAME.gw_fct_refresh_mat_view()
 */
 
 DECLARE
@@ -20,8 +20,8 @@ DECLARE
 
 BEGIN
 	--  Search path
-    SET search_path = "ws_sample", public;
-	v_schemaname = 'ws_sample';
+    SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
     -- Rename process
 	FOR v_viewname IN SELECT matviewname from pg_matviews where schemaname = v_schemaname
