@@ -20,23 +20,22 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 -- 2018/11/03
 INSERT INTO sys_fprocess_cat VALUES (33, 'Update project data schema', 'System', 'Project data schema', 'utils');
 
-INSERT INTO audit_cat_function VALUES (2510, 'gw_fct_utils_csv2pg_import_dbprices', 'edit', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2512, 'gw_fct_utils_csv2pg_import_omvisit', 'edit', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2514, 'gw_fct_utils_csv2pg_import_elements', 'edit', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2516, 'gw_fct_utils_csv2pg_import_addfields', 'edit', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2518, 'gw_fct_utils_csv2pg_export_epa_inp', 'epa', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2520, 'gw_fct_utils_csv2pg_import_epanet_rpt', 'epa', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2522, 'gw_fct_utils_csv2pg_import_epanet_inp', 'admin', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2524, 'gw_fct_utils_csv2pg_import_swmm_inp', 'admin', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2526, 'gw_fct_utils_csv2pg_export_epanet_inp', 'epa', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2528, 'gw_fct_utils_csv2pg_export_swmm_inp', 'epa', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2530, 'gw_fct_utils_csv2pg_import_swmm_rpt', 'epa', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2532, 'gw_fct_utils_csv2pg_import_epa_inp', 'epa', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2536, 'gw_fct_utils_csv2pg_import_epa_rpt', 'epa', NULL, '', '', NULL, NULL, NULL);
-
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2510, 'gw_fct_utils_csv2pg_import_dbprices', 'role_edit', FALSE, 'Function imports prices from csv file into database');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2512, 'gw_fct_utils_csv2pg_import_omvisit', 'role_edit', FALSE,'Function imports visits from csv file into database' );
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2514, 'gw_fct_utils_csv2pg_import_elements', 'role_edit',  FALSE,'Function imports elements from csv file into database');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2516, 'gw_fct_utils_csv2pg_import_addfields', 'role_edit', FALSE,'Function imports personalized fields from csv file into database');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2518, 'gw_fct_utils_csv2pg_export_epa_inp', 'role_epa', FALSE,'Function indicates the correct inp data export depending on project type');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2520, 'gw_fct_utils_csv2pg_import_epanet_rpt', 'role_epa', FALSE,'Function imports epanet model results from rpt file into database');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2522, 'gw_fct_utils_csv2pg_import_epanet_inp', 'role_admin',FALSE,'Function imports network data from epanet inp file into database');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2524, 'gw_fct_utils_csv2pg_import_swmm_inp', 'role_admin', FALSE,'Function imports network data from swmm inp file into database');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2526, 'gw_fct_utils_csv2pg_export_epanet_inp', 'role_epa', FALSE,'Function exports epanet model data from database into inp file');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2528, 'gw_fct_utils_csv2pg_export_swmm_inp', 'role_epa', FALSE,'Function exports swmm model data from database into inp file');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2530, 'gw_fct_utils_csv2pg_import_swmm_rpt', 'role_epa', FALSE,'Function imports swmm model results from rpt file into database');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2532, 'gw_fct_utils_csv2pg_import_epa_inp', 'role_epa', FALSE,'Function indicates the correct inp data import depending on project type');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2536, 'gw_fct_utils_csv2pg_import_epa_rpt', 'role_epa', FALSE,'Function indicates the correct rpt data import depending on project type');
 
 -- 2018/11/08
-INSERT INTO audit_cat_function VALUES (2534, 'gw_fct_repair_link', 'edit', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2534, 'gw_fct_repair_link', 'role_edit', FALSE,'Function allows to conected link geometries defined by user with the network');
 
 
 -- 2018/11/11
@@ -59,14 +58,14 @@ INSERT INTO audit_cat_table VALUES ('v_ui_workcat_polygon_all', 'om', null, null
 
 
 -- 2018/11/23
-INSERT INTO audit_cat_function VALUES (2538, 'gw_fct_dinlet', 'om', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2540, 'gw_fct_inlet_flowtrace', 'om', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2538, 'gw_fct_dinlet', 'role_om', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2540, 'gw_fct_inlet_flowtrace', 'role_om', FALSE, NULL);
 
 -- 2018/12/14
-INSERT INTO audit_cat_function VALUES (2542, 'gw_trg_arc_vnodelink_update', 'edit', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2544, 'gw_trg_link_connecrotation_update', 'edit', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2546, 'gw_fct_admin_schema_update', 'edit', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2548, 'gw_trg_om_visit', 'om', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript)  VALUES (2542, 'gw_trg_arc_vnodelink_update', 'role_edit',FALSE, 'Function recreates link when arc was updated');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript)  VALUES (2544, 'gw_trg_link_connecrotation_update', 'role_edit', FALSE, 'Function sets connec''s label_rotation depending on link''s position');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript)  VALUES (2546, 'gw_fct_admin_schema_update', 'role_edit',FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript)  VALUES (2548, 'gw_trg_om_visit', 'role_om', FALSE, 'Function allowing to automatically insert new workcat_id same as code of the visit');
 
 INSERT INTO audit_cat_param_user VALUES ('edit_link_connecrotation_update', 'edit', 'Used to rotate label and symbol of connec using the links angle', 'role_edit');
 
@@ -78,12 +77,12 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_visit_parameters', '{"AutoNewWorkcat":"FALSE"}', 'json', 'om', 'Visit parameters. AutoNewWorkcat IF TRUE, automatic workcat is created with same id that visit');
 
 -- 2018/12/24
-INSERT INTO audit_cat_function VALUES (2550, 'gw_fct_admin_updateschema_drops', 'admin', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2552, 'gw_fct_admin_role_permissions', 'admin', NULL, '', '', NULL, NULL, NULL);
-INSERT INTO audit_cat_function VALUES (2554, 'gw_fct_admin_schema_utils_fk', 'admin', NULL, '', '', NULL, NULL, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2550, 'gw_fct_admin_updateschema_drops', 'role_admin',FALSE, 'Function that eliminates deprecated sequences, views, tables and functions');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2552, 'gw_fct_admin_role_permissions', 'role_admin', FALSE, 'Function that assignes roles to database');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2554, 'gw_fct_admin_schema_utils_fk', 'role_admin', FALSE, 'Function that creates foreign keys for utils schema');
 
 --2018/12/25
-INSERT INTO audit_cat_table VALUES ('audit_cat_sequence', 'admin', null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
+INSERT INTO audit_cat_table VALUES ('audit_cat_sequence', 'role_admin', null, null, 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
 -- 2019/01/15
@@ -93,3 +92,40 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('edit_uncertain_sysvdefault', 'FALSE', 'boolean', 'edit', 'System default value for uncertain');
 
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2558, 'gw_api_get_featureinfo', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2560, 'gw_api_get_featureupsert', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2562, 'gw_api_get_formfields', 'role_basic', FALSE,  'Get fields of a form');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2564, 'gw_api_get_widgetjson', 'role_basic', FALSE, 'Get widget type of a field');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2566, 'gw_api_getattributetable', 'role_basic', FALSE, 'Get atrribute tcatalog of a feature');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2570, 'gw_api_getconfig', 'role_basic', FALSE, 'Get configs fields and data');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2572, 'gw_api_getchilds', 'role_basic', FALSE, 'Get child view fields and data');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2574, 'gw_api_getfeatureinsert', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2576, 'gw_api_getgo2epa', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2578, 'gw_api_getinfocrossection', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2580, 'gw_api_getinfofromcoordinates', 'role_basic', FALSE, 'Get information by feature coordinates');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2582, 'gw_api_getinfofromid', 'role_basic', FALSE, 'Get information by feature id');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2584, 'gw_api_getinfofromlist', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2586, 'gw_api_getinfoplan', 'role_basic', FALSE, 'Get information about plan cost');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2588, 'gw_api_getinsertfeature', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2590, 'gw_api_getlayersfromcoordinates', 'role_basic', FALSE,  'Get information about layer by coordinates');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2592, 'gw_api_getlist', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2594, 'gw_api_getmessage', 'role_basic', FALSE, 'Get message');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2596, 'gw_api_getpermissions', 'role_basic', FALSE, 'Get information about permissions');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2598, 'gw_api_getrowinsert', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2600, 'gw_api_getsearch', 'role_basic', FALSE, 'Get search form fields');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2602, 'gw_api_gettypeahead', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2604, 'gw_api_getvisit', 'role_basic', FALSE, 'Get visit form fiels');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2606, 'gw_api_setconfig', 'role_basic', FALSE, 'Set new config values');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2608, 'gw_api_setdelete', 'role_basic', FALSE, 'Set delete feature');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2610, 'gw_api_setfields', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2612, 'gw_api_setfileinsert', 'role_basic', FALSE, 'Set insert visit file');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2614, 'gw_api_setgo2epa', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2616, 'gw_api_setinsert', 'role_basic', FALSE, 'Set insert feature');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2618, 'gw_api_setsearch', 'role_basic', FALSE, 'Search elements by defined fields');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2620, 'gw_api_setsearch_add', 'role_basic', FALSE, 'Search address by defined fields');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2622, 'gw_api_setvisit', 'role_basic', FALSE, 'Set new visit values');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2624, 'gw_fct_json_object_delete_keys', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2626, 'gw_fct_json_object_set_key', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2628, 'gw_api_gettoolbarbuttons', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2630, 'gw_api_getgeometry', 'role_basic', FALSE, NULL);
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2632, 'gw_trg_visit_update_enddate', 'role_basic', FALSE, 'Function that sets the visits enddate to current date');

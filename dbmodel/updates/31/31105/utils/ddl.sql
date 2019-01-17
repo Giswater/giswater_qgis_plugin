@@ -55,8 +55,8 @@ CREATE INDEX ext_rtc_hydrometer_x_data_index_hydrometer_id ON ext_rtc_hydrometer
 CREATE INDEX ext_rtc_hydrometer_x_data_index_cat_period_id ON ext_rtc_hydrometer_x_data USING btree (cat_period_id);
 
 -- 2018/12/25
-ALTER TABLE audit_cat_table ADD COLUMN isdrepecated boolean DEFAULT FALSE;
-ALTER TABLE audit_cat_function ADD COLUMN isdrepecated boolean DEFAULT FALSE;
+ALTER TABLE audit_cat_table ADD COLUMN isdeprecated boolean DEFAULT FALSE;
+ALTER TABLE audit_cat_function ADD COLUMN isdeprecated boolean DEFAULT FALSE;
 
 
 CREATE TABLE audit_cat_sequence (
