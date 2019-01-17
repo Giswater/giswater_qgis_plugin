@@ -759,6 +759,35 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>cmb_connection</tabstop>
+  <tabstop>cmb_project_type</tabstop>
+  <tabstop>project_schema_name</tabstop>
+  <tabstop>project_schema_title</tabstop>
+  <tabstop>project_schema_author</tabstop>
+  <tabstop>project_schema_last_update</tabstop>
+  <tabstop>btn_schema_create</tabstop>
+  <tabstop>btn_copy</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_close</tabstop>
+  <tabstop>btn_update_schema</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>btn_info</tabstop>
+  <tabstop>software_version_info</tabstop>
+  <tabstop>btn_custom_load_file</tabstop>
+  <tabstop>chk_schema_fk</tabstop>
+  <tabstop>chk_schema_funcion</tabstop>
+  <tabstop>chk_schema_trigger</tabstop>
+  <tabstop>btn_schema_file_to_db</tabstop>
+  <tabstop>btn_update_api</tabstop>
+  <tabstop>chk_api_fk</tabstop>
+  <tabstop>chk_api_funcion</tabstop>
+  <tabstop>chk_api_trigger</tabstop>
+  <tabstop>btn_api_file_to_db</tabstop>
+  <tabstop>btn_api_create</tabstop>
+  <tabstop>custom_path_folder</tabstop>
+  <tabstop>btn_custom_select_file</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
