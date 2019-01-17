@@ -128,5 +128,9 @@ CREATE TABLE om_visit_lot_x_arc(
   CONSTRAINT om_visit_filetype_x_extension_pkey PRIMARY KEY (filetype, fextension)
 );
 
+ALTER TABLE om_visit_lot_x_arc ADD COLUMN observations TEXT;
+ALTER TABLE om_visit_lot_x_node ADD COLUMN observations TEXT;
+ALTER TABLE om_visit_lot_x_connec ADD COLUMN observations TEXT;
+
 
 
