@@ -268,16 +268,38 @@ BEGIN
 	
 	-- Subcatchments geometry
 	--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
-	FOR v_data IN SELECT * FROM subcatchment WHERE subc_id='30130' LOOP
+	FOR v_data IN SELECT * FROM subcatchment LOOP
 	
 		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
 		LOOP	
 			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
-			geom_array=array_append(geom_array,v_point_geom);
+			INSERT INTO temp_table (text_column,geom_point) VALUES (v_data.subc_id,v_point_geom);
+
+			--geom_array=array_append(geom_array,v_point_geom);
 		END LOOP;
-			v_line_geom=ST_MakeLine(geom_array);
-		UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,epsg_val)) where subc_id=v_data.subc_id;
-		INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
+		SELECT ARRAY(SELECT geom_point FROM temp_table WHERE text_column=v_data.subc_id) into geom_array;
+		v_line_geom=ST_MakeLine(geom_array);
+		INSERT INTO temp_table (text_column,geom_line) VALUES (v_data.subc_id,v_line_geom);
+		IF array_length(geom_array, 1) > 3 THEN
+				v_line_geom=ST_MakeLine(geom_array);
+				INSERT INTO temp_table (text_column,geom_line) VALUES (v_data.subc_id,v_line_geom);
+
+				IF ST_IsClosed(v_line_geom) THEN
+					UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,epsg_val)) where subc_id=v_data.subc_id;
+					INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
+				ELSE
+					v_line_geom = ST_AddPoint(v_line_geom, ST_StartPoint(v_line_geom));
+					IF ST_IsClosed(v_line_geom) THEN
+						UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,epsg_val)) where subc_id=v_data.subc_id;
+						INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
+					ELSE
+						RAISE NOTICE 'The polygon cant be created because the geometry is not closed. Subc_id: ,%', v_data.subc_id;
+					END IF;
+				END IF;
+			ELSE 
+				RAISE NOTICE 'The polygonn cant be created because it has less than 4 vertexes. Subc_id: ,%', v_data.subc_id;
+			END IF;
+		
 	END LOOP;
 		
 	-- Mapzones geometry
