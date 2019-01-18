@@ -7,23 +7,16 @@ or (at your option) any later version.
 """
 
 
-from PyQt4.QtCore import QDate, Qt
-from PyQt4.QtCore import QModelIndex
-from PyQt4.QtGui import QBrush
-from PyQt4.QtGui import QColor
+from PyQt4.QtCore import QDate, Qt, QPyNullVariant
 from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QComboBox, QAction, QAbstractItemView
+from PyQt4.QtGui import QCheckBox, QHBoxLayout, QStandardItem, QStandardItemModel, QWidget
+
+
 from functools import partial
 
-from PyQt4.QtGui import QPalette
-from PyQt4.QtGui import QStandardItem
-from PyQt4.QtGui import QStandardItemModel
-from PyQt4.QtGui import QStyledItemDelegate
-from PyQt4.QtGui import QTableWidgetItem
-from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
-
 import utils_giswater
-from datetime import datetime
-from giswater.actions.multiple_selection import MultipleSelection
+
+
 from giswater.actions.parent_manage import ParentManage
 from giswater.ui_manager import AddLot
 from giswater.ui_manager import VisitManagement
@@ -97,10 +90,10 @@ class AddNewLot(ParentManage):
             self.set_values(lot_id)
             self.populate_table(lot_id)
             self.update_id_list()
-            # sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + ""
-            #        " WHERE lot_id ='" + str(lot_id) + "'")
-            # rows = self.controller.get_rows(sql)
-            # self.populate_combos(self.tbl_relation, rows)
+            sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + ""
+                   " WHERE lot_id ='" + str(lot_id) + "'")
+            rows = self.controller.get_rows(sql)
+            self.put_checkbox(self.tbl_relation, rows, 'status', 3)
         self.enable_feature_type(self.dlg_lot)
         # Set signals
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
@@ -117,12 +110,32 @@ class AddNewLot(ParentManage):
         # Set autocompleters of the form
         self.set_completers()
 
+        # model_rows = self.read_standaritemmodel(self.tbl_relation)
+        # self.controller.log_info(str(model_rows))
         # p = self.dlg_lot.tbl_relation.palette()
         # p.setColor(QPalette.Base, QColor("yellow"))
         # self.dlg_lot.tbl_relation.setPalette(p)
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
+    def read_standaritemmodel(self, qtable):
+        headers = self.get_headers(qtable)
+        rows = []
+        model = qtable.model()
+        for x in range(0, model.rowCount()):
+            row = {}
+            for c in range(0, model.columnCount()-1):
+                index = model.index(x, c)
+                item = model.data(index)
+                row[headers[c]] = item
+
+            widget_cell = qtable.model().index(x, 4)
+            widget = qtable.indexWidget(widget_cell)
+            chk_list = widget.findChildren(QCheckBox)
+            if chk_list[0].isChecked():
+                row['status'] = '3'
+            rows.append(row)
+        return rows
 
     def fill_fields(self):
         """ Fill combo boxes of the form """
@@ -254,13 +267,13 @@ class AddNewLot(ParentManage):
     def set_headers(self, qtable):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
+        columns_name.append(['validate'])
         standar_model = QStandardItemModel()
         qtable.setModel(standar_model)
         qtable.horizontalHeader().setStretchLastSection(True)
 
         # # Get headers
         headers = []
-        self.controller.log_info(str(columns_name))
         for x in columns_name:
             headers.append(x[0])
         # Set headers
@@ -276,7 +289,10 @@ class AddNewLot(ParentManage):
         for row in rows:
             item = []
             for value in row:
-                item.append(QStandardItem(str(value)))
+                if value is not None:
+                    item.append(QStandardItem(str(value)))
+                else:
+                    item.append(QStandardItem(None))
             if len(row) > 0:
                 standar_model.appendRow(item)
 
@@ -338,7 +354,6 @@ class AddNewLot(ParentManage):
 
         for id_ in self.ids:
             item = []
-            self.controller.log_info(str(id_))
             if id_ not in id_list:
                 row = []
                 item.append(lot_id)
@@ -448,20 +463,31 @@ class AddNewLot(ParentManage):
         if self.is_new_lot is True:
             sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
                    " VALUES (" + values + ") RETURNING id")
-            row = self.controller.execute_returning(sql, log_sql=False)
-            _id = row[0]
+            row = self.controller.execute_returning(sql, log_sql=True)
+            lot__id = row[0]
         else:
-            _id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
+            lot__id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
 
         sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
-               " WHERE lot_id = '"+str(_id)+"';")
+               " WHERE lot_id = '"+str(lot__id)+"'; \n")
 
-        id_list = self.get_table_values(self.tbl_relation, lot['feature_type'])
+        model_rows = self.read_standaritemmodel(self.tbl_relation)
 
-        for x in range(0, len(id_list)):
-            sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
-                    "(lot_id, "+lot['feature_type']+"_id, status)"
-                    " VALUES('" + str(_id) + "', '" + str(id_list[x]) + "', '0'); \n")
+        for item in model_rows:
+            keys = ""
+            values = ""
+            for key, value in item.items():
+
+                if value != '' and type(value) != QPyNullVariant:
+                    keys += ""+key+", "
+                    if type(value) in (int, bool):
+                        values += "$$"+str(value)+"$$, "
+                    else:
+                        values += "$$" + value + "$$, "
+            keys = keys[:-2]
+            values = values[:-2]
+            sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
+                    " VALUES (" + values + "); \n")
         self.controller.execute_sql(sql, log_sql=False)
 
 
@@ -488,33 +514,29 @@ class AddNewLot(ParentManage):
         self.disconnect_signal_selection_changed()
         self.close_dialog(self.dlg_lot)
 
-    def populate_combos(self, qtable, rows):
-        """ Set one column of a QtableView as QComboBox with values from database. """
+    def put_checkbox(self, qtable, rows, checker, value):
+        """ Set one column of a QtableView as QCheckBox with values from database. """
 
         for x in range(0, len(rows)):
-            combo = QComboBox()
-            # sql = "SELECT DISTINCT(work_id) FROM " + self.schema_name + "." + tableleft + " ORDER BY work_id"
-            # row = self.controller.get_rows(sql)
-            # utils.fillComboBox(combo, row, False)
-            # row = rows[x]
-
-            rows = [('0', 'cero'), ('1', 'uno'), ('2', 'dos')]
-            utils_giswater.set_item_data(combo, rows, 1)
-
-            # priority = row[7]
-            # utils.setSelectedItem(combo, str(priority))
-            i = qtable.model().index(x, 2)
-
-            qtable.setIndexWidget(i, combo)
-            combo.setStyleSheet("background:#E6E6E6")
-            combo.currentIndexChanged.connect(partial(self.update_combobox_values, qtable, combo, x))
-
-    def update_combobox_values(self, qtable, combo, x):
-        """ Insert combobox.currentText into widget (QTableView) """
-        index = qtable.model().index(x, 2)
-        qtable.model().setData(index, combo.currentText())
+            row = rows[x]
+            cell_widget = QWidget()
+            chk = QCheckBox()
+            if row[checker] == value:
+                chk.setCheckState(Qt.Checked)
+            lay_out = QHBoxLayout(cell_widget)
+            lay_out.addWidget(chk)
+            lay_out.setAlignment(Qt.AlignCenter)
+            lay_out.setContentsMargins(0, 0, 0, 0)
+            cell_widget.setLayout(lay_out)
+            i = qtable.model().index(x, 4)
+            qtable.setIndexWidget(i, cell_widget)
 
 
+    def get_headers(self, qtable):
+        headers = []
+        for x in range(0, qtable.model().columnCount()):
+            headers.append(qtable.model().headerData(x, Qt.Horizontal))
+        return headers
 
 
 
@@ -638,7 +660,7 @@ class AddNewLot(ParentManage):
 
         # set previous dialog
         # if hasattr(self, 'previous_dialog'):
-        self.manage_lot(selected_object_id, feature_type=feature_type)
+        self.manage_lot(selected_object_id, feature_type=feature_type, is_new=False)
 
     def filter_lot(self, dialog, widget_table, widget_txt):
         """ Filter om_visit in self.dlg_lot_man.tbl_visit based on (id AND text AND between dates)"""
