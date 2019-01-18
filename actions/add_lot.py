@@ -32,11 +32,13 @@ class AddNewLot(ParentManage):
         self.ids = []
 
 
+
     def manage_lot(self, lot_id=None, is_new=True, feature_type=None):
         # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
+        self.chk_position = 4
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -50,6 +52,7 @@ class AddNewLot(ParentManage):
 
         self.dlg_lot = AddLot()
         self.load_settings(self.dlg_lot)
+
         self.dlg_lot.open()
 
         # Set icons
@@ -66,7 +69,7 @@ class AddNewLot(ParentManage):
         # Tab 'Relations'
         self.feature_type = self.dlg_lot.findChild(QComboBox, "feature_type")
         self.tbl_relation = self.dlg_lot.findChild(QTableView, "tbl_relation")
-
+        self.tbl_relation.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.set_selectionbehavior(self.dlg_lot)
 
         # Fill QWidgets of the form
@@ -95,6 +98,8 @@ class AddNewLot(ParentManage):
             rows = self.controller.get_rows(sql)
             self.put_checkbox(self.tbl_relation, rows, 'status', 3)
         self.enable_feature_type(self.dlg_lot)
+
+
         # Set signals
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, layer_name=None))
@@ -105,7 +110,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
-        self.dlg_lot.btn_accept.clicked.connect(partial(self.manage_rejected))
+
 
         # Set autocompleters of the form
         self.set_completers()
@@ -137,6 +142,7 @@ class AddNewLot(ParentManage):
             rows.append(row)
         return rows
 
+
     def fill_fields(self):
         """ Fill combo boxes of the form """
         # Visit tab
@@ -159,9 +165,10 @@ class AddNewLot(ParentManage):
             utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, self.visitclass_ids, 1)
 
         # Fill ComboBox cmb_assigned_to
-        sql = ("SELECT id, name"
-               " FROM " + self.schema_name + ".cat_users"
-               " ORDER BY name")
+        sql = ("SELECT id, idval"
+               " FROM " + self.schema_name + ".cat_team "
+               " WHERE active is True "
+               " ORDER BY idval")
         self.users = self.controller.get_rows(sql, commit=self.autocommit)
         if self.users:
             utils_giswater.set_item_data(self.dlg_lot.cmb_assigned_to, self.users, 1)
@@ -253,7 +260,7 @@ class AddNewLot(ParentManage):
             utils_giswater.setCalendarDate(self.dlg_lot, 'startdate', lot['startdate'])
             utils_giswater.setCalendarDate(self.dlg_lot, 'enddate', lot['enddate'])
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, lot['visitclass_id'], 0)
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['assigned_to'], 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['team_id'], 0)
             utils_giswater.setWidgetText(self.dlg_lot, 'descript', lot['descript'])
             utils_giswater.setChecked(self.dlg_lot, 'chk_active', lot['active'])
             utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
@@ -352,25 +359,25 @@ class AddNewLot(ParentManage):
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
         id_list = self.get_table_values(self.tbl_relation, feature_type)
 
-        for id_ in self.ids:
+        for feature_id in self.ids:
             item = []
-            if id_ not in id_list:
+            if feature_id not in id_list:
                 row = []
                 item.append(lot_id)
-                item.append(id_)
+                item.append(feature_id)
                 item.append(0)
                 for value in item:
                     row.append(QStandardItem(str(value)))
-
                 if len(row) > 0:
                     standar_model.appendRow(row)
+                    self.insert_single_checkbox(self.tbl_relation)
 
 
     def insert_row(self):
+        """ Inser single row into QStandardItemModel """
         feature_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.feature_id)
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
         standar_model = self.tbl_relation.model()
-
 
         if feature_id not in self.ids:
             item = []
@@ -383,6 +390,20 @@ class AddNewLot(ParentManage):
             if len(row) > 0:
                 standar_model.appendRow(row)
                 self.ids.append(feature_id)
+                self.insert_single_checkbox(self.tbl_relation)
+
+
+    def insert_single_checkbox(self, qtable):
+        """ Create one QCheckBox and put into QTableView at position @self.chk_position """
+        cell_widget = QWidget()
+        chk = QCheckBox()
+        lay_out = QHBoxLayout(cell_widget)
+        lay_out.addWidget(chk)
+        lay_out.setAlignment(Qt.AlignCenter)
+        lay_out.setContentsMargins(0, 0, 0, 0)
+        cell_widget.setLayout(lay_out)
+        i = qtable.model().index(qtable.model().rowCount()-1, self.chk_position)
+        qtable.setIndexWidget(i, cell_widget)
 
 
     def remove_selection(self, dialog, qtable):
@@ -398,9 +419,7 @@ class AddNewLot(ParentManage):
         index = index_list[0]
         model = qtable.model()
 
-
         for i in range(len(index_list)-1, -1, -1):
-
             row = index_list[i].row()
             column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type + '_id')
             feature_id = index.sibling(row, column_index).data()
@@ -408,6 +427,7 @@ class AddNewLot(ParentManage):
             model.takeRow(row)
 
         self.enable_feature_type(dialog)
+
 
     def set_active_layer(self,  dialog, widget, layer_name=None):
         self.current_layer = self.iface.activeLayer()
@@ -427,12 +447,11 @@ class AddNewLot(ParentManage):
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed(dialog)
 
+
     def connect_signal_selection_changed(self, dialog):
         """ Connect signal selectionChanged """
-
         try:
             self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog,  self.layer_lot, self.geom_type))
-
         except Exception:
             pass
 
@@ -446,7 +465,7 @@ class AddNewLot(ParentManage):
         lot['descript'] = utils_giswater.getWidgetText(self.dlg_lot, 'descript', False, False)
         lot['active'] = utils_giswater.isChecked(self.dlg_lot, 'chk_active')
         lot['feature_type'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
-        lot['assigned_to'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
+        lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
         keys = ""
         values = ""
 
@@ -477,8 +496,7 @@ class AddNewLot(ParentManage):
             keys = ""
             values = ""
             for key, value in item.items():
-
-                if value != '' and type(value) != QPyNullVariant:
+                if value not in('', None) and type(value) != QPyNullVariant:
                     keys += ""+key+", "
                     if type(value) in (int, bool):
                         values += "$$"+str(value)+"$$, "
@@ -488,7 +506,9 @@ class AddNewLot(ParentManage):
             values = values[:-2]
             sql += ("INSERT INTO " + self.schema_name + ".om_visit_lot_x_" + lot['feature_type'] + "("+keys+") "
                     " VALUES (" + values + "); \n")
-        self.controller.execute_sql(sql, log_sql=False)
+        status = self.controller.execute_sql(sql, log_sql=True)
+        if status:
+            self.manage_rejected()
 
 
     def set_completers(self):
@@ -514,6 +534,7 @@ class AddNewLot(ParentManage):
         self.disconnect_signal_selection_changed()
         self.close_dialog(self.dlg_lot)
 
+
     def put_checkbox(self, qtable, rows, checker, value):
         """ Set one column of a QtableView as QCheckBox with values from database. """
 
@@ -528,7 +549,7 @@ class AddNewLot(ParentManage):
             lay_out.setAlignment(Qt.AlignCenter)
             lay_out.setContentsMargins(0, 0, 0, 0)
             cell_widget.setLayout(lay_out)
-            i = qtable.model().index(x, 4)
+            i = qtable.model().index(x, self.chk_position)
             qtable.setIndexWidget(i, cell_widget)
 
 
@@ -540,8 +561,66 @@ class AddNewLot(ParentManage):
 
 
 
+    # def edit_visit(self):
+    #     """ Button 65: Edit visit """
+    #
+    #     # Create the dialog
+    #     self.dlg_man = VisitManagement()
+    #     self.load_settings(self.dlg_man)
+    #     # save previous dialog and set new one.
+    #     # previous dialog will be set exiting the current one
+    #     # self.previous_dialog = utils_giswater.dialog()
+    #     self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
+    #
+    #      # Set a model with selected filter. Attach that model to selected table
+    #     table_object = "v_ui_om_visitman_x_" + str(geom_type)
+    #     expr_filter = geom_type + "_id = '" + feature_id + "'"
+    #     # Refresh model with selected filter
+    #     self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
+    #     self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+    #
+    #     # manage save and rollback when closing the dialog
+    #     self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
+    #     self.dlg_man.accepted.connect(
+    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+    #
+    #     # Set dignals
+    #     self.dlg_man.tbl_visit.doubleClicked.connect(
+    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+    #     self.dlg_man.btn_open.clicked.connect(
+    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+    #     self.dlg_man.btn_delete.clicked.connect(
+    #         partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+    #     self.dlg_man.txt_filter.textChanged.connect(
+    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
+    #                 expr_filter))
+    #
+    #     # set timeStart and timeEnd as the min/max dave values get from model
+    #     current_date = QDate.currentDate()
+    #     sql = ("SELECT MIN(startdate), MAX(enddate)"
+    #            " FROM {}.{}".format(self.schema_name, 'om_visit'))
+    #     row = self.controller.get_row(sql, log_info=False, commit=self.autocommit)
+    #     if row:
+    #         if row[0]:
+    #             self.dlg_man.date_event_from.setDate(row[0])
+    #         if row[1]:
+    #             self.dlg_man.date_event_to.setDate(row[1])
+    #         else:
+    #             self.dlg_man.date_event_to.setDate(current_date)
+    #
+    #     # set date events
+    #     self.dlg_man.date_event_from.dateChanged.connect(
+    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
+    #                 expr_filter))
+    #     self.dlg_man.date_event_to.dateChanged.connect(
+    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
+    #                 expr_filter))
+    #
+    #     # Open form
+    #     self.open_dialog(self.dlg_man, dlg_name="visit_management")
 
-        # Attach model to table view
+
+    # Attach model to table view
 
     # def fill_custom_model(self, widget, table_name, expr_filter=None):
     #     """ Set a model with selected filter. Attach that model to selected table """

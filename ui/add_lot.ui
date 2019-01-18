@@ -80,9 +80,16 @@
             <item>
              <widget class="QLineEdit" name="lot_id">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background: rgb(242, 242, 242);
+                                                 color: rgb(100, 100, 100)</string>
               </property>
               <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="readOnly">
                <bool>true</bool>
               </property>
              </widget>
@@ -353,9 +360,16 @@
             <item>
              <widget class="QLineEdit" name="user_name">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background: rgb(242, 242, 242);
+                                                 color: rgb(100, 100, 100)</string>
               </property>
               <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="readOnly">
                <bool>true</bool>
               </property>
              </widget>
