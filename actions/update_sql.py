@@ -471,7 +471,7 @@ class UpdateSQL(ParentAction):
         return True
 
         
-    def update_31to39(self, new_project=False, project_type=False):
+    def update_31to39(self, new_project=False, project_type=False, no_ct=False):
 
         status = True
 
@@ -519,7 +519,7 @@ class UpdateSQL(ParentAction):
                                                        '/utils/') is False:
                                     print(False)
                                 else:
-                                    status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/')
+                                    status = self.load_sql(self.folderUpdates + folder + '/' + sub_folder + '/utils/', no_ct=no_ct)
                                     if status is False:
                                         print(False)
                                 if self.process_folder(
@@ -528,7 +528,7 @@ class UpdateSQL(ParentAction):
                                     print(False)
                                 else:
                                     status = self.load_sql(
-                                        self.folderUpdates + folder + '/' + sub_folder + '/' + project_type + '/')
+                                        self.folderUpdates + folder + '/' + sub_folder + '/' + project_type + '/', no_ct=no_ct)
                                     if status is False:
                                         print(False)
                                 if self.process_folder(self.folderUpdates + folder + '/' + sub_folder + '/i18n/' + str(
@@ -1116,10 +1116,10 @@ class UpdateSQL(ParentAction):
         return True
 
         
-    def load_sql(self, path_folder):
+    def load_sql(self, path_folder, no_ct=False):
     
         for (path, ficheros, archivos) in os.walk(path_folder):
-            status = self.executeFiles(archivos, path)
+            status = self.executeFiles(archivos, path, no_ct=no_ct)
             if status is False:
                 return False
         return True
@@ -1432,7 +1432,7 @@ class UpdateSQL(ParentAction):
             self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
-            self.update_31to39(new_project=True, project_type=project_type)
+            self.update_31to39(new_project=True, project_type=project_type, no_ct=True)
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.setArrowCursor()
@@ -1976,7 +1976,7 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_rename.show()
 
         
-    def executeFiles(self, filelist, filedir, i18n=False):
+    def executeFiles(self, filelist, filedir, i18n=False, no_ct=False):
     
         if not filelist:
             return
@@ -1997,9 +1997,10 @@ class UpdateSQL(ParentAction):
             self.read_execute_file(filedir, '/' + str(self.project_type_selected) + '.sql', schema_name, filter_srid_value)
         else:
             for file in filelist:
-                print(filedir + '/' + file)
                 if ".sql" in file:
-                    self.read_execute_file(filedir, file, schema_name, filter_srid_value)
+                    if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
+                        print(filedir + '/' + file)
+                        self.read_execute_file(filedir, file, schema_name, filter_srid_value)
 
         return True
 
