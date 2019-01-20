@@ -1496,7 +1496,7 @@ class UpdateSQL(ParentAction):
             result = self.controller.show_info_box(msg, "Info")
             self.close_dialog(self.dlg_readsql_create_project)
         else:
-            msg = "Some error has occurred while the create process was running."
+            msg = "Some errors has occurred. Process has not been executed."
             result = self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
