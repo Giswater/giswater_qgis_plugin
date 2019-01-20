@@ -1565,9 +1565,9 @@ class UpdateSQL(ParentAction):
         result = self.controller.ask_question(msg, "Info")
         if result:
             self.setWaitCursor()
+            self.reload_fct_ftrg(project_type)
             self.load_updates(project_type, update_changelog=True)
             self.reload_tablect(project_type)
-            self.reload_fct_ftrg(project_type)
             self.reload_trg(project_type)
             self.setArrowCursor()
 
@@ -1594,9 +1594,9 @@ class UpdateSQL(ParentAction):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         self.setWaitCursor()
+        self.load_fct_ftrg(project_type=project_type)
         self.update_30to31(project_type=project_type)
         self.update_31to39(project_type=project_type)
-        self.load_fct_ftrg(project_type=project_type)
         self.load_trg(project_type=project_type)
         self.load_tablect(project_type=project_type)
         self.api(project_type=project_type)
@@ -1793,27 +1793,24 @@ class UpdateSQL(ParentAction):
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
         else:
-            sql = "SELECT title, author, date FROM " + schema_name + ".inp_project_id"
+            sql = "SELECT title, author FROM " + schema_name + ".inp_project_id"
             row = self.controller.get_row(sql)
             if row is None:
                 utils_giswater.setWidgetText(self.dlg_readsql,
                                              self.dlg_readsql.project_schema_title, '')
                 utils_giswater.setWidgetText(self.dlg_readsql,
                                              self.dlg_readsql.project_schema_author, '')
-                utils_giswater.setWidgetText(self.dlg_readsql,
-                                             self.dlg_readsql.project_schema_last_update, '')
             else:
                 utils_giswater.setWidgetText(self.dlg_readsql,
                                              self.dlg_readsql.project_schema_title, str(row[0]))
                 utils_giswater.setWidgetText(self.dlg_readsql,
                                              self.dlg_readsql.project_schema_author, str(row[1]))
-                utils_giswater.setWidgetText(self.dlg_readsql,
-                                             self.dlg_readsql.project_schema_last_update, str(row[2]))
-            sql = "SELECT giswater FROM " + schema_name + ".version"
+            sql = "SELECT giswater, date::date FROM " + schema_name + ".version order by id desc LIMIT 1"
             row = self.controller.get_row(sql)
             if row is not None:
                 self.project_data_schema_version = str(row[0])
-
+                utils_giswater.setWidgetText(self.dlg_readsql,
+                                            self.dlg_readsql.project_schema_last_update, str(row[1]))
         if self.version is None:
             self.version = '0'
         self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
