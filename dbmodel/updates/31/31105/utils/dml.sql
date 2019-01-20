@@ -47,7 +47,6 @@ INSERT INTO sys_fprocess_cat VALUES (34, 'Dynamic minimun sector analysis', 'EDI
 
 INSERT INTO audit_cat_table VALUES ('dattrib', 'om', 'Table to store dynamic mapzones', 'role_om', 0, NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('dattrib_type', 'om', 'Table to store the different types of dynamic mapzones', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
-INSERT INTO audit_cat_table VALUES ('anl_mincut_inlet_x_arc', 'om', 'Table to arcs as a inlets', 'role_admin', 0, NULL, NULL, 0, NULL, NULL, NULL);
 
 
 --2018/11/20

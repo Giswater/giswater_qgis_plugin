@@ -1,6 +1,11 @@
-﻿-- Function: aa1.gw_fct_admin_updateschema_drops()
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
--- DROP FUNCTION aa1.gw_fct_admin_updateschema_drops();
+--FUNCTION CODE: 2550
+
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_dropdeprecated_rel()
   RETURNS void AS
@@ -48,5 +53,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_admin_updateschema_drops()
-  OWNER TO postgres;
+

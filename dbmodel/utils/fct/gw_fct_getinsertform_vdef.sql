@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2508
 
 
-CREATE OR REPLACE FUNCTION ud_sample.gw_fct_getinsertform_vdef(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getinsertform_vdef(
     p_feature_cat text,
     p_x double precision,
     p_y double precision)
@@ -15,7 +15,7 @@ CREATE OR REPLACE FUNCTION ud_sample.gw_fct_getinsertform_vdef(
 $BODY$
 
 /*EXAMPLE
-SELECT ud_sample.gw_fct_getinsertform_vdef('WJOIN',2,2)
+SELECT SCHEMA_NAME.gw_fct_getinsertform_vdef('WJOIN',2,2)
 */
 
 DECLARE
@@ -58,7 +58,7 @@ DECLARE
 	
 BEGIN
 	--    Set search path to local schema
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;

@@ -82,7 +82,4 @@ ALTER TABLE inp_pump_additional ADD CONSTRAINT inp_pump_additional_check CHECK (
 
 -- ADD UNIQUE
 ALTER TABLE "inp_pump_additional" ADD CONSTRAINT "inp_pump_additional_unique" UNIQUE (node_id, order_id);
-ALTER TABLE "inp_cat_mat_roughness" ADD CONSTRAINT "inp_cat_mat_roughness_unique" UNIQUE (matcat_id, init_age, end_age);;
-
-
-
+ALTER TABLE "inp_cat_mat_roughness" ADD CONSTRAINT "inp_cat_mat_roughness_unique" UNIQUE (matcat_id, init_age, end_age);

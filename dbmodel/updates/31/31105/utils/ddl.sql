@@ -9,7 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2018/10/27
 ALTER TABLE om_visit_parameter ADD COLUMN ismultifeature boolean;
-UPDATE om_visit_parameter SET ismultifeature=true WHERE form_type='event_standard';
 
 DROP RULE IF EXISTS insert_plan_arc_x_pavement ON arc;
 CREATE OR REPLACE RULE insert_plan_arc_x_pavement AS ON INSERT TO arc DO  

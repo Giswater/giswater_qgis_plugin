@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2464
 
-CREATE OR REPLACE FUNCTION ud_sample.gw_fct_setvalurn()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setvalurn()
   RETURNS integer AS
 $BODY$
 
@@ -33,7 +33,7 @@ psector_vdef_aux text;
 BEGIN 
 
 	-- search path
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
 	--urn

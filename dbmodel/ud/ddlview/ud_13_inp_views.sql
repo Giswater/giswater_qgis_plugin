@@ -1458,7 +1458,7 @@ FROM inp_selector_result, rpt_inp_node
 DROP VIEW IF EXISTS v_inp_vertice CASCADE;
 CREATE OR REPLACE VIEW v_inp_vertice AS 
  SELECT 
-row_number() over (order by arc_id )arc.arc_id AS id,
+row_number() over (order by arc_id ) AS id,
 arc.arc_id,
  st_x(arc.point)::numeric(16,3) AS xcoord,
  st_y(arc.point)::numeric(16,3) AS ycoord

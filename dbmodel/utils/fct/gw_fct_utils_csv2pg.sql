@@ -39,24 +39,24 @@ BEGIN
 		SELECT gw_fct_utils_csv2pg_import_addfields(csv2pgcat_id_aux, label_aux) INTO v_return;
 			
 	-- export inp
-	ELSIF csv2pgcat_id_aux=9 AND project_type_aux='WS' THEN
+	ELSIF csv2pgcat_id_aux=10 AND project_type_aux='WS' THEN
 		SELECT gw_fct_utils_csv2pg_export_epa_inp(csv2pgcat_id_aux, label_aux) INTO v_return;
 
-	ELSIF csv2pgcat_id_aux=9 AND project_type_aux='UD' THEN
+	ELSIF csv2pgcat_id_aux=10 AND project_type_aux='UD' THEN
 		SELECT gw_fct_utils_csv2pg_export_epa_inp(csv2pgcat_id_aux, label_aux) INTO v_return;
 
 	-- import rpt
-	ELSIF csv2pgcat_id_aux=10 AND project_type_aux='WS' THEN
+	ELSIF csv2pgcat_id_aux=11 AND project_type_aux='WS' THEN
 		SELECT gw_fct_utils_csv2pg_import_epa_rpt(csv2pgcat_id_aux, label_aux) INTO v_return;
 
-	ELSIF csv2pgcat_id_aux=10 AND project_type_aux='UD' THEN
+	ELSIF csv2pgcat_id_aux=11 AND project_type_aux='UD' THEN
 		SELECT gw_fct_utils_csv2pg_import_epa_rpt(csv2pgcat_id_aux, label_aux) INTO v_return;
 	
 	-- import inp
-	ELSIF csv2pgcat_id_aux=11 AND project_type_aux='WS' THEN
+	ELSIF csv2pgcat_id_aux=12 AND project_type_aux='WS' THEN
 		SELECT gw_fct_utils_csv2pg_import_epanet_inp(csv2pgcat_id_aux, label_aux) INTO v_return;
 
-	ELSIF csv2pgcat_id_aux=11 AND project_type_aux='UD' THEN
+	ELSIF csv2pgcat_id_aux=12 AND project_type_aux='UD' THEN
 		SELECT gw_fct_utils_csv2pg_import_swmm_inp(csv2pgcat_id_aux, label_aux) INTO v_return;
 	
 	END IF;
