@@ -1561,14 +1561,11 @@ class UpdateSQL(ParentAction):
     #TODO:Rename this function => Update all versions from changelog file.
     def update(self, project_type):
     
-        msg = "Estas seguro que quieres actualizar las foreing keys, funciones y trigers a los de la ultima version?"
+        msg = "Are you shure to update the project schema to lastest version?"
         result = self.controller.ask_question(msg, "Info")
         if result:
             self.setWaitCursor()
-            self.reload_fct_ftrg(project_type)
             self.load_updates(project_type, update_changelog=True)
-            self.reload_tablect(project_type)
-            self.reload_trg(project_type)
             self.setArrowCursor()
 
         # Show message if precess execute correctly
@@ -1597,8 +1594,6 @@ class UpdateSQL(ParentAction):
         self.load_fct_ftrg(project_type=project_type)
         self.update_30to31(project_type=project_type)
         self.update_31to39(project_type=project_type)
-        self.load_trg(project_type=project_type)
-        self.load_tablect(project_type=project_type)
         self.api(project_type=project_type)
         self.execute_last_process(schema_name=schema_name, locale=True)
         self.setArrowCursor()
