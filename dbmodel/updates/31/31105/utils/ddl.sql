@@ -68,7 +68,7 @@ ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN m3_total_period_hydro double pre
 ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN effc double precision;
 ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN minc double precision;
 ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN maxc double precision;
-ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN isscada boolean
+ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN isscada boolean;
 
 ALTER TABLE dma ADD COLUMN minc double precision;
 ALTER TABLE dma ADD COLUMN maxc double precision;
