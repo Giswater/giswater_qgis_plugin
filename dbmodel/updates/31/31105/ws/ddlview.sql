@@ -107,8 +107,6 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_connec_dattrib AS
 		rpt(feature_id character varying, dattrib4 text)) a ON connec_id = feature_id;
 
 
-		
-
 DROP VIEW IF EXISTS "v_inp_pattern";
 CREATE VIEW "v_inp_pattern" AS
 SELECT id,
@@ -130,12 +128,7 @@ factor_14,
 factor_15,
 factor_16,
 factor_17,
-factor_18,
-factor_19,
-factor_20,
-factor_21,
-factor_22,
-factor_23,
-factor_24
+factor_18
 FROM inp_pattern_value;
+
 

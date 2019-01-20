@@ -82,3 +82,54 @@ WHERE selector_psector.cur_user="current_user"() AND selector_psector.psector_id
 order by 2;
 
 
+
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
+ SELECT rtc_hydrometer_x_connec.hydrometer_id,
+    rtc_hydrometer_x_connec.connec_id,
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2
+   FROM rtc_hydrometer_x_connec
+     JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     JOIN rpt_inp_arc ON rpt_inp_arc.arc_id::text = v_edit_connec.arc_id::text;
+
+	 
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
+ SELECT 
+   a.hydrometer_id,
+    a.node_1 AS node_id,
+   a.arc_id,
+   b.dma_id,
+   b.period_id,
+   b.lps_avg * 0.5::double precision AS lps_avg_real,
+   c.effc::numeric(5,4)as losses,
+    b.lps_avg * 0.5::double precision * c.effc::double precision AS lps_avg,
+    c.minc AS cmin,
+    b.lps_avg * 0.5::double precision * c.minc AS lps_min,
+    c.maxc AS cmax,
+    b.lps_avg * 0.5::double precision * c.maxc AS lps_max
+   FROM v_rtc_hydrometer_x_arc a
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::integer=b.dma_id
+union
+ SELECT 
+   a.hydrometer_id,
+    a.node_2 AS node_id,
+   a.arc_id,
+   b.dma_id,
+   b.period_id,
+   b.lps_avg * 0.5::double precision AS lps_avg_real,
+   c.effc::numeric(5,4)as losses,
+    b.lps_avg * 0.5::double precision * c.effc::double precision AS lps_avg,
+    c.minc AS cmin,
+    b.lps_avg * 0.5::double precision * c.minc AS lps_min,
+    c.maxc AS cmax,
+    b.lps_avg * 0.5::double precision * c.maxc AS lps_max
+   FROM v_rtc_hydrometer_x_arc a
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::integer=b.dma_id;
+
+
+

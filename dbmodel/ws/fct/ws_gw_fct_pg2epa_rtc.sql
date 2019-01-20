@@ -7,13 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2330
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_rtc(character varying );
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_rtc(result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
 
-rec_options 	record;
-node_rec	record;
-demand_aux	double precision;
+v_options 	record;
+v_rec		record;
+v_demand	double precision;
       
 
 BEGIN
@@ -21,7 +20,7 @@ BEGIN
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
-	SELECT * INTO rec_options FROM inp_options;
+	SELECT * INTO v_options FROM inp_options;
 
 	RAISE NOTICE 'Starting pg2epa process.';
 	
@@ -29,19 +28,19 @@ BEGIN
 	UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var;
 
 	-- Updating values from rtc into inp_rpt table
-	FOR node_rec IN SELECT * FROM v_rtc_hydrometer_x_node_period
+	FOR v_rec IN SELECT * FROM SCHEMA_NAME.v_rtc_hydrometer_x_node_period
 	LOOP
-		IF rec_option.rtc_coefficient='MIN' THEN
-			demand_aux:=node_rec.lps_min;
-		ELSIF rec_option.rtc_coefficient='AVG' THEN
-			demand_aux:=node_rec.lps_avg;
-		ELSIF rec_option.rtc_coefficient='MAX' THEN
-			demand_aux:=node_rec.lps_max;
-		ELSIF rec_option.rtc_coefficient='REAL' THEN
-			demand_aux:=node_rec.lps_avg_real;
+		IF v_options.rtc_coefficient='MIN' THEN
+			v_demand:=v_rec.lps_min;
+		ELSIF v_options.rtc_coefficient='AVG' THEN
+			v_demand:=v_rec.lps_avg;
+		ELSIF v_options.rtc_coefficient='MAX' THEN
+			v_demand:=v_rec.lps_max;
+		ELSIF v_options.rtc_coefficient='REAL' THEN
+			v_demand:=v_rec.lps_avg_real;
 		END IF;
 			
-		UPDATE rpt_inp_node SET demand=demand_aux WHERE result_id=result_id_var AND node_id=node_rec.node_id;
+		UPDATE rpt_inp_node SET demand=v_demand::numeric(12,6) WHERE result_id=result_id_var AND node_id=v_rec.node_id;
 
 	END LOOP;
 

@@ -61,4 +61,16 @@ ALTER TABLE audit_cat_function ADD COLUMN isdeprecated boolean DEFAULT FALSE;
 CREATE TABLE audit_cat_sequence (
   id text PRIMARY KEY,
   isdeprecated boolean DEFAULT false );
+  
+ 
+-- 20129/01/20
+ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN m3_total_period_hydro double precision;
+ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN effc double precision;
+ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN minc double precision;
+ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN maxc double precision;
+ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN isscada boolean
+
+ALTER TABLE dma ADD COLUMN minc double precision;
+ALTER TABLE dma ADD COLUMN maxc double precision;
+
 

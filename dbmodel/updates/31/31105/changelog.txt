@@ -1,8 +1,16 @@
-***UTILS****
+****************************
+******    3.1.105   ********
+****************************
+
+
+*******    UTILS    ********
 
 31105-utils-existing views
 --------------------------
 New field cat_period_code on v_edit_rtc_hydrometer_x_data, issue#577;
+Update view v_rtc_hydrometer_x_arc
+Update view v_rtc_hydrometer_x_node_period
+
 
 31105-utils-other
 -----------------
@@ -15,6 +23,12 @@ New field ismultifeature on om_visit_parameter, issue#549
 New field isarcdivide on node_type, issue#556
 New field isdeprecated on audit_cat_function
 New field isdeprecated on audit_cat_table
+New field on ext_rtc_scada_dma_period, m3_total_period_hydro;
+New field on ext_rtc_scada_dma_period, effc;
+New field on ext_rtc_scada_dma_period, minc;
+New field on ext_rtc_scada_dma_period, maxc;
+New field on dma, minc;
+New field on dma, maxc;
 New table dattrib, issue#561
 New table dattrib_type, issue#561
 New table audit_cat_sequence, 
@@ -54,6 +68,7 @@ New system parameter om_visit_parameters, issue#595
 New system parameter edit_publish_sysvdefaut, issue#600
 New system parameter edit_inventory_sysvdefaut, issue#600 
 New system parameter edit_uncertain_sysvdefaut, issue#600 
+New system parameter sys_scada_schema
 Automatic update state_type on connec/gully when link is created, issue#587
 Enhance arc division function with automatic update of node.arc_id of disconnecteds nodes, issue#591
 Set urn value before insert urn feature #597 
@@ -99,7 +114,7 @@ New api functions
 (2630) gw_api_getgeometry
 
 
-***WS***
+***********  WS  ************
 
 31105-ws-drop and create for existing views
 -------------------------------------------
@@ -118,9 +133,10 @@ New user parameter om_mincut_analysis_pipehazard, issue#561;
 New user parameter om_mincut_analysis_dinletsector, issue#561;
 New views v_arc_dattrib, v_node_dattrib, v_connec_dattrib, issue#561;
 Update symbol rotation when node is disconnected from the network, issue#594;
+New function (2638)  gw_fct_utils_update_dma_hydroval;
 
 
-***UD***
+***********  UD  ************
 
 31105-ud-existing views
 -----------------------
@@ -134,7 +150,7 @@ Bug fix on v_ui_node_x_connection_upstream view, issue#584
 Add edit_automatic_insert_link on ud_gw_trg_edit_arc, issue#601
 
 
-***i18n***
+**********  I18N  ***********
 
 31105-i18n
 ----------

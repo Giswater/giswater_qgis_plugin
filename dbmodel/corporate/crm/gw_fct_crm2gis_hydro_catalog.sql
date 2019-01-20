@@ -22,6 +22,12 @@ BEGIN
 	INSERT INTO ws.ext_cat_period (id, code, start_date, end_date)
 	SELECT id, code, start_date, end_date FROM crm.hydro_cat_period WHERE id NOT IN (SELECT id::integer FROM ws.ext_cat_period);
 
+	-- dma period values
+	INSERT INTO ws.ext_rtc_scada_dma_period (dma_id, cat_period_id, minc, maxc, isscada)
+	SELECT dma_id, id, minc, maxc, false FROM crm.hydro_cat_period, ws.dma 
+	WHERE id NOT IN (SELECT id::integer FROM ws.ext_cat_period) 
+	order by id, dma_id;
+
 	-- state values
 	INSERT INTO ws.ext_rtc_hydrometer_state (id, name, observ)
 	SELECT id, code, observ FROM crm.hydro_val_state WHERE id NOT IN (SELECT id FROM ws.ext_rtc_hydrometer_state);

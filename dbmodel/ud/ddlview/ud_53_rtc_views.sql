@@ -116,7 +116,9 @@ CREATE OR REPLACE VIEW v_rtc_dma_hydrometer_period AS
    JOIN ext_cat_period ON inp_options.rtc_period_id = ext_cat_period.id
   GROUP BY v_rtc_hydrometer_period.dma_id, ext_cat_period.id, ext_cat_period.period_seconds;
   
-  DROP VIEW IF EXISTS v_rtc_dma_parameter_period CASCADE;
+
+-- deprecated on 3.1.105 
+DROP VIEW IF EXISTS v_rtc_dma_parameter_period CASCADE;
 CREATE OR REPLACE VIEW v_rtc_dma_parameter_period AS 
  SELECT v_rtc_dma_hydrometer_period.dma_id, 
     v_rtc_dma_hydrometer_period.period_id, 
@@ -131,8 +133,9 @@ CREATE OR REPLACE VIEW v_rtc_dma_parameter_period AS
    FROM v_rtc_dma_hydrometer_period
   JOIN ext_rtc_scada_dma_period ON ext_rtc_scada_dma_period.cat_period_id = v_rtc_dma_hydrometer_period.period_id;
   
-  
-  DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
+
+-- updated on 3.1.105 
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
  SELECT rtc_hydrometer_x_connec.hydrometer_id,
     rtc_hydrometer_x_connec.connec_id,
@@ -143,7 +146,9 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS
      JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
      RIGHT JOIN rpt_inp_arc ON rpt_inp_arc.arc_id = v_edit_connec.arc_id;
 
-  DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
+
+-- updated on 3.1.105
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
  SELECT 
     v_rtc_hydrometer_x_arc.hydrometer_id,

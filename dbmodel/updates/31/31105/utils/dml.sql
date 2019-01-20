@@ -130,3 +130,9 @@ INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, de
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2632, 'gw_trg_visit_update_enddate', 'role_basic', FALSE, 'Function that sets the visits enddate to current date');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2634, 'gw_fct_refresh_mat_view', 'role_basic', FALSE, 'Function that sets the visits enddate to current date');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2636, 'gw_fct_admin_schema_renameviews', 'role_basic', FALSE, 'Function that sets the visits enddate to current date');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2638, 'gw_fct_utils_update_dma_hydroval', 'role_epa', FALSE, 'Function to update the values of hydrometers on dmas');
+
+
+
+--2019/01/21
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('sys_scada_schema', 'FALSE', 'Boolean', 'System', 'Variable to check if scada schema exists');
