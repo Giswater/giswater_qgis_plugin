@@ -38,7 +38,7 @@ class AddNewLot(ParentManage):
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
-        self.chk_position = 4
+        self.chk_position = 5
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -134,7 +134,7 @@ class AddNewLot(ParentManage):
                 item = model.data(index)
                 row[headers[c]] = item
 
-            widget_cell = qtable.model().index(x, 4)
+            widget_cell = qtable.model().index(x, self.chk_position)
             widget = qtable.indexWidget(widget_cell)
             chk_list = widget.findChildren(QCheckBox)
             if chk_list[0].isChecked():
@@ -347,7 +347,6 @@ class AddNewLot(ParentManage):
                 selected_id = feature.attribute(field_id)
                 if selected_id not in self.ids:
                     self.ids.append(selected_id)
-
         self.reload_table()
         self.enable_feature_type(dialog)
 
@@ -359,12 +358,18 @@ class AddNewLot(ParentManage):
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
         id_list = self.get_table_values(self.tbl_relation, feature_type)
 
+        layer_name = 'v_edit_' + utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
+        field_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower() + str('_id')
+        layer = self.controller.get_layer_by_tablename(layer_name)
+
         for feature_id in self.ids:
+            feature = self.get_feature_by_id(layer, feature_id, field_id)
             item = []
             if feature_id not in id_list:
                 row = []
                 item.append(lot_id)
                 item.append(feature_id)
+                item.append(feature.attribute('code'))
                 item.append(0)
                 for value in item:
                     row.append(QStandardItem(str(value)))
@@ -375,22 +380,41 @@ class AddNewLot(ParentManage):
 
     def insert_row(self):
         """ Inser single row into QStandardItemModel """
+        standar_model = self.tbl_relation.model()
         feature_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.feature_id)
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
-        standar_model = self.tbl_relation.model()
+
+        layer_name = 'v_edit_' + utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
+        field_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower() + str('_id')
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        feature = self.get_feature_by_id(layer, feature_id, field_id)
+        if feature is False:
+            return
 
         if feature_id not in self.ids:
             item = []
             item.append(lot_id)
             item.append(feature_id)
+            item.append(feature.attribute('code'))
             item.append(0)
             row = []
             for value in item:
-                row.append(QStandardItem(str(value)))
+                if value not in ('', None) and type(value) != QPyNullVariant:
+                    row.append(QStandardItem(str(value)))
+                else:
+                    row.append(QStandardItem(None))
             if len(row) > 0:
                 standar_model.appendRow(row)
                 self.ids.append(feature_id)
                 self.insert_single_checkbox(self.tbl_relation)
+
+
+    def get_feature_by_id(self, layer, id, field_id):
+        iter = layer.getFeatures()
+        for feature in iter:
+            if feature[field_id] == id:
+                return feature
+        return False
 
 
     def insert_single_checkbox(self, qtable):
