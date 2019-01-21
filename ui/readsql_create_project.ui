@@ -96,7 +96,7 @@
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>Disable constraints</string>
+         <string>Constrains disabled</string>
         </property>
         <property name="checked">
          <bool>false</bool>
