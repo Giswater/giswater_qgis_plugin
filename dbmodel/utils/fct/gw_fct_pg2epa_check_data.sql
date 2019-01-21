@@ -10,6 +10,11 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(result_id_var character varying)
   RETURNS integer AS
 $BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data ('m8')
+*/
+
 DECLARE
 
 rec_options 		record;
@@ -23,6 +28,7 @@ infiltration_aux	text;
 rgage_rec			record;
 scenario_aux		text;
 v_min_node2arc		float;
+v_arc			text;
 
 
 BEGIN
@@ -33,8 +39,9 @@ BEGIN
 	-- select config values
 	SELECT * INTO rec_options FROM inp_options;
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
-	SELECT st_length(the_geom) INTO v_min_node2arc FROM rpt_inp_arc WHERE result_id=result_id_var ORDER BY 1 asc LIMIT 1;
-	
+	SELECT st_length(a.the_geom), a.arc_id INTO v_min_node2arc, v_arc FROM v_edit_arc a JOIN rpt_inp_arc b ON a.arc_id=b.arc_id WHERE result_id=result_id_var ORDER BY 1 asc LIMIT 1;
+
+	raise notice 'nodearc %, arc %', v_min_node2arc, v_arc;
 
 	-- init variables
 	count_aux=0;
@@ -48,17 +55,26 @@ BEGIN
 	
 	-- UTILS
 	-- Check disconnected nodes (14)
-	FOR rec_var IN SELECT node_id FROM rpt_inp_node WHERE result_id=result_id_var AND node_id NOT IN 
+	FOR rec_var IN SELECT * FROM rpt_inp_node WHERE result_id=result_id_var AND node_id NOT IN 
 	(SELECT node_1 FROM rpt_inp_arc WHERE result_id=result_id_var UNION SELECT node_2 FROM rpt_inp_arc WHERE result_id=result_id_var)
 	LOOP
 		count_aux=count_aux+1;
 		INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-		VALUES (14, result_id_var, rec_var, 'node', 'Node is disconnected');
+		VALUES (14, result_id_var, rec_var.node_id, 'node', 'Node is disconnected');
 		count_global_aux=count_global_aux+count_aux;
 		
 	END LOOP;
-		
+
+	-- Check arcs with nodes not in node table
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
 	
+	SELECT 14, result_id_var, node_1, 'node', 'Arc with node not present in the exportation' 
+		FROM rpt_inp_arc where result_id=result_id_var AND node_1 NOT IN (SELECT node_id FROM rpt_inp_node where result_id=result_id_var)
+	UNION 
+	SELECT 14, result_id_var, node_2, 'node', 'Arc with node not present in the exportation' 
+		FROM rpt_inp_arc where result_id=result_id_var AND node_2 NOT IN (SELECT node_id FROM rpt_inp_node where result_id=result_id_var);
+
+			
 	-- only UD projects
 	IF 	project_type_aux='UD' THEN
 
@@ -276,7 +292,7 @@ BEGIN
 		WHERE (((initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL)) AND result_id=result_id_var);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, result_id_var,'Tank','Various', concat('There are ',count_aux,' with null values on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol)'));
+				VALUES (14, result_id_var, 'Various', 'Tank', concat('There are ',count_aux,' with null values on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol)'));
 				count_global_aux=count_global_aux+count_aux;
 				count_aux=0;
 			END IF;	
@@ -285,9 +301,10 @@ BEGIN
 		-- valve
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE ((valv_type IS NULL) OR (inp_valve.status IS NULL) OR (to_arc IS NULL)) AND result_id=result_id_var;
+
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, result_id_var,'Valve','Various', concat('There are ',count_aux,' with null values on mandatory columns for valve (valv_type, status, to_arc)'));
+				VALUES (14, result_id_var, 'Various', 'Valve', concat('There are ',count_aux,' with null values on mandatory columns for valve (valv_type, status, to_arc)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;
@@ -297,7 +314,7 @@ BEGIN
 		WHERE ((valv_type='PBV' OR valv_type='PRV' OR valv_type='PSV') AND (pressure IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, result_id_var,'Valve','pressure', concat('There are ',count_aux,' with null values on the mandatory column for Pressure valves'));
+				VALUES (14, result_id_var,'Various','PBV-PRV-PSV Valves', concat('There are ',count_aux,' with null values on the mandatory column for Pressure valves'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;				
@@ -306,7 +323,7 @@ BEGIN
 		WHERE ((valv_type='GPV') AND (curve_id IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, result_id_var,'Valve','curve_id', concat('There are ',count_aux,' with null values on the mandatory column for General purpose valves'));
+				VALUES (14, result_id_var,'Various','GPV Valves', concat('There are ',count_aux,' with null values on the mandatory column for General purpose valves'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;	
@@ -315,7 +332,7 @@ BEGIN
 		WHERE ((valv_type='TCV')) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, result_id_var,'Valve','losses', concat('There are ',count_aux,' with null values on the mandatory column for Losses valves'));
+				VALUES (14, result_id_var,'Various','TCV Valves', concat('There are ',count_aux,' with null values on the mandatory column for Losses Valves'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;				
@@ -324,7 +341,7 @@ BEGIN
 		WHERE ((valv_type='FCV') AND (flow IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, result_id_var,'Valve','flow', concat('There are ',count_aux,' with null values on the mandatory column for Flow control valves'));
+				VALUES (14, result_id_var,'Various','FCV Valves', concat('There are ',count_aux,' with null values on the mandatory column for Flow Control Valves'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;				
@@ -334,7 +351,7 @@ BEGIN
 		WHERE ((curve_id IS NULL) OR (inp_pump.status IS NULL) OR (to_arc IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, result_id_var,'Pump','Various', concat('There are ',count_aux,' with null values on mandatory columns for pump (curve_id, status, to_arc)'));
+				VALUES (14, result_id_var,'Various','Pump', concat('There are ',count_aux,' with null values on mandatory columns for pump (curve_id, status, to_arc)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;	
@@ -343,7 +360,7 @@ BEGIN
 		WHERE ((curve_id IS NULL) OR (inp_pump_additional.status IS NULL)) AND result_id=result_id_var;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, result_id_var,'inp_pump_additional','Various', concat('There are ',count_aux,' with null values on mandatory columns for additional pump (curve_id, status)'));
+				VALUES (14, result_id_var,'Various','Additional pumps', concat('There are ',count_aux,' with null values on mandatory columns for additional pump (curve_id, status)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;	
@@ -357,5 +374,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(character varying)
-  OWNER TO postgres;
