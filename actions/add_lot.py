@@ -32,7 +32,6 @@ class AddNewLot(ParentManage):
         self.ids = []
 
 
-
     def manage_lot(self, lot_id=None, is_new=True, feature_type=None):
         # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
         self.autocommit = True
@@ -99,7 +98,6 @@ class AddNewLot(ParentManage):
             self.put_checkbox(self.tbl_relation, rows, 'status', 3)
         self.enable_feature_type(self.dlg_lot)
 
-
         # Set signals
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, layer_name=None))
@@ -111,15 +109,9 @@ class AddNewLot(ParentManage):
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
 
-
         # Set autocompleters of the form
         self.set_completers()
 
-        # model_rows = self.read_standaritemmodel(self.tbl_relation)
-        # self.controller.log_info(str(model_rows))
-        # p = self.dlg_lot.tbl_relation.palette()
-        # p.setColor(QPalette.Base, QColor("yellow"))
-        # self.dlg_lot.tbl_relation.setPalette(p)
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
@@ -288,7 +280,7 @@ class AddNewLot(ParentManage):
 
 
     def populate_table(self, lot_id):
-        standar_model = self.tbl_relation.model()
+        standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + ""
                " WHERE lot_id ='"+str(lot_id)+"'")
@@ -301,7 +293,7 @@ class AddNewLot(ParentManage):
                 else:
                     item.append(QStandardItem(None))
             if len(row) > 0:
-                standar_model.appendRow(item)
+                standard_model.appendRow(item)
 
 
     def update_id_list(self):
@@ -353,7 +345,7 @@ class AddNewLot(ParentManage):
 
     def reload_table(self):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
-        standar_model = self.tbl_relation.model()
+        standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
         id_list = self.get_table_values(self.tbl_relation, feature_type)
@@ -374,13 +366,13 @@ class AddNewLot(ParentManage):
                 for value in item:
                     row.append(QStandardItem(str(value)))
                 if len(row) > 0:
-                    standar_model.appendRow(row)
+                    standard_model.appendRow(row)
                     self.insert_single_checkbox(self.tbl_relation)
 
 
     def insert_row(self):
         """ Inser single row into QStandardItemModel """
-        standar_model = self.tbl_relation.model()
+        standard_model = self.tbl_relation.model()
         feature_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.feature_id)
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
 
@@ -392,11 +384,7 @@ class AddNewLot(ParentManage):
             return
 
         if feature_id not in self.ids:
-            item = []
-            item.append(lot_id)
-            item.append(feature_id)
-            item.append(feature.attribute('code'))
-            item.append(0)
+            item = [lot_id, feature_id, feature.attribute('code'), 0]
             row = []
             for value in item:
                 if value not in ('', None) and type(value) != QPyNullVariant:
@@ -404,7 +392,7 @@ class AddNewLot(ParentManage):
                 else:
                     row.append(QStandardItem(None))
             if len(row) > 0:
-                standar_model.appendRow(row)
+                standard_model.appendRow(row)
                 self.ids.append(feature_id)
                 self.insert_single_checkbox(self.tbl_relation)
 
@@ -507,12 +495,12 @@ class AddNewLot(ParentManage):
             sql = ("INSERT INTO " + self.schema_name + ".om_visit_lot("+keys+") "
                    " VALUES (" + values + ") RETURNING id")
             row = self.controller.execute_returning(sql, log_sql=True)
-            lot__id = row[0]
+            lot_id = row[0]
         else:
-            lot__id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
+            lot_id = utils_giswater.getWidgetText(self.dlg_lot, 'lot_id', False, False)
 
         sql = ("DELETE FROM " + self.schema_name + ".om_visit_lot_x_"+lot['feature_type'] + " "
-               " WHERE lot_id = '"+str(lot__id)+"'; \n")
+               " WHERE lot_id = '"+str(lot_id)+"'; \n")
 
         model_rows = self.read_standaritemmodel(self.tbl_relation)
 
@@ -696,7 +684,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.rejected.connect(partial(self.close_dialog, self.dlg_lot_man))
         self.dlg_lot_man.accepted.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, table_object))
 
-        # Set dignals
+        # Set signals
         self.dlg_lot_man.tbl_visit.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit))
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_visit))

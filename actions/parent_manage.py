@@ -841,7 +841,7 @@ class ParentManage(ParentAction, object):
 
     def enable_feature_type(self, dialog):
         feature_type = dialog.findChild(QComboBox, 'feature_type')
-        assigned_to  = dialog.findChild(QComboBox, 'cmb_assigned_to')
+        assigned_to = dialog.findChild(QComboBox, 'cmb_assigned_to')
         table = dialog.findChild(QTableView, 'tbl_relation')
         if feature_type is not None and table is not None:
             if len(self.ids) > 0:
