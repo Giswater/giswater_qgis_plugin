@@ -66,7 +66,7 @@ CREATE VIEW v_anl_connec AS
      JOIN sys_fprocess_cat ON anl_connec.fprocesscat_id = sys_fprocess_cat.id
   WHERE anl_connec.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_connec.cur_user::name = "current_user"();
 
-
+/* drop view causes problems as many other views depends on it
 DROP VIEW IF EXISTS v_rtc_hydrometer;
 CREATE VIEW v_rtc_hydrometer AS 
  SELECT rtc_hydrometer.hydrometer_id,
@@ -104,7 +104,7 @@ CREATE VIEW v_rtc_hydrometer AS
      JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
      JOIN exploitation ON exploitation.expl_id = connec.expl_id
      JOIN value_state ON value_state.id = connec.state;
-
+*/
 
 -----------------------
 -- create views ve

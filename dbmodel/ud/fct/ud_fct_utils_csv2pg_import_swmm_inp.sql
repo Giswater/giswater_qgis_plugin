@@ -129,13 +129,13 @@ BEGIN
 			v_target=rpt_rec.csv1;
 		END IF;
 		UPDATE temp_csv2pg SET source=v_target WHERE rpt_rec.id=temp_csv2pg.id;
-		IF rpt_rec.source LIKE '%STORAGE%' THEN
-			
-		END IF;
+	END LOOP;
 		-- refactor of [OPTIONS] target
 		--Target in order to insert them to the tables using editable views, which have different values concatenated into one field. 
 		--Those values are later separated using the trigger in order to put it in corresponding fields if necessary.
 		--Concatenation is made using ';' when the values need the separation in the next step (trigger) and by ' ' when they are inserted into the same field.
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id order by id
+	LOOP
 
 		IF rpt_rec.source ='[TEMPERATURE]' AND rpt_rec.csv3 is not null THEN 
 			IF rpt_rec.csv1 LIKE 'TIMESERIES' OR rpt_rec.csv1 LIKE 'FILE' OR rpt_rec.csv1 LIKE 'SNOWMELT' THEN

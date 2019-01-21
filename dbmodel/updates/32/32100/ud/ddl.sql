@@ -79,3 +79,17 @@ CREATE TABLE inp_hydrograph
   hydro_id integer PRIMARY KEY NOT NULL DEFAULT nextval('inp_hydrograph_seq'::regclass),
   text character varying(254)
 );
+
+
+DROP TABLE IF EXISTS inp_lid_control CASCADE;
+CREATE TABLE inp_lid_control(
+  id integer PRIMARY KEY NOT NULL DEFAULT nextval('SCHEMA_NAME.inp_lid_control_seq'::regclass),
+  lidco_id character varying(16),
+  lidco_type character varying(16), --changed length of the field
+  value_2 numeric(12,4),
+  value_3 numeric(12,4),
+  value_4 numeric(12,4),
+  value_5 numeric(12,4),
+  value_6 numeric(12,4),
+  value_7 numeric(12,4),
+  value_8 numeric(12,4));

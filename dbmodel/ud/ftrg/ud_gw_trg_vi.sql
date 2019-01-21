@@ -124,7 +124,7 @@
 				nullif(split_part(NEW.other_val,';',2),'')::numeric,nullif(split_part(NEW.other_val,';',3),'')::numeric,nullif(split_part(NEW.other_val,';',4),'')::numeric,
 				nullif(split_part(NEW.other_val,';',5),'')::numeric,nullif(split_part(NEW.other_val,';',6),'')::numeric);
 			END IF;
-		ELSIF v_view='vi_conduits' THEN --NEW.z1 (elevmax1),NEW.z2 (elevmax2) where do they go??
+		ELSIF v_view='vi_conduits' THEN 
 			INSERT INTO arc (arc_id, node_1,node_2,y1,y2, sys_length, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2,NEW.z1, NEW.z2, NEW.length, 'EPACONDUIT','EPACONDUIT-DEF','CONDUIT',1,1,1,1,2);
 			INSERT INTO man_conduit(arc_id) VALUES (NEW.arc_id);
