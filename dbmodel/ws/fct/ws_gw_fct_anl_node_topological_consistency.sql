@@ -25,18 +25,22 @@ BEGIN
     
     -- Computing process
    INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, expl_id, fprocesscat_id, the_geom)
-	
-    SELECT node_id, nodecat_id, node.state, COUNT(*), node.expl_id, 8, node.the_geom FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
-	GROUP BY node.node_id, nodecat_id, node.state, node.expl_id, node.the_geom HAVING COUNT(*) != 4
+
+    SELECT node_id, nodecat_id, v_edit_node.state, COUNT(*), v_edit_node.expl_id, 8, v_edit_node.the_geom FROM v_edit_node JOIN arc ON arc.node_1 = v_edit_node.node_id OR arc.node_2 = v_edit_node.node_id
+    JOIN node_type ON nodetype_id=id WHERE num_arcs=4
+	GROUP BY v_edit_node.node_id, nodecat_id, v_edit_node.state, v_edit_node.expl_id, v_edit_node.the_geom HAVING COUNT(*) != 4
     UNION
-    SELECT node_id, nodecat_id, node.state, COUNT(*),  node.expl_id, 8, node.the_geom FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
-	GROUP BY node.node_id, nodecat_id, node.state, node.expl_id, node.the_geom HAVING COUNT(*) != 3
+    SELECT node_id, nodecat_id, v_edit_node.state, COUNT(*), v_edit_node.expl_id, 8, v_edit_node.the_geom FROM v_edit_node JOIN arc ON arc.node_1 = v_edit_node.node_id OR arc.node_2 = v_edit_node.node_id
+    JOIN node_type ON nodetype_id=id WHERE num_arcs=3
+	GROUP BY v_edit_node.node_id, nodecat_id, v_edit_node.state, v_edit_node.expl_id, v_edit_node.the_geom HAVING COUNT(*) != 3
     UNION
-    SELECT node_id, nodecat_id, node.state, COUNT(*), node.expl_id, 8, node.the_geom FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
-	GROUP BY node.node_id, nodecat_id, node.state, node.expl_id, node.the_geom HAVING COUNT(*) != 2
+    SELECT node_id, nodecat_id, v_edit_node.state, COUNT(*), v_edit_node.expl_id, 8, v_edit_node.the_geom FROM v_edit_node JOIN arc ON arc.node_1 = v_edit_node.node_id OR arc.node_2 = v_edit_node.node_id
+    JOIN node_type ON nodetype_id=id WHERE num_arcs=2
+	GROUP BY v_edit_node.node_id, nodecat_id, v_edit_node.state, v_edit_node.expl_id, v_edit_node.the_geom HAVING COUNT(*) != 2
     UNION
-    SELECT node_id, nodecat_id, node.state, COUNT(*), node.expl_id, 8, node.the_geom FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
-	GROUP BY node.node_id, nodecat_id, node.state, node.expl_id, node.the_geom HAVING COUNT(*) != 1;
+    SELECT node_id, nodecat_id, v_edit_node.state, COUNT(*), v_edit_node.expl_id, 8, v_edit_node.the_geom FROM v_edit_node JOIN arc ON arc.node_1 = v_edit_node.node_id OR arc.node_2 = v_edit_node.node_id
+    JOIN node_type ON nodetype_id=id WHERE num_arcs=1
+	GROUP BY v_edit_node.node_id, nodecat_id, v_edit_node.state, v_edit_node.expl_id, v_edit_node.the_geom HAVING COUNT(*) != 1;
     
     DELETE FROM selector_audit WHERE fprocesscat_id=8 AND cur_user=current_user;	
     INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (8, current_user);
