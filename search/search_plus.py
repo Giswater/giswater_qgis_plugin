@@ -151,7 +151,7 @@ class SearchPlus(QObject):
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
             self.iface.legendInterface().setLayerVisible(layer, True)
-            #self.iface.actionZoomToSelected().trigger()
+            self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 
 
@@ -893,7 +893,7 @@ class SearchPlus(QObject):
 
 
     def expl_name_changed(self):
-        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id','name')
+        #self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id','name')
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
 
         if expl_name == "null" or expl_name is None or expl_name == "None":
