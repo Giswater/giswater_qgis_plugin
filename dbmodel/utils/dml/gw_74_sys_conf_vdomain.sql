@@ -79,39 +79,6 @@ INSERT INTO config_param_system VALUES (56, 'hydrometer_link_absolute_path', NUL
 
 
 
-UPDATE config_param_system SET descript = 'Folder in your computer which Giswater uses to manage Custom Options on developer toolbox' WHERE parameter = 'custom_giswater_folder';
-UPDATE config_param_system SET descript = 'deprecated' WHERE parameter = 'doc_absolute_path';
-UPDATE config_param_system SET descript = 'deprecated' WHERE parameter = 'om_visit_absolute_path';
-UPDATE config_param_system SET descript = 'Different ways to use mincut. If true, mincut is done with pgrouting, an extension of Postgis' WHERE parameter = 'om_mincut_use_pgrouting';
-UPDATE config_param_system SET descript = 'If true, the direction of the arc is fixed by the slope (UD)' WHERE parameter = 'geom_slp_direction';
-UPDATE config_param_system SET descript = 'Default value used if Node ymax is NULL when drawing profile (UD)' WHERE parameter = 'ymax_vd';
-UPDATE config_param_system SET descript = 'Default value used if Node system elevation is NULL when drawing profile (UD)' WHERE parameter = 'sys_elev_vd';
-UPDATE config_param_system SET descript = 'Default value used if Arc catalog geom1 is NULL when drawing profile (UD)' WHERE parameter = 'geom1_vd';
-UPDATE config_param_system SET descript = 'Default value used if Arc catalog z1 is NULL when drawing profile (UD)' WHERE parameter = 'z1_vd';
-UPDATE config_param_system SET descript = 'Default value used if Arc catalog z2 is NULL when drawing profile (UD)' WHERE parameter = 'z2_vd';
-UPDATE config_param_system SET descript = 'Default value used if Node catalog geom1 is NULL when drawing profile (UD)' WHERE parameter = 'cat_geom1_vd';
-UPDATE config_param_system SET descript = 'Default value used if Arc system elevation 1 is NULL when drawing profile (UD)' WHERE parameter = 'sys_elev1_vd';
-UPDATE config_param_system SET descript = 'Default value used if Node top elevation is NULL when drawing profile (UD)' WHERE parameter = 'top_elev_vd';
-UPDATE config_param_system SET descript = 'Default value used if Arc system elevation 2 is NULL when drawing profile (UD)' WHERE parameter = 'sys_elev2_vd';
-UPDATE config_param_system SET descript = 'Default value used if Arc y1 is NULL when drawing profile (UD)' WHERE parameter = 'y1_vd';
-UPDATE config_param_system SET descript = 'Default value used if Arc y2 is NULL when drawing profile (UD)' WHERE parameter = 'y2_vd';
-UPDATE config_param_system SET descript = 'Buffer to find neighbour elements' WHERE parameter = 'proximity_buffer';
-UPDATE config_param_system SET descript = 'If true, Giswater save traceability from each valve to the tank which it has access (WS)' WHERE parameter = 'om_mincut_valve2tank_traceability';
-UPDATE config_param_system SET descript = 'Default value used if Arc slope is NULL when drawing profile (UD)' WHERE parameter = 'slope_vd';
-UPDATE config_param_system SET descript = 'To enable or disable state topology rules (WS)' WHERE parameter = 'state_topocontrol';
-UPDATE config_param_system SET descript = 'If true, mincut temporary overlaps are disabled. Giswater won''t show you a message when different mincuts overlaps eachselfs (WS)' WHERE parameter = 'om_mincut_disable_check_temporary_overlap';
-UPDATE config_param_system SET descript = 'If true, when inserting a new reduction, diam1 and diam2 values are capturated from dnom and dint from cat_node (WS)' WHERE parameter = 'edit_node_reduction_auto_d1d2';
-UPDATE config_param_system SET descript = 'deprecated' WHERE parameter = 'module_om_rehabit';
-UPDATE config_param_system SET descript = 'Inventary migration date. Used in system rapports' WHERE parameter = 'inventory_update_date';
-UPDATE config_param_system SET descript = 'deprecated' WHERE parameter = 'link_search_button';
-UPDATE config_param_system SET descript = 'Buffer which links use to search an arc to connect with' WHERE parameter = 'link_searchbuffer';
-UPDATE config_param_system SET descript = 'deprecated' WHERE parameter = 'edit_arc_divide_automatic_control';
-UPDATE config_param_system SET descript = 'If true, user can manually update node_1 and node_2. Used in migrations with trustly data for not execute arc_searchnodes trigger' WHERE parameter = 'edit_enable_arc_nodes_update';
-UPDATE config_param_system SET descript = 'The hyperlink in the hydrometer info to an url or a file is made up of two parts. A common part to all hydrometers, and a specific part for each hydrometer. The common part to all is the value of this variable' WHERE parameter = 'hydrometer_link_absolute_path';
-UPDATE config_param_system SET descript = 'System parameter which identifies existing schema in the database with common information for those organizations which share cartography in more than on production schema(ws/ud). In this case, information is propagated to both schemas using views' WHERE parameter = 'ext_utils_schema';
-
-
-
 
 	
 
