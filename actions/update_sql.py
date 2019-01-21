@@ -1348,9 +1348,9 @@ class UpdateSQL(ParentAction):
             extras = '"isNewProject":"' + str('TRUE') + '", '
         else:
             extras = '"isNewProject":"' + str('FALSE') + '", '
-        extras += '"gwVersion":"' + str('3.1.105') + '", '
+        extras += '"gwVersion":"' + str(self.version_metadata) + '", '
         extras += '"projectType":"' + str(schema_type).upper() + '", '
-        extras += '"epsg":' + str('25831')
+        extras += '"epsg":' + str(self.filter_srid_value).replace('"', '')
         if new_project is True:
             if str(self.title) != 'null':
                 extras += ', ' + '"title":"' + str(self.title) + '"'
@@ -1911,10 +1911,10 @@ class UpdateSQL(ParentAction):
             self.rdb_sample_dev.setEnabled(False)
 
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
-        utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', '25831')
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+'25831'+"%' ORDER BY substr(srtext, 1, 6), srid"
+        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(self.filter_srid_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
 
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
@@ -1927,8 +1927,6 @@ class UpdateSQL(ParentAction):
 
         # enable_disable data file widgets
         self.enable_datafile()
-
-        self.filter_srid_value = '25831'
 
         #Get combo locale
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
