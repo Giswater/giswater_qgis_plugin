@@ -129,9 +129,10 @@ ALTER TABLE inp_times DROP CONSTRAINT IF EXISTS inp_times_f_statistic_check;
 ALTER TABLE inp_pump_additional DROP CONSTRAINT IF EXISTS inp_pump_additional_pattern_check;
 
 
-ALTER TABLE inp_pump_importinp DROP CONSTRAINT inp_pump_importinp_curve_id_fkey;
-ALTER TABLE inp_valve_importinp DROP CONSTRAINT inp_valve_importinp_to_arc_fkey;
-ALTER TABLE inp_valve_importinp DROP CONSTRAINT inp_valve_importinp_curve_id_fkey;
+ALTER TABLE inp_pump_importinp DROP CONSTRAINT IF EXISTS inp_pump_importinp_curve_id_fkey;
+ALTER TABLE inp_valve_importinp DROP CONSTRAINT IF EXISTS inp_valve_importinp_to_arc_fkey;
+ALTER TABLE inp_valve_importinp DROP CONSTRAINT IF EXISTS inp_valve_importinp_curve_id_fkey;
+
 
 --DROP UNIQUE
 ALTER TABLE "inp_pump_additional" DROP CONSTRAINT IF EXISTS "inp_pump_additional_unique";
