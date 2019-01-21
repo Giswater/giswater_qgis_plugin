@@ -1372,7 +1372,9 @@ class UpdateSQL(ParentAction):
         data = '"data":{' + extras + '}'
         body = "" + client + data
         sql = ("SELECT " + self.schema_name + ".gw_fct_admin_schema_lastprocess($${" + body + "}$$)::text")
-        self.controller.execute_sql(sql)
+        status = self.controller.execute_sql(sql)
+        if status is False:
+            self.error_count = self.error_count + 1
         return
 
         
@@ -1981,10 +1983,14 @@ class UpdateSQL(ParentAction):
             schema_name = self.schema.replace('"', '')
         filter_srid_value = str(self.filter_srid_value).replace('"', '')
         if i18n:
-            print(filedir + '/' + 'utils.sql')
-            self.read_execute_file(filedir, '/utils.sql', schema_name, filter_srid_value)
-            print(filedir + '/' + str(self.project_type_selected) + '.sql')
-            self.read_execute_file(filedir, '/' + str(self.project_type_selected) + '.sql', schema_name, filter_srid_value)
+            for file in filelist:
+                if "utils.sql" in file :
+                    print(filedir + '/' + 'utils.sql')
+                    self.read_execute_file(filedir, '/utils.sql', schema_name, filter_srid_value)
+                elif str(self.project_type_selected) + ".sql" in file:
+                    print(filedir + '/' + str(self.project_type_selected) + '.sql')
+                    self.read_execute_file(filedir, '/' + str(self.project_type_selected) + '.sql', schema_name,
+                                           filter_srid_value)
         else:
             for file in filelist:
                 if ".sql" in file:
