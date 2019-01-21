@@ -101,19 +101,25 @@ CREATE TABLE om_visit_lot(
 CREATE TABLE om_visit_lot_x_arc( 
   lot_id integer,
   arc_id varchar (16),
+  code varchar(30),
   status integer,
+  observ text,
   constraint om_visit_lot_x_arc_pkey PRIMARY KEY (lot_id, arc_id));
 
   CREATE TABLE om_visit_lot_x_node( 
   lot_id integer,
   node_id varchar (16),
+  code varchar(30),
   status integer,
+  observ text,
   constraint om_visit_lot_x_node_pkey PRIMARY KEY (lot_id, node_id));
 
   CREATE TABLE om_visit_lot_x_connec( 
   lot_id integer,
   connec_id varchar (16),
+  code varchar(30),
   status integer,
+  observ text,
   constraint om_visit_lot_x_connec_pkey PRIMARY KEY (lot_id, connec_id));
 
   
@@ -123,8 +129,6 @@ CREATE TABLE om_visit_lot_x_arc(
   cur_user text ,
   CONSTRAINT selector_lot_lot_id_cur_user_unique UNIQUE (lot_id, cur_user));
 
-
-  ALTER TABLE om_visit ADD column lot_id integer;
 
   CREATE TABLE cat_team(
   id serial PRIMARY KEY,
@@ -140,10 +144,10 @@ CREATE TABLE om_visit_lot_x_arc(
   CONSTRAINT om_visit_filetype_x_extension_pkey PRIMARY KEY (filetype, fextension)
 );
 
-ALTER TABLE om_visit_lot_x_arc ADD COLUMN observations TEXT;
-ALTER TABLE om_visit_lot_x_node ADD COLUMN observations TEXT;
-ALTER TABLE om_visit_lot_x_connec ADD COLUMN observations TEXT;
-
+ALTER TABLE om_visit ADD column lot_id integer;
 ALTER TABLE om_visit ADD COLUMN class_id integer;
 ALTER TABLE om_visit ADD COLUMN suspendendcat_id integer;
+ALTER TABLE om_visit_lot DROP COLUMN active;
+ALTER TABLE om_visit_lot DROP COLUMN visitcat_id;
+ALTER TABLE om_visit_lot ADD column status integer;
 

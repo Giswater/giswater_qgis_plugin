@@ -11,7 +11,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
   CREATE TABLE om_visit_lot_x_gully( 
   lot_id integer,
   gully_id varchar (16),
+  code varchar(30),
   status integer,
+  observ text,
   constraint om_visit_lot_x_gully_pkey PRIMARY KEY (lot_id, gully_id));
 
-ALTER TABLE om_visit_lot_x_gully ADD COLUMN observations TEXT;
