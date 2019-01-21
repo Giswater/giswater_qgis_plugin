@@ -456,7 +456,10 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     if rows is None:
         return
     for row in rows:
-        elem = [row[0], row[1]]
+        elem = []
+        for x in range(0, len(row)):
+            print(row[x])
+            elem.append(row[x])
         records.append(elem)
 
     combo.blockSignals(True)

@@ -842,16 +842,22 @@ class ParentManage(ParentAction, object):
     def enable_feature_type(self, dialog):
         feature_type = dialog.findChild(QComboBox, 'feature_type')
         assigned_to = dialog.findChild(QComboBox, 'cmb_assigned_to')
+        visit_class = dialog.findChild(QComboBox, 'cmb_visit_class')
         table = dialog.findChild(QTableView, 'tbl_relation')
         if feature_type is not None and table is not None:
             if len(self.ids) > 0:
                 feature_type.setEnabled(False)
                 if assigned_to is not None:
                     assigned_to.setEnabled(False)
+                if assigned_to is not None:
+                    visit_class.setEnabled(False)
             else:
                 feature_type.setEnabled(True)
                 if assigned_to is not None:
                     assigned_to.setEnabled(True)
+                if assigned_to is not None:
+                    visit_class.setEnabled(True)
+
 
     def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
         """ Select feature with entered id. Set a model with selected filter.
