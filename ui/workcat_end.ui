@@ -96,7 +96,11 @@
              </spacer>
             </item>
             <item>
-             <widget class="QComboBox" name="workcat_id_end"/>
+             <widget class="QComboBox" name="workcat_id_end">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_new_workcat">

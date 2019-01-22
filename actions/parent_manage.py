@@ -171,6 +171,7 @@ class ParentManage(ParentAction, object):
             row_type = self.controller.get_row(sql)
             if row_type:
                 utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
+            utils_giswater.setWidgetText(dialog, "code", row['code'])
             utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
             utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
@@ -181,7 +182,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "link", row['link'])
             utils_giswater.setWidgetText(dialog, "verified", row['verified'])
             utils_giswater.setWidgetText(dialog, "rotation", row['rotation'])
-            if str(row['undelete'])== 'True':
+            if str(row['undelete']) == 'True':
                 dialog.undelete.setChecked(True)
             builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
             enddate = QDate.fromString(str(row['enddate']), 'yyyy-MM-dd')
@@ -228,8 +229,8 @@ class ParentManage(ParentAction, object):
 
         # Check if we already have data with selected object_id
         sql = ("SELECT * " 
-            " FROM " + self.schema_name + "." + str(table_object) + ""
-            " WHERE " + str(field_object_id) + " = '" + str(object_id) + "'")
+               " FROM " + self.schema_name + "." + str(table_object) + ""
+               " WHERE " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False)
 
         # If object_id not found: Clear data
@@ -719,8 +720,8 @@ class ParentManage(ParentAction, object):
         if query:
             self.remove_selection()
         # Update list
-        self.list_ids[self.geom_type] = self.ids                        
-        
+        self.list_ids[self.geom_type] = self.ids
+        self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -822,7 +823,7 @@ class ParentManage(ParentAction, object):
         # Remove selection in generic 'v_edit' layers
         if self.plan_om == 'plan':
             self.remove_selection(False)
-                    
+        self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -835,6 +836,14 @@ class ParentManage(ParentAction, object):
         self.controller.execute_sql(sql)
 
 
+    def enable_feature_type(self, dialog):
+        combo = dialog.findChild(QComboBox, 'feature_type')
+        table = dialog.findChild(QTableView, 'tbl_relation')
+        if combo is not None and table is not None:
+            if len(self.ids) > 0:
+                combo.setEnabled(False)
+            else:
+                combo.setEnabled(True)
 
     def insert_feature(self, dialog, table_object, query=False):
         """ Select feature with entered id. Set a model with selected filter.
@@ -895,7 +904,7 @@ class ParentManage(ParentAction, object):
 
         # Update list
         self.list_ids[self.geom_type] = self.ids
-
+        self.enable_feature_type(dialog)
         self.connect_signal_selection_changed(dialog, table_object)
 
 
@@ -1028,7 +1037,7 @@ class ParentManage(ParentAction, object):
         widget_id = table_object + "_id"
         if table_object == "element":
             field_object_id = table_object + "_id"
-        if table_object == "om_visit":
+        if table_object == "v_ui_om_visit":
             widget_id = "visit_id"
         elif "v_ui_om_visitman_x_" in table_object:
             field_object_id = "visit_id"
@@ -1046,7 +1055,7 @@ class ParentManage(ParentAction, object):
         elif table_object == "element":
             self.manage_element(new_element_id=False)
             utils_giswater.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
-        elif table_object == "om_visit":
+        elif table_object == "v_ui_om_visit":
             self.manage_visit(visit_id=selected_object_id)
         elif "v_ui_om_visitman_x_" in table_object:
             self.manage_visit(visit_id=selected_object_id)

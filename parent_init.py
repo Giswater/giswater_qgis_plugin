@@ -6,6 +6,10 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+import json
+from collections import OrderedDict
+
+from PyQt4.QtGui import QStandardItem
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
@@ -14,10 +18,12 @@ from PyQt4.QtCore import QSettings, Qt, QPoint
 from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
-from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
 from datetime import datetime
+
+import ctypes
 import os
 import sys  
 import urlparse
@@ -26,7 +32,7 @@ import subprocess
 
 import utils_giswater
 from dao.controller import DaoController
-from ui_manager import AddSum, NewWorkcat
+from ui_manager import AddSum
 from ui_manager import CFWScatalog
 from ui_manager import CFUDcatalog
 from ui_manager import LoadDocuments
@@ -39,7 +45,6 @@ from models.sys_feature_cat import SysFeatureCat
 from models.man_addfields_parameter import ManAddfieldsParameter
 from map_tools.snapping_utils import SnappingConfigManager
 from actions.manage_visit import ManageVisit
-from utils_.widget_manager import WidgetManager
 
 
 class ParentDialog(QDialog):
@@ -132,12 +137,25 @@ class ParentDialog(QDialog):
         else:
             point = self.canvas.mouseLastXY()
             point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), point.x(), point.y())
+            table_name = self.controller.get_layer_source_table_name(self.layer)
+            if table_name not in self.feature_cat:
+                return
 
-            sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('"+str(point[0])+"', '"+str(point[1])+"')")
-            row = self.controller.get_row(sql)
+            id_table = self.feature_cat[table_name].id
+            sql = ("SELECT "+self.schema_name+".gw_fct_getinsertform_vdef('" + str(id_table) + "', '"+str(point[0])+"', '"+str(point[1])+"')")
+            row = self.controller.get_row(sql, log_sql=True)
+            if not row:
+                return
             values = row[0]
+
             # if 'feature_id' in values:
             #     utils_giswater.setWidgetText(self.dialog, self.geom_type + "_id", str(values['feature_id']))
+            if 'value' in values['inventory']:
+                utils_giswater.setChecked(self.dialog, 'inventory', values['inventory']['value'])
+            if 'value' in values['publish']:
+                utils_giswater.setChecked(self.dialog, 'publish', values['publish']['value'])
+            if 'value' in values['uncertain']:
+                utils_giswater.setChecked(self.dialog, 'uncertain', values['uncertain']['value'])
             if 'name' in values['muni_id']:
                 utils_giswater.setWidgetText(self.dialog, 'muni_id', values['muni_id']['name'])
             if 'name' in values['sector_id']:
@@ -146,8 +164,27 @@ class ParentDialog(QDialog):
                 utils_giswater.setWidgetText(self.dialog, 'expl_id', values['expl_id']['name'])
             if 'name' in values['dma_id']:
                 utils_giswater.setWidgetText(self.dialog, 'dma_id', values['dma_id']['name'])
-       
-       
+            if 'name' in values['state']:
+                utils_giswater.setWidgetText(self.dialog, 'state', values['state']['name'])
+            if 'name' in values['state_type']:
+                utils_giswater.setWidgetText(self.dialog, 'state_type', values['state_type']['name'])
+            if 'id' in values['cat_id']:
+                widget_list = ['nodecat_id', 'arccat_id', 'conneccat_id', 'gratecat_id']
+                for w in widget_list:
+                    widget = self.dialog.findChild(QWidget, w)
+                    if widget:
+                        utils_giswater.setWidgetText(self.dialog, widget, values['cat_id']['id'])
+                        break
+            if 'id' in values['type']:
+                widget_list = ['node_type', 'arc_type', 'connec_type', 'gully_type']
+                for w in widget_list:
+                    widget = self.dialog.findChild(QWidget, w)
+                    if widget:
+                        utils_giswater.setWidgetText(self.dialog, widget, values['type']['id'])
+                        break
+
+
+
     def load_default(self, dialog, feature_type=None):
         """ Load default user values from table 'config_param_user' """
         
@@ -259,10 +296,18 @@ class ParentDialog(QDialog):
         if close_dialog:
             self.close_dialog()
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
-               "WHERE parameter='cf_keep_opened_edition' AND cur_user = current_user")
-        row = self.controller.get_row(sql)
+               "WHERE parameter = 'cf_keep_opened_edition' AND cur_user = current_user")
+        row = self.controller.get_row(sql, commit=True)
         if row:
             self.iface.activeLayer().startEditing()
+
+        # Close database connection        
+        self.controller.close_db()         
+        
+        # Close logger file
+        self.controller.close_logger()
+                      
+        del self.controller              
 
 
     def parse_commit_error_message(self):       
@@ -318,24 +363,40 @@ class ParentDialog(QDialog):
         self.controller.plugin_settings_set_value("check_topology_arc", "0")        
         self.controller.plugin_settings_set_value("close_dlg", "0")                           
         if close:
-            self.dialog.parent().setVisible(False)         
+            self.dialog.parent().setVisible(False)
+
+        # Close database connection         
+        self.controller.close_db()       
         
+        # Close logger file
+        self.controller.close_logger()
+        
+        del self.controller  
+
 
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
-         
+        
+        screens = ctypes.windll.user32
+        screen_x = screens.GetSystemMetrics(78)
+        screen_y = screens.GetSystemMetrics(79)
         if dialog is None:
             dialog = self.dialog
-        
-        try:                          
-            key = self.layer.name()                                   
+
+        try:
+            key = self.layer.name()
+            x = self.controller.plugin_settings_value(key + "_x")
+            y = self.controller.plugin_settings_value(key + "_y")
             width = self.controller.plugin_settings_value(key + "_width", dialog.parent().width())
             height = self.controller.plugin_settings_value(key + "_height", dialog.parent().height())
-            x = self.controller.plugin_settings_value(key + "_x")
-            y = self.controller.plugin_settings_value(key + "_y")                                             
-            if x == "" or y == "":
+
+            if x == "" or y == "" or int(x) < 0 or int(y) < 0:
                 dialog.resize(int(width), int(height))
             else:
+                if int(x) > screen_x:
+                    x = int(screen_x) - int(width)
+                if int(y) > screen_y:
+                    y = int(screen_y)
                 dialog.setGeometry(int(x), int(y), int(width), int(height))
         except:
             pass
@@ -349,23 +410,26 @@ class ParentDialog(QDialog):
             
         try:
             key = self.layer.name()         
-            self.controller.plugin_settings_set_value(key + "_width", dialog.parent().width())
-            self.controller.plugin_settings_set_value(key + "_height", dialog.parent().height())
+            self.controller.plugin_settings_set_value(key + "_width", dialog.parent().property('width'))
+            self.controller.plugin_settings_set_value(key + "_height", dialog.parent().property('height'))
             self.controller.plugin_settings_set_value(key + "_x", dialog.parent().pos().x())
             self.controller.plugin_settings_set_value(key + "_y", dialog.parent().pos().y())        
         except:
             pass             
         
         
-    def set_model_to_table(self, widget, table_name, expr_filter): 
+    def set_model_to_table(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter.
         Attach that model to selected table """
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel();
+        model = QSqlTableModel()
         model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
-        model.setFilter(expr_filter)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        if expr_filter is not None:
+            model.setFilter(expr_filter)
         model.select()
 
         # Check for errors
@@ -563,7 +627,7 @@ class ParentDialog(QDialog):
             # Refresh table in Qtableview
             # Fill tab Hydrometer
             table_hydrometer = "v_rtc_hydrometer"
-            self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
+            self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydrometer, self.filter)
           
             self.dlg_sum.close_dialog()
                 
@@ -627,24 +691,23 @@ class ParentDialog(QDialog):
         widget.model().select()  
         
         
-    def set_configuration(self, widget, table_name):
+    def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
         
         widget = utils_giswater.getWidget(self.dialog, widget)
         if not widget:
             return
-
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
                " FROM " + self.schema_name + ".config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
-        rows = self.controller.get_rows(sql, log_info=False)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return
-        
-        for row in rows:        
+
+        for row in rows:
             if not row['status']:
                 columns_to_delete.append(row['column_index']-1)
             else:
@@ -652,15 +715,24 @@ class ParentDialog(QDialog):
                 if width is None:
                     width = 100
                 widget.setColumnWidth(row['column_index']-1, width)
-                widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
-    
-        # Set order
-        widget.model().setSort(0, Qt.AscendingOrder)    
-        widget.model().select()
+                if row['alias'] is not None:
+                    widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
 
-        # Delete columns        
+        # Set order
+        if not isQStandardItemModel:
+            if widget.model() is QSqlTableModel:
+                widget.model().setSort(sort_order, Qt.AscendingOrder)
+                widget.model().select()
+            elif widget.model() is QSqlQueryModel:
+                #widget.setModel(model)
+                widget.show()
+
+        else:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+
+        # Delete columns
         for column in columns_to_delete:
-            widget.hideColumn(column) 
+            widget.hideColumn(column)
         
         
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
@@ -699,7 +771,6 @@ class ParentDialog(QDialog):
         utils_giswater.fillComboBox(dialog, "doc_type", rows)
         
         # Set model of selected widget
-        table_name = self.schema_name + "." + table_name   
         self.set_model_to_table(widget, table_name, expr_filter)
         
         # Adding auto-completion to a QLineEdit
@@ -797,7 +868,6 @@ class ParentDialog(QDialog):
         new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
         
         # Set model of selected widget
-        table_name = self.schema_name + "." + table_name   
         self.set_model_to_table(widget, table_name, expr_filter)
         
         # Adding auto-completion to a QLineEdit
@@ -1311,7 +1381,7 @@ class ParentDialog(QDialog):
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText(self.dialog, "event_type")
         if event_type_value != 'null':
-            expr+= " AND parameter_type = '" + event_type_value + "'"
+            expr += " AND parameter_type = '" + event_type_value + "'"
         event_id = utils_giswater.getWidgetText(self.dialog, "event_id")
         if event_id != 'null':
             expr+= " AND parameter_id = '" + event_id + "'"
@@ -1326,16 +1396,26 @@ class ParentDialog(QDialog):
 
         # Get widgets
         self.cat_period_id_filter = self.dialog.findChild(QComboBox, "cat_period_id_filter")
+        self.cmb_hyd_customer_code = self.dialog.findChild(QComboBox, "cmb_hyd_customer_code")
 
         # Populate combo filter hydrometer value
-        sql = "SELECT distinct(cat_period_id) FROM " + self.schema_name + ".v_edit_rtc_hydro_data_x_connec ORDER BY cat_period_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dialog, self.cat_period_id_filter, rows)
-        self.controller.log_info(str(sql))
+        sql = "SELECT id, code FROM " + self.schema_name + ".ext_cat_period ORDER BY code"
+        rows = [('', '')]
+        rows.extend(self.controller.get_rows(sql, log_sql=False))
+        utils_giswater.set_item_data(self.cat_period_id_filter, rows, 1)
+
+        sql = ("SELECT hydrometer_id, hydrometer_customer_code "
+               " FROM " + self.schema_name + ".v_rtc_hydrometer "
+               " WHERE connec_id = '"+str(self.id)+"' "
+               " ORDER BY hydrometer_customer_code")
+        rows = [('', '')]
+        rows.extend(self.controller.get_rows(sql, log_sql=True))
+        utils_giswater.set_item_data(self.cmb_hyd_customer_code, rows, 1)
 
         # Set signals
         if widget == self.tbl_hydrometer_value:
             self.cat_period_id_filter.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, widget))
+            self.cmb_hyd_customer_code.currentIndexChanged.connect(partial(self.set_filter_hydrometer_values, widget))
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
@@ -1344,12 +1424,14 @@ class ParentDialog(QDialog):
         """ Get Filter for table hydrometer value with combo value"""
 
         # Get combo value
-        cat_period_id_filter = str(self.cat_period_id_filter.currentText())
-
+        cat_period_id_filter = utils_giswater.get_item_data(self.dialog, self.cat_period_id_filter)
+        hyd_customer_code = utils_giswater.get_item_data(self.dialog, self.cmb_hyd_customer_code)
         # Set filter
         expr = self.field_id + " = '" + self.id + "'"
-        expr += " AND cat_period_id = '" + cat_period_id_filter + "'"
-
+        if cat_period_id_filter not in (None, ''):
+            expr += " AND cat_period_id = '" + cat_period_id_filter + "'"
+        if hyd_customer_code not in (None, ''):
+            expr += " AND hydrometer_id = '" + hyd_customer_code + "'"
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
@@ -2177,7 +2259,7 @@ class ParentDialog(QDialog):
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + ".exploitation AS t2 ON t1.expl_id = t2.expl_id "
                " WHERE t2.name = '" + str(utils_giswater.getWidgetText(dialog, exploitation)) + "'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             list_items = [rows[i] for i in range(len(rows))]
             utils_giswater.fillComboBox(dialog, dma, list_items, allow_nulls=False)
@@ -2195,7 +2277,7 @@ class ParentDialog(QDialog):
         sql = ("SELECT t1.name FROM " + self.schema_name + ".dma AS t1"
                " INNER JOIN " + self.schema_name + "." + str(geom_type) + " AS t2 ON t1.dma_id = t2.dma_id "
                " WHERE t2." + str(geom_type) + "_id = '" + str(feature_id) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=True)
         if not row:
             return
 
@@ -2270,7 +2352,7 @@ class ParentDialog(QDialog):
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + ".v_rtc_scada"
                " WHERE node_id = '" + str(self.id) + "';")
-        row = self.controller.get_row(sql, log_info=False, log_sql=True)
+        row = self.controller.get_row(sql, log_info=False)
         if not row:
             self.tab_main.removeTab(6) 
             self.tab_scada_removed = 1
@@ -2367,111 +2449,6 @@ class ParentDialog(QDialog):
                    " WHERE " + str(geom_type) + "_id = '" + str(feature_id) + "'")
             self.controller.execute_sql(sql)
 
-    # New Workcat
-
-    # def cf_new_workcat(self, dialog):
-    #
-    #     self.dlg_previous_cf = dialog
-    #     self.wm_new_workcat = WidgetManager(NewWorkcat())
-    #     self.dlg_new_workcat = self.wm_new_workcat.getDialog()
-    #     self.load_settings(self.dlg_new_workcat)
-    #
-    #     self.wm_new_workcat.setCalendarDate(self.dlg_new_workcat.builtdate, None, True)
-    #     table_object = "cat_work"
-    #     self.new_workcat_set_completer_object(table_object, self.dlg_new_workcat.cat_work_id, 'id')
-    #
-    #     # Set signals
-    #     self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.cf_manage_new_workcat_accept, table_object))
-    #     self.dlg_new_workcat.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
-    #
-    #     # Open dialog
-    #     self.cf_open_dialog(self.dlg_new_workcat)
-    #
-    #
-    # def cf_manage_new_workcat_accept(self, table_object):
-    #     """ Insert table 'cat_work'. Add cat_work """
-    #
-    #     # Get values from dialog
-    #     values = ""
-    #     fields = ""
-    #     cat_work_id = self.wm_new_workcat.getWidgetText(self.dlg_new_workcat.cat_work_id)
-    #     if cat_work_id != "null":
-    #         fields += 'id, '
-    #         values += ("'" + str(cat_work_id) + "', ")
-    #     descript = self.wm_new_workcat.getWidgetText("descript")
-    #     if descript != "null":
-    #         fields += 'descript, '
-    #         values += ("'" + str(descript) + "', ")
-    #     link = self.wm_new_workcat.getWidgetText("link")
-    #     if link != "null":
-    #         fields += 'link, '
-    #         values += ("'" + str(link) + "', ")
-    #     workid_key_1 = self.wm_new_workcat.getWidgetText("workid_key_1")
-    #     if workid_key_1 != "null":
-    #         fields += 'workid_key1, '
-    #         values += ("'" + str(workid_key_1) + "', ")
-    #     workid_key_2 = self.wm_new_workcat.getWidgetText("workid_key_2")
-    #     if workid_key_2 != "null":
-    #         fields += 'workid_key2, '
-    #         values += ("'" + str(workid_key_2) + "', ")
-    #     builtdate = self.wm_new_workcat.dialog.builtdate.dateTime().toString('yyyy-MM-dd')
-    #     if builtdate != "null":
-    #         fields += 'builtdate, '
-    #         values += ("'" + str(builtdate) + "', ")
-    #
-    #     if values != "":
-    #         fields = fields[:-2]
-    #         values = values[:-2]
-    #         if cat_work_id == 'null':
-    #             msg = "El campo Work id esta vacio"
-    #             self.controller.show_info_box(msg, "Warning")
-    #         else:
-    #             # Check if this element already exists
-    #             sql = ("SELECT DISTINCT(id)"
-    #                    " FROM " + self.schema_name + "." + str(table_object) + ""
-    #                    " WHERE id = '" + str(cat_work_id) + "'")
-    #             row = self.controller.get_row(sql, log_info=False)
-    #
-    #             if row is None :
-    #                 sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
-    #                 self.controller.execute_sql(sql)
-    #
-    #                 sql = ("SELECT id FROM " + self.schema_name + ".cat_work ORDER BY id")
-    #                 rows = self.controller.get_rows(sql)
-    #                 if rows:
-    #                     cmb_workcat_id = self.dlg_previous_cf.findChild(QComboBox, "workcat_id")
-    #                     self.wm_new_workcat.fillComboBox(cmb_workcat_id, rows)
-    #                     cmb_workcat_id.setCurrentIndex(cmb_workcat_id.findText(str(cat_work_id)))
-    #                 self.close_dialog(self.dlg_new_workcat)
-    #             else:
-    #                 msg = "Este Workcat ya existe"
-    #                 self.controller.show_info_box(msg, "Warning")
-    #
-    #
-    # def new_workcat_set_completer_object(self, tablename, widget, field_id):
-    #     """ Set autocomplete of widget @table_object + "_id"
-    #         getting id's from selected @table_object
-    #     """
-    #     if not widget:
-    #         return
-    #
-    #     # Set SQL
-    #     sql = ("SELECT DISTINCT(" + field_id + ")"
-    #            " FROM " + self.schema_name + "." + tablename +""
-    #            " ORDER BY "+ field_id + "")
-    #     row = self.controller.get_rows(sql)
-    #     for i in range(0, len(row)):
-    #         aux = row[i]
-    #         row[i] = str(aux[0])
-    #
-    #     # Set completer and model: add autocomplete in the widget
-    #     self.completer = QCompleter()
-    #     self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-    #     widget.setCompleter(self.completer)
-    #     model = QStringListModel()
-    #     model.setStringList(row)
-    #     self.completer.setModel(model)
-
 
     def cf_open_dialog(self, dlg=None, dlg_name=None, maximize_button=True, stay_on_top=True):
         """ Open dialog """
@@ -2520,3 +2497,5 @@ class ParentDialog(QDialog):
     def check_actions(self, action, enabled):
         if not self.dlg_is_destroyed:
             action.setChecked(enabled)
+            
+            

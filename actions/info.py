@@ -27,30 +27,30 @@ class Info(ParentAction):
 
     def info_show_info(self):
         """ Button 36: Info show info, open giswater and visit web page """
-        
+
         # Create form
         self.dlg_info = InfoShowInfo()
         self.load_settings(self.dlg_info)
-        
+
         # Get Plugin, Giswater, PostgreSQL and Postgis version
         postgresql_version = self.controller.get_postgresql_version()
         postgis_version = self.controller.get_postgis_version()
         plugin_version = self.get_plugin_version()
-        (giswater_file_path, giswater_build_version) = self.get_giswater_jar()  #@UnusedVariable         
-        project_version = self.controller.get_project_version()      
-        
+        (giswater_file_path, giswater_build_version) = self.get_giswater_jar()  #@UnusedVariable
+        project_version = self.controller.get_project_version()
+
         message = ("Plugin version:     " + str(plugin_version) + "\n"
                    "Project version:    " + str(project_version) + "\n"                    
                    "Giswater version:   " + str(giswater_build_version) + "\n" 
                    "PostgreSQL version: " + str(postgresql_version) + "\n" 
                    "Postgis version:    " + str(postgis_version))
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_info, message)
-        
+
         # Set signals
         self.dlg_info.btn_open_giswater.clicked.connect(self.open_giswater)
         self.dlg_info.btn_open_web.clicked.connect(partial(self.open_web_browser, self.dlg_info, None))
         self.dlg_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_info))
-        
+
         # Open dialog
         self.open_dialog(self.dlg_info, maximize_button=False)
 
@@ -62,5 +62,4 @@ class Info(ParentAction):
             self.execute_giswater("ed_giswater_jar")
         else:
             self.controller.show_info("Function not supported in this Operating System")
-            
-                    
+

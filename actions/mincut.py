@@ -110,6 +110,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set signals
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)        
         self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
+        self.dlg_mincut.dlg_rejected.connect(self.mincut_close)
         self.dlg_mincut.btn_start.clicked.connect(self.real_start)
         self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
@@ -214,7 +215,8 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mincut_close(self):
         
-        Mincut.closeMainWin = True
+        self.dlg_mincut.closeMainWin = True
+        self.dlg_mincut.mincutCanceled = True
 
         # If id exists in data base on btn_cancel delete
         if self.action == "mg_mincut":
@@ -235,12 +237,12 @@ class MincutParent(ParentAction, MultipleSelection):
         # Close dialog, save dialog position, and disconnect snapping
         self.close_dialog(self.dlg_mincut)
         self.disconnect_snapping()
+        self.refresh_map_canvas()
         
     
     def disconnect_snapping(self, action_pan=True):
         """ Select 'Pan' as current map tool and disconnect snapping """
-        
-        Mincut.closeMainWin = True
+
         try:
             self.canvas.xyCoordinates.disconnect()             
             self.emit_point.canvasClicked.disconnect()
@@ -501,10 +503,16 @@ class MincutParent(ParentAction, MultipleSelection):
                             self.controller.show_info_box(message, "See layers", parameter=views)
                             self.dlg_mincut.close()
                 else:
+                    self.dlg_mincut.closeMainWin = True
+                    self.dlg_mincut.mincutCanceled = False
                     self.dlg_mincut.close()
             else:
+                self.dlg_mincut.closeMainWin = True
+                self.dlg_mincut.mincutCanceled = False
                 self.dlg_mincut.close()
         else:
+            self.dlg_mincut.closeMainWin = True
+            self.dlg_mincut.mincutCanceled = False
             self.dlg_mincut.close()
         self.iface.actionPan().trigger()
 
@@ -579,6 +587,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Set dialog add_connec
         self.dlg_connec = Mincut_add_connec()
+        self.dlg_connec.setWindowTitle("Connec management")
         self.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
@@ -740,6 +749,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set dialog Mincut_add_hydrometer
         self.dlg_hydro = Mincut_add_hydrometer()
         self.load_settings(self.dlg_hydro)
+        self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
         # self.dlg_hydro.btn_snapping.setEnabled(False)
         
@@ -1267,7 +1277,8 @@ class MincutParent(ParentAction, MultipleSelection):
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
 
-        Mincut.closeMainWin = True
+        self.dlg_mincut.closeMainWin = True
+        self.dlg_mincut.canceled = False
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
@@ -1338,12 +1349,10 @@ class MincutParent(ParentAction, MultipleSelection):
             self.iface.legendInterface().setLayerVisible(layer, True)
 
         # Refresh extension of layer
-        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_arc")
-        layer.updateExtents()
-        # Zoom to executed mincut
-        self.iface.setActiveLayer(layer)
-        self.iface.zoomToActiveLayer()
-        
+        layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_node")
+        if layer:
+            self.iface.legendInterface().setLayerVisible(layer, True)
+
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
 
@@ -1433,20 +1442,29 @@ class MincutParent(ParentAction, MultipleSelection):
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
-        cur_user = self.controller.get_project_user()        
         sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
-               " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
+               " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "');")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        complet_result = row[0]
 
-        if row:
-            if row[0]:
+        if 'mincutOverlap' in complet_result:
+            if complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
-                self.controller.show_info_box(message, parameter=row[0])
+                self.controller.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
                 message = "Mincut done successfully"
                 self.controller.show_info(message)
-
-            # Update table 'anl_mincut_result_cat'
+            # Zoom to rectangle (zoom to mincut)
+            polygon = complet_result['geometry']
+            polygon = polygon[9:len(polygon)-2]
+            polygon = polygon.split(',')
+            x1, y1 = polygon[0].split(' ')
+            x2, y2 = polygon[2].split(' ')
+            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            
             sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat"
                    " SET mincut_class = 1, "
                    " anl_the_geom = ST_SetSRID(ST_Point(" + str(snapping_position.x()) + ", "
@@ -1675,14 +1693,12 @@ class MincutParent(ParentAction, MultipleSelection):
         sql = ("SELECT mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id) + "'")
         row = self.controller.get_row(sql)
-        if row:
+        mincut_class_status = None
+        if row[0]:
             mincut_class_status = str(row[0])
-        else:
-            msg = "Class status doesnt exist, check data base!"
-            self.controller.show_warning(msg)
-            return
+
         self.set_visible_mincut_layers()
-  
+
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
         if self.current_state == '0':
@@ -1732,7 +1748,11 @@ class MincutParent(ParentAction, MultipleSelection):
                 self.action_custom_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(False)
-                
+            if mincut_class_status is None:
+                self.action_mincut.setDisabled(False)
+                self.action_custom_mincut.setDisabled(True)
+                self.action_add_connec.setDisabled(False)
+                self.action_add_hydrometer.setDisabled(False)
         # Current_state == '1': In progress
         elif self.current_state == '1':
 
@@ -1891,18 +1911,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Get exploitation code: 'expl_id'
         expl_id = utils_giswater.get_item_data(dialog, dialog.address_exploitation)
-        
-        # Select features of @layer applying @expr
-        layer = self.layers['expl_layer']
-        expr_filter = self.street_field_expl[0] + " = '" + str(expl_id) + "'"
-        (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
-        if not is_valid:
-            return        
-        self.select_features_by_expr(layer, expr)
-
-        # Zoom to selected feature of the layer
-        self.zoom_to_selected_features(layer)      
-        layer.removeSelection()        
 
         # Get postcodes related with selected 'expl_id'
         sql = "SELECT DISTINCT(postcode) FROM " + self.controller.schema_name + ".ext_address"
@@ -2333,7 +2341,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.dlg_mincut.depth.setDisabled(True)
             self.dlg_mincut.appropiate.setDisabled(True)
             self.dlg_mincut.real_description.setDisabled(True)
-            self.dlg_mincut.btn_start.setDisabled(False)
+            self.dlg_mincut.btn_start.setDisabled(True)
             self.dlg_mincut.btn_end.setDisabled(True)        
             # Actions
             self.action_mincut.setDisabled(False)

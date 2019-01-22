@@ -47,7 +47,7 @@ class ManConnecDialog(ParentDialog):
         super(ManConnecDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.dlg_is_destroyed = False
-        self.controller.manage_translation('ud_man_connec', dialog) 
+        #self.controller.manage_translation('ud_man_connec', dialog) 
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
@@ -59,7 +59,10 @@ class ManConnecDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
 
-        # Get widget controls      
+        # Get user permisions
+        role_basic = self.controller.check_role_user("role_basic")
+
+        # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
@@ -82,12 +85,15 @@ class ManConnecDialog(ParentDialog):
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
-        action.setChecked(layer.isEditable())
-        layer.editingStarted.connect(partial(self.check_actions, action, True))
-        layer.editingStopped.connect(partial(self.check_actions, action, False))
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, self.layer))
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
+        if not role_basic:
+            action.setChecked(layer.isEditable())
+            layer.editingStarted.connect(partial(self.check_actions, action, True))
+            layer.editingStopped.connect(partial(self.check_actions, action, False))
+            self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
+        else:
+            action.setEnabled(False)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         
@@ -148,9 +154,9 @@ class ManConnecDialog(ParentDialog):
 
         table_hydrometer = "v_rtc_hydrometer"    
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
-        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name + "." + table_hydrometer, self.filter)
+        self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydrometer, self.filter)
         self.set_configuration(self.tbl_hydrometer, table_hydrometer)
-        self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name + "." + table_hydrometer_value, self.filter)
+        self.fill_tbl_hydrometer(self.tbl_hydrometer_value,  table_hydrometer_value, self.filter)
         self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)     

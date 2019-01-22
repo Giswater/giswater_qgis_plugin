@@ -39,7 +39,7 @@ class ManArcDialog(ParentDialog):
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.dlg_is_destroyed = False
-        self.controller.manage_translation('ws_man_arc', dialog)
+        #self.controller.manage_translation('ws_man_arc', dialog)
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
@@ -52,7 +52,10 @@ class ManArcDialog(ParentDialog):
         self.connec_type = utils_giswater.getWidgetText(self.dialog, "cat_arctype_id", False)
         self.connecat_id = utils_giswater.getWidgetText(self.dialog, "arccat_id", False)
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
-        
+
+        # Get user permisions
+        role_basic = self.controller.check_role_user("role_basic")
+
         # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")
@@ -83,13 +86,16 @@ class ManArcDialog(ParentDialog):
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
-        action.setChecked(layer.isEditable())
-        layer.editingStarted.connect(partial(self.check_actions, action, True))
-        layer.editingStopped.connect(partial(self.check_actions, action, False))
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, self.canvas, layer))
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
+        if not role_basic:
+            action.setChecked(layer.isEditable())
+            layer.editingStarted.connect(partial(self.check_actions, action, True))
+            layer.editingStopped.connect(partial(self.check_actions, action, False))
+            self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
+        else:
+            action.setEnabled(False)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, self.canvas, layer))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))

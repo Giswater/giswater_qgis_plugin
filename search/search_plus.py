@@ -7,6 +7,7 @@ from PyQt4.QtSql import QSqlTableModel
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 
 from functools import partial
+import ctypes
 import operator
 import os
 import csv
@@ -60,8 +61,8 @@ class SearchPlus(QObject):
         # Set signals
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
             (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-            (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
+        # self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
+        #     (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
         
         # self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
         #     (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
@@ -185,8 +186,8 @@ class SearchPlus(QObject):
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
-        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
-        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm, workcat_id))
+        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end, workcat_id))
         self.items_dialog.export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
@@ -217,7 +218,7 @@ class SearchPlus(QObject):
         self.items_dialog.open()
 
 
-    def force_state(self, qbutton, state, qtable):
+    def force_state(self, qbutton, state, qtable, workcat_id):
         """ Force selected state and set qtable enabled = True """
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
                " WHERE cur_user=current_user AND state_id ='" + str(state) + "'")
@@ -231,6 +232,14 @@ class SearchPlus(QObject):
         qbutton.setEnabled(False)
         self.refresh_map_canvas()
 
+        table_name = "v_ui_workcat_x_feature"
+        table_name_end = "v_ui_workcat_x_feature_end"
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm, table_name)
+        expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
+        self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
+        self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
 
     def disable_qatable_by_state(self, qtable, _id, qbutton):
 
@@ -713,7 +722,8 @@ class SearchPlus(QObject):
             return
         connec_group = self.controller.get_group_layers('connec')
         for layer in connec_group:
-            layer = self.controller.get_layer_by_tablename('v_edit_man_' + str(layer.name().lower()))
+            layer_source = self.controller.get_layer_source(layer)
+            layer = self.controller.get_layer_by_tablename(layer_source['table'])
             if layer:
                 it = layer.getFeatures(QgsFeatureRequest(expr))
                 ids = [i.id() for i in it]
@@ -843,26 +853,21 @@ class SearchPlus(QObject):
                " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
                " INNER JOIN " + self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
                " INNER JOIN " + self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
-               " WHERE " + str(self.field_to_search) + " IS NOT NULL"
-               " AND t1.expl_id IN"
+               " WHERE  t1.expl_id IN "
                " (SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user = current_user)"
                " AND t1.state IN "
                " (SELECT state_id FROM " + self.controller.schema_name + ".selector_state WHERE cur_user = current_user)"               
                " ORDER BY " + str(self.field_to_search))
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
-
         list_codes = ['']
         for row in rows:
-            append_to_list = True
             for x in range(0, len(row)):
                 if row[x] is None:
-                    append_to_list = False
-            if append_to_list:
-                list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4])
-
-        return list_codes       
+                    row[x] = ''
+            list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4]+"")
+        return list_codes
         
      
     def network_geom_type_populate(self):
@@ -888,7 +893,7 @@ class SearchPlus(QObject):
 
 
     def expl_name_changed(self):
-        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id','name')
+        #self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id','name')
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
 
         if expl_name == "null" or expl_name is None or expl_name == "None":
@@ -964,8 +969,10 @@ class SearchPlus(QObject):
             geom_type = row[0].lower()
 
         # Check if the expression is valid
-        expr_filter = self.field_to_search + " = '" + feature_id + "'"
-        expr_filter += " AND " + geom_type+"_id = '" + geom_id + "'"
+
+        expr_filter = "" + geom_type + "_id = '" + geom_id + "'"
+        if feature_id:
+            expr_filter += " AND " + self.field_to_search + " = '" + feature_id + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
             return
@@ -1414,21 +1421,28 @@ class SearchPlus(QObject):
         for column in columns_to_delete:
             widget.hideColumn(column)
 
-
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
+        screens = ctypes.windll.user32
+        screen_x = screens.GetSystemMetrics(78)
+        screen_y = screens.GetSystemMetrics(79)
 
         if dialog is None:
-            dialog = self.dlg_search
+            dialog = self.dlg
 
         try:
-            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
-            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
             y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.property('height'))
+
             if int(x) < 0 or int(y) < 0:
                 dialog.resize(int(width), int(height))
             else:
+                if int(x) > screen_x:
+                    x = int(screen_x) - int(width)
+                if int(y) > screen_y:
+                    y = int(screen_y)
                 dialog.setGeometry(int(x), int(y), int(width), int(height))
         except:
             pass
@@ -1440,8 +1454,8 @@ class SearchPlus(QObject):
         if dialog is None:
             dialog = self.dlg_search
 
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
 

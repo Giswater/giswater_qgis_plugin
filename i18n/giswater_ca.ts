@@ -120,7 +120,7 @@
     </message>
     <message>
         <source>61_text</source>
-        <translation>Gestor del catàleg de treball</translation>
+        <translation>Informacio de la visita</translation>
     </message>
     <message>
         <source>66_text</source>

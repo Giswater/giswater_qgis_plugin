@@ -52,7 +52,7 @@ class ManNodeDialog(ParentDialog):
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.dlg_is_destroyed = False
-        self.controller.manage_translation('ws_man_node', dialog)
+        #self.controller.manage_translation('ws_man_node', dialog)
         if dialog.parent():
             dialog.parent().setFixedSize(625, 660)
             
@@ -85,7 +85,10 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         self.pump_hemisphere = self.dialog.findChild(QLineEdit, 'pump_hemisphere')
 
-        # Get widget controls   
+        # Get user permisions
+        role_basic = self.controller.check_role_user("role_basic")
+
+        # Get widget controls
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
@@ -118,14 +121,18 @@ class ManNodeDialog(ParentDialog):
 
         # Toolbar actions
         action = self.dialog.findChild(QAction, "actionEnabled")
-        action.setChecked(layer.isEditable())
-        layer.editingStarted.connect(partial(self.check_actions, action, True))
-        layer.editingStopped.connect(partial(self.check_actions, action, False))
+
         self.dialog.findChild(QAction, "actionCopyPaste").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionRotation").setEnabled(layer.isEditable())
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, self.feature, self.canvas, self.layer))
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
+        if not role_basic:
+            action.setChecked(layer.isEditable())
+            layer.editingStarted.connect(partial(self.check_actions, action, True))
+            layer.editingStopped.connect(partial(self.check_actions, action, False))
+            self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, self.layer))
+        else:
+            action.setEnabled(False)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, self.feature, self.canvas, self.layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
@@ -214,7 +221,7 @@ class ManNodeDialog(ParentDialog):
         row = self.controller.get_row(sql)
         if row:
             sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-                " WHERE parameter = 'edit_arc_division_dsbl' AND cur_user = current_user")
+                   " WHERE parameter = 'edit_arc_division_dsbl' AND cur_user = current_user")
             row2 = self.controller.get_row(sql)
             if row2 and str(row2[0].lower()) == 'true':
                 self.controller.plugin_settings_set_value("check_topology_arc", "1")

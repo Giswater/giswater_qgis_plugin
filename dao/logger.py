@@ -43,13 +43,25 @@ class Logger():
         formatter = logging.Formatter(log_format, log_date)
         
         # Create file handler
-        fh = logging.FileHandler(filepath) 
-        fh.setFormatter(formatter)
-        self.logger_file.addHandler(fh)    
+        self.fh = logging.FileHandler(filepath) 
+        self.fh.setFormatter(formatter)
+        self.logger_file.addHandler(self.fh)    
         
         # Initialize number of errors in current process
         self.num_errors = 0
                 
+                
+    def close_logger(self):
+        """ Close logger file """
+        
+        try:
+            self.logger_file.removeHandler(self.fh)
+            self.fh.flush()
+            self.fh.close()    
+            del self.fh        
+        except Exception:
+            pass            
+            
                 
     def log(self, msg=None, log_level=logging.INFO, stack_level=2):
         """ Logger message into logger file with selected level """

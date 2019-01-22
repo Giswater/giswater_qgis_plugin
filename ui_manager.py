@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt4 import QtGui, uic
+from PyQt4 import QtGui, uic, QtCore
+from PyQt4.QtGui import QMainWindow
 import os
 
 
@@ -190,7 +191,7 @@ class HydrologySelector(QtGui.QDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('info_show_info.ui')
 class InfoShowInfo(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
-        QtGui.QDialog.__init__(self)
+        QMainWindow.__init__(self)
         self.setupUi(self)
 
 
@@ -210,19 +211,27 @@ class LoadProfiles(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(QtGui.QMainWindow, FORM_CLASS):
+    dlg_rejected = QtCore.pyqtSignal()
     def __init__(self):
-        self.closeMainWin = True
+        self.closeMainWin = False
+        self.mincutCanceled = True
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
 
     def closeEvent(self, event):
         """ Overwrite closeEvent method """
+
         if self.closeMainWin:
             event.accept()
+            if self.mincutCanceled:
+                self.dlg_rejected.emit()
+                return super(Mincut, self).closeEvent(event)
         else:
-            # event.accept()
-            QtGui.QMessageBox.information(self, "", "Press cancel to exit")
-            event.ignore()
+            event.accept()
+            # QtGui.QMessageBox.information(self, "", "Press cancel to exit")
+            # event.ignore()
+
+
 
 
 FORM_CLASS = get_ui_class('mincut_add_connec.ui')
@@ -328,6 +337,29 @@ class Psector_rapport(QtGui.QDialog, FORM_CLASS):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
 
+FORM_CLASS = get_ui_class('readsql.ui')
+class Readsql(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('readsql_create_project.ui')
+class ReadsqlCreateProject(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('readsql_rename.ui')
+class ReadsqlRename(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('readsql_show_info.ui')
+class ReadsqlShowInfo(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
 
 FORM_CLASS = get_ui_class('selector_date.ui')
 class SelectorDate(QtGui.QDialog, FORM_CLASS):

@@ -25,6 +25,7 @@ from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
 
 from snapping_utils import SnappingConfigManager
 
+import ctypes
 import os
 import sys
 
@@ -230,25 +231,32 @@ class ParentMapTool(QgsMapTool):
                     self.set_action_pan()
         except AttributeError:
             pass
-        
 
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
-                     
+        screens = ctypes.windll.user32
+        screen_x = screens.GetSystemMetrics(78)
+        screen_y = screens.GetSystemMetrics(79)
+
         if dialog is None:
             dialog = self.dlg
-              
-        try:      
-            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
-            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+
+        try:
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
-            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")          
+            y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+            width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
+            height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.property('height'))
+
             if int(x) < 0 or int(y) < 0:
                 dialog.resize(int(width), int(height))
             else:
+                if int(x) > screen_x:
+                    x = int(screen_x) - int(width)
+                if int(y) > screen_y:
+                    y = int(screen_y)
                 dialog.setGeometry(int(x), int(y), int(width), int(height))
         except:
-            pass                        
+            pass
             
             
     def save_settings(self, dialog=None):
@@ -258,8 +266,8 @@ class ParentMapTool(QgsMapTool):
             dialog = self.dlg
             
         try:             
-            self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
-            self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
             self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x())
             self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())  
         except:

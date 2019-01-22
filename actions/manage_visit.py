@@ -352,6 +352,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.ext_code = self.ext_code.text()
         self.current_visit.visitcat_id = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitcat_id, 0)
         self.current_visit.descript = utils_giswater.getWidgetText(self.dlg_add_visit, 'descript', False, False)
+        self.current_visit.is_done = utils_giswater.isChecked(self.dlg_add_visit, 'is_done')
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
             
@@ -359,7 +360,7 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit.upsert(commit=self.autocommit)
 
 
-    def update_relations(self):
+    def update_relations(self, dialog):
         """Save current selected features in tbl_relations. Steps are:
         A) remove all old relations related with current visit_id.
         B) save new relations get from that listed in tbl_relations."""
@@ -420,6 +421,8 @@ class ManageVisit(ParentManage, QObject):
             # than save the showed records
             db_record.upsert(commit=self.autocommit)
 
+        self.enable_feature_type(dialog)
+
 
     def manage_tab_changed(self, dialog, index):
         """Do actions when tab is exit and entered.
@@ -432,11 +435,11 @@ class ManageVisit(ParentManage, QObject):
             # need to create the relation record that is done only
             # changing tab
             if self.locked_geom_type:
-                self.update_relations()
+                self.update_relations(dialog)
 
         # tab Relation
         if self.current_tab_index == self.tab_index('RelationsTab'):
-            self.update_relations()
+            self.update_relations(dialog)
 
         # manage arriving tab
         # tab Visit
@@ -466,7 +469,6 @@ class ManageVisit(ParentManage, QObject):
                " FROM " + self.schema_name + ".om_visit_parameter"
                " WHERE UPPER (parameter_type) = '" + self.parameter_type_id.currentText().upper() + "'"
                " AND UPPER (feature_type) = '" + self.feature_type.currentText().upper() + "'")
-
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
 
@@ -547,12 +549,16 @@ class ManageVisit(ParentManage, QObject):
 
         if geom_type is None:
             # Set a model with selected filter. Attach that model to selected table
-            table_object = "om_visit"
+            utils_giswater.setWidgetText(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by ext_code')
+            filed_to_filter = "ext_code"
+            table_object = "v_ui_om_visit"
             expr_filter = ""
             self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
             self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
+            utils_giswater.setWidgetText(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by code')
+            filed_to_filter = "code"
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
             expr_filter = geom_type + "_id = '" + feature_id + "'"
             # Refresh model with selected filter            
@@ -571,7 +577,7 @@ class ManageVisit(ParentManage, QObject):
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.txt_filter.textChanged.connect(
-            partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+            partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()        
@@ -587,15 +593,15 @@ class ManageVisit(ParentManage, QObject):
                 self.dlg_man.date_event_to.setDate(current_date)
 
         # set date events
-        self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
-        self.dlg_man.date_event_to.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter))
+        self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
+        self.dlg_man.date_event_to.dateChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
 
         # Open form
         self.open_dialog(self.dlg_man, dlg_name="visit_management")
 
 
-    def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter):
+    def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
         """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates)"""
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
@@ -611,14 +617,14 @@ class ManageVisit(ParentManage, QObject):
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
-        if table_object == "om_visit":
+        if table_object == "v_ui_om_visit":
             expr_filter += ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
             if object_id != 'null':
-                expr_filter += " AND ext_code::TEXT ILIKE '%" + str(object_id) + "%'"
+                expr_filter += " AND "+filed_to_filter+"::TEXT ILIKE '%" + str(object_id) + "%'"
         else:
             expr_filter += ("AND (visit_start BETWEEN {0}) AND (visit_end BETWEEN {0})".format(interval))
             if object_id != 'null':
-                expr_filter += " AND visit_id::TEXT ILIKE '%" + str(object_id) + "%'"
+                expr_filter += " AND "+filed_to_filter+"::TEXT ILIKE '%" + str(object_id) + "%'"
 
         # Refresh model with selected filter
         widget_table.model().setFilter(expr_filter)
