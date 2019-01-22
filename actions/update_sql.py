@@ -1306,8 +1306,7 @@ class UpdateSQL(ParentAction):
         self.controller.execute_sql(sql, commit=False)
 
         
-    def execute_last_process(self, new_project=False, schema_name=False, schema_type='', locale=False):
-    
+    def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
         # Execute last process function
         if new_project is True:
             extras = '"isNewProject":"' + str('TRUE') + '", '
@@ -1379,9 +1378,8 @@ class UpdateSQL(ParentAction):
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
-
+        self.setWaitCursor()
         if self.rdb_import_data.isChecked():
-            self.setWaitCursor()
             self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -1390,17 +1388,14 @@ class UpdateSQL(ParentAction):
             self.execute_import_data()
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
-            self.setArrowCursor()
             
         elif self.rdb_no_ct.isChecked():
-            self.setWaitCursor()
             self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type, no_ct=True)
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
-            self.setArrowCursor()
             
         elif self.rdb_sample.isChecked():
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
@@ -1409,8 +1404,9 @@ class UpdateSQL(ParentAction):
                 if result:
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
                 else:
+                    self.setArrowCursor()
                     return
-            self.setWaitCursor()
+
             self.load_base(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -1419,8 +1415,7 @@ class UpdateSQL(ParentAction):
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.load_sample_data(project_type=project_type)
-            self.setArrowCursor()
-                    
+
         elif self.rdb_sample_dev.isChecked():
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
                 msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
@@ -1428,8 +1423,9 @@ class UpdateSQL(ParentAction):
                 if result:
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
                 else:
+                    self.setArrowCursor()
                     return
-            self.setWaitCursor()
+
             self.load_base(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -1439,10 +1435,10 @@ class UpdateSQL(ParentAction):
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
-            self.setArrowCursor()
-                    
+
+
         elif self.rdb_data.isChecked():
-            self.setWaitCursor()
+
             self.load_base(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -1450,18 +1446,17 @@ class UpdateSQL(ParentAction):
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
-            self.setArrowCursor()
+        self.setArrowCursor()
 
         # Show message if process executed correctly
         if self.error_count == 0:
-            self.dao.commit()
+            self.controller.dao.commit()
             msg = "The project has been created correctly."
             result = self.controller.show_info_box(msg, "Info")
             self.close_dialog(self.dlg_readsql_create_project)
         else:
-            self.dao.rollback()
+            self.controller.dao.rollback()
             msg = "Some errors has occurred. Process has not been executed."
-            self.dao.rollback()
             result = self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
@@ -1485,12 +1480,12 @@ class UpdateSQL(ParentAction):
 
         # Show message if precess execute correctly
         if self.error_count == 0:
-            self.dao.commit()
+            self.controller.dao.commit()
             msg = "Api has been updated correctly."
             result = self.controller.show_info_box(msg, "Info")
 
         else:
-            self.dao.rollback()
+            self.controller.dao.rollback()
             msg = "Some error has occurred while the api updated process was running."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1514,12 +1509,12 @@ class UpdateSQL(ParentAction):
 
         # Show message if precess execute correctly
         if self.error_count == 0:
-            self.dao.commit()
+            self.controller.dao.commit()
             msg = "The process has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
         else:
-            self.dao.rollback()
+            self.controller.dao.rollback()
             msg = "Some error has occurred while the process was running."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1539,14 +1534,14 @@ class UpdateSQL(ParentAction):
 
         # Show message if precess execute correctly
         if self.error_count == 0:
-            self.dao.commit()
+            self.controller.dao.commit()
             msg = "The update has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
             # Close dialog when process has been execute correctly
             self.close_dialog(self.dlg_readsql_show_info)
         else:
-            self.dao.rollback()
+            self.controller.dao.rollback()
             msg = "Some error has occurred while the update process was running."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1572,11 +1567,11 @@ class UpdateSQL(ParentAction):
         if update_changelog is False:
             # Show message if precess execute correctly
             if self.error_count == 0:
-                self.dao.commit()
+                self.controller.dao.commit()
                 msg = "The update has been executed correctly."
                 result = self.controller.show_info_box(msg, "Info")
             else:
-                self.dao.rollback()
+                self.controller.dao.rollback()
                 msg = "Some error has occurred while the update process was running."
                 result = self.controller.show_info_box(msg, "Info")
 
@@ -1602,8 +1597,7 @@ class UpdateSQL(ParentAction):
 
         connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
 
-        credentials = {'db': None, 'schema': None, 'table': None,
-                       'host': None, 'port': None, 'user': None, 'password': None}
+        credentials = {'db': None, 'host': None, 'port': None, 'user': None, 'password': None}
 
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections/" + connection_name)
@@ -1817,12 +1811,12 @@ class UpdateSQL(ParentAction):
 
         # Show message if precess execute correctly
         if self.error_count == 0:
-            self.dao.commit()
+            self.controller.dao.commit()
             msg = "The reload has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
         else:
-            self.dao.rollback()
+            self.controller.dao.rollback()
             msg = "Some error has occurred while the reload process was running."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1847,12 +1841,12 @@ class UpdateSQL(ParentAction):
 
         # Show message if precess execute correctly
         if self.error_count == 0:
-            self.dao.commit()
+            self.controller.dao.commit()
             msg = "The reload has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
         else:
-            self.dao.rollback()
+            self.controller.dao.rollback()
             msg = "Some error has occurred while the reload process was running."
             result = self.controller.show_info_box(msg, "Info")
 
@@ -1983,20 +1977,19 @@ class UpdateSQL(ParentAction):
                 f_to_read = str(
                     f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
                     str('utf-8-sig'))
+
                 status = self.controller.execute_sql(str(f_to_read), commit=False)
 
                 if status is False:
                     self.error_count = self.error_count + 1
                     self.controller.log_info(str("Error to execute"))
                     self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
-                    self.dao.rollback()
                     return False
 
         except Exception as e:
             self.error_count = self.error_count + 1
             self.controller.log_info(str("Error to execute"))
             self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
-            self.dao.rollback()
             return False
 
             
@@ -2012,7 +2005,6 @@ class UpdateSQL(ParentAction):
                 else:
                     return False
             except Exception as e:
-                self.dao.rollback()
                 return False
         return True
 
