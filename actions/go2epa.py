@@ -44,11 +44,14 @@ class Go2Epa(ParentAction):
         # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
         #self.get_last_gsw_file()
 
+        # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
+        #self.get_last_gsw_file()
 
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
         self.dlg_go2epa.setFixedSize(620, 300)        
+
         # TODO habilitar todos estos widgets cuando Edgar acabe el giswater_java en python
         """
         # Set widgets
@@ -62,6 +65,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.chk_exec.setVisible(False)
         self.dlg_go2epa.chk_import.setVisible(False)
         """
+
         # Set signals
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)

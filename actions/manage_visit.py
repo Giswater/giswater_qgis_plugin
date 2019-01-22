@@ -674,6 +674,7 @@ class ManageVisit(ParentManage, QObject):
                        " ORDER BY name")
                 row = self.controller.get_row(sql)
                 utils_giswater.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
+
         # Relations tab
         # fill feature_type
         sql = ("SELECT id"
