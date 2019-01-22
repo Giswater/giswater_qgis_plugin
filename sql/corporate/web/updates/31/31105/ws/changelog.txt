@@ -1,0 +1,4 @@
+31103-ws (api)
+--------------
+New parameter api_mincut_visible_layers, #issue570
+
