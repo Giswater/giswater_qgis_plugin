@@ -210,3 +210,7 @@ FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('A
 DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_connec_control ON connec;
 CREATE TRIGGER gw_trg_man_addfields_value_connec_control AFTER UPDATE OF connec_id OR DELETE ON SCHEMA_NAME.connec
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('CONNEC');
+
+DROP TRIGGER gw_trg_om_visit ON om_visit;
+CREATE TRIGGER gw_trg_om_visit AFTER INSERT ON om_visit
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_om_visit();
