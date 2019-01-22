@@ -258,7 +258,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="lbl_connection">
              <property name="text">
-              <string>Connection:</string>
+              <string>Connection name:</string>
              </property>
             </widget>
            </item>

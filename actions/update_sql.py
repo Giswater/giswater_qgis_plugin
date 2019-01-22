@@ -163,8 +163,6 @@ class UpdateSQL(ParentAction):
 
         s.endGroup()
         utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
-        if self.controller.logged:
-            utils_giswater.set_combo_itemData(self.cmb_connection, str(self.controller.layer_source['db']), 1)
 
         # Set Listeners
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
@@ -195,7 +193,7 @@ class UpdateSQL(ParentAction):
                                                'Project data schema version:' + self.project_data_schema_version)
 
         # Set last connection for default
-        utils_giswater.setWidgetText(self.dlg_readsql, self.cmb_connection, str(self.last_connection))
+        utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
 
         # Open dialog
         self.dlg_readsql.show()
@@ -1462,6 +1460,10 @@ class UpdateSQL(ParentAction):
         # Reset count error variable to 0
         self.error_count = 0
 
+        # Referesh data main dialog
+        self.event_change_connection()
+        self.set_info_project()
+
         
     def rename_project_data_schema(self):
     
@@ -1525,12 +1527,15 @@ class UpdateSQL(ParentAction):
     #TODO:Rename this function => Update all versions from changelog file.
     def update(self, project_type):
     
-        msg = "Are you shure to update the project schema to lastest version?"
+        msg = "Are you sure to update the project schema to lastest version?"
         result = self.controller.ask_question(msg, "Info")
         if result:
             self.setWaitCursor()
             self.load_updates(project_type, update_changelog=True)
+            self.set_info_project()
             self.setArrowCursor()
+        else:
+            return
 
         # Show message if precess execute correctly
         if self.error_count == 0:
