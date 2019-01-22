@@ -107,6 +107,7 @@ class AddNewLot(ParentManage):
         #self.populate_visits(self.dlg_lot.tbl_visit, table_name, expr_filter)
         self.update_feature_type_cmb()
         self.event_feature_type_selected(self.dlg_lot)
+        self.reload_table_visit()
         # Set signals
         self.feature_type.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, layer_name=None))
@@ -133,6 +134,8 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
     def test(self):
         self.controller.log_info(str("HOLAs"))
+
+
     def read_standaritemmodel(self, qtable):
         headers = self.get_headers(qtable)
         rows = []
@@ -535,13 +538,11 @@ class AddNewLot(ParentManage):
         self.feature_type.setEnabled(False)
 
 
-    def reload_table_visit(self, x):
-        self.controller.log_info(str(type(x)))
-        self.controller.log_info(str((x)))
+    def reload_table_visit(self):
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=False)
         model = QSqlTableModel()
         model.setTable(row['tablename'])
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
