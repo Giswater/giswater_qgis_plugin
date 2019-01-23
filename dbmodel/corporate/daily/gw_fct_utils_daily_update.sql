@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-DROP FUNCTION IF EXISTS utils.gw_fct_utils_daily_update();
 CREATE OR REPLACE FUNCTION utils.gw_fct_utils_daily_update()
 
 RETURNS integer AS

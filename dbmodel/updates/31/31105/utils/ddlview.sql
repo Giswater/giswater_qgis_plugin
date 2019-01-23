@@ -111,7 +111,7 @@ SELECT
     c.maxc AS cmax,
     b.lps_avg * 0.5::double precision * c.maxc AS lps_max
    FROM v_rtc_hydrometer_x_arc a
-     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::int8 = a.hydrometer_id::int8
      JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id=b.dma_id::text
 union
  SELECT 
@@ -128,7 +128,7 @@ union
     c.maxc AS cmax,
     b.lps_avg * 0.5::double precision * c.maxc AS lps_max
    FROM v_rtc_hydrometer_x_arc a
-     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::int8 = a.hydrometer_id::int8
      JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id=b.dma_id::text;
 
 
