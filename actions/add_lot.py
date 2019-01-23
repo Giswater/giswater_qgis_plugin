@@ -40,6 +40,7 @@ class AddNewLot(ParentManage):
         self.remove_ids = False
         self.is_new_lot = is_new
         self.chk_position = 5
+
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
@@ -75,6 +76,7 @@ class AddNewLot(ParentManage):
 
         # Fill QWidgets of the form
         self.fill_fields()
+        self.reload_table_visit()
 
         new_lot_id = lot_id
         if lot_id is None:
@@ -85,7 +87,6 @@ class AddNewLot(ParentManage):
         viewname = "v_edit_" + self.geom_type
         self.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
         self.clear_selection()
-
 
         # Set widgets signals
         self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot, self.feature_type, layer_name=None))
