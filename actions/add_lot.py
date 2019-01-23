@@ -99,6 +99,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.event_feature_type_selected, self.dlg_lot))
         self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.reload_table_visit)
 
+        self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature))
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
@@ -131,6 +132,11 @@ class AddNewLot(ParentManage):
 
     def test(self):
         self.controller.log_info(str("HOLAs"))
+
+
+
+
+
 
 
     def read_standaritemmodel(self, qtable):
@@ -645,6 +651,27 @@ class AddNewLot(ParentManage):
 
         model.setStringList(values)
         self.completer.setModel(model)
+
+
+    def zoom_to_feature(self):
+        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
+        selected_list = self.tbl_relation.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        index = selected_list[0]
+        row = index.row()
+        column_index = 0
+        column_index = utils_giswater.get_col_index_by_col_name(self.tbl_relation, feature_type+'_id')
+        feature_id = index.sibling(row, column_index).data()
+        expr_filter = '"{}_id" IN ({})'.format(self.geom_type, "'"+feature_id+"'")
+
+        # Check expression
+        (is_valid, expr) = self.check_expression(expr_filter)
+        self.select_features_by_ids(feature_type, expr)
+        self.iface.actionZoomToSelected().trigger()
 
 
     def manage_rejected(self):
