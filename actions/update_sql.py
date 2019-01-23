@@ -1732,7 +1732,7 @@ class UpdateSQL(ParentAction):
             self.btn_push_file.setEnabled(True)
         else:
             self.data_file.setReadOnly(True)
-            self.btn_push_file.setEnabled(True)
+            self.btn_push_file.setEnabled(False)
 
             
     def populate_data_schema_name(self, widget):
