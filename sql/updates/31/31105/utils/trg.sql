@@ -5,16 +5,20 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-drop trigger if exists gw_trg_visit_update_enddate ON SCHEMA_NAME.om_visit;
-CREATE TRIGGER gw_trg_visit_update_enddate AFTER INSERT OR UPDATE OF is_done ON SCHEMA_NAME.om_visit
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_update_enddate('visit');
+DROP TRIGGER IF EXISTS gw_trg_visit_update_enddate ON "SCHEMA_NAME".om_visit;
+CREATE TRIGGER gw_trg_visit_update_enddate AFTER INSERT OR UPDATE OF is_done ON "SCHEMA_NAME".om_visit
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_visit_update_enddate('visit');
 
-drop trigger if exists gw_trg_visit_update_enddate ON SCHEMA_NAME.om_visit_event;
-CREATE TRIGGER gw_trg_visit_update_enddate BEFORE INSERT OR UPDATE ON SCHEMA_NAME.om_visit_event 
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_update_enddate('event');
+DROP TRIGGER IF EXISTS gw_trg_visit_update_enddate ON "SCHEMA_NAME".om_visit_event;
+CREATE TRIGGER gw_trg_visit_update_enddate BEFORE INSERT OR UPDATE ON "SCHEMA_NAME".om_visit_event 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_visit_update_enddate('event');
 
 DROP TRIGGER IF EXISTS gw_trg_ui_visit ON "SCHEMA_NAME".v_ui_om_visit;
-CREATE TRIGGER gw_trg_ui_visit INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visit FOR EACH ROW EXECUTE PROCEDURE 
-"SCHEMA_NAME".gw_trg_ui_visit();
+CREATE TRIGGER gw_trg_ui_visit INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visit 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_visit();
+
+DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".om_visit;
+CREATE TRIGGER gw_trg_om_visit AFTER INSERT ON "SCHEMA_NAME".om_visit
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit();
