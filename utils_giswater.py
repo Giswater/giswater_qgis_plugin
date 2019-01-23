@@ -10,8 +10,9 @@ from PyQt4.QtGui import QDoubleValidator
 
 """ Module with utility functions to interact with dialog and its widgets """
 from qgis.gui import QgsDateTimeEdit
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
+from PyQt4.QtGui import QSpinBox, QTimeEdit, QPushButton
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime
 
@@ -484,3 +485,20 @@ def double_validator(widget, min=0, max=999999, decimals=3, notation=QDoubleVali
     validator = QDoubleValidator(min, max, decimals)
     validator.setNotation(notation)
     widget.setValidator(validator)
+
+
+def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
+    widget_list = dialog.findChildren(QWidget)
+    for widget in widget_list:
+        if str(widget.objectName()) not in ignore_widgets:
+            if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                widget.setReadOnly(not enable)
+                if enable:
+                    widget.setStyleSheet("QWidget { background: rgb(255, 255, 255);"
+                                         " color: rgb(0, 0, 0)}")
+                else:
+                    widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
+                                         " color: rgb(100, 100, 100)}")
+            elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                widget.setEnabled(enable)
+

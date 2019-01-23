@@ -138,10 +138,7 @@ class DaoController():
         self.logged = self.connect_to_database(self.layer_source['host'], self.layer_source['port'], 
                                                self.layer_source['db'], self.layer_source['user'],
                                                self.layer_source['password'])
-
-        if not_version is True:
-            return False
-        return self.logged    
+        return (self.logged, not_version)
     
     
     def get_layer_source_from_credentials(self):
@@ -191,7 +188,7 @@ class DaoController():
             not_version = False
             self.last_error = self.tr("Layer not found") + ": 'version'"
             return None, not_version
-        return credentials, not_version
+        return (credentials, not_version)
     
     def connect_to_database(self, host, port, db, user, pwd):
         """ Connect to database with selected parameters """

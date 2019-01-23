@@ -6,7 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication
+from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView
+from PyQt4.QtGui import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand
 from PyQt4.QtCore import QSettings, Qt
 
 import os
@@ -35,7 +36,7 @@ class UpdateSQL(ParentAction):
         self.project_type = controller.get_project_type()
 
         
-    def init_sql(self):
+    def init_sql(self, connection_status=False):
         """ Button 100: Execute SQL. Info show info """
         
         # Get last database connection from controller
@@ -126,8 +127,17 @@ class UpdateSQL(ParentAction):
             self.cmb_project_type.addItem(str(type))
         self.change_project_type(self.cmb_project_type)
 
-        self.populate_data_schema_name(self.cmb_project_type)
-        self.set_info_project()
+        # Populate combo connections
+        s = QSettings()
+        s.beginGroup("PostgreSQL/connections")
+        connections = s.childGroups()
+        list_connections = []
+        for con in connections:
+            elem = [con, con]
+            list_connections.append(elem)
+
+        s.endGroup()
+        utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
 
         # Declare all file variables
         self.file_pattern_tablect = "tablect"
@@ -152,17 +162,8 @@ class UpdateSQL(ParentAction):
         self.folderUpdatesApi = self.sql_dir + '/api/updates/'
         self.folderApi = self.sql_dir + '/api/'
 
-        # Populate combo connections
-        s = QSettings()
-        s.beginGroup("PostgreSQL/connections")
-        connections = s.childGroups()
-        list_connections = []
-        for con in connections:
-            elem = [con, con]
-            list_connections.append(elem)
-
-        s.endGroup()
-        utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
+        # Set last connection for default
+        utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
 
         # Set Listeners
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
@@ -185,18 +186,25 @@ class UpdateSQL(ParentAction):
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
 
+        # Open dialog
+        self.dlg_readsql.show()
+
+        if connection_status is False:
+            self.controller.show_message("Connection Failed. Please, try with other connection.", 1)
+            utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            return
+        else:
+            utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
+
+        self.populate_data_schema_name(self.cmb_project_type)
+        self.set_info_project()
+
         # Put current info into software version info widget
         if self.version is None:
             self.version = '0'
             self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
                                                'Database version: ' + self.version + '\n \n' +
                                                'Project data schema version:' + self.project_data_schema_version)
-
-        # Set last connection for default
-        utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
-
-        # Open dialog
-        self.dlg_readsql.show()
 
             
     """ Declare all read sql process """
@@ -1619,6 +1627,12 @@ class UpdateSQL(ParentAction):
                                                credentials['db'], credentials['user'],
                                                credentials['password'])
 
+        if self.logged == False:
+            self.controller.show_message("Connection Failed. Please, try with other connection.", 1)
+            utils_giswater.dis_enable_dialog(self.dlg_readsql, False, ignore_widgets='cmb_connection')
+        else:
+            utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
+
         self.populate_data_schema_name(self.cmb_project_type)
 
         self.set_last_connection(connection_name)
@@ -1714,11 +1728,11 @@ class UpdateSQL(ParentAction):
     def enable_datafile(self):
     
         if self.rdb_import_data.isChecked() is True:
-            self.data_file.setEnabled(True)
+            self.data_file.setReadOnly(False)
             self.btn_push_file.setEnabled(True)
         else:
-            self.data_file.setEnabled(False)
-            self.btn_push_file.setEnabled(False)
+            self.data_file.setReadOnly(True)
+            self.btn_push_file.setEnabled(True)
 
             
     def populate_data_schema_name(self, widget):

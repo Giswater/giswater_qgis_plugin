@@ -99,7 +99,7 @@ class Giswater(QObject):
         """ Define widget and event signals """
         self.iface.projectRead.connect(self.project_read)                
 
-    def set_info_button(self):
+    def set_info_button(self, connection_status):
         self.toolButton = QToolButton()
         self.iface.addToolBarWidget(self.toolButton)
 
@@ -113,7 +113,7 @@ class Giswater(QObject):
         self.toolButton.setDefaultAction(action)
 
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
-        action.triggered.connect(self.update_sql.init_sql)
+        action.triggered.connect(partial(self.update_sql.init_sql, connection_status))
 
     def tr(self, message):
         if self.controller:
@@ -518,9 +518,9 @@ class Giswater(QObject):
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
-        connection_status = self.controller.set_database_connection()
-        self.set_info_button()
-        if not connection_status:
+        connection_status, not_version = self.controller.set_database_connection()
+        self.set_info_button(connection_status)
+        if not connection_status or not_version:
             message = self.controller.last_error
             if show_warning:
                 self.controller.show_warning(message, 15)
