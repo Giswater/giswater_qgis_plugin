@@ -782,7 +782,11 @@
            </layout>
           </item>
           <item>
-           <widget class="QTableView" name="tbl_visit"/>
+           <widget class="QTableView" name="tbl_visit">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
