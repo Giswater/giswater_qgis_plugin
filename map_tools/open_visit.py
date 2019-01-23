@@ -19,6 +19,7 @@
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QAction
+from PyQt4.QtGui import QCursor
 from qgis.core import QgsPoint, QgsFeatureRequest
 from PyQt4.QtCore import QPoint, Qt, QDate
 
@@ -97,7 +98,8 @@ class OpenVisit(ParentMapTool):
         self.iface.setActiveLayer(self.layer_visit)
 
         # Change cursor
-        self.canvas.setCursor(self.cursor)
+
+        self.canvas.setCursor(QCursor(Qt.WhatsThisCursor))
 
         # Show help message when action is activated
         if self.show_help:

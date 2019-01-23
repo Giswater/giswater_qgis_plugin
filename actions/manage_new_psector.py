@@ -320,17 +320,19 @@ class ManageNewPsector(ParentManage):
 
     def update_total(self, dialog, qtable):
         """ Show description of product plan/om _psector as label """
-        
-        selected_list = qtable.model()
-        if selected_list is None:
-            return
-        total = 0
-        psector_id = utils_giswater.getWidgetText(dialog, 'psector_id')
-        for x in range(0, selected_list.rowCount()):
-            if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
-                if str(qtable.model().record(x).value('total_budget')) != 'NULL':
-                    total += float(qtable.model().record(x).value('total_budget'))
-        utils_giswater.setText(dialog, 'lbl_total', str(total))
+        try:
+            selected_list = qtable.model()
+            if selected_list is None:
+                return
+            total = 0
+            psector_id = utils_giswater.getWidgetText(dialog, 'psector_id')
+            for x in range(0, selected_list.rowCount()):
+                if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
+                    if str(qtable.model().record(x).value('total_budget')) != 'NULL':
+                        total += float(qtable.model().record(x).value('total_budget'))
+            utils_giswater.setText(dialog, 'lbl_total', str(total))
+        except:
+            pass
 
 
     def open_dlg_rapports(self, previous_dialog):#, self.dlg_plan_psector
@@ -346,7 +348,7 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
-        self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport.txt_path))
+        self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path))
 
         utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path,
             self.controller.plugin_settings_value('psector_rapport_path'))

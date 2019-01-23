@@ -1324,7 +1324,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="chk_enabled">
+   <widget class="QCheckBox" name="rtc_enabled">
     <property name="geometry">
      <rect>
       <x>18</x>
@@ -1399,7 +1399,7 @@
   <tabstop>node_id</tabstop>
   <tabstop>valve_mode</tabstop>
   <tabstop>valve_mode_mincut_result</tabstop>
-  <tabstop>chk_enabled</tabstop>
+  <tabstop>rtc_enabled</tabstop>
   <tabstop>rtc_period_id</tabstop>
   <tabstop>rtc_coefficient</tabstop>
   <tabstop>btn_accept</tabstop>

@@ -107,7 +107,7 @@ class Table(object):
         # remove all None elements
         none_indexes = []
         for index, value in enumerate(values):
-            if not value:
+            if value in (None, '', 'null'):
                 none_indexes.append(index)
         for index in reversed(none_indexes):  # reversed to avoid change of index
             del fields[index]

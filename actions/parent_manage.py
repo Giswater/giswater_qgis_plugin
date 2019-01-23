@@ -174,6 +174,7 @@ class ParentManage(ParentAction, object):
             row_type = self.controller.get_row(sql)
             if row_type:
                 utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
+            utils_giswater.setWidgetText(dialog, "code", row['code'])
             utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
             utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
@@ -184,7 +185,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "link", row['link'])
             utils_giswater.setWidgetText(dialog, "verified", row['verified'])
             utils_giswater.setWidgetText(dialog, "rotation", row['rotation'])
-            if str(row['undelete'])== 'True':
+            if str(row['undelete']) == 'True':
                 dialog.undelete.setChecked(True)
             builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
             enddate = QDate.fromString(str(row['enddate']), 'yyyy-MM-dd')
@@ -231,8 +232,8 @@ class ParentManage(ParentAction, object):
 
         # Check if we already have data with selected object_id
         sql = ("SELECT * " 
-            " FROM " + self.schema_name + "." + str(table_object) + ""
-            " WHERE " + str(field_object_id) + " = '" + str(object_id) + "'")
+               " FROM " + self.schema_name + "." + str(table_object) + ""
+               " WHERE " + str(field_object_id) + " = '" + str(object_id) + "'")
         row = self.controller.get_row(sql, log_info=False)
 
         # If object_id not found: Clear data

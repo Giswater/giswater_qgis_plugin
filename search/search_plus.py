@@ -61,8 +61,8 @@ class SearchPlus(QObject):
         # Set signals
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
             (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-            (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
+        # self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
+        #     (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
         
         # self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
         #     (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
@@ -893,7 +893,7 @@ class SearchPlus(QObject):
 
 
     def expl_name_changed(self):
-        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id','name')
+        #self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id','name')
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
 
         if expl_name == "null" or expl_name is None or expl_name == "None":
@@ -1454,8 +1454,8 @@ class SearchPlus(QObject):
         if dialog is None:
             dialog = self.dlg_search
 
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
-        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
 

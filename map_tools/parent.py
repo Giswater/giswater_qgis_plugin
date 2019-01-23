@@ -266,8 +266,8 @@ class ParentMapTool(QgsMapTool):
             dialog = self.dlg
             
         try:             
-            self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
-            self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.property('width'))
+            self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.property('height'))
             self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x())
             self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())  
         except:
