@@ -54,6 +54,7 @@ class UpdateSQL(ParentAction):
         # Check if user have dev permisions
         self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
         self.read_all_updates = self.settings.value('system_variables/read_all_updates').upper()
+        self.dev_commit = self.settings.value('system_variables/dev_commit').upper()
 
         # Get plugin version
         self.plugin_version = self.get_plugin_version()
@@ -1997,18 +1998,24 @@ class UpdateSQL(ParentAction):
                     f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
                     str('utf-8-sig'))
 
-                status = self.controller.execute_sql(str(f_to_read), commit=False)
-
+                if self.dev_commit == 'TRUE':
+                    status = self.controller.execute_sql(str(f_to_read))
+                else:
+                    status = self.controller.execute_sql(str(f_to_read), commit=False)
                 if status is False:
                     self.error_count = self.error_count + 1
                     self.controller.log_info(str("Error to execute"))
                     self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
+                    if self.dev_commit == 'TRUE':
+                        self.controller.dao.rollback()
                     return False
 
         except Exception as e:
             self.error_count = self.error_count + 1
             self.controller.log_info(str("Error to execute"))
             self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
+            if self.dev_commit == 'TRUE':
+                self.controller.dao.rollback()
             return False
 
             
