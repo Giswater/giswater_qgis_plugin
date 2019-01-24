@@ -459,7 +459,6 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     for row in rows:
         elem = []
         for x in range(0, len(row)):
-            print(row[x])
             elem.append(row[x])
         records.append(elem)
 

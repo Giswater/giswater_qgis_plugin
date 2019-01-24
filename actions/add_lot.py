@@ -39,7 +39,7 @@ class AddNewLot(ParentManage):
         self.autocommit = True
         self.remove_ids = False
         self.is_new_lot = is_new
-        self.chk_position = 5
+        self.chk_position = 5  # Variable used to set the position of the QCheckBox in the relations table
 
         # Get layers of every geom_type
         self.reset_lists()
@@ -100,7 +100,6 @@ class AddNewLot(ParentManage):
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
-
 
         self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature))
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
@@ -582,8 +581,7 @@ class AddNewLot(ParentManage):
         if object_id != 'null':
             expr_filter += " AND " + str(feature_type) + "_id::TEXT ILIKE '%" + str(object_id) + "%'"
 
-
-        expr_filter += "AND " + str(feature_type) + "_id IN ('0', "
+        expr_filter += " AND " + str(feature_type) + "_id IN ('0', "
         for i in range(len(self.ids)):
             expr_filter += "'" + str(self.ids[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
@@ -598,8 +596,6 @@ class AddNewLot(ParentManage):
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setFilter(expr_filter)
         model.sort(0, 1)
-        # if expr_filter:
-        #     model.setFilter(expr_filter)
         model.select()
 
         # Check for errors

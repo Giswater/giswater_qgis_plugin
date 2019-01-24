@@ -263,9 +263,9 @@ class Go2Epa(ParentAction):
         dlg_wstimes = WStimes()
         self.load_settings(dlg_wstimes)
         dlg_wstimes.duration.setValidator(QIntValidator())
-        sql = "SELECT id FROM "+self.schema_name+".inp_value_times ORDER BY id"
+        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_times ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_wstimes, dlg_wstimes.statistic, rows, False)
+        utils_giswater.set_item_data(dlg_wstimes.statistic, rows, 1)
         dlg_wstimes.btn_accept.clicked.connect(partial(self.update_table, 'inp_times', dlg_wstimes))
         dlg_wstimes.btn_cancel.clicked.connect(dlg_wstimes.close)
         self.go2epa_options_get_data('inp_times', dlg_wstimes)
