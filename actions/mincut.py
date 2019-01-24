@@ -1333,7 +1333,7 @@ class MincutParent(ParentAction, MultipleSelection):
                 break   
 
 
-    def set_visible_mincut_layers(self):
+    def set_visible_mincut_layers(self, zoom=False):
         """ Set visible mincut result layers """
         
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_valve") 
@@ -1352,6 +1352,12 @@ class MincutParent(ParentAction, MultipleSelection):
         layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_node")
         if layer:
             self.iface.legendInterface().setLayerVisible(layer, True)
+            if zoom:
+                # Refresh extension of layer
+                layer.updateExtents()
+                # Zoom to executed mincut
+                self.iface.setActiveLayer(layer)
+                self.iface.zoomToActiveLayer()
 
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
@@ -1697,7 +1703,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if row[0]:
             mincut_class_status = str(row[0])
 
-        self.set_visible_mincut_layers()
+        self.set_visible_mincut_layers(True)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
