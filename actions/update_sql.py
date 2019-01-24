@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView
-from PyQt4.QtGui import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand
+from PyQt4.QtGui import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand, QPixmap
 from PyQt4.QtCore import QSettings, Qt
 
 import os
@@ -50,6 +50,12 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql = Readsql()
         self.load_settings(self.dlg_readsql)
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
+
+        # Set label status connection
+
+        self.icon_folder = self.plugin_dir + '/icons/'
+        self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
+        self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
 
         # Check if user have dev permisions
         self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
@@ -193,9 +199,11 @@ class UpdateSQL(ParentAction):
         if connection_status is False:
             self.controller.show_message("Connection Failed. Please, try with other connection.", 1)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             return
         else:
             utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
 
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
@@ -1631,8 +1639,10 @@ class UpdateSQL(ParentAction):
         if self.logged == False:
             self.controller.show_message("Connection Failed. Please, try with other connection.", 1)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, False, ignore_widgets='cmb_connection')
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
         else:
             utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
 
         self.populate_data_schema_name(self.cmb_project_type)
 
