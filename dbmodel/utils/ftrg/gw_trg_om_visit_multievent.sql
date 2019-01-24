@@ -26,9 +26,9 @@ BEGIN
 		NEW.visit_id = (SELECT nextval('om_visit_id_seq'));
 	END IF;
 
-            INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, the_geom, descript, is_done, class_id, suspendendcat_id) 
+            INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, the_geom, descript, is_done, class_id, suspendendcat_id, lot_id) 
             VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate, NEW.enddate, NEW.user_name, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
-            NEW.is_done, NEW.class_id, NEW.suspendendcat_id);
+            NEW.is_done, NEW.class_id, NEW.suspendendcat_id, NEW.lot_id);
 
 
             FOR v_parameters IN SELECT * FROM om_visit_parameter 
@@ -63,7 +63,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
             UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, startdate=NEW.startdate, enddate=NEW.enddate, user_name=NEW.user_name,
             webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
-            suspendendcat_id=NEW.suspendendcat_id WHERE id=NEW.visit_id;
+            suspendendcat_id=NEW.suspendendcat_id, lot_id=NEW.lot_id WHERE id=NEW.visit_id;
 
             FOR v_parameters IN SELECT * FROM om_visit_parameter 
             JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
