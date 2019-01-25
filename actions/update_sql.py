@@ -195,6 +195,7 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
+        self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
 
         # Open dialog
         self.dlg_readsql.show()
@@ -1319,7 +1320,9 @@ class UpdateSQL(ParentAction):
 
         return True
 
+
     """ Functions execute process """
+
 
     def execute_import_data(self):
         #TODO:: This functions are comment at the moment. We dont enable this function until 3.2
@@ -1366,6 +1369,7 @@ class UpdateSQL(ParentAction):
 
         
     """ Buttons calling functions """
+
 
     def create_project_data_schema(self):
     
@@ -1490,12 +1494,18 @@ class UpdateSQL(ParentAction):
         self.set_info_project()
 
         
-    def rename_project_data_schema(self):
-    
+    def rename_project_data_schema(self, schema):
+
         self.setWaitCursor()
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
-        self.load_fct_ftrg(project_type=self.project_type_selected)
-        self.execute_last_process(schema_name=self.schema, locale=True)
+        sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
+        status = self.controller.execute_sql(sql)
+        if status:
+            self.reload_trg(project_type=self.project_type_selected)
+            self.reload_fct_ftrg(project_type=self.project_type_selected)
+            sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_schema_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
+            status = self.controller.execute_sql(sql)
+            self.execute_last_process(schema_name=self.schema, locale=True)
         self.setArrowCursor()
 
         
@@ -1581,6 +1591,7 @@ class UpdateSQL(ParentAction):
         
     """ Checkbox calling functions """
 
+
     def load_updates(self, project_type, update_changelog=False):
     
         # Get current schema selected
@@ -1622,6 +1633,7 @@ class UpdateSQL(ParentAction):
 
         
     """ Create new connection when change combo connections """
+
 
     def event_change_connection(self):
 
@@ -1670,12 +1682,14 @@ class UpdateSQL(ParentAction):
         settings.setValue('selected', connection_name)
         settings.endGroup()
 
+
     def get_last_connection(self):
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
         connection_name = settings.value('selected')
         settings.endGroup()
         return connection_name
+
 
     def get_user_connection(self, connection_name):
         settings = QSettings()
@@ -1684,7 +1698,9 @@ class UpdateSQL(ParentAction):
         settings.endGroup()
         return connection_username
 
+
     """ Other functions """
+
 
     def check_roladmin_user(self, username):
         res = False
@@ -1842,6 +1858,12 @@ class UpdateSQL(ParentAction):
                                            'Schema name: ' + schema_name + '\n' +
                                            'Schema version: ' + self.project_data_schema_version)
 
+        # Enable or Disable rename button according schema version
+        if str(self.version_metadata) != str(self.project_data_schema_version):
+            self.dlg_readsql.btn_schema_rename.setEnabled(False)
+        else:
+            self.dlg_readsql.btn_schema_rename.setEnabled(True)
+
 
     def process_folder(self, folderPath, filePattern):
     
@@ -1991,8 +2013,10 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_rename = ReadsqlRename()
         self.load_settings(self.dlg_readsql_rename)
 
+        schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
         # Set listeners
-        self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema))
+        self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema, schema))
         self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_rename))
 
         # Open dialog
@@ -2024,7 +2048,6 @@ class UpdateSQL(ParentAction):
                                            filter_srid_value)
         else:
             for file in filelist:
-                self.controller.log_info(str(filedir + '/' + file))
                 if ".sql" in file:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                         self.controller.log_info(str(filedir + '/' + file))
