@@ -133,6 +133,7 @@ DECLARE
 	v_featuretype text;
 	v_pageinfo json;
 	v_vdefault text;
+	v_listclass text;
 BEGIN
 
 -- Set search path to local schema
@@ -170,64 +171,82 @@ BEGIN
 		RAISE EXCEPTION 'The config table is bad configured. v_tablename is null';
 	END IF;
 
---  Creating the list fields
-----------------------------
-	-- Get idname column
-	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-		INTO v_idname
-		USING v_tablename;
-        
-	-- For views it suposse pk is the first column
-	IF v_idname ISNULL THEN
-		EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-			AND t.relname = $1 
-			AND s.nspname = $2
-			ORDER BY a.attnum LIMIT 1'
+	-- control not existing table
+	IF v_tablename IN (SELECT table_name FROM information_schema.tables WHERE table_schema = v_schemaname) THEN
+
+		
+		--  Creating the list fields
+		----------------------------
+		-- Get idname column
+		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
 			INTO v_idname
-			USING v_tablename, v_schemaname;
-	END IF;
-
-	-- Get column type
-	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
-	    JOIN pg_class t on a.attrelid = t.oid
-	    JOIN pg_namespace s on t.relnamespace = s.oid
-	    WHERE a.attnum > 0 
-	    AND NOT a.attisdropped
-	    AND a.attname = $3
-	    AND t.relname = $2 
-	    AND s.nspname = $1
-	    ORDER BY a.attnum'
-            USING v_schemaname, v_tablename, v_idname
-            INTO v_column_type;
-
-        -- Getting geometry column
-        EXECUTE 'SELECT attname FROM pg_attribute a        
-            JOIN pg_class t on a.attrelid = t.oid
-            JOIN pg_namespace s on t.relnamespace = s.oid
-            WHERE a.attnum > 0 
-            AND NOT a.attisdropped
-            AND t.relname = $1
-            AND s.nspname = $2
-            AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-            ORDER BY a.attnum' 
-            USING v_tablename, v_schemaname
-            INTO v_the_geom;
-
-	--  get querytext
-	EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 AND device = $2'
-		INTO v_query_result
-		USING v_tablename, v_device;
-
-	-- if v_device is not configured on config_api_list table
-	IF v_query_result IS NULL THEN
-		EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 LIMIT 1'
-			INTO v_query_result
 			USING v_tablename;
-	END IF;
+        
+		-- For views it suposse pk is the first column
+		IF v_idname ISNULL THEN
+			EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+				AND t.relname = $1 
+				AND s.nspname = $2
+				ORDER BY a.attnum LIMIT 1'
+					INTO v_idname
+					USING v_tablename, v_schemaname;
+		END IF;
 
-	-- if v_tablename is not configured on config_api_list table
-	IF v_query_result IS NULL THEN
-		v_query_result = 'SELECT * FROM '||v_tablename||' WHERE '||v_idname||' IS NOT NULL ';
+		-- Get column type
+		EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+		JOIN pg_class t on a.attrelid = t.oid
+		JOIN pg_namespace s on t.relnamespace = s.oid
+		WHERE a.attnum > 0 
+		AND NOT a.attisdropped
+		AND a.attname = $3
+		AND t.relname = $2 
+		AND s.nspname = $1
+		ORDER BY a.attnum'
+			USING v_schemaname, v_tablename, v_idname
+			INTO v_column_type;
+
+		-- Getting geometry column
+		EXECUTE 'SELECT attname FROM pg_attribute a        
+		JOIN pg_class t on a.attrelid = t.oid
+		JOIN pg_namespace s on t.relnamespace = s.oid
+		WHERE a.attnum > 0 
+		AND NOT a.attisdropped
+		AND t.relname = $1
+		AND s.nspname = $2
+		AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+		ORDER BY a.attnum' 
+			USING v_tablename, v_schemaname
+			INTO v_the_geom;
+
+		--  get querytext
+		EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 AND device = $2'
+			INTO v_query_result
+			USING v_tablename, v_device;
+
+		-- if v_device is not configured on config_api_list table
+		IF v_query_result IS NULL THEN
+			EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 LIMIT 1'
+				INTO v_query_result
+				USING v_tablename;
+		END IF;	
+
+		-- if v_tablename is not configured on config_api_list table
+		IF v_query_result IS NULL THEN
+			v_query_result = 'SELECT * FROM '||v_tablename||' WHERE '||v_idname||' IS NOT NULL ';
+		END IF;
+
+	ELSE
+		--  get querytext
+		EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 AND device = $2'
+			INTO v_query_result
+			USING v_tablename, v_device;
+
+		-- if v_device is not configured on config_api_list table
+		IF v_query_result IS NULL THEN
+			EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 LIMIT 1'
+				INTO v_query_result
+				USING v_tablename;
+		END IF;	
 	END IF;
 
 	--  add filters
@@ -389,11 +408,15 @@ BEGIN
 	-- getting cardinality
 	v_i = cardinality(v_filter_fields) ;
 
+	EXECUTE 'SELECT listclass FROM config_api_list WHERE tablename = $1 LIMIT 1'
+		INTO v_listclass
+		USING v_tablename;
+
 	-- setting new element
 	IF v_device =9 THEN
-		v_filter_fields[v_i+1] := json_build_object('widgettype','iconList','datatype','icon','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	ELSE
-		v_filter_fields[v_i+1] := json_build_object('type','iconList','dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
 
 	raise notice 'v_filter_fields %', v_filter_fields;

@@ -26,6 +26,11 @@ ALTER TABLE audit_cat_param_user ADD COLUMN widgettype character varying(30);
 ALTER TABLE audit_cat_param_user ADD COLUMN vdefault text;
 
 
+-- om_visit
+ALTER TABLE om_visit ADD column lot_id integer;
+ALTER TABLE om_visit ADD COLUMN class_id integer;
+ALTER TABLE om_visit ADD COLUMN status integer;
+
 --SYS TABLES
 CREATE TABLE sys_combo_cat(
   id serial NOT NULL,
@@ -90,13 +95,15 @@ CREATE TABLE om_visit_lot(
   startdate date DEFAULT now(),
   enddate date,
   visitclass_id integer,
-  visitcat_id integer,
   descript text,
   active boolean DEFAULT true,
   team_id integer,
   duration text,
-  feature_type text);
+  feature_type text,
+  status integer
+  the_geom public.geometry(POLYGON, SRID_VALUE));
   
+   
 
 CREATE TABLE om_visit_lot_x_arc( 
   lot_id integer,
@@ -136,6 +143,27 @@ CREATE TABLE om_visit_lot_x_arc(
   descript text,
   active boolean DEFAULT true);
   
+
+  CREATE TABLE cat_vehicle(
+  id serial NOT NULL,
+  idval text,
+  descript text,
+  active boolean DEFAULT true,
+  CONSTRAINT cat_vehicle_pkey PRIMARY KEY (id));
+
+ 
+  CREATE TABLE om_visit_lot_team_x_user(
+  team_id integer,
+  user_id varchar(16),
+  constraint om_visit_lot_team_x_user_pkey PRIMARY KEY (team_id, user_id));
+  
+ 
+  CREATE TABLE om_visit_lot_user_x_vehicle(
+  user_id varchar(16),
+  vehicle_id integer,
+  constraint om_visit_lot_user_x_vehicle_pkey PRIMARY KEY (user_id, vehicle_id));
+  
+ 
   
   CREATE TABLE om_visit_filetype_x_extension
 (
@@ -144,10 +172,4 @@ CREATE TABLE om_visit_lot_x_arc(
   CONSTRAINT om_visit_filetype_x_extension_pkey PRIMARY KEY (filetype, fextension)
 );
 
-ALTER TABLE om_visit ADD column lot_id integer;
-ALTER TABLE om_visit ADD COLUMN class_id integer;
-ALTER TABLE om_visit ADD COLUMN suspendendcat_id integer;
-ALTER TABLE om_visit_lot DROP COLUMN active;
-ALTER TABLE om_visit_lot DROP COLUMN visitcat_id;
-ALTER TABLE om_visit_lot ADD column status integer;
 

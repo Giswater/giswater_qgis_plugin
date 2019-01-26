@@ -5,8 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, v_visitability boolean, device int4, p_info_type int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfofromid"(alias_id_arg varchar, table_id_arg varchar, id varchar, editable bool, v_visitability boolean, device int4, p_info_type int4, lang varchar) 
+RETURNS pg_catalog.json AS $BODY$
 DECLARE
+
+/* EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_getinfofromid('id', 'om_visit_lot', '1', false, false, 3, 100, 'es') 
+*/
 
 --    Variables
     form_info json;    
@@ -39,6 +44,7 @@ DECLARE
     mincut_act boolean;
     visit_act boolean;
     v_visitability boolean;
+    table_id_arg_new text;
 
     -- fixed info type parameter(to do)
     --p_info_type integer=200;
@@ -185,7 +191,11 @@ BEGIN
 	AND inforole_id='||p_info_type;
 
     	-- Identify tableinforole_id 
-	EXECUTE v_query_text INTO table_id_arg;
+	EXECUTE v_query_text INTO table_id_arg_new;
+
+	IF table_id_arg_new IS NOT NULL THEN
+		table_id_arg :=  table_id_arg_new;
+	END IF;
 
 	-- Identify Name of feature type (to put on header of form)
 	EXECUTE' SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1'
@@ -202,9 +212,13 @@ BEGIN
 	EXECUTE 'SELECT tableinforole_id FROM config_web_layer
 	JOIN config_web_tableinfo_x_inforole ON config_web_layer.tableinfo_id=config_web_tableinfo_x_inforole.tableinfo_id 
 	WHERE layer_id=$1 AND inforole_id=$2'
-	INTO table_id_arg
-	USING table_id_arg, p_info_type;
+		INTO table_id_arg_new 
+		USING table_id_arg, p_info_type;
 
+	IF table_id_arg_new IS NOT NULL THEN
+		table_id_arg :=  table_id_arg_new;
+	END IF;
+	
 	raise notice 'NO parent-child, NO editable, Informable: %, p_info_type: %' , table_id_arg, p_info_type;
 
     -- Check if it is not parent, not editable and has not tableinfo_id (is not informable)
