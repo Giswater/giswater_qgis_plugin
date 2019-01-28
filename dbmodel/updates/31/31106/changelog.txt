@@ -27,7 +27,7 @@ New api functions
 
 31106-ws-other
 --------------
-
+Add check constraint on fields epa_table and man_table in *_type tables.
 
 
 ***********  UD  ************
@@ -38,7 +38,7 @@ New api functions
 
 31106-ud-other
 ---------------
-
+Add check constraint on fields epa_table and man_table in *_type tables.
 
 **********  I18N  ***********
 
