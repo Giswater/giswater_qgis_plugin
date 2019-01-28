@@ -27,7 +27,6 @@ ALTER TABLE "inp_value_noneall" DROP CONSTRAINT IF EXISTS "inp_value_noneall_che
 ALTER TABLE "inp_value_mixing" DROP CONSTRAINT IF EXISTS "inp_value_mixing_check";
 ALTER TABLE "inp_value_param_energy" DROP CONSTRAINT IF EXISTS "inp_value_param_energy_check";
 ALTER TABLE "inp_typevalue_reactions_gl" DROP CONSTRAINT IF EXISTS "inp_typevalue_reactions_gl_check";
-ALTER TABLE "inp_value_reactions_el" DROP CONSTRAINT IF EXISTS "inp_value_reactions_el_check";
 ALTER TABLE "inp_value_opti_hyd" DROP CONSTRAINT IF EXISTS "inp_value_opti_hyd_check";
 ALTER TABLE "inp_value_opti_unbal" DROP CONSTRAINT IF EXISTS "inp_value_opti_unbal_check";
 ALTER TABLE "inp_value_opti_units" DROP CONSTRAINT IF EXISTS "inp_value_opti_units_check";
