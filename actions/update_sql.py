@@ -1395,13 +1395,30 @@ class UpdateSQL(ParentAction):
             msg = "The 'Title' field is required."
             result = self.controller.show_info_box(msg, "Info")
             return
+
         sql = ("SELECT schema_name, schema_name FROM information_schema.schemata")
         rows = self.controller.get_rows(sql)
+        available = False
         for row in rows:
             if str(project_name) == str(row[0]):
-                msg = "This 'Project_name' is already exist."
-                result = self.controller.show_info_box(msg, "Info")
-                return
+                msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(project_name) + "_bk' ?"
+                result = self.controller.ask_question(msg, "Info")
+                if result:
+                    i = 0
+                    while available is False:
+                        for row in rows:
+                            if str(project_name) + "_bk" == str(row[0]) or \
+                               str(project_name) + "_bk_" + str(i) == str(row[0]):
+                                msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
+                                    project_name) + "_bk_" + str(i+1) + "' ?"
+                                result = self.controller.ask_question(msg, "Info")
+                                i = i + 1
+                            else:
+                                available = True
+                    self.rename_project_data_schema(str(project_name), str(project_name) + "_bk_" + str(i))
+                else:
+                    self.setArrowCursor()
+                    return
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
@@ -1494,10 +1511,13 @@ class UpdateSQL(ParentAction):
         self.set_info_project()
 
         
-    def rename_project_data_schema(self, schema):
+    def rename_project_data_schema(self, schema, create_project=None):
 
         self.setWaitCursor()
-        self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
+        if create_project is None:
+            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
+        else:
+            self.schema = str(create_project)
         sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
         status = self.controller.execute_sql(sql)
         if status:
