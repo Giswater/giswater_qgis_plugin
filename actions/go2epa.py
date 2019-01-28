@@ -44,9 +44,6 @@ class Go2Epa(ParentAction):
         # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
         #self.get_last_gsw_file()
 
-        # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
-        #self.get_last_gsw_file()
-
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
@@ -252,7 +249,7 @@ class Go2Epa(ParentAction):
         self.dlg_wsoptions.btn_accept.clicked.connect(
             partial(self.update_table, 'inp_options', self.dlg_wsoptions))
         self.dlg_wsoptions.btn_cancel.clicked.connect(self.dlg_wsoptions.close)
-        self.go2epa_options_get_data('inp_options',self.dlg_wsoptions)
+        self.go2epa_options_get_data('inp_options', self.dlg_wsoptions)
         self.dlg_wsoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_wsoptions.exec_()
 
