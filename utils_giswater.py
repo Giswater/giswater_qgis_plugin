@@ -1,19 +1,20 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3.1
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QDoubleValidator
+
 
 """ Module with utility functions to interact with dialog and its widgets """
 from qgis.gui import QgsDateTimeEdit
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
+from PyQt4.QtGui import QTableView, QDoubleValidator, QSpinBox, QTimeEdit
 from PyQt4.Qt import QDate, QDateTime
-from PyQt4.QtCore import QTime
+from PyQt4.QtCore import QTime, Qt
 
 from functools import partial
 import inspect
@@ -456,7 +457,9 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     if rows is None:
         return
     for row in rows:
-        elem = [row[0], row[1]]
+        elem = []
+        for x in range(0, len(row)):
+            elem.append(row[x])
         records.append(elem)
 
     combo.blockSignals(True)
@@ -484,3 +487,19 @@ def double_validator(widget, min=0, max=999999, decimals=3, notation=QDoubleVali
     validator = QDoubleValidator(min, max, decimals)
     validator.setNotation(notation)
     widget.setValidator(validator)
+
+
+def set_qtv_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
+    """ Set QTableView configurations """
+    widget.setSelectionBehavior(selection)
+    widget.setEditTriggers(edit_triggers)
+
+
+def get_col_index_by_col_name(qtable, column_name):
+    """ Return column index searching by column name """
+    column_index = False
+    for x in range(0, qtable.model().columnCount()):
+        if qtable.model().headerData(x, Qt.Horizontal) == column_name:
+            column_index = x
+            break
+    return column_index

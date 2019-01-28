@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3.1
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -22,6 +22,8 @@ import utils_giswater
 from giswater.actions.parent import ParentAction
 from giswater.actions.multiple_selection import MultipleSelection
 
+from actions.CustomModel import CustomSqlModel
+
 
 class ParentManage(ParentAction, object):
 
@@ -39,6 +41,7 @@ class ParentManage(ParentAction, object):
         self.lazy_widget = None
         self.workcat_id_end = None
         self.xyCoordinates_conected = False
+        self.remove_ids = True
 
     def reset_lists(self):
         """ Reset list of selected records """
@@ -770,9 +773,10 @@ class ParentManage(ParentAction, object):
         """ Slot function for signal 'canvas.selectionChanged' """
 
         self.disconnect_signal_selection_changed()
-
         field_id = geom_type + "_id"
-        self.ids = []
+
+        if self.remove_ids:
+            self.ids = []
 
         # Iterate over all layers of the group
         for layer in self.layers[self.geom_type]:
@@ -837,23 +841,34 @@ class ParentManage(ParentAction, object):
 
 
     def enable_feature_type(self, dialog):
-        combo = dialog.findChild(QComboBox, 'feature_type')
+        feature_type = dialog.findChild(QComboBox, 'feature_type')
+        assigned_to = dialog.findChild(QComboBox, 'cmb_assigned_to')
+        visit_class = dialog.findChild(QComboBox, 'cmb_visit_class')
         table = dialog.findChild(QTableView, 'tbl_relation')
-        if combo is not None and table is not None:
+        if feature_type is not None and table is not None:
             if len(self.ids) > 0:
-                combo.setEnabled(False)
+                feature_type.setEnabled(False)
+                if assigned_to is not None:
+                    assigned_to.setEnabled(False)
+                if assigned_to is not None:
+                    visit_class.setEnabled(False)
             else:
-                combo.setEnabled(True)
+                feature_type.setEnabled(True)
+                if assigned_to is not None:
+                    assigned_to.setEnabled(True)
+                if assigned_to is not None:
+                    visit_class.setEnabled(True)
 
-    def insert_feature(self, dialog, table_object, query=False):
+
+    def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
-
         self.disconnect_signal_selection_changed()
 
         # Clear list of ids
-        self.ids = []
+        if remove_ids:
+            self.ids = []
         field_id = self.geom_type + "_id"
 
         feature_id = utils_giswater.getWidgetText(dialog, "feature_id")
@@ -870,7 +885,8 @@ class ParentManage(ParentAction, object):
                 for feature in features:
                     # Append 'feature_id' into the list
                     selected_id = feature.attribute(field_id)
-                    self.ids.append(selected_id)
+                    if selected_id not in self.ids:
+                        self.ids.append(selected_id)
             if feature_id not in self.ids:
                 # If feature id doesn't exist in list -> add
                 self.ids.append(str(feature_id))
@@ -951,7 +967,8 @@ class ParentManage(ParentAction, object):
 
     def fill_table_object(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
-
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -977,7 +994,6 @@ class ParentManage(ParentAction, object):
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         if object_id != 'null':
             expr = field_object_id + "::text ILIKE '%" + str(object_id) + "%'"
-            self.controller.log_info(str(expr))
             # Refresh model with selected filter
             widget_table.model().setFilter(expr)
             widget_table.model().select()

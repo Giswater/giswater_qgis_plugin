@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3.1
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -8,18 +8,18 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
 from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap
-from PyQt4.QtGui import QStringListModel, QCompleter
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap, QCompleter
+from PyQt4.QtGui import QStringListModel, QAction
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
-import os
-import sys
-import webbrowser
-import ConfigParser
 from functools import partial
 
+import ConfigParser
 import ctypes
+import os
+import sys
 import utils_giswater
+import webbrowser
 
 
 class ParentAction(object):
@@ -801,3 +801,21 @@ class ParentAction(object):
         rect = QgsRectangle(float(x1)-margin, float(y1)-margin, float(x2)+margin, float(y2)+margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
+
+
+    def create_action(self, action_name, action_group, icon_num=None, text=None):
+        """ Creates a new action with selected parameters """
+
+        icon = None
+        icon_folder = self.plugin_dir + '/icons/'
+        icon_path = icon_folder + icon_num + '.png'
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+
+        if icon is None:
+            action = QAction(text, action_group)
+        else:
+            action = QAction(icon, text, action_group)
+        action.setObjectName(action_name)
+
+        return action
