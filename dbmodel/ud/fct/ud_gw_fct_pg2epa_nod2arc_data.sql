@@ -151,7 +151,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_data(text)
-  OWNER TO postgres;
 
   

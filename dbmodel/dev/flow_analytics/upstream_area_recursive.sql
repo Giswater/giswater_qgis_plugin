@@ -103,5 +103,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION gw_fct_upstream_recursive(character varying, integer)
-  OWNER TO postgres;

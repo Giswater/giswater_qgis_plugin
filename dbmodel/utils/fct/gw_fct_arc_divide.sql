@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2114
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(character varying);
+DROP FUNCTION IF EXISTS ws_sample.gw_fct_arc_divide(character varying);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(node_id_arg character varying)
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_arc_divide(node_id_arg character varying)
   RETURNS smallint AS
 $BODY$
 DECLARE
@@ -19,8 +19,8 @@ DECLARE
     line1        geometry;
     line2        geometry;
     rec_aux        record;
-    rec_aux1	"SCHEMA_NAME".v_edit_arc;
-    rec_aux2    "SCHEMA_NAME".v_edit_arc;
+    rec_aux1	"ws_sample".v_edit_arc;
+    rec_aux2    "ws_sample".v_edit_arc;
     intersect_loc    double precision;
     numArcs    integer;
     rec_doc record;
@@ -47,7 +47,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
 	
 	-- Get project type
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
@@ -102,13 +102,13 @@ BEGIN
 		SELECT * INTO rec_aux2 FROM v_edit_arc WHERE arc_id = arc_id_aux;
 
 		-- Update values of new arc_id (1)
-		rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
+		rec_aux1.arc_id := nextval('ws_sample.urn_id_seq');
 		rec_aux1.node_1 := null;
 		rec_aux1.node_2 := null;
 		rec_aux1.the_geom := line1;
 
 		-- Update values of new arc_id (2)
-		rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');	
+		rec_aux2.arc_id := nextval('ws_sample.urn_id_seq');	
 		rec_aux2.node_1 := null;
 		rec_aux2.node_2 := null;
 		rec_aux2.the_geom := line2;
@@ -214,8 +214,8 @@ BEGIN
 			PERFORM gw_fct_connect_to_network(array_agg_connec, 'CONNEC');
 			PERFORM gw_fct_connect_to_network(array_agg_gully, 'GULLY');
 					
-			
-		ELSIF (state_aux=1 AND state_node_arg=2 AND plan_arc_vdivision_dsbl_aux IS NOT TRUE)  OR (state_aux=2 AND state_node_arg=2)  THEN 
+	
+		ELSIF (state_aux=1 AND state_node_arg=2 AND plan_arc_vdivision_dsbl_aux IS NOT TRUE) THEN 
 			rec_aux1.state=2;
 			rec_aux1.state_type=(SELECT value::smallint FROM config_param_user WHERE "parameter"='statetype_plan_vdefault' AND cur_user=current_user);
 			
@@ -244,7 +244,85 @@ BEGIN
 			(SELECT value::smallint FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user), arc_id_aux, 0, FALSE);
 	
 		ELSIF (state_aux=1 AND state_node_arg=2) AND plan_arc_vdivision_dsbl_aux IS TRUE THEN
-			PERFORM audit_function(1054,2114);			
+			PERFORM audit_function(1054,2114);
+				
+		ELSIF (state_aux=2 AND state_node_arg=2) THEN 
+		
+			-- Insert new records into arc table
+			-- downgrade temporary the state_topocontrol to prevent conflicts	
+			UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
+			INSERT INTO v_edit_arc SELECT rec_aux1.*;
+			INSERT INTO v_edit_arc SELECT rec_aux2.*;
+			-- force trg topocontrol to prevent conflicts
+			update arc set the_geom=the_geom where arc_id=rec_aux1.arc_id;
+			update arc set the_geom=the_geom where arc_id=rec_aux2.arc_id;
+			-- restore the state_topocontrol variable
+			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
+			
+			--Copy addfields from old arc to new arcs	
+			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
+			SELECT 
+			rec_aux2.arc_id,
+			parameter_id,
+			value_param
+			FROM man_addfields_value WHERE feature_id=arc_id_aux;
+			
+			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
+			SELECT 
+			rec_aux1.arc_id,
+			parameter_id,
+			value_param
+			FROM man_addfields_value WHERE feature_id=arc_id_aux;
+			
+			-- update arc_id of disconnected nodes linked to old arc
+			FOR rec_node IN SELECT node_id, the_geom FROM node WHERE arc_id=arc_id_aux
+			LOOP
+				UPDATE node SET arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(rec_node.the_geom, 
+				v_edit_arc.the_geom,0.001) AND arc_id != arc_id_aux LIMIT 1) 
+				WHERE node_id=rec_node.node_id;
+			END LOOP;
+						
+			-- Insert data into traceability table
+			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 
+			VALUES ('DIVIDE PLANIFIED JARC',  arc_id_aux, rec_aux1.arc_id, rec_aux2.arc_id, node_id_arg,CURRENT_TIMESTAMP,CURRENT_USER);
+		
+			-- Update elements from old arc to new arcs
+			FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=arc_id_aux  LOOP
+				INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
+				INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
+				DELETE FROM element_x_arc WHERE arc_id=arc_id_aux;
+			END LOOP;
+		
+			-- Update documents from old arc to the new arcs
+			FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=arc_id_aux  LOOP
+				INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
+				INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
+				DELETE FROM doc_x_arc WHERE arc_id=arc_id_aux;
+
+			END LOOP;
+		
+			-- Update visits from old arc to the new arcs
+			FOR rec_aux IN SELECT * FROM om_visit_x_arc WHERE arc_id=arc_id_aux  LOOP
+				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux1.arc_id);
+				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux2.arc_id);
+				DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
+
+			END LOOP;
+
+			-- Update arc_id on node
+			FOR rec_aux IN SELECT * FROM node WHERE arc_id=arc_id_aux  LOOP
+
+				-- find the new arc id
+				SELECT arc_id INTO v_newarc FROM v_edit_arc AS a 
+				WHERE ST_DWithin(rec_aux.the_geom, a.the_geom, 0.5) AND arc_id !=arc_id_aux ORDER BY ST_Distance(rec_aux.the_geom, a.the_geom) LIMIT 1;
+
+				-- update values
+				UPDATE node SET arc_id=v_newarc WHERE node_id=rec_aux.node_id;
+					
+			END LOOP;
+			
+			-- delete old arc
+			DELETE FROM arc WHERE arc_id=arc_id_aux;		
 
 		ELSIF (state_aux=2 AND state_node_arg=1) THEN
 			RETURN return_aux;		

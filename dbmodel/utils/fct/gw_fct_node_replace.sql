@@ -201,5 +201,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_node_replace(character varying, character varying, date, boolean)
-  OWNER TO postgres;

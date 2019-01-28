@@ -43,29 +43,9 @@ BEGIN
 		UPDATE rpt_inp_node SET demand=v_demand::numeric(12,6) WHERE result_id=result_id_var AND node_id=v_rec.node_id;
 
 	END LOOP;
-
-
-RETURN 1;
-
-ALTER TABLE SCHEMA_NAME.v_inp_demand
-  OWNER TO postgres;
-
-
-
-
-
-
-
-
-
-
-
-
-	
 	
 RETURN 1;
-	
-	
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

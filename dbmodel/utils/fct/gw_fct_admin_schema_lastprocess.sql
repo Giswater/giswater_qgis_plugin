@@ -109,5 +109,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_admin_schema_lastprocess(json)
-  OWNER TO postgres;
