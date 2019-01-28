@@ -1514,7 +1514,7 @@ class UpdateSQL(ParentAction):
     def rename_project_data_schema(self, schema, create_project=None):
 
         self.setWaitCursor()
-        if create_project is None:
+        if create_project is None or create_project is False:
             self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
         else:
             self.schema = str(create_project)
