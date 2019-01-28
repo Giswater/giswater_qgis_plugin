@@ -5,7 +5,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
+import os
 
 from PyQt4.QtCore import QDate, Qt, QPyNullVariant
 from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QComboBox, QAction, QAbstractItemView
@@ -14,10 +14,10 @@ from PyQt4.QtGui import QCheckBox, QHBoxLayout, QStandardItem, QStandardItemMode
 
 from functools import partial
 
+from PyQt4.QtGui import QToolButton
 from PyQt4.QtSql import QSqlTableModel
 
 import utils_giswater
-
 
 from giswater.actions.parent_manage import ParentManage
 from giswater.ui_manager import AddLot
@@ -54,13 +54,24 @@ class AddNewLot(ParentManage):
 
         self.dlg_lot = AddLot()
         self.load_settings(self.dlg_lot)
+        self.dropdown = self.dlg_lot.findChild(QToolButton, 'action_selector')
+        self.dropdown.setPopupMode(QToolButton.MenuButtonPopup)
+
+
+        # Create action and put into QToolButton
+        action_by_expression = self.create_action('action_by_expression', self.dlg_lot.action_selector, '204', 'Select by expression')
+        action_by_polygon = self.create_action('action_by_polygon', self.dlg_lot.action_selector, '205', 'Select by polygon')
+        self.dropdown.addAction(action_by_expression)
+        self.dropdown.addAction(action_by_polygon)
+        self.dropdown.setDefaultAction(action_by_expression)
+
+
         self.dlg_lot.open()
 
         # Set icons
         self.set_icon(self.dlg_lot.btn_feature_insert, "111")
         self.set_icon(self.dlg_lot.btn_feature_delete, "112")
         self.set_icon(self.dlg_lot.btn_feature_snapping, "137")
-        self.set_icon(self.dlg_lot.btn_expr_filter, "204")
 
         self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
         self.id_val = self.dlg_lot.findChild(QLineEdit, "txt_idval")
@@ -87,8 +98,11 @@ class AddNewLot(ParentManage):
         self.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
         self.clear_selection()
 
+        # Set actions signals
+        action_by_expression.triggered.connect(partial(self.activate_selection, self.dlg_lot, action_by_expression, 'mActionSelectByExpression'))
+        action_by_polygon.triggered.connect(partial(self.activate_selection, self.dlg_lot, action_by_polygon, 'mActionSelectPolygon'))
+
         # Set widgets signals
-        self.dlg_lot.btn_expr_filter.clicked.connect(partial(self.open_expression, self.dlg_lot))
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_row))
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer))
@@ -139,11 +153,6 @@ class AddNewLot(ParentManage):
 
     def test(self):
         self.controller.log_info(str("HOLAs"))
-
-
-
-
-
 
 
 
@@ -198,6 +207,7 @@ class AddNewLot(ParentManage):
         if users:
             utils_giswater.set_item_data(self.dlg_lot.cmb_assigned_to, users, 1)
 
+        # TODO fill combo with correct table
         # Fill ComboBox cmb_status
         sql = ("SELECT id, idval"
                " FROM " + self.schema_name + ".om_visit_class "
@@ -379,12 +389,13 @@ class AddNewLot(ParentManage):
         return id_list
 
 
-    def open_expression(self, dialog):
+    def activate_selection(self, dialog, action, action_name):
         self.set_active_layer()
+        self.dropdown.setDefaultAction(action)
         self.disconnect_signal_selection_changed()
-        self.iface.mainWindow().findChild(QAction, 'mActionSelectByExpression').triggered.connect(
+        self.iface.mainWindow().findChild(QAction, action_name).triggered.connect(
             partial(self.selection_changed_by_expr, dialog, self.layer_lot, self.geom_type))
-        self.iface.mainWindow().findChild(QAction, 'mActionSelectByExpression').trigger()
+        self.iface.mainWindow().findChild(QAction,action_name).trigger()
 
 
     def selection_changed_by_expr(self, dialog, layer, geom_type):
@@ -707,12 +718,9 @@ class AddNewLot(ParentManage):
 
         index = selected_list[0]
         row = index.row()
-        column_index = 0
         column_index = utils_giswater.get_col_index_by_col_name(self.tbl_relation, feature_type+'_id')
         feature_id = index.sibling(row, column_index).data()
         expr_filter = '"{}_id" IN ({})'.format(self.geom_type, "'"+feature_id+"'")
-        self.controller.log_info(str(expr_filter))
-        self.controller.log_info(str(feature_id))
 
         # Check expression
         (is_valid, expr) = self.check_expression(expr_filter)

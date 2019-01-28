@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>499</width>
+    <width>496</width>
     <height>572</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="LotTab">
          <attribute name="title">
@@ -619,31 +619,15 @@
              <widget class="QLineEdit" name="feature_id"/>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_expr_filter">
-              <property name="minimumSize">
-               <size>
-                <width>28</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>28</width>
-                <height>24</height>
-               </size>
-              </property>
+             <widget class="QToolButton" name="action_selector">
               <property name="text">
-               <string/>
+               <string>...</string>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/204.png</normaloff>../icons/204.png</iconset>
+              <property name="popupMode">
+               <enum>QToolButton::MenuButtonPopup</enum>
               </property>
-              <property name="iconSize">
-               <size>
-                <width>22</width>
-                <height>22</height>
-               </size>
+              <property name="autoRaise">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -832,6 +816,11 @@
     </layout>
    </item>
   </layout>
+  <action name="actionT">
+   <property name="text">
+    <string>t</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>tab_widget</tabstop>
