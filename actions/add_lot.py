@@ -582,6 +582,15 @@ class AddNewLot(ParentManage):
         object_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.txt_filter)
         visit_start = self.dlg_lot.date_event_from.date()
         visit_end = self.dlg_lot.date_event_to.date()
+        visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
+        sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
+               " WHERE visitclass_id ='" + str(visit_class_id) + "'")
+        row = self.controller.get_row(sql, log_sql=False)
+
+        table_name = row['tablename']
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
         # Create interval dates
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
@@ -597,13 +606,8 @@ class AddNewLot(ParentManage):
             expr_filter += "'" + str(self.ids[i]) + "', "
         expr_filter = expr_filter[:-2] + ")"
 
-
-        visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
-        sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
-               " WHERE visitclass_id ='" + str(visit_class_id) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
         model = QSqlTableModel()
-        model.setTable(row['tablename'])
+        model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setFilter(expr_filter)
         model.sort(0, 1)
