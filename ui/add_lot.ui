@@ -20,7 +20,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="LotTab">
          <attribute name="title">
@@ -738,6 +738,13 @@
               </item>
               <item>
                <widget class="QDateEdit" name="date_event_to">
+                <property name="date">
+                 <date>
+                  <year>3000</year>
+                  <month>1</month>
+                  <day>1</day>
+                 </date>
+                </property>
                 <property name="calendarPopup">
                  <bool>true</bool>
                 </property>

@@ -582,6 +582,13 @@ class AddNewLot(ParentManage):
         object_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.txt_filter)
         visit_start = self.dlg_lot.date_event_from.date()
         visit_end = self.dlg_lot.date_event_to.date()
+        # Get selected dates
+        date_from = visit_start.toString('yyyyMMdd 00:00:00')
+        date_to = visit_end.toString('yyyyMMdd 23:59:59')
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)
+            return
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
