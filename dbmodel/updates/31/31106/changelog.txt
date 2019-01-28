@@ -44,3 +44,4 @@ Add check constraint on fields epa_table and man_table in *_type tables.
 
 31106-i18n
 ----------
+
