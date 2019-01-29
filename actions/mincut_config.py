@@ -149,6 +149,8 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit = Mincut_edit()
         self.load_settings(self.dlg_min_edit)
         self.set_dates()
+        self.dlg_min_edit.date_from.setEnabled(False)
+        self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
