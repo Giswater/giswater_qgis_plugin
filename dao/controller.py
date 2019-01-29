@@ -130,9 +130,9 @@ class DaoController():
         self.log_codes = {}
         
         self.layer_source, not_version = self.get_layer_source_from_credentials()
-
-        if self.layer_source is None:
-            return False
+        if self.layer_source['db'] is None or self.layer_source['host'] is None or self.layer_source['user'] is None \
+                or self.layer_source['password'] is None or self.layer_source['port'] is None:
+            return False, not_version
             
         # Connect to database
         self.logged = self.connect_to_database(self.layer_source['host'], self.layer_source['port'], 
@@ -165,7 +165,7 @@ class DaoController():
                     logged = self.connect_to_database(credentials['host'], credentials['port'],
                                                       credentials['db'], credentials['user'], credentials['password'])
                 else:
-                    return None
+                    return None, not_version
 
             # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
             QgsCredentials.instance().put(conn_info, credentials['user'], credentials['password'])
