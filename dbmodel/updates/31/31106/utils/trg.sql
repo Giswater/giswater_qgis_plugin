@@ -50,7 +50,10 @@ CREATE TRIGGER gw_trg_om_visit_singlevent
   FOR EACH ROW
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('node');
   
-  
+
+DROP TRIGGER IF EXISTS gw_trg_visit_user_manager on SCHEMA_NAME.ve_visit_user_manager;
+CREATE TRIGGER gw_trg_visit_user_manager INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.ve_visit_user_manager
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_user_manager();
 
 -- REVISAR
 DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_node_control ON node;
@@ -64,3 +67,5 @@ FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('A
 DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_connec_control ON connec;
 CREATE TRIGGER gw_trg_man_addfields_value_connec_control AFTER UPDATE OF connec_id OR DELETE ON SCHEMA_NAME.connec
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('CONNEC');
+
+

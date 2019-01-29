@@ -259,12 +259,12 @@ CREATE OR REPLACE VIEW ve_visit_singlevent_x_node AS
  
 CREATE OR REPLACE VIEW ve_visit_user_manager AS 
  SELECT a.id AS user_id,
-    d.idval AS team_id,
-    e.idval AS vehicle_id,
+    d.id AS team_id,
+    e.id AS vehicle_id,
     now()::date AS date
    FROM cat_users a
-     LEFT JOIN om_visit_team_x_user b ON b.user_id = a.id
+     LEFT JOIN om_visit_team_x_user b ON b.user_id::text = a.id::text
      LEFT JOIN om_visit_user_x_vehicle c ON c.user_id::text = b.user_id::text
      LEFT JOIN cat_team d ON b.team_id = d.id
-     LEFT JOIN cat_vehicle e ON e.id = c.vehicle_id 
-     WHERE b.user_id::name = "current_user"();
+     LEFT JOIN cat_vehicle e ON e.id = c.vehicle_id
+  WHERE b.user_id::name = "current_user"();
