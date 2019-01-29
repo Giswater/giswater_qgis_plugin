@@ -11,7 +11,7 @@
 
 31106-utils-other
 -----------------
-
+New function trigger (2644) gw_trg_visit_user_manager
 
 New api functions 
 -----------------
