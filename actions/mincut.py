@@ -501,6 +501,8 @@ class MincutParent(ParentAction, MultipleSelection):
                             views = 'v_anl_arc, v_anl_node, v_anl_connec'
                             message = "To see the conflicts load the views"
                             self.controller.show_info_box(message, "See layers", parameter=views)
+                            self.dlg_mincut.closeMainWin = True
+                            self.dlg_mincut.mincutCanceled = False
                             self.dlg_mincut.close()
                 else:
                     self.dlg_mincut.closeMainWin = True
