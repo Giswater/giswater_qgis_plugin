@@ -7,9 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2114
 
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_arc_divide(character varying);
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_arc_divide(node_id_arg character varying)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(node_id_arg character varying)
   RETURNS smallint AS
 $BODY$
 DECLARE
@@ -19,8 +18,8 @@ DECLARE
     line1        geometry;
     line2        geometry;
     rec_aux        record;
-    rec_aux1	"ws_sample".v_edit_arc;
-    rec_aux2    "ws_sample".v_edit_arc;
+    rec_aux1	"SCHEMA_NAME".v_edit_arc;
+    rec_aux2    "SCHEMA_NAME".v_edit_arc;
     intersect_loc    double precision;
     numArcs    integer;
     rec_doc record;
@@ -47,7 +46,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 	
 	-- Get project type
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
@@ -102,13 +101,13 @@ BEGIN
 		SELECT * INTO rec_aux2 FROM v_edit_arc WHERE arc_id = arc_id_aux;
 
 		-- Update values of new arc_id (1)
-		rec_aux1.arc_id := nextval('ws_sample.urn_id_seq');
+		rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
 		rec_aux1.node_1 := null;
 		rec_aux1.node_2 := null;
 		rec_aux1.the_geom := line1;
 
 		-- Update values of new arc_id (2)
-		rec_aux2.arc_id := nextval('ws_sample.urn_id_seq');	
+		rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');	
 		rec_aux2.node_1 := null;
 		rec_aux2.node_2 := null;
 		rec_aux2.the_geom := line2;
