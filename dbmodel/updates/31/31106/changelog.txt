@@ -33,6 +33,8 @@ v_inp_pump
 Add check constraint on fields epa_table and man_table in *_type tables.
 ALTER TABLE rpt_inp_arc ADD COLUMN flw_code text;
 Bug fix on go2epa pump additional function;
+Enhance pg2epa velocity using existing network geometry
+Enhance pg2epa velocity using only mandatory nodarc
 
 
 
