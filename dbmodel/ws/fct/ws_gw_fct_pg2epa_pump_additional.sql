@@ -6,9 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2318
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_pump_additional(text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_pump_additional(result_id_var text)  RETURNS integer AS
-
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_pump_additional(result_id_var text)
+  RETURNS integer AS
 $BODY$
 DECLARE
     
@@ -29,6 +28,7 @@ xp2 float;
 yp2 float;
 odd_var float;
 pump_order float;
+v_old_arc_id varchar(16);
 
 
 BEGIN
@@ -51,7 +51,8 @@ BEGIN
 	FOR pump_rec IN SELECT * FROM inp_pump_additional WHERE node_id=node_id_aux
 	LOOP
 
-		-- Id creation from pattern arc 
+		-- Id creation from pattern arc
+		v_old_arc_id = arc_rec.arc_id;
 		record_new_arc.arc_id=concat(arc_rec.arc_id,pump_rec.order_id);
 
 		-- Right or left hand
@@ -92,9 +93,9 @@ BEGIN
 		record_new_arc.the_geom=ST_makeline(ARRAY[ST_startpoint(arc_rec.the_geom), p2_geom, p1_geom, ST_endpoint(arc_rec.the_geom)]);
 
 		-- Inserting into rpt_inp_arc
-		INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, epa_type, sector_id, arccat_id, state, the_geom, expl_id) 
-		VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, record_new_arc.epa_type, record_new_arc.sector_id, 
-		record_new_arc.arccat_id, record_new_arc.state, record_new_arc.the_geom, record_new_arc.expl_id);
+		INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, epa_type, sector_id, arccat_id, state, the_geom, expl_id, flw_code) 
+		VALUES (result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.epa_type, record_new_arc.sector_id, 
+		record_new_arc.arccat_id, record_new_arc.state, record_new_arc.the_geom, record_new_arc.expl_id, v_old_arc_id);
 				
 	END LOOP;
     
@@ -108,5 +109,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
   

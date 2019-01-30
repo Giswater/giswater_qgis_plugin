@@ -276,7 +276,7 @@ FROM inp_selector_result, rpt_inp_node
 
   
    
-   
+-- updated on 3.1.106
 DROP VIEW IF EXISTS "v_inp_pump" CASCADE;
 CREATE VIEW "v_inp_pump" AS 
 SELECT 

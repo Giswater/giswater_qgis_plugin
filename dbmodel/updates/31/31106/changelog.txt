@@ -23,11 +23,14 @@ New api functions
 
 31106-ws- existing views
 -------------------------------------------
+v_inp_pump
 
 
 31106-ws-other
 --------------
 Add check constraint on fields epa_table and man_table in *_type tables.
+ALTER TABLE rpt_inp_arc ADD COLUMN flw_code text;
+
 
 
 ***********  UD  ************
