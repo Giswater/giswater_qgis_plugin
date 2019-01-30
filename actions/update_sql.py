@@ -39,13 +39,16 @@ class UpdateSQL(ParentAction):
     def init_sql(self, connection_status=False):
         """ Button 100: Execute SQL. Info show info """
         
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+
         # Get last database connection from controller
         self.last_connection = self.get_last_connection()
 
         # Get database connection user and role
         self.username = self.get_user_connection(self.last_connection)
 
-        if self.project_type is not None:
+        if self.project_type is not None and len(layers) != 0:
             self.info_show_info()
             return
             
