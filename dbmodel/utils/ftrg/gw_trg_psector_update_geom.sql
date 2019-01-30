@@ -34,7 +34,7 @@ BEGIN
 
 	SELECT epsg INTO epsg_val FROM version LIMIT 1;
 	
-	IF TG_OP='INSERT' OR TG_OP='UPDATE' THEN
+	IF TG_OP='INSERT' OR TG_OP='UPDATE' AND NEW.doable IS TRUE THEN
 
 		-- Looking for new feature and calculating the aggregated geom
 		IF psector_type_aux='plan' THEN
@@ -113,7 +113,9 @@ BEGIN
 
 		RETURN NEW;
 		
-	ELSE 
+
+	ELSIF TG_OP='DELETE' AND OLD.doable IS TRUE THEN
+
 
 		-- Looking for new feature and calculating the aggregated geom
 		IF psector_type_aux='plan' THEN
@@ -191,6 +193,13 @@ BEGIN
 		END IF;
 
 		RETURN OLD;
+
+	ELSIF TG_OP='INSERT' OR TG_OP='UPDATE' THEN
+		RETURN NEW;
+		
+	ELSIF TG_OP='DELETE' THEN
+		RETURN OLD;
+		
 	END IF;
 
 END;
