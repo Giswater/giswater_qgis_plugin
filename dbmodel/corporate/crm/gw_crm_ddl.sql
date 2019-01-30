@@ -73,7 +73,7 @@ CREATE TABLE hydro_cat_type(
 
 CREATE TABLE hydro_cat_category(
 "id" integer PRIMARY KEY,
-"code" character varying(16) NOT NULL,
+"code" character varying(30) NOT NULL,
 "observ" character varying(100)
 );
 
@@ -87,7 +87,7 @@ CREATE TABLE hydro_val_state(
 
 CREATE TABLE hydro_cat_period(
 "id" integer PRIMARY KEY,
-"code" character varying(16) NOT NULL,
+"code" character varying(30) NOT NULL,
 "observ" character varying(100),
 "start_date" date,
 "end_date" date);
