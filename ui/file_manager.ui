@@ -106,7 +106,7 @@
           <item>
            <widget class="QCheckBox" name="chk_only_check">
             <property name="text">
-             <string>only check</string>
+             <string>Use previous network geometry</string>
             </property>
            </widget>
           </item>
