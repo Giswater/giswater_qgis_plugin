@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+import subprocess
 from PyQt4.QtCore import QTime, QDate, Qt
 from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox, QComboBox
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
@@ -44,10 +45,11 @@ class Go2Epa(ParentAction):
         # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
         #self.get_last_gsw_file()
 
+
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
-        self.dlg_go2epa.setFixedSize(620, 300)        
+        #self.dlg_go2epa.setFixedSize(620, 300)
 
         # TODO habilitar todos estos widgets cuando Edgar acabe el giswater_java en python
         """
@@ -72,7 +74,6 @@ class Go2Epa(ParentAction):
         if self.project_type == 'ws':
             self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
             self.dlg_go2epa.btn_options.clicked.connect(self.ws_options)
-            self.dlg_go2epa.btn_times.clicked.connect(self.ws_times)
             tableleft = "cat_dscenario"
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
@@ -176,6 +177,7 @@ class Go2Epa(ParentAction):
         self.dlg_wsoptions.diffusivity.setValidator(QDoubleValidator())
         self.dlg_wsoptions.tolerance.setValidator(QDoubleValidator())
         self.dlg_wsoptions.demand_multiplier.setValidator(QDoubleValidator())
+        self.dlg_wsoptions.duration.setValidator(QIntValidator())
 
         self.dlg_wsoptions.rtc_enabled.setChecked(True)
 
@@ -220,6 +222,10 @@ class Go2Epa(ParentAction):
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_wsoptions.rtc_coefficient, rows)
 
+        sql = "SELECT id, id FROM " + self.schema_name + ".inp_value_times ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(self.dlg_wsoptions.statistic, rows)
+
         # TODO
         if self.dlg_wsoptions.valve_mode.currentText() != "MINCUT RESULTS":
             self.dlg_wsoptions.valve_mode_mincut_result.setEnabled(False)
@@ -238,7 +244,10 @@ class Go2Epa(ParentAction):
         if utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled):
             self.dlg_wsoptions.rtc_period_id.setEnabled(True)
             self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
-            
+
+
+
+
         self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(
             partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.unbalanced, self.dlg_wsoptions.unbalanced_n, "STOP"))
         self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(
@@ -249,28 +258,14 @@ class Go2Epa(ParentAction):
             partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, ("EPA TABLES", "INVENTORY VALUES")))
         self.dlg_wsoptions.rtc_enabled.stateChanged.connect(self.enable_per_coef)
 
-        self.dlg_wsoptions.btn_accept.clicked.connect(
-            partial(self.update_table, 'inp_options', self.dlg_wsoptions))
+        self.dlg_wsoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', self.dlg_wsoptions))
+        self.dlg_wsoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_times', self.dlg_wsoptions))
         self.dlg_wsoptions.btn_cancel.clicked.connect(self.dlg_wsoptions.close)
         self.go2epa_options_get_data('inp_options', self.dlg_wsoptions)
+        self.go2epa_options_get_data('inp_times', self.dlg_wsoptions)
         self.dlg_wsoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_wsoptions.exec_()
 
-
-    def ws_times(self):
-        """ Open dialog ws_times.ui"""
-        
-        dlg_wstimes = WStimes()
-        self.load_settings(dlg_wstimes)
-        dlg_wstimes.duration.setValidator(QIntValidator())
-        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_times ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(dlg_wstimes.statistic, rows, 1)
-        dlg_wstimes.btn_accept.clicked.connect(partial(self.update_table, 'inp_times', dlg_wstimes))
-        dlg_wstimes.btn_cancel.clicked.connect(dlg_wstimes.close)
-        self.go2epa_options_get_data('inp_times', dlg_wstimes)
-        dlg_wstimes.setWindowFlags(Qt.WindowStaysOnTopHint)
-        dlg_wstimes.exec_()
 
 
     def enable_per_coef(self):
