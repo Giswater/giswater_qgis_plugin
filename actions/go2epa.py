@@ -73,11 +73,6 @@ class Go2Epa(ParentAction):
             self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
             self.dlg_go2epa.btn_options.clicked.connect(self.ws_options)
             self.dlg_go2epa.btn_times.clicked.connect(self.ws_times)
-            tableleft = "sector"
-            tableright = "inp_selector_sector"
-            field_id_left = "sector_id"
-            field_id_right = "sector_id"
-            self.dlg_go2epa.btn_sector_selection.clicked.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
             tableleft = "cat_dscenario"
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
@@ -99,7 +94,15 @@ class Go2Epa(ParentAction):
         # Open dialog
         self.open_dialog(self.dlg_go2epa, dlg_name='file_manager', maximize_button=False)
 
-    
+    def go2epa_sector_selector(self):
+
+            tableleft = "sector"
+            tableright = "inp_selector_sector"
+            field_id_left = "sector_id"
+            field_id_right = "sector_id"
+            self.sector_selection(tableleft, tableright, field_id_left, field_id_right)
+
+
     def get_last_gsw_file(self, show_warning=True):
         """ Get last GSW file used by Giswater """
         

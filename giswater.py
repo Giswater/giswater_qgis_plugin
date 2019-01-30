@@ -148,7 +148,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 25, 29):
+            elif int(index_action) in (23, 25, 29, 196):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
@@ -246,7 +246,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 86, 64, 65, 66, 67, 68, 81, 82, 83, 84, 98, 99):
+                                 50, 86, 64, 65, 66, 67, 68, 81, 82, 83, 84, 98, 99, 196):
 
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
@@ -323,7 +323,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)   
         
         toolbar_id = "epa"
-        list_actions = ['23', '25', '29']
+        list_actions = ['196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)    
         
         toolbar_id = "master"
