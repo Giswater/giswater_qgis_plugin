@@ -7,15 +7,14 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2314
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa(character varying, boolean );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, only_check_bool boolean)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean)  RETURNS integer AS $BODY$
 DECLARE
 
--- only_check_bool NOT USED VARIABLE
 
 rec_options 	record;
-valve_rec		record;
+valve_rec	record;
 check_count_aux integer;
+v_mandatory_nodarc boolean = false;
       
 BEGIN
 
@@ -25,21 +24,25 @@ BEGIN
 	SELECT * INTO rec_options FROM inp_options;
 
 	RAISE NOTICE 'Starting pg2epa process.';
-	
-	-- Fill inprpt tables
-	PERFORM gw_fct_pg2epa_fill_data(result_id_var);
 
+	IF p_use_networkgeom IS FALSE THEN
+		-- Fill inprpt tables
+		PERFORM gw_fct_pg2epa_fill_data(result_id_var);
+	END IF;
+	
 	-- Update demand values filtering by dscenario
 	PERFORM gw_fct_pg2epa_dscenario(result_id_var);
-	
-	-- Calling for gw_fct_pg2epa_nod2arc function
-	PERFORM gw_fct_pg2epa_nod2arc(result_id_var);
 
-	-- Calling for gw_fct_pg2epa_pump_additional function;
-	PERFORM gw_fct_pg2epa_pump_additional(result_id_var);
+	IF p_use_networkgeom IS FALSE THEN
+		-- Calling for gw_fct_pg2epa_nod2arc function
+		PERFORM gw_fct_pg2epa_nod2arc(result_id_var, v_mandatory_nodarc);
+			
+		-- Calling for gw_fct_pg2epa_pump_additional function;
+		PERFORM gw_fct_pg2epa_pump_additional(result_id_var);
 
-	-- Check data quality
-	SELECT gw_fct_pg2epa_check_data(result_id_var) INTO check_count_aux;
+		-- Check data quality
+		SELECT gw_fct_pg2epa_check_data(result_id_var) INTO check_count_aux;	
+	END IF;
 
 	-- Real values of demand if rtc is enabled;
 	IF rec_options.rtc_enabled IS TRUE THEN
@@ -47,12 +50,9 @@ BEGIN
 	END IF;
 
 	-- Calling for modify the valve status
-	PERFORM gw_fct_pg2epa_valve_status(result_id_var);
-		
-	
+	PERFORM gw_fct_pg2epa_valve_status(result_id_var, v_mandatory_nodarc);
 
 RETURN check_count_aux;
-	
 	
 END;
 $BODY$

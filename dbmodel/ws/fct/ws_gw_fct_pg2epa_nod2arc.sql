@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2316
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer AS $BODY$
 DECLARE
     
    record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
@@ -27,6 +27,7 @@ DECLARE
 	rec_options record;
 	error_var text;
 	rec record;
+	v_query_text text;
 	
     
 
@@ -43,15 +44,24 @@ BEGIN
 --  Move valves to arc
     RAISE NOTICE 'Start loop.....';
 
-    FOR node_id_aux IN (
+    IF p_only_mandatory_nodarc THEN
+	v_query_text = 'SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
+			JOIN inp_valve ON rpt_inp_node.node_id=inp_valve.node_id WHERE result_id=result_id_var
+				UNION 
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
+			JOIN inp_pump ON rpt_inp_node.node_id=inp_pump.node_id WHERE result_id=result_id_var';
+    ELSE
+	v_query_text = 	'SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_valve ON rpt_inp_node.node_id=inp_valve.node_id WHERE result_id=result_id_var
 				UNION 
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_shortpipe ON rpt_inp_node.node_id=inp_shortpipe.node_id WHERE result_id=result_id_var
 				UNION 
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
-			JOIN inp_pump ON rpt_inp_node.node_id=inp_pump.node_id WHERE result_id=result_id_var)
+			JOIN inp_pump ON rpt_inp_node.node_id=inp_pump.node_id WHERE result_id=result_id_var';
+    END IF;
+
+    FOR node_id_aux IN EXECUTE v_query_text
     LOOP
 	
 --        RAISE NOTICE 'Process valve: %', node_id_aux;
