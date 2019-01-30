@@ -152,6 +152,7 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         self.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
+        self.set_icon(self.dlg_min_edit.btn_show, "191")
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
@@ -173,18 +174,15 @@ class MincutConfig(ParentAction):
         self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
         self.dlg_min_edit.date_from.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
         self.dlg_min_edit.date_to.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
+        self.dlg_min_edit.cmb_expl.currentIndexChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
+        self.dlg_min_edit.btn_show.clicked.connect(partial(self.show_selection))
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "v_ui_anl_mincut_result_cat", "id"))
         self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(self.mincut_selector))
 
-        # Fill ComboBox state
-        sql = ("SELECT name"
-               " FROM " + self.schema_name + ".anl_mincut_cat_state"
-               " ORDER BY name")
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
+        self.populate_combos()
         self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
 
         # Set a model with selected filter. Attach that model to selected table
@@ -196,6 +194,40 @@ class MincutConfig(ParentAction):
         # Open the dialog
         self.dlg_min_edit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_min_edit.show()
+
+
+    def show_selection(self):
+        selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;")
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = self.tbl_mincut_edit.model().record(row).value("id")
+            sql += ("\nINSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) "
+                    "  VALUES(current_user, " + str(id_) + ");")
+        status = self.controller.execute_sql(sql)
+        if not status:
+            message = "Error updating table"
+            self.controller.show_warning(message, parameter='anl_mincut_result_selector')
+        self.mincut.set_visible_mincut_layers(True)
+
+
+    def populate_combos(self):
+        # Fill ComboBox state
+        sql = ("SELECT name"
+               " FROM " + self.schema_name + ".anl_mincut_cat_state"
+               " ORDER BY name")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_min_edit, "state_edit", rows)
+
+        sql = ("SELECT expl_id, name FROM " + self.schema_name + ".exploitation ORDER BY name")
+        rows = [('', '')]
+        rows.extend(self.controller.get_rows(sql, log_sql=False))
+        utils_giswater.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
 
 
     def mincut_selector(self):
@@ -244,6 +276,7 @@ class MincutConfig(ParentAction):
         expr = ""
         id_ = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
         state = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.state_edit, False, False)
+        expl = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
         dates_filter = ""
         if state == '':
             self.dlg_min_edit.date_from.setEnabled(False)
@@ -283,8 +316,9 @@ class MincutConfig(ParentAction):
         expr += " " + dates_filter + ""
         if state != '':
             expr += " AND state::text ILIKE '%" + state + "%'"
+        expr += " AND exp_name::text ILIKE '%" + expl + "%'"
+        
         # Refresh model with selected filter
-
         qtable.model().setFilter(expr)
         qtable.model().select()
 
