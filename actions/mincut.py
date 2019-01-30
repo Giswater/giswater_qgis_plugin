@@ -104,7 +104,7 @@ class MincutParent(ParentAction, MultipleSelection):
         utils_giswater.double_validator(self.distance, 0, 9999999, 3)
         utils_giswater.double_validator(self.depth, 0, 9999999, 3)
 
-        # Manage adress
+        # Manage address
         self.adress_init_config(self.dlg_mincut)
 
         # Set signals
@@ -276,12 +276,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def real_end(self):
 
-        # Set current date and time
-        date_end = QDate.currentDate()
-        time_end = QTime.currentTime()
-        self.dlg_mincut.cbx_date_end.setDate(date_end)
-        self.dlg_mincut.cbx_hours_end.setTime(time_end)
-
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
         self.load_settings(self.dlg_fin)
@@ -316,6 +310,8 @@ class MincutParent(ParentAction, MultipleSelection):
         time_start = self.dlg_mincut.cbx_hours_start.time()
         self.dlg_fin.cbx_date_start_fin.setDate(date_start)
         self.dlg_fin.cbx_hours_start_fin.setTime(time_start)
+        date_end = self.dlg_mincut.cbx_date_end.date()
+        time_end = self.dlg_mincut.cbx_hours_end.time()
         self.dlg_fin.cbx_date_end_fin.setDate(date_end)
         self.dlg_fin.cbx_hours_end_fin.setTime(time_end) 
 
@@ -455,8 +451,8 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Update table 'anl_mincut_result_selector'
         sql += ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
-               "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
-               " (current_user, " + str(result_mincut_id) + ");")
+                "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
+                " (current_user, " + str(result_mincut_id) + ");")
         
         # Check if any 'connec' or 'hydro' associated
         if self.sql_connec <> "":
@@ -2381,8 +2377,8 @@ class MincutParent(ParentAction, MultipleSelection):
             # Group Real dates
             self.dlg_mincut.cbx_date_start.setDisabled(False)
             self.dlg_mincut.cbx_hours_start.setDisabled(False)
-            self.dlg_mincut.cbx_date_end.setDisabled(True)
-            self.dlg_mincut.cbx_hours_end.setDisabled(True)
+            self.dlg_mincut.cbx_date_end.setDisabled(False)
+            self.dlg_mincut.cbx_hours_end.setDisabled(False)
             self.dlg_mincut.distance.setDisabled(False)
             self.dlg_mincut.depth.setDisabled(False)
             self.dlg_mincut.appropiate.setDisabled(False)
