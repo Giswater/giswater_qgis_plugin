@@ -90,8 +90,11 @@ BEGIN
 		EXECUTE 'SELECT setval(''SCHEMA_NAME.doc_seq'','||max_aux||', true)';
 	END IF;
 	
-	SELECT setval('SCHEMA_NAME.inp_vertice_id_seq', 1, true);
-
+	IF project_type_aux='WS' THEN 
+		PERFORM setval('SCHEMA_NAME.inp_vertice_id_seq', 1, true);
+	ELSE 
+		PERFORM setval('SCHEMA_NAME.inp_vertice_seq', 1, true);
+	END IF;
 	
 	-- rest of sequences
 	FOR table_record IN SELECT * FROM audit_cat_table WHERE sys_sequence IS NOT NULL AND sys_sequence_field IS NOT NULL AND sys_sequence!='urn_id_seq' AND sys_sequence!='doc_seq'
