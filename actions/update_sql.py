@@ -1823,10 +1823,22 @@ class UpdateSQL(ParentAction):
     
         # Get filter
         filter = str(utils_giswater.getWidgetText(self.dlg_readsql, widget))
+        result_list = []
+
         # Populate Project data schema Name
-        sql = ("SELECT schema_name, schema_name FROM information_schema.schemata WHERE schema_name LIKE '%"+filter+"%'")
+        sql = ("SELECT schema_name FROM information_schema.schemata")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, rows, 1)
+        for row in rows:
+            sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = '" + str(row[0]) + "' "
+                   " AND table_name = 'version')")
+            exists = self.controller.get_row(sql)
+            if str(exists[0]) == 'True':
+                sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
+                result = self.controller.get_row(sql)
+                if result is not None and result[0] == filter.upper():
+                    elem = [row[0], row[0]]
+                    result_list.append(elem)
+        utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
 
         
     def filter_srid_changed(self):
