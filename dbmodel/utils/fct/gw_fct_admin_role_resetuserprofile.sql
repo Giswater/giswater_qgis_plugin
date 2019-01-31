@@ -6,19 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2556
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_role_resetuserprofile(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_admin_role_resetuserprofile(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
 -- reset values
-SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{}}$$)
+SELECT ws_sample.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{}}$$)
 
 -- taking values from another user
-SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{"copyFromUserSameRole":"postgres"}}$$)
+SELECT ws_sample.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{"copyFromUserSameRole":"postgres"}}$$)
 
 -- Setting specific values (todo)
-SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{"exploitation":{1,2,3}, "state":{1}}}$$)
+SELECT ws_sample.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{"exploitation":{1,2,3}, "state":{1}}}$$)
 */
 
 
@@ -32,7 +32,7 @@ DECLARE
 BEGIN
 
 --  Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 
 --  Get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -73,16 +73,24 @@ BEGIN
 	ELSE
 	
 		-- config_param_user, getting role parameters where ismandatory is true (forced always)
-		INSERT INTO config_param_user (parameter, value, cur_user) 
-		SELECT parameter, value, v_user FROM SCHEMA_NAME.config_param_user JOIN SCHEMA_NAME.audit_cat_param_user ON audit_cat_param_user.id=parameter 
+		DELETE FROM config_param_user WHERE cur_user=v_user;
+		INSERT INTO config_param_user (parameter, value, cur_user)
+		SELECT audit_cat_param_user.id, vdefault, v_user FROM ws_sample.config_param_user RIGHT JOIN ws_sample.audit_cat_param_user ON audit_cat_param_user.id=parameter 
 		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(v_user, oid, 'member'));
 
+
 		-- selectors
+		DELETE FROM selector_expl WHERE cur_user=v_user;
+		DELETE FROM selector_state WHERE cur_user=v_user;
+		DELETE FROM selector_hydrometer WHERE cur_user=v_user;
+
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, v_user FROM selector_expl;
 		INSERT INTO selector_state (state_id, cur_user) SELECT 1, v_user FROM selector_state LIMIT 1;
 		INSERT INTO selector_hydrometer (state_id, cur_user) SELECT state_id, v_user FROM selector_hydrometer;
 		
 	END IF;
+
+RETURN '{"status":"ok"}';
 
 END;
 $BODY$
