@@ -15,6 +15,8 @@ import os
 import csv
 from functools import partial
 
+from PyQt4.QtGui import QGridLayout
+
 import utils_giswater
 from actions.update_sql import UpdateSQL
 from giswater.ui_manager import FileManager
@@ -26,7 +28,9 @@ from giswater.ui_manager import UDtimes
 from giswater.ui_manager import HydrologySelector
 from giswater.ui_manager import EpaResultCompareSelector
 from giswater.ui_manager import EpaResultManager
+from giswater.actions.api_go2epa_options import Go2EpaOptions
 from giswater.actions.parent import ParentAction
+
 
 
 class Go2Epa(ParentAction):
@@ -35,6 +39,7 @@ class Go2Epa(ParentAction):
         """ Class to control toolbar 'go2epa' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
+        self.g2epa_opt = Go2EpaOptions(iface, settings, controller, plugin_dir)
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -64,7 +69,18 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.chk_exec.setVisible(False)
         self.dlg_go2epa.chk_import.setVisible(False)
         """
-
+        grl_general_1 = self.dlg_go2epa.findChild(QGridLayout, 'grl_general_1')
+        grl_general_2 = self.dlg_go2epa.findChild(QGridLayout, 'grl_general_2')
+        grl_hyd_3 = self.dlg_go2epa.findChild(QGridLayout, 'grl_hyd_3')
+        grl_hyd_4 = self.dlg_go2epa.findChild(QGridLayout, 'grl_hyd_4')
+        grl_quality_5 = self.dlg_go2epa.findChild(QGridLayout, 'grl_quality_5')
+        grl_quality_6 = self.dlg_go2epa.findChild(QGridLayout, 'grl_quality_6')
+        grl_statu_7 = self.dlg_go2epa.findChild(QGridLayout, 'grl_statu_7')
+        grl_statu_8 = self.dlg_go2epa.findChild(QGridLayout, 'grl_statu_8')
+        grl_crm_9 = self.dlg_go2epa.findChild(QGridLayout, 'grl_crm_9')
+        grl_crm_10 = self.dlg_go2epa.findChild(QGridLayout, 'grl_crm_10')
+        grl_date_11 = self.dlg_go2epa.findChild(QGridLayout, 'grl_date_11')
+        grl_date_12 = self.dlg_go2epa.findChild(QGridLayout, 'grl_date_12')
         # Set signals
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
@@ -158,113 +174,114 @@ class Go2Epa(ParentAction):
 
     def ws_options(self):
         """ Open dialog ws_options.ui """
-        
-        # Create dialog
-        self.dlg_wsoptions = WSoptions()
-        self.load_settings(self.dlg_wsoptions)
-
-        # Allow QTextView only Double text
-        self.dlg_wsoptions.viscosity.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.trials.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.accuracy.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.emitter_exponent.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.checkfreq.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.maxcheck.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.damplimit.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.node_id.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.unbalanced_n.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.specific_gravity.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.diffusivity.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.tolerance.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.demand_multiplier.setValidator(QDoubleValidator())
-        self.dlg_wsoptions.duration.setValidator(QIntValidator())
-
-        self.dlg_wsoptions.rtc_enabled.setChecked(True)
-
-        # Set values from widgets of type QComboBox
-        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.units, rows)
-
-        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.headloss, rows)
-
-        sql = "SELECT pattern_id, pattern_id FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.pattern, rows)
-
-        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.unbalanced, rows)
-
-        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.hydraulics, rows)
-
-        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.quality, rows)
-
-        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_valvemode ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.valve_mode, rows)
-
-        sql = "SELECT id::text, id::text FROM "+self.schema_name+".anl_mincut_result_cat ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.valve_mode_mincut_result, rows)
-
-        sql = "SELECT id, code FROM "+self.schema_name+".ext_cat_period ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.rtc_period_id, rows, 1)
-
-        sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.rtc_coefficient, rows)
-
-        sql = "SELECT id, id FROM " + self.schema_name + ".inp_value_times ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_wsoptions.statistic, rows)
-
-        # TODO
-        if self.dlg_wsoptions.valve_mode.currentText() != "MINCUT RESULTS":
-            self.dlg_wsoptions.valve_mode_mincut_result.setEnabled(False)
-
-        if self.dlg_wsoptions.hydraulics.currentText() == "":
-            self.dlg_wsoptions.hydraulics_fname.setEnabled(False)
-        else:
-            self.dlg_wsoptions.hydraulics_fname.setEnabled(True)
-
-        # TODO
-        if self.dlg_wsoptions.quality.currentText() == "TRACE":
-            self.dlg_wsoptions.node_id.setEnabled(False)
-        else:
-            self.dlg_wsoptions.node_id.setEnabled(True)
-
-        if utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled):
-            self.dlg_wsoptions.rtc_period_id.setEnabled(True)
-            self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
-
-
-
-
-        self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.unbalanced, self.dlg_wsoptions.unbalanced_n, "STOP"))
-        self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.hydraulics, self.dlg_wsoptions.hydraulics_fname, ""))
-        self.dlg_wsoptions.quality.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.quality, self.dlg_wsoptions.node_id, "TRACE"))
-        self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(
-            partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, ("EPA TABLES", "INVENTORY VALUES")))
-        self.dlg_wsoptions.rtc_enabled.stateChanged.connect(self.enable_per_coef)
-
-        self.dlg_wsoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', self.dlg_wsoptions))
-        self.dlg_wsoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_times', self.dlg_wsoptions))
-        self.dlg_wsoptions.btn_cancel.clicked.connect(self.dlg_wsoptions.close)
-        self.go2epa_options_get_data('inp_options', self.dlg_wsoptions)
-        self.go2epa_options_get_data('inp_times', self.dlg_wsoptions)
-        self.dlg_wsoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_wsoptions.exec_()
+        self.g2epa_opt.go2epa_options()
+        return
+        # # Create dialog
+        # self.dlg_wsoptions = WSoptions()
+        # self.load_settings(self.dlg_wsoptions)
+        #
+        # # Allow QTextView only Double text
+        # self.dlg_wsoptions.viscosity.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.trials.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.accuracy.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.emitter_exponent.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.checkfreq.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.maxcheck.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.damplimit.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.node_id.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.unbalanced_n.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.specific_gravity.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.diffusivity.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.tolerance.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.demand_multiplier.setValidator(QDoubleValidator())
+        # self.dlg_wsoptions.duration.setValidator(QIntValidator())
+        #
+        # self.dlg_wsoptions.rtc_enabled.setChecked(True)
+        #
+        # # Set values from widgets of type QComboBox
+        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.units, rows)
+        #
+        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.headloss, rows)
+        #
+        # sql = "SELECT pattern_id, pattern_id FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.pattern, rows)
+        #
+        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.unbalanced, rows)
+        #
+        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.hydraulics, rows)
+        #
+        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.quality, rows)
+        #
+        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_valvemode ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.valve_mode, rows)
+        #
+        # sql = "SELECT id::text, id::text FROM "+self.schema_name+".anl_mincut_result_cat ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.valve_mode_mincut_result, rows)
+        #
+        # sql = "SELECT id, code FROM "+self.schema_name+".ext_cat_period ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.rtc_period_id, rows, 1)
+        #
+        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.rtc_coefficient, rows)
+        #
+        # sql = "SELECT id, id FROM " + self.schema_name + ".inp_value_times ORDER BY id"
+        # rows = self.controller.get_rows(sql)
+        # utils_giswater.set_item_data(self.dlg_wsoptions.statistic, rows)
+        #
+        # # TODO
+        # if self.dlg_wsoptions.valve_mode.currentText() != "MINCUT RESULTS":
+        #     self.dlg_wsoptions.valve_mode_mincut_result.setEnabled(False)
+        #
+        # if self.dlg_wsoptions.hydraulics.currentText() == "":
+        #     self.dlg_wsoptions.hydraulics_fname.setEnabled(False)
+        # else:
+        #     self.dlg_wsoptions.hydraulics_fname.setEnabled(True)
+        #
+        # # TODO
+        # if self.dlg_wsoptions.quality.currentText() == "TRACE":
+        #     self.dlg_wsoptions.node_id.setEnabled(False)
+        # else:
+        #     self.dlg_wsoptions.node_id.setEnabled(True)
+        #
+        # if utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled):
+        #     self.dlg_wsoptions.rtc_period_id.setEnabled(True)
+        #     self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
+        #
+        #
+        #
+        #
+        # self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(
+        #     partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.unbalanced, self.dlg_wsoptions.unbalanced_n, "STOP"))
+        # self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(
+        #     partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.hydraulics, self.dlg_wsoptions.hydraulics_fname, ""))
+        # self.dlg_wsoptions.quality.currentIndexChanged.connect(
+        #     partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.quality, self.dlg_wsoptions.node_id, "TRACE"))
+        # self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(
+        #     partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, ("EPA TABLES", "INVENTORY VALUES")))
+        # self.dlg_wsoptions.rtc_enabled.stateChanged.connect(self.enable_per_coef)
+        #
+        # self.dlg_wsoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', self.dlg_wsoptions))
+        # self.dlg_wsoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_times', self.dlg_wsoptions))
+        # self.dlg_wsoptions.btn_cancel.clicked.connect(self.dlg_wsoptions.close)
+        # self.go2epa_options_get_data('inp_options', self.dlg_wsoptions)
+        # self.go2epa_options_get_data('inp_times', self.dlg_wsoptions)
+        # self.dlg_wsoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
+        # self.dlg_wsoptions.exec_()
 
 
 
@@ -560,10 +577,61 @@ class Go2Epa(ParentAction):
         # Close form
         self.close_dialog(self.dlg_go2epa)
         
-        # Execute 'go2epa_express'
-        self.go2epa_express()
-     
-    
+    #     # Execute 'go2epa_express'
+    #     self.go2epa_express()
+    #
+    #
+    #
+    # def go2epa_express(self):
+    #     """ Button 24: Open giswater in silent mode
+    #         Executes all options of File Manager: Export INP, Execute EPA software and Import results
+    #     """
+    #
+    #     self.get_last_gsw_file(False)
+    #     self.execute_giswater("mg_go2epa_express")
+    #
+    #
+    # def execute_giswater(self, parameter):
+    #     ''' Executes giswater with selected parameter '''
+    #
+    #     if self.giswater_file_path is None or self.java_exe is None:
+    #         return
+    #
+    #         # Save database connection parameters into GSW file
+    #     self.save_database_parameters()
+    #
+    #     # Check if gsw file exists. If not giswater will open with the last .gsw file
+    #     if self.file_gsw is None:
+    #         self.file_gsw = ""
+    #     if self.file_gsw:
+    #         if self.file_gsw != "" and not os.path.exists(self.file_gsw):
+    #             message = "GSW file not found"
+    #             self.controller.show_info(message, parameter=self.file_gsw)
+    #             self.file_gsw = ""
+    #
+    #             # Start program
+    #     aux = '"' + self.giswater_file_path + '"'
+    #     if self.file_gsw != "":
+    #         aux += ' "' + self.file_gsw + '"'
+    #         program = [self.java_exe, "-jar", self.giswater_file_path, self.file_gsw, parameter]
+    #     else:
+    #         program = [self.java_exe, "-jar", self.giswater_file_path, "", parameter]
+    #
+    #     self.controller.log_info(str(program))
+    #     self.controller.start_program(program)
+    #
+    #     # Compare Java and Plugin versions
+    #     if self.plugin_version <> self.giswater_build_version:
+    #         msg = ("Giswater and plugin versions are different. "
+    #                "Giswater version: " + self.giswater_build_version + ""
+    #                                                                     " - Plugin version: " + self.plugin_version)
+    #         self.controller.show_info(msg, 10)
+    #     # Show information message
+    #     else:
+    #         message = "Executing..."
+    #         self.controller.show_info(message, parameter=aux)
+
+
     def check_result_id(self, result_id):  
         """ Check if selected @result_id already exists """
         
