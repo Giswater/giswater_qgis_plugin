@@ -204,18 +204,21 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.show()
 
         if connection_status is False:
-            self.controller.show_message("Connection Failed. Please, check connection parameters.", 1)
+            self.controller.show_message("Connection Failed. Please, check connection parameters", 1)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, 'Connection Failed. Please, check connection parameters')
             return
         else:
             if self.check_roladmin_user(self.username) is False:
-                self.controller.show_message("Connection Failed. You dont have permisions for this connection.", 1)
+                self.controller.show_message("You don't have permissions to administrate project schemas on this connection", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, "You don't have permissions to administrate project schemas on this connection")
             else:
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
 
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
@@ -1683,9 +1686,12 @@ class UpdateSQL(ParentAction):
             self.controller.show_message("Connection Failed. Please, check connection parameters.", 1)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, False, ignore_widgets='cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                         'Connection Failed. Please, check connection parameters')
         else:
             utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
 
         self.populate_data_schema_name(self.cmb_project_type)
 
@@ -1693,10 +1699,12 @@ class UpdateSQL(ParentAction):
 
         if self.logged == True:
             self.username = self.get_user_connection(self.get_last_connection())
-            if self.check_roladmin_user(self.username) is False:
+            if self.check_roladmin_user(self.username) is False or self.username != 'postgres':
                 self.controller.show_message("Connection Failed. You dont have permisions for this connection.", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                             "You don't have permissions to administrate project schemas on this connection")
 
 
     def set_last_connection(self, connection_name):

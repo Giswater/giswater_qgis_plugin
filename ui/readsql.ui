@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>info_show_info</class>
- <widget class="QMainWindow" name="info_show_info">
+ <class>readsql</class>
+ <widget class="QMainWindow" name="readsql">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,11 +11,56 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Giswater</string>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="3" column="0" colspan="5">
+    <item row="4" column="2">
+     <widget class="QLabel" name="lbl_status">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="4" column="5">
+     <widget class="QPushButton" name="btn_close">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Close</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="6">
      <widget class="QTabWidget" name="tab_main">
       <property name="enabled">
        <bool>true</bool>
@@ -222,6 +267,13 @@
            <string>Water project</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lbl_connection">
+             <property name="text">
+              <string>Connection name:</string>
+             </property>
+            </widget>
+           </item>
            <item row="2" column="1">
             <widget class="QComboBox" name="cmb_project_type">
              <property name="sizePolicy">
@@ -229,6 +281,13 @@
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cmb_connection">
+             <property name="enabled">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -258,20 +317,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="lbl_connection">
-             <property name="text">
-              <string>Connection name:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="cmb_connection">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
           </layout>
           <zorder>cmb_project_type</zorder>
           <zorder>horizontalSpacer</zorder>
@@ -286,7 +331,14 @@
            <string>Information about software versions</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
-           <item row="0" column="1">
+           <item row="1" column="0" colspan="4">
+            <widget class="QTextEdit" name="software_version_info">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
             <widget class="QPushButton" name="btn_info">
              <property name="enabled">
               <bool>true</bool>
@@ -326,12 +378,18 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QTextEdit" name="software_version_info">
-             <property name="enabled">
-              <bool>false</bool>
+           <item row="0" column="0">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-            </widget>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -753,41 +811,9 @@
      </widget>
     </item>
     <item row="4" column="3">
-     <spacer name="horizontalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="4" column="4">
-     <widget class="QPushButton" name="btn_close">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Close</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="2">
-     <widget class="QLabel" name="lbl_status">
+     <widget class="QLabel" name="lbl_status_text">
       <property name="text">
        <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
       </property>
      </widget>
     </item>
