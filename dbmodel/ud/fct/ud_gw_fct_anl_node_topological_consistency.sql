@@ -21,9 +21,9 @@ BEGIN
     
 	-- Computing process
     INSERT INTO anl_node (node_id, node_type, expl_id, num_arcs, fprocesscat_id, the_geom)
-    SELECT node_id, node_type, node.expl_id, COUNT(*), 8, node.the_geom 
-    FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
-    WHERE node.node_type != 'OUTFALL' GROUP BY node.node_id HAVING COUNT(*) = 1;
+    SELECT node_id, node_type, v_edit_node.expl_id, COUNT(*), 8, v_edit_node.the_geom 
+    FROM v_edit_node INNER JOIN v_edit_arc ON v_edit_arc.node_1 = v_edit_node.node_id OR v_edit_arc.node_2 = v_edit_node.node_id 
+    WHERE v_edit_node.node_type != 'OUTFALL' GROUP BY v_edit_node.node_id HAVING COUNT(*) = 1;
 
     DELETE FROM selector_audit WHERE fprocesscat_id=8 AND cur_user=current_user;    
 	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (8, current_user);

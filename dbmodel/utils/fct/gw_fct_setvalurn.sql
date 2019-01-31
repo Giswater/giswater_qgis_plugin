@@ -6,8 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2464
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setvalurn();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setvalurn()
-  RETURNS integer AS
+  RETURNS int8 AS
 $BODY$
 
 DECLARE 
