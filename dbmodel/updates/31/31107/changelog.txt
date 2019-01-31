@@ -1,15 +1,15 @@
 ****************************
-******    3.1.106   ********
+******    3.1.107   ********
 ****************************
 
 
 *******    UTILS    ********
 
-31106-utils-existing views
+31107-utils-existing views
 --------------------------
 
 
-31106-utils-other
+31107-utils-other
 -----------------
 New function trigger (2644) gw_trg_visit_user_manager
 Update geometry generator of psector using ONLY doables=TRUE
@@ -19,16 +19,18 @@ New api functions
 -----------------
 (2640) gw_api_getvisitmanager
 (2642) gw_api_setvisitmanager
+(2644) gw_api_getvisitform
+
 
 
 ***********  WS  ************
 
-31106-ws- existing views
+31107-ws- existing views
 -------------------------------------------
 v_inp_pump
 
 
-31106-ws-other
+31107-ws-other
 --------------
 Add check constraint on fields epa_table and man_table in *_type tables.
 ALTER TABLE rpt_inp_arc ADD COLUMN flw_code text;
@@ -40,16 +42,16 @@ Enhance pg2epa velocity using only mandatory nodarc
 
 ***********  UD  ************
 
-31106-ud-existing views
+31107-ud-existing views
 -----------------------
 
 
-31106-ud-other
+31107-ud-other
 ---------------
 Add check constraint on fields epa_table and man_table in *_type tables.
 
 **********  I18N  ***********
 
-31106-i18n
+31107-i18n
 ----------
 
