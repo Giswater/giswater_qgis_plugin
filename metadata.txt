@@ -14,7 +14,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 
-changelog=Version 3.1.105 (22/01/2019)
+changelog=Version 3.1.106 (31/01/2019)
     - Recovered the informative label for plan_psector -> add_price
     - Bug fix, set correct values into go2epa ws_options
     - Canceled zoom to exploitation
