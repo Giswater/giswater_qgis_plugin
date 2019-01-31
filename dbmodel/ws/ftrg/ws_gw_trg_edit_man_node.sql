@@ -234,7 +234,7 @@ BEGIN
 		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 	
 		IF pol_id_aux IS NOT NULL THEN
-			query_text:= 'SELECT node_id FROM '||tablename_aux||' WHERE pol_id::integer='||pol_id_aux||' LIMIT 1';
+			query_text:= 'SELECT node_id FROM '||tablename_aux||' WHERE pol_id::bigint='||pol_id_aux||' LIMIT 1';
 			EXECUTE query_text INTO node_id_aux;
 			NEW.parent_id=node_id_aux;
 		END IF;
