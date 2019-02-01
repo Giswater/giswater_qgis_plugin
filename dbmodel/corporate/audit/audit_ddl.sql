@@ -9,7 +9,7 @@ CREATE SCHEMA audit;
 
 
 CREATE TABLE audit.log (
-id serial PRIMARY KEY,
+id serial8 PRIMARY KEY,
 schema_name text, 
 table_name text,
 id_name text,
