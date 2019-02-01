@@ -16,6 +16,7 @@ UPDATE  config_client_forms SET status=false WHERE table_id='v_ui_anl_mincut_res
 ALTER TABLE anl_mincut_cat_state DROP CONSTRAINT anl_mincut_cat_state_check;
 INSERT INTO anl_mincut_cat_state VALUES (3, 'Canceled');
 
+INSERT INTO audit_cat_param_user VALUES ('manholecat_vdefault', NULL, 'Default value for manhole element parameter', 'role_edit', 'cat_node', 'id', 'SELECT cat_node.id FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''MANHOLE'' AND cat_node.id=', 'text');
 --temp remove constraints inp
 
 ALTER TABLE inp_selector_dscenario DROP CONSTRAINT IF EXISTS dscenario_id_cur_user_unique;
