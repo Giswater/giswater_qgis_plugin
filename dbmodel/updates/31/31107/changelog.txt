@@ -38,7 +38,7 @@ Bug fix on go2epa pump additional function;
 Enhance pg2epa velocity using existing network geometry
 Enhance pg2epa velocity using only mandatory nodarc
 New status on mincut: canceled #620
-
+Editable link values of feature tables #622
 
 
 ***********  UD  ************
@@ -50,6 +50,7 @@ New status on mincut: canceled #620
 31107-ud-other
 ---------------
 Add check constraint on fields epa_table and man_table in *_type tables.
+Editable link values of feature tables #622
 
 **********  I18N  ***********
 
