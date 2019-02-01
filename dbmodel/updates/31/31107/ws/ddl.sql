@@ -11,3 +11,31 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2019/01/30
 ALTER TABLE rpt_inp_arc ADD COLUMN flw_code text;
 
+
+
+-----------------------
+-- create import inp tables
+----------------------
+CREATE TABLE inp_valve_importinp
+(
+  arc_id character varying(16) PRIMARY KEY NOT NULL,
+  valv_type character varying(18),
+  pressure numeric(12,4),
+  diameter numeric(12,4),
+  flow numeric(12,4),
+  coef_loss numeric(12,4),
+  curve_id character varying(16),
+  minorloss numeric(12,4),
+  status character varying(12),
+  to_arc character varying(16)
+  );
+
+CREATE TABLE inp_pump_importinp
+(
+  arc_id character varying(16) PRIMARY KEY NOT NULL,
+  power character varying,
+  curve_id character varying,
+  speed numeric(12,6),
+  pattern character varying,
+  status character varying(12)
+);
