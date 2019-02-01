@@ -176,6 +176,7 @@ class MincutConfig(ParentAction):
         self.dlg_min_edit.date_to.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
         self.dlg_min_edit.cmb_expl.currentIndexChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
         self.dlg_min_edit.btn_show.clicked.connect(partial(self.show_selection))
+        self.dlg_min_edit.btn_cancel_mincut.clicked.connect(partial(self.set_state_cancel_mincut))
         self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_min_edit))
         self.dlg_min_edit.rejected.connect(partial(self.close_dialog, self.dlg_min_edit))
@@ -194,6 +195,32 @@ class MincutConfig(ParentAction):
         # Open the dialog
         self.dlg_min_edit.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_min_edit.show()
+
+
+    def set_state_cancel_mincut(self):
+        selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = self.tbl_mincut_edit.model().record(row).value("id")
+            inf_text += str(id_)+", "
+            list_id = list_id+"'"+str(id_)+"', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        msg = "Are you sure you want to cancel these mincuts?"
+        title = "Cancel mincuts"
+        answer = self.controller.ask_question(msg, title, inf_text)
+        if answer:
+            sql = ("UPDATE " + self.schema_name + ".anl_mincut_result_cat SET mincut_state = 3 "
+                   " WHERE id::text IN ("+list_id+")")
+            self.controller.execute_sql(sql, log_sql=False)
+            self.tbl_mincut_edit.model().select()
+
 
 
     def show_selection(self):

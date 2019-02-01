@@ -20,8 +20,15 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="3" column="0">
-       <widget class="QLineEdit" name="txt_mincut_id">
+      <item row="3" column="3">
+       <widget class="QDateEdit" name="date_from">
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="11">
+       <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -29,7 +36,21 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string/>
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QLabel" name="lbl_date_to">
+        <property name="text">
+         <string>Date to:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QDateEdit" name="date_to">
+        <property name="calendarPopup">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -46,13 +67,6 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="10">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="2">
        <widget class="QComboBox" name="state_edit">
         <property name="sizePolicy">
@@ -63,13 +77,17 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="11">
-       <widget class="QTableView" name="tbl_mincut_edit"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
+      <item row="1" column="3">
+       <widget class="QLabel" name="lbl_date_from">
         <property name="text">
-         <string>Filter by: id OR work_order</string>
+         <string>Date from:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="11">
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Close</string>
         </property>
        </widget>
       </item>
@@ -86,37 +104,10 @@
         </property>
        </spacer>
       </item>
-      <item row="3" column="3">
-       <widget class="QDateEdit" name="date_from">
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="lbl_date_from">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Date from:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QLabel" name="lbl_date_to">
-        <property name="text">
-         <string>Date to:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="10">
-       <widget class="QPushButton" name="btn_delete">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Delete</string>
+         <string>Filter by: id OR work_order</string>
         </property>
        </widget>
       </item>
@@ -124,13 +115,6 @@
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>State:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4">
-       <widget class="QDateEdit" name="date_to">
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -150,6 +134,22 @@
         </property>
        </spacer>
       </item>
+      <item row="3" column="0">
+       <widget class="QLineEdit" name="txt_mincut_id">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="12">
+       <widget class="QTableView" name="tbl_mincut_edit"/>
+      </item>
       <item row="1" column="5">
        <widget class="QLabel" name="label_3">
         <property name="text">
@@ -161,6 +161,13 @@
        <widget class="QPushButton" name="btn_show">
         <property name="text">
          <string>Show selection</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="10">
+       <widget class="QPushButton" name="btn_cancel_mincut">
+        <property name="text">
+         <string>Cancel mincut</string>
         </property>
        </widget>
       </item>

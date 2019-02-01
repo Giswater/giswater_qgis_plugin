@@ -1795,8 +1795,8 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             
-        # Current_state == '2': Finished
-        elif self.current_state == '2':
+        # Current_state == '2': Finished, '3':Canceled
+        elif self.current_state in ('2', '3'):
             
             self.dlg_mincut.work_order.setDisabled(True)
             # Group Location
