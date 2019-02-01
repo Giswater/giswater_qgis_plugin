@@ -13,6 +13,7 @@ DECLARE
     connec_id_seq int8;
 	count_aux integer;
 	promixity_buffer_aux double precision;
+	link_path_aux varchar;
 
 BEGIN
 
@@ -214,6 +215,12 @@ BEGIN
 		PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
  	END IF;
 
+ 		
+			--link_path
+		SELECT link_path INTO link_path_aux FROM connec_type WHERE id=NEW.connec_type;
+		IF link_path_aux IS NOT NULL THEN
+			NEW.link = replace(NEW.link, link_path_aux,'');
+		END IF;
 
         UPDATE connec 
         SET  code=NEW.code, customer_code=NEW.customer_code, top_elev=NEW.top_elev, y1=NEW.y1, y2=NEW.y2, connecat_id=NEW.connecat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, demand=NEW.demand,

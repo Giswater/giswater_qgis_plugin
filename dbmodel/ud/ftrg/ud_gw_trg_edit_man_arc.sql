@@ -22,7 +22,8 @@ This version of Giswater is provided by Giswater Association
 		promixity_buffer_aux double precision;
 		edit_enable_arc_nodes_update_aux boolean;
 		code_autofill_bool boolean;
-		
+		link_path_aux varchar;
+
 	BEGIN
 
 		EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -329,6 +330,12 @@ This version of Giswater is provided by Giswater Association
 				v_sql2:= 'INSERT INTO '||new_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
 				EXECUTE v_sql2;
 			END IF;
+		END IF;
+	
+		--link_path
+		SELECT link_path INTO link_path_aux FROM arc_type WHERE id=NEW.arc_type;
+		IF link_path_aux IS NOT NULL THEN
+			NEW.link = replace(NEW.link, link_path_aux,'');
 		END IF;
 
 			UPDATE arc 

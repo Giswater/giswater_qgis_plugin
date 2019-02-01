@@ -21,6 +21,7 @@ DECLARE
 	count_aux integer;
 	promixity_buffer_aux double precision;
 	edit_enable_arc_nodes_update_aux boolean;
+	link_path_aux varchar;
 
 BEGIN
 
@@ -307,6 +308,11 @@ BEGIN
 		END IF;
 	END IF;
 	
+			--link_path
+		SELECT link_path INTO link_path_aux FROM arc_type WHERE id=NEW.arc_type;
+		IF link_path_aux IS NOT NULL THEN
+			NEW.link = replace(NEW.link, link_path_aux,'');
+		END IF;
     
 		UPDATE arc 
 		SET code=NEW.code, y1=NEW.y1, custom_y1=NEW.custom_y1, elev1=NEW.elev1, custom_elev1=NEW.custom_elev1, y2=NEW.y2, custom_y2=NEW.custom_y2, elev2=NEW.elev2, custom_elev2=NEW.custom_elev2,

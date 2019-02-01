@@ -22,7 +22,7 @@ DECLARE
     node_id_seq int8;
 	count_aux integer;
 	promixity_buffer_aux double precision;
-
+	link_path_aux varchar;
 
 BEGIN
 
@@ -288,6 +288,11 @@ BEGIN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
 		END IF;
 		
+			--link_path
+		SELECT link_path INTO link_path_aux FROM node_type WHERE id=NEW.node_type;
+		IF link_path_aux IS NOT NULL THEN
+			NEW.link = replace(NEW.link, link_path_aux,'');
+		END IF;
 
 		UPDATE node 
 			SET code=NEW.code, top_elev=NEW.top_elev,custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, custom_elev=NEW.custom_elev,

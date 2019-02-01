@@ -15,6 +15,7 @@ DECLARE
     gully_id_seq int8;
 	count_aux integer;
 	promixity_buffer_aux double precision;
+	link_path_aux varchar;
 
 BEGIN
 
@@ -227,6 +228,12 @@ BEGIN
 		PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);	
 		END IF;
 	
+		
+			--link_path
+		SELECT link_path INTO link_path_aux FROM gully_type WHERE id=NEW.gully_type;
+		IF link_path_aux IS NOT NULL THEN
+			NEW.link = replace(NEW.link, link_path_aux,'');
+		END IF;
 
        -- UPDATE values
 		IF gully_geometry = 'gully' THEN

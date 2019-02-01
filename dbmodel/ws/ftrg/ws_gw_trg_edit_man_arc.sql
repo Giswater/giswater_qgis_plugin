@@ -19,6 +19,7 @@ DECLARE
 	count_aux integer;
 	promixity_buffer_aux double precision;
 	edit_enable_arc_nodes_update_aux boolean;
+	link_path_aux varchar;
 
 BEGIN
 
@@ -239,7 +240,13 @@ BEGIN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
 
+		--link_path
+		SELECT link_path INTO link_path_aux FROM arc_type JOIN cat_arc ON cat_arc.arctype_id=arc_type.id WHERE cat_arc.id=NEW.arccat_id;
 		
+		IF link_path_aux IS NOT NULL THEN
+			NEW.link = replace(NEW.link, link_path_aux,'');
+		END IF;
+
 		UPDATE arc
 		SET code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ, 
 				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
@@ -248,7 +255,7 @@ BEGIN
 				streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified, 
 				undelete=NEW.undelete, label_x=NEW.label_x, the_geom=NEW.the_geom, 
 				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
-				expl_id=NEW.expl_id,num_value=NEW.num_value
+				expl_id=NEW.expl_id,num_value=NEW.num_value, link=NEW.link
 			WHERE arc_id=OLD.arc_id;
 			
         RETURN NEW;

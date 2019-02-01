@@ -37,7 +37,8 @@ ALTER TABLE rpt_inp_arc ADD COLUMN flw_code text;
 Bug fix on go2epa pump additional function;
 Enhance pg2epa velocity using existing network geometry
 Enhance pg2epa velocity using only mandatory nodarc
-
+New status on mincut: canceled #620
+Editable link values of feature tables #622
 
 
 ***********  UD  ************
@@ -49,6 +50,7 @@ Enhance pg2epa velocity using only mandatory nodarc
 31107-ud-other
 ---------------
 Add check constraint on fields epa_table and man_table in *_type tables.
+Editable link values of feature tables #622
 
 **********  I18N  ***********
 
