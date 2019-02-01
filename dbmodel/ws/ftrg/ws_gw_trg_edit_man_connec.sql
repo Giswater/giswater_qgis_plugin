@@ -22,7 +22,8 @@ DECLARE
 	rec Record;
 	count_aux integer;
 	promixity_buffer_aux double precision;
-	
+	link_path_aux varchar;
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -288,6 +289,11 @@ BEGIN
 			END IF;
 		END IF;
 
+		--link_path
+		SELECT link_path INTO link_path_aux FROM connec_type JOIN cat_connec ON cat_connec.connectype_id=connec_type.id WHERE cat_connec.id=NEW.connecat_id;
+		IF link_path_aux IS NOT NULL THEN
+			NEW.link = replace(NEW.link, link_path_aux,'');
+		END IF;
 		
 		UPDATE connec 
 			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.customer_code,
@@ -296,7 +302,7 @@ BEGIN
 			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=NEW.streetaxis2_id, 
 			postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode, descript=NEW.descript, verified=NEW.verified, 
 			postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
-			publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length
+			publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link
 			WHERE connec_id=OLD.connec_id;
 			
         IF man_table ='man_greentap' THEN

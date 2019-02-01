@@ -21,6 +21,7 @@ DECLARE
 	new_arc_type_aux text;
 	old_arc_type_aux text;
 	query_text text;
+	link_path_aux varchar;
 	
 BEGIN
 
@@ -273,8 +274,13 @@ BEGIN
 
         END IF;
 
+		--link_path
+		SELECT link_path INTO link_path_aux FROM arc_type JOIN cat_arc ON cat_arc.arctype_id=arc_type.id WHERE cat_arc.id=NEW.arccat_id;
+		IF link_path_aux IS NOT NULL THEN
+			NEW.link = replace(NEW.link, link_path_aux,'');
+		END IF;
     
-UPDATE arc 
+	UPDATE arc 
 			SET code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id,  state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ, 
 				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
 				fluid_type=NEW.fluid_type, 
@@ -282,7 +288,7 @@ UPDATE arc
 				ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postcode=NEW.postcode,streetaxis2_id=NEW.streetaxis2_id, postnumber=NEW.postnumber,
 				postnumber2=NEW.postnumber2,descript=NEW.descript, the_geom=NEW.the_geom, 
 				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x,
-				label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value
+				label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link
 			WHERE arc_id=OLD.arc_id;
 
         RETURN NEW;
