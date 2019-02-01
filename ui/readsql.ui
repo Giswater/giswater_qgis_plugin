@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>readsql</class>
- <widget class="QMainWindow" name="readsql">
+ <class>mw_readsql</class>
+ <widget class="QMainWindow" name="mw_readsql">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -93,7 +93,7 @@
               <enum>QFrame::Raised</enum>
              </property>
              <property name="text">
-              <string>Last update:</string>
+              <string>Date:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -819,7 +819,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="action_create_sample">
    <property name="text">
     <string>Create Sample</string>

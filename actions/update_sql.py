@@ -111,15 +111,6 @@ class UpdateSQL(ParentAction):
         # Get metadata version
         self.version_metadata = self.get_plugin_version()
 
-        # Get version if not new project
-        self.version = None
-        if self.controller.schema_name is not None:
-            sql = ("SELECT giswater from " + self.controller.schema_name + ".version")
-            row = self.controller.get_row(sql)
-            self.version = row[0]
-            if self.version.replace('.','') >= self.plugin_version.replace('.',''):
-                self.btn_update_schema.setEnabled(False)
-                self.btn_update_api.setEnabled(False)
         if self.dev_user != 'TRUE':
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
@@ -201,6 +192,7 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
 
         # Open dialog
+        self.dlg_readsql.setWindowTitle('Giswater - ' + str(self.plugin_version))
         self.dlg_readsql.show()
 
         if connection_status is False:
@@ -222,13 +214,6 @@ class UpdateSQL(ParentAction):
 
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
-
-        # Put current info into software version info widget
-        if self.version is None:
-            self.version = '0'
-            self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
-                                               'Database version: ' + self.version + '\n \n' +
-                                               'Project data schema version:' + self.project_data_schema_version)
 
             
     """ Declare all read sql process """
@@ -1854,8 +1839,8 @@ class UpdateSQL(ParentAction):
         filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
         if filter_value is 'null':
             filter_value = ''
-        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "
-        sql += '"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(filter_value)
+        sql = "SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as "+'"SRID"' + ", substr(split_part(srtext, ',', 1), 9) as "
+        sql += '"Description"' + " FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '" + str(filter_value)
         sql += "%' ORDER BY substr(srtext, 1, 6), srid"
         
         # Populate Table
@@ -1894,10 +1879,18 @@ class UpdateSQL(ParentAction):
                 self.project_data_schema_version = str(row[0])
                 utils_giswater.setWidgetText(self.dlg_readsql,
                                             self.dlg_readsql.project_schema_last_update, str(row[1]))
-        if self.version is None:
-            self.version = '0'
-        self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
-                                           'Database version: ' + self.version + '\n \n' +
+
+        # Get parameters
+        sql = ("SELECT version();")
+        result = self.controller.get_row(sql)
+        database_version = result[0].split(',')
+
+        sql = ("SELECT PostGIS_FULL_VERSION();")
+        result = self.controller.get_row(sql)
+        postgis_version = result[0].split('GEOS=')
+
+        self.software_version_info.setText('Database version: ' + str(database_version[0]) + '\n' +
+                                           '' + str(postgis_version[0]) + ' \n \n' +
                                            'Schema name: ' + schema_name + '\n' +
                                            'Schema version: ' + self.project_data_schema_version)
 
@@ -2013,7 +2006,7 @@ class UpdateSQL(ParentAction):
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(self.filter_srid_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
+        sql = "SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as "+'"SRID"' + ", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '" + str(self.filter_srid_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
 
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
@@ -2046,7 +2039,11 @@ class UpdateSQL(ParentAction):
                 utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
 
 
+        # Get connection ddb name
+        connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
+
         # Open dialog
+        self.dlg_readsql_create_project.setWindowTitle('Create Project - ' + str(connection_name))
         self.dlg_readsql_create_project.show()
 
         
@@ -2063,6 +2060,7 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_rename))
 
         # Open dialog
+        self.dlg_readsql_rename.setWindowTitle('Rename project - ' + schema)
         self.dlg_readsql_rename.show()
 
         
