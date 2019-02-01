@@ -1048,7 +1048,7 @@ class ApiParent(ParentAction):
         else:
             self.vertex_marker.hide()
 
-    def construct_form_param_user(self, dialog, row, pos, put_chk=True):
+    def construct_form_param_user(self, dialog, row, pos, _json, put_chk=True):
         for field in row[pos]['fields']:
             if field['label']:
                 lbl = QLabel()
@@ -1069,44 +1069,43 @@ class ApiParent(ParentAction):
                 if field['widgettype'] == 'text':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field))
+                    widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
                     self.populate_combo(widget, field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field))
+                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = chk
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, chk, field))
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, chk, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datepickertime':
                     widget = QDateEdit()
                     widget.setCalendarPopup(True)
                     date = QDate.fromString(field['value'], 'yyyy/MM/dd')
                     widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field))
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field))
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                 widget.setObjectName(field['name'])
 
                 # Set signals
                 if put_chk is True:
-                    chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field))
+                    chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
                 self.put_wigets(dialog, field, field['layout_name'], lbl, chk, widget)
 
 
     def put_wigets(self, dialog, field, layout_name, lbl, chk, widget):
         """ Insert widget into layout """
         layout = dialog.findChild(QGridLayout, layout_name)
-        self.controller.log_info(str(layout.objectName()))
         if layout is None:
             return
         layout.addWidget(lbl, field['layout_order'], 0)
@@ -1115,9 +1114,7 @@ class ApiParent(ParentAction):
         if field['widgettype'] != 'check':
             layout.addWidget(widget, field['layout_order'], 2)
 
-
-
-    def get_values_changed_param_user(self, dialog, chk, widget, field, value=None):
+    def get_values_changed_param_user(self, dialog, chk, widget, field, list, value=None):
 
         elem = {}
         if type(widget) is QLineEdit:
@@ -1128,17 +1125,45 @@ class ApiParent(ParentAction):
             value = utils_giswater.isChecked(dialog, chk)
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(dialog, widget)
-
-        if chk.isChecked():
+        if chk is None:
+            elem['widget'] = str(widget.objectName())
+            elem['value'] = value
+            elem['sys_role_id'] = str(field['sys_role_id'])
+        elif chk.isChecked():
             elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
             elem['isChecked'] = str(utils_giswater.isChecked(dialog, chk))
             elem['value'] = value
             elem['sys_role_id'] = str(field['sys_role_id'])
-            self.list_update.append(elem)
+        list.append(elem)
+        self.controller.log_info(str(list))
+    # def get_values_changed_param_user(self, dialog, chk, widget, field, _json, value=None):
+    #
+    #     if type(widget) is QLineEdit:
+    #         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+    #     elif type(widget) is QComboBox:
+    #         value = utils_giswater.get_item_data(dialog, widget, 0)
+    #     elif type(widget) is QCheckBox:
+    #         value = utils_giswater.isChecked(dialog, chk)
+    #     elif type(widget) is QDateEdit:
+    #         value = utils_giswater.getCalendarDate(dialog, widget)
+    #     if chk is None:
+    #         if str(value) == '' or value is None:
+    #             _json[str(widget.objectName())] = None
+    #         else:
+    #             _json['widget'] = str(value)
+    #             _json['value'] = value
+    #             _json['sys_role_id'] = str(field['sys_role_id'])
+    #     elif chk.isChecked():
+    #         _json['widget'] = str(widget.objectName())
+    #         _json['chk'] = str(chk.objectName())
+    #         _json['isChecked'] = str(utils_giswater.isChecked(dialog, chk))
+    #         _json['value'] = value
+    #         _json['sys_role_id'] = str(field['sys_role_id'])
+    #
+    #     self.controller.log_info(str(_json))
 
-
-    def get_values_checked_param_user(self, dialog, chk, widget, field, value=None):
+    def get_values_checked_param_user(self, dialog, chk, widget, field, _json, value=None):
 
         elem = {}
         elem['widget'] = str(widget.objectName())
