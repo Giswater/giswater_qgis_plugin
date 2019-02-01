@@ -166,9 +166,6 @@ class UpdateSQL(ParentAction):
         self.folderUpdatesApi = self.sql_dir + '/api/updates/'
         self.folderApi = self.sql_dir + '/api/'
 
-        # Set last connection for default
-        utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
-
         # Set Listeners
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
@@ -190,6 +187,9 @@ class UpdateSQL(ParentAction):
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
+
+        # Set last connection for default
+        utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
 
         # Open dialog
         self.dlg_readsql.setWindowTitle('Giswater - ' + str(self.plugin_version))
