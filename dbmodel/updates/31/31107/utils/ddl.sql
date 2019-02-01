@@ -100,7 +100,7 @@ CREATE TABLE om_visit_lot(
   team_id integer,
   duration text,
   feature_type text,
-  status integer
+  status integer,
   the_geom public.geometry(POLYGON, SRID_VALUE));
   
    

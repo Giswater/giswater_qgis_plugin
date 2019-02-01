@@ -26,3 +26,6 @@ ALTER TABLE node_type ADD CONSTRAINT node_type_man_table_check CHECK (man_table 
 'man_valve', 'man_waterwell', 'man_wtp'));
 
 ALTER TABLE connec_type ADD CONSTRAINT connec_type_man_table_check CHECK (man_table IN ('man_fountain', 'man_greentap', 'man_tap', 'man_wjoin'));
+
+-- anl_mincut_cat_state_check DROP CONSTRAINT is in dml.sql file
+ALTER TABLE anl_mincut_cat_state ADD CONSTRAINT anl_mincut_cat_state_check CHECK (id = ANY (ARRAY[0, 1, 2, 3]));

@@ -37,6 +37,7 @@ ALTER TABLE rpt_inp_arc ADD COLUMN flw_code text;
 Bug fix on go2epa pump additional function;
 Enhance pg2epa velocity using existing network geometry
 Enhance pg2epa velocity using only mandatory nodarc
+New status on mincut: canceled #620
 
 
 
