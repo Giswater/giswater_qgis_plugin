@@ -17,3 +17,9 @@ INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, de
 INSERT INTO sys_csv2pg_cat VALUES (10, 'Export inp', 'Export inp', null, 'role_epa');
 INSERT INTO sys_csv2pg_cat VALUES (11, 'Import rpt', 'Import rpt', null, 'role_epa');
 INSERT INTO sys_csv2pg_cat VALUES (12, 'Import inp', 'Import inp', null, 'role_admin');
+
+-- 2019/02/02
+UPDATE audit_cat_function SET istoolbox=TRUE,  descript=return_type, context=project_type, project_type='utils', function_type='{"featureType":"node"}', 
+return_type=null, input_params='[{"name":"nodeTolerance", "type":"float"}]' , sys_roled_id='role_edit', isparametric=true;
+
+WHERE function_name='gw_fct_anl_node_duplicated';

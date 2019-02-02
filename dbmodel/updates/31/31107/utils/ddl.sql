@@ -8,6 +8,12 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+
+ALTER TABLE audit_cat_function ADD COLUMN istoolbox boolean;
+ALTER TABLE audit_cat_function ADD COLUMN alias varchar(30);
+ALTER TABLE audit_cat_function ADD COLUMN isparametric boolean;
+
+
 --audit_cat_param_user
 ALTER TABLE audit_cat_param_user ADD COLUMN label text;
 ALTER TABLE audit_cat_param_user ADD COLUMN dv_querytext text;
