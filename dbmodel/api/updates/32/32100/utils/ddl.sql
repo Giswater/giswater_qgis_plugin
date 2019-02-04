@@ -99,7 +99,7 @@ CREATE TABLE config_api_layer
   orderby integer,
   link_id text,
   is_tiled boolean,
-  CONSTRAINT config_web_layer_pkey PRIMARY KEY (layer_id)
+  CONSTRAINT config_api_layer_pkey PRIMARY KEY (layer_id)
 );
 
 

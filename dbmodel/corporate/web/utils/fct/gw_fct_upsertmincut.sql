@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION ws.gw_fct_upsertmincut(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_upsertmincut(
     mincut_id_arg integer,
     x double precision,
     y double precision,
@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION ws.gw_fct_upsertmincut(
 $BODY$
 
 /*
-SELECT ws.gw_fct_upsertmincut(477,419203.72254917,4576479.7842369,25831,3,$${"work_order":null,"mincut_state":"0","mincut_type":"Real","anl_cause":"Accidental","assigned_to":"1","anl_descript":null,"anl_tstamp":"2019-01-08 11:50:41",
+SELECT SCHEMA_NAME.gw_fct_upsertmincut(477,419203.72254917,4576479.7842369,25831,3,$${"work_order":null,"mincut_state":"0","mincut_type":"Real","anl_cause":"Accidental","assigned_to":"1","anl_descript":null,"anl_tstamp":"2019-01-08 11:50:41",
 "forecast_start":null,"forecast_end":null,"muni_id":"Sant Boi del Llobregat","postcode":"08830","streetaxis_id":"1-10100C","postnumber":null,"exec_start":null,"exec_descript":null,"exec_from_plot":null,"exec_depth":null,
 "exec_user":null,"exec_appropiate":"false","exec_end":null}$$,'arc','2021')
 */
@@ -62,7 +62,7 @@ DECLARE
 BEGIN
 
 --    Set search path to local schema
-    SET search_path = "ws", public;   
+    SET search_path = "SCHEMA_NAME", public;   
     schemas_array := current_schemas(FALSE);
 
 --    Get api version
