@@ -1520,7 +1520,11 @@ class UpdateSQL(ParentAction):
             status = self.controller.execute_sql(sql)
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.setArrowCursor()
+        self.event_change_connection()
+        utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
         self.close_dialog(self.dlg_readsql_rename)
+        msg = "Rename project has been executed correctly."
+        result = self.controller.show_info_box(msg, "Info")
 
         
     def update_api(self):
