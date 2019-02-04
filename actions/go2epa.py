@@ -6,23 +6,28 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import subprocess
+
 from PyQt4.QtCore import QTime, QDate, Qt
 from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox, QComboBox
+from PyQt4.QtGui import QCompleter
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
 
-import os
+
 import csv
+import json
+import os
+import subprocess
+
+from collections import OrderedDict
 from functools import partial
 
 from PyQt4.QtGui import QGridLayout
+from PyQt4.QtGui import QStringListModel
 
 import utils_giswater
 from actions.update_sql import UpdateSQL
 from giswater.ui_manager import FileManager
 from giswater.ui_manager import Multirow_selector
-from giswater.ui_manager import WSoptions
-from giswater.ui_manager import WStimes
 from giswater.ui_manager import UDoptions
 from giswater.ui_manager import UDtimes
 from giswater.ui_manager import HydrologySelector
@@ -48,7 +53,7 @@ class Go2Epa(ParentAction):
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
         # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
-        #self.get_last_gsw_file()
+        self.get_last_gsw_file()
 
 
         # Create dialog
@@ -57,31 +62,21 @@ class Go2Epa(ParentAction):
         #self.dlg_go2epa.setFixedSize(620, 300)
 
         # TODO habilitar todos estos widgets cuando Edgar acabe el giswater_java en python
-        """
+
         # Set widgets
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
-        self.dlg_go2epa.txt_result_name.setText(self.project_name)
-
+        self.dlg_go2epa.txt_result_name.setText(self.result_name)
+        """
         # Hide checkboxes
         self.dlg_go2epa.chk_export.setVisible(False)
         self.dlg_go2epa.chk_export_subcatch.setVisible(False)
         self.dlg_go2epa.chk_exec.setVisible(False)
         self.dlg_go2epa.chk_import.setVisible(False)
         """
-        grl_general_1 = self.dlg_go2epa.findChild(QGridLayout, 'grl_general_1')
-        grl_general_2 = self.dlg_go2epa.findChild(QGridLayout, 'grl_general_2')
-        grl_hyd_3 = self.dlg_go2epa.findChild(QGridLayout, 'grl_hyd_3')
-        grl_hyd_4 = self.dlg_go2epa.findChild(QGridLayout, 'grl_hyd_4')
-        grl_quality_5 = self.dlg_go2epa.findChild(QGridLayout, 'grl_quality_5')
-        grl_quality_6 = self.dlg_go2epa.findChild(QGridLayout, 'grl_quality_6')
-        grl_statu_7 = self.dlg_go2epa.findChild(QGridLayout, 'grl_statu_7')
-        grl_statu_8 = self.dlg_go2epa.findChild(QGridLayout, 'grl_statu_8')
-        grl_crm_9 = self.dlg_go2epa.findChild(QGridLayout, 'grl_crm_9')
-        grl_crm_10 = self.dlg_go2epa.findChild(QGridLayout, 'grl_crm_10')
-        grl_date_11 = self.dlg_go2epa.findChild(QGridLayout, 'grl_date_11')
-        grl_date_12 = self.dlg_go2epa.findChild(QGridLayout, 'grl_date_12')
+
         # Set signals
+        self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
@@ -107,7 +102,8 @@ class Go2Epa(ParentAction):
             field_id_right = "sector_id"
             self.dlg_go2epa.btn_sector_selection.clicked.connect(
                 partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
-
+        # self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
+        self.set_completer_result(self.dlg_go2epa.txt_result_name, 'arc', 'arc_id')
         # Open dialog
         self.open_dialog(self.dlg_go2epa, dlg_name='file_manager', maximize_button=False)
 
@@ -145,7 +141,7 @@ class Go2Epa(ParentAction):
         self.set_gsw_settings()
         self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
         self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')
-        self.project_name = self.gsw_settings.value('PROJECT_NAME')        
+        self.result_name = self.gsw_settings.value('RESULT_NAME')
         
         return True
             
@@ -174,7 +170,7 @@ class Go2Epa(ParentAction):
 
     def ws_options(self):
         """ Open dialog ws_options.ui """
-        self.g2epa_opt.go2epa_options()
+        status = self.g2epa_opt.go2epa_options()
         return
         # # Create dialog
         # self.dlg_wsoptions = WSoptions()
@@ -493,7 +489,7 @@ class Go2Epa(ParentAction):
 
     def go2epa_select_file_inp(self):
         """ Select INP file """
-        
+        self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         # Set default value if necessary
         if self.file_inp is None or self.file_inp == '':
             self.file_inp = self.plugin_dir
@@ -527,13 +523,131 @@ class Go2Epa(ParentAction):
             self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
 
+    def insert_into_inp(self, folder_path=None, all_rows=None):
+        file1 = open(folder_path, "w")
+        for row in all_rows:
+            line = ""
+            for x in range(0, len(row)):
+                if row[x] is not None:
+                    line += str(row[x])
+                    if len(row[x]) < 4:
+                        line += "\t\t\t\t\t"
+                    elif len(row[x]) < 8:
+                        line += "\t\t\t\t"
+                    elif len(row[x]) < 12:
+                        line += "\t\t\t"
+                    elif len(row[x]) < 16:
+                        line += "\t\t"
+                    else:
+                        line += "\t"
+            line += "\n"
+            file1.write(line)
+        file1.close()
+
+        msg = "INP file has been created"
+        self.controller.show_info(msg)
+
+    def insert_into_db(self, folder_path=None):
+        file = open(folder_path, "r+")
+        full_file = file.readlines()
+        # row = element.split(' . ', 3)
+        # feature_id = str(row[0])
+        # geom_id = str(row[1])
+        # cat_feature_id = str(row[2])
+        sql = ("INSERT INTO " + self.schema_name + ".temp_csv2pg"
+               " (csv2pgcat_id, user_name, csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12")
+        values = "VALUES(11, cur_user, "
+        source = ""
+        for row in full_file:
+            sp = row.split('\t')
+            sp.remove("\n")
+            for x in range(0, len(sp)):
+
+                sp[x] = sp[x].replace("''", None)
+
+            self.controller.log_info(str(type(sp)))
+            self.controller.log_info(str(len(sp)))
+            self.controller.log_info(str(sp))
+            # print(type(row))
+            # print(len(row))
+            # print(row)
+        # rows = full_file[1].split('\n')
+        # self.controller.log_info(str(type(rows)))
+        # self.controller.log_info(str(rows))
+        # try:
+        #     with open(path, "rb") as file_input:
+        #         rows = csv.reader(file_input, delimiter=delimiter)
+        #         for row in rows:
+        #             unicode_row = [x.decode(str(_unicode)) for x in row]
+        #             items = [QStandardItem(field) for field in unicode_row]
+        #             model.appendRow(items)
+        # except Exception as e:
+        #     self.controller.show_warning(str(e))
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
 
         # Get widgets values
+        self.result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
+        prev_net_geom = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
+        export_inp = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
+        export_subcatch = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
         self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        exec_epa = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
         self.file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
-        self.project_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
+        import_result = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
+        self.controller.log_info(str(self.result_name))
+        if self.result_name is 'null':
+            message = "You have to set this parameter"
+            self.controller.show_warning(message, parameter="Result Name")
+            return
+        # Export to inp file
+        # if export_inp is True:
+        #     sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_export_epa_inp($$"+str(self.result_name)+"$$)")
+        #     row = self.controller.get_row(sql, log_sql=False)
+        #     sql = ("SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 "
+        #            " FROM " + self.schema_name + ".temp_csv2pg "
+        #            " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
+        #     rows = self.controller.get_rows(sql, log_sql=True)
+        #     self.insert_into_inp(self.file_inp, rows)
+
+
+        # Import to DB
+        if import_result is True:
+            # sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
+            #        " WHERE user_name=current_user AND csv2pgcat_id=11")
+            # self.controller.execute_sql(sql, log_sql=False)
+            self.insert_into_db(self.file_inp)
+        return
+        # Execute epa
+        if exec_epa is True:
+            if self.project_type in 'ws':
+                opener = self.plugin_dir + "/epa/ws_epanet20012.exe"
+            elif self.project_type in 'ud':
+                opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
+            subprocess.call([opener, self.file_inp, self.file_rpt])
+
+        # Save INP, RPT and result name into GSW file
+        self.save_file_parameters()
+
+        return
+
+        # fields = ['{"widget": "txt_result_name", "value": "'+result_name+'"}',
+        #           '{"widget": "chk_only_check", "value": ' + str(prev_net_geom) + '}']
+        #
+        # form = '"formName":"go2epa"'
+        # extras = '"fields":' + str(fields) + ''
+        # body = self.create_body(form=form, extras=extras)
+        # # Get layers under mouse clicked
+        # sql = ("SELECT " + self.schema_name + ".gw_api_setgo2epa($${" + body + "}$$)::text")
+        # self.controller.log_info(str(sql))
+        # #row = self.controller.get_row(sql, log_sql=True)
+        # row = None
+        # if not row:
+        #     self.controller.show_message("NOT ROW FOR: " + sql, 2)
+        #     return False
+        # complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+
+
         
         # Check that all parameters has been set
         if self.file_inp == "null":
@@ -544,32 +658,48 @@ class Go2Epa(ParentAction):
             message = "You have to set this parameter"
             self.controller.show_warning(message, parameter="RPT file")
             return            
-        if self.project_name == "null":
-            message = "You have to set this parameter"
-            self.controller.show_warning(message, parameter="Project Name")
-            return     
-        
-        # Check if selected @result_id already exists
-        exists = self.check_result_id(self.project_name)
-        if exists:
-            message = "Selected 'Result name' already exists. Do you want to overwrite it?"
-            answer = self.controller.ask_question(message, 'Result name')
-            if not answer:
-                return
+
+
+
+
+
+
+
+
+
+
+
         
         only_check = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
         if only_check:
-            self.check_data()
-            return
-        
+             sql = ("SELECT " + self.scheman_name + ".gw_fct_utils_csv2pg_export_epa_inp('"+self.result_name+"')")
+             row = self.controller.get_row(sql, log_sql=True)
+            #self.check_data()
+            #return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # Execute function 'gw_fct_pg2epa'
         sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'False');"  
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             return False        
     
-        # Save INP, RPT and result name into GSW file
-        self.save_file_parameters()
+
         
         # Save database connection parameters into GSW file
         self.save_database_parameters()
@@ -631,14 +761,42 @@ class Go2Epa(ParentAction):
     #         message = "Executing..."
     #         self.controller.show_info(message, parameter=aux)
 
+    def set_completer_result(self, widget, viewname, field_name):
+        """ Set autocomplete of widget 'feature_id'
+            getting id's from selected @viewname
+        """
 
-    def check_result_id(self, result_id):  
+        # Adding auto-completion to a QLineEdit
+        self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        widget.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = ("SELECT "+field_name+" FROM " + self.schema_name + "." + viewname)
+        row = self.controller.get_rows(sql)
+        if row:
+            self.dlg_go2epa.chk_only_check.setChecked(True)
+            for i in range(0, len(row)):
+                aux = row[i]
+                row[i] = str(aux[0])
+
+            model.setStringList(row)
+            self.completer.setModel(model)
+        else:
+            self.dlg_go2epa.chk_only_check.setChecked(False)
+
+
+    def check_result_id(self):
         """ Check if selected @result_id already exists """
-        
-        sql = ("SELECT * FROM " + self.schema_name + ".v_ui_rpt_cat_result"
+        result_id = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
+        sql = ("SELECT result_id FROM " + self.schema_name + ".v_ui_rpt_cat_result"
                " WHERE result_id = '" + str(result_id) + "'")
         row = self.controller.get_row(sql)
-        return row
+        self.controller.log_info(str(row))
+        if not row:
+            self.dlg_go2epa.chk_only_check.setEnabled(False)
+        else:
+            self.dlg_go2epa.chk_only_check.setEnabled(True)
             
                     
     def check_data(self):
@@ -708,10 +866,10 @@ class Go2Epa(ParentAction):
 
     def save_file_parameters(self):
         """ Save INP, RPT and result name into GSW file """
-              
+
         self.gsw_settings.setValue('FILE_INP', self.file_inp)
         self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
-        self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
+        self.gsw_settings.setValue('RESULT_NAME', self.result_name)
         
 
     def go2epa_result_selector(self):

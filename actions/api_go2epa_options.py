@@ -25,7 +25,7 @@ else:
 import csv
 import json
 import os
-import subprocess
+
 
 from collections import OrderedDict
 from functools import partial
@@ -33,7 +33,7 @@ from functools import partial
 import utils_giswater
 
 from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import WSoptions
+from giswater.ui_manager import EpaOptions
 
 
 class Go2EpaOptions(ApiParent):
@@ -52,12 +52,12 @@ class Go2EpaOptions(ApiParent):
         """ Button 23: Open form to set INP, RPT and project """
 
         # Create dialog
-        self.dlg_options = WSoptions()
+        self.dlg_options = EpaOptions()
         self.load_settings(self.dlg_options)
 
 
-        reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]") # para dias:horas:minutos:segundos
-        reg_exp = QRegExp("[ \\d]{0-4}:[0-5][0-9]:[0-5][0-9]")  # para horas:minutos:segundos
+        reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]")  # para dias:horas:minutos:segundos
+        reg_exp = QRegExp("[\\d]+:[0-5][0-9]:[0-5][0-9]")  # para horas:minutos:segundos
         # self.dlg_options.line_1.setInputMask("009:99:99")
         self.dlg_options.line_1.setValidator(QRegExpValidator(reg_exp))
 
@@ -66,7 +66,12 @@ class Go2EpaOptions(ApiParent):
         # Get layers under mouse clicked
         sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        # TODO controllar si row tiene algo
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+
         self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list, False)
 
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))

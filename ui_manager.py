@@ -434,8 +434,8 @@ class CFWScatalog(QtGui.QDialog, FORM_CLASS):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
 
-FORM_CLASS = get_ui_class('ws_options.ui')
-class WSoptions(QtGui.QDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('epa_options.ui')
+class EpaOptions(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)

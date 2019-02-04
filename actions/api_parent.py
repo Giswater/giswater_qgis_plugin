@@ -540,7 +540,8 @@ class ApiParent(ParentAction):
         
         widget = QLineEdit()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         if 'iseditable' in field:
@@ -617,8 +618,9 @@ class ApiParent(ParentAction):
     
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
-        self.populate_combo(widget, field)
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
+        widget = self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
         return widget
@@ -639,13 +641,14 @@ class ApiParent(ParentAction):
         # Populate combo
         for record in combolist:
             widget.addItem(record[1], record)
-
+        return widget
 
     def add_frame(self, field, x=None):
     
         widget = QFrame()
         widget.setObjectName(field['widgetname'] + "_" + str(x))
-        widget.setProperty('column_id', field['column_id'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
         widget.setFrameShape(QFrame.HLine)
         widget.setFrameShadow(QFrame.Sunken)
         return widget
@@ -657,7 +660,8 @@ class ApiParent(ParentAction):
         widget = QLabel()
         widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         return widget
@@ -672,7 +676,8 @@ class ApiParent(ParentAction):
     
         widget = HyperLinkLabel()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -712,7 +717,8 @@ class ApiParent(ParentAction):
             if field['widgettype'] == 'doubleSpinbox':
                 widget = QDoubleSpinBox()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             if field['widgettype'] == 'spinbox' and field['value'] != "":
                 widget.setValue(int(field['value']))
@@ -926,7 +932,8 @@ class ApiParent(ParentAction):
     
         widget = QgsDateTimeEdit()
         widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
         widget.setAllowNull(True)
         widget.setCalendarPopup(True)
         widget.setDisplayFormat('yyyy/MM/dd')
@@ -1052,7 +1059,7 @@ class ApiParent(ParentAction):
         for field in row[pos]['fields']:
             if field['label']:
                 lbl = QLabel()
-                lbl.setObjectName('lbl' + field['name'])
+                lbl.setObjectName('lbl' + field['widgetname'])
                 lbl.setText(field['label'])
                 lbl.setMinimumSize(160, 0)
                 lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
@@ -1060,7 +1067,7 @@ class ApiParent(ParentAction):
                 if put_chk is True:
                     if field['checked'] == "True":
                         chk = QCheckBox()
-                        chk.setObjectName('chk_' + field['name'])
+                        chk.setObjectName('chk_' + field['widgetname'])
                         chk.setChecked(True)
                     elif field['checked'] == "False":
                         chk.setChecked(False)
@@ -1072,8 +1079,7 @@ class ApiParent(ParentAction):
                     widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
-                    widget = QComboBox()
-                    self.populate_combo(widget, field)
+                    widget = self.add_combobox(field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
@@ -1095,7 +1101,7 @@ class ApiParent(ParentAction):
                     widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-                widget.setObjectName(field['name'])
+                widget.setObjectName(field['widgetname'])
 
                 # Set signals
                 if put_chk is True:

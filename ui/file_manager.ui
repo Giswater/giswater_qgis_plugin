@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>936</width>
-    <height>507</height>
+    <width>695</width>
+    <height>587</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -142,7 +142,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Export subcatchments</string>
+             <string>Export UD  subcatchments</string>
             </property>
            </widget>
           </item>
@@ -284,6 +284,13 @@
            </layout>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chk_import_result">
+          <property name="text">
+           <string>Import result</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
