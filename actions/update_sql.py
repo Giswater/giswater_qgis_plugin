@@ -1513,11 +1513,14 @@ class UpdateSQL(ParentAction):
         status = self.controller.execute_sql(sql)
         if status:
             self.reload_trg(project_type=self.project_type_selected)
+            self.reload_trg(project_type='api')
             self.reload_fct_ftrg(project_type=self.project_type_selected)
+            self.reload_fct_ftrg(project_type='api')
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_schema_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             status = self.controller.execute_sql(sql)
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.setArrowCursor()
+        self.close_dialog(self.dlg_readsql_rename)
 
         
     def update_api(self):
