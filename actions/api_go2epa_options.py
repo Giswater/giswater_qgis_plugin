@@ -50,40 +50,11 @@ class Go2EpaOptions(ApiParent):
 
     def go2epa_options(self):
         """ Button 23: Open form to set INP, RPT and project """
-        # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
-        #self.get_last_gsw_file()
-
 
         # Create dialog
         self.dlg_options = WSoptions()
         self.load_settings(self.dlg_options)
-        #self.dlg_go2epa.setFixedSize(620, 300)
 
-        # TODO habilitar todos estos widgets cuando Edgar acabe el giswater_java en python
-        """
-        # Set widgets
-        self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
-        self.dlg_go2epa.txt_result_name.setText(self.project_name)
-
-        # Hide checkboxes
-        self.dlg_go2epa.chk_export.setVisible(False)
-        self.dlg_go2epa.chk_export_subcatch.setVisible(False)
-        self.dlg_go2epa.chk_exec.setVisible(False)
-        self.dlg_go2epa.chk_import.setVisible(False)
-        """
-        grl_general_1 = self.dlg_options.findChild(QGridLayout, 'grl_general_1')
-        grl_general_2 = self.dlg_options.findChild(QGridLayout, 'grl_general_2')
-        grl_hyd_3 = self.dlg_options.findChild(QGridLayout, 'grl_hyd_3')
-        grl_hyd_4 = self.dlg_options.findChild(QGridLayout, 'grl_hyd_4')
-        grl_quality_5 = self.dlg_options.findChild(QGridLayout, 'grl_quality_5')
-        grl_quality_6 = self.dlg_options.findChild(QGridLayout, 'grl_quality_6')
-        grl_statu_7 = self.dlg_options.findChild(QGridLayout, 'grl_statu_7')
-        grl_statu_8 = self.dlg_options.findChild(QGridLayout, 'grl_statu_8')
-        grl_crm_9 = self.dlg_options.findChild(QGridLayout, 'grl_crm_9')
-        grl_crm_10 = self.dlg_options.findChild(QGridLayout, 'grl_crm_10')
-        grl_date_11 = self.dlg_options.findChild(QGridLayout, 'grl_date_11')
-        grl_date_12 = self.dlg_options.findChild(QGridLayout, 'grl_date_12')
 
         reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]") # para dias:horas:minutos:segundos
         reg_exp = QRegExp("[ \\d]{0-4}:[0-5][0-9]:[0-5][0-9]")  # para horas:minutos:segundos
@@ -98,14 +69,14 @@ class Go2EpaOptions(ApiParent):
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list, False)
 
-        self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.self.epa_options_list))
+        self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
         self.dlg_options.show()
 
 
     def update_values(self, _json):
         my_json = json.dumps(_json)
         form = '"formName":"epaoptions"'
-        extras = '"fields":[' + my_json + ']'
+        extras = '"fields":' + my_json + ''
         body = self.create_body(form=form, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_setconfig($${" + body + "}$$)")
         self.controller.execute_sql(sql, log_sql=True)
