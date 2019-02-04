@@ -10,7 +10,8 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_audit_manager() RETURNS TRIGGER AS $body$
 DECLARE
-    
+      table_record record;    
+
 BEGIN
 
 --	Set search path to local schema
@@ -18,7 +19,7 @@ BEGIN
 	
 	FOR table_record IN SELECT * FROM audit_cat_table WHERE isaudit  IS TRUE
 	LOOP 
-		DELETE FROM audit.log WHERE interval (now()-tstamp) > table_record.keepauditdays
+		DELETE FROM audit.log WHERE (date (now())- date (tstamp)) > table_record.keepauditdays;
 	END LOOP;	
 
 

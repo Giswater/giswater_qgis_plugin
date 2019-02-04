@@ -19,18 +19,18 @@ BEGIN
 
     IF (TG_OP = 'INSERT') THEN
         v_new_data := row_to_json(NEW.*);
-        INSERT INTO log (schema_name,table_name,user_name,action,newdata,query)
-        VALUES (TG_TABLE_SCHEMA::TEXT,TG_TABLE_NAME::TEXT,session_user::TEXT,substring(TG_OP,1,1),v_new_data, current_query());
+        INSERT INTO audit.log (schema,table_name,user_name,action,newdata,query)
+        VALUES (TG_TABLE_SCHEMA::TEXT, TG_TABLE_NAME::TEXT ,session_user::TEXT,substring(TG_OP,1,1),v_new_data, current_query());
         RETURN NEW;
     ELSIF (TG_OP = 'UPDATE') THEN
         v_old_data := row_to_json(OLD.*);
         v_new_data := row_to_json(NEW.*);
-        INSERT INTO log (schema_name,table_name,user_name,action,olddata,newdata,query) 
+        INSERT INTO audit.log (schema,table_name,user_name,action,olddata,newdata,query) 
         VALUES (TG_TABLE_SCHEMA::TEXT,TG_TABLE_NAME::TEXT,session_user::TEXT,substring(TG_OP,1,1),v_old_data,v_new_data, current_query());
         RETURN NEW;
     ELSIF (TG_OP = 'DELETE') THEN
         v_old_data := row_to_json(OLD.*);
-        INSERT INTO log (schema_name,table_name,user_name,action,olddata,query)
+        INSERT INTO audit.log (schema,table_name,user_name,action,olddata,query)
         VALUES (TG_TABLE_SCHEMA::TEXT,TG_TABLE_NAME::TEXT,session_user::TEXT,substring(TG_OP,1,1),v_old_data, current_query());
         RETURN OLD;
     END IF;

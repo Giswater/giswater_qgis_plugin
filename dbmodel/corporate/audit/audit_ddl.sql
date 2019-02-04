@@ -10,7 +10,7 @@ CREATE SCHEMA audit;
 
 CREATE TABLE audit.log (
 id serial8 PRIMARY KEY,
-schema_name text, 
+schema text, 
 table_name text,
 id_name text,
 user_name text,
@@ -23,6 +23,6 @@ tstamp timestamp default now()
 
 
 
-ALTER TABLE audit_cat_table add column isaudit boolean;
-ALTER TABLE audit_cat_table add column keepauditdays integer;
+ALTER TABLE SCHEMA_NAME.audit_cat_table add column isaudit boolean;
+ALTER TABLE SCHEMA_NAME.audit_cat_table add column keepauditdays integer;
 

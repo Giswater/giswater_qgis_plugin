@@ -17,6 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_audit_schema('disable')
 
 DECLARE 
       v_schema_name text;
+      table_record record;
 
 BEGIN 
 	-- search path
@@ -29,7 +30,7 @@ BEGIN
 		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit'||table_record.id||' ON '||table_record.id;
 		IF p_action='enable' THEN
 			EXECUTE 'CREATE TRIGGER gw_trg_audit'||table_record.id||' AFTER INSERT OR UPDATE OR DELETE ON '||v_schema_name||'.'
-			||table_record.id||'FOR EACH ROW EXECUTE PROCEDURE '||v_schema_name||'.gw_trg_audit()';
+			||table_record.id||' FOR EACH ROW EXECUTE PROCEDURE '||v_schema_name||'.gw_trg_audit()';
 		END IF;
 	END LOOP;		
 
