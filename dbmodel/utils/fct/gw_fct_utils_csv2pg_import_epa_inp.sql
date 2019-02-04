@@ -30,10 +30,10 @@ BEGIN
 	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	
 	IF project_type_aux='WS' THEN
-		PERFORM gw_fct_utils_csv2pg_import_epanet_inp(11, p_path);
+		PERFORM gw_fct_utils_csv2pg_import_epanet_inp(p_path);
 	
 	ELSE
-		PERFORM gw_fct_utils_csv2pg_import_swmm_inp(11, p_path);
+		PERFORM gw_fct_utils_csv2pg_import_swmm_inp(p_path);
 	
 	END IF;
 		

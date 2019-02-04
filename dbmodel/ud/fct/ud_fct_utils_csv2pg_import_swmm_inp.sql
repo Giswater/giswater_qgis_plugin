@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2524
   
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(p_csv2pgcat_id integer, p_path text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(p_path text)
   RETURNS integer AS
 
 /*EXAMPLE
@@ -30,6 +30,7 @@ $BODY$
 	v_query_fields text;
 	v_rec_view record;
 	v_sql text;
+	v_csv2pgcat_id integer =12;
 	
 BEGIN
 	-- Search path
@@ -47,7 +48,7 @@ BEGIN
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(p_csv2pgcat_id)||','||quote_literal(p_path)||' )';
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' )';
 	END IF;
 	
 	-- MAPZONES
@@ -121,7 +122,7 @@ BEGIN
 	INSERT INTO cat_node VALUES ('EPASTORAGE-DEF', 'EPAMAT');
 
 	-- HARMONIZE THE SOURCE TABLE
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 		-- massive refactor of source field (getting target)
 		--Fill in the fields source with the name of the target in order to refactor and read data correctly
@@ -134,7 +135,7 @@ BEGIN
 		--Target in order to insert them to the tables using editable views, which have different values concatenated into one field. 
 		--Those values are later separated using the trigger in order to put it in corresponding fields if necessary.
 		--Concatenation is made using ';' when the values need the separation in the next step (trigger) and by ' ' when they are inserted into the same field.
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 
 		IF rpt_rec.source ='[TEMPERATURE]' AND rpt_rec.csv3 is not null THEN 
@@ -226,7 +227,7 @@ BEGIN
 	END LOOP;
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=p_csv2pgcat_id order by id
+	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id order by id
 	LOOP
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -240,7 +241,7 @@ BEGIN
 		
 		--inserting values on editable view
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv2pg where source like '||quote_literal(concat('%',v_rec_table.target,'%'))||' 
-		AND csv2pgcat_id='||p_csv2pgcat_id||' AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
+		AND csv2pgcat_id='||v_csv2pgcat_id||' AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
 
 		raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;
@@ -254,7 +255,7 @@ BEGIN
 
 		--Insert start point, add vertices if exist, add end point
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
-		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
+		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
 		LOOP	
 			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
 			geom_array=array_append(geom_array,v_point_geom);
@@ -270,7 +271,7 @@ BEGIN
 	--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
 	FOR v_data IN SELECT * FROM subcatchment LOOP
 	
-		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=p_csv2pgcat_id and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
+		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
 		LOOP	
 			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
 			INSERT INTO temp_table (text_column,geom_point) VALUES (v_data.subc_id,v_point_geom);

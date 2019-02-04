@@ -23,32 +23,33 @@ DECLARE
 	type_aux text;
 	rpt_rec record;
 	project_type_aux varchar;
+	v_csv2pgcat_id integer = 11;
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-
+v_csv2pgcat_id
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=11;
+		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id;
 		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(p_path)||' WITH (NULL '''', FORMAT TEXT)';	
 	END IF;
 
-	UPDATE temp_csv2pg SET csv2pgcat_id=11 WHERE csv2pgcat_id IS NULL AND user_name=current_user;
+	UPDATE temp_csv2pg SET csv2pgcat_id=v_csv2pgcat_id WHERE csv2pgcat_id IS NULL AND user_name=current_user;
 	
 	--remove data from with the same result_id
-	FOR rpt_rec IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=11 EXCEPT SELECT * FROM sys_csv2pg_config WHERE tablename='rpt_cat_result' LOOP
+	FOR rpt_rec IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT * FROM sys_csv2pg_config WHERE tablename='rpt_cat_result' LOOP
 		EXECUTE 'DELETE FROM '||rpt_rec.tablename||' WHERE result_id='''||p_result_id||''';';
 	END LOOP;
 	
 	hour_aux=null;
 					
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=11 order by id
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
-		IF (SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=11) 
+		IF (SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id) 
 		IS NOT NULL THEN
-			type_aux=(SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=11);
+			type_aux=(SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id);
 			hour_aux=rpt_rec.csv4;
 		END IF;
 					
