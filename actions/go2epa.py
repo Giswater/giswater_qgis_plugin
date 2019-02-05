@@ -8,28 +8,25 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from PyQt4.QtCore import QTime, QDate, Qt
-from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QSpinBox, QComboBox
-from PyQt4.QtGui import QCompleter
-from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog
+from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QStringListModel
+from PyQt4.QtGui import QCompleter, QFileDialog
+
 
 
 import csv
-import json
+
 import os
 import subprocess
 
-from collections import OrderedDict
+
 from functools import partial
 
-from PyQt4.QtGui import QGridLayout
-from PyQt4.QtGui import QStringListModel
+
 
 import utils_giswater
 from actions.update_sql import UpdateSQL
 from giswater.ui_manager import FileManager
 from giswater.ui_manager import Multirow_selector
-from giswater.ui_manager import UDoptions
-from giswater.ui_manager import UDtimes
 from giswater.ui_manager import HydrologySelector
 from giswater.ui_manager import EpaResultCompareSelector
 from giswater.ui_manager import EpaResultManager
@@ -59,21 +56,15 @@ class Go2Epa(ParentAction):
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
-        #self.dlg_go2epa.setFixedSize(620, 300)
+        if self.project_type in 'ws':
+            self.dlg_go2epa.chk_export_subcatch.setVisible(False)
 
-        # TODO habilitar todos estos widgets cuando Edgar acabe el giswater_java en python
 
         # Set widgets
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
-        """
-        # Hide checkboxes
-        self.dlg_go2epa.chk_export.setVisible(False)
-        self.dlg_go2epa.chk_export_subcatch.setVisible(False)
-        self.dlg_go2epa.chk_exec.setVisible(False)
-        self.dlg_go2epa.chk_import.setVisible(False)
-        """
+
 
         # Set signals
         self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
@@ -82,9 +73,9 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
         self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.rejected.connect(partial(self.close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
         if self.project_type == 'ws':
             self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
-            self.dlg_go2epa.btn_options.clicked.connect(self.ws_options)
             tableleft = "cat_dscenario"
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
@@ -94,8 +85,6 @@ class Go2Epa(ParentAction):
         if self.project_type == 'ud':
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
-            self.dlg_go2epa.btn_options.clicked.connect(self.ud_options)
-            self.dlg_go2epa.btn_times.clicked.connect(self.ud_times)
             tableleft = "sector"
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
@@ -168,195 +157,10 @@ class Go2Epa(ParentAction):
         dlg_psector_sel.exec_()
 
 
-    def ws_options(self):
+    def epa_options(self):
         """ Open dialog ws_options.ui """
         status = self.g2epa_opt.go2epa_options()
         return
-        # # Create dialog
-        # self.dlg_wsoptions = WSoptions()
-        # self.load_settings(self.dlg_wsoptions)
-        #
-        # # Allow QTextView only Double text
-        # self.dlg_wsoptions.viscosity.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.trials.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.accuracy.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.emitter_exponent.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.checkfreq.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.maxcheck.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.damplimit.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.node_id.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.unbalanced_n.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.specific_gravity.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.diffusivity.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.tolerance.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.demand_multiplier.setValidator(QDoubleValidator())
-        # self.dlg_wsoptions.duration.setValidator(QIntValidator())
-        #
-        # self.dlg_wsoptions.rtc_enabled.setChecked(True)
-        #
-        # # Set values from widgets of type QComboBox
-        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_units ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.units, rows)
-        #
-        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_headloss ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.headloss, rows)
-        #
-        # sql = "SELECT pattern_id, pattern_id FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.pattern, rows)
-        #
-        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_unbal ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.unbalanced, rows)
-        #
-        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_hyd ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.hydraulics, rows)
-        #
-        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_qual ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.quality, rows)
-        #
-        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_valvemode ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.valve_mode, rows)
-        #
-        # sql = "SELECT id::text, id::text FROM "+self.schema_name+".anl_mincut_result_cat ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.valve_mode_mincut_result, rows)
-        #
-        # sql = "SELECT id, code FROM "+self.schema_name+".ext_cat_period ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.rtc_period_id, rows, 1)
-        #
-        # sql = "SELECT id, id FROM "+self.schema_name+".inp_value_opti_rtc_coef ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.rtc_coefficient, rows)
-        #
-        # sql = "SELECT id, id FROM " + self.schema_name + ".inp_value_times ORDER BY id"
-        # rows = self.controller.get_rows(sql)
-        # utils_giswater.set_item_data(self.dlg_wsoptions.statistic, rows)
-        #
-        # # TODO
-        # if self.dlg_wsoptions.valve_mode.currentText() != "MINCUT RESULTS":
-        #     self.dlg_wsoptions.valve_mode_mincut_result.setEnabled(False)
-        #
-        # if self.dlg_wsoptions.hydraulics.currentText() == "":
-        #     self.dlg_wsoptions.hydraulics_fname.setEnabled(False)
-        # else:
-        #     self.dlg_wsoptions.hydraulics_fname.setEnabled(True)
-        #
-        # # TODO
-        # if self.dlg_wsoptions.quality.currentText() == "TRACE":
-        #     self.dlg_wsoptions.node_id.setEnabled(False)
-        # else:
-        #     self.dlg_wsoptions.node_id.setEnabled(True)
-        #
-        # if utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled):
-        #     self.dlg_wsoptions.rtc_period_id.setEnabled(True)
-        #     self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
-        #
-        #
-        #
-        #
-        # self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(
-        #     partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.unbalanced, self.dlg_wsoptions.unbalanced_n, "STOP"))
-        # self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(
-        #     partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.hydraulics, self.dlg_wsoptions.hydraulics_fname, ""))
-        # self.dlg_wsoptions.quality.currentIndexChanged.connect(
-        #     partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.quality, self.dlg_wsoptions.node_id, "TRACE"))
-        # self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(
-        #     partial(self.enable_linetext, self.dlg_wsoptions, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, ("EPA TABLES", "INVENTORY VALUES")))
-        # self.dlg_wsoptions.rtc_enabled.stateChanged.connect(self.enable_per_coef)
-        #
-        # self.dlg_wsoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', self.dlg_wsoptions))
-        # self.dlg_wsoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_times', self.dlg_wsoptions))
-        # self.dlg_wsoptions.btn_cancel.clicked.connect(self.dlg_wsoptions.close)
-        # self.go2epa_options_get_data('inp_options', self.dlg_wsoptions)
-        # self.go2epa_options_get_data('inp_times', self.dlg_wsoptions)
-        # self.dlg_wsoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
-        # self.dlg_wsoptions.exec_()
-
-
-
-    def enable_per_coef(self):
-        """ Enable or dissable cbx """
-        self.dlg_wsoptions.rtc_period_id.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled))
-        self.dlg_wsoptions.rtc_coefficient.setEnabled(utils_giswater.isChecked(self.dlg_wsoptions, self.dlg_wsoptions.rtc_enabled))
-
-
-    def enable_linetext(self, dialog, widget1, widget2, text):
-        """ Enable or disable txt """
-        if utils_giswater.getWidgetText(dialog, widget1) in text:
-            utils_giswater.setWidgetEnabled(dialog, widget2, False)
-        else:
-            utils_giswater.setWidgetEnabled(dialog, widget2, True)
-
-
-    def ud_options(self):
-        """ Dialog ud_options.ui """
-        
-        # Create dialog
-        dlg_udoptions = UDoptions()
-        self.load_settings(dlg_udoptions)
-
-        dlg_udoptions.min_slope.setValidator(QDoubleValidator())
-        dlg_udoptions.lengthening_step.setValidator(QDoubleValidator())
-        dlg_udoptions.max_trials.setValidator(QIntValidator())
-        dlg_udoptions.sys_flow_tol.setValidator(QIntValidator())
-        dlg_udoptions.variable_step.setValidator(QIntValidator())
-        dlg_udoptions.min_surfarea.setValidator(QIntValidator())
-        dlg_udoptions.head_tolerance.setValidator(QDoubleValidator())
-        dlg_udoptions.lat_flow_tol.setValidator(QIntValidator())
-
-        # Set values from widgets of type QComboBox
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fu ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.flow_units, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fr ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.flow_routing, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_lo ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.link_offsets, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fme ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.force_main_equation, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_nfl ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.normal_flow_limited, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_id ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.inertial_damping, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_yesno ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.allow_ponding, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.skip_steady_state, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_rainfall, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_snowmelt, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_groundwater, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_routing, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_quality, rows, False)
-        dlg_udoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', dlg_udoptions))
-        dlg_udoptions.btn_cancel.clicked.connect(dlg_udoptions.close)
-        self.go2epa_options_get_data('inp_options', dlg_udoptions)
-        dlg_udoptions.setWindowFlags(Qt.WindowStaysOnTopHint)
-        dlg_udoptions.exec_()
-
-
-    def ud_times(self):
-        """ Dialog ud_times.ui """
-
-        dlg_udtimes = UDtimes()
-        self.load_settings(dlg_udtimes)
-        dlg_udtimes.dry_days.setValidator(QIntValidator())
-        dlg_udtimes.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', dlg_udtimes))
-        dlg_udtimes.btn_cancel.clicked.connect(dlg_udtimes.close)
-        self.go2epa_options_get_data('inp_options', dlg_udtimes)
-        dlg_udtimes.setWindowFlags(Qt.WindowStaysOnTopHint)
-        dlg_udtimes.exec_()
 
 
     def ud_hydrology_selector(self):
@@ -434,59 +238,6 @@ class Go2Epa(ParentAction):
         self.update_labels()
 
 
-    def update_table(self, tablename, dialog):
-        """ INSERT or UPDATE tables according :param update"""
-        
-        sql = "SELECT * FROM " + self.schema_name + "." + tablename
-        row = self.controller.get_row(sql)
-
-        columns = []
-        for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
-            columns.append(column_name)
-
-        if columns is not None:
-            sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
-            for column_name in columns:
-                if column_name != 'id':
-                    widget = dialog.findChild(QWidget, column_name)
-                    widget_type = utils_giswater.getWidgetType(dialog, widget)
-                    if widget_type is QCheckBox:
-                        value = utils_giswater.isChecked(dialog, widget)
-                    elif widget_type is QDateEdit:
-                        date = dialog.findChild(QDateEdit, str(column_name))
-                        value = date.dateTime().toString('dd/MM/yyyy')
-                    elif widget_type is QTimeEdit:
-                        aux = 0
-                        widget_day = str(column_name) + "_day"
-                        day = utils_giswater.getText(dialog, widget_day)
-                        if day != "null":
-                            aux = int(day) * 24
-                        time = dialog.findChild(QTimeEdit, str(column_name))
-                        timeparts = time.dateTime().toString('HH:mm:ss').split(':')
-                        h = int(timeparts[0]) + int(aux)
-                        aux = str(h) + ":" + str(timeparts[1]) + ":" + str(timeparts[2])
-                        value = aux
-                    elif widget_type is QSpinBox:
-                        x = dialog.findChild(QSpinBox, str(column_name))
-                        value = x.value()
-                    elif widget_type is QComboBox:
-                        value = utils_giswater.get_item_data(dialog, widget)
-                    else:
-                        value = utils_giswater.getWidgetText(dialog, widget)
-                    if value == 'null':
-                        sql += column_name + " = null, "
-                    elif value is None:
-                        pass
-                    else:
-                        if type(value) is not bool and widget_type is not QSpinBox:
-                            value = value.replace(",", ".")
-                        sql += column_name + " = '" + str(value) + "', "
-            sql = sql[:len(sql) - 2]
-        self.controller.execute_sql(sql)
-        dialog.close()
-
-
     def go2epa_select_file_inp(self):
         """ Select INP file """
         self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
@@ -550,39 +301,30 @@ class Go2Epa(ParentAction):
     def insert_into_db(self, folder_path=None):
         file = open(folder_path, "r+")
         full_file = file.readlines()
-        # row = element.split(' . ', 3)
-        # feature_id = str(row[0])
-        # geom_id = str(row[1])
-        # cat_feature_id = str(row[2])
-        sql = ("INSERT INTO " + self.schema_name + ".temp_csv2pg"
-               " (csv2pgcat_id, user_name, csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12")
-        values = "VALUES(11, cur_user, "
-        source = ""
+
+
+        keys = ['csv2pgcat_id', 'user_name', 'csv1', 'csv2', 'csv3', 'csv4', 'csv5', 'csv6', 'csv7', 'csv8', 'csv9', 'csv10', 'csv11', 'csv12']
+        sql = ""
         for row in full_file:
+            sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, user_name, "
+            values = "VALUES(11, current_user, "
+
             sp = row.split('\t')
             sp.remove("\n")
+
+            for x in range(len(sp)-1, -1, -1):
+                if sp[x] == '':
+                    sp.pop(x)
             for x in range(0, len(sp)):
+                sql += keys[x+2] + ", "
+                values += "'" + sp[x] + "', "
 
-                sp[x] = sp[x].replace("''", None)
+            sql = sql[:-2]+") "
+            values = values[:-2] + ");\n"
+            sql += values
+        self.controller.execute_sql(sql, log_sql=True)
 
-            self.controller.log_info(str(type(sp)))
-            self.controller.log_info(str(len(sp)))
-            self.controller.log_info(str(sp))
-            # print(type(row))
-            # print(len(row))
-            # print(row)
-        # rows = full_file[1].split('\n')
-        # self.controller.log_info(str(type(rows)))
-        # self.controller.log_info(str(rows))
-        # try:
-        #     with open(path, "rb") as file_input:
-        #         rows = csv.reader(file_input, delimiter=delimiter)
-        #         for row in rows:
-        #             unicode_row = [x.decode(str(_unicode)) for x in row]
-        #             items = [QStandardItem(field) for field in unicode_row]
-        #             model.appendRow(items)
-        # except Exception as e:
-        #     self.controller.show_warning(str(e))
+
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
 
@@ -595,171 +337,55 @@ class Go2Epa(ParentAction):
         exec_epa = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
         self.file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         import_result = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
-        self.controller.log_info(str(self.result_name))
+
         if self.result_name is 'null':
             message = "You have to set this parameter"
             self.controller.show_warning(message, parameter="Result Name")
             return
-        # Export to inp file
-        # if export_inp is True:
-        #     sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_export_epa_inp($$"+str(self.result_name)+"$$)")
-        #     row = self.controller.get_row(sql, log_sql=False)
-        #     sql = ("SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 "
-        #            " FROM " + self.schema_name + ".temp_csv2pg "
-        #            " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
-        #     rows = self.controller.get_rows(sql, log_sql=True)
-        #     self.insert_into_inp(self.file_inp, rows)
 
+        if self.project_type in 'ws':
+            opener = self.plugin_dir + "/epa/ws_epanet20012.exe"
+            epa_function_call = "gw_fct_pg2epa($$"+str(self.result_name)+"$$, "+str(prev_net_geom)+")"
+        elif self.project_type in 'ud':
+            opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
+            epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", "+str(export_subcatch)+")"
+
+        # Export to inp file
+        if export_inp is True:
+            # Check that all parameters has been set
+            if self.file_inp == "null":
+                message = "You have to set this parameter"
+                self.controller.show_warning(message, parameter="INP file")
+                return
+            sql = ("SELECT " + self.schema_name + "." + epa_function_call)
+            row = self.controller.get_row(sql, log_sql=True)
+            sql = ("SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 "
+                   " FROM " + self.schema_name + ".temp_csv2pg "
+                   " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
+            rows = self.controller.get_rows(sql, log_sql=True)
+            self.insert_into_inp(self.file_inp, rows)
 
         # Import to DB
         if import_result is True:
-            # sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
-            #        " WHERE user_name=current_user AND csv2pgcat_id=11")
-            # self.controller.execute_sql(sql, log_sql=False)
+            sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
+                   " WHERE user_name=current_user AND csv2pgcat_id=11")
+            self.controller.execute_sql(sql, log_sql=True)
             self.insert_into_db(self.file_inp)
-        return
+
         # Execute epa
         if exec_epa is True:
-            if self.project_type in 'ws':
-                opener = self.plugin_dir + "/epa/ws_epanet20012.exe"
-            elif self.project_type in 'ud':
-                opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
+            if self.file_rpt == "null":
+                message = "You have to set this parameter"
+                self.controller.show_warning(message, parameter="RPT file")
+                return
             subprocess.call([opener, self.file_inp, self.file_rpt])
 
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
-
-        return
-
-        # fields = ['{"widget": "txt_result_name", "value": "'+result_name+'"}',
-        #           '{"widget": "chk_only_check", "value": ' + str(prev_net_geom) + '}']
-        #
-        # form = '"formName":"go2epa"'
-        # extras = '"fields":' + str(fields) + ''
-        # body = self.create_body(form=form, extras=extras)
-        # # Get layers under mouse clicked
-        # sql = ("SELECT " + self.schema_name + ".gw_api_setgo2epa($${" + body + "}$$)::text")
-        # self.controller.log_info(str(sql))
-        # #row = self.controller.get_row(sql, log_sql=True)
-        # row = None
-        # if not row:
-        #     self.controller.show_message("NOT ROW FOR: " + sql, 2)
-        #     return False
-        # complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-
-
-        
-        # Check that all parameters has been set
-        if self.file_inp == "null":
-            message = "You have to set this parameter"
-            self.controller.show_warning(message, parameter="INP file")
-            return
-        if self.file_rpt == "null":
-            message = "You have to set this parameter"
-            self.controller.show_warning(message, parameter="RPT file")
-            return            
-
-
-
-
-
-
-
-
-
-
-
-        
-        only_check = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
-        if only_check:
-             sql = ("SELECT " + self.scheman_name + ".gw_fct_utils_csv2pg_export_epa_inp('"+self.result_name+"')")
-             row = self.controller.get_row(sql, log_sql=True)
-            #self.check_data()
-            #return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # Execute function 'gw_fct_pg2epa'
-        sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'False');"  
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            return False        
-    
-
-        
-        # Save database connection parameters into GSW file
-        self.save_database_parameters()
         
         # Close form
         self.close_dialog(self.dlg_go2epa)
-        
-    #     # Execute 'go2epa_express'
-    #     self.go2epa_express()
-    #
-    #
-    #
-    # def go2epa_express(self):
-    #     """ Button 24: Open giswater in silent mode
-    #         Executes all options of File Manager: Export INP, Execute EPA software and Import results
-    #     """
-    #
-    #     self.get_last_gsw_file(False)
-    #     self.execute_giswater("mg_go2epa_express")
-    #
-    #
-    # def execute_giswater(self, parameter):
-    #     ''' Executes giswater with selected parameter '''
-    #
-    #     if self.giswater_file_path is None or self.java_exe is None:
-    #         return
-    #
-    #         # Save database connection parameters into GSW file
-    #     self.save_database_parameters()
-    #
-    #     # Check if gsw file exists. If not giswater will open with the last .gsw file
-    #     if self.file_gsw is None:
-    #         self.file_gsw = ""
-    #     if self.file_gsw:
-    #         if self.file_gsw != "" and not os.path.exists(self.file_gsw):
-    #             message = "GSW file not found"
-    #             self.controller.show_info(message, parameter=self.file_gsw)
-    #             self.file_gsw = ""
-    #
-    #             # Start program
-    #     aux = '"' + self.giswater_file_path + '"'
-    #     if self.file_gsw != "":
-    #         aux += ' "' + self.file_gsw + '"'
-    #         program = [self.java_exe, "-jar", self.giswater_file_path, self.file_gsw, parameter]
-    #     else:
-    #         program = [self.java_exe, "-jar", self.giswater_file_path, "", parameter]
-    #
-    #     self.controller.log_info(str(program))
-    #     self.controller.start_program(program)
-    #
-    #     # Compare Java and Plugin versions
-    #     if self.plugin_version <> self.giswater_build_version:
-    #         msg = ("Giswater and plugin versions are different. "
-    #                "Giswater version: " + self.giswater_build_version + ""
-    #                                                                     " - Plugin version: " + self.plugin_version)
-    #         self.controller.show_info(msg, 10)
-    #     # Show information message
-    #     else:
-    #         message = "Executing..."
-    #         self.controller.show_info(message, parameter=aux)
+
 
     def set_completer_result(self, widget, viewname, field_name):
         """ Set autocomplete of widget 'feature_id'

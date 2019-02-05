@@ -12,16 +12,16 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer, QDate, SIGNAL
+    from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer, QDate, SIGNAL, QRegExp
     from PyQt4.QtGui import QAction, QCheckBox, QComboBox, QCompleter, QColor, QGridLayout, QLineEdit, QSizePolicy, QWidget,  QSpacerItem, QLabel
     from PyQt4.QtGui import  QStringListModel, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
-    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QDateEdit
+    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QDateEdit, QRegExpValidator
 
     from PyQt4.QtSql import QSqlTableModel
     from qgis.gui import QgsMapCanvasSnapper
 else:
-    from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel
-    from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator
+    from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel, QRegExp
+    from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
     from qgis.PyQt.QtWidgets import QAction, QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
     from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
     from qgis.PyQt.QtSql import QSqlTableModel
@@ -1076,6 +1076,10 @@ class ApiParent(ParentAction):
                 if field['widgettype'] == 'text':
                     widget = QLineEdit()
                     widget.setText(field['value'])
+                    if 'reg_exp' in field:
+                        if field['reg_exp'] is not None:
+                            reg_exp = QRegExp(str(field['reg_exp']))
+                            widget.setValidator(QRegExpValidator(reg_exp))
                     widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
@@ -1106,10 +1110,10 @@ class ApiParent(ParentAction):
                 # Set signals
                 if put_chk is True:
                     chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
-                self.put_wigets(dialog, field, field['layout_name'], lbl, chk, widget)
+                self.put_widgets(dialog, field, field['layout_name'], lbl, chk, widget)
 
 
-    def put_wigets(self, dialog, field, layout_name, lbl, chk, widget):
+    def put_widgets(self, dialog, field, layout_name, lbl, chk, widget):
         """ Insert widget into layout """
         layout = dialog.findChild(QGridLayout, layout_name)
         if layout is None:

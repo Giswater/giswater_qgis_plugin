@@ -55,11 +55,10 @@ class Go2EpaOptions(ApiParent):
         self.dlg_options = EpaOptions()
         self.load_settings(self.dlg_options)
 
-
-        reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]")  # para dias:horas:minutos:segundos
-        reg_exp = QRegExp("[\\d]+:[0-5][0-9]:[0-5][0-9]")  # para horas:minutos:segundos
-        # self.dlg_options.line_1.setInputMask("009:99:99")
-        self.dlg_options.line_1.setValidator(QRegExpValidator(reg_exp))
+        # reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]")  # para dias:horas:minutos:segundos
+        # reg_exp = QRegExp("[\\d]+:[0-5][0-9]:[0-5][0-9]")  # para horas:minutos:segundos
+        # # self.dlg_options.line_1.setInputMask("009:99:99")
+        # self.dlg_options.line_1.setValidator(QRegExpValidator(reg_exp))
 
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)

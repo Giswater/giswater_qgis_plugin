@@ -819,3 +819,11 @@ class ParentAction(object):
         action.setObjectName(action_name)
 
         return action
+
+
+    def set_wait_cursor(self):
+        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
+
+
+    def set_arrow_cursor(self):
+        QApplication.instance().setOverrideCursor(Qt.ArrowCursor)
