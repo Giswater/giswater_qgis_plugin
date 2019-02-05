@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -12,18 +12,18 @@ CREATE OR REPLACE VIEW v_ui_om_event AS
  SELECT *     
    FROM om_visit_event;
  
-create view v_ui_om_lot AS
+create OR REPLACE view v_ui_om_lot AS
 select * FROM om_visit_lot;
 
-create view v_ui_om_visit_x_doc
+create OR REPLACE view v_ui_om_visit_x_doc
 as 
 SELECT * FROM doc_x_visit;
 
 CREATE OR REPLACE VIEW ve_lot_x_arc AS 
  SELECT arc.arc_id,
     om_visit_lot_x_arc.lot_id,
-    status,
-    the_geom
+    om_visit_lot_x_arc.status,
+    arc.the_geom
     FROM selector_lot, om_visit_lot
      JOIN om_visit_lot_x_arc ON lot_id=id
      JOIN arc ON arc.arc_id=om_visit_lot_x_arc.arc_id
@@ -44,7 +44,7 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.suspendendcat_id,
+    --om_visit.suspendendcat_id,
     a.param_1 AS sediments_arc,
     a.param_2 AS desperfectes_arc,
     a.param_3 AS neteja_arc
@@ -78,7 +78,7 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.suspendendcat_id,
+    --om_visit.suspendendcat_id,
     a.param_1 AS sediments_node,
     a.param_2 AS desperfectes_node,
     a.param_3 AS neteja_node
@@ -112,7 +112,7 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.suspendendcat_id,
+    --om_visit.suspendendcat_id,
     a.param_1 AS sediments_connec,
     a.param_2 AS desperfectes_connec,
     a.param_3 AS neteja_connec
@@ -147,7 +147,7 @@ CREATE OR REPLACE VIEW ve_visit_singlevent_x_arc AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.suspendendcat_id,
+    --om_visit.suspendendcat_id,
 	om_visit_event.id AS event_id,
     om_visit_event.event_code,
     om_visit_event.position_id,
@@ -189,7 +189,7 @@ CREATE OR REPLACE VIEW ve_visit_singlevent_x_connec AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.suspendendcat_id,
+    --om_visit.suspendendcat_id,
 	om_visit_event.id AS event_id,
     om_visit_event.event_code,
     om_visit_event.position_id,
@@ -230,7 +230,7 @@ CREATE OR REPLACE VIEW ve_visit_singlevent_x_node AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.suspendendcat_id,
+    --om_visit.suspendendcat_id,
 	om_visit_event.id AS event_id,
     om_visit_event.event_code,
     om_visit_event.position_id,

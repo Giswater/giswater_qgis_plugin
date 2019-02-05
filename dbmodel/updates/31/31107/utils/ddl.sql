@@ -158,16 +158,16 @@ CREATE TABLE om_visit_lot_x_arc(
   CONSTRAINT cat_vehicle_pkey PRIMARY KEY (id));
 
  
-  CREATE TABLE om_visit_lot_team_x_user(
+  CREATE TABLE om_visit_team_x_user(
   team_id integer,
   user_id varchar(16),
-  constraint om_visit_lot_team_x_user_pkey PRIMARY KEY (team_id, user_id));
+  constraint om_visit_team_x_user_pkey PRIMARY KEY (team_id, user_id));
   
  
-  CREATE TABLE om_visit_lot_user_x_vehicle(
+  CREATE TABLE om_visit_user_x_vehicle(
   user_id varchar(16),
   vehicle_id integer,
-  constraint om_visit_lot_user_x_vehicle_pkey PRIMARY KEY (user_id, vehicle_id));
+  constraint om_visit_user_x_vehicle_pkey PRIMARY KEY (user_id, vehicle_id));
   
  
   
@@ -177,6 +177,8 @@ CREATE TABLE om_visit_lot_x_arc(
   fextension varchar (16),
   CONSTRAINT om_visit_filetype_x_extension_pkey PRIMARY KEY (filetype, fextension)
 );
+
+
 
 
 ---inp

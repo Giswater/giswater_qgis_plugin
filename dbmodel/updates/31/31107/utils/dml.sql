@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -20,6 +20,4 @@ INSERT INTO sys_csv2pg_cat VALUES (12, 'Import inp', 'Import inp', null, 'role_a
 
 -- 2019/02/02
 UPDATE audit_cat_function SET istoolbox=TRUE,  descript=return_type, context=project_type, project_type='utils', function_type='{"featureType":"node"}', 
-return_type=null, input_params='[{"name":"nodeTolerance", "type":"float"}]' , sys_roled_id='role_edit', isparametric=true;
-
-WHERE function_name='gw_fct_anl_node_duplicated';
+return_type=null, input_params='[{"name":"nodeTolerance", "type":"float"}]' , sys_role_id='role_edit', isparametric=true WHERE function_name='gw_fct_anl_node_duplicated';
