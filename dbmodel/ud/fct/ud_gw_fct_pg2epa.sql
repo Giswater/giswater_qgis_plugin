@@ -51,8 +51,6 @@ BEGIN
 		PERFORM gw_fct_pg2epa_dump_subcatch (result_id_var);
 	END IF;
 	
-	-- Generate data into temp table ready to export
-	PERFORM gw_fct_utils_csv2pg_export_swmm_inp(result_id_var);
 
 	
 RETURN check_count_aux;
