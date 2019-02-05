@@ -67,7 +67,7 @@ class Go2Epa(ParentAction):
 
 
         # Set signals
-        self.dlg_go2epa.chk_import_result.stateChanged.connect(partial(self.chk_control))
+        #self.dlg_go2epa.chk_import_result.stateChanged.connect(partial(self.chk_control))
         self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
@@ -320,38 +320,27 @@ class Go2Epa(ParentAction):
         sql = ""
         get_row = False
         for row in full_file:
-            sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg ("
-            values = "VALUES("
-            #self.controller.log_info(str(row))
             if 'Analysis Options' in row:
                 get_row = True
             if get_row:
-                row = row.split('\t')
-                row = row.split('\n')
-                self.controller.log_info(str(row))
+                sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg ("
+                values = "VALUES("
+                sp_n = row.split('  ')
+                for x in range(len(sp_n) - 1, -1, -1):
+                    if sp_n[x] == '':
+                        sp_n.pop(x)
+                for x in range(0, len(sp_n)):
+                    if "*" not in sp_n[x]:
+                        sql += keys[x] + ", "
+                        values += "'" + sp_n[x].replace("\n", "") + "', "
+                    else:
+                        sql += keys[x] + ", "
+                        values = "VALUES(null, "
+                sql = sql[:-2]+") "
+                values = values[:-2] + ");\n"
+                sql += values
 
-
-
-        sql = sql[:-2]+") "
-        values = values[:-2] + ");\n"
-        sql += values
-        #     sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg ("
-        #     values = "VALUES("
-        #
-        #     sp = row.split('\t')
-        #     sp.remove("\n")
-        #
-        #     for x in range(len(sp)-1, -1, -1):
-        #         if sp[x] == '':
-        #             sp.pop(x)
-        #     for x in range(0, len(sp)):
-        #         sql += keys[x+2] + ", "
-        #         values += "'" + sp[x] + "', "
-        #
-        #     sql = sql[:-2]+") "
-        #     values = values[:-2] + ");\n"
-        #     sql += values
-        # self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql, log_sql=True)
 
 
     def go2epa_accept(self):
@@ -403,13 +392,7 @@ class Go2Epa(ParentAction):
             rows = self.controller.get_rows(sql, log_sql=True)
             self.insert_into_inp(self.file_inp, rows)
 
-        # Import to DB
-        if import_result is True:
-            sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
-                   " WHERE user_name=current_user AND csv2pgcat_id=11")
-            self.controller.execute_sql(sql, log_sql=True)
-            self.insert_rpt_into_db(self.file_rpt)
-        return
+
         # Execute epa
         if exec_epa is True:
             if self.file_rpt == "null":
@@ -417,6 +400,15 @@ class Go2Epa(ParentAction):
                 self.controller.show_warning(message, parameter="RPT file")
                 return
             subprocess.call([opener, self.file_inp, self.file_rpt])
+
+
+        # Import to DB
+        if import_result is True:
+            sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
+                   " WHERE user_name=current_user AND csv2pgcat_id=11")
+            self.controller.execute_sql(sql, log_sql=True)
+            self.insert_rpt_into_db(self.file_rpt)
+
 
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
