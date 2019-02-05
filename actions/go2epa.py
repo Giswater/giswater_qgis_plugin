@@ -67,6 +67,7 @@ class Go2Epa(ParentAction):
 
 
         # Set signals
+        self.dlg_go2epa.chk_import_result.stateChanged.connect(partial(self.chk_control))
         self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
@@ -95,6 +96,18 @@ class Go2Epa(ParentAction):
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'arc', 'arc_id')
         # Open dialog
         self.open_dialog(self.dlg_go2epa, dlg_name='file_manager', maximize_button=False)
+
+
+    def chk_control(self, state):
+        if state == 2:
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
+            self.dlg_go2epa.chk_exec.setEnabled(False)
+            self.dlg_go2epa.chk_export.setEnabled(False)
+        else:
+            self.dlg_go2epa.chk_exec.setEnabled(True)
+            self.dlg_go2epa.chk_export.setEnabled(True)
+
 
     def go2epa_sector_selector(self):
 
@@ -298,31 +311,47 @@ class Go2Epa(ParentAction):
         msg = "INP file has been created"
         self.controller.show_info(msg)
 
-    def insert_into_db(self, folder_path=None):
+    def insert_rpt_into_db(self, folder_path=None):
         file = open(folder_path, "r+")
         full_file = file.readlines()
 
 
-        keys = ['csv2pgcat_id', 'user_name', 'csv1', 'csv2', 'csv3', 'csv4', 'csv5', 'csv6', 'csv7', 'csv8', 'csv9', 'csv10', 'csv11', 'csv12']
+        keys = ['csv1', 'csv2', 'csv3', 'csv4', 'csv5', 'csv6', 'csv7', 'csv8', 'csv9', 'csv10', 'csv11', 'csv12']
         sql = ""
+        get_row = False
         for row in full_file:
-            sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, user_name, "
-            values = "VALUES(11, current_user, "
+            sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg ("
+            values = "VALUES("
+            #self.controller.log_info(str(row))
+            if 'Analysis Options' in row:
+                get_row = True
+            if get_row:
+                row = row.split('\t')
+                row = row.split('\n')
+                self.controller.log_info(str(row))
 
-            sp = row.split('\t')
-            sp.remove("\n")
 
-            for x in range(len(sp)-1, -1, -1):
-                if sp[x] == '':
-                    sp.pop(x)
-            for x in range(0, len(sp)):
-                sql += keys[x+2] + ", "
-                values += "'" + sp[x] + "', "
 
-            sql = sql[:-2]+") "
-            values = values[:-2] + ");\n"
-            sql += values
-        self.controller.execute_sql(sql, log_sql=True)
+        sql = sql[:-2]+") "
+        values = values[:-2] + ");\n"
+        sql += values
+        #     sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg ("
+        #     values = "VALUES("
+        #
+        #     sp = row.split('\t')
+        #     sp.remove("\n")
+        #
+        #     for x in range(len(sp)-1, -1, -1):
+        #         if sp[x] == '':
+        #             sp.pop(x)
+        #     for x in range(0, len(sp)):
+        #         sql += keys[x+2] + ", "
+        #         values += "'" + sp[x] + "', "
+        #
+        #     sql = sql[:-2]+") "
+        #     values = values[:-2] + ");\n"
+        #     sql += values
+        # self.controller.execute_sql(sql, log_sql=True)
 
 
     def go2epa_accept(self):
@@ -349,6 +378,8 @@ class Go2Epa(ParentAction):
         elif self.project_type in 'ud':
             opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
             epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", "+str(export_subcatch)+")"
+        export_function = "gw_fct_utils_csv2pg_export_epa_inp('" + str(self.result_name) + "')"
+
 
         # Export to inp file
         if export_inp is True:
@@ -357,8 +388,15 @@ class Go2Epa(ParentAction):
                 message = "You have to set this parameter"
                 self.controller.show_warning(message, parameter="INP file")
                 return
+            # Call function gw_fct_pg2epa
             sql = ("SELECT " + self.schema_name + "." + epa_function_call)
             row = self.controller.get_row(sql, log_sql=True)
+
+            # Call function gw_fct_utils_csv2pg_export_epa_inp
+            sql = ("SELECT " + self.schema_name + "." + export_function)
+            row = self.controller.get_row(sql, log_sql=True)
+
+            # Get values from temp_csv2pg and insert into INP file
             sql = ("SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 "
                    " FROM " + self.schema_name + ".temp_csv2pg "
                    " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
@@ -370,8 +408,8 @@ class Go2Epa(ParentAction):
             sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
                    " WHERE user_name=current_user AND csv2pgcat_id=11")
             self.controller.execute_sql(sql, log_sql=True)
-            self.insert_into_db(self.file_inp)
-
+            self.insert_rpt_into_db(self.file_rpt)
+        return
         # Execute epa
         if exec_epa is True:
             if self.file_rpt == "null":
