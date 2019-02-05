@@ -262,10 +262,26 @@ IF tab_arg = 'network' THEN
                     CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ('||query_text||')b
                     WHERE search_field::text ILIKE ' || quote_literal(text_arg) || ' AND sys_table_id = '||quote_literal(id_arg)||'
                     ORDER BY search_field LIMIT 10) a'
+                    USING query_text, text_arg, id_arg
                     INTO response_json;
     END IF;
 
-    
+
+/*
+
+  EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a)))
+      FROM (SELECT '||v_visit_display_field||' as display_name, '''||v_visit_layer||''' AS sys_table_id , '''||v_visit_id_field||''' AS sys_id,
+      '''||v_visit_layer||''' AS sys_idname FROM '|| v_visit_layer||
+      ' WHERE '||v_visit_id_field||'::text ILIKE '''||text_arg||''' LIMIT 10 )a')
+      INTO response_json;
+
+  EXECUTE FORMAT('SELECT array_to_json(array_agg(row_to_json(a)))
+      FROM (SELECT %s as display_name, $1 AS sys_table_id , $2 AS sys_id, $1 AS sys_idname FROM %s
+      WHERE %s::text ILIKE $3 LIMIT 10 )a',quote_ident(v_visit_display_field), quote_ident(v_visit_layer), quote_ident(v_visit_display_field))
+      USING v_visit_layer, v_visit_id_field, text_arg
+      INTO response_json;
+
+*/
 -- address
 ---------
 ELSIF tab_arg = 'address' THEN
@@ -376,13 +392,20 @@ ELSIF tab_arg = 'address' THEN
     edit1 := search_data->>'workcat_search';
     text_arg := concat('%', edit1->>'text' ,'%');
 
-
+/*
     --  Search in the workcat
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
         FROM (SELECT '||v_workcat_display_field||' as display_name, '||quote_literal(v_workcat_layer)||' AS sys_table_id , 
         '||(v_workcat_id_field)||' AS sys_id, '||quote_literal(v_workcat_layer)||' 
         AS sys_idname FROM '||quote_ident(v_workcat_layer) ||' 
         WHERE '||v_workcat_display_field||'::text ILIKE'''||text_arg||'''LIMIT 10 )a'
+        INTO response_json;
+*/
+
+    EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) 
+        FROM (SELECT $1 display_name, $2 AS sys_table_id , $3 AS sys_id, $2 AS sys_idname FROM %s
+        WHERE workcat_id ILIKE $4 LIMIT 10 )a', quote_ident(v_workcat_layer))
+        USING v_workcat_display_field, quote_literal(v_workcat_layer), v_workcat_id_field, text_arg
         INTO response_json;
 
 
@@ -400,15 +423,11 @@ ELSIF tab_arg = 'address' THEN
     edit1 := search_data->>'visit_search';
     text_arg := concat('%', edit1->>'text' ,'%');
 
-    --  Search in the visit
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||v_visit_display_field||' as display_name, '||quote_literal(v_visit_layer)||' AS sys_table_id , 
-        '||(v_visit_id_field)||' AS sys_id, '||quote_literal(v_visit_layer)||' 
-        AS sys_idname FROM '||v_visit_layer||'  
-        WHERE '||v_visit_display_field||'::text ILIKE '''||text_arg||''' LIMIT 10 )a'
-        INTO response_json;
-
-
+  EXECUTE FORMAT('SELECT array_to_json(array_agg(row_to_json(a)))
+      FROM (SELECT %s as display_name, $1 AS sys_table_id , $2 AS sys_id, $1 AS sys_idname FROM %s
+      WHERE %s::text ILIKE $3 LIMIT 10 )a',quote_ident(v_visit_display_field), quote_ident(v_visit_layer), quote_ident(v_visit_display_field))
+      USING v_visit_layer, v_visit_id_field, text_arg
+      INTO response_json;
 
 -- Psector tab
 --------------
@@ -448,8 +467,6 @@ ELSIF tab_arg = 'address' THEN
         WHERE '||v_exploitation_layer||'.'||v_exploitation_display_field||' = '||quote_literal(name_arg)||'
         AND '||v_psector_layer||'.'||v_psector_display_field||' ILIKE '''||text_arg||''' LIMIT 10 )a'
         INTO response_json;
-    ELSE
- 
 
     END IF;
 

@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2640
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_setvisitmanagerstart(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setvisitmanagerstart(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 --new call
-SELECT ws_sample.gw_api_setvisitmanagerstart($${
+SELECT SCHEMA_NAME.gw_api_setvisitmanagerstart($${
 "client":{"device":3,"infoType":100,"lang":"es"},
 "form":{},
 "data":{}}$$)

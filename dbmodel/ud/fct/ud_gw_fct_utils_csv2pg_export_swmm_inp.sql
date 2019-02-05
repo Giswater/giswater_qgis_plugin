@@ -26,6 +26,7 @@ DECLARE
 
 BEGIN
 
+/*
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -93,6 +94,7 @@ BEGIN
 		TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
 
+	*/
 
 RETURN;
         

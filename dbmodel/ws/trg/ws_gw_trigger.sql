@@ -4,6 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+
+SET search_path='SCHEMA_NAME', public;
+
 DROP TRIGGER IF EXISTS gw_trg_arc_noderotation_update ON "SCHEMA_NAME".arc;
 CREATE TRIGGER gw_trg_arc_noderotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON "SCHEMA_NAME".arc 
 FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_noderotation_update();

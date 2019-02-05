@@ -6,9 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2314
 
+drop function if exists SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean)  ;
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean)  
+RETURNS integer AS 
+$BODY$
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean)  RETURNS integer AS $BODY$
+/*EXAMPLE
+ SELECT SCHEMA_NAME.gw_fct_pg2epa('test1', false)  
+*/
+
 DECLARE
+
 
 
 rec_options 	record;
@@ -51,6 +59,11 @@ BEGIN
 
 	-- Calling for modify the valve status
 	PERFORM gw_fct_pg2epa_valve_status(result_id_var, v_mandatory_nodarc);
+	
+	-- Generate data into temp table ready to export
+	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(result_id_var);
+	
+	
 
 RETURN check_count_aux;
 	

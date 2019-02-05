@@ -14,6 +14,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp('result_1', 'D:\dades\test.inp')
 */
+
 DECLARE
 	rec_table record;
 	column_number integer;
@@ -26,6 +27,7 @@ DECLARE
 
 BEGIN
 
+/*
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
@@ -92,7 +94,9 @@ BEGIN
 		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 FROM temp_csv2pg WHERE csv2pgcat_id=10 and user_name=current_user order by id) 
 		TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
-	
+
+*/ 
+
 RETURN;
         
 END;$BODY$
