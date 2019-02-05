@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: XXXX
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_audit_manager() RETURNS TRIGGER AS $body$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_manager() RETURNS integer AS $body$
 DECLARE
       table_record record;    
 
@@ -22,6 +22,7 @@ BEGIN
 		DELETE FROM audit.log WHERE (date (now())- date (tstamp)) > table_record.keepauditdays;
 	END LOOP;	
 
+RETURN 0;
 
 END;
 $body$
