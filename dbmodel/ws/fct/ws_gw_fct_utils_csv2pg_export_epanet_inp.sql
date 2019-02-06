@@ -27,12 +27,9 @@ DECLARE
 
 BEGIN
 
-/*
+
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-
-	-- execute pg2epa function
-	PERFORM SCHEMA_NAME.gw_fct_pg2epa(p_result_id, false);
 
 	--Delete previous
 	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_pg2csvcat_id;
@@ -81,12 +78,14 @@ BEGIN
 		END CASE;
   
 		--add formating - spaces
-		FOR num_col_rec IN 1..num_column::integer
-		LOOP
-			IF num_col_rec < num_column::integer THEN
-				EXECUTE 'UPDATE temp_csv2pg SET csv'||num_col_rec||'=rpad(csv'||num_col_rec||',20) WHERE source='''||rec_table.tablename||''';';
-			END IF;
-		END LOOP;
+		IF p_path IS NOT NULL THEN
+			FOR num_col_rec IN 1..num_column::integer
+			LOOP
+				IF num_col_rec < num_column::integer THEN
+					EXECUTE 'UPDATE temp_csv2pg SET csv'||num_col_rec||'=rpad(csv'||num_col_rec||',20) WHERE source='''||rec_table.tablename||''';';
+				END IF;
+			END LOOP;
+		END IF;
 	END LOOP;
 
 	-- use the copy function of postgres to export to file in case of file must be provided as a parameter
@@ -95,7 +94,6 @@ BEGIN
 		TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
 
-*/ 
 
 RETURN;
         

@@ -29,11 +29,11 @@ BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-v_csv2pgcat_id
+	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
 		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id;
-		EXECUTE 'COPY temp_csv2pg (csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12) FROM '||quote_literal(p_path)||' WITH (NULL '''', FORMAT TEXT)';	
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' )';	
 	END IF;
 
 	UPDATE temp_csv2pg SET csv2pgcat_id=v_csv2pgcat_id WHERE csv2pgcat_id IS NULL AND user_name=current_user;

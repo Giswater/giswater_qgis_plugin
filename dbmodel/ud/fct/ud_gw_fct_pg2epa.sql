@@ -51,7 +51,7 @@ BEGIN
 	
 	IF p_dumpsubcatchment THEN
 		-- Dump subcatchments
-		PERFORM gw_fct_pg2epa_dump_subcatch (result_id_var);
+		PERFORM gw_fct_pg2epa_dump_subcatch ();
 	END IF;
 	
 

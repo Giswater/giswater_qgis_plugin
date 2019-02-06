@@ -38,7 +38,7 @@ BEGIN
 	
 	END IF;
 		
-RETURN v_count;
+RETURN 0;
 	
 END;
 $BODY$
