@@ -23,15 +23,19 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa process.';
 	
+	-- Upsert on rpt_cat_table
+	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
+	INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
+	
+	-- Upsert on node rpt_inp result manager table
+	DELETE FROM inp_selector_result WHERE cur_user=current_user;
+	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 	
 	IF p_use_networkgeom IS FALSE THEN
 
 		-- Fill inprpt tables
 		PERFORM gw_fct_pg2epa_fill_data(result_id_var);
 	
-		-- Fill inprpt tables
-		PERFORM gw_fct_pg2epa_fill_data(result_id_var);
-
 		-- Make virtual arcs (EPA) transparents for hydraulic model
 		PERFORM gw_fct_pg2epa_join_virtual(result_id_var);
 		
