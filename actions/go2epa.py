@@ -314,36 +314,28 @@ class Go2Epa(ParentAction):
     def insert_rpt_into_db(self, folder_path=None):
         file = open(folder_path, "r+")
         full_file = file.readlines()
-
-
-        keys = ['csv1', 'csv2', 'csv3', 'csv4', 'csv5', 'csv6', 'csv7', 'csv8', 'csv9', 'csv10', 'csv11', 'csv12']
         sql = ""
-        get_row = False
         for row in full_file:
-            if 'Analysis Options' in row:
-                get_row = True
-            if get_row:
-                sp_n = row.split('  ')
-                for x in range(len(sp_n) - 1, -1, -1):
-                    if sp_n[x] == '' or "**" in sp_n[x] or "--" in sp_n[x]:
-                        sp_n.pop(x)
-                if len(sp_n) > 0:
-                    sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
-                    values = "VALUES(11, "
-                    for x in range(0, len(sp_n)):
-                        if "''" not in sp_n[x]:
-                            sql += keys[x] + ", "
-                            value = "'" + sp_n[x].replace("\n", "") + "', "
-                            values += value.replace("''", "null")
-                        else:
-                            sql += keys[x] + ", "
-                            values = "VALUES(null, "
-
-
-
-                    sql = sql[:-2]+") "
-                    values = values[:-2] + ");\n"
-                    sql += values
+            sp_n = row.split(' ')
+            for x in range(len(sp_n) - 1, -1, -1):
+                if sp_n[x] == '' or "**" in sp_n[x] or "--" in sp_n[x]:
+                    sp_n.pop(x)
+            if len(sp_n) > 0:
+                sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
+                values = "VALUES(11, "
+                self.controller.log_info(str(len(sp_n)))
+                self.controller.log_info(str(sp_n))
+                for x in range(0, len(sp_n)):
+                    if "''" not in sp_n[x]:
+                        sql += "csv" + str(x+1) + ", "
+                        value = "'" + sp_n[x].strip().replace("\n", "") + "', "
+                        values += value.replace("''", "null")
+                    else:
+                        sql += "csv" + str(x+1) + ", "
+                        values = "VALUES(null, "
+                sql = sql[:-2]+") "
+                values = values[:-2] + ");\n"
+                sql += values
 
         self.controller.execute_sql(sql, log_sql=True, commit=True)
 
