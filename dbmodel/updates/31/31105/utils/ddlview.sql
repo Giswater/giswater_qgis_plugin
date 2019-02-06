@@ -15,6 +15,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 	- has not trigger
 */
 
+-- updated on 3.1.107
 DROP VIEW IF EXISTS v_edit_rtc_hydro_data_x_connec;
 CREATE OR REPLACE VIEW v_edit_rtc_hydro_data_x_connec AS
 SELECT
@@ -32,6 +33,8 @@ LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::int8 = ext_rtc_hydrometer
 JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::int8=ext_rtc_hydrometer_x_data.hydrometer_id::int8
 JOIN ext_cat_period ON cat_period_id=ext_cat_period.id
 ORDER BY 3, 5 DESC ;
+
+
 
 
 

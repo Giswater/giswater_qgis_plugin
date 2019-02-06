@@ -51,7 +51,10 @@ BEGIN
 			JOIN inp_valve ON rpt_inp_node.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||' 
 				UNION 
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
-			JOIN inp_pump ON rpt_inp_node.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var);
+			JOIN inp_pump ON rpt_inp_node.node_id=inp_pump.node_id WHERE result_id='||quote_literal(result_id_var)||'
+				UNION
+			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
+			JOIN inp_shortpipe ON rpt_inp_node.node_id=inp_shortpipe.node_id WHERE result_id='||quote_literal(result_id_var)||' AND to_arc IS NOT NULL';
     ELSE
 	v_query_text = 	'SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_valve ON rpt_inp_node.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||'

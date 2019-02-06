@@ -8,6 +8,43 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+
+-- 2019/02/06
+DROP VIEW v_edit_rtc_hydro_data_x_connec;
+CREATE OR REPLACE VIEW v_edit_rtc_hydro_data_x_connec AS 
+ SELECT ext_rtc_hydrometer_x_data.id,
+    rtc_hydrometer_x_connec.connec_id,
+    ext_rtc_hydrometer.code,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_period.code AS cat_period_code,
+    ext_rtc_hydrometer_x_data.value_date,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::bigint = ext_rtc_hydrometer.catalog_id::bigint
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer_x_data.hydrometer_id::bigint
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+  ORDER BY ext_rtc_hydrometer_x_data.hydrometer_id, ext_rtc_hydrometer_x_data.cat_period_id DESC;
+  
+  
+  
+  CREATE OR REPLACE VIEW v_inp_junction AS 
+SELECT 
+rpt_inp_node.node_id, 
+elevation, 
+elev, 
+rpt_inp_node.demand, 
+pattern_id, 
+st_x(the_geom)::numeric(16,3) AS xcoord, 
+st_y(the_geom)::numeric(16,3) AS ycoord
+FROM inp_selector_result, rpt_inp_node
+   LEFT JOIN inp_junction ON inp_junction.node_id = rpt_inp_node.node_id
+   WHERE epa_type IN ('JUNCTION', 'SHORTPIPE') AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+   ORDER BY rpt_inp_node.node_id;
+  
+
 -- 2019/01/30
 CREATE OR REPLACE VIEW v_inp_pump AS 
 SELECT arc_id::text,
