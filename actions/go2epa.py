@@ -105,19 +105,13 @@ class Go2Epa(ParentAction):
 
 
     def go2epa_sector_selector(self):
-        if self.project_type == 'ws':
-            tableleft = "sector"
-            tableright = "inp_selector_sector"
-            field_id_left = "sector_id"
-            field_id_right = "sector_id"
-
-        if self.project_type == 'ud':
-            tableleft = "sector"
-            tableright = "inp_selector_sector"
-            field_id_left = "sector_id"
-            field_id_right = "sector_id"
-
+        tableleft = "sector"
+        tableright = "inp_selector_sector"
+        field_id_left = "sector_id"
+        field_id_right = "sector_id"
         self.sector_selection(tableleft, tableright, field_id_left, field_id_right)
+
+
     def get_last_gsw_file(self, show_warning=True):
         """ Get last GSW file used by Giswater """
         
