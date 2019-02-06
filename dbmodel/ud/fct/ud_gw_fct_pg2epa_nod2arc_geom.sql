@@ -12,10 +12,10 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(result_id_va
 $BODY$
 DECLARE
 	
-record_node "SCHEMA_NAME".rpt_inp_node%ROWTYPE;
-record_arc1 "SCHEMA_NAME".rpt_inp_arc%ROWTYPE;
-record_arc2 "SCHEMA_NAME".rpt_inp_arc%ROWTYPE;
-record_new_arc "SCHEMA_NAME".rpt_inp_arc%ROWTYPE;
+record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
+record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+record_arc2 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+record_new_arc SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
 node_diameter double precision;
 nodarc_geometry geometry;
 nodarc_node_1_geom geometry;
