@@ -2,6 +2,7 @@
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
+*/
 
 
 -- 3.1.105
@@ -9,4 +10,19 @@ gw_fct_crm2gis_hydro_catalog
 
 
 
-*/
+-- 3.1.107
+ALTER TABLE hydrometer ADD COLUMN hydrotype_id;
+ALTER TABLE hydrometer ADD COLUMN omtype_id;
+ALTER TABLE hydrometer ADD COLUMN instal_date;
+ALTER TABLE hydrometer ADD COLUMN observ;
+ALTER TABLE hydrometer ADD COLUMN valve_type;
+ALTER TABLE hydrometer ADD COLUMN valve_diam;
+ALTER TABLE hydrometer ADD COLUMN valve_mat;
+ALTER TABLE hydrometer ADD COLUMN valve_update_date;
+
+
+
+
+CREATE TABLE hydro_cat_omtype
+
+
