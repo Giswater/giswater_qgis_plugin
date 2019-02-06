@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO raingage VALUES ('RG-01', 'VOLUME', '0:05', 1.0000, 'TIMESERIES', 'T5-5m', NULL, NULL, NULL, 1, '0101000020E764000039A71EA280941941AB5F34D0B8755141');
+INSERT INTO raingage VALUES ('RG-01', 'VOLUME', '0:05', 1.0000, 'TIMESERIES_RAIN', 'T5-5m', NULL, NULL, NULL, 1, '0101000020E764000039A71EA280941941AB5F34D0B8755141');
 
 
 INSERT INTO subcatchment (subc_id, node_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, conduct_2, drytime_2, sector_id, hydrology_id, the_geom) VALUES ('S18873', '18873', 'RG-01', 0.445340, 90.0000, 49.8325, 3.0907, 89.3675, NULL, 0.0130, 0.0250, 4.2280, 0.0000, 0.0000, 'IMPERVIOUS', 100.0000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 83.0000, 0.0000, 10.0000, 2, 1, '0106000020E764000001000000010300000001000000090000008BA4E7640B8A194199858F9F99765141DF6E1F9E9889194136CE36449F7651410C7FE62A8E8919412B0F814EA47651417EE9BBDCA08919413164235EA57651416C284323088B1941A8A86A13A9765141EDB901C92C8B1941A8110F3BA3765141A45F70AE2C8B1941FDEE6C25A276514148613C53CC8A19413B120BA29B7651418BA4E7640B8A194199858F9F99765141');
@@ -371,8 +371,8 @@ INSERT INTO inp_conduit (arc_id, barrels, culvert, kentry, kexit, kavg, flap, q0
 
 
 INSERT INTO inp_curve_id VALUES ('PUMP-01', 'PUMP2');
-INSERT INTO inp_curve_id VALUES ('EBAR-01', 'STORAGE');
-INSERT INTO inp_curve_id VALUES ('EBAR-02', 'STORAGE');
+INSERT INTO inp_curve_id VALUES ('EBAR-01', 'STORAGE_CURVE');
+INSERT INTO inp_curve_id VALUES ('EBAR-02', 'STORAGE_CURVE');
 INSERT INTO inp_curve_id VALUES ('PUMP-02', 'PUMP2');
 
 INSERT INTO inp_curve VALUES (8, 'EBAR-01', 0.000000, 17.500000);
@@ -597,8 +597,8 @@ INSERT INTO inp_project_id VALUES ('title', NULL, 'Dec-2017');
 
 INSERT INTO inp_selector_hydrology VALUES ('1', '1', current_user);
 
-INSERT INTO inp_storage (node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond) VALUES ('18828', 'TABULAR', 'EBAR-02', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
-INSERT INTO inp_storage (node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond) VALUES ('238', 'TABULAR', 'EBAR-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_storage (node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond) VALUES ('18828', 'TABULAR_STORAGE', 'EBAR-02', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_storage (node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond) VALUES ('238', 'TABULAR_STORAGE', 'EBAR-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0000, 0.0000, 0.0000);
 
 INSERT INTO inp_timser_id VALUES ('T10-5m', 'Rainfall', 'RELATIVE');
 INSERT INTO inp_timser_id VALUES ('T5-5m', 'Rainfall', 'RELATIVE');
