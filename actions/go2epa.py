@@ -86,12 +86,7 @@ class Go2Epa(ParentAction):
         if self.project_type == 'ud':
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
-            tableleft = "sector"
-            tableright = "inp_selector_sector"
-            field_id_left = "sector_id"
-            field_id_right = "sector_id"
-            self.dlg_go2epa.btn_sector_selection.clicked.connect(
-                partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+
         # self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'arc', 'arc_id')
         # Open dialog
@@ -110,14 +105,19 @@ class Go2Epa(ParentAction):
 
 
     def go2epa_sector_selector(self):
-
+        if self.project_type == 'ws':
             tableleft = "sector"
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
             field_id_right = "sector_id"
-            self.sector_selection(tableleft, tableright, field_id_left, field_id_right)
 
+        if self.project_type == 'ud':
+            tableleft = "sector"
+            tableright = "inp_selector_sector"
+            field_id_left = "sector_id"
+            field_id_right = "sector_id"
 
+        self.sector_selection(tableleft, tableright, field_id_left, field_id_right)
     def get_last_gsw_file(self, show_warning=True):
         """ Get last GSW file used by Giswater """
         
@@ -311,6 +311,7 @@ class Go2Epa(ParentAction):
         msg = "INP file has been created"
         self.controller.show_info(msg)
 
+
     def insert_rpt_into_db(self, folder_path=None):
         file = open(folder_path, "r+")
         full_file = file.readlines()
@@ -323,8 +324,6 @@ class Go2Epa(ParentAction):
             if len(sp_n) > 0:
                 sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
                 values = "VALUES(11, "
-                self.controller.log_info(str(len(sp_n)))
-                self.controller.log_info(str(sp_n))
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += "csv" + str(x+1) + ", "
