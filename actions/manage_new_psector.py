@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import subprocess
 
-from qgis.core import QgsComposition
+from qgis.core import QgsComposition,  QgsRectangle, QgsPoint
 from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence, QCompleter
 from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel, QStringListModel
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
@@ -235,7 +235,19 @@ class ManageNewPsector(ParentManage):
             if not is_valid:
                 return
             self.select_features_by_expr(layer, expr)
-            self.zoom_to_selected_features(layer)
+
+            # Get canvas extend in order to create a QgsRectangle
+            ext = self.canvas.extent()
+            startPoint = QgsPoint(ext.xMinimum(), ext.yMaximum())
+            endPoint = QgsPoint(ext.xMaximum(), ext.yMinimum())
+            canvas_rec = QgsRectangle(startPoint, endPoint)
+
+            # Get boundingBox(QgsRectangle) from selected feature
+            feature = layer.selectedFeatures()[0]
+            layer_rec = feature.geometry().boundingBox()
+            # Do zoom when QgsRectangles don't intersect
+            if not canvas_rec.intersects(layer_rec):
+                self.zoom_to_selected_features(layer)
             layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
@@ -317,6 +329,7 @@ class ManageNewPsector(ParentManage):
                " WHERE psector_id = '" + str(psector_id) + "'")
         self.controller.execute_sql(sql, log_sql=True)
         self.refresh_map_canvas()
+
 
     def update_total(self, dialog, qtable):
         """ Show description of product plan/om _psector as label """
