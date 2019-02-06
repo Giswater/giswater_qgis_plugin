@@ -11,7 +11,6 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa(result_id_var character v
 RETURNS integer AS 
 $BODY$
 
--- only_check_bool NOT USED VARIABLE
 
 DECLARE
 	check_count_aux integer; 
