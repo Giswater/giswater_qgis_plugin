@@ -323,24 +323,29 @@ class Go2Epa(ParentAction):
             if 'Analysis Options' in row:
                 get_row = True
             if get_row:
-                sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg ("
-                values = "VALUES("
                 sp_n = row.split('  ')
                 for x in range(len(sp_n) - 1, -1, -1):
-                    if sp_n[x] == '':
+                    if sp_n[x] == '' or "**" in sp_n[x] or "--" in sp_n[x]:
                         sp_n.pop(x)
-                for x in range(0, len(sp_n)):
-                    if "*" not in sp_n[x]:
-                        sql += keys[x] + ", "
-                        values += "'" + sp_n[x].replace("\n", "") + "', "
-                    else:
-                        sql += keys[x] + ", "
-                        values = "VALUES(null, "
-                sql = sql[:-2]+") "
-                values = values[:-2] + ");\n"
-                sql += values
+                if len(sp_n) > 0:
+                    sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
+                    values = "VALUES(11, "
+                    for x in range(0, len(sp_n)):
+                        if "''" not in sp_n[x]:
+                            sql += keys[x] + ", "
+                            value = "'" + sp_n[x].replace("\n", "") + "', "
+                            values += value.replace("''", "null")
+                        else:
+                            sql += keys[x] + ", "
+                            values = "VALUES(null, "
 
-        self.controller.execute_sql(sql, log_sql=True)
+
+
+                    sql = sql[:-2]+") "
+                    values = values[:-2] + ");\n"
+                    sql += values
+
+        self.controller.execute_sql(sql, log_sql=True, commit=True)
 
 
     def go2epa_accept(self):
