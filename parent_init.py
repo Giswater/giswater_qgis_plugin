@@ -670,22 +670,27 @@ class ParentDialog(QDialog):
         """ Get values selected by the user and sets a new filter for its table model """
         
         # Get selected dates
-        date_from = self.date_document_from.date().toString('yyyyMMdd') 
-        date_to = self.date_document_to.date().toString('yyyyMMdd') 
-        if (date_from > date_to):
+        date_from = self.date_document_from.date()
+        date_to = self.date_document_to.date()
+        # Create interval dates
+        format_low = 'yyyy-MM-dd 00:00:00.000'
+        format_high = 'yyyy-MM-dd 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            date_from.toString(format_low), date_to.toString(format_high))
+        if date_from > date_to:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)                   
             return
-        
+
         # Set filter
         expr = self.field_id+" = '"+self.id+"'"
-        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
-        
+        expr += (" AND(date BETWEEN {0})".format(interval))
+
         # Get selected values in Comboboxes        
         doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type")
-        if doc_type_value != 'null' or doc_type_value is not None:
+        if doc_type_value != 'null':
             expr += " AND doc_type = '"+str(doc_type_value)+"'"
-  
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()  
