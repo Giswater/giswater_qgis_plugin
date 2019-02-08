@@ -964,6 +964,9 @@ class ParentDialog(QDialog):
         self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
         self.parameter_id = self.tbl_event.model().record(selected_row).value("parameter_id")
 
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
         sql = ("SELECT gallery, document"
                " FROM " + table_name + ""
                " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
@@ -1246,8 +1249,11 @@ class ParentDialog(QDialog):
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
+
+        self.set_dates_from_to(self.date_event_to, self.date_event_from, table_name, 'visit_start', 'visit_end')
         date = QDate.currentDate()
         self.date_event_to.setDate(date)
+
 
         btn_open_visit = self.dialog.findChild(QPushButton, "btn_open_visit")
         btn_new_visit = self.dialog.findChild(QPushButton, "btn_new_visit")
@@ -1358,7 +1364,7 @@ class ParentDialog(QDialog):
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText(self.dialog, "event_type")
         if event_type_value != 'null':
-            expr+= " AND parameter_type = '" + event_type_value + "'"
+            expr += " AND parameter_type = '" + event_type_value + "'"
         event_id = utils_giswater.getWidgetText(self.dialog, "event_id")
         if event_id != 'null': 
             expr += " AND parameter_id = '" + event_id + "'"
@@ -2503,4 +2509,21 @@ class ParentDialog(QDialog):
         if not self.dlg_is_destroyed:
             action.setChecked(enabled)
             
-            
+
+
+    def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
+        sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
+               " FROM {}.{}".format(self.schema_name, table_name))
+        self.controller.log_info(str(sql))
+        row = self.controller.get_row(sql, log_sql=False)
+        if row:
+            if row[0]:
+                widget_from.setDate(row[0])
+            else:
+                current_date = QDate.currentDate()
+                widget_from.setDate(current_date)
+            if row[1]:
+                widget_to.setDate(row[1])
+            else:
+                current_date = QDate.currentDate()
+                widget_to.setDate(current_date)
