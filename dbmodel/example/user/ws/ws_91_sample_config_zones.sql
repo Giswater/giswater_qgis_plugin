@@ -31,19 +31,21 @@ INSERT INTO config_param_user VALUES (30, 'psector_scale_vdefault', '2.00', curr
 INSERT INTO config_param_user VALUES (31, 'psector_rotation_vdefault', '0.0000', current_user);
 INSERT INTO config_param_user VALUES (32, 'psector_gexpenses_vdefault', '19.00', current_user);
 INSERT INTO config_param_user VALUES (33, 'psector_vat_vdefault', '21.00', current_user);
-INSERT INTO config_param_user VALUES (34, 'psector_other_vdefault', '4.00', current_user);
-INSERT INTO config_param_user VALUES (35, 'presszone_vdefault', 'Medium-Expl_01', current_user);
-INSERT INTO config_param_user VALUES (36, 'flexunioncat_vdefault', 'FLEXUNION', current_user);
+INSERT INTO config_param_user VALUES (34, 'psector_type_vdefault', '1', current_user);
+INSERT INTO config_param_user VALUES (35, 'psector_other_vdefault', '4.00', current_user);
+INSERT INTO config_param_user VALUES (36, 'presszone_vdefault', 'Medium-Expl_01', current_user);
+INSERT INTO config_param_user VALUES (37, 'flexunioncat_vdefault', 'FLEXUNION', current_user);
 INSERT INTO config_param_user VALUES (38, 'arccat_vdefault', 'FC110-PN10', current_user);
 INSERT INTO config_param_user VALUES (1, 'state_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'work1', current_user);
 INSERT INTO config_param_user VALUES (3, 'verified_vdefault', 'VERIFIED', current_user);
 INSERT INTO config_param_user VALUES (8, 'connecat_vdefault', 'PVC25-PN16-DOM', current_user);
 INSERT INTO config_param_user VALUES (39, 'nodecat_vdefault', 'AIR VALVE DN50', current_user);
-INSERT INTO config_param_user VALUES (41, 'pavementcat_vdefault', 'Asphalt', current_user);
+INSERT INTO config_param_user VALUES (40, 'pavementcat_vdefault', 'Asphalt', current_user);
 INSERT INTO config_param_user VALUES (9, 'elementcat_vdefault', 'COVER', current_user);
-INSERT INTO config_param_user VALUES (42, 'soilcat_vdefault', 'Standard soil', current_user);
-INSERT INTO config_param_user VALUES (44, 'statetype_vdefault', '2', current_user);
+INSERT INTO config_param_user VALUES (41, 'soilcat_vdefault', 'Standard soil', current_user);
+INSERT INTO config_param_user VALUES (42, 'statetype_vdefault', '2', current_user);
+INSERT INTO config_param_user VALUES (43, 'ownercat_vdefault', 'owner1', current_user);
 INSERT INTO config_param_user VALUES (46, 'wtpcat_vdefault', 'ETAP', current_user);
 INSERT INTO config_param_user VALUES (79, 'psector_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES (81, 'cad_tools_base_layer_vdefault', 'Streetaxis', current_user);
@@ -53,6 +55,7 @@ INSERT INTO config_param_user VALUES (91, 'edit_arc_downgrade_force', 'FALSE', c
 INSERT INTO config_param_user VALUES (102, 'edit_arc_division_dsbl', 'FALSE', current_user);
 INSERT INTO config_param_user VALUES (103, 'plan_arc_vdivision_dsbl', 'FALSE', current_user);
 INSERT INTO config_param_user VALUES (94, 'statetype_plan_vdefault', 3, current_user);
+
 
 
 
