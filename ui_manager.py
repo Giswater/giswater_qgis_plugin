@@ -55,6 +55,13 @@ class AddVisit(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('api_config.ui')
+class ApiConfigUi(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('arc_fusion.ui')
 class ArcFusion(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
@@ -85,13 +92,6 @@ class Cad_add_point(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('change_node_type.ui')
 class ChangeNodeType(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('config.ui')
-class ConfigUtils(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
