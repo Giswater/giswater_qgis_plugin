@@ -14,7 +14,6 @@ from PyQt4.QtGui import QCompleter, QFileDialog
 
 
 import csv
-
 import os
 import subprocess
 
@@ -40,8 +39,8 @@ class Go2Epa(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'go2epa' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-
         self.g2epa_opt = Go2EpaOptions(iface, settings, controller, plugin_dir)
+
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -49,7 +48,6 @@ class Go2Epa(ParentAction):
 
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
-        # TODO habilitar esta llamada  Edgar acabe el giswater_java en python
         self.get_last_gsw_file()
 
 
@@ -59,7 +57,9 @@ class Go2Epa(ParentAction):
         if self.project_type in 'ws':
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
 
-
+        self.dlg_go2epa.progressBar.setMaximum(0)
+        self.dlg_go2epa.progressBar.setMinimum(0)
+        self.dlg_go2epa.progressBar.setVisible(False)
         # Set widgets
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
@@ -87,8 +87,8 @@ class Go2Epa(ParentAction):
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
 
-        # self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
-        self.set_completer_result(self.dlg_go2epa.txt_result_name, 'arc', 'arc_id')
+        # TODO es realmente result_id de la vista v_ui_rpt_cat_result lo que debemos comparar?
+        self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         # Open dialog
         self.open_dialog(self.dlg_go2epa, dlg_name='file_manager', maximize_button=False)
 
@@ -358,7 +358,6 @@ class Go2Epa(ParentAction):
             opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
             epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", "+str(export_subcatch)+")"
         export_function = "gw_fct_utils_csv2pg_export_epa_inp('" + str(self.result_name) + "')"
-
 
         # Export to inp file
         if export_inp is True:
