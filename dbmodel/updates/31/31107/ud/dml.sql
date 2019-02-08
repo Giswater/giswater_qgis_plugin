@@ -249,3 +249,17 @@ INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, reverse_pg2c
 INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, reverse_pg2csvcat_id) VALUES (66, 11, 'rpt_high_flowinest_ind', 'Highest Flow', NULL);
 INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, reverse_pg2csvcat_id) VALUES (67, 11, 'rpt_timestep_critelem', 'Time-Step Critical', NULL);
 INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, reverse_pg2csvcat_id) VALUES (68, 11, 'rpt_high_conterrors', 'Highest Continuity', NULL);
+
+--2019/02/08
+DELETE FROM audit_cat_param_user WHERE id='virtual_line_vdefault';
+DELETE FROM audit_cat_param_user WHERE id='virtual_point_vdefault';
+DELETE FROM audit_cat_param_user WHERE id='virtual_polygon_vdefault';
+DELETE FROM audit_cat_param_user WHERE id='qgis_template_folder_path';
+
+
+DELETE FROM config_param_user WHERE parameter='virtual_line_vdefault';
+DELETE FROM config_param_user WHERE parameter='virtual_point_vdefault';
+DELETE FROM config_param_user WHERE parameter='virtual_polygon_vdefault';
+DELETE FROM config_param_user WHERE parameter='qgis_template_folder_path';
+
+

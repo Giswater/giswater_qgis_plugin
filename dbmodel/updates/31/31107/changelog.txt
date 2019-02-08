@@ -46,12 +46,15 @@ Editable link values of feature tables #622
 
 31107-ud-existing views
 -----------------------
+Bug fix on v_anl_flow_connec and hydrometer definition
 
 
 31107-ud-other
 ---------------
 Add check constraint on fields epa_table and man_table in *_type tables.
 Editable link values of feature tables #622
+Harmonize config_param_user. Same rows for UD and WS
+
 
 **********  I18N  ***********
 

@@ -1393,3 +1393,32 @@ CREATE OR REPLACE VIEW vi_polygons AS
  temp_table.text_column
  FROM temp_table
  WHERE fprocesscat_id=17;
+ 
+ 
+-- 2019/02/08
+DROP VIEW IF EXISTS v_anl_flow_connec;
+CREATE OR REPLACE VIEW v_anl_flow_connec AS 
+ SELECT v_edit_connec.connec_id,
+    anl_flow_arc.context,
+    anl_flow_arc.expl_id,
+    v_edit_connec.the_geom
+   FROM anl_flow_arc
+     JOIN v_edit_connec ON anl_flow_arc.arc_id::text = v_edit_connec.arc_id::text
+     JOIN selector_expl ON anl_flow_arc.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_flow_arc.cur_user::name = "current_user"();
+	 
+	 
+DROP VIEW IF EXISTS v_anl_flow_hydrometer;
+CREATE OR REPLACE VIEW v_anl_flow_hydrometer AS 
+SELECT hydrometer_id,
+v_edit_connec.connec_id,
+code,
+context,
+anl_flow_arc.expl_id,
+anl_flow_arc.arc_id
+FROM selector_expl, anl_flow_arc
+	JOIN v_edit_connec on v_edit_connec.arc_id=anl_flow_arc.arc_id
+	JOIN rtc_hydrometer_x_connec on rtc_hydrometer_x_connec.connec_id=v_edit_connec.connec_id
+	WHERE anl_flow_arc.expl_id=selector_expl.expl_id
+	AND selector_expl.cur_user="current_user"()
+	AND anl_flow_arc.cur_user="current_user"();
+ 
