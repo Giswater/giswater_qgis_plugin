@@ -10,7 +10,11 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(node_id_arg character varying)
   RETURNS smallint AS
+
 $BODY$
+/*
+SELECT "SCHEMA_NAME".gw_fct_arc_divide('1079');
+*/
 DECLARE
     node_geom    geometry;
     arc_id_aux    varchar;
@@ -69,17 +73,19 @@ BEGIN
 	-- Check if it's a end/start point node in case of wrong topology without start or end nodes
 	SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), node_geom, v_arcsearch_nodes) 
 		    OR ST_DWithin(ST_endpoint(the_geom), node_geom, v_arcsearch_nodes) LIMIT 1;
-	IF arc_id_aux IS NOT NULL THEN 
-		IF (SELECT arc_id FROM v_edit_arc WHERE arc_id=arc_id_aux AND node_1 IS NULL OR node_2 IS NULL LIMIT 1) IS NOT NULL THEN
-			UPDATE arc SET the_geom=the_geom WHERE arc_id=arc_id_aux;
-			RETURN 0;
-		END IF;
+	IF arc_id_aux IS NOT NULL THEN
+		-- force trigger of topology in order to reconnect extremal nodes (in case of null's)
+		UPDATE arc SET the_geom=the_geom WHERE arc_id=arc_id_aux;
+		SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(the_geom, node_geom, v_arcsearch_nodes) AND arc_id != arc_id_aux;
 	END IF;
 
 	-- Find closest arc inside tolerance
 	SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
 	WHERE ST_DWithin(node_geom, a.the_geom, arc_divide_tolerance_aux) AND node_1 != node_id_arg AND node_2 != node_id_arg
 	ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
+
+
+	RAISE NOTICE 'arc_id_aux %', arc_id_aux;
 
 	IF arc_id_aux IS NOT NULL THEN 
 
