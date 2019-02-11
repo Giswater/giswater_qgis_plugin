@@ -80,8 +80,8 @@ class GwToolBox(ApiParent):
         # self.web.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
         # self.web.settings().setAttribute(QWebSettings.LocalContentCanAccessFileUrls, True)
         #self.web.load(QUrl('file:///C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf'))
-        self.web.setUrl(QUrl('file:///C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf'))
-        #self.web.load(QUrl('C:/Users/user/.qgis2/python/plugins/giswater/png/ud_section_semielliptical.png'))
+        #self.web.setUrl(QUrl('file:///C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf'))
+        self.web.load(QUrl('C:/Users/user/.qgis2/python/plugins/giswater/png/ud_section_semielliptical.png'))
 
         #self.web.load(QUrl('C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf'))
         #self.web.setHtml('<h1>HTML normal</h1><p><a href="file://C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf">http://investor.google.com/pdf/2007_google_annual_report.pdf</a></p>');

@@ -1280,5 +1280,4 @@ class Utils(ParentAction):
 
 
     def utils_toolbox(self):
-        self.controller.log_info("TEST")
         self.toolbox.open_toolbox()

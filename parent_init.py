@@ -6,20 +6,17 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import json
-from collections import OrderedDict
-
-from PyQt4.QtGui import QStandardItem
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
+
 from PyQt4.Qt import QDate, QDateTime
-from PyQt4.QtCore import QSettings, Qt, QPoint
+from PyQt4.QtCore import QSettings, Qt, QPoint, QUrl
 from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-
+from PyQt4.QtWebKit import QWebView, QWebSettings
 from functools import partial
 from datetime import datetime
 
@@ -1759,6 +1756,8 @@ class ParentDialog(QDialog):
 
     def action_help(self, wsoftware, geom_type):
         """ Open PDF file with selected @wsoftware and @geom_type """
+        self.web = QWebView()
+        self.web.settings().setAttribute(QWebSettings.PluginsEnabled, True)
 
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
@@ -1770,20 +1769,21 @@ class ParentDialog(QDialog):
             locale = 'en'
 
         # Get PDF file
-        pdf_folder = os.path.join(self.plugin_dir, 'png')
-        pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
-
+        png_folder = os.path.join(self.plugin_dir, 'png')
+        png_path = os.path.join(png_folder, wsoftware + "_" + geom_type + "_" + locale + ".png")
         # Open PDF if exists. If not open Spanish version
-        if os.path.exists(pdf_path):
-            os.system(pdf_path)
+        if os.path.exists(png_path):
+            self.web.load(QUrl(png_path))
+            self.web.show()
         else:
             locale = "es"
-            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
-            if os.path.exists(pdf_path):
-                os.system(pdf_path)
+            png_path = os.path.join(png_folder, wsoftware + "_" + geom_type + "_" + locale + ".png")
+            if os.path.exists(png_path):
+                self.web.load(QUrl(png_path))
+                self.web.show()
             else:
                 message = "File not found"
-                self.controller.show_warning(message, parameter=pdf_path)
+                self.controller.show_warning(message, parameter=png_path)
 
 
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
