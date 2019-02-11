@@ -1087,7 +1087,7 @@ class ApiParent(ParentAction):
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
-                    widget = chk
+                    widget = QCheckBox()
                     widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, chk, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datepickertime':

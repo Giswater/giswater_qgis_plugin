@@ -33,7 +33,7 @@ from functools import partial
 import utils_giswater
 
 from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import EpaOptions
+from giswater.ui_manager import ApiEpaOptions
 
 
 class Go2EpaOptions(ApiParent):
@@ -52,12 +52,11 @@ class Go2EpaOptions(ApiParent):
         """ Button 23: Open form to set INP, RPT and project """
 
         # Create dialog
-        self.dlg_options = EpaOptions()
+        self.dlg_options = ApiEpaOptions()
         self.load_settings(self.dlg_options)
 
-        # reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]")  # para dias:horas:minutos:segundos
-        # reg_exp = QRegExp("[\\d]+:[0-5][0-9]:[0-5][0-9]")  # para horas:minutos:segundos
-        # # self.dlg_options.line_1.setInputMask("009:99:99")
+        # reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]")  # to days:hours:minutes:seconds (dd:23:59:%9)
+        # reg_exp = QRegExp("[\\d]+:[0-5][0-9]:[0-5][0-9]")  # to hours:minutes:seconds (999:59:59)
         # self.dlg_options.line_1.setValidator(QRegExpValidator(reg_exp))
 
         form = '"formName":"epaoptions"'
@@ -74,6 +73,7 @@ class Go2EpaOptions(ApiParent):
         self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list, False)
 
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
+        self.dlg_options.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_options))
         self.dlg_options.show()
 
 

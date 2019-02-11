@@ -11,27 +11,18 @@ from PyQt4.QtCore import QTime, QDate, Qt
 from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QStringListModel
 from PyQt4.QtGui import QCompleter, QFileDialog
 
-
-
 import csv
 import os
 import subprocess
 
-
 from functools import partial
-
-
 
 import utils_giswater
 from actions.update_sql import UpdateSQL
-from giswater.ui_manager import FileManager
-from giswater.ui_manager import Multirow_selector
-from giswater.ui_manager import HydrologySelector
-from giswater.ui_manager import EpaResultCompareSelector
-from giswater.ui_manager import EpaResultManager
 from giswater.actions.api_go2epa_options import Go2EpaOptions
 from giswater.actions.parent import ParentAction
-
+from giswater.ui_manager import FileManager, Multirow_selector, HydrologySelector
+from giswater.ui_manager import EpaResultCompareSelector, EpaResultManager
 
 
 class Go2Epa(ParentAction):
@@ -64,10 +55,12 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
+        self.dlg_go2epa.chk_only_check.setChecked(False)
+        self.dlg_go2epa.chk_only_check.setEnabled(False)
 
 
         # Set signals
-        #self.dlg_go2epa.chk_import_result.stateChanged.connect(partial(self.chk_control))
+        self.dlg_go2epa.chk_import_result.stateChanged.connect(partial(self.chk_control))
         self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
@@ -165,7 +158,7 @@ class Go2Epa(ParentAction):
 
 
     def epa_options(self):
-        """ Open dialog ws_options.ui """
+        """ Open dialog api_epa_options.ui.ui """
         status = self.g2epa_opt.go2epa_options()
         return
 
@@ -307,8 +300,8 @@ class Go2Epa(ParentAction):
 
 
     def insert_rpt_into_db(self, folder_path=None):
-        file = open(folder_path, "r+")
-        full_file = file.readlines()
+        _file = open(folder_path, "r+")
+        full_file = _file.readlines()
         sql = ""
         for row in full_file:
             sp_n = row.split(' ')
@@ -330,7 +323,7 @@ class Go2Epa(ParentAction):
                 values = values[:-2] + ");\n"
                 sql += values
 
-        self.controller.execute_sql(sql, log_sql=True, commit=True)
+        self.controller.execute_sql(sql, log_sql=False, commit=True)
 
 
     def go2epa_accept(self):
@@ -368,17 +361,17 @@ class Go2Epa(ParentAction):
                 return
             # Call function gw_fct_pg2epa
             sql = ("SELECT " + self.schema_name + "." + epa_function_call)
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql, log_sql=False)
 
             # Call function gw_fct_utils_csv2pg_export_epa_inp
             sql = ("SELECT " + self.schema_name + "." + export_function)
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql, log_sql=False)
 
             # Get values from temp_csv2pg and insert into INP file
             sql = ("SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 "
                    " FROM " + self.schema_name + ".temp_csv2pg "
                    " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
-            rows = self.controller.get_rows(sql, log_sql=True)
+            rows = self.controller.get_rows(sql, log_sql=False)
             self.insert_into_inp(self.file_inp, rows)
 
 
@@ -390,14 +383,16 @@ class Go2Epa(ParentAction):
                 return
             subprocess.call([opener, self.file_inp, self.file_rpt])
 
-
         # Import to DB
         if import_result is True:
-            sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
-                   " WHERE user_name=current_user AND csv2pgcat_id=11")
-            self.controller.execute_sql(sql, log_sql=True)
-            self.insert_rpt_into_db(self.file_rpt)
-
+            if os.path.exists(self.file_rpt):
+                sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
+                       " WHERE user_name=current_user AND csv2pgcat_id=11")
+                self.controller.execute_sql(sql, log_sql=False)
+                self.insert_rpt_into_db(self.file_rpt)
+            else:
+                msg = "Can't export rpt, File not found"
+                self.controller.show_warning(msg, parameter=self.file_rpt)
 
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
@@ -410,6 +405,7 @@ class Go2Epa(ParentAction):
         """ Set autocomplete of widget 'feature_id'
             getting id's from selected @viewname
         """
+        result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
 
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
@@ -418,17 +414,17 @@ class Go2Epa(ParentAction):
         model = QStringListModel()
 
         sql = ("SELECT "+field_name+" FROM " + self.schema_name + "." + viewname)
-        row = self.controller.get_rows(sql)
-        if row:
-            self.dlg_go2epa.chk_only_check.setChecked(True)
-            for i in range(0, len(row)):
-                aux = row[i]
-                row[i] = str(aux[0])
+        rows = self.controller.get_rows(sql, log_sql=False)
 
-            model.setStringList(row)
+        if rows:
+            for i in range(0, len(rows)):
+                aux = rows[i]
+                rows[i] = str(aux[0])
+
+            model.setStringList(rows)
             self.completer.setModel(model)
-        else:
-            self.dlg_go2epa.chk_only_check.setChecked(False)
+            if result_name in rows:
+                self.dlg_go2epa.chk_only_check.setEnabled(True)
 
 
     def check_result_id(self):
@@ -437,8 +433,8 @@ class Go2Epa(ParentAction):
         sql = ("SELECT result_id FROM " + self.schema_name + ".v_ui_rpt_cat_result"
                " WHERE result_id = '" + str(result_id) + "'")
         row = self.controller.get_row(sql)
-        self.controller.log_info(str(row))
         if not row:
+            self.dlg_go2epa.chk_only_check.setChecked(False)
             self.dlg_go2epa.chk_only_check.setEnabled(False)
         else:
             self.dlg_go2epa.chk_only_check.setEnabled(True)
@@ -448,7 +444,7 @@ class Go2Epa(ParentAction):
         """ Check data executing function 'gw_fct_pg2epa' """
         
         sql = "SELECT " + self.schema_name + ".gw_fct_pg2epa('" + str(self.project_name) + "', 'True');"  
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=False)
         if not row:
             return False
         
@@ -487,7 +483,7 @@ class Go2Epa(ParentAction):
         sql = ("SELECT table_id, column_id, error_message"
                " FROM " + self.schema_name + "." + tablename + ""
                " WHERE fprocesscat_id = 14 AND result_id = '" + self.project_name + "'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             message = "No records found with selected 'result_id'"
             self.controller.show_warning(message, parameter=self.project_name)
