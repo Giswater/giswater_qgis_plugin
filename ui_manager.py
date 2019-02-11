@@ -382,6 +382,13 @@ class Toolbox(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('trv_toolbox.ui')
+class TrvToolbox(QtGui.QDockWidget, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('ud_catalog.ui')
 class UDcatalog(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
