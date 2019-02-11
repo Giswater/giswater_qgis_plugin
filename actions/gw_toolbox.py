@@ -8,6 +8,7 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 from PyQt4.QtCore import QSize
 from PyQt4.QtGui import QDialog
+from PyQt4.QtGui import QItemSelectionModel
 
 try:
     from qgis.core import Qgis
@@ -22,7 +23,7 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
     from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget
     from PyQt4.QtGui import QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget
-    from PyQt4.QtGui import QAbstractItemView, QPrinter
+    from PyQt4.QtGui import QAbstractItemView, QPrinter, QTreeWidgetItem
     from PyQt4.QtSql import QSqlTableModel
     import urlparse
     import win32gui
@@ -32,7 +33,7 @@ else:
     from qgis.PyQt.QtCore import Qt, QDate, QStringListModel,QPoint
     from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QStandardItem, QStandardItemModel
     from qgis.PyQt.QtWebKit import QWebView, QWebSettings, QWebPage
-    from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
+    from qgis.PyQt.QtWidgets import QTreeWidgetItem, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
     from qgis.PyQt.QtWidgets import QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget
     from qgis.PyQt.QtWidgets import QTabWidget, QAbstractItemView, QMenu,  QApplication,QSpinBox, QDoubleSpinBox
     from qgis.PyQt.QtSql import QSqlTableModel, QListWidgetItem
@@ -62,37 +63,135 @@ class GwToolBox(ApiParent):
     def open_toolbox(self):
         self.dlg_toolbox = TrvToolbox()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
+        form = '"formName":"epaoptions"'
+        body = self.create_body(form=form)
+        # Get layers under mouse clicked
+        sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        # TODO controllar si row tiene algo
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['form']['formTabs'])
+        self.dlg_toolbox.trv.doubleClicked.connect(partial(self.test))
         self.dlg_toolbox.show()
 
-        # self.page = QWebPage()
-        # self.p = QPrinter(QPrinter.HighResolution)
-        # self.p.setOutputFormat(QPrinter.PdfFormat)
-        # self.p.setOutputFileName("nestor_out.pdf")
-        # text = "<html> <body> coucou <br>coucou br>coucou <br>coucou <br>coucou <br>coucou <br>coucou </body> </html>";
-        # self.page.mainFrame().setHtml(text)
-        # self.page.setViewportSize(QSize(2000,2000))
-        # self.page.mainFrame().print_(self.p)
+    def test(self, index):
+        self.controller.log_info(str("TEST 10"))
+        feature_id = index.sibling(index.row(), 1).data()
+        self.controller.log_info(str(feature_id))
+    def populate_trv(self, trv_widget, result):
 
-        self.web = QWebView()
-        self.web.settings().setAttribute(QWebSettings.PluginsEnabled, True)
-        # self.web.settings().setAttribute(QWebSettings.AutoLoadImages, True)
-        # self.web.settings().setAttribute(QWebSettings.PrivateBrowsingEnabled, True)
-        # self.web.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
-        # self.web.settings().setAttribute(QWebSettings.LocalContentCanAccessFileUrls, True)
-        #self.web.load(QUrl('file:///C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf'))
-        #self.web.setUrl(QUrl('file:///C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf'))
-        self.web.load(QUrl('C:/Users/user/.qgis2/python/plugins/giswater/png/ud_section_semielliptical.png'))
+        model = QStandardItemModel()
+        #model.setHorizontalHeaderLabels(['col1', 'col2', 'col3'])
+        trv_widget.setModel(model)
+        trv_widget.setUniformRowHeights(False)
 
-        #self.web.load(QUrl('C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf'))
-        #self.web.setHtml('<h1>HTML normal</h1><p><a href="file://C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf">http://investor.google.com/pdf/2007_google_annual_report.pdf</a></p>');
-        #self.web.setContent('C:/Users/user/.qgis2/python/plugins/giswater/png/ud_section_semielliptical.png', "application/pdf")
-        self.web.show()
+        for field in result[0]['fields']:
+            parent1 = QStandardItem('Aqui deberia ir el grupo padre {}'.format("GRUPO PADRE"))
+            self.controller.log_info(str(type(field)))
+            for key, value in field.items():
+                label = QStandardItem('{}'.format(key.capitalize()))
+                func_name = QStandardItem('{}'.format(value))
+                parent1.appendRow([label, func_name])
+            model.appendRow(parent1)
+            index = model.indexFromItem(parent1)
+            trv_widget.expand(index)
 
-        # self.web.load(QUrl('file:///C:/Users/user/.qgis2/python/plugins/giswater/png/ud_arc_es.pdf'))
-        self.web2 = QWebView()
-        self.web2.settings().setAttribute(QWebSettings.PluginsEnabled, True)
+        return
+        # populate data
+        for i in range(3):
+            parent1 = QStandardItem('Family {}. Some long status text for sp'.format(i))
+            for j in range(3):
+                child1 = QStandardItem('Child {}'.format(i * 3 + j))
+                child2 = QStandardItem('row: {}, col: {}'.format(i, j + 1))
+                child3 = QStandardItem('row: {}, col: {}'.format(i, j + 2))
+                parent1.appendRow([child1, child2, child3])
+            model.appendRow(parent1)
+            # span container columns
+            trv_widget.setFirstColumnSpanned(i, trv_widget.rootIndex(), True)
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # expand third container
+        index = model.indexFromItem(parent1)
+        trv_widget.expand(index)
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # select last row
+        selmod = trv_widget.selectionModel()
+        index2 = model.indexFromItem(child3)
+        selmod.select(index2, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+        # self.model = QStandardItemModel()
+        #
+        # topLevelParentItem = self.model.invisibleRootItem()
+        #
+        #
+        # for item in data:
+        #     splitName = item.split('/')
+        #
+        #     # first part of string is defo parent item
+        #     # check to make sure not to add duplicate
+        #     if len(self.model.findItems(splitName[0], flags=QtCore.Qt.MatchFixedString)) == 0:
+        #         parItem = QStandardItem(splitName[0])
+        #         topLevelParentItem.appendRow(parItem)
+        #
+        #
+        #     def addItems(parent, elements):
+        #         """
+        #         This method recursively adds items to a QStandardItemModel from a list of paths.
+        #         :param parent:
+        #         :param elements:
+        #         :return:
+        #         """
+        #
+        #         for element in elements:
+        #
+        #             # first check if this element already exists in the hierarchy
+        #             noOfChildren = parent.rowCount()
+        #
+        #             # if there are child objects under specified parent
+        #             if noOfChildren != 0:
+        #                 # create dict to store all child objects under parent for testing against
+        #                 childObjsList = {}
+        #
+        #                 # iterate over indexes and get names of all child objects
+        #                 for c in range(noOfChildren):
+        #                     childObj = parent.child(c)
+        #                     childObjsList[childObj.text()] = childObj
+        #
+        #                 if element in childObjsList.keys():
+        #                     # only run recursive function if there are still elements to work on
+        #                     if elements[1:]:
+        #                         addItems(childObjsList[element], elements[1:])
+        #
+        #                     return
+        #
+        #                 else:
+        #                     # item does not exist yet, create it and parent
+        #                     newObj = QtGui.QStandardItem(element)
+        #                     parent.appendRow(newObj)
+        #
+        #                     # only run recursive function if there are still elements to work on
+        #                     if elements[1:]:
+        #                         addItems(newObj, elements[1:])
+        #
+        #                     return
+        #
+        #             else:
+        #                 # if there are no existing child objects, it's safe to create the item and parent it
+        #                 newObj = QtGui.QStandardItem(element)
+        #                 parent.appendRow(newObj)
+        #
+        #                 # only run recursive function if there are still elements to work on
+        #                 if elements[1:]:
+        #                     # now run the recursive function again with the latest object as the parent and
+        #                     # the rest of the elements as children
+        #                     addItems(newObj, elements[1:])
+        #
+        #                 return
+        #
+        #
+        #     # call proc to add remaining items after toplevel item to the hierarchy
+        #     print "### calling addItems({0}, {1})".format(parItem.text(), splitName[1:])
+        #     addItems(parItem, splitName[1:])
 
-        self.web2.show()
-        self.web2.load(QUrl("https://bmaps.bgeo.es/dev/demo/"))
-
-
+        #     print 'done: ' + item + '\n'
