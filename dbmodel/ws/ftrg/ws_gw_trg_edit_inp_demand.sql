@@ -30,16 +30,23 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-				INSERT INTO inp_demand (id, demand, pattern_id, deman_type, dscenario_id) 
-				VALUES (NEW.id,NEW.demand, NEW.pattern_id, NEW.deman_type, NEW.dscenario_id);
+
+				-- overwrite id values (in case of user fill something
+				PERFORM setval('SCHEMA_NAME.inp_demand_id_seq',(SELECT max(id) FROM inp_demand), true);
+				NEW.id=nextval('SCHEMA_NAME.inp_demand_id_seq'::regclass);
+	
+				INSERT INTO inp_demand (id, node_id, demand, pattern_id, deman_type, dscenario_id) 
+				VALUES (NEW.id,NEW.node_id, NEW.demand, NEW.pattern_id, NEW.deman_type, NEW.dscenario_id);
 				RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-				UPDATE inp_demand SET id=NEW.id, demand=NEW.demand, pattern_id=NEW.pattern_id, deman_type=NEW.deman_type, dscenario_id=NEW.dscenario_id
+				UPDATE inp_demand SET id=NEW.id, node_id=NEW.node_id, demand=NEW.demand, pattern_id=NEW.pattern_id, deman_type=NEW.deman_type, dscenario_id=NEW.dscenario_id
 				WHERE id=OLD.id;
+				RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-				RETURN NEW;
+				DELETE FROM inp_demand	WHERE id=OLD.id;
+				RETURN OLD;
     
     END IF;
        

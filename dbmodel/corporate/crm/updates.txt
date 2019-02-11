@@ -21,8 +21,7 @@ ALTER TABLE hydrometer ADD COLUMN valve_mat;
 ALTER TABLE hydrometer ADD COLUMN valve_update_date;
 
 
-
-
 CREATE TABLE hydro_cat_omtype
 
+REFACTOR FUNCTION gw_fct_crm2gis_hydro_catalog
 

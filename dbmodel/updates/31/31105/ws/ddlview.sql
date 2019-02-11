@@ -106,7 +106,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_connec_dattrib AS
             FROM crosstab('SELECT feature_id, dattrib_type, idval FROM SCHEMA_NAME.dattrib ORDER BY 1,2'::text, 'VALUES (''4'')'::text) 
 		rpt(feature_id character varying, dattrib4 text)) a ON connec_id = feature_id;
 
-
+--updated on 3.1.107
 DROP VIEW IF EXISTS "v_inp_pattern";
 CREATE VIEW "v_inp_pattern" AS
 SELECT id,

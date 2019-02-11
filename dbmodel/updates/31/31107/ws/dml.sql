@@ -8,6 +8,13 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+
+--2019/02/11
+SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('epa_units_factor', 
+'{"LPS":1, "LPM":60, "MLD":0.216, "CMH":3.6, "CMD":3.6, "CMD":86.4, "CFS":0, "GPM":0, "MGD":0, "IMGD":0, "AFD":0}', 'json', 'Epa', 'Conversion factors of CRM flows in function of EPA units choosed by user');
+
+
 -- 2019/01/26
 DELETE FROM config_client_forms WHERE table_id='v_ui_anl_mincut_result_cat' AND column_id='macroexpl_id' AND column_index=8;
 UPDATE  config_client_forms SET status=false WHERE table_id='v_ui_anl_mincut_result_cat' AND column_index=2;

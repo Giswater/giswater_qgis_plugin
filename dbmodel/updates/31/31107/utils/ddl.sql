@@ -8,6 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+ALTER TABLE rpt_cat_result ADD COLUMN user_name text;
+ALTER TABLE rpt_cat_result ALTER COLUMN user_name SET DEFAULT current_user;
+
+ALTER TABLE dma ADD COLUMN effc double precision;
 
 ALTER TABLE audit_cat_function ADD COLUMN istoolbox boolean;
 ALTER TABLE audit_cat_function ADD COLUMN alias varchar(30);

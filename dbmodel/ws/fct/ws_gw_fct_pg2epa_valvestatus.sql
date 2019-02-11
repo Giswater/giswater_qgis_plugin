@@ -70,7 +70,7 @@ BEGIN
 	
 
 	ELSIF rec_options.valve_mode='EPA TABLES' THEN
-			UPDATE rpt_inp_arc SET status='CLOSED' FROM (SELECT arc_id, status FROM arc join inp_shortpipe ON node_id=node_1
+			UPDATE rpt_inp_arc SET status=a.status FROM (SELECT arc_id, status FROM arc join inp_shortpipe ON node_id=node_1
 									union
 								      SELECT arc_id, status from arc join inp_shortpipe ON node_id=node_2) a 
 								WHERE a.arc_id=rpt_inp_arc.arc_id AND result_id=result_id_var;			

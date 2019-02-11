@@ -7,12 +7,18 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2330
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_rtc(result_id_var character varying)  RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_rtc(result_id_var character varying)  RETURNS integer AS 
+$BODY$
+/*
+SELECT SCHEMA_NAME.gw_fct_pg2epa_rtc('test88')
+*/
+
 DECLARE
 
 v_options 	record;
 v_rec		record;
 v_demand	double precision;
+v_epaunitsfactor double precision;
       
 
 BEGIN
@@ -22,30 +28,26 @@ BEGIN
 
 	SELECT * INTO v_options FROM inp_options;
 
-	RAISE NOTICE 'Starting pg2epa process.';
+	RAISE NOTICE 'Starting pg2epa rtc.';
 	
 	-- Reset values of inp_rpt table
 	UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var;
 
-	-- Updating values from rtc into inp_rpt table
-	FOR v_rec IN SELECT * FROM SCHEMA_NAME.v_rtc_hydrometer_x_node_period
-	LOOP
-		IF v_options.rtc_coefficient='MIN' THEN
-			v_demand:=v_rec.lps_min;
-		ELSIF v_options.rtc_coefficient='AVG' THEN
-			v_demand:=v_rec.lps_avg;
-		ELSIF v_options.rtc_coefficient='MAX' THEN
-			v_demand:=v_rec.lps_max;
-		ELSIF v_options.rtc_coefficient='REAL' THEN
-			v_demand:=v_rec.lps_avg_real;
-		END IF;
-			
-		UPDATE rpt_inp_node SET demand=v_demand::numeric(12,6) WHERE result_id=result_id_var AND node_id=v_rec.node_id;
+	EXECUTE 'SELECT value::json->>'||quote_literal(v_options.units)||' FROM config_param_system WHERE parameter=''epa_units_factor'''
+		INTO v_epaunitsfactor;
 
-	END LOOP;
+	-- Updating values from rtc into inp_rpt table
+	IF v_options.rtc_coefficient='MIN' THEN
+		UPDATE rpt_inp_node SET demand=lps_min::numeric(12,6)*v_epaunitsfactor FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+	ELSIF v_options.rtc_coefficient='AVG' THEN
+		UPDATE rpt_inp_node SET demand=lps_avg::numeric(12,6)*v_epaunitsfactor FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+	ELSIF v_options.rtc_coefficient='MAX' THEN
+		UPDATE rpt_inp_node SET demand=lps_max::numeric(12,6)*v_epaunitsfactor FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+	ELSIF v_options.rtc_coefficient='REAL' THEN
+		UPDATE rpt_inp_node SET demand=lps_avg::numeric(12,6)*v_epaunitsfactor FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+	END IF;
 	
 RETURN 1;
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

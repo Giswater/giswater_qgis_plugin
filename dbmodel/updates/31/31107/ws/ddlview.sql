@@ -8,6 +8,66 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+-- 2019/02/07
+DROP VIEW IF EXISTS "v_inp_pattern";
+CREATE VIEW "v_inp_pattern" AS
+SELECT id,
+pattern_id,
+factor_1,
+factor_2,
+factor_3,
+factor_4,
+factor_5,
+factor_6,
+factor_7,
+factor_8,
+factor_9,
+factor_10,
+factor_11,
+factor_12,
+factor_13,
+factor_14,
+factor_15,
+factor_16,
+factor_17,
+factor_18
+FROM inp_pattern_value
+order by 1;
+
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
+ SELECT a.hydrometer_id,
+    a.node_1 AS node_id,
+    a.arc_id,
+    b.dma_id,
+    b.period_id,
+    b.lps_avg * 0.5::double precision AS lps_avg_real,
+    c.effc::numeric(5,4) AS losses,
+    b.lps_avg * 0.5::double precision / c.effc AS lps_avg,
+    c.minc AS cmin,
+    (b.lps_avg * 0.5::double precision / c.effc )* c.minc AS lps_min,
+    c.maxc AS cmax,
+    (b.lps_avg * 0.5::double precision / c.effc ) * c.maxc AS lps_max
+   FROM v_rtc_hydrometer_x_arc a
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text
+UNION
+ SELECT a.hydrometer_id,
+    a.node_2 AS node_id,
+    a.arc_id,
+    b.dma_id,
+    b.period_id,
+    b.lps_avg * 0.5::double precision AS lps_avg_real,
+    c.effc::numeric(5,4) AS losses,
+    b.lps_avg * 0.5::double precision / c.effc AS lps_avg,
+    c.minc AS cmin,
+   (b.lps_avg * 0.5::double precision / c.effc ) * c.minc AS lps_min,
+    c.maxc AS cmax,
+    (b.lps_avg * 0.5::double precision / c.effc ) * c.maxc AS lps_max
+   FROM v_rtc_hydrometer_x_arc a
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text;
+
 
 -- 2019/02/06
 DROP VIEW v_edit_rtc_hydro_data_x_connec;
