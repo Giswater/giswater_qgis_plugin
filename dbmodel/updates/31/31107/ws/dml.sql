@@ -274,5 +274,9 @@ INSERT INTO sys_csv2pg_config VALUES (1, 10, 'vi_junctions', '[JUNCTIONS]', 'csv
 INSERT INTO sys_csv2pg_config VALUES (4, 10, 'vi_pipes', '[PIPES]', 'csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8', 12);
 INSERT INTO sys_csv2pg_config VALUES (3, 10, 'vi_tanks', '[TANKS]', 'csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8', 12);
 
+--2019/02/08
+INSERT INTO audit_cat_param_user VALUES ('psector_type_vdefault', NULL, 'Default value for psector type parameter', 'role_master', NULL, NULL, NULL, NULL, 'float');
+INSERT INTO audit_cat_param_user VALUES ('owndercat_vdefault', NULL, 'Default value for owner parameter', 'role_edit', NULL, 'cat_owner', 'id', NULL, 'text');
+DELETE FROM config_param_user WHERE parameter='qgis_template_folder_path';
 
 

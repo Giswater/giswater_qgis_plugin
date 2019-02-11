@@ -104,3 +104,10 @@ CREATE TABLE inp_lid_control(
   value_6 numeric(12,4),
   value_7 numeric(12,4),
   value_8 numeric(12,4));
+
+CREATE TABLE rpt_warning_summary(
+id serial NOT NULL PRIMARY KEY,
+result_id varchar(30),
+warning_number varchar(30),
+text text
+);

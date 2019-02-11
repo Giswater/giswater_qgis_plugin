@@ -69,3 +69,6 @@ CREATE TRIGGER gw_trg_man_addfields_value_connec_control AFTER UPDATE OF connec_
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('CONNEC');
 
 
+DROP TRIGGER IF EXISTS gw_trg_calculate_period ON "SCHEMA_NAME".ext_cat_period;
+CREATE TRIGGER gw_trg_calculate_period AFTER INSERT ON "SCHEMA_NAME".ext_cat_period 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_calculate_period();
