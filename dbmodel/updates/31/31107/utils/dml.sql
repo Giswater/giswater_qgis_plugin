@@ -23,4 +23,6 @@ UPDATE audit_cat_function SET istoolbox=TRUE,  descript=return_type, context=pro
 return_type=null, input_params='[{"name":"nodeTolerance", "type":"float"}]' , sys_role_id='role_edit', isparametric=true WHERE function_name='gw_fct_anl_node_duplicated';
 
 -- 2019/02/08
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('vdefault_rtc_period_seconds','2592000','integer', 'rtc', 'Default value used if ext_cat_period doesn''t have date values or they are incorrect');
+SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('vdefault_rtc_period_seconds','2592000','integer', 'rtc', 'Default value used if ext_cat_period doesn''t have date values or they are incorrect');
