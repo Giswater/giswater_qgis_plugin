@@ -5,12 +5,22 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+
+
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
 import os
+import re
 
 from PyQt4.QtCore import QDate, Qt, QPyNullVariant
 from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QComboBox, QAction, QAbstractItemView
-from PyQt4.QtGui import QCheckBox, QHBoxLayout, QStandardItem, QStandardItemModel, QWidget
+from PyQt4.QtGui import QCheckBox, QHBoxLayout, QStandardItem, QStandardItemModel, QWidget, QColor
 
+from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
+from qgis.gui import QgsVertexMarker, QgsRubberBand
 
 from functools import partial
 
@@ -18,28 +28,12 @@ from PyQt4.QtGui import QToolButton
 from PyQt4.QtSql import QSqlTableModel
 
 import utils_giswater
-
+from giswater.actions.manage_visit import ManageVisit
 from giswater.actions.parent_manage import ParentManage
 from giswater.ui_manager import AddLot
 from giswater.ui_manager import VisitManagement
 
 
-"""
-These actions have been disabled, to enable them you have to uncomment the file giswater.config:
-om_ud and om_ws
-; 74_function=om_add_lot
-; 75_function=om_lot_management
-
-,configure the file giswater.py
-AND  paste this lines into om.py file
-    def om_add_lot(self):
-        """''' Button 74: Add new lot '''"""
-        self.new_lot.manage_lot()
-
-    def om_lot_management(self):
-        """ '''Button 75: Lot management '''"""
-        self.new_lot.lot_manager()
-"""
 class AddNewLot(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -129,7 +123,11 @@ class AddNewLot(ParentManage):
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
 
-        self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature))
+        self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature,self.dlg_lot.tbl_relation))
+        self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
+        self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
+        self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
+
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
@@ -168,6 +166,23 @@ class AddNewLot(ParentManage):
     def test(self):
         self.controller.log_info(str("HOLAs"))
 
+
+    def open_visit(self, qtable):
+        # Get selected rows
+        field_index = qtable.model().fieldIndex('visit_id')
+        selected_list = qtable.selectionModel().selectedRows(field_index)
+        if not selected_list:
+            message = "Any record selected"
+            self.controller.show_info_box(message)
+            return
+        elif len(selected_list) > 1:
+            message = "More then one document selected. Select just one document."
+            self.controller.show_warning(message)
+            return
+
+        visit_id = selected_list[0].data()
+        manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit.manage_visit(visit_id=visit_id)
 
 
     def read_standaritemmodel(self, qtable):
@@ -347,6 +362,7 @@ class AddNewLot(ParentManage):
         # Set headers
         standard_model.setHorizontalHeaderLabels(headers)
 
+
     def populate_table_relations(self, lot_id):
         standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
@@ -362,6 +378,7 @@ class AddNewLot(ParentManage):
                     item.append(QStandardItem(None))
             if len(row) > 0:
                 standard_model.appendRow(item)
+
 
     def populate_visits(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
@@ -382,6 +399,7 @@ class AddNewLot(ParentManage):
 
         # Attach model to table view
         widget.setModel(model)
+
 
     def update_id_list(self):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
@@ -731,9 +749,9 @@ class AddNewLot(ParentManage):
         self.completer.setModel(model)
 
 
-    def zoom_to_feature(self):
+    def zoom_to_feature(self, qtable):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
-        selected_list = self.tbl_relation.selectionModel().selectedRows()
+        selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
@@ -741,7 +759,7 @@ class AddNewLot(ParentManage):
 
         index = selected_list[0]
         row = index.row()
-        column_index = utils_giswater.get_col_index_by_col_name(self.tbl_relation, feature_type+'_id')
+        column_index = utils_giswater.get_col_index_by_col_name(qtable, feature_type+'_id')
         feature_id = index.sibling(row, column_index).data()
         expr_filter = '"{}_id" IN ({})'.format(self.geom_type, "'"+feature_id+"'")
 
@@ -751,9 +769,57 @@ class AddNewLot(ParentManage):
         self.iface.actionZoomToSelected().trigger()
 
 
+        layer = self.iface.activeLayer()
+        features = layer.selectedFeatures()
+        for f in features:
+            list_coord = f.geometry().asPolyline()
+            break
+
+        coords = "LINESTRING("
+        for c in list_coord:
+            coords += str(c[0]) + " " + str(c[1]) + ","
+        coords = coords[:-1] + ")"
+        list_coord = re.search('\((.*)\)', str(coords))
+        points = self.get_points(list_coord)
+        self.draw_polygon(points)
+
     def manage_rejected(self):
         self.disconnect_signal_selection_changed()
         self.close_dialog(self.dlg_lot)
+
+    # TODO delete function draw_polygon(*args) when api_parent.py is integrated into giswater proyect
+    def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+        self.rubber_polygon = QgsRubberBand(self.canvas)
+        self.rubber_polygon.setColor(Qt.darkRed)
+        self.rubber_polygon.setIconSize(20)
+        """ Draw 'line' over canvas following list of points """
+        if Qgis.QGIS_VERSION_INT >= 10900:
+            rb = self.rubber_polygon
+            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+            rb.setColor(color)
+            rb.setWidth(width)
+            rb.show()
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(width)
+            self.vMarker.setCenter(points)
+            self.vMarker.show()
+
+    # TODO delete function get_points(*args) when api_parent.py is integrated into giswater proyect
+    def get_points(self, list_coord=None):
+        """ Return list of QgsPoints taken from geometry
+        :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+        """
+
+        coords = list_coord.group(1)
+        polygon = coords.split(',')
+        points = []
+
+        for i in range(0, len(polygon)):
+            x, y = polygon[i].split(' ')
+            point = QgsPoint(float(x), float(y))
+            points.append(point)
+        return points
 
 
     def put_checkbox(self, qtable, rows, checker, value):

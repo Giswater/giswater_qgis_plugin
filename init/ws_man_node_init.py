@@ -409,7 +409,9 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'O&M' (event) """
         
         table_event_node = "v_ui_om_visit_x_node"         
-        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)         
+        self.fill_tbl_event(self.tbl_event, table_event_node, self.filter)
+        self.tbl_event.model().rowsInserted.connect(self.set_filter_table_event, self.tbl_event)
+        self.tbl_event.model().rowsRemoved.connect(self.set_filter_table_event, self.tbl_event)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_node)
         

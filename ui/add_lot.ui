@@ -20,7 +20,7 @@
       <item>
        <widget class="QTabWidget" name="tab_widget">
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="LotTab">
          <attribute name="title">
@@ -757,14 +757,14 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_14">
             <item>
-             <widget class="QPushButton" name="btn_open">
+             <widget class="QPushButton" name="btn_open_visit">
               <property name="text">
                <string>Open visit</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_delete">
+             <widget class="QPushButton" name="btn_delete_visit">
               <property name="text">
                <string>Delete visit</string>
               </property>

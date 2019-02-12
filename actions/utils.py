@@ -26,6 +26,7 @@ from functools import partial
 from encodings.aliases import aliases
 
 import utils_giswater
+from giswater.actions.gw_toolbox import GwToolBox
 from giswater.actions.parent import ParentAction
 from giswater.actions.manage_visit import ManageVisit
 from giswater.ui_manager import Toolbox
@@ -38,6 +39,9 @@ class Utils(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        
+        self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
+        self.toolbox = GwToolBox(iface, settings, controller, plugin_dir)
 
 
     def set_project_type(self, project_type):
@@ -504,3 +508,6 @@ class Utils(ParentAction):
                    " VALUES (" + str(fprocesscat_id) + ", current_user);")
         self.controller.execute_sql(sql)
 
+
+    def utils_toolbox(self):
+        self.toolbox.open_toolbox()

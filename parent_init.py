@@ -6,20 +6,17 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import json
-from collections import OrderedDict
-
-from PyQt4.QtGui import QStandardItem
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
+
 from PyQt4.Qt import QDate, QDateTime
-from PyQt4.QtCore import QSettings, Qt, QPoint
+from PyQt4.QtCore import QSettings, Qt, QPoint, QUrl
 from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
 from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-
+from PyQt4.QtWebKit import QWebView, QWebSettings
 from functools import partial
 from datetime import datetime
 
@@ -670,22 +667,27 @@ class ParentDialog(QDialog):
         """ Get values selected by the user and sets a new filter for its table model """
         
         # Get selected dates
-        date_from = self.date_document_from.date().toString('yyyyMMdd') 
-        date_to = self.date_document_to.date().toString('yyyyMMdd') 
-        if (date_from > date_to):
+        date_from = self.date_document_from.date()
+        date_to = self.date_document_to.date()
+        # Create interval dates
+        format_low = 'yyyy-MM-dd 00:00:00.000'
+        format_high = 'yyyy-MM-dd 23:59:59.999'
+        interval = "'{}'::timestamp AND '{}'::timestamp".format(
+            date_from.toString(format_low), date_to.toString(format_high))
+        if date_from > date_to:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)                   
             return
-        
+
         # Set filter
         expr = self.field_id+" = '"+self.id+"'"
-        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
-        
+        expr += (" AND(date BETWEEN {0})".format(interval))
+
         # Get selected values in Comboboxes        
         doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type")
-        if doc_type_value != 'null' or doc_type_value is not None:
+        if doc_type_value != 'null':
             expr += " AND doc_type = '"+str(doc_type_value)+"'"
-  
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()  
@@ -958,6 +960,9 @@ class ParentDialog(QDialog):
         self.visit_id = self.tbl_event.model().record(selected_row).value("visit_id")
         self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
         self.parameter_id = self.tbl_event.model().record(selected_row).value("parameter_id")
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
 
         sql = ("SELECT gallery, document"
                " FROM " + table_name + ""
@@ -1241,8 +1246,11 @@ class ParentDialog(QDialog):
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
+
+        self.set_dates_from_to(self.date_event_to, self.date_event_from, table_name, 'visit_start', 'visit_end')
         date = QDate.currentDate()
         self.date_event_to.setDate(date)
+
 
         btn_open_visit = self.dialog.findChild(QPushButton, "btn_open_visit")
         btn_new_visit = self.dialog.findChild(QPushButton, "btn_new_visit")
@@ -1353,7 +1361,7 @@ class ParentDialog(QDialog):
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText(self.dialog, "event_type")
         if event_type_value != 'null':
-            expr+= " AND parameter_type = '" + event_type_value + "'"
+            expr += " AND parameter_type = '" + event_type_value + "'"
         event_id = utils_giswater.getWidgetText(self.dialog, "event_id")
         if event_id != 'null': 
             expr += " AND parameter_id = '" + event_id + "'"
@@ -1748,6 +1756,8 @@ class ParentDialog(QDialog):
 
     def action_help(self, wsoftware, geom_type):
         """ Open PDF file with selected @wsoftware and @geom_type """
+        self.web = QWebView()
+        self.web.settings().setAttribute(QWebSettings.PluginsEnabled, True)
 
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
@@ -1759,20 +1769,21 @@ class ParentDialog(QDialog):
             locale = 'en'
 
         # Get PDF file
-        pdf_folder = os.path.join(self.plugin_dir, 'png')
-        pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
-
+        png_folder = os.path.join(self.plugin_dir, 'png')
+        png_path = os.path.join(png_folder, wsoftware + "_" + geom_type + "_" + locale + ".png")
         # Open PDF if exists. If not open Spanish version
-        if os.path.exists(pdf_path):
-            os.system(pdf_path)
+        if os.path.exists(png_path):
+            self.web.load(QUrl(png_path))
+            self.web.show()
         else:
             locale = "es"
-            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
-            if os.path.exists(pdf_path):
-                os.system(pdf_path)
+            png_path = os.path.join(png_folder, wsoftware + "_" + geom_type + "_" + locale + ".png")
+            if os.path.exists(png_path):
+                self.web.load(QUrl(png_path))
+                self.web.show()
             else:
                 message = "File not found"
-                self.controller.show_warning(message, parameter=pdf_path)
+                self.controller.show_warning(message, parameter=png_path)
 
 
     def manage_custom_fields(self, cat_feature_id=None, tab_to_remove=None):
@@ -2498,4 +2509,21 @@ class ParentDialog(QDialog):
         if not self.dlg_is_destroyed:
             action.setChecked(enabled)
             
-            
+
+
+    def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
+        sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
+               " FROM {}.{}".format(self.schema_name, table_name))
+        self.controller.log_info(str(sql))
+        row = self.controller.get_row(sql, log_sql=False)
+        if row:
+            if row[0]:
+                widget_from.setDate(row[0])
+            else:
+                current_date = QDate.currentDate()
+                widget_from.setDate(current_date)
+            if row[1]:
+                widget_to.setDate(row[1])
+            else:
+                current_date = QDate.currentDate()
+                widget_to.setDate(current_date)

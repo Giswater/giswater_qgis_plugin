@@ -294,6 +294,12 @@ class Om(ParentAction):
             self.to_date = QDate.currentDate().addDays(1)
 
 
+    def om_add_lot(self):
+        """''' Button 74: Add new lot '''"""
+        self.new_lot.manage_lot()
 
 
+    def om_lot_management(self):
+        """ '''Button 75: Lot management '''"""
+        self.new_lot.lot_manager()
 

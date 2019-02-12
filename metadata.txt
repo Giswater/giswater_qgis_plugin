@@ -46,5 +46,5 @@ repository=https://github.com/giswater/giswater_qgis_plugin
 tracker=https://github.com/giswater/giswater_qgis_plugin/issues
 category=Plugins
 icon=icons/giswater.png
-experimental=True
+experimental=False
 deprecated=False
