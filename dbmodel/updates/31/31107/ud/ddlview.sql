@@ -5,6 +5,84 @@ This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
+
+
+CREATE OR REPLACE VIEW v_om_visit AS 
+ SELECT distinct (visit_id) * FROM (om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit_cat.name,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit_x_node.node_id AS feature_id,
+    'NODE'::text as feature_type,
+    om_visit.the_geom
+   FROM selector_state,
+    om_visit
+     JOIN om_visit_x_node ON om_visit_x_node.visit_id = om_visit.id
+     JOIN node ON node.node_id::text = om_visit_x_node.node_id::text
+     JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+  WHERE selector_state.state_id = node.state AND selector_state.cur_user = "current_user"()::text
+UNION
+ SELECT om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit_cat.name,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit_x_arc.arc_id AS feature_id,
+    'ARC'::text as feature_type,
+    om_visit.the_geom
+   FROM selector_state,
+    om_visit
+     JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
+     JOIN arc ON arc.arc_id::text = om_visit_x_arc.arc_id::text
+     JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+  WHERE selector_state.state_id = arc.state AND selector_state.cur_user = "current_user"()::text
+UNION
+ SELECT om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit_cat.name,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit_x_connec.connec_id AS feature_id,
+    'CONNEC'::text as feature_type,
+    om_visit.the_geom
+   FROM selector_state,
+    om_visit
+     JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
+     JOIN connec ON connec.connec_id::text = om_visit_x_connec.connec_id::text
+     JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+  WHERE selector_state.state_id = connec.state AND selector_state.cur_user = "current_user"()::text
+UNION
+ SELECT om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit_cat.name,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit_x_gully.gully_id AS feature_id,
+    'CONNEC'::text as feature_type,
+    om_visit.the_geom
+   FROM selector_state,
+    om_visit
+     JOIN om_visit_x_gully ON om_visit_x_gully.visit_id = om_visit.id
+     JOIN gully ON gully.gully_id::text = om_visit_x_gully.gully_id::text
+     JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+  WHERE selector_state.state_id = gully.state AND selector_state.cur_user = "current_user"()::text)a;
+
+
 -----------------------
 -- inp edit views
 -----------------------

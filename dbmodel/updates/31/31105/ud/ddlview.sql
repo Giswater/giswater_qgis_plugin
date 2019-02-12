@@ -73,8 +73,8 @@ UNION
 
 
 
+-- updated on 3.1.107
 -- 2018/12/14
-
 DROP VIEW v_om_visit;
 CREATE OR REPLACE VIEW v_om_visit AS 
  SELECT om_visit.id AS visit_id,

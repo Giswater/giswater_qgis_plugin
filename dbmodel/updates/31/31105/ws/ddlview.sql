@@ -15,6 +15,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 	- has not trigger
 */
 
+-- Updated on 3.1.107
 DROP VIEW IF EXISTS v_om_visit;
 CREATE OR REPLACE VIEW v_om_visit AS 
  SELECT om_visit.id AS visit_id,
