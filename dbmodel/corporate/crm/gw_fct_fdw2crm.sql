@@ -23,9 +23,14 @@ BEGIN
 
     -- Search path
     SET search_path = "crm", public;
-	
+
+	RAISE NOTICE ' Executing gw_fct_fdw2crm_hydro_catalog ';
 	PERFORM crm.gw_fct_fdw2crm_hydro_catalog();
+
+	RAISE NOTICE ' Executing gw_fct_fdw2crm_hydro_data ';
 	PERFORM crm.gw_fct_fdw2crm_hydro_data();
+
+	RAISE NOTICE ' Executing gw_fct_fdw2crm_hydro_flow ';
 	PERFORM crm.gw_fct_fdw2crm_hydro_flow();	
 
     RETURN;
