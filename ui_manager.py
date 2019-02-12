@@ -69,6 +69,20 @@ class AddVisit(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('api_config.ui')
+class ApiConfigUi(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('api_epa_options.ui')
+class ApiEpaOptions(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('arc_fusion.ui')
 class ArcFusion(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
@@ -99,13 +113,6 @@ class Cad_add_point(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('change_node_type.ui')
 class ChangeNodeType(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('config.ui')
-class ConfigUtils(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
@@ -251,8 +258,6 @@ class Mincut(QtGui.QMainWindow, FORM_CLASS):
             event.accept()
             # QtGui.QMessageBox.information(self, "", "Press cancel to exit")
             # event.ignore()
-
-
 
 
 FORM_CLASS = get_ui_class('mincut_add_connec.ui')
@@ -408,19 +413,6 @@ class CFUDcatalog(QtGui.QDialog, FORM_CLASS):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
 
-FORM_CLASS = get_ui_class('ud_options.ui')
-class UDoptions(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('ud_times.ui')
-class UDtimes(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
 
 FORM_CLASS = get_ui_class('visit_management.ui')
 class VisitManagement(QtGui.QDialog, FORM_CLASS):
@@ -444,19 +436,6 @@ class WScatalog(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('cf_ws_catalog.ui')
 class CFWScatalog(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-FORM_CLASS = get_ui_class('ws_options.ui')
-class WSoptions(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('ws_times.ui')
-class WStimes(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)

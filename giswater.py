@@ -148,7 +148,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 25, 29):
+            elif int(index_action) in (23, 25, 29, 196):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
@@ -323,7 +323,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)   
         
         toolbar_id = "epa"
-        list_actions = ['23', '25', '29']
+        list_actions = ['196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)    
         
         toolbar_id = "master"
