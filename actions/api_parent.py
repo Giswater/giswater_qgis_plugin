@@ -275,7 +275,7 @@ class ApiParent(ParentAction):
                 
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
-        self.controller.restore_info()
+
         if Qgis.QGIS_VERSION_INT > 29900:
             return
         

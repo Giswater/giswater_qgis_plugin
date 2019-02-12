@@ -44,7 +44,7 @@ class ApiConfig(ApiParent):
 
     def api_config(self):
         """ Button 36: Info show info, open giswater and visit web page """
-        # self.controller.restore_info()
+
         self.list_update = []
 
         body = '"client":{"device":3, "infoType":100, "lang":"ES"}, '
