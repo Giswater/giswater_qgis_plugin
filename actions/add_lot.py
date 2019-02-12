@@ -24,22 +24,6 @@ from giswater.ui_manager import AddLot
 from giswater.ui_manager import VisitManagement
 
 
-"""
-These actions have been disabled, to enable them you have to uncomment the file giswater.config:
-om_ud and om_ws
-; 74_function=om_add_lot
-; 75_function=om_lot_management
-
-,configure the file giswater.py
-AND  paste this lines into om.py file
-    def om_add_lot(self):
-        """''' Button 74: Add new lot '''"""
-        self.new_lot.manage_lot()
-
-    def om_lot_management(self):
-        """ '''Button 75: Lot management '''"""
-        self.new_lot.lot_manager()
-"""
 class AddNewLot(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
