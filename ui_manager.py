@@ -34,8 +34,22 @@ class AddLot(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
-FORM_CLASS = get_ui_class('add_picture.ui')
-class AddPicture(QtGui.QDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('add_doc.ui')
+class AddDoc(QtGui.QDialog, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('api_toolbox.ui')
+class ApiToolbox(QtGui.QDockWidget, FORM_CLASS):
+    def __init__(self):
+        QtGui.QDialog.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('api_toolbox_functions.ui')
+class ApiFunctionTb(QtGui.QDialog, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
@@ -377,13 +391,6 @@ class SelectorDate(QtGui.QDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('toolbox.ui')
 class Toolbox(QtGui.QDialog, FORM_CLASS):
-    def __init__(self):
-        QtGui.QDialog.__init__(self)
-        self.setupUi(self)
-
-
-FORM_CLASS = get_ui_class('trv_toolbox.ui')
-class TrvToolbox(QtGui.QDockWidget, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)

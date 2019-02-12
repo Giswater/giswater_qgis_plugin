@@ -49,7 +49,7 @@ from functools import partial
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import TrvToolbox
+from giswater.ui_manager import ApiToolbox, ApiFunctionTb
 
 
 class GwToolBox(ApiParent):
@@ -61,12 +61,12 @@ class GwToolBox(ApiParent):
         self.project_type = project_type
 
     def open_toolbox(self):
-        self.dlg_toolbox = TrvToolbox()
+        self.dlg_toolbox = ApiToolbox()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
         # Get layers under mouse clicked
-        sql = ("SELECT " + self.schema_name + ".gw_api_getconfig($${" + body + "}$$)::text")
+        sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
