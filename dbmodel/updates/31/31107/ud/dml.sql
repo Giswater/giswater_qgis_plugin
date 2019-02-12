@@ -263,3 +263,10 @@ DELETE FROM config_param_user WHERE parameter='virtual_polygon_vdefault';
 DELETE FROM config_param_user WHERE parameter='qgis_template_folder_path';
 
 
+-- 2019/02/12
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_valvestat_using_valveunaccess', 'FALSE', 'Boolean', 'Mincut', 'Variable to enable/disable the possibility to use valve unaccess button to open valves with closed status (WS)');
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_debug', 'FALSE', 'Boolean', 'Mincut', 'Variable to enable/disable the debug messages of mincut (WS)');
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('epa_units_factor', 
+'{"CFS":0, "GPM":0, "MGD":0, "CMS":1, "LPS":1000, "MLD":86.4}', 'json', 'Epa', 'Conversion factors of CRM flows in function of EPA units choosed by user');
+
+
