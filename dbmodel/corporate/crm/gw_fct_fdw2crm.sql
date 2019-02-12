@@ -14,7 +14,7 @@ SET search_path = "crm", public, pg_catalog;
 -- ----------------------------
 
 
-CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()
+CREATE OR REPLACE FUNCTION crm.gw_fct_fdw2crm()
   RETURNS void AS
 $BODY$DECLARE
 
@@ -24,17 +24,9 @@ BEGIN
     -- Search path
     SET search_path = "crm", public;
 	
-	
-	IF (SELECT value::boolean FROM config_param_system WHERE parameter='sys_fdw2crm_process') IS TRUE THEN
-		PERFORM crm.gw_fct_fdw2crm();
-	END IF;
-	
-	
-	-- crm. its mandatory due bug of Postgres only in this case
-	PERFORM crm.gw_fct_crm2gis_hydro_catalog();
-	PERFORM crm.gw_fct_crm2gis_hydro_data();
-	PERFORM crm.gw_fct_crm2gis_hydro_flow();
-
+	PERFORM crm.gw_fct_fdw2crm_hydro_catalog();
+	PERFORM crm.gw_fct_fdw2crm_hydro_data();
+	PERFORM crm.gw_fct_fdw2crm_hydro_flow();	
 
     RETURN;
         

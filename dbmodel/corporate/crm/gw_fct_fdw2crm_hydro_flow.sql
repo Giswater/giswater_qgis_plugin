@@ -14,32 +14,37 @@ SET search_path = "crm", public, pg_catalog;
 -- ----------------------------
 
 
-CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()
+CREATE OR REPLACE FUNCTION crm.gw_fct_fdw2crm_hydro_flow()
   RETURNS void AS
-$BODY$DECLARE
+$BODY$
+
+/*
+SELECT crm.gw_fct_fdw2crm_hydro_flow()
+*/
+
+DECLARE
 
 
 BEGIN
 
-    -- Search path
-    SET search_path = "crm", public;
-	
-	
-	IF (SELECT value::boolean FROM config_param_system WHERE parameter='sys_fdw2crm_process') IS TRUE THEN
-		PERFORM crm.gw_fct_fdw2crm();
-	END IF;
-	
-	
-	-- crm. its mandatory due bug of Postgres only in this case
-	PERFORM crm.gw_fct_crm2gis_hydro_catalog();
-	PERFORM crm.gw_fct_crm2gis_hydro_data();
-	PERFORM crm.gw_fct_crm2gis_hydro_flow();
+	-- Search path
+	SET search_path = crm, public;
 
+	-- DELETE OLD DATA FROM EXT_RTC_HYDROMETER_X_DATA
+	DELETE FROM crm.hydrometer_x_data;
 
-    RETURN;
-        
+	-- INSERT NEW DATA INTO EXT_RTC_HYDROMETER_X_DATA
+	INSERT INTO hydrometer_x_data (hydrometer_id, m3value, period_id, value_date)
+	SELECT 
+	hydrometer_id,
+	m3value,
+	period_id::int8,
+	value_date
+	FROM crm.hydrometer_x_data_ora
+	
+   
+RETURN;
+            
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-  

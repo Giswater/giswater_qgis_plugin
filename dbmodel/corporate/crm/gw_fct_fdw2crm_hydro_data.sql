@@ -13,33 +13,21 @@ SET search_path = "crm", public, pg_catalog;
 -- CRM FUNCTIONS
 -- ----------------------------
 
-
-CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()
+CREATE OR REPLACE FUNCTION crm.gw_fct_fdw2crm_hydro_data()
   RETURNS void AS
-$BODY$DECLARE
+$BODY$
 
+
+DECLARE
 
 BEGIN
 
-    -- Search path
-    SET search_path = "crm", public;
-	
-	
-	IF (SELECT value::boolean FROM config_param_system WHERE parameter='sys_fdw2crm_process') IS TRUE THEN
-		PERFORM crm.gw_fct_fdw2crm();
-	END IF;
-	
-	
-	-- crm. its mandatory due bug of Postgres only in this case
-	PERFORM crm.gw_fct_crm2gis_hydro_catalog();
-	PERFORM crm.gw_fct_crm2gis_hydro_data();
-	PERFORM crm.gw_fct_crm2gis_hydro_flow();
-
+	-- insert into rtc_hydrometer
+	INSERT INTO crm.rtc_hydrometer 
+	SELECT  a.* FROM crm.hydrometer_ora a JOIN (SELECT id::int8 FROM crm.hydrometer_ora EXCEPT (SELECT id::int8 FROM crm.hydrometer))b ON a.id::int8=b.id::int8;
 
     RETURN;
         
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-  

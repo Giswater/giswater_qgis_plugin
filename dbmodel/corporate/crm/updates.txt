@@ -23,5 +23,18 @@ ALTER TABLE hydrometer ADD COLUMN valve_update_date;
 
 CREATE TABLE hydro_cat_omtype
 
-REFACTOR FUNCTION gw_fct_crm2gis_hydro_catalog
+FUNCTION gw_fct_crm2gis_hydro_catalog
+FUNCTION gw_fct_crm2gis
 
+
+CREATE TABLE config_param_system (
+  id serial PRIMARY KEY,
+  parameter character varying(50) NOT NULL,
+  value text,
+  data_type character varying(20),
+  context character varying(50),
+  descript text);
+
+
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('sys_fdw2crm_process', FALSE, 'Boolean', 'rtc', 'If exists, preprocess function exists moving data from foreing data wraper to crm tables');
