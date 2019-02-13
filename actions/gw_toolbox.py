@@ -49,7 +49,7 @@ from functools import partial
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import ApiToolbox, ApiFunctionTb
+from giswater.ui_manager import ApiDlgToolbox, ApiFunctionTb
 
 
 class GwToolBox(ApiParent):
@@ -61,39 +61,56 @@ class GwToolBox(ApiParent):
         self.project_type = project_type
 
     def open_toolbox(self):
-        self.dlg_toolbox = ApiToolbox()
+        self.dlg_toolbox = ApiDlgToolbox()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
-        # Get layers under mouse clicked
-        sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
+        sql = ("SELECT " + self.schema_name + ".gw_api_getttoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
-        # TODO controllar si row tiene algo
+
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['form']['formTabs'])
-        self.dlg_toolbox.trv.doubleClicked.connect(partial(self.test))
+
+        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'])
+        self.dlg_toolbox.trv.doubleClicked.connect(partial(self.open_function))
         self.dlg_toolbox.show()
 
-    def test(self, index):
-        self.controller.log_info(str("TEST 10"))
+    def open_function(self, index):
+
         feature_id = index.sibling(index.row(), 1).data()
         self.controller.log_info(str(feature_id))
+        self.dlg_functions = ApiFunctionTb()
+        form = '"formName":"epaoptions"'
+        body = self.create_body(form=form)
+        sql = ("SELECT " + self.schema_name + ".gw_api_getttoolbox($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            return False
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+
+
+        self.dlg_functions.show()
+
+
+    def populate_dlg(self, dialog):
+        self.controller.log_info(str("TEST 10"))
+
     def populate_trv(self, trv_widget, result):
 
         model = QStandardItemModel()
         #model.setHorizontalHeaderLabels(['col1', 'col2', 'col3'])
+        model.setHorizontalHeaderLabels(['Toolbox'])
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
 
-        for field in result[0]['fields']:
-            parent1 = QStandardItem('Aqui deberia ir el grupo padre {}'.format("GRUPO PADRE"))
-            self.controller.log_info(str(type(field)))
-            for key, value in field.items():
-                label = QStandardItem('{}'.format(key.capitalize()))
-                func_name = QStandardItem('{}'.format(value))
+        for group, functions in result['fields'].items():
+            parent1 = QStandardItem('{}'.format(group))
+            for function in functions:
+                label = QStandardItem('{}'.format(function['alias']))
+                func_name = QStandardItem('{}'.format(function['function_name']))
                 parent1.appendRow([label, func_name])
             model.appendRow(parent1)
             index = model.indexFromItem(parent1)
@@ -195,3 +212,92 @@ class GwToolBox(ApiParent):
         #     addItems(parItem, splitName[1:])
 
         #     print 'done: ' + item + '\n'
+
+    fake_row = [
+        {
+            "status": "Accepted",
+            "message": {
+                "priority": 1,
+                "text": "This is a test message"
+            },
+            "apiVersion": {
+                "value": "0.9.101"
+            },
+            "body": {
+                "form": {},
+                "feature": {},
+                "data": {
+                    "fields": {
+                        "edit": [
+                            {
+                                "alias": "Node duplicated",
+                                "descript": "Check topology assistant. To review how many nodes are duplicated (using the parameter node duplicated tolerance)",
+                                "function_type_": {
+                                    "featureType": "node"
+                                },
+                                "input_params_": [
+                                    {
+                                        "name": "nodeTolerance",
+                                        "label": "Node tolerance:",
+                                        "widgettype": "text",
+                                        "datatype": "float"
+                                    }
+                                ],
+                                "sys_role_id": "role_edit"
+                            },
+                            {
+                                "alias": "Node duplicated 2",
+                                "descript": "Check topology assistant. To review how many nodes are duplicated (using the parameter node duplicated tolerance)",
+                                "function_type_": {
+                                    "featureType": "node"
+                                },
+                                "input_params_": [
+                                    {
+                                        "name": "nodeTolerance",
+                                        "label": "Node tolerance:",
+                                        "widgettype": "text",
+                                        "datatype": "float"
+                                    }
+                                ],
+                                "sys_role_id": "role_edit"
+                            }
+                        ],
+                        "master": [
+                            {
+                                "alias": "Node duplicated",
+                                "descript": "Check topology assistant. To review how many nodes are duplicated (using the parameter node duplicated tolerance)",
+                                "function_type_": {
+                                    "featureType": "node"
+                                },
+                                "input_params_": [
+                                    {
+                                        "name": "nodeTolerance",
+                                        "label": "Node tolerance:",
+                                        "widgettype": "text",
+                                        "datatype": "float"
+                                    }
+                                ],
+                                "sys_role_id": "role_edit"
+                            },
+                            {
+                                "alias": "Node duplicated 2",
+                                "descript": "Check topology assistant. To review how many nodes are duplicated (using the parameter node duplicated tolerance)",
+                                "function_type_": {
+                                    "featureType": "node"
+                                },
+                                "input_params_": [
+                                    {
+                                        "name": "nodeTolerance",
+                                        "label": "Node tolerance:",
+                                        "widgettype": "text",
+                                        "datatype": "float"
+                                    }
+                                ],
+                                "sys_role_id": "role_edit"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]

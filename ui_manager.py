@@ -42,7 +42,7 @@ class AddDoc(QtGui.QDialog, FORM_CLASS):
 
 
 FORM_CLASS = get_ui_class('api_toolbox.ui')
-class ApiToolbox(QtGui.QDockWidget, FORM_CLASS):
+class ApiDlgToolbox(QtGui.QDockWidget, FORM_CLASS):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
