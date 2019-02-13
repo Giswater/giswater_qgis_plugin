@@ -223,139 +223,139 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderUtils, self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddl), self.folderUtils + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_dml), self.folderUtils + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ftrg), self.folderUtils + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddlrule), self.folderSoftware + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_tablect + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_tablect), self.folderSoftware + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ftrg), self.folderSoftware + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_tablect + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_tablect), self.folderUtils + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddlrule), self.folderUtils + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
                     
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
-                    return False
+                    status = False
                 else:
                     status = self.executeFiles(os.listdir(self.sql_dir + '\i18n/' + 'EN'), self.sql_dir + '\i18n/' + 'EN', True)
                     if status is False:
-                        return False
+                        status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderLocale), self.folderLocale, True)
                 if status is False:
-                    return False
+                    status = False
                     
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddl), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlrule), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_dml), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_tablect + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_tablect), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
-                    return False
+                    status = False
                 else:
                     status = self.executeFiles(os.listdir(
                         self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + 'EN'), self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + 'EN', True)
                     if status is False:
-                        return False
+                        status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/'), self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', True)
                 if status is False:
-                    return False
+                    status = False
 
         return True
         
@@ -365,121 +365,121 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderUtils, self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddl), self.folderUtils + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_dml), self.folderUtils + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ftrg), self.folderUtils + self.file_pattern_ftrg)
                 if status is False:
-                    return False					
+                    status = False					
             if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddlrule), self.folderSoftware + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ftrg), self.folderSoftware + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddlrule), self.folderUtils + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
-                    return False
+                    status = False
                 else:
                     status = self.executeFiles(os.listdir(
                         self.sql_dir + '\i18n/' + 'EN'), self.sql_dir + '\i18n/' + 'EN', True)
                     if status is False:
-                        return False
+                        status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderLocale), self.folderLocale, True)
                 if status is False:
-                    return False
+                    status = False
                     
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddl), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlrule), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_dml), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
-                    return False
+                    status = False
                 else:
                     status = self.executeFiles(os.listdir(
                         self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + 'EN'), self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + 'EN', True)
                     if status is False:
-                        return False
+                        status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/'), self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', True)
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -774,26 +774,26 @@ class UpdateSQL(ParentAction):
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderSoftware, self.file_pattern_ddlview + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddlview), self.folderSoftware + self.file_pattern_ddlview)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ddlview + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddlview),
                                            self.folderUtils + self.file_pattern_ddlview)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddlview + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlview),
                                            self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlview)
                 if status is False:
-                    return False
+                    status = False
         return True
 
         
@@ -955,19 +955,19 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderExemple, 'user/'+project_type) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderExemple + 'user/'+project_type), self.folderExemple + 'user/'+project_type)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '\example/user/', '') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '\example/user/'),
                                            self.sql_dir + '/' + str(project_type) + '\example/user/')
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -977,19 +977,19 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderExemple, 'dev/'+project_type) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderExemple + 'dev/'+project_type), self.folderExemple + 'dev/'+project_type)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '\example/dev/', '') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '\example/dev/'),
                                            self.sql_dir + '/' + str(project_type) + '\example/dev/')
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -999,44 +999,44 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderUtils, self.file_pattern_fct) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ftrg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ftrg), self.folderUtils + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_fct) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ftrg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ftrg), self.folderSoftware + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_fct) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct),
                                            self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ftrg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg),
                                            self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -1046,26 +1046,26 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderSoftware, self.file_pattern_tablect) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_tablect), self.folderSoftware + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_tablect) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_tablect),
                                            self.folderUtils + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_tablect) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_tablect),
                                            self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -1075,24 +1075,24 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderUtils, self.file_pattern_trg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_trg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_trg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_trg), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_trg)
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -1102,7 +1102,7 @@ class UpdateSQL(ParentAction):
         for (path, ficheros, archivos) in os.walk(path_folder):
             status = self.executeFiles(archivos, path, no_ct=no_ct)
             if status is False:
-                return False
+                status = False
         return True
         
 
@@ -2123,7 +2123,7 @@ class UpdateSQL(ParentAction):
                     self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
                     if self.dev_commit == 'TRUE':
                         self.controller.dao.rollback()
-                    return False
+                    status = False
 
         except Exception as e:
             self.error_count = self.error_count + 1
@@ -2131,7 +2131,7 @@ class UpdateSQL(ParentAction):
             self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
             if self.dev_commit == 'TRUE':
                 self.controller.dao.rollback()
-            return False
+            status = False
 
             
     def readFiles(self, filelist, filedir):
@@ -2144,9 +2144,9 @@ class UpdateSQL(ParentAction):
                     f_to_read = f_to_read + '\n \n'
                     self.message_update = self.message_update + '\n' + str(f_to_read)
                 else:
-                    return False
+                    status = False
             except Exception as e:
-                return False
+                status = False
         return True
 
 
