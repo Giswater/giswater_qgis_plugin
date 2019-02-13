@@ -334,10 +334,12 @@ BEGIN
             ELSIF (OLD.epa_type = 'STORAGE') THEN
                 inp_table:= 'inp_storage';    
 			END IF;
-            v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
-            EXECUTE v_sql;
+			IF inp_table IS NOT NULL THEN
+                v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
+                EXECUTE v_sql;
+            END IF;
+            
 			inp_table := NULL;
-
 
             IF (NEW.epa_type = 'JUNCTION') THEN
                 inp_table:= 'inp_junction';   
@@ -348,8 +350,10 @@ BEGIN
             ELSIF (NEW.epa_type = 'STORAGE') THEN
                 inp_table:= 'inp_storage';
             END IF;
-            v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-            EXECUTE v_sql;
+            IF inp_table IS NOT NULL THEN
+                v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
+				EXECUTE v_sql;
+            END IF;
 
         END IF;
 
