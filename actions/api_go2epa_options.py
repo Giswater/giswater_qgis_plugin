@@ -78,6 +78,7 @@ class Go2EpaOptions(ApiParent):
 
 
     def update_values(self, _json):
+
         my_json = json.dumps(_json)
         form = '"formName":"epaoptions"'
         extras = '"fields":' + my_json + ''

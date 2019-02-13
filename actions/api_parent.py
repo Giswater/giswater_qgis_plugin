@@ -1056,7 +1056,11 @@ class ApiParent(ParentAction):
             self.vertex_marker.hide()
 
     def construct_form_param_user(self, dialog, row, pos, _json, put_chk=True):
-        for field in row[pos]['fields']:
+        if 'fields' in row[pos]:
+            field = 'fields'
+        elif 'input_params_' in row[pos]:
+            field = 'input_params_'
+        for field in row[pos][field]:
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['widgetname'])
@@ -1118,11 +1122,11 @@ class ApiParent(ParentAction):
         layout = dialog.findChild(QGridLayout, layout_name)
         if layout is None:
             return
-        layout.addWidget(lbl, field['layout_order'], 0)
+        layout.addWidget(lbl, int(field['layout_order']), 0)
         if chk is not None:
-            layout.addWidget(chk, field['layout_order'], 1)
+            layout.addWidget(chk, int(field['layout_order']), 1)
         if field['widgettype'] != 'check':
-            layout.addWidget(widget, field['layout_order'], 2)
+            layout.addWidget(widget, int(field['layout_order']), 2)
 
     def get_values_changed_param_user(self, dialog, chk, widget, field, list, value=None):
 
@@ -1138,7 +1142,9 @@ class ApiParent(ParentAction):
         if chk is None:
             elem['widget'] = str(widget.objectName())
             elem['value'] = value
-            elem['sys_role_id'] = str(field['sys_role_id'])
+            if 'sys_role_id' in field:
+                elem['sys_role_id'] = str(field['sys_role_id'])
+
         elif chk.isChecked():
             elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
