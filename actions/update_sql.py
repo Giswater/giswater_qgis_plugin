@@ -345,7 +345,7 @@ class UpdateSQL(ParentAction):
                 if status is False:
                     status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', '') is False:
-                if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
+                if self.process_folder(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/', 'EN') is False:
                     status = False
                 else:
                     status = self.executeFiles(os.listdir(
