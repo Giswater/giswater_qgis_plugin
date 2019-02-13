@@ -129,26 +129,7 @@ UNION
      JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text;
 
 
--- 2019/02/06
-DROP VIEW v_edit_rtc_hydro_data_x_connec;
-CREATE OR REPLACE VIEW v_edit_rtc_hydro_data_x_connec AS 
- SELECT ext_rtc_hydrometer_x_data.id,
-    rtc_hydrometer_x_connec.connec_id,
-    ext_rtc_hydrometer.code,
-    ext_rtc_hydrometer_x_data.hydrometer_id,
-    ext_rtc_hydrometer.catalog_id,
-    ext_cat_period.code AS cat_period_code,
-    ext_rtc_hydrometer_x_data.value_date,
-    ext_rtc_hydrometer_x_data.sum,
-    ext_rtc_hydrometer_x_data.custom_sum
-   FROM ext_rtc_hydrometer_x_data
-     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id
-     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::bigint = ext_rtc_hydrometer.catalog_id::bigint
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer_x_data.hydrometer_id::bigint
-     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-  ORDER BY ext_rtc_hydrometer_x_data.hydrometer_id, ext_rtc_hydrometer_x_data.cat_period_id DESC;
-  
-  
+ 
   
   CREATE OR REPLACE VIEW v_inp_junction AS 
 SELECT 
