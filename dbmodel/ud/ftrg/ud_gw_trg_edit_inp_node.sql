@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -61,7 +61,7 @@ BEGIN
 			SET storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond 
 			WHERE node_id=OLD.node_id;
 			
-        ELSIF node_table = 'inp_outlfall' THEN          
+        ELSIF node_table = 'inp_outfall' THEN          
             UPDATE inp_outfall 
 			SET outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate 
 			WHERE node_id=OLD.node_id;
