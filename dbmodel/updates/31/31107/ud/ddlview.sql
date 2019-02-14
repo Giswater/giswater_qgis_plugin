@@ -6,9 +6,41 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+--2019/02/13 
+DROP VIEW IF EXISTS v_edit_inp_storage CASCADE;
+CREATE VIEW v_edit_inp_storage AS
+SELECT 
+v_node.node_id, 
+top_elev,
+custom_top_elev,
+ymax,
+custom_ymax,
+elev,
+custom_elev,
+sys_elev,
+nodecat_id, 
+v_node.sector_id, 
+macrosector_id,"state", 
+the_geom,
+annotation,
+inp_storage.storage_type, 
+inp_storage.curve_id, 
+inp_storage.a1, 
+inp_storage.a2,
+inp_storage.a0, 
+inp_storage.fevap, 
+inp_storage.sh, 
+inp_storage.hc, 
+inp_storage.imd, 
+inp_storage.y0, 
+inp_storage.ysur,
+inp_storage.apond
+FROM inp_selector_sector, v_node
+	JOIN inp_storage ON (((v_node.node_id) = (inp_storage.node_id)))
+	WHERE ((v_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
-
+--2019/02/12
 CREATE OR REPLACE VIEW v_om_visit AS 
  SELECT distinct (visit_id) * FROM (om_visit.id AS visit_id,
     om_visit.ext_code AS code,

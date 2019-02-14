@@ -94,6 +94,7 @@ FROM inp_selector_sector, v_node
 	WHERE ((v_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
+-- updated on 3.1.107
 DROP VIEW IF EXISTS v_edit_inp_storage CASCADE;
 CREATE VIEW v_edit_inp_storage AS
 SELECT 
