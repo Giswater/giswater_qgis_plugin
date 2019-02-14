@@ -636,8 +636,8 @@ class UpdateSQL(ParentAction):
 
         else:
             if not os.path.exists(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + ''):
-                self.controller.show_message("The project_type folder was not found in sql folder.", 1)
-                self.error_count = self.error_count + 1
+                # self.controller.show_message("The project_type folder was not found in sql folder.", 1)
+                # self.error_count = self.error_count + 1
                 return
             folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + '')
             for folder in folders:
@@ -880,8 +880,8 @@ class UpdateSQL(ParentAction):
 
         else:
             if not os.path.exists(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + ''):
-                self.controller.show_message("The project_type folder was not found in sql folder.", 1)
-                self.error_count = self.error_count + 1
+                # self.controller.show_message("The project_type folder was not found in sql folder.", 1)
+                # self.error_count = self.error_count + 1
                 return
             folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + '')
             for folder in folders:
