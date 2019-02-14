@@ -50,7 +50,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Serialize data of table 'anl_mincut_cat_state'
         self.set_states()
         self.current_state = None
-        
+        self.is_new = True
 
     def set_states(self):
         """ Serialize data of table 'anl_mincut_cat_state' """
@@ -169,15 +169,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.action_mincut_composer = action
 
         # Show future id of mincut
-        result_mincut_id = 1
-        sql = ("SELECT setval('" +self.schema_name+".urn_id_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
-        # sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
-        row = self.controller.get_row(sql, log_sql=True)
-        if row:
-            if row[0] is not None:
-                result_mincut_id = str(int(row[0])+1)
-
-        self.result_mincut_id.setText(str(result_mincut_id))
+        self.set_id_val()
 
         # Set state name
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
@@ -187,6 +179,19 @@ class MincutParent(ParentAction, MultipleSelection):
         self.sql_hydro = ""
         
         self.dlg_mincut.show()
+
+
+    def set_id_val(self):
+        # Show future id of mincut
+        result_mincut_id = 1
+        sql = ("SELECT setval('" +self.schema_name+".urn_id_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
+        row = self.controller.get_row(sql, log_sql=False)
+        if row:
+            if row[0] is not None:
+                if self.is_new:
+                    result_mincut_id = str(int(row[0])+1)
+
+        self.result_mincut_id.setText(str(result_mincut_id))
 
 
     def mg_mincut(self):
@@ -400,7 +405,9 @@ class MincutParent(ParentAction, MultipleSelection):
                 message = "Some mandatory field is missing. Please, review your data"
                 self.controller.show_warning(message)
                 return
-        
+        if self.is_new:
+            self.set_id_val()
+            self.is_new = False
         # Check if id exist in table 'anl_mincut_result_cat'
         result_mincut_id = self.result_mincut_id.text()        
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat" 
@@ -1428,8 +1435,12 @@ class MincutParent(ParentAction, MultipleSelection):
     def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
-        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         srid = self.controller.plugin_settings_value('srid')
+
+        if self.is_new == True:
+            self.set_id_val()
+            self.is_new = False
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in 'anl_mincut_result_cat'
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
