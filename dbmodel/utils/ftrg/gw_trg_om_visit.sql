@@ -18,10 +18,18 @@ BEGIN
 
     -- automatic creation of workcat
     IF (SELECT (value::json->>'AutoNewWorkcat') FROM config_param_system WHERE parameter='om_visit_parameters') THEN
-		INSERT INTO cat_work (id) VALUES (NEW.id);
+	
+		IF TG_OP='INSERT' THEN
+			INSERT INTO cat_work (id) VALUES (NEW.id);
+			RETURN NEW;	
+			
+		ELSIF TG_OP='DELETE' THEN
+			DELETE FROM cat_work WHERE id=OLD.id;
+			RETURN OLD;
+			
+		END IF;
+		
     END IF;
-
-RETURN NEW;
     
 END; 
 $BODY$
