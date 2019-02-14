@@ -168,6 +168,9 @@ BEGIN
 					INTO v_cat_id;
 					
 				IF v_cat_id IS NULL THEN 
+
+					IF v_tablecat='cat_gully' THEN v_tablecat='cat_grate'; END IF;
+					
 					EXECUTE 'SELECT row_to_json(a) FROM (SELECT id FROM '||v_tablecat||' LIMIT 1) a'
 						INTO v_cat_id;
 				END IF;
