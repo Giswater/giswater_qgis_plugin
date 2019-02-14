@@ -171,7 +171,8 @@ class ManageVisit(ParentManage, QObject):
 
         # Show id of visit. If not set, infer a new value
         if not visit_id:
-            visit_id = self.current_visit.max_pk(commit=self.autocommit) + 1
+            #visit_id = self.current_visit.max_pk(commit=self.autocommit) + 1
+            visit_id = self.current_visit.nextval(commit=self.autocommit)
         self.visit_id.setText(str(visit_id))
 
         # manage relation locking
