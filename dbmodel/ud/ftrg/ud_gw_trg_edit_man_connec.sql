@@ -165,6 +165,11 @@ BEGIN
 	       NEW.link=NEW.connec_id;
 	    END IF;
 		
+	    -- Customer code  
+	    IF (NEW.customer_code IS NULL AND (SELECT "value" FROM config_param_system WHERE "parameter"='customer_code_autofill')::boolean= TRUE) THEN
+			NEW.customer_code = NEW.connec_id;
+	    END IF;
+		
 
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation, "observ",

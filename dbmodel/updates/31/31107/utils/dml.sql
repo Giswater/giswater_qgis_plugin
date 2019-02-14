@@ -26,3 +26,7 @@ return_type=null, input_params='[{"name":"nodeTolerance", "type":"float"}]' , sy
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('vdefault_rtc_period_seconds','2592000','integer', 'rtc', 'Default value used if ext_cat_period doesn''t have date values or they are incorrect');
+
+-- 2019/02/14
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('customer_code_autofill', 'FALSE', 'boolean', 'System', 'If TRUE, when insert a new connec customer_code will be the same as connec_id');
