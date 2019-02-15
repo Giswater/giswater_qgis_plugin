@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2102
 
 
-CREATE OR REPLACE FUNCTION "ws_sample".gw_fct_anl_arc_no_startend_node(p_data json)  RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_arc_no_startend_node(p_data json)  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -38,7 +38,7 @@ v_totcount integer = 0;
 
 BEGIN
 
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
