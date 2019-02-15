@@ -52,7 +52,7 @@ BEGIN
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
 		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=6;
-	ELSE;
+	ELSE
 		-- set selector
 		DELETE FROM selector_audit WHERE fprocesscat_id=6 AND cur_user=current_user;    
 		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (6, current_user);
