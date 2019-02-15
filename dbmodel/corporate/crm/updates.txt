@@ -38,3 +38,5 @@ CREATE TABLE crm.config_param_system (
 
 INSERT INTO crm.config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('sys_fdw2crm_process', FALSE, 'Boolean', 'rtc', 'If exists, preprocess function exists moving data from foreing data wraper to crm tables');
+
+ALTER TABLE ext_rtc_hydrometer ALTER COLUMN plot_code TYPE character varying(30);

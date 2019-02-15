@@ -37,6 +37,7 @@ CREATE OR REPLACE VIEW ws.ext_rtc_hydrometer AS
 FILE ws_52_1_krn_views_edit
 FILE ws_52_2_rtc_views_edit
 FILE ws_53_rtc_views
+View v_anl_mincut_result_hydrometer from ws_63_anl_mincut_views
 
 -- triggers
 FILE ws_gw_trg_edit_man_connec
