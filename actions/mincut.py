@@ -29,7 +29,7 @@ from giswater.ui_manager import MincutComposer
 
 
 class MincutParent(ParentAction, MultipleSelection):
-    
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
 
@@ -50,7 +50,8 @@ class MincutParent(ParentAction, MultipleSelection):
         # Serialize data of table 'anl_mincut_cat_state'
         self.set_states()
         self.current_state = None
-        
+        self.is_new = True
+
 
     def set_states(self):
         """ Serialize data of table 'anl_mincut_cat_state' """
@@ -69,7 +70,7 @@ class MincutParent(ParentAction, MultipleSelection):
         
     def init_mincut_form(self):
         """ Custom form initial configuration """
-
+        self.is_new = True
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -168,16 +169,8 @@ class MincutParent(ParentAction, MultipleSelection):
         self.set_icon(action, "181")
         self.action_mincut_composer = action
 
-        # Show future id of mincut
-        result_mincut_id = 1
-        sql = ("SELECT setval('" +self.schema_name+".urn_id_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
-        # sql = "SELECT nextval('" + self.schema_name + ".anl_mincut_result_cat_seq');"
-        row = self.controller.get_row(sql, log_sql=True)
-        if row:
-            if row[0] is not None:
-                result_mincut_id = str(int(row[0])+1)
-
-        self.result_mincut_id.setText(str(result_mincut_id))
+        # # Show future id of mincut
+        self.set_id_val()
 
         # Set state name
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
@@ -187,6 +180,18 @@ class MincutParent(ParentAction, MultipleSelection):
         self.sql_hydro = ""
         
         self.dlg_mincut.show()
+
+    def set_id_val(self):
+        # Show future id of mincut
+        result_mincut_id = 1
+        sql = ("SELECT setval('" +self.schema_name+".urn_id_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
+        row = self.controller.get_row(sql, log_sql=False)
+        if row:
+            if row[0] is not None:
+                if self.is_new:
+                    result_mincut_id = str(int(row[0])+1)
+
+        self.result_mincut_id.setText(str(result_mincut_id))
 
 
     def mg_mincut(self):
@@ -396,7 +401,11 @@ class MincutParent(ParentAction, MultipleSelection):
                 message = "Some mandatory field is missing. Please, review your data"
                 self.controller.show_warning(message)
                 return
-        
+
+        if self.is_new:
+            self.set_id_val()
+            self.is_new = False
+
         # Check if id exist in table 'anl_mincut_result_cat'
         result_mincut_id = self.result_mincut_id.text()        
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat" 
@@ -461,7 +470,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if self.sql_hydro <> "":
             sql += self.sql_hydro
                             
-        status = self.controller.execute_sql(sql, log_error=True, log_sql=True)
+        status = self.controller.execute_sql(sql, log_error=True, log_sql=False)
         if status:                                  
             message = "Values has been updated"
             self.controller.show_info(message)
@@ -821,7 +830,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Check if hydrometer_id belongs to any 'connec_id'
         sql = ("SELECT hydrometer_id FROM " + self.schema_name + ".v_rtc_hydrometer"
                " WHERE hydrometer_customer_code = '" + str(hydrometer_cc) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=False)
         if not row:
             message = "Selected hydrometer_id not found"
             self.controller.show_info_box(message, parameter=hydrometer_cc)
@@ -1426,21 +1435,25 @@ class MincutParent(ParentAction, MultipleSelection):
     def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
-        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
+
         srid = self.controller.plugin_settings_value('srid')
 
+        if self.is_new == True:
+            self.set_id_val()
+            self.is_new = False
+        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         # Check if id exist in 'anl_mincut_result_cat'
         sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id_text) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_sql=False)
         # Before of executing 'gw_fct_mincut' we already need to have id in 'anl_mincut_result_cat'
         if not row:
             sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_state)"
                    " VALUES ('" + str(result_mincut_id_text) + "', 0)")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql, log_sql=False)
 
         # Change cursor to 'WaitCursor'
-        self.set_cursor_wait()        
+        #self.set_cursor_wait()
         
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id: id of snapped arc/node
@@ -1448,7 +1461,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # result_mincut_id: result_mincut_id from form
         sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
                " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "');")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
@@ -1476,7 +1489,7 @@ class MincutParent(ParentAction, MultipleSelection):
                    " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "',"
                    " anl_feature_id = '" + str(elem_id) + "'"
                    " WHERE id = '" + result_mincut_id_text + "'")
-            status = self.controller.execute_sql(sql, log_sql=True)
+            status = self.controller.execute_sql(sql, log_sql=False)
             if not status:
                 message = "Error updating element in table, you need to review data"
                 self.controller.show_warning(message)
@@ -1495,7 +1508,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.refresh_map_canvas()
 
         # Restore default cursor
-        self.set_cursor_restore()
+        #self.set_cursor_restore()
         
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
@@ -1627,7 +1640,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if result_mincut_id != 'null':
             sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
                    "('" + str(elem_id) + "', '" + str(result_mincut_id) + "', '" + str(cur_user) + "');")
-            status = self.controller.execute_sql(sql, log_sql=True)
+            status = self.controller.execute_sql(sql, log_sql=False)
             if status:
                 message = "Custom mincut executed successfully"
                 self.controller.show_info(message)
@@ -1657,7 +1670,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def load_mincut(self, result_mincut_id):
         """ Load selected mincut """
-
+        self.is_new = False
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
 
@@ -1669,7 +1682,7 @@ class MincutParent(ParentAction, MultipleSelection):
                " ON cat_users.id = anl_mincut_result_cat.assigned_to"
                " WHERE anl_mincut_result_cat.id = '" + str(result_mincut_id) + "'")
 
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_sql=False)
         if not row:
             return
               
@@ -2163,7 +2176,7 @@ class MincutParent(ParentAction, MultipleSelection):
             sql = ("SELECT " + self.params['expl_field_name'] + ""
                    " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""
                    " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql, log_sql=False)
             if row:
                 utils_giswater.setSelectedItem(dialog, dialog.address_exploitation, row[0])
 
