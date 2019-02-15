@@ -1510,21 +1510,34 @@ class UpdateSQL(ParentAction):
         else:
             self.schema = str(create_project)
         sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
-        status = self.controller.execute_sql(sql)
+        status = self.controller.execute_sql(sql, commit=False)
         if status:
             self.reload_trg(project_type=self.project_type_selected)
             self.reload_trg(project_type='api')
             self.reload_fct_ftrg(project_type=self.project_type_selected)
             self.reload_fct_ftrg(project_type='api')
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_schema_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
-            status = self.controller.execute_sql(sql)
+            status = self.controller.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.setArrowCursor()
-        self.event_change_connection()
-        utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
-        self.close_dialog(self.dlg_readsql_rename)
-        msg = "Rename project has been executed correctly."
-        result = self.controller.show_info_box(msg, "Info")
+
+
+        # Show message if precess execute correctly
+        if self.error_count == 0:
+            self.controller.dao.commit()
+            self.event_change_connection()
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
+            self.close_dialog(self.dlg_readsql_rename)
+            msg = "Rename project has been executed correctly."
+            result = self.controller.show_info_box(msg, "Info")
+
+        else:
+            self.controller.dao.rollback()
+            msg = "Some error has occurred while the rename process was running."
+            result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
 
         
     def update_api(self):
