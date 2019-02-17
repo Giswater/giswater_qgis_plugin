@@ -7,18 +7,12 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-ALTER TABLE rpt_cat_result ADD COLUMN user_name text;
-ALTER TABLE rpt_cat_result ALTER COLUMN user_name SET DEFAULT current_user;
-
-ALTER TABLE dma ADD COLUMN effc double precision;
-
-ALTER TABLE audit_cat_function ADD COLUMN istoolbox boolean;
-ALTER TABLE audit_cat_function ADD COLUMN alias varchar(30);
-ALTER TABLE audit_cat_function ADD COLUMN isparametric boolean;
-
-
 --audit_cat_param_user
+ALTER TABLE audit_cat_param_user RENAME context  TO formname;
+ALTER TABLE audit_cat_param_user RENAME data_type TO idval;
+ALTER TABLE audit_cat_param_user DROP COLUMN dv_table;
+ALTER TABLE audit_cat_param_user DROP COLUMN dv_column;
+ALTER TABLE audit_cat_param_user DROP COLUMN dv_clause;
 ALTER TABLE audit_cat_param_user ADD COLUMN label text;
 ALTER TABLE audit_cat_param_user ADD COLUMN dv_querytext text;
 ALTER TABLE audit_cat_param_user ADD COLUMN dv_parent_id text;
@@ -33,7 +27,36 @@ ALTER TABLE audit_cat_param_user ADD COLUMN feature_dv_parent_value text;
 ALTER TABLE audit_cat_param_user ADD COLUMN isautoupdate boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN datatype character varying(30);
 ALTER TABLE audit_cat_param_user ADD COLUMN widgettype character varying(30);
+ALTER TABLE audit_cat_param_user ADD COLUMN ismandatory boolean;
+ALTER TABLE audit_cat_param_user ADD COLUMN widgetcontrols json;
 ALTER TABLE audit_cat_param_user ADD COLUMN vdefault text;
+ALTER TABLE audit_cat_param_user ADD COLUMN layout_name text;
+ALTER TABLE audit_cat_param_user ADD COLUMN reg_exp text;
+
+
+ALTER TABLE rpt_cat_result ADD COLUMN user_name text;
+ALTER TABLE rpt_cat_result ALTER COLUMN user_name SET DEFAULT current_user;
+
+ALTER TABLE dma ADD COLUMN effc double precision;
+
+ALTER TABLE audit_cat_function ADD COLUMN istoolbox boolean;
+ALTER TABLE audit_cat_function ADD COLUMN alias varchar(30);
+ALTER TABLE audit_cat_function ADD COLUMN isparametric boolean;
+
+
+
+ALTER TABLE config_param_system ADD COLUMN label text;
+ALTER TABLE config_param_system ADD COLUMN dv_querytext text;
+ALTER TABLE config_param_system ADD COLUMN dv_filterbyfield text;
+ALTER TABLE config_param_system ADD COLUMN isenabled boolean;
+ALTER TABLE config_param_system ADD COLUMN layout_id integer;
+ALTER TABLE config_param_system ADD COLUMN layout_order integer;
+ALTER TABLE config_param_system ADD COLUMN project_type character varying;
+ALTER TABLE config_param_system ADD COLUMN dv_isparent boolean;
+ALTER TABLE config_param_system ADD COLUMN isautoupdate boolean;
+ALTER TABLE config_param_system ADD COLUMN datatype character varying;
+ALTER TABLE config_param_system ADD COLUMN widgettype character varying;
+ALTER TABLE config_param_system ADD COLUMN tooltip text;
 
 
 -- om_visit
@@ -41,27 +64,60 @@ ALTER TABLE om_visit ADD column lot_id integer;
 ALTER TABLE om_visit ADD COLUMN class_id integer;
 ALTER TABLE om_visit ADD COLUMN status integer;
 
---SYS TABLES
-CREATE TABLE sys_combo_cat(
-  id serial NOT NULL,
-  idval text,
-  CONSTRAINT sys_combo_cat_pkey PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
-);
+
+ALTER TABLE temp_csv2pg RENAME TO _temp_csv2pg;
+ALTER SEQUENCE temp_csv2pg_id_seq RENAME TO temp_csv2pg_id_seq2;
+
+CREATE TABLE temp_csv2pg(
+  id serial PRIMARY KEY,
+  csv2pgcat_id integer,
+  user_name text DEFAULT "current_user"(),
+  source text,
+  csv1 text,
+  csv2 text,
+  csv3 text,
+  csv4 text,
+  csv5 text,
+  csv6 text,
+  csv7 text,
+  csv8 text,
+  csv9 text,
+  csv10 text,
+  csv11 text,
+  csv12 text,
+  csv13 text,
+  csv14 text,
+  csv15 text,
+  csv16 text,
+  csv17 text,
+  csv18 text,
+  csv19 text,
+  csv20 text,
+  tstamp timestamp without time zone DEFAULT now(),
+  csv21 text,
+  csv22 text,
+  csv23 text,
+  csv24 text,
+  csv25 text,
+  csv26 text,
+  csv27 text,
+  csv28 text,
+  csv29 text,
+  csv30 text,
+  CONSTRAINT temp_csv2pg_csv2pgcat_id_fkey2 FOREIGN KEY (csv2pgcat_id)
+      REFERENCES sys_csv2pg_cat (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT);
 
 
-CREATE TABLE sys_combo_values(
-  sys_combo_cat_id integer NOT NULL,
+CREATE TABLE om_visit_parameter_cat_combo(
+  parameter_id integer NOT NULL,
   id integer NOT NULL,
   idval text,
   descript text,
-  CONSTRAINT sys_combo_pkey PRIMARY KEY (sys_combo_cat_id, id)
-)
-WITH (
-  OIDS=FALSE
+  CONSTRAINT sys_combo_pkey PRIMARY KEY (parameter_id, id)
 );
+
+
 
 ---OM TABLES
 

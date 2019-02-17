@@ -11,18 +11,21 @@ gw_fct_crm2gis_hydro_catalog
 
 
 -- 3.1.107
-ALTER TABLE hydrometer ADD COLUMN hydrotype_id;
-ALTER TABLE hydrometer ADD COLUMN omtype_id;
-ALTER TABLE hydrometer ADD COLUMN instal_date;
-ALTER TABLE hydrometer ADD COLUMN observ;
-ALTER TABLE hydrometer ADD COLUMN valve_type;
-ALTER TABLE hydrometer ADD COLUMN valve_diam;
-ALTER TABLE hydrometer ADD COLUMN valve_mat;
-ALTER TABLE hydrometer ADD COLUMN valve_update_date;
+
+ALTER TABLE hydrometer ADD COLUMN hydrotype_id varchar(30);
+ALTER TABLE hydrometer ADD COLUMN omtype_id integer;
+ALTER TABLE hydrometer ADD COLUMN instal_date date;
+ALTER TABLE hydrometer ADD COLUMN observ text;
+ALTER TABLE hydrometer ADD COLUMN valve_type varchar(30);
+ALTER TABLE hydrometer ADD COLUMN valve_diam numeric(12,3);
+ALTER TABLE hydrometer ADD COLUMN valve_mat varchar(30);
+ALTER TABLE hydrometer ADD COLUMN valve_update_date date;
 
 
-CREATE TABLE hydro_cat_omtype
-
+CREATE TABLE hydro_cat_omtype (
+"id" integer PRIMARY KEY,
+"code" character varying(16) NOT NULL,
+"observ" character varying(100));
 FUNCTION gw_fct_crm2gis_hydro_catalog
 FUNCTION gw_fct_crm2gis
 

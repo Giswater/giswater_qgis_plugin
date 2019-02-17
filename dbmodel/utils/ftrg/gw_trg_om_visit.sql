@@ -29,8 +29,18 @@ BEGIN
 			
 		END IF;
 		
-    END IF;
-    
+    ELSE
+		IF TG_OP='INSERT' THEN
+			RETURN NEW;	
+			
+		ELSIF TG_OP='DELETE' THEN
+			RETURN OLD;
+			
+		END IF;
+		
+	END IF;
+	
+   	
 END; 
 $BODY$
   LANGUAGE plpgsql VOLATILE

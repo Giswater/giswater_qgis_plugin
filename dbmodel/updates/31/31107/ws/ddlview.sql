@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -109,7 +109,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS
     c.maxc AS cmax,
     (b.lps_avg * 0.5::double precision / c.effc ) * c.maxc AS lps_max
    FROM v_rtc_hydrometer_x_arc a
-     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::int8 = a.hydrometer_id::bigint
      JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text
 UNION
  SELECT a.hydrometer_id,
@@ -125,7 +125,7 @@ UNION
     c.maxc AS cmax,
     (b.lps_avg * 0.5::double precision / c.effc ) * c.maxc AS lps_max
    FROM v_rtc_hydrometer_x_arc a
-     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::int8 = a.hydrometer_id::bigint
      JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text;
 
 
@@ -406,16 +406,20 @@ CREATE OR REPLACE VIEW vi_title AS
 
 
 DROP VIEW IF EXISTS vi_junctions CASCADE;
-CREATE OR REPLACE VIEW vi_junctions AS 
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elevation,
-    rpt_inp_node.demand,
-    inp_junction.pattern_id
-   FROM inp_selector_result,   rpt_inp_node
-   LEFT JOIN inp_junction ON inp_junction.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.epa_type::text = 'JUNCTION'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text 
-  AND inp_selector_result.cur_user = "current_user"()::text
-  ORDER BY rpt_inp_node.node_id;
+ CREATE OR REPLACE VIEW vi_junctions AS 
+SELECT 
+rpt_inp_node.node_id, 
+elevation, 
+elev, 
+rpt_inp_node.demand, 
+pattern_id, 
+st_x(the_geom)::numeric(16,3) AS xcoord, 
+st_y(the_geom)::numeric(16,3) AS ycoord
+FROM inp_selector_result, rpt_inp_node
+   LEFT JOIN inp_junction ON inp_junction.node_id = rpt_inp_node.node_id
+   WHERE epa_type IN ('JUNCTION', 'SHORTPIPE') AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+   ORDER BY rpt_inp_node.node_id;
+  
 
 
 DROP VIEW IF EXISTS vi_reservoirs CASCADE;
@@ -475,17 +479,29 @@ UNION
 
 
 CREATE OR REPLACE VIEW vi_pumps AS 
- SELECT concat(inp_pump.node_id, '_n2a') AS arc_id,
+SELECT arc_id::text,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
-    concat('POWER '::text || inp_pump.power::text) AS power,
-    concat('HEAD '::text || inp_pump.curve_id::text) AS curve_id,
-    concat('SPEED '::text || inp_pump.speed) AS speed,
-    concat('PATTERN '::text || inp_pump.pattern::text) AS pattern
-   FROM inp_selector_result,
-    inp_pump
+    ('POWER'::text || ' '::text) || inp_pump.power::text AS power,
+    ('HEAD'::text || ' '::text) || inp_pump.curve_id::text AS head,
+    ('SPEED'::text || ' '::text) || inp_pump.speed AS speed,
+    ('PATTERN'::text || ' '::text) || inp_pump.pattern::text AS pattern
+   FROM inp_selector_result, inp_pump
      JOIN rpt_inp_arc ON rpt_inp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a')
+  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+union
+SELECT arc_id::text,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    ('POWER'::text || ' '::text) || inp_pump.power::text AS power,
+    ('HEAD'::text || ' '::text) || inp_pump.curve_id::text AS head,
+    ('SPEED'::text || ' '::text) || inp_pump.speed AS speed,
+    ('PATTERN'::text || ' '::text) || inp_pump.pattern::text AS pattern
+   FROM inp_selector_result, inp_pump
+     JOIN rpt_inp_arc ON rpt_inp_arc.flw_code::text = concat(inp_pump.node_id, '_n2a')
   WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
+
+
 
 
 DROP VIEW IF EXISTS vi_valves CASCADE;
@@ -592,8 +608,7 @@ CREATE OR REPLACE VIEW vi_patterns AS
     inp_pattern_value.factor_5,' ',inp_pattern_value.factor_6,' ',inp_pattern_value.factor_7,' ',inp_pattern_value.factor_8,' ',
     inp_pattern_value.factor_9,' ',inp_pattern_value.factor_10,' ',inp_pattern_value.factor_11,' ', inp_pattern_value.factor_12,' ',
     inp_pattern_value.factor_13,' ', inp_pattern_value.factor_14,' ',inp_pattern_value.factor_15,' ', inp_pattern_value.factor_16,' ',
-    inp_pattern_value.factor_17,' ', inp_pattern_value.factor_18,' ',inp_pattern_value.factor_19,' ',inp_pattern_value.factor_20,' ',
-    inp_pattern_value.factor_21,' ',inp_pattern_value.factor_22,' ',inp_pattern_value.factor_23,' ',inp_pattern_value.factor_24) as multipliers
+    inp_pattern_value.factor_17,' ', inp_pattern_value.factor_18) as multipliers
    FROM inp_pattern_value
   ORDER BY inp_pattern_value.pattern_id;
 
@@ -642,15 +657,17 @@ UNION
 
 DROP VIEW IF EXISTS vi_rules CASCADE;
 CREATE OR REPLACE VIEW vi_rules AS 
- SELECT inp_rules_x_arc.text
+ SELECT * FROM (SELECT inp_rules_x_arc.text
    FROM inp_selector_result,  inp_rules_x_arc
      JOIN rpt_inp_arc ON inp_rules_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
   WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+  order by inp_rules_x_arc.id)a
 UNION
- SELECT inp_rules_x_node.text
+ SELECT * FROM (SELECT inp_rules_x_node.text
    FROM inp_selector_result, inp_rules_x_node
    JOIN rpt_inp_node ON inp_rules_x_node.node_id::text = rpt_inp_node.node_id::text
-  WHERE inp_selector_result.result_id::text = rpt_inp_node.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
+  WHERE inp_selector_result.result_id::text = rpt_inp_node.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+  order by inp_rules_x_node.id)b;
 
 
 

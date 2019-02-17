@@ -7,59 +7,60 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO config_param_user VALUES (6, 'pipecat_vdefault', 'FC110-PN10', current_user);
-INSERT INTO config_param_user VALUES (78, 'psector_measurement_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (11, 'tankcat_vdefault', 'TANK_01', current_user);
-INSERT INTO config_param_user VALUES (12, 'hydrantcat_vdefault', 'HYDRANT 1X110', current_user);
-INSERT INTO config_param_user VALUES (13, 'junctioncat_vdefault', 'JUNCTION DN110', current_user);
-INSERT INTO config_param_user VALUES (14, 'pumpcat_vdefault', 'PUMP-01', current_user);
-INSERT INTO config_param_user VALUES (15, 'valvecat_vdefault', 'AIR VALVE DN50', current_user);
-INSERT INTO config_param_user VALUES (16, 'metercat_vdefault', 'PRESSUREMETERDN110 PN16', current_user);
-INSERT INTO config_param_user VALUES (17, 'sourcecat_vdefault', 'SOURCE-01', current_user);
-INSERT INTO config_param_user VALUES (18, 'filtercat_vdefault', 'FILTER-01-DN200', current_user);
-INSERT INTO config_param_user VALUES (19, 'registercat_vdefault', 'REGISTER', current_user);
-INSERT INTO config_param_user VALUES (20, 'netwjoincat_vdefault', 'WATER-CONNECTION', current_user);
-INSERT INTO config_param_user VALUES (21, 'expansiontankcat_vdefault', 'EXPANTANK', current_user);
-INSERT INTO config_param_user VALUES (22, 'flexuioncat_vdefault', 'FLEXUNION', current_user);
-INSERT INTO config_param_user VALUES (23, 'netelementcat_vdefault', 'NETELEMENT', current_user);
-INSERT INTO config_param_user VALUES (24, 'netsamplepointcat_vdefault', 'NETSAMPLEPOINT', current_user);
-INSERT INTO config_param_user VALUES (26, 'greentapcat_vdefault', 'PVC50-PN16-GRE', current_user);
-INSERT INTO config_param_user VALUES (27, 'wjoincat_vdefault', 'PVC25-PN16-DOM', current_user);
-INSERT INTO config_param_user VALUES (28, 'fountaincat_vdefault', 'PVC63-PN16-FOU', current_user);
-INSERT INTO config_param_user VALUES (29, 'tapcat_vdefault', 'PVC25-PN16-TAP', current_user);
-INSERT INTO config_param_user VALUES (30, 'psector_scale_vdefault', '2.00', current_user);
-INSERT INTO config_param_user VALUES (31, 'psector_rotation_vdefault', '0.0000', current_user);
-INSERT INTO config_param_user VALUES (32, 'psector_gexpenses_vdefault', '19.00', current_user);
-INSERT INTO config_param_user VALUES (33, 'psector_vat_vdefault', '21.00', current_user);
-INSERT INTO config_param_user VALUES (34, 'psector_type_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (35, 'psector_other_vdefault', '4.00', current_user);
-INSERT INTO config_param_user VALUES (36, 'presszone_vdefault', 'Medium-Expl_01', current_user);
-INSERT INTO config_param_user VALUES (37, 'flexunioncat_vdefault', 'FLEXUNION', current_user);
-INSERT INTO config_param_user VALUES (38, 'arccat_vdefault', 'FC110-PN10', current_user);
-INSERT INTO config_param_user VALUES (1, 'state_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (2, 'workcat_vdefault', 'work1', current_user);
-INSERT INTO config_param_user VALUES (3, 'verified_vdefault', 'VERIFIED', current_user);
-INSERT INTO config_param_user VALUES (8, 'connecat_vdefault', 'PVC25-PN16-DOM', current_user);
-INSERT INTO config_param_user VALUES (39, 'nodecat_vdefault', 'AIR VALVE DN50', current_user);
-INSERT INTO config_param_user VALUES (40, 'pavementcat_vdefault', 'Asphalt', current_user);
-INSERT INTO config_param_user VALUES (9, 'elementcat_vdefault', 'COVER', current_user);
-INSERT INTO config_param_user VALUES (41, 'soilcat_vdefault', 'Standard soil', current_user);
-INSERT INTO config_param_user VALUES (42, 'statetype_vdefault', '2', current_user);
-INSERT INTO config_param_user VALUES (43, 'ownercat_vdefault', 'owner1', current_user);
-INSERT INTO config_param_user VALUES (46, 'wtpcat_vdefault', 'ETAP', current_user);
-INSERT INTO config_param_user VALUES (79, 'psector_vdefault', '1', current_user);
-INSERT INTO config_param_user VALUES (81, 'cad_tools_base_layer_vdefault', 'Streetaxis', current_user);
-INSERT INTO config_param_user VALUES (82, 'dim_tooltip', 'false', current_user);
-INSERT INTO config_param_user VALUES (90, 'qgis_template_folder_path', NULL, current_user);
-INSERT INTO config_param_user VALUES (91, 'edit_arc_downgrade_force', 'FALSE', current_user);
-INSERT INTO config_param_user VALUES (102, 'edit_arc_division_dsbl', 'FALSE', current_user);
-INSERT INTO config_param_user VALUES (103, 'plan_arc_vdivision_dsbl', 'FALSE', current_user);
-INSERT INTO config_param_user VALUES (94, 'statetype_plan_vdefault', 3, current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pipecat_vdefault', 'FC110-PN10', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_measurement_vdefault', '1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('tankcat_vdefault', 'TANK_01', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('hydrantcat_vdefault', 'HYDRANT 1X110', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('junctioncat_vdefault', 'JUNCTION DN110', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pumpcat_vdefault', 'PUMP-01', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('valvecat_vdefault', 'AIR VALVE DN50', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('metercat_vdefault', 'PRESSUREMETERDN110 PN16', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('sourcecat_vdefault', 'SOURCE-01', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('filtercat_vdefault', 'FILTER-01-DN200', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('registercat_vdefault', 'REGISTER', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('netwjoincat_vdefault', 'WATER-CONNECTION', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('expansiontankcat_vdefault', 'EXPANTANK', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('flexuioncat_vdefault', 'FLEXUNION', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('netelementcat_vdefault', 'NETELEMENT', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('netsamplepointcat_vdefault', 'NETSAMPLEPOINT', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('greentapcat_vdefault', 'PVC50-PN16-GRE', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('wjoincat_vdefault', 'PVC25-PN16-DOM', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('fountaincat_vdefault', 'PVC63-PN16-FOU', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('tapcat_vdefault', 'PVC25-PN16-TAP', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_scale_vdefault', '2.00', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_rotation_vdefault', '0.0000', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_gexpenses_vdefault', '19.00', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_vat_vdefault', '21.00', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_type_vdefault', '1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_other_vdefault', '4.00', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('presszone_vdefault', 'Medium-Expl_01', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('flexunioncat_vdefault', 'FLEXUNION', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('arccat_vdefault', 'FC110-PN10', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('state_vdefault', '1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('workcat_vdefault', 'work1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('verified_vdefault', 'VERIFIED', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('connecat_vdefault', 'PVC25-PN16-DOM', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('nodecat_vdefault', 'AIR VALVE DN50', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('pavementcat_vdefault', 'Asphalt', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('elementcat_vdefault', 'COVER', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('soilcat_vdefault', 'Standard soil', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_vdefault', '2', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('ownercat_vdefault', 'owner1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('wtpcat_vdefault', 'ETAP', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('psector_vdefault', '1', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('cad_tools_base_layer_vdefault', 'Streetaxis', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('dim_tooltip', 'false', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('qgis_template_folder_path', NULL, current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arc_downgrade_force', 'FALSE', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_arc_division_dsbl', 'FALSE', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_arc_vdivision_dsbl', 'FALSE', current_user);
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('statetype_plan_vdefault', 3, current_user);
 
 
-
-
-
+-- insert mandatory values
+INSERT INTO config_param_user (parameter, value, cur_user)
+		SELECT audit_cat_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN audit_cat_param_user ON audit_cat_param_user.id=parameter 
+		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'));
 
 
 

@@ -102,10 +102,6 @@ CREATE TABLE value_type
 -- create new fields
 ----------------------
 
-ALTER TABLE audit_cat_param_user ADD COLUMN formname text;
-ALTER TABLE audit_cat_param_user ADD COLUMN ismandatory boolean;
-ALTER TABLE audit_cat_param_user ADD COLUMN widgetcontrols json;
-
 
 ALTER TABLE cat_arc ADD COLUMN  dn integer;
 ALTER TABLE cat_arc ADD COLUMN  pn integer;
@@ -124,21 +120,6 @@ ALTER TABLE cat_feature ADD COLUMN orderby integer;
 ALTER TABLE cat_feature ADD COLUMN active boolean;
 ALTER TABLE cat_feature ADD COLUMN code_autofill boolean;
 
-ALTER TABLE config_param_system ADD COLUMN dt integer;
-ALTER TABLE config_param_system ADD COLUMN wt integer;
-ALTER TABLE config_param_system ADD COLUMN label text;
-ALTER TABLE config_param_system ADD COLUMN dv_querytext text;
-ALTER TABLE config_param_system ADD COLUMN dv_filterbyfield text;
-ALTER TABLE config_param_system ADD COLUMN isenabled boolean;
-ALTER TABLE config_param_system ADD COLUMN orderby integer;
-ALTER TABLE config_param_system ADD COLUMN layout_id integer;
-ALTER TABLE config_param_system ADD COLUMN layout_order integer;
-ALTER TABLE config_param_system ADD COLUMN project_type character varying;
-ALTER TABLE config_param_system ADD COLUMN dv_isparent boolean;
-ALTER TABLE config_param_system ADD COLUMN isautoupdate boolean;
-ALTER TABLE config_param_system ADD COLUMN datatype character varying;
-ALTER TABLE config_param_system ADD COLUMN widgettype character varying;
-ALTER TABLE config_param_system ADD COLUMN tooltip text;
 
 --rename instead of add column?
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydrometer_id character varying(16);

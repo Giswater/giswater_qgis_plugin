@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -42,7 +42,7 @@ FROM inp_selector_sector, v_node
 
 --2019/02/12
 CREATE OR REPLACE VIEW v_om_visit AS 
- SELECT distinct (visit_id) * FROM (om_visit.id AS visit_id,
+ SELECT distinct ON (visit_id) * FROM (SELECT om_visit.id AS visit_id,
     om_visit.ext_code AS code,
     om_visit.visitcat_id,
     om_visit_cat.name,
@@ -526,15 +526,16 @@ CREATE OR REPLACE VIEW vi_title AS
    FROM inp_project_id
   ORDER BY inp_project_id.title;
 
+
 DROP VIEW IF EXISTS vi_options CASCADE;
 CREATE OR REPLACE VIEW vi_options AS 
- SELECT a.description as parameter,
+ SELECT a.idval as parameter,
  CASE WHEN inp_typevalue.idval is not null then inp_typevalue.idval
  else b.value end as value
    FROM audit_cat_param_user a
      LEFT JOIN config_param_user b ON a.id = b.parameter::text
      LEFT JOIN inp_typevalue ON  inp_typevalue.id=b.value and inp_typevalue.typevalue LIKE 'inp_value_options%'
-  WHERE a.context = 'inp_options'::text AND b.cur_user::name = "current_user"();
+  WHERE a.formname = 'epaoptions'::text AND b.cur_user::name = "current_user"();
 
 
 DROP VIEW IF EXISTS vi_report CASCADE;
@@ -543,7 +544,7 @@ CREATE OR REPLACE VIEW vi_report AS
     b.value
    FROM audit_cat_param_user a
      LEFT JOIN config_param_user b ON a.id = b.parameter::text
-  WHERE a.context = 'inp_report'::text AND b.cur_user::name = "current_user"();
+  WHERE a.formname = 'inp_report'::text AND b.cur_user::name = "current_user"();
   
 
 DROP VIEW IF EXISTS  vi_files CASCADE;
@@ -1519,7 +1520,7 @@ CREATE OR REPLACE VIEW v_anl_flow_connec AS
 	 
 DROP VIEW IF EXISTS v_anl_flow_hydrometer;
 CREATE OR REPLACE VIEW v_anl_flow_hydrometer AS 
-SELECT hydrometer_id,
+SELECT hydrometer_id AS id,
 v_edit_connec.connec_id,
 code,
 context,

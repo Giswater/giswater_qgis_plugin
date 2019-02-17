@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_arc_no_startend_node(p_data js
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_anl_arc_no_startend_node($${
+SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "id":["2004","2005"]},
 "data":{"selectionMode":"previousSelection",

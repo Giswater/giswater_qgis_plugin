@@ -11,6 +11,10 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(fprocesscat_id
   RETURNS integer AS
 $BODY$
 
+/*
+select SCHEMA_NAME.gw_fct_audit_check_project(1)
+*/
+
 DECLARE 
 query_text 	text;
 sys_rows_aux 	text;
@@ -51,14 +55,6 @@ BEGIN
 	  DELETE FROM selector_psector WHERE psector_id =(SELECT value FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer AND cur_user=current_user;
 	  INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT value FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer, current_user);
 	END IF;
-
-	/* setting values user (>3.2)
-	-- if is first time for user
-	IF (SELECT cur_user FROM config_param user WHERE cur_user=current_user LIMIT 1) IS NULL THEN   
-		-- set values of user
-		PERFORM gw_fct_admin_role_resetuserprofile('"user":"'||current_user||'", "values":{}');
-	END IF;
-	*/
 
 	-- Reset sequences
 	IF project_type_aux='WS' THEN
@@ -106,7 +102,15 @@ BEGIN
 		END IF;
 	END LOOP;		
 
+	-- check if it's new user
+	IF (SELECT cur_user FROM config_param_user WHERE cur_user=current_user LIMIT 1) IS NULL THEN
 
+		-- Inserting mandatory values for user
+		INSERT INTO config_param_user (parameter, value, cur_user) 
+		SELECT audit_cat_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN audit_cat_param_user ON audit_cat_param_user.id=parameter 
+		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'));
+	END IF;
+	
 	-- check qgis project (1)
 	IF fprocesscat_id_aux=1 THEN
 	

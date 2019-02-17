@@ -40,19 +40,3 @@ CREATE TABLE inp_pump_importinp
   status character varying(12)
 );
 
-
-
-ALTER TABLE hydrometer ADD COLUMN hydrotype_id varchar(30);
-ALTER TABLE hydrometer ADD COLUMN omtype_id integer;
-ALTER TABLE hydrometer ADD COLUMN instal_date date;
-ALTER TABLE hydrometer ADD COLUMN observ text;
-ALTER TABLE hydrometer ADD COLUMN valve_type varchar(30);
-ALTER TABLE hydrometer ADD COLUMN valve_diam numeric(12,3);
-ALTER TABLE hydrometer ADD COLUMN valve_mat varchar(30);
-ALTER TABLE hydrometer ADD COLUMN valve_update_date date;
-
-CREATE TABLE hydro_cat_omtype (
-"id" integer PRIMARY KEY,
-"code" character varying(16) NOT NULL,
-"observ" character varying(100));
-);
