@@ -1120,7 +1120,7 @@ UNION
   AND inp_selector_result.cur_user = "current_user"()::text
 UNION
 SELECT rpt_inp_arc.arc_id,
-    inp_typevalue.descript as shape,
+    inp_typevalue.idval as shape,
     concat(inp_weir.geom1,' ',inp_weir.geom2,' ',inp_weir.geom3,' ',inp_weir.geom4) as other_val
    FROM inp_selector_result,rpt_inp_arc
      JOIN inp_weir ON inp_weir.arc_id::text = rpt_inp_arc.arc_id::text
@@ -1129,7 +1129,7 @@ SELECT rpt_inp_arc.arc_id,
   AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
-    inp_typevalue.descript as shape,
+    inp_typevalue.idval as shape,
     concat(inp_flwreg_weir.geom1,' ',inp_flwreg_weir.geom2,' ',inp_flwreg_weir.geom3) as other_val
    FROM inp_selector_result,rpt_inp_arc
      JOIN inp_flwreg_weir ON rpt_inp_arc.flw_code::text = 

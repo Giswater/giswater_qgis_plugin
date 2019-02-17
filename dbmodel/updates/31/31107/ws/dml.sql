@@ -64,6 +64,97 @@ INSERT INTO audit_cat_param_user VALUES ('inp_report_quality', 'epaoptions', nul
 INSERT INTO audit_cat_param_user VALUES ('inp_times_statistic', 'epaoptions', null, 'role_epa', NULL, 'STATISTIC','Statistic:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_times''', NULL, true, 12, 9, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'NONE', 'grl_date_12', '[\d]+:[0-5][0-9]:[0-5][0-9]');
 
 
+/*
+-- example on 31107/utils/dml
+UPDATE audit_cat_param_user SET     WHERE parameter='pumpcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Pump catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''PUMP''', NULL, true, 9, 9, 'ws', false, NULL, 'nodecat_id', 'PUMP', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='wtpcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Wtp catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''WTP''', NULL, true, 9, 2, 'ws', false, NULL, 'nodecat_id', 'WTP', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='waterwellcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Waterwell catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''WATERWELL''', NULL, true, 9, 15, 'ws', false, NULL, 'nodecat_id', 'WATERWELL', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='netsamplepointcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Netsamplepoint catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''NETSAMPLEPOINT''', NULL, true, 9, 3, 'ws', false, NULL, 'nodecat_id', 'NETSAMPLEPOINT', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='reductioncat_vdefault', 'config', NULL, 'role_edit', NULL, 'Reduction catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''REDUCTION''', NULL, true, 9, 10, 'ws', false, NULL, 'nodecat_id', 'REDUCTION', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='flexunioncat_vdefault', 'config', NULL, 'role_edit', NULL, 'Flexunioncat catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''FLEXUNION''', NULL, true, 9, 5, 'ws', false, NULL, 'nodecat_id', 'FLEXUNION', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='metercat_vdefault', 'config', NULL, 'role_edit', NULL, 'Meter catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''METER''', NULL, true, 9, 13, 'ws', false, NULL, 'nodecat_id', 'METER', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='netwjoincat_vdefault', 'config', NULL, 'role_edit', NULL, 'Netwjoin catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''NETWJOIN''', NULL, true, 9, 18, 'ws', false, NULL, 'nodecat_id', 'NETWJOIN', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='netelementcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Netelement catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''NETELEMENT''', NULL, true, 9, 4, 'ws', false, NULL, 'nodecat_id', 'NETELEMENT', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='registercat_vdefault', 'config', NULL, 'role_edit', NULL, 'Register catalog:', 'SELECT cat_node.id AS id,  cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''REGISTER''', NULL, true, 9, 17, 'ws', false, NULL, 'nodecat_id', 'REGISTER', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='connectype_vdefault', 'config', NULL, 'role_edit', NULL, 'Connec Type:', 'SELECT id AS id, id AS idval FROM connec_type WHERE id IS NOT NULL', NULL, true, 9, 3, 'ud', false, NULL, 'connecat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='hydrantcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Hydrant catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''HYDRANT''', NULL, true, 9, 7, 'ws', false, NULL, 'nodecat_id', 'HYDRANT', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='wjoincat_vdefault', 'config', NULL, 'role_edit', NULL, 'Wjoin catalog:', 'SELECT cat_connec.id AS id, cat_connec.id as idval FROM cat_connec JOIN connec_type ON connec_type.id=connectype_id WHERE type=''WJOIN''', NULL, true, 9, 21, 'ws', false, NULL, 'connecat_id', 'WJOIN', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='greentapcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Greentap catalog:', 'SELECT cat_connec.id AS id, cat_connec.id as idval  FROM cat_connec JOIN connec_type ON connec_type.id=connectype_id WHERE type=''GREENTAP''', NULL, true, 9, 22, 'ws', false, NULL, 'connecat_id', 'GREENTAP', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='fountaincat_vdefault', 'config', NULL, 'role_edit', NULL, 'Fountain catalog', 'SELECT cat_connec.id AS id, cat_connec.id as idval  FROM cat_connec JOIN connec_type ON connec_type.id=connectype_id WHERE type=''FOUNTAIN''', NULL, true, 9, 23, 'ws', false, NULL, 'connecat_id', 'FOUNTAIN', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='expansiontankcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Expansiontank catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''EXPANSIONTANK''', NULL, true, 9, 19, 'ws', false, NULL, 'nodecat_id', 'EXPANTANK', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='sourcecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Source catalog:', 'SELECT cat_node.id AS id,  cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''SOURCE''', NULL, true, 9, 14, 'ws', false, NULL, 'nodecat_id', 'SOURCE', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='valvecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Valve catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''VALVE''', NULL, true, 9, 11, 'ws', false, NULL, 'nodecat_id', 'VALVE', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='presszone_vdefault', 'config', NULL, 'role_edit', NULL, 'Presszone:', 'SELECT cat_presszone.id AS id, cat_presszone.id as idval FROM cat_presszone WHERE id IS NOT NULL', NULL, true, 9, 1, 'ws', false, NULL, 'presszone_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='tankcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Tank catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''TANK''', NULL, true, 9, 6, 'ws', false, NULL, 'nodecat_id', 'TANK', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='filtercat_vdefault', 'config', NULL, 'role_edit', NULL, 'Filter catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''FILTER''', NULL, true, 9, 16, 'ws', false, NULL, 'nodecat_id', 'FILTER', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='pipecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Pipe catalog:', 'SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc JOIN arc_type ON arc_type.id=arctype_id WHERE type=''PIPE''', NULL, true, 9, 20, 'ws', false, NULL, 'arccat_id', 'PIPE', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='junctioncat_vdefault', 'config', NULL, 'role_edit', NULL, 'Junction catalog:', 'SELECT cat_node.id AS id,cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''JUNCTION''', NULL, true, 9, 8, 'ws', false, NULL, 'nodecat_id', 'JUNCTION', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='tapcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Tap catalog:', 'SELECT cat_connec.id AS id, cat_connec.id as idval  FROM cat_connec JOIN connec_type ON connec_type.id=connectype_id WHERE type=''TAP''', NULL, true, 9, 24, 'ws', false, NULL, 'connecat_id', 'TAP', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='manholecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Manhole catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval  FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''MANHOLE''', NULL, true, 9, 12, 'ws', false, NULL, 'nodecat_id', 'MANHOLE', false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+*/
+
+
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_energy';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_pump';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_reactions_gl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_source';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_valve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_ampm';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_curve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_mixing';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_noneall';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_headloss';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_hyd';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_qual';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_rtc_coef';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_unbal';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_units';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_valvemode';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_param_energy';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_reactions_el';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_reactions_gl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_status_pipe';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_status_pump';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_status_valve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_times';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_yesno';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_yesnofull';
+
+
+
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_backdrop';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_controls';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_curve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_demand';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_emitter';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_energy_el';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_energy_gl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_junction';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_label';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_mixing';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_options';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_pattern';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_pipe';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_project_id';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_pump';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_quality';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_reactions_el';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_reactions_gl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_report';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_reservoir';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_rules';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_source';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_status';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_tags';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_tank';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_times';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_valve_cu';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_valve_fl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_valve_lc';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_valve_pr';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_vertice';
+
+
 
 --2019/02/11
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);

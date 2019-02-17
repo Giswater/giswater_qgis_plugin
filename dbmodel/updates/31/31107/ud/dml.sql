@@ -61,6 +61,120 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_lat_flow_tol', 'epaoptions
 INSERT INTO audit_cat_param_user VALUES ('inp_options_infiltration', 'epaoptions', NULL, 'role_epa', NULL, 'INFILTRATION', 'inp_options_infiltration:', 'SELECT idval as id, idval FROM inp_typevalue WHERE typevalue = ''inp_value_options_in''', NULL, true, 1, 37, 'ud', NULL, NULL, NULL, NULL, NULL, 'string', 'combo', true, NULL, 'HORTON', 'gw_1', NULL);
 
 
+/*
+
+-- example on 31107/utils/dml
+UPDATE audit_cat_param_user SET     WHERE parameter='arccat_vdefault', 'config', NULL, 'role_edit', NULL, 'Arc catalog:', 'SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL', NULL, true, 10, 2, 'ud', false, NULL, 'arccat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='nodecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Node catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval FROM cat_node WHERE id IS NOT NULL', NULL, true, 10, 2, 'ud', false, NULL, 'nodecat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='connecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Connec catalog:', 'SELECT cat_connec.id AS id, cat_connec.id as idval FROM cat_connec WHERE id IS NOT NULL', NULL, true, 10, 3, 'ud', false, NULL, 'connecat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+UPDATE audit_cat_param_user SET     WHERE parameter='gratecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Grate catalog:', 'SELECT id AS id, id AS idval FROM connec_type WHERE id IS NOT NULL', NULL, true, 10, 4, 'ud', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+
+*/
+
+
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_divider';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_evap';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_orifice';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_outfall';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_outlet';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_pattern';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_divider';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_raingage';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_divider';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_storage';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_temp';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_timeseries';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_allnone';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_buildup';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_catarc';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_curve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_files_actio';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_files_type';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_inflows';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_lidcontrol';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_mapunits';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_options_fme';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_options_fr';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_options_fu';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_options_id';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_options_in';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_options_lo';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_options_nfl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_orifice';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_pollutants';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_raingage';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_routeto';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_status';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_timserid';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_treatment';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_washoff';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_weirs';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_yesno';
+
+
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_adjustments';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_aquifer';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_backdrop';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_buildup';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_conduit_cu';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_conduit_no';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_conduit_xs';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_controls';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_coverages';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_curve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_divider_cu';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_divider_ov';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_divider_tb';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_divider_wr';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_dwf_flow';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_dwf_load';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_files';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_groundwater';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_infiltration_cu';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_infiltration_gr';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_infiltration_ho';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_inflows_flow';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_inflows_load';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_junction';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_label';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_landuses';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_lidusage';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_loadings';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_losses';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_mapdim';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_mapunits';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_options';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_orifice';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outfall_fi';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outfall_fr';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outfall_nm';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outfall_ti';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outfall_ts';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outlet_fcd';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outlet_fch';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outlet_tbd';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_outlet_tbh';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_pollutant';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_project_id';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_pump';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_rdii';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_report';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_rgage_fl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_rgage_ts';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_storage_fc';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_storage_tb';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_subcatch';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_temp_sn';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_temp_wf';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_temp_wf';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_timser_abs';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_timser_rel';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_timser_fl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_transects';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_treatment';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_vertice';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_washoff';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_weir';
 
 
 -- ----------------------------

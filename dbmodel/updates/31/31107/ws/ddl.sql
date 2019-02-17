@@ -12,10 +12,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE rpt_inp_arc ADD COLUMN flw_code text;
 
 
+CREATE TABLE rpt_selector_hourly_compare
+( id serial NOT NULL,
+  "time" character varying(100) NOT NULL,
+  cur_user text NOT NULL,
+  CONSTRAINT rpt_selector_result_hourly_compare_pkey PRIMARY KEY (id)
+);
 
------------------------
--- create import inp tables
-----------------------
+
+
 CREATE TABLE inp_valve_importinp
 (
   arc_id character varying(16) PRIMARY KEY NOT NULL,
@@ -30,6 +35,7 @@ CREATE TABLE inp_valve_importinp
   to_arc character varying(16)
   );
 
+  
 CREATE TABLE inp_pump_importinp
 (
   arc_id character varying(16) PRIMARY KEY NOT NULL,

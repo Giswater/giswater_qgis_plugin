@@ -110,6 +110,17 @@ ALTER TABLE "inp_weir" DROP CONSTRAINT IF EXISTS "inp_weir_weir_type_fkey";
 ALTER TABLE "inp_weir" DROP CONSTRAINT IF EXISTS "inp_weir_flap_fkey";
 
 
+ALTER TABLE cat_arc_shape DROP CONSTRAINT cat_arc_shape_epa_fkey;
+
+ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT IF EXISTS inp_flwreg_orifice_ori_type_fkey;
+ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT IF EXISTS inp_flwreg_orifice_shape_fkey;
+ALTER TABLE inp_flwreg_outlet DROP CONSTRAINT IF EXISTS inp_flwreg_outlet_outlet_type_fkey;
+ALTER TABLE inp_flwreg_pump DROP CONSTRAINT IF EXISTS inp_flwreg_pump_status_fkey;
+ALTER TABLE inp_flwreg_weir DROP CONSTRAINT IF EXISTS inp_flwreg_weir_weir_type_fkey;
+
+
+
+
 
 --DROP CHECK
 
@@ -277,3 +288,9 @@ ALTER TABLE inp_flwreg_pump ADD CONSTRAINT inp_flwreg_pump_check CHECK (flwreg_i
 ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT inp_flwreg_orifice_check CHECK (flwreg_id IN (1,2,3,4,5,6,7,8,9));
 ALTER TABLE inp_flwreg_weir ADD CONSTRAINT inp_flwreg_weir_check CHECK (flwreg_id IN (1,2,3,4,5,6,7,8,9));
 ALTER TABLE inp_flwreg_outlet ADD CONSTRAINT inp_flwreg_outlet_check CHECK (flwreg_id IN (1,2,3,4,5,6,7,8,9));
+
+ALTER TABLE inp_flwreg_pump ADD CONSTRAINT inp_flwreg_pump_check_status CHECK (status IN ('ON', 'OFF'));
+ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT inp_flwreg_orifice_check_ory_type CHECK (ori_type IN ('SIDE', 'BOTTOM'));
+ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT inp_flwreg_orifice_check_shape CHECK (shape IN ('CIRCULAR', 'RECT-CLOSED'));
+ALTER TABLE inp_flwreg_weir ADD CONSTRAINT inp_flwreg_weir_check_type CHECK (weir_type IN ('SIDEFLOW', 'TRANSVERSE','TRAPEZOIDAL'));
+ALTER TABLE inp_flwreg_outlet ADD CONSTRAINT inp_flwreg_outlet_check_type CHECK (outlet_type IN ('FUNCTIONAL/DEPTH', 'FUNCTIONAL/HEAD', 'TABULAR/DEPTH', 'TABULAR/HEAD'));

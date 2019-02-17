@@ -7,6 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+
 -----------------------
 -- remove all the tables that are refactored in the v3.2
 -----------------------
@@ -72,8 +74,6 @@ CREATE TABLE rpt_selector_hourly_compare
   cur_user text NOT NULL,
   CONSTRAINT rpt_selector_result_hourly_compare_pkey PRIMARY KEY (id)
 );
-
-
 
 
 CREATE TABLE audit_cat_table_x_column

@@ -10,7 +10,9 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_dropdeprecated_rel()
   RETURNS void AS
 $BODY$
-
+/*
+select ud5.gw_fct_admin_schema_dropdeprecated_rel()
+*/
 
 DECLARE
 	v_schemaname text;
@@ -22,24 +24,22 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	-- Drop sequences
-	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS TRUE
+	--TODO 
+
+	-- Drop views
+	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS TRUE AND id IN (SELECT table_name FROM information_schema.views WHERE table_schema=v_schemaname) 
 	LOOP
 		v_query_text:= 'DROP VIEW IF EXISTS '||v_tablerecord.id||';';
 		EXECUTE v_query_text;
 	END LOOP;
 
-	-- Drop views and tables
-	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS TRUE
+	-- Drop tables
+	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS TRUE AND id NOT IN (SELECT table_name FROM information_schema.views WHERE table_schema=v_schemaname) 
 	LOOP
-		IF v_tablerecord.id IN (SELECT tablename FROM information_schema.views WHERE table_schema=v_schemaname) THEN
-			v_query_text:= 'DROP VIEW IF EXISTS '||v_tablerecord.id||';';
-			EXECUTE v_query_text;
-		ELSE
-	
 		v_query_text:= 'DROP TABLE IF EXISTS '||v_tablerecord.id||';';
 		EXECUTE v_query_text;
-		END IF;
 	END LOOP;
+	
 	-- Drop functions
 	FOR v_tablerecord IN SELECT * FROM audit_cat_function WHERE isdeprecated IS TRUE
 	LOOP

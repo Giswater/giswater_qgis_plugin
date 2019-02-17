@@ -109,17 +109,15 @@ CREATE TABLE temp_csv2pg(
       ON UPDATE CASCADE ON DELETE RESTRICT);
 
 
-CREATE TABLE om_visit_parameter_cat_combo(
-  parameter_id integer NOT NULL,
+---OM TABLES
+
+CREATE TABLE om_visit_typevalue(
+  parameter_id text PRIMARY KEY,
   id integer NOT NULL,
   idval text,
-  descript text,
-  CONSTRAINT sys_combo_pkey PRIMARY KEY (parameter_id, id)
+  descript text
 );
 
-
-
----OM TABLES
 
 CREATE TABLE om_visit_class
 ( id serial NOT NULL,
@@ -239,69 +237,6 @@ CREATE TABLE om_visit_lot_x_arc(
 );
 
 
-
-
----inp
-/*
-drop TABLE if exists temp_csv2pg;
-CREATE TABLE temp_csv2pg (
-id serial PRIMARY KEY,
-csv2pgcat_id integer,
-user_name text DEFAULT current_user,
-source text,
-csv1 text,
-  csv2 text,
-  csv3 text,
-  csv4 text,
-  csv5 text,
-  csv6 text,
-  csv7 text,
-  csv8 text,
-  csv9 text,
-  csv10 text,
-  csv11 text,
-  csv12 text,
-  csv13 text,
-  csv14 text,
-  csv15 text,
-  csv16 text,
-  csv17 text,
-  csv18 text,
-  csv19 text,
-  csv20 text,
-  csv21 text,
-  csv22 text,
-  csv23 text,
-  csv24 text,
-  csv25 text,
-  csv26 text,
-  csv27 text,
-  csv28 text,
-  csv29 text,
-  csv30 text,
-  csv31 text,
-  csv32 text,
-  csv33 text,
-  csv34 text,
-  csv35 text,
-  csv36 text,
-  csv37 text,
-  csv38 text,
-  csv39 text,
-  csv40 text,
-  csv41 text,
-  csv42 text,
-  csv43 text,
-  csv44 text,
-  csv45 text,
-  csv46 text,
-  csv47 text,
-  csv48 text,
-  csv49 text,
-  csv50 text,
-tstamp timestamp DEFAULT now()
-);
-  */
 
 CREATE TABLE sys_csv2pg_config
 (
