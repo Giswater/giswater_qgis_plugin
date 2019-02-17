@@ -913,19 +913,6 @@ UNION
   AND inp_typevalue.typevalue='inp_value_status_pipe';
 
 
-CREATE OR REPLACE VIEW vi_pumps AS 
- SELECT concat(inp_pump.node_id, '_n2a') AS arc_id,
-    rpt_inp_arc.node_1,
-    rpt_inp_arc.node_2,
-    concat('POWER '::text || inp_pump.power::text) AS power,
-    concat('HEAD '::text || inp_pump.curve_id::text) AS curve_id,
-    concat('SPEED '::text || inp_pump.speed) AS speed,
-    concat('PATTERN '::text || inp_pump.pattern::text) AS pattern
-   FROM inp_selector_result,
-    inp_pump
-     JOIN rpt_inp_arc ON rpt_inp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a')
-  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
-
 
 DROP VIEW IF EXISTS vi_valves CASCADE;
 CREATE OR REPLACE VIEW vi_valves AS 
