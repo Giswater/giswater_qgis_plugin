@@ -258,7 +258,7 @@ FROM inp_selector_result, inp_tank
 	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
--- updated on 3.1.107
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_junction" CASCADE;
 CREATE OR REPLACE VIEW v_inp_junction AS 
 SELECT 

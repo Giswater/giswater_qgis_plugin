@@ -98,7 +98,7 @@ LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
 JOIN selector_state ON element.state=selector_state.state_id
 AND selector_state.cur_user = "current_user"()::text;
 
--- 'definiton updated on 3.1.107'
+-- 'definiton updated on 3.1.110'
 drop view if exists v_ui_element_x_connec cascade; 
 CREATE OR REPLACE VIEW v_ui_element_x_connec AS
 SELECT

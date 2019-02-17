@@ -19,7 +19,7 @@ DROP TRIGGER IF EXISTS gw_trg_ui_visit ON "SCHEMA_NAME".v_ui_om_visit;
 CREATE TRIGGER gw_trg_ui_visit INSTEAD OF DELETE ON "SCHEMA_NAME".v_ui_om_visit 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_visit();
 
--- updated on 3.1.107
+-- updated on 3.1.110
 DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".om_visit;
 CREATE TRIGGER gw_trg_om_visit AFTER INSERT ON "SCHEMA_NAME".om_visit
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit();

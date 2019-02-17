@@ -40,7 +40,7 @@ FROM selector_expl, anl_flow_node
 
 
 
--- definiton updated on 3.1.107
+-- definiton updated on 3.1.110
 DROP VIEW IF EXISTS v_anl_flow_connec CASCADE;
 CREATE OR REPLACE VIEW v_anl_flow_connec AS 
 SELECT
@@ -57,7 +57,7 @@ FROM selector_expl, anl_flow_arc
 
 	
 
--- definiton updated on 3.1.107
+-- definiton updated on 3.1.110
 DROP VIEW IF EXISTS v_anl_flow_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_anl_flow_hydrometer AS 
 SELECT

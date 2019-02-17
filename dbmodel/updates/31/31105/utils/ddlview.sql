@@ -15,7 +15,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 	- has not trigger
 */
 
--- updated on 3.1.107
+-- updated on 3.1.110
 DROP VIEW IF EXISTS v_edit_rtc_hydro_data_x_connec;
 CREATE OR REPLACE VIEW v_edit_rtc_hydro_data_x_connec AS
 SELECT
