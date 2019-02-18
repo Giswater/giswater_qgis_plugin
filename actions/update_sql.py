@@ -1236,8 +1236,8 @@ class UpdateSQL(ParentAction):
                                     status=False
                                 else:
                                     status = self.executeFiles(os.listdir(
-                                        self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + self.locale),
-                                        self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + self.locale + '/', True)
+                                        self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/EN'),
+                                        self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/EN', True)
                                     if status is False:
                                         status=False
                             else:
@@ -1280,8 +1280,8 @@ class UpdateSQL(ParentAction):
                                     status=False
                                 else:
                                     status = self.executeFiles(os.listdir(
-                                        self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + self.locale),
-                                        self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/' + self.locale + '/',
+                                        self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/EN'),
+                                        self.folderUpdatesApi + folder + '/' + sub_folder + '/i18n/EN',
                                         True)
                                     if status is False:
                                         status=False
@@ -1504,7 +1504,7 @@ class UpdateSQL(ParentAction):
         
     def rename_project_data_schema(self, schema, create_project=None):
 
-        self.setWaitCursor()
+        self.set_wait_cursor()
         if create_project is None or create_project is False:
             self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
         else:
@@ -1519,7 +1519,7 @@ class UpdateSQL(ParentAction):
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_schema_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             status = self.controller.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
-        self.setArrowCursor()
+        self.set_arrow_cursor()
         
         # Show message if precess execute correctly
         if self.error_count == 0:
