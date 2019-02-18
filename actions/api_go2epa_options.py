@@ -71,6 +71,12 @@ class Go2EpaOptions(ApiParent):
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         self.construct_form_param_user(self.dlg_options, complet_result[0]['body']['form']['formTabs'], 0, self.epa_options_list, False)
+        grbox_list = self.dlg_options.findChildren(QGroupBox)
+        for grbox in grbox_list:
+            widget_list = grbox.findChildren(QWidget)
+            if len(widget_list) == 0:
+                grbox.setVisible(False)
+
 
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
         self.dlg_options.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_options))
