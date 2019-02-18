@@ -102,6 +102,11 @@ class GwToolBox(ApiParent):
     def open_function(self, index):
         # this '0' refers to the index of the item in the selected row (alias in this case)
         alias_function = index.sibling(index.row(), 0).data()
+        
+        # Control no clickable items
+        if alias_function in ('Giswater', 'edit', 'master', 'admin'):
+            return
+
         self.dlg_functions = ApiFunctionTb()
         extras = '"filterText":"' + alias_function + '"'
         body = self.create_body(extras=extras)
