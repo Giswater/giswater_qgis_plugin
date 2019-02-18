@@ -90,10 +90,10 @@ INSERT INTO config_api_form_tabs VALUES (562,'ve_arc','tab_rpt','EPA results',NU
 INSERT INTO config_api_form_tabs VALUES (563,'ve_node','tab_inp','EPA inp',NULL,'role_epa',NULL,NULL,NULL);
 INSERT INTO config_api_form_tabs VALUES (564,'ve_node','tab_rpt','EPA results',NULL,'role_om',NULL,NULL,NULL);
 INSERT INTO config_api_form_tabs VALUES (565,'search','tab_visit','Visita','Visita',NULL,NULL,NULL,NULL);
-INSERT INTO config_api_form_tabs VALUES (566,'ve_connec','tab_hydrometer_val','Consumos','Valores de consumo para abonado',NULL,NULL,NULL,NULL);ç
+INSERT INTO config_api_form_tabs VALUES (566,'ve_connec','tab_hydrometer_val','Consumos','Valores de consumo para abonado',NULL,NULL,NULL,NULL);
 
 -----------------------
 -- add api parameter config param system
 -----------------------
 
-INSERT INTO config_param_system VALUES (90,'ApiVersion','0.9.101',NULL,NULL,NULL,NULL,NULL,NULL,TRUE,,NULL,NULL,NULL,TRUE,TRUE,,NULL,NULL,NULL);
+INSERT INTO config_param_system VALUES (90,'ApiVersion','0.9.101',NULL,NULL,NULL,NULL,NULL,NULL,TRUE,NULL,NULL,NULL,TRUE,TRUE,NULL,NULL,NULL);
