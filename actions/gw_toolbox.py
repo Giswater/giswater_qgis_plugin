@@ -6,9 +6,12 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-from PyQt4.QtCore import QSize
-from PyQt4.QtGui import QDialog
-from PyQt4.QtGui import QItemSelectionModel
+import os
+import json
+import sys
+import operator
+
+from PyQt4.QtGui import QIcon
 
 try:
     from qgis.core import Qgis
@@ -41,9 +44,7 @@ else:
 
 
 from qgis.core import QgsMapLayerRegistry, QgsProject
-import json
-import sys
-import operator
+
 
 from collections import OrderedDict
 from datetime import datetime
@@ -111,8 +112,14 @@ class GwToolBox(ApiParent):
             return False
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
-        self.populate_functions_dlg(self.dlg_functions, complet_result[0]['body']['data'])
-
+        status = self.populate_functions_dlg(self.dlg_functions, complet_result[0]['body']['data'])
+        if not status:
+            alias_function = index.sibling(index.row(), 1).data()
+            msg = "Function not found"
+            self.controller.show_message(msg, parameter=alias_function)
+            return
+        self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
+                                                                          self.dlg_functions.cmb_layers))
         self.dlg_functions.rbt_previous.toggled.connect(partial(self.rbt_state, self.dlg_functions.rbt_previous))
         self.dlg_functions.rbt_layer.toggled.connect(partial(self.rbt_state, self.dlg_functions.rbt_layer))
         self.dlg_functions.rbt_previous.setChecked(True)
@@ -122,11 +129,21 @@ class GwToolBox(ApiParent):
         self.dlg_functions.show()
 
 
+    def set_selected_layer(self, dialog, combo):
+        layer_name = utils_giswater.get_item_data(dialog, combo, 1)
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if layer is None:
+            self.controller.show_warning("Layer not found", parameter=layer_name)
+            return None
+        self.iface.setActiveLayer(layer)
+        return layer
+
+
     def rbt_state(self, rbt, state):
         if rbt.objectName() == 'rbt_previous' and state is True:
-            self.rbt_checked['widget'] = 'rbt_previous'
+            self.rbt_checked['widget'] = 'previousSelection'
         elif rbt.objectName() == 'rbt_layer' and state is True:
-            self.rbt_checked['widget'] = 'rbt_layer'
+            self.rbt_checked['widget'] = 'wholeSelection'
 
         self.rbt_checked['value'] = state
 
@@ -134,56 +151,120 @@ class GwToolBox(ApiParent):
     def execute_function(self, dialog, combo, result):
 
         layer_name = utils_giswater.get_item_data(dialog, combo, 1)
-        extras = ""
+        layer = self.set_selected_layer(dialog, combo)
+        selection_mode = self.rbt_checked['widget']
+        if layer is None:
+            return
+        function_name = ''
+    #     if rbt.objectName() == 'rbt_previous' and state is True:
+    #         self.rbt_checked['widget'] = 'previousSelection'
+    #     elif rbt.objectName() == 'rbt_layer' and state is True:
+    #         self.rbt_checked['widget'] = 'wholeSelection'
+        extras = '"selectionMode":"'+selection_mode+'",'
+
         for group, function in result['fields'].items():
             if len(function) != 0:
-                extras = '"functionName":"' + function[0]['functionname'] + '"'
-                extras += ', "sys_role_id":"' + function[0]['sys_role_id'] + '"'
-                extras += ', "layer_name":"' + layer_name + '"'
+                function_name = function[0]['functionname']
+                feature_type = function[0]['function_type_']['featureType']
                 break
 
-        # Find if radiobutton was added to self.function_list
-        index = -1
-        for _index, d in enumerate(self.function_list):
-            if d['widget'] == 'rbt_previous' or d['widget'] == 'rbt_layer':
-                index = _index
-                break
+        # Check selection mode and get (or not get) all feature id
+        feature_id_list = '"id":['
+        if selection_mode == 'wholeSelection':
+            feature_id_list += ']'
+        elif selection_mode == 'previousSelection':
+            features = layer.selectedFeatures()
+            for feature in features:
+                feature_id = feature.attribute(feature_type+"_id")
+                feature_id_list += '"'+feature_id+'", '
+            if len(features) > 0:
+                feature_id_list = feature_id_list[:-2] + ']'
+            else:
+                feature_id_list += ']'
+        feature_field = '"tableName":"' + layer_name + '", ' + feature_id_list
 
-        # If the radiobutton was not added, it is added, and if it was added, its value is modified
-        if index == -1:
-            self.function_list.append(self.rbt_checked)
-        else:
-            self.function_list[index]['widget'] = self.rbt_checked['widget']
+
+
+        # # Find if radiobutton was added to self.function_list
+        # index = -1
+        # for _index, d in enumerate(self.function_list):
+        #     if d['widget'] == 'previousSelection' or d['widget'] == 'wholeSelection':
+        #         index = _index
+        #         break
+        #
+        # # If the radiobutton was not added, it is added, and if it was added, its value is modified
+        # if index == -1:
+        #     self.function_list.append(self.rbt_checked)
+        # else:
+        #     self.function_list[index]['widget'] = self.rbt_checked['widget']
 
         # Convert list to json
-        my_json = json.dumps(self.function_list)
+        # TODO no podemos hacerlo como el config (widget": "xxxxxx", "value": "xx")?
+        # TODO con estas dos lineas bastaria
+        # my_json = json.dumps(self.function_list)
+        # extras += '"fields":' + my_json + ''
 
-        extras += ', "fields":' + my_json + ''
-        body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
 
-        self.controller.log_info(str(sql))
+        widget_list = dialog.grb_parameters.findChildren(QWidget)
+        widget_is_void = False
+        extras += '"parameters":{'
+        for group, function in result['fields'].items():
+            if len(function) != 0:
+                for field in function[0]['input_params_']:
+                    widget = dialog.findChild(QWidget, field['widgetname'])
+                    param_name = widget.objectName()
+                    if type(widget) in ('', QLineEdit):
+                        widget.setStyleSheet("border: 1px solid gray")
+                        value = utils_giswater.getWidgetText(dialog, widget, False, False)
+                        extras += '"' + param_name + '":"' + str(value) + '", '
+                        if value is '':
+                            widget_is_void = True
+                            widget.setStyleSheet("border: 1px solid red")
+                    elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
+                        value = utils_giswater.getWidgetText(dialog, widget, False, False)
+                        if value == '':
+                            value = 0
+                        extras += '"' + param_name + '":"' + str(value) + '", '
+                    elif type(widget) in ('', QComboBox):
+                        value = utils_giswater.get_item_data(dialog, widget, 0)
+                        extras += '"' + param_name + '":"' + str(value).lower() + '", '
+
+        if widget_is_void:
+            message = "This paramater is mandatory. Please, set a value"
+            self.controller.show_warning(message, parameter='')
+            return
+        if len(widget_list) > 0:
+            extras = extras[:-2] + '}'
+        else:
+            extras += '}'
+        extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
+        body = self.create_body(feature=feature_field, extras=extras)
+        sql = ("SELECT " + self.schema_name + "."+str(function_name)+"($${" + body + "}$$)::text")
+        self.controller.execute_sql_notify(sql)
 
 
     def populate_functions_dlg(self, dialog, result):
+        status = False
         for group, function in result['fields'].items():
             if len(function) != 0:
                 dialog.setWindowTitle(function[0]['alias'])
                 self.construct_form_param_user(dialog, function, 0, self.function_list, False)
                 dialog.txt_info.setText(str(function[0]['descript']))
-
-                # TODO controlar la progresbar
-                if function[0]['function_type_']['durationType'] == 'short':
-                    self.controller.log_info(str("IS SHORT"))
-
-                self.populate_layer_combo(function[0]['function_type_']['featureType'])
+                if 'durationType' in function[0]['function_type_']:
+                    if function[0]['function_type_']['durationType'] == 'short':
+                        dialog.progressBar.setVisible(False)
+                    self.populate_layer_combo(function[0]['function_type_']['featureType'])
+                    status = True
+                    break
+        return status
 
 
     def populate_layer_combo(self, geom_type):
         self.layers = []
         self.layers = self.controller.get_group_layers(geom_type)
 
-        layers = [['', '']]
+        #layers = [['', '']]
+        layers = []
         for layer in self.layers:
             if layer in self.iface.legendInterface().layers():
                 elem = []
@@ -201,14 +282,22 @@ class GwToolBox(ApiParent):
 
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
-
+        main_parent = QStandardItem('{}'.format('Giswater'))
+        self.icon_folder = self.plugin_dir + '/icons/'
+        icon_path = self.icon_folder + '36.png'
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            main_parent.setIcon(icon)
         for group, functions in result['fields'].items():
             parent1 = QStandardItem('{}'.format(group))
             for function in functions:
                 label = QStandardItem('{}'.format(function['alias']))
+                if os.path.exists(icon_path):
+                    label.setIcon(icon)
                 func_name = QStandardItem('{}'.format(function['functionname']))
                 parent1.appendRow([label, func_name])
-            model.appendRow(parent1)
-            index = model.indexFromItem(parent1)
-            trv_widget.expand(index)
+            main_parent.appendRow(parent1)
+        model.appendRow(main_parent)
+        index = model.indexFromItem(main_parent)
+        trv_widget.expand(index)
 

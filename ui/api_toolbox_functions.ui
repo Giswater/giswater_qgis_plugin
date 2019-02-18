@@ -56,19 +56,6 @@
    </item>
    <item row="0" column="0" colspan="3">
     <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="1">
-      <widget class="QRadioButton" name="rbt_layer">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Whole layer</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0">
       <widget class="QRadioButton" name="rbt_previous">
        <property name="sizePolicy">
@@ -82,16 +69,37 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0" colspan="2">
-      <widget class="QGroupBox" name="groupBox">
-       <property name="title">
-        <string>Option parameters:</string>
+     <item row="0" column="2" rowspan="5">
+      <widget class="QTextEdit" name="txt_info">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <layout class="QGridLayout" name="grl_option_parameters"/>
-        </item>
-       </layout>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QRadioButton" name="rbt_layer">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Whole layer</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QComboBox" name="cmb_layers">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
       </widget>
      </item>
      <item row="0" column="0" colspan="2">
@@ -104,23 +112,6 @@
        </property>
        <property name="text">
         <string>Input layer:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="3">
-      <widget class="QCheckBox" name="checkBox">
-       <property name="text">
-        <string>Save result into database</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0" colspan="2">
-      <widget class="QComboBox" name="cmb_layers">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
        </property>
       </widget>
      </item>
@@ -137,13 +128,22 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="2" rowspan="5">
-      <widget class="QTextEdit" name="txt_info">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+     <item row="3" column="0" colspan="2">
+      <widget class="QGroupBox" name="grb_parameters">
+       <property name="title">
+        <string>Option parameters:</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="grl_option_parameters"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="3">
+      <widget class="QCheckBox" name="chk_save">
+       <property name="text">
+        <string>Save result into database</string>
        </property>
       </widget>
      </item>

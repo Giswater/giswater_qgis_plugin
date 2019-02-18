@@ -1103,7 +1103,7 @@ class ApiParent(ParentAction):
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
-                    if 'value' in field and field['value'] is not None:
+                    if 'value' in field and field['value'] not in(None, ""):
                         value = float(str(field['value']))
                         widget.setValue(value)
                     widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
@@ -1140,8 +1140,8 @@ class ApiParent(ParentAction):
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(dialog, widget)
         if chk is None:
-            elem['widget'] = str(widget.objectName())
-            elem['value'] = value
+            elem[widget.objectName()] = value
+            #elem['value'] = value
             if 'sys_role_id' in field:
                 elem['sys_role_id'] = str(field['sys_role_id'])
 

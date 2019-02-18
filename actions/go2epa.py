@@ -352,6 +352,7 @@ class Go2Epa(ParentAction):
             epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", "+str(export_subcatch)+")"
         export_function = "gw_fct_utils_csv2pg_export_epa_inp('" + str(self.result_name) + "')"
 
+        self.dlg_go2epa.progressBar.setVisible(True)
         # Export to inp file
         if export_inp is True:
             # Check that all parameters has been set
@@ -372,6 +373,10 @@ class Go2Epa(ParentAction):
                    " FROM " + self.schema_name + ".temp_csv2pg "
                    " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
             rows = self.controller.get_rows(sql, log_sql=False)
+            if rows is None:
+                self.controller.show_message("NOT ROW FOR: " + sql, 2)
+                self.dlg_go2epa.progressBar.setVisible(False)
+                return
             self.insert_into_inp(self.file_inp, rows)
 
 
@@ -380,6 +385,7 @@ class Go2Epa(ParentAction):
             if self.file_rpt == "null":
                 message = "You have to set this parameter"
                 self.controller.show_warning(message, parameter="RPT file")
+                self.dlg_go2epa.progressBar.setVisible(False)
                 return
             subprocess.call([opener, self.file_inp, self.file_rpt])
 
@@ -396,7 +402,7 @@ class Go2Epa(ParentAction):
 
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
-        
+        self.dlg_go2epa.progressBar.setVisible(False)
         # Close form
         self.close_dialog(self.dlg_go2epa)
 
