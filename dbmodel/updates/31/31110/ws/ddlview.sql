@@ -589,9 +589,9 @@ SELECT  text
             a.text
            FROM ( SELECT inp_controls_x_arc.id,
                     inp_controls_x_arc.text
-                   FROM ws_sample.inp_selector_result,
-                    ws_sample.inp_controls_x_arc
-                     JOIN ws_sample.rpt_inp_arc ON inp_controls_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+                   FROM SCHEMA_NAME.inp_selector_result,
+                    SCHEMA_NAME.inp_controls_x_arc
+                     JOIN SCHEMA_NAME.rpt_inp_arc ON inp_controls_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
                   WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
                   ORDER BY inp_controls_x_arc.id) a
         UNION
@@ -599,9 +599,9 @@ SELECT  text
             b.text
            FROM ( SELECT (inp_controls_x_node.id+1000000) as id,
                     inp_controls_x_node.text
-                   FROM ws_sample.inp_selector_result,
-                    ws_sample.inp_controls_x_node
-                     JOIN ws_sample.rpt_inp_node ON inp_controls_x_node.node_id::text = rpt_inp_node.node_id::text
+                   FROM SCHEMA_NAME.inp_selector_result,
+                    SCHEMA_NAME.inp_controls_x_node
+                     JOIN SCHEMA_NAME.rpt_inp_node ON inp_controls_x_node.node_id::text = rpt_inp_node.node_id::text
                   WHERE inp_selector_result.result_id::text = rpt_inp_node.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
                   ORDER BY inp_controls_x_node.id) b) c
                   ORDER BY id;
@@ -614,9 +614,9 @@ SELECT  text
             a.text
            FROM ( SELECT inp_rules_x_arc.id,
                     inp_rules_x_arc.text
-                   FROM ws_sample.inp_selector_result,
-                    ws_sample.inp_rules_x_arc
-                     JOIN ws_sample.rpt_inp_arc ON inp_rules_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+                   FROM SCHEMA_NAME.inp_selector_result,
+                    SCHEMA_NAME.inp_rules_x_arc
+                     JOIN SCHEMA_NAME.rpt_inp_arc ON inp_rules_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
                   WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
                   ORDER BY inp_rules_x_arc.id) a
         UNION
@@ -624,9 +624,9 @@ SELECT  text
             b.text
            FROM ( SELECT (inp_rules_x_node.id+1000000) as id,
                     inp_rules_x_node.text
-                   FROM ws_sample.inp_selector_result,
-                    ws_sample.inp_rules_x_node
-                     JOIN ws_sample.rpt_inp_node ON inp_rules_x_node.node_id::text = rpt_inp_node.node_id::text
+                   FROM SCHEMA_NAME.inp_selector_result,
+                    SCHEMA_NAME.inp_rules_x_node
+                     JOIN SCHEMA_NAME.rpt_inp_node ON inp_rules_x_node.node_id::text = rpt_inp_node.node_id::text
                   WHERE inp_selector_result.result_id::text = rpt_inp_node.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
                   ORDER BY inp_rules_x_node.id) b) c
                   ORDER BY id; 
@@ -701,12 +701,12 @@ CREATE OR REPLACE VIEW vi_mixing AS
 
 CREATE OR REPLACE VIEW vi_options AS 
 SELECT a.idval as parameter,
-	     case when (a.idval ='UNBALANCED' AND value='CONTINUE') THEN concat(value,' ',(SELECT value FROM ws_sample.config_param_user WHERE parameter='inp_options_unbalanced_n')) 
-		  when (a.idval ='QUALITY' AND value='TRACE') THEN concat(value,' ',(SELECT value FROM ws_sample.config_param_user WHERE parameter='inp_options_node_id')) 
-  		  when (a.idval ='HYDRAULICS' AND (value='USE' OR value='SAVE')) THEN concat(value,' ',(SELECT value FROM ws_sample.config_param_user WHERE parameter='inp_options_hydraulics_fname')) 
+	     case when (a.idval ='UNBALANCED' AND value='CONTINUE') THEN concat(value,' ',(SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_unbalanced_n')) 
+		  when (a.idval ='QUALITY' AND value='TRACE') THEN concat(value,' ',(SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_node_id')) 
+  		  when (a.idval ='HYDRAULICS' AND (value='USE' OR value='SAVE')) THEN concat(value,' ',(SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_hydraulics_fname')) 
 		  else value END AS value
-   FROM ws_sample.audit_cat_param_user a
-     JOIN ws_sample.config_param_user b ON a.id = b.parameter::text
+   FROM SCHEMA_NAME.audit_cat_param_user a
+     JOIN SCHEMA_NAME.config_param_user b ON a.id = b.parameter::text
   WHERE (a.layout_name = ANY (ARRAY['grl_general_1'::text, 'grl_general_2'::text, 'grl_hyd_3'::text, 'grl_hyd_4'::text, 'grl_quality_5'::text, 'grl_quality_6'::text])) 
   AND a.idval NOT IN ('UNBALANCED_N', 'NODE_ID', 'HYDRAULICS_FNAME') AND b.cur_user::name = "current_user"()
   AND cur_user=current_user

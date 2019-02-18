@@ -32,6 +32,10 @@ ALTER TABLE audit_cat_param_user ADD COLUMN widgetcontrols json;
 ALTER TABLE audit_cat_param_user ADD COLUMN vdefault text;
 ALTER TABLE audit_cat_param_user ADD COLUMN layout_name text;
 ALTER TABLE audit_cat_param_user ADD COLUMN reg_exp text;
+ALTER TABLE audit_cat_param_user ADD COLUMN iseditable boolean;
+ALTER TABLE audit_cat_param_user ADD COLUMN dv_orderby_id boolean;
+ALTER TABLE audit_cat_param_user ADD COLUMN dv_isnullvalue boolean;
+ALTER TABLE audit_cat_param_user ADD COLUMN stylesheet json;
 
 
 ALTER TABLE rpt_cat_result ADD COLUMN user_name text;
@@ -57,6 +61,14 @@ ALTER TABLE config_param_system ADD COLUMN isautoupdate boolean;
 ALTER TABLE config_param_system ADD COLUMN datatype character varying;
 ALTER TABLE config_param_system ADD COLUMN widgettype character varying;
 ALTER TABLE config_param_system ADD COLUMN tooltip text;
+ALTER TABLE config_param_system ADD COLUMN ismandatory boolean;
+ALTER TABLE config_param_system ADD COLUMN iseditable boolean;
+ALTER TABLE config_param_system ADD COLUMN reg_exp text;
+ALTER TABLE config_param_system ADD COLUMN dv_orderby_id boolean;
+ALTER TABLE config_param_system ADD COLUMN dv_isnullvalue boolean;
+ALTER TABLE config_param_system ADD COLUMN stylesheet json;
+ALTER TABLE config_param_system ADD COLUMN widgetcontrols json;
+
 
 
 -- om_visit

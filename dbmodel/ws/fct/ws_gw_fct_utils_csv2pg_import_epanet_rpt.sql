@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt(p_r
 $BODY$
 
 /*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt('rzz1',null)
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt('result1', 'D:\dades\test.rpt')
 */
 
