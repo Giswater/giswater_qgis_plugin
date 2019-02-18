@@ -53,3 +53,47 @@ INSERT INTO config_api_form_groupbox VALUES (7, 'config', 7, 'gb7');
 INSERT INTO config_api_form_groupbox VALUES (8, 'config', 8, 'gb8');
 INSERT INTO config_api_form_groupbox VALUES (9, 'config', 9, 'gb9');
 INSERT INTO config_api_form_groupbox VALUES (10, 'config', 10, 'gb10');
+
+
+-----------------------
+-- config api values
+-----------------------
+
+INSERT INTO config_api_form_tabs VALUES (1,'filters','tabExploitation','Explotacions','Explotacions actives',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (2,'filters','tabNetworkState','Elements xarxa','Elements de xarxa',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (3,'filters','tabHydroState','Abonats','Abonats',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (7,'search','tab_network','Xarxa','Elements de xarxa',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (8,'search_','tab_search','Cercador','Carrerer API web',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (9,'search','tab_address','Carrerer','Carrerer dades PG',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (10,'search','tab_hydro','Abonat','Abonat',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (11,'search','tab_workcat','Expedient','Expedients',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (12,'search','tab_psector','Psector','Sectors de planejament',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (204,'ve_node','tab_elements','Elem','Lista de elementos relacionados',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (206,'ve_node','tab_connections','Conn','{"Elementos aguas arriba"','"Elementos aguas abajo"}',NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (207,'ve_node','tab_visit','Visit','Lista de eventos del elemento',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (208,'ve_node','tab_documents','Doc','Lista de documentos',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (210,'ve_node','tab_plan','Cost','Partidas del elemento',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (302,'ve_arc','tab_elements','Elem','Lista de elementos relacionados',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (303,'ve_arc','tab_relations','Rel','Lista de relaciones',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (306,'ve_arc','tab_om','OM','Lista de eventos del elemento',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (307,'ve_arc','tab_documents','Doc','Lista de documentos',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (309,'ve_arc','tab_plan','Cos','Partidas del elemento',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (311,'ve_arc','tab_visit','Visit','Lista de eventos del elemento',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (408,'ve_connec','tab_elements','Elem','Lista de elementos relacionados',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (409,'ve_connec','tab_hydrometer','Abonados','Lista de abonados',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (411,'ve_connec','tab_visit','Visit','Lista de eventos del elemento',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (412,'ve_connec','tab_documents','Doc','Lista de documentos',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (500,'config','tabUser','User',NULL,'role_basic',NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (560,'config','tabAdmin','Admin',NULL,'role_admin',NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (561,'ve_arc','tab_inp','EPA inp',NULL,'role_epa',NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (562,'ve_arc','tab_rpt','EPA results',NULL,'role_om',NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (563,'ve_node','tab_inp','EPA inp',NULL,'role_epa',NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (564,'ve_node','tab_rpt','EPA results',NULL,'role_om',NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (565,'search','tab_visit','Visita','Visita',NULL,NULL,NULL,NULL);
+INSERT INTO config_api_form_tabs VALUES (566,'ve_connec','tab_hydrometer_val','Consumos','Valores de consumo para abonado',NULL,NULL,NULL,NULL);ç
+
+-----------------------
+-- add api parameter config param system
+-----------------------
+
+INSERT INTO config_param_system VALUES (90,'ApiVersion','0.9.101',NULL,NULL,NULL,NULL,NULL,NULL,TRUE,,NULL,NULL,NULL,TRUE,TRUE,,NULL,NULL,NULL);

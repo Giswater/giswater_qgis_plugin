@@ -77,8 +77,8 @@ BEGIN
 	-- if ismandatory is true. First time for user value is forced
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		SELECT label, audit_cat_param_user.id as name, value, datatype, widgettype, layout_id, layout_order, TRUE AS iseditable,
-		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, 
+		SELECT label, audit_cat_param_user.id as widgetname, value, datatype, widgettype, layout_id, layout_order,layout_name, TRUE AS iseditable,
+		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, reg_exp,
 		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked,
 		(CASE WHEN (widgetcontrols->>''minValue'') IS NOT NULL THEN widgetcontrols->>''minValue'' ELSE NULL END) AS minvalue,
 		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue
@@ -90,83 +90,80 @@ BEGIN
 		ORDER by orderby)a'
 			INTO fields_array ;
 
-			raise notice 'fields_array %', fields_array;
+			
 
 	--  Combo rows
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		 SELECT label, audit_cat_param_user.id as name, datatype, widgettype, 
-		 layout_id, layout_order, row_number()over(ORDER BY layout_id, layout_order) AS orderby, value, dv_querytext,dv_parent_id, isparent, sys_role_id
+		 SELECT label, audit_cat_param_user.id as widgetname, datatype, widgettype, 
+		 layout_id, layout_order,layout_name,TRUE AS iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, value,project_type, dv_querytext,dv_parent_id, isparent, sys_role_id
 		 FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		 WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
   		 AND formname ='||quote_literal(lower(v_formname))||'
 		 AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||')
 		 AND isenabled IS TRUE
-		 AND dv_parent_id IS NULL ORDER BY orderby) a WHERE widgettype = ''combo'''
+		 ORDER BY orderby) a WHERE widgettype = ''combo'''
 			INTO combo_rows;
 			combo_rows := COALESCE(combo_rows, '{}');
 
 	FOREACH aux_json IN ARRAY combo_rows
 	LOOP	
-		-- Get combo id's
-		EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
-			INTO combo_json;
+		IF (aux_json->>'dv_parent_id') IS null THEN
+			-- Get combo id's
+			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
+				INTO combo_json;
 
-		-- Update array
-		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
-		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
+			-- Update array
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
 
-		-- Get combo values
-		EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
-			INTO combo_json; 
-			combo_json := COALESCE(combo_json, '[]');
+			-- Get combo values
+			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
+				INTO combo_json; 
+				combo_json := COALESCE(combo_json, '[]');
 
-		-- Update array
-		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
-		
-		IF (aux_json->>'dv_isparent') IS NOT NULL THEN
-
-			--  Combo rows child
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, column_id, sys_api_cat_widgettype_id AS widgettype, sys_api_cat_datatype_id AS datatype,
-				dv_querytext, dv_isparent, dv_parent_id, orderby , dv_querytext_filterc
-				FROM config_api_layer_field WHERE table_id = $1 AND dv_parent_id='||quote_literal(aux_json->>'column_id')||' ORDER BY orderby) a WHERE widgettype = 2'
-				INTO combo_rows_child
-				USING p_table_id;
-				combo_rows_child := COALESCE(combo_rows_child, '{}');
+			-- Update array
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 			
-			FOREACH aux_json_child IN ARRAY combo_rows_child
-			LOOP
-
-				SELECT (json_array_elements(array_to_json(fields_array[(aux_json->> 'orderby')::INT:(aux_json->> 'orderby')::INT])))->>'selectedId' INTO v_selected_id;
-
-				-- Get combo id's
-				IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN		
-					query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
-					execute query_text INTO combo_json_child;
-				ELSE 	
-					EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY idval)a' INTO combo_json_child;
-				END IF;
-					
-				-- Update array
-				fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
-				fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'selectedId', combo_json_child->>'value');      
+			IF (aux_json->>'isparent')::boolean IS TRUE THEN
+				--  Combo rows child
+				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, audit_cat_param_user.id as widgetname, datatype, widgettype, 
+					layout_id, layout_order,layout_name,TRUE AS iseditable,project_type, dv_querytext,dv_querytext_filterc,dv_parent_id, isparent, sys_role_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby
+					FROM audit_cat_param_user WHERE dv_parent_id='||quote_literal(aux_json->>'widgetname')||') a WHERE widgettype = ''combo'''
+					INTO combo_rows_child;
+					combo_rows_child := COALESCE(combo_rows_child, '{}');
 				
-				-- Get combo values
-				IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND (aux_json->> 'selectedId') IS NOT NULL THEN
-					query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
-					execute query_text INTO combo_json_child;
-				ELSE 	
-					EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY idval)a'
-						INTO combo_json_child;
-				END IF;
-
-				combo_json_child := COALESCE(combo_json_child, '[]');
-			
-				-- Update array
-				fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);
-			END LOOP;
+				FOREACH aux_json_child IN ARRAY combo_rows_child
+				LOOP
+					SELECT (json_array_elements(array_to_json(fields_array[(aux_json->> 'orderby')::INT:(aux_json->> 'orderby')::INT])))->>'value' INTO v_selected_id;
+					raise notice 'v_selected_id %',v_selected_id;
+					-- Get combo id's
+					IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN	
+						query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
+						execute query_text INTO combo_json_child;
+					ELSE 	
+						EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY idval)a' INTO combo_json_child;
+					END IF;
+					raise notice 'combo_json_child %',combo_json_child;
+					-- Update array
+					fields_array[(aux_json->>'orderby')::INT+1] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT+1], 'comboIds', COALESCE(combo_json_child, '[]'));
+					fields_array[(aux_json->>'orderby')::INT+1] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT+1], 'selectedId', aux_json->>'value');      
+					-- Get combo values
+					IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN
+						query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
+						execute query_text INTO combo_json_child;
+					ELSE 	
+						EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY idval)a'
+							INTO combo_json_child;
+					END IF;
+					raise notice 'combo_json_child %',combo_json_child;
+					combo_json_child := COALESCE(combo_json_child, '[]');
+					-- Update array
+					fields_array[(aux_json->>'orderby')::INT+1] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT+1], 'comboNames', combo_json_child);
+				END LOOP;
+			END IF;
 		END IF;
 	END LOOP;
-	  
+	 
 --     Convert to json
        fields := array_to_json(fields_array);
        fields := COALESCE(fields, '[]');    
@@ -196,16 +193,16 @@ BEGIN
 	IF rec_tab.tabname IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN 
 
 		-- Get fields for admin enabled
-		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
+		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
 			widgettype, datatype, layout_id, layout_order, orderby, tooltip, TRUE AS iseditable
-			FROM config_param_system WHERE isenabled=TRUE ORDER BY orderby) a'
+			FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
 			INTO fields_array;
 
 	ELSE 
 		-- Get fields for admin disabled (only to show)
-		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS column_id, parameter AS name, concat(''admin_'',parameter), value, 
+		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
 			widgettype, datatype, layout_id, layout_order, orderby, tooltip, FALSE AS iseditable
-			FROM config_param_system WHERE isenabled=TRUE ORDER BY orderby) a'
+			FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
 			INTO fields_array;
 	END IF;
 
@@ -259,4 +256,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
+ALTER FUNCTION SCHEMA_NAME.gw_api_getconfig(json)
+  OWNER TO postgres;
