@@ -15,6 +15,7 @@ from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QS
 from PyQt4.QtGui import QSpinBox, QTimeEdit, QPushButton
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime, Qt
+from PyQt4.QtGui import QTableView, QDoubleValidator, QSpinBox, QTimeEdit
 
 from functools import partial
 import inspect

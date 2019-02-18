@@ -26,12 +26,13 @@ from functools import partial
 from encodings.aliases import aliases
 
 import utils_giswater
+from giswater.actions.api_config import ApiConfig
 from giswater.actions.gw_toolbox import GwToolBox
 from giswater.actions.parent import ParentAction
 from giswater.actions.manage_visit import ManageVisit
 from giswater.ui_manager import Toolbox
 from giswater.ui_manager import Csv2Pg
-from actions.api_config import ApiConfig
+
 
 
 class Utils(ParentAction):
