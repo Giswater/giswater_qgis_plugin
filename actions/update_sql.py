@@ -6,7 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView, QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication
+from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView
+from PyQt4.QtGui import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand, QPixmap
 from PyQt4.QtCore import QSettings, Qt
 
 import os
@@ -35,13 +36,19 @@ class UpdateSQL(ParentAction):
         self.project_type = controller.get_project_type()
 
         
-    def init_sql(self):
+    def init_sql(self, connection_status=False):
         """ Button 100: Execute SQL. Info show info """
         
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+
         # Get last database connection from controller
         self.last_connection = self.get_last_connection()
 
-        if self.project_type is not None:
+        # Get database connection user and role
+        self.username = self.get_user_connection(self.last_connection)
+
+        if self.project_type is not None and len(layers) != 0:
             self.info_show_info()
             return
             
@@ -50,9 +57,16 @@ class UpdateSQL(ParentAction):
         self.load_settings(self.dlg_readsql)
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
 
+        # Set label status connection
+
+        self.icon_folder = self.plugin_dir + '/icons/'
+        self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
+        self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
+
         # Check if user have dev permisions
         self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
         self.read_all_updates = self.settings.value('system_variables/read_all_updates').upper()
+        self.dev_commit = self.settings.value('system_variables/dev_commit').upper()
 
         # Get plugin version
         self.plugin_version = self.get_plugin_version()
@@ -97,15 +111,6 @@ class UpdateSQL(ParentAction):
         # Get metadata version
         self.version_metadata = self.get_plugin_version()
 
-        # Get version if not new project
-        self.version = None
-        if self.controller.schema_name is not None:
-            sql = ("SELECT giswater from " + self.controller.schema_name + ".version")
-            row = self.controller.get_row(sql)
-            self.version = row[0]
-            if self.version.replace('.','') >= self.plugin_version.replace('.',''):
-                self.btn_update_schema.setEnabled(False)
-                self.btn_update_api.setEnabled(False)
         if self.dev_user != 'TRUE':
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
@@ -126,8 +131,17 @@ class UpdateSQL(ParentAction):
             self.cmb_project_type.addItem(str(type))
         self.change_project_type(self.cmb_project_type)
 
-        self.populate_data_schema_name(self.cmb_project_type)
-        self.set_info_project()
+        # Populate combo connections
+        s = QSettings()
+        s.beginGroup("PostgreSQL/connections")
+        connections = s.childGroups()
+        list_connections = []
+        for con in connections:
+            elem = [con, con]
+            list_connections.append(elem)
+
+        s.endGroup()
+        utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
 
         # Declare all file variables
         self.file_pattern_tablect = "tablect"
@@ -152,18 +166,6 @@ class UpdateSQL(ParentAction):
         self.folderUpdatesApi = self.sql_dir + '/api/updates/'
         self.folderApi = self.sql_dir + '/api/'
 
-        # Populate combo connections
-        s = QSettings()
-        s.beginGroup("PostgreSQL/connections")
-        connections = s.childGroups()
-        list_connections = []
-        for con in connections:
-            elem = [con, con]
-            list_connections.append(elem)
-
-        s.endGroup()
-        utils_giswater.set_item_data(self.cmb_connection, list_connections, 1)
-
         # Set Listeners
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
@@ -184,19 +186,34 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_custom_select_file.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
-
-        # Put current info into software version info widget
-        if self.version is None:
-            self.version = '0'
-            self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
-                                               'Database version: ' + self.version + '\n \n' +
-                                               'Project data schema version:' + self.project_data_schema_version)
+        self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
 
         # Open dialog
+        self.dlg_readsql.setWindowTitle('Giswater - ' + str(self.plugin_version))
         self.dlg_readsql.show()
+
+        if connection_status is False:
+            self.controller.show_message("Connection Failed. Please, check connection parameters", 1)
+            utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, 'Connection Failed. Please, check connection parameters')
+            return
+        else:
+            if self.check_roladmin_user(self.username) is False:
+                self.controller.show_message("You don't have permissions to administrate project schemas on this connection", 1)
+                utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+                self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, "You don't have permissions to administrate project schemas on this connection")
+            else:
+                utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
+                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+
+        self.populate_data_schema_name(self.cmb_project_type)
+        self.set_info_project()
 
             
     """ Declare all read sql process """
@@ -206,139 +223,139 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderUtils, self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddl), self.folderUtils + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_dml), self.folderUtils + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ftrg), self.folderUtils + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddlrule), self.folderSoftware + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_tablect + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_tablect), self.folderSoftware + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ftrg), self.folderSoftware + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_tablect + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_tablect), self.folderUtils + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddlrule), self.folderUtils + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
                     
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
-                    return False
+                    status = False
                 else:
                     status = self.executeFiles(os.listdir(self.sql_dir + '\i18n/' + 'EN'), self.sql_dir + '\i18n/' + 'EN', True)
                     if status is False:
-                        return False
+                        status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderLocale), self.folderLocale, True)
                 if status is False:
-                    return False
+                    status = False
                     
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddl), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlrule), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_dml), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_tablect + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_tablect), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', '') is False:
-                if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
-                    return False
+                if self.process_folder(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/', 'EN') is False:
+                    status = False
                 else:
                     status = self.executeFiles(os.listdir(
                         self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + 'EN'), self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + 'EN', True)
                     if status is False:
-                        return False
+                        status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/'), self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', True)
                 if status is False:
-                    return False
+                    status = False
 
         return True
         
@@ -348,121 +365,121 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderUtils, self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddl), self.folderUtils + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_dml), self.folderUtils + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ftrg), self.folderUtils + self.file_pattern_ftrg)
                 if status is False:
-                    return False					
+                    status = False					
             if self.process_folder(self.folderSoftware, self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddl), self.folderSoftware + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddlrule), self.folderSoftware + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_dml), self.folderSoftware + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ftrg), self.folderSoftware + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddlrule), self.folderUtils + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
-                    return False
+                    status = False
                 else:
                     status = self.executeFiles(os.listdir(
                         self.sql_dir + '\i18n/' + 'EN'), self.sql_dir + '\i18n/' + 'EN', True)
                     if status is False:
-                        return False
+                        status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderLocale), self.folderLocale, True)
                 if status is False:
-                    return False
+                    status = False
                     
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddl + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddl), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddl)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddlrule + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlrule), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlrule)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_dml + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_dml), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_dml)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_fct + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ftrg + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', '') is False:
                 if self.process_folder(self.sql_dir + '\i18n/', 'EN') is False:
-                    return False
+                    status = False
                 else:
                     status = self.executeFiles(os.listdir(
                         self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + 'EN'), self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + 'EN', True)
                     if status is False:
-                        return False
+                        status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/'), self.sql_dir + '/' + str(project_type) + '/' + '\i18n/' + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + '/', True)
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -619,8 +636,8 @@ class UpdateSQL(ParentAction):
 
         else:
             if not os.path.exists(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + ''):
-                self.controller.show_message("The project_type folder was not found in sql folder.", 1)
-                self.error_count = self.error_count + 1
+                # self.controller.show_message("The project_type folder was not found in sql folder.", 1)
+                # self.error_count = self.error_count + 1
                 return
             folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + '')
             for folder in folders:
@@ -757,26 +774,26 @@ class UpdateSQL(ParentAction):
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderSoftware, self.file_pattern_ddlview + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ddlview), self.folderSoftware + self.file_pattern_ddlview)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ddlview + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ddlview),
                                            self.folderUtils + self.file_pattern_ddlview)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ddlview + '/') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlview),
                                            self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ddlview)
                 if status is False:
-                    return False
+                    status = False
         return True
 
         
@@ -863,8 +880,8 @@ class UpdateSQL(ParentAction):
 
         else:
             if not os.path.exists(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + ''):
-                self.controller.show_message("The project_type folder was not found in sql folder.", 1)
-                self.error_count = self.error_count + 1
+                # self.controller.show_message("The project_type folder was not found in sql folder.", 1)
+                # self.error_count = self.error_count + 1
                 return
             folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + '')
             for folder in folders:
@@ -938,19 +955,19 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderExemple, 'user/'+project_type) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderExemple + 'user/'+project_type), self.folderExemple + 'user/'+project_type)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '\example/user/', '') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '\example/user/'),
                                            self.sql_dir + '/' + str(project_type) + '\example/user/')
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -960,19 +977,19 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderExemple, 'dev/'+project_type) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderExemple + 'dev/'+project_type), self.folderExemple + 'dev/'+project_type)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '\example/dev/', '') is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '\example/dev/'),
                                            self.sql_dir + '/' + str(project_type) + '\example/dev/')
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -982,44 +999,44 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderUtils, self.file_pattern_fct) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_fct), self.folderUtils + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_ftrg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_ftrg), self.folderUtils + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_fct) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_fct), self.folderSoftware + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_ftrg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_ftrg), self.folderSoftware + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_fct) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct),
                                            self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_fct)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_ftrg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg),
                                            self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_ftrg)
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -1029,26 +1046,26 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderSoftware, self.file_pattern_tablect) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_tablect), self.folderSoftware + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderUtils, self.file_pattern_tablect) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_tablect),
                                            self.folderUtils + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_tablect) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_tablect),
                                            self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_tablect)
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -1058,24 +1075,24 @@ class UpdateSQL(ParentAction):
         status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if self.process_folder(self.folderUtils, self.file_pattern_trg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderUtils + self.file_pattern_trg), self.folderUtils + self.file_pattern_trg)
                 if status is False:
-                    return False
+                    status = False
             if self.process_folder(self.folderSoftware, self.file_pattern_trg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.folderSoftware + self.file_pattern_trg), self.folderSoftware + self.file_pattern_trg)
                 if status is False:
-                    return False
+                    status = False
         else:
             if self.process_folder(self.sql_dir + '/' + str(project_type) + '/', self.file_pattern_trg) is False:
-                return False
+                status = False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_trg), self.sql_dir + '/' + str(project_type) + '/' + self.file_pattern_trg)
                 if status is False:
-                    return False
+                    status = False
 
         return True
 
@@ -1085,7 +1102,7 @@ class UpdateSQL(ParentAction):
         for (path, ficheros, archivos) in os.walk(path_folder):
             status = self.executeFiles(archivos, path, no_ct=no_ct)
             if status is False:
-                return False
+                status = False
         return True
         
 
@@ -1294,7 +1311,9 @@ class UpdateSQL(ParentAction):
 
         return True
 
+
     """ Functions execute process """
+
 
     def execute_import_data(self):
         #TODO:: This functions are comment at the moment. We dont enable this function until 3.2
@@ -1342,6 +1361,7 @@ class UpdateSQL(ParentAction):
         
     """ Buttons calling functions """
 
+
     def create_project_data_schema(self):
     
         self.title = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_title)
@@ -1366,13 +1386,30 @@ class UpdateSQL(ParentAction):
             msg = "The 'Title' field is required."
             result = self.controller.show_info_box(msg, "Info")
             return
+
         sql = ("SELECT schema_name, schema_name FROM information_schema.schemata")
         rows = self.controller.get_rows(sql)
+        available = False
         for row in rows:
             if str(project_name) == str(row[0]):
-                msg = "This 'Project_name' is already exist."
-                result = self.controller.show_info_box(msg, "Info")
-                return
+                msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(project_name) + "_bk' ?"
+                result = self.controller.ask_question(msg, "Info")
+                if result:
+                    i = 0
+                    while available is False:
+                        for row in rows:
+                            if str(project_name) + "_bk" == str(row[0]) or \
+                               str(project_name) + "_bk_" + str(i) == str(row[0]):
+                                msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
+                                    project_name) + "_bk_" + str(i+1) + "' ?"
+                                result = self.controller.ask_question(msg, "Info")
+                                i = i + 1
+                            else:
+                                available = True
+                    self.rename_project_data_schema(str(project_name), str(project_name) + "_bk_" + str(i))
+                else:
+                    self.setArrowCursor()
+                    return
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
@@ -1465,13 +1502,41 @@ class UpdateSQL(ParentAction):
         self.set_info_project()
 
         
-    def rename_project_data_schema(self):
-    
-        self.set_wait_cursor()
-        self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
-        self.load_fct_ftrg(project_type=self.project_type_selected)
-        self.execute_last_process(schema_name=self.schema, locale=True)
-        self.set_arrow_cursor()
+    def rename_project_data_schema(self, schema, create_project=None):
+
+        self.setWaitCursor()
+        if create_project is None or create_project is False:
+            self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
+        else:
+            self.schema = str(create_project)
+        sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
+        status = self.controller.execute_sql(sql, commit=False)
+        if status:
+            self.reload_trg(project_type=self.project_type_selected)
+            self.reload_trg(project_type='api')
+            self.reload_fct_ftrg(project_type=self.project_type_selected)
+            self.reload_fct_ftrg(project_type='api')
+            sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_schema_rename_fixviews($${"data":{"currentSchemaName":"' + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
+            status = self.controller.execute_sql(sql, commit=False)
+            self.execute_last_process(schema_name=self.schema, locale=True)
+        self.setArrowCursor()
+        
+        # Show message if precess execute correctly
+        if self.error_count == 0:
+            self.controller.dao.commit()
+            self.event_change_connection()
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
+            self.close_dialog(self.dlg_readsql_rename)
+            msg = "Rename project has been executed correctly."
+            result = self.controller.show_info_box(msg, "Info")
+
+        else:
+            self.controller.dao.rollback()
+            msg = "Some error has occurred while the rename process was running."
+            result = self.controller.show_info_box(msg, "Info")
+
+        # Reset count error variable to 0
+        self.error_count = 0
 
         
     def update_api(self):
@@ -1556,6 +1621,7 @@ class UpdateSQL(ParentAction):
         
     """ Checkbox calling functions """
 
+
     def load_updates(self, project_type, update_changelog=False):
     
         # Get current schema selected
@@ -1598,6 +1664,7 @@ class UpdateSQL(ParentAction):
         
     """ Create new connection when change combo connections """
 
+
     def event_change_connection(self):
 
         connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
@@ -1619,9 +1686,29 @@ class UpdateSQL(ParentAction):
                                                credentials['db'], credentials['user'],
                                                credentials['password'])
 
+        if self.logged == False:
+            self.controller.show_message("Connection Failed. Please, check connection parameters.", 1)
+            utils_giswater.dis_enable_dialog(self.dlg_readsql, False, ignore_widgets='cmb_connection')
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                         'Connection Failed. Please, check connection parameters')
+        else:
+            utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+
         self.populate_data_schema_name(self.cmb_project_type)
 
         self.set_last_connection(connection_name)
+
+        if self.logged == True:
+            self.username = self.get_user_connection(self.get_last_connection())
+            if self.check_roladmin_user(self.username) is False or self.username != 'postgres':
+                self.controller.show_message("Connection Failed. You dont have permisions for this connection.", 1)
+                utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+                self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                             "You don't have permissions to administrate project schemas on this connection")
 
 
     def set_last_connection(self, connection_name):
@@ -1630,6 +1717,7 @@ class UpdateSQL(ParentAction):
         settings.setValue('selected', connection_name)
         settings.endGroup()
 
+
     def get_last_connection(self):
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
@@ -1637,7 +1725,29 @@ class UpdateSQL(ParentAction):
         settings.endGroup()
         return connection_name
 
+
+    def get_user_connection(self, connection_name):
+        settings = QSettings()
+        settings.beginGroup("PostgreSQL/connections/" + connection_name)
+        connection_username = settings.value('username')
+        settings.endGroup()
+        return connection_username
+
+
     """ Other functions """
+
+
+    def check_roladmin_user(self, username):
+        res = False
+        sql = ("SELECT r.rolname as username,r1.rolname FROM pg_catalog.pg_roles r "
+               "JOIN pg_catalog.pg_auth_members m ON (m.member = r.oid) "
+               "JOIN pg_roles r1 ON (m.roleid=r1.oid) "
+               "WHERE r.rolname = '" + str(username) + "' and r1.rolname = 'role_admin'")
+        row = self.controller.get_row(sql)
+        if row is not None:
+            res = True
+        return res
+
 
     def show_info(self):
     
@@ -1714,10 +1824,10 @@ class UpdateSQL(ParentAction):
     def enable_datafile(self):
     
         if self.rdb_import_data.isChecked() is True:
-            self.data_file.setEnabled(True)
+            self.data_file.setReadOnly(False)
             self.btn_push_file.setEnabled(True)
         else:
-            self.data_file.setEnabled(False)
+            self.data_file.setReadOnly(True)
             self.btn_push_file.setEnabled(False)
 
             
@@ -1725,10 +1835,22 @@ class UpdateSQL(ParentAction):
     
         # Get filter
         filter = str(utils_giswater.getWidgetText(self.dlg_readsql, widget))
+        result_list = []
+
         # Populate Project data schema Name
-        sql = ("SELECT schema_name, schema_name FROM information_schema.schemata WHERE schema_name LIKE '%"+filter+"%'")
+        sql = ("SELECT schema_name FROM information_schema.schemata")
         rows = self.controller.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, rows, 1)
+        for row in rows:
+            sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = '" + str(row[0]) + "' "
+                   " AND table_name = 'version')")
+            exists = self.controller.get_row(sql)
+            if str(exists[0]) == 'True':
+                sql = ("SELECT wsoftware FROM " + str(row[0]) + ".version")
+                result = self.controller.get_row(sql)
+                if result is not None and result[0] == filter.upper():
+                    elem = [row[0], row[0]]
+                    result_list.append(elem)
+        utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
 
         
     def filter_srid_changed(self):
@@ -1736,8 +1858,8 @@ class UpdateSQL(ParentAction):
         filter_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
         if filter_value is 'null':
             filter_value = ''
-        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "
-        sql += '"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(filter_value)
+        sql = "SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as "+'"SRID"' + ", substr(split_part(srtext, ',', 1), 9) as "
+        sql += '"Description"' + " FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '" + str(filter_value)
         sql += "%' ORDER BY substr(srtext, 1, 6), srid"
         
         # Populate Table
@@ -1776,12 +1898,26 @@ class UpdateSQL(ParentAction):
                 self.project_data_schema_version = str(row[0])
                 utils_giswater.setWidgetText(self.dlg_readsql,
                                             self.dlg_readsql.project_schema_last_update, str(row[1]))
-        if self.version is None:
-            self.version = '0'
-        self.software_version_info.setText('Plugin version: ' + self.plugin_version + '\n' +
-                                           'Database version: ' + self.version + '\n \n' +
+
+        # Get parameters
+        sql = ("SELECT version();")
+        result = self.controller.get_row(sql)
+        database_version = result[0].split(',')
+
+        sql = ("SELECT PostGIS_FULL_VERSION();")
+        result = self.controller.get_row(sql)
+        postgis_version = result[0].split('GEOS=')
+
+        self.software_version_info.setText('Database version: ' + str(database_version[0]) + '\n' +
+                                           '' + str(postgis_version[0]) + ' \n \n' +
                                            'Schema name: ' + schema_name + '\n' +
                                            'Schema version: ' + self.project_data_schema_version)
+
+        # Enable or Disable rename button according schema version
+        if str(self.version_metadata) != str(self.project_data_schema_version):
+            self.dlg_readsql.btn_schema_rename.setEnabled(False)
+        else:
+            self.dlg_readsql.btn_schema_rename.setEnabled(True)
 
 
     def process_folder(self, folderPath, filePattern):
@@ -1889,7 +2025,7 @@ class UpdateSQL(ParentAction):
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT substr(srtext, 1, 6) as "+'"Type"'+", srid as "+'"SRID"'+", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '"+str(self.filter_srid_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
+        sql = "SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as "+'"SRID"' + ", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '" + str(self.filter_srid_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
 
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
@@ -1922,7 +2058,11 @@ class UpdateSQL(ParentAction):
                 utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
 
 
+        # Get connection ddb name
+        connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
+
         # Open dialog
+        self.dlg_readsql_create_project.setWindowTitle('Create Project - ' + str(connection_name))
         self.dlg_readsql_create_project.show()
 
         
@@ -1932,11 +2072,14 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_rename = ReadsqlRename()
         self.load_settings(self.dlg_readsql_rename)
 
+        schema = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
         # Set listeners
-        self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema))
+        self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema, schema))
         self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_rename))
 
         # Open dialog
+        self.dlg_readsql_rename.setWindowTitle('Rename project - ' + schema)
         self.dlg_readsql_rename.show()
 
         
@@ -1965,7 +2108,6 @@ class UpdateSQL(ParentAction):
                                            filter_srid_value)
         else:
             for file in filelist:
-                self.controller.log_info(str(filedir + '/' + file))
                 if ".sql" in file:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                         self.controller.log_info(str(filedir + '/' + file))
@@ -1983,19 +2125,25 @@ class UpdateSQL(ParentAction):
                     f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
                     str('utf-8-sig'))
 
-                status = self.controller.execute_sql(str(f_to_read), commit=False)
-
+                if self.dev_commit == 'TRUE':
+                    status = self.controller.execute_sql(str(f_to_read))
+                else:
+                    status = self.controller.execute_sql(str(f_to_read), commit=False)
                 if status is False:
                     self.error_count = self.error_count + 1
                     self.controller.log_info(str("Error to execute"))
                     self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
-                    return False
+                    if self.dev_commit == 'TRUE':
+                        self.controller.dao.rollback()
+                    status = False
 
         except Exception as e:
             self.error_count = self.error_count + 1
             self.controller.log_info(str("Error to execute"))
             self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
-            return False
+            if self.dev_commit == 'TRUE':
+                self.controller.dao.rollback()
+            status = False
 
             
     def readFiles(self, filelist, filedir):
@@ -2008,9 +2156,9 @@ class UpdateSQL(ParentAction):
                     f_to_read = f_to_read + '\n \n'
                     self.message_update = self.message_update + '\n' + str(f_to_read)
                 else:
-                    return False
+                    status = False
             except Exception as e:
-                return False
+                status = False
         return True
 
 

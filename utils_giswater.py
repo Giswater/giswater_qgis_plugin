@@ -12,7 +12,7 @@ or (at your option) any later version.
 from qgis.gui import QgsDateTimeEdit
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from PyQt4.QtGui import QAbstractItemView, QCompleter, QSortFilterProxyModel, QStringListModel, QDateTimeEdit
-from PyQt4.QtGui import QTableView, QDoubleValidator, QSpinBox, QTimeEdit
+from PyQt4.QtGui import QSpinBox, QTimeEdit, QPushButton
 from PyQt4.Qt import QDate, QDateTime
 from PyQt4.QtCore import QTime, Qt
 
@@ -489,6 +489,22 @@ def double_validator(widget, min=0, max=999999, decimals=3, notation=QDoubleVali
     widget.setValidator(validator)
 
 
+def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
+    widget_list = dialog.findChildren(QWidget)
+    for widget in widget_list:
+        if str(widget.objectName()) not in ignore_widgets:
+            if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                widget.setReadOnly(not enable)
+                if enable:
+                    widget.setStyleSheet("QWidget { background: rgb(255, 255, 255);"
+                                         " color: rgb(0, 0, 0)}")
+                else:
+                    widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
+                                         " color: rgb(100, 100, 100)}")
+            elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                widget.setEnabled(enable)
+
+
 def set_qtv_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
     """ Set QTableView configurations """
     widget.setSelectionBehavior(selection)
@@ -503,3 +519,4 @@ def get_col_index_by_col_name(qtable, column_name):
             column_index = x
             break
     return column_index
+

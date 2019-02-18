@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>info_show_info</class>
- <widget class="QMainWindow" name="info_show_info">
+ <class>mw_readsql</class>
+ <widget class="QMainWindow" name="mw_readsql">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,11 +11,43 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Giswater</string>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
     <item row="4" column="2">
+     <widget class="QLabel" name="lbl_status">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="4" column="5">
      <widget class="QPushButton" name="btn_close">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -28,8 +60,11 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="0" colspan="3">
+    <item row="3" column="0" colspan="6">
      <widget class="QTabWidget" name="tab_main">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -44,20 +79,31 @@
            <string>Project data schema</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
-           <item row="0" column="2">
-            <widget class="QPushButton" name="btn_schema_create">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_custom_node_type_4">
              <property name="font">
               <font>
-               <weight>50</weight>
-               <bold>false</bold>
+               <pointsize>8</pointsize>
               </font>
              </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
              <property name="text">
-              <string>Create</string>
+              <string>Date:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="margin">
+              <number>3</number>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="label_custom_node_type_3">
              <property name="font">
               <font>
@@ -81,13 +127,89 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="project_schema_author">
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="project_schema_last_update">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string/>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="project_schema_author">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="project_schema_name">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="frame">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="btn_schema_create">
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Create</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_custom_node_type_2">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+              </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <property name="text">
+              <string>Title:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="margin">
+              <number>3</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="project_schema_title">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -115,88 +237,14 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="project_schema_last_update">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
+           <item row="4" column="2">
+            <widget class="QPushButton" name="btn_delete">
              <property name="text">
-              <string/>
+              <string>Delete</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="project_schema_name">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="frame">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="project_schema_title">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="readOnly">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_custom_node_type_4">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <property name="text">
-              <string>Last update:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="margin">
-              <number>3</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_custom_node_type_2">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <property name="text">
-              <string>Title:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="margin">
-              <number>3</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
+           <item row="3" column="2">
             <widget class="QPushButton" name="btn_copy">
              <property name="text">
               <string>Copy</string>
@@ -204,9 +252,9 @@
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="QPushButton" name="btn_delete">
+            <widget class="QPushButton" name="btn_schema_rename">
              <property name="text">
-              <string>Delete</string>
+              <string>Rename</string>
              </property>
             </widget>
            </item>
@@ -219,6 +267,13 @@
            <string>Water project</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="lbl_connection">
+             <property name="text">
+              <string>Connection name:</string>
+             </property>
+            </widget>
+           </item>
            <item row="2" column="1">
             <widget class="QComboBox" name="cmb_project_type">
              <property name="sizePolicy">
@@ -226,6 +281,13 @@
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cmb_connection">
+             <property name="enabled">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -255,16 +317,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="lbl_connection">
-             <property name="text">
-              <string>Connection name:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="cmb_connection"/>
-           </item>
           </layout>
           <zorder>cmb_project_type</zorder>
           <zorder>horizontalSpacer</zorder>
@@ -279,7 +331,14 @@
            <string>Information about software versions</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
-           <item row="0" column="1">
+           <item row="1" column="0" colspan="4">
+            <widget class="QTextEdit" name="software_version_info">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
             <widget class="QPushButton" name="btn_info">
              <property name="enabled">
               <bool>true</bool>
@@ -319,12 +378,18 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QTextEdit" name="software_version_info">
-             <property name="enabled">
-              <bool>false</bool>
+           <item row="0" column="0">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-            </widget>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -372,8 +437,8 @@
             <widget class="QLabel" name="label_5">
              <property name="font">
               <font>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -404,8 +469,8 @@
             <widget class="QLabel" name="label_8">
              <property name="font">
               <font>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -433,8 +498,8 @@
             <widget class="QLabel" name="label_30">
              <property name="font">
               <font>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -446,8 +511,8 @@
             <widget class="QLabel" name="label_7">
              <property name="font">
               <font>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -559,8 +624,8 @@
             <widget class="QLabel" name="label_10">
              <property name="font">
               <font>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -588,8 +653,8 @@
             <widget class="QLabel" name="label_9">
              <property name="font">
               <font>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -601,8 +666,8 @@
             <widget class="QLabel" name="label_34">
              <property name="font">
               <font>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -643,8 +708,8 @@
             <widget class="QLabel" name="label_2">
              <property name="font">
               <font>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -745,9 +810,15 @@
       </widget>
      </widget>
     </item>
+    <item row="4" column="3">
+     <widget class="QLabel" name="lbl_status_text">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="action_create_sample">
    <property name="text">
     <string>Create Sample</string>
@@ -767,8 +838,6 @@
   <tabstop>project_schema_author</tabstop>
   <tabstop>project_schema_last_update</tabstop>
   <tabstop>btn_schema_create</tabstop>
-  <tabstop>btn_copy</tabstop>
-  <tabstop>btn_delete</tabstop>
   <tabstop>btn_close</tabstop>
   <tabstop>btn_update_schema</tabstop>
   <tabstop>tab_main</tabstop>

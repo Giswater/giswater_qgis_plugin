@@ -95,7 +95,7 @@ class ParentDialog(QDialog):
         self.controller = DaoController(self.settings, self.plugin_name, iface, 'forms')
         self.controller.set_plugin_dir(self.plugin_dir)  
         self.controller.set_qgis_settings(self.qgis_settings)  
-        status = self.controller.set_database_connection()      
+        status, not_version = self.controller.set_database_connection()
         if not status:
             message = self.controller.last_error
             self.controller.show_warning(message) 

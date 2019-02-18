@@ -37,7 +37,7 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Please, set a project name</string>
+         <string>Please, set a new project name:</string>
         </property>
        </widget>
       </item>
