@@ -526,25 +526,23 @@ CREATE OR REPLACE VIEW vi_title AS
    FROM inp_project_id
   ORDER BY inp_project_id.title;
 
-
-DROP VIEW IF EXISTS vi_options CASCADE;
+  
+  
 CREATE OR REPLACE VIEW vi_options AS 
- SELECT a.idval as parameter,
- CASE WHEN inp_typevalue.idval is not null then inp_typevalue.idval
- else b.value end as value
-   FROM audit_cat_param_user a
-     LEFT JOIN config_param_user b ON a.id = b.parameter::text
-     LEFT JOIN inp_typevalue ON  inp_typevalue.id=b.value and inp_typevalue.typevalue LIKE 'inp_value_options%'
-  WHERE a.formname = 'epaoptions'::text AND b.cur_user::name = "current_user"();
+SELECT idval, value
+from audit_cat_param_user a
+join config_param_user b on a.id=b.parameter
+where layout_name IN ('grl_general_1', 'grl_general_2', 'grl_dyn_11', 'grl_dyn_12')
+AND cur_user=current_user;
 
 
-DROP VIEW IF EXISTS vi_report CASCADE;
 CREATE OR REPLACE VIEW vi_report AS 
- SELECT a.description as parameter,
-    b.value
-   FROM audit_cat_param_user a
-     LEFT JOIN config_param_user b ON a.id = b.parameter::text
-  WHERE a.formname = 'inp_report'::text AND b.cur_user::name = "current_user"();
+SELECT idval, value
+from audit_cat_param_user a
+join config_param_user b on a.id=b.parameter
+where layout_name IN ('grl_reports_17', 'grl_reports_18')
+AND cur_user=current_user;
+
   
 
 DROP VIEW IF EXISTS  vi_files CASCADE;

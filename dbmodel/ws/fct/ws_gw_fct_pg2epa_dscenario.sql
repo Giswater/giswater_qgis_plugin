@@ -10,7 +10,6 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_dscenario (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
 
-rec_options 	record;
 rec_demand	record;
 dscenario_aux	integer;      
 
@@ -19,12 +18,11 @@ BEGIN
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
-	SELECT * INTO rec_options FROM inp_options;
 	SELECT dscenario_id INTO dscenario_aux FROM inp_selector_dscenario WHERE cur_user=current_user;
 
 	RAISE NOTICE 'Starting pg2epa for filling demand scenario';
 	
-	FOR rec_demand IN SELECT * FROM v_inp_demand
+	FOR rec_demand IN SELECT * FROM vi_demands
 	LOOP	
 		UPDATE rpt_inp_node SET demand=rec_demand.demand	WHERE node_id=rec_demand.node_id;
 	END LOOP;
