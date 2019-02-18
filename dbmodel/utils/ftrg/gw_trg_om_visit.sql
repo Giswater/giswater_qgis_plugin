@@ -24,7 +24,7 @@ BEGIN
 			RETURN NEW;	
 			
 		ELSIF TG_OP='DELETE' THEN
-			DELETE FROM cat_work WHERE id=OLD.id;
+			DELETE FROM cat_work WHERE id=OLD.id::text;
 			RETURN OLD;
 			
 		END IF;
