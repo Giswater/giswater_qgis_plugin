@@ -65,7 +65,7 @@ ALTER TABLE om_visit ADD COLUMN class_id integer;
 ALTER TABLE om_visit ADD COLUMN status integer;
 
 
-ALTER TABLE temp_csv2pg RENAME TO _temp_csv2pg;
+ALTER TABLE temp_csv2pg RENAME TO old_temp_csv2pg;
 ALTER SEQUENCE temp_csv2pg_id_seq RENAME TO temp_csv2pg_id_seq2;
 
 CREATE TABLE temp_csv2pg(
