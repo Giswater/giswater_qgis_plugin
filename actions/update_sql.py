@@ -1413,7 +1413,7 @@ class UpdateSQL(ParentAction):
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
-        self.setWaitCursor()
+        self.set_wait_cursor()
         if self.rdb_import_data.isChecked():
             self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
@@ -1439,7 +1439,7 @@ class UpdateSQL(ParentAction):
                 if result:
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
                 else:
-                    self.setArrowCursor()
+                    self.set_arrow_cursor()
                     return
 
             self.load_base(project_type=project_type)
@@ -1458,7 +1458,7 @@ class UpdateSQL(ParentAction):
                 if result:
                     utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
                 else:
-                    self.setArrowCursor()
+                    self.set_arrow_cursor()
                     return
 
             self.load_base(project_type=project_type)
@@ -1481,7 +1481,7 @@ class UpdateSQL(ParentAction):
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
-        self.setArrowCursor()
+        self.set_arrow_cursor()
 
         # Show message if process executed correctly
         if self.error_count == 0:
@@ -1520,8 +1520,7 @@ class UpdateSQL(ParentAction):
             status = self.controller.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.setArrowCursor()
-
-
+        
         # Show message if precess execute correctly
         if self.error_count == 0:
             self.controller.dao.commit()
@@ -1542,9 +1541,9 @@ class UpdateSQL(ParentAction):
         
     def update_api(self):
     
-        self.setWaitCursor()
+        self.set_wait_cursor()
         self.api(False)
-        self.setArrowCursor()
+        self.set_arrow_cursor()
 
         # Show message if precess execute correctly
         if self.error_count == 0:
@@ -1563,17 +1562,17 @@ class UpdateSQL(ParentAction):
         
     def implement_api(self):
     
-        self.setWaitCursor()
+        self.set_wait_cursor()
         self.api(True)
-        self.setArrowCursor()
+        self.set_arrow_cursor()
 
         
     def load_custom_sql_files(self, dialog, widget):
     
         folder_path = utils_giswater.getWidgetText(dialog, widget)
-        self.setWaitCursor()
+        self.set_wait_cursor()
         self.load_sql(folder_path)
-        self.setArrowCursor()
+        self.set_arrow_cursor()
 
         # Show message if precess execute correctly
         if self.error_count == 0:
@@ -1596,10 +1595,10 @@ class UpdateSQL(ParentAction):
         msg = "Are you sure to update the project schema to lastest version?"
         result = self.controller.ask_question(msg, "Info")
         if result:
-            self.setWaitCursor()
+            self.set_wait_cursor()
             self.load_updates(project_type, update_changelog=True)
             self.set_info_project()
-            self.setArrowCursor()
+            self.set_arrow_cursor()
         else:
             return
 
@@ -1628,13 +1627,13 @@ class UpdateSQL(ParentAction):
         # Get current schema selected
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
-        self.setWaitCursor()
+        self.set_wait_cursor()
         self.load_fct_ftrg(project_type=project_type)
         self.update_30to31(project_type=project_type)
         self.update_31to39(project_type=project_type)
         self.api(project_type=project_type)
         self.execute_last_process(schema_name=schema_name, locale=True)
-        self.setArrowCursor()
+        self.set_arrow_cursor()
 
         if update_changelog is False:
             # Show message if precess execute correctly
@@ -1937,19 +1936,19 @@ class UpdateSQL(ParentAction):
     def schema_file_to_db(self):
 
         if self.chk_schema_fk.isChecked():
-            self.setWaitCursor()
+            self.set_wait_cursor()
             self.reload_tablect(self.project_type_selected)
-            self.setArrowCursor()
+            self.set_arrow_cursor()
 
         if self.chk_schema_funcion.isChecked():
-            self.setWaitCursor()
+            self.set_wait_cursor()
             self.reload_fct_ftrg(self.project_type_selected)
-            self.setArrowCursor()
+            self.set_arrow_cursor()
 
         if self.chk_schema_trigger.isChecked():
-            self.setWaitCursor()
+            self.set_wait_cursor()
             self.reload_trg(self.project_type_selected)
-            self.setArrowCursor()
+            self.set_arrow_cursor()
 
         # Show message if precess execute correctly
         if self.error_count == 0:
@@ -1969,17 +1968,17 @@ class UpdateSQL(ParentAction):
     def api_file_to_db(self):
 
         if self.chk_api_fk.isChecked():
-            self.setWaitCursor()
+            self.set_wait_cursor()
             self.reload_tablect('api')
-            self.setArrowCursor()
+            self.set_arrow_cursor()
         if self.chk_api_funcion.isChecked():
-            self.setWaitCursor()
+            self.set_wait_cursor()
             self.reload_fct_ftrg('api')
-            self.setArrowCursor()
+            self.set_arrow_cursor()
         if self.chk_api_trigger.isChecked():
-            self.setWaitCursor()
+            self.set_wait_cursor()
             self.reload_trg('api')
-            self.setArrowCursor()
+            self.set_arrow_cursor()
 
         # Show message if precess execute correctly
         if self.error_count == 0:
@@ -2162,13 +2161,6 @@ class UpdateSQL(ParentAction):
                 status = False
         return True
 
-
-    def setWaitCursor(self):
-        QApplication.instance().setOverrideCursor(Qt.WaitCursor)
-        
-        
-    def setArrowCursor(self):
-        QApplication.instance().setOverrideCursor(Qt.ArrowCursor)
 
 
     """ Take current project type changed """

@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3.1
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -13,9 +13,10 @@ from datetime import datetime
 from functools import partial
 
 import utils_giswater
-from giswater.actions.parent import ParentAction
+from giswater.actions.add_lot import AddNewLot
 from giswater.actions.manage_visit import ManageVisit
 from giswater.actions.manage_new_psector import ManageNewPsector
+from giswater.actions.parent import ParentAction
 from giswater.ui_manager import Psector_management
 from giswater.ui_manager import SelectorDate
 
@@ -25,6 +26,7 @@ class Om(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.new_lot = AddNewLot(iface, settings, controller, plugin_dir)
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
 
@@ -290,4 +292,14 @@ class Om(ParentAction):
         except:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
-            
+
+
+    def om_add_lot(self):
+        """''' Button 74: Add new lot '''"""
+        self.new_lot.manage_lot()
+
+
+    def om_lot_management(self):
+        """ '''Button 75: Lot management '''"""
+        self.new_lot.lot_manager()
+

@@ -1366,7 +1366,6 @@ class DrawProfiles(ParentMapTool):
         rotation = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation)
 
         if self.rotation_vd_exist:
-            self.controller.log_info(str("test1") + str(rotation))
             if str(rotation) != 'null':
                 sql = ("UPDATE " + self.schema_name + "." + tablename + ""
                        " SET value = '" + str(rotation) + "'"

@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 2.0
+This file is part of Giswater 3.1
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
@@ -409,7 +409,9 @@ class ManNodeDialog(ParentDialog):
         """ Fill tab 'O&M' (event) """
         
         table_event_node = "v_ui_om_visit_x_node"         
-        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_node, self.filter)         
+        self.fill_tbl_event(self.tbl_event, table_event_node, self.filter)
+        self.tbl_event.model().rowsInserted.connect(self.set_filter_table_event, self.tbl_event)
+        self.tbl_event.model().rowsRemoved.connect(self.set_filter_table_event, self.tbl_event)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
         self.set_configuration(self.tbl_event, table_event_node)
         

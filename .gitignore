@@ -10,7 +10,6 @@ test
 data/
 log/*.*
 templates/profile.png
-sql
 
 
 #################
