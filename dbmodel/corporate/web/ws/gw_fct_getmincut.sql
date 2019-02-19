@@ -64,6 +64,9 @@ DECLARE
 
 	v_mincut_street_none text;
 
+	v_anl_mincut_cat_type_idval text;
+	v_anl_mincut_cat_cause_idval text;
+
 	
 
 BEGIN
@@ -97,6 +100,15 @@ BEGIN
 	
 	v_mincut_class_name := (SELECT name FROM anl_mincut_cat_class WHERE id= v_mincut_class);
 
+-- use descript field for anl_mincut_cat_type and anl_mincut_cat_cause
+	IF (SELECT value::json->>'id' FROM config_param_system WHERE parameter='customer_info')::integer = 1 THEN
+		v_anl_mincut_cat_type_idval = 'descript';
+		v_anl_mincut_cat_cause_idval = 'descript';
+	ELSE
+		v_anl_mincut_cat_type_idval = 'id';
+		v_anl_mincut_cat_cause_idval = 'id';
+	END IF;
+		
 
 --	Enable / dissable widgets
 	v_mincut_state := (SELECT mincut_state FROM anl_mincut_result_cat WHERE id= mincut_id_arg);
@@ -171,8 +183,8 @@ BEGIN
 		json_array[0] := gw_fct_createwidgetjson('Id:', 'mincut_id', 'text', 'string', '', TRUE, mincut_data.mincut_id::TEXT);
 		json_array[1] := gw_fct_createwidgetjson('Orden trabajo:', 'work_order', 'text', 'string', '', v_state0, mincut_data.work_order);
 		json_array[2] := gw_fct_createcombojson('Estado:', 'mincut_state', 'combo', 'string', '', TRUE, 'anl_mincut_cat_state','id','name',mincut_data.mincut_state);
-		json_array[3] := gw_fct_createcombojson('Tipo:', 'mincut_type', 'combo', 'string', '', v_state0, 'anl_mincut_cat_type','id','id',mincut_data.mincut_type);
-		json_array[4] := gw_fct_createcombojson('Causa:', 'anl_cause', 'combo', 'string', '', v_state0, 'anl_mincut_cat_cause','id','id',mincut_data.anl_cause);
+		json_array[3] := gw_fct_createcombojson('Tipo:', 'mincut_type', 'combo', 'string', '', v_state0, 'anl_mincut_cat_type','id',v_anl_mincut_cat_type_idval, mincut_data.mincut_type);
+		json_array[4] := gw_fct_createcombojson('Causa:', 'anl_cause', 'combo', 'string', '', v_state0, 'anl_mincut_cat_cause','id',v_anl_mincut_cat_cause_idval, mincut_data.anl_cause);
 		json_array[5] := gw_fct_createcombojson('Asignado a:', 'assigned_to', 'combo', 'string', '', v_state0, 'cat_users','id','name',mincut_data.assigned_to);
 		json_array[6] := gw_fct_createwidgetjson('Descripción:', 'anl_descript', 'textarea', 'string', '', v_state0, mincut_data.anl_descript);
 		json_array[7] := gw_fct_createwidgetjson('Fechas', 'divider', 'formDivider', 'string', NULL, TRUE, NULL);
@@ -251,8 +263,8 @@ BEGIN
 		json_array[0] := gw_fct_createwidgetjson('Id:', 'mincut_id', 'text', 'string', '', TRUE, '');
 		json_array[1] := gw_fct_createwidgetjson('Orden trabajo:', 'work_order', 'text', 'string', '', v_state0, '');
 		json_array[2] := gw_fct_createcombojson('Estado:', 'mincut_state', 'combo', 'string', '', v_state0, 'anl_mincut_cat_state','id','name',v_mincut_new_state::TEXT);
-		json_array[3] := gw_fct_createcombojson('Tipo:', 'mincut_type', 'combo', 'string', '', v_state0, 'anl_mincut_cat_type','id','id',v_mincut_new_type::TEXT);
-		json_array[4] := gw_fct_createcombojson('Causa:', 'anl_cause', 'combo', 'string', '', v_state0, 'anl_mincut_cat_cause','id','id',v_mincut_new_cause);
+		json_array[3] := gw_fct_createcombojson('Tipo:', 'mincut_type', 'combo', 'string', '', v_state0, 'anl_mincut_cat_type','id',v_anl_mincut_cat_type_idval,v_mincut_new_type::TEXT);
+		json_array[4] := gw_fct_createcombojson('Causa:', 'anl_cause', 'combo', 'string', '', v_state0, 'anl_mincut_cat_cause','id',v_anl_mincut_cat_cause_idval,v_mincut_new_cause);
 		json_array[5] := gw_fct_createcombojson('Asignado a:', 'assigned_to', 'combo', 'string', '', v_state0, 'cat_users','id','name',v_mincut_new_assigned);
 		json_array[6] := gw_fct_createwidgetjson('Descripción:', 'anl_descript', 'textarea', 'string', '', v_state0, '');		
 		json_array[7] := gw_fct_createwidgetjson('Fechas', 'divider', 'formDivider', 'string', NULL, TRUE, NULL);
