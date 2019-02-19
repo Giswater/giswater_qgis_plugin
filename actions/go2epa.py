@@ -41,7 +41,6 @@ class Go2Epa(ParentAction):
         """ Button 23: Open form to set INP, RPT and project """
         self.get_last_gsw_file()
 
-
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
@@ -58,9 +57,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.chk_only_check.setChecked(False)
         self.dlg_go2epa.chk_only_check.setEnabled(False)
 
-
         # Set signals
-        self.dlg_go2epa.chk_import_result.stateChanged.connect(partial(self.chk_control))
         self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
@@ -82,19 +79,38 @@ class Go2Epa(ParentAction):
 
         # TODO es realmente result_id de la vista v_ui_rpt_cat_result lo que debemos comparar?
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
+
         # Open dialog
-        self.open_dialog(self.dlg_go2epa, dlg_name='file_manager', maximize_button=False)
+        self.dlg_go2epa.show()
 
-
-    def chk_control(self, state):
-        if state == 2:
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
-            self.dlg_go2epa.chk_exec.setEnabled(False)
-            self.dlg_go2epa.chk_export.setEnabled(False)
-        else:
-            self.dlg_go2epa.chk_exec.setEnabled(True)
-            self.dlg_go2epa.chk_export.setEnabled(True)
+    def chk_control(self):
+        if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
+            file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+            result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
+            msg = "RPT file not found"
+            if file_rpt is not None:
+                if not os.path.exists(file_rpt):
+                    self.controller.show_warning(msg, parameter=str(file_rpt))
+                    return False
+            else:
+                self.controller.show_warning(msg, parameter=str(file_rpt))
+                return False
+            if result_name == '':
+                self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid red")
+                msg = "This parameter is mandatory. Please, set a value"
+                self.controller.show_details(msg, title="Rpt fail", inf_text=None)
+                return False
+            else:
+                sql = ("SELECT result_id FROM " + self.schema_name + ".rpt_cat_result "
+                       " WHERE result_id='"+str(result_name)+"' LIMIT 1")
+                row = self.controller.get_row(sql, log_sql=True)
+                self.controller.log_info("ROW: " + str(row))
+                if row:
+                    msg = "Result name already exists"
+                    answer = self.controller.ask_question(msg, title="Alert")
+                    if not answer:
+                        return False
+        return True
 
 
     def go2epa_sector_selector(self):
@@ -141,7 +157,6 @@ class Go2Epa(ParentAction):
         dlg_psector_sel = Multirow_selector()
         self.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
-        # dlg_psector_sel.setWindowTitle(" Dscenario selector")
         if tableleft == 'sector':
             dlg_psector_sel.setWindowTitle(" Sector selector")
             utils_giswater.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter, self.controller.tr('Filter by: Sector name', context_name='labels'))
@@ -275,8 +290,17 @@ class Go2Epa(ParentAction):
 
 
     def insert_into_inp(self, folder_path=None, all_rows=None):
+        progress = 0
+        self.dlg_go2epa.progressBar.setFormat("The INP file is begin imported...")
+        self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
+        self.dlg_go2epa.progressBar.setVisible(True)
+        self.dlg_go2epa.progressBar.setValue(progress)
+        row_count = sum(1 for rows in all_rows)  # @UnusedVariable
+        self.dlg_go2epa.progressBar.setMaximum(row_count)
         file1 = open(folder_path, "w")
         for row in all_rows:
+            progress += 1
+            self.dlg_go2epa.progressBar.setValue(progress)
             line = ""
             for x in range(0, len(row)):
                 if row[x] is not None:
@@ -294,16 +318,23 @@ class Go2Epa(ParentAction):
             line += "\n"
             file1.write(line)
         file1.close()
-
-        msg = "INP file has been created"
-        self.controller.show_info(msg)
+        del file1
 
 
     def insert_rpt_into_db(self, folder_path=None):
         _file = open(folder_path, "r+")
         full_file = _file.readlines()
         sql = ""
+        progress = 0
+        self.dlg_go2epa.progressBar.setFormat("The RPT file is begin imported...")
+        self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
+        self.dlg_go2epa.progressBar.setVisible(True)
+        self.dlg_go2epa.progressBar.setValue(progress)
+        row_count = sum(1 for rows in full_file)  # @UnusedVariable
+        self.dlg_go2epa.progressBar.setMaximum(row_count)
         for row in full_file:
+            progress += 1
+            self.dlg_go2epa.progressBar.setValue(progress)
             sp_n = row.split(' ')
             for x in range(len(sp_n) - 1, -1, -1):
                 if sp_n[x] == '' or "**" in sp_n[x] or "--" in sp_n[x]:
@@ -322,13 +353,21 @@ class Go2Epa(ParentAction):
                 sql = sql[:-2]+") "
                 values = values[:-2] + ");\n"
                 sql += values
-
+            if progress % 500 == 0:
+                self.controller.execute_sql(sql, log_sql=False, commit=True)
+                sql = ""
         self.controller.execute_sql(sql, log_sql=False, commit=True)
 
 
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
+        self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid gray")
+        status = self.chk_control()
+        if not status:
+            return
 
+        self.dlg_go2epa.progressBar.setVisible(True)
+        common_msg = ""
         # Get widgets values
         self.result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         prev_net_geom = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
@@ -352,7 +391,6 @@ class Go2Epa(ParentAction):
             epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", "+str(export_subcatch)+")"
         export_function = "gw_fct_utils_csv2pg_export_epa_inp('" + str(self.result_name) + "')"
 
-        self.dlg_go2epa.progressBar.setVisible(True)
         # Export to inp file
         if export_inp is True:
             # Check that all parameters has been set
@@ -362,23 +400,23 @@ class Go2Epa(ParentAction):
                 return
             # Call function gw_fct_pg2epa
             sql = ("SELECT " + self.schema_name + "." + epa_function_call)
-            row = self.controller.get_row(sql, log_sql=False)
+            row = self.controller.get_row(sql, log_sql=True)
 
             # Call function gw_fct_utils_csv2pg_export_epa_inp
             sql = ("SELECT " + self.schema_name + "." + export_function)
-            row = self.controller.get_row(sql, log_sql=False)
+            row = self.controller.get_row(sql, log_sql=True)
 
             # Get values from temp_csv2pg and insert into INP file
-            sql = ("SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 "
+            sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12 "
                    " FROM " + self.schema_name + ".temp_csv2pg "
                    " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
-            rows = self.controller.get_rows(sql, log_sql=False)
+            rows = self.controller.get_rows(sql, log_sql=True)
             if rows is None:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
                 self.dlg_go2epa.progressBar.setVisible(False)
                 return
             self.insert_into_inp(self.file_inp, rows)
-
+            common_msg += "Export INP finished. \t"
 
         # Execute epa
         if exec_epa is True:
@@ -387,21 +425,31 @@ class Go2Epa(ParentAction):
                 self.controller.show_warning(message, parameter="RPT file")
                 self.dlg_go2epa.progressBar.setVisible(False)
                 return
+            self.dlg_go2epa.progressBar.setMaximum(0)
+            self.dlg_go2epa.progressBar.setMinimum(0)
+            self.dlg_go2epa.progressBar.setFormat("Epa software is running...")
+            self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
+            self.dlg_go2epa.progressBar.setVisible(True)
             subprocess.call([opener, self.file_inp, self.file_rpt])
+            common_msg += "EPA model finished. \t"
 
         # Import to DB
         if import_result is True:
             if os.path.exists(self.file_rpt):
                 sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
                        " WHERE user_name=current_user AND csv2pgcat_id=11")
-                self.controller.execute_sql(sql, log_sql=False)
+                self.controller.execute_sql(sql, log_sql=True)
                 self.insert_rpt_into_db(self.file_rpt)
+                common_msg += "Import RPT finished."
             else:
                 msg = "Can't export rpt, File not found"
                 self.controller.show_warning(msg, parameter=self.file_rpt)
+        if common_msg is not None:
+            self.controller.show_info(common_msg)
 
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
+
         self.dlg_go2epa.progressBar.setVisible(False)
         # Close form
         self.close_dialog(self.dlg_go2epa)
@@ -641,11 +689,8 @@ class Go2Epa(ParentAction):
         self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)
 
-
         # Open form
-        self.open_dialog(self.dlg_manager) 
-            
-
+        self.open_dialog(self.dlg_manager)         
 
 
     def fill_combo_result_id(self):
