@@ -357,7 +357,8 @@ class Go2Epa(ParentAction):
                 self.controller.execute_sql(sql, log_sql=False, commit=True)
                 sql = ""
         self.controller.execute_sql(sql, log_sql=False, commit=True)
-
+        _file.close()
+        del _file
 
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
