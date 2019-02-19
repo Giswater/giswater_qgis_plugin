@@ -126,11 +126,6 @@ DROP TRIGGER IF EXISTS gw_trg_om_psector_x_node ON "SCHEMA_NAME".om_psector_x_no
 CREATE TRIGGER gw_trg_om_psector_x_node AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".om_psector_x_node 
 FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_plan_psector_geom('om');
 
-DROP TRIGGER IF EXISTS gw_trg_selector_expl ON "SCHEMA_NAME".selector_expl;
-CREATE TRIGGER gw_trg_selector_expl AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME".selector_expl 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_selector_expl();
-ALTER TABLE selector_expl DISABLE TRIGGER gw_trg_selector_expl;
-
 DROP TRIGGER IF EXISTS gw_trg_topocontrol_node ON "SCHEMA_NAME".node;
 CREATE TRIGGER gw_trg_topocontrol_node BEFORE INSERT OR UPDATE OF the_geom, "state" ON "SCHEMA_NAME".node
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_topocontrol_node();
