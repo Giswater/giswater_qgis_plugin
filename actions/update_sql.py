@@ -1905,14 +1905,22 @@ class UpdateSQL(ParentAction):
         # Get parameters
         sql = ("SELECT version();")
         result = self.controller.get_row(sql)
-        database_version = result[0].split(',')
+        if result:
+            database_version = result[0].split(',')
+        else:
+            database_version = ''
 
         sql = ("SELECT PostGIS_FULL_VERSION();")
         result = self.controller.get_row(sql)
-        postgis_version = result[0].split('GEOS=')
-
-        sql = ("SELECT value FROM " + schema_name + ".config_param_system WHERE parameter = 'schema_manager'")
-        result = self.controller.get_row(sql)
+        if result:
+            postgis_version = result[0].split('GEOS=')
+        else:
+            postgis_version = ''
+        if schema_name == 'Nothing to select' or schema_name == '':
+            result = None
+        else:
+            sql = ("SELECT value FROM " + schema_name + ".config_param_system WHERE parameter = 'schema_manager'")
+            result = self.controller.get_row(sql)
         if result is None:
             result = ['{"title":"","author":"","date":""}']
         result = [json.loads(result[0])]
