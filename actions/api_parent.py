@@ -1086,6 +1086,7 @@ class ApiParent(ParentAction):
                             widget.setValidator(QRegExpValidator(reg_exp))
                     widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
                 elif field['widgettype'] == 'combo':
                     widget = self.add_combobox(field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
@@ -1109,7 +1110,18 @@ class ApiParent(ParentAction):
                     widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
+                # Set editable/readonly
+                if 'iseditable' in field:
+                    if type(widget) in (QLineEdit, QDoubleSpinBox):
+                        if str(field['iseditable']) == "False":
+                            widget.setReadOnly(True)
+                            widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+
+                    elif type(widget) in (QComboBox, QCheckBox):
+                        if str(field['iseditable']) == "False":
+                            widget.setEnabled(False)
                 widget.setObjectName(field['widgetname'])
+
 
                 # Set signals
                 if put_chk is True:
