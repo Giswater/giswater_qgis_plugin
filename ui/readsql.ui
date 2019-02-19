@@ -328,7 +328,7 @@
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_3">
           <property name="title">
-           <string>Information about software versions</string>
+           <string>Information about versions</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
            <item row="1" column="0" colspan="4">

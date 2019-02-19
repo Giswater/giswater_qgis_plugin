@@ -13,6 +13,7 @@ from PyQt4.QtCore import QSettings, Qt
 import os
 import sys
 import re
+import json
 from functools import partial
 
 import utils_giswater
@@ -170,6 +171,7 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
 
+
         #TODO:: QGIS project file (hidden)
         # self.dlg_readsql.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "path_folder"))
 
@@ -187,6 +189,7 @@ class UpdateSQL(ParentAction):
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
+        self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -202,7 +205,7 @@ class UpdateSQL(ParentAction):
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, 'Connection Failed. Please, check connection parameters')
             return
         else:
-            if self.check_roladmin_user(self.username) is False:
+            if self.check_roladmin_user(self.username) is False or self.username != 'postgres':
                 self.controller.show_message("You don't have permissions to administrate project schemas on this connection", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
@@ -1908,10 +1911,19 @@ class UpdateSQL(ParentAction):
         result = self.controller.get_row(sql)
         postgis_version = result[0].split('GEOS=')
 
+        sql = ("SELECT value FROM " + schema_name + ".config_param_system WHERE parameter = 'schema_manager'")
+        result = self.controller.get_row(sql)
+        if result is None:
+            result = ['{"title":"","author":"","date":""}']
+        result = [json.loads(result[0])]
+
         self.software_version_info.setText('Database version: ' + str(database_version[0]) + '\n' +
                                            '' + str(postgis_version[0]) + ' \n \n' +
                                            'Schema name: ' + schema_name + '\n' +
-                                           'Schema version: ' + self.project_data_schema_version)
+                                           'Schema version: ' + self.project_data_schema_version + ' \n \n' +
+                                           'Schema Title: ' + str(result[0]['title']) + '\n' +
+                                           'Schema Author: ' + str(result[0]['author']) + '\n' +
+                                           'Schema Date: ' + str(result[0]['date']))
 
         # Enable or Disable rename button according schema version
         if str(self.version_metadata) != str(self.project_data_schema_version):
@@ -2162,6 +2174,17 @@ class UpdateSQL(ParentAction):
         return True
 
 
+    def delete_schema(self):
+        project_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        msg = "Are you sure you want delete schema '" + str(project_name) + "' ?"
+        result = self.controller.ask_question(msg, "Info")
+        if result:
+            sql = ('DROP SCHEMA ' + str(project_name) + ' CASCADE;')
+            status = self.controller.execute_sql(sql)
+            if status:
+                msg = "The Schema was deleted correctly."
+                result = self.controller.show_info_box(msg, "Info")
+        self.populate_data_schema_name(self.cmb_project_type)
 
     """ Take current project type changed """
 
