@@ -31,6 +31,7 @@ DECLARE
 	v_title text;
 	v_author text;
 	v_date text;
+	v_schema_info json;
 
 BEGIN 
 	-- search path
@@ -59,8 +60,14 @@ BEGIN
 		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg);	
 		v_message='Project sucessfully created';
 		
-		-- inserting on inp_project table
-		INSERT INTO inp_project_id VALUES (v_title, v_author, v_date);
+		-- create json info_schema
+		v_title := COALESCE(v_title, '');
+		v_author := COALESCE(v_author, '');
+		v_date := COALESCE(v_date, '');
+		v_schema_info = '{"title":"'||v_title||'","author":"'||v_author||'","date":"'||v_date||'"}';
+		
+		-- inserting on config_param_system table
+		INSERT INTO config_param_system (parameter, value, data_type, context) VALUES ('schema_manager', v_schema_info,'json','System');
 		
 		-- fk from utils schema
 		PERFORM gw_fct_admin_schema_utils_fk();  -- this is the posiition to use it because of we need values on version table to workwith
