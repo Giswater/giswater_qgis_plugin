@@ -55,7 +55,7 @@ BEGIN
 	END IF;
 		
 	-- Calling for the export function
-	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(result_id_var);
+	PERFORM gw_fct_utils_csv2pg_export_swmm_inp(result_id_var);
 	
 	
 RETURN check_count_aux;

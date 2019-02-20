@@ -14,6 +14,9 @@ UPDATE config_param_system SET label='Gully units tolerance:' ,isenabled=TRUE,la
 UPDATE config_param_system SET label='Node geom 1 tolerance:' ,isenabled=TRUE,layout_id=15 ,layout_order=7 ,project_type='ud' ,datatype='double' ,widgettype='spinbox' WHERE parameter='rev_node_geom1_tol';
 UPDATE config_param_system SET label='custom_giswater_folder:' ,isenabled=FALSE ,layout_id=NULL ,layout_order=NULL ,project_type=NULL , datatype='string' ,widgettype='linetext' WHERE parameter='custom_giswater_folder';
 
+INSERT INTO sys_fprocess_cat VALUES (35, 'Recursive go2epa process', 'EPA', 'Recursive go2epa process', 'ud');
+
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2640, 'gw_fct_pg2epa_recursive', 'role_epa', FALSE, 'Function to enable recursive calculations on epa workflow');
 
 /*
 

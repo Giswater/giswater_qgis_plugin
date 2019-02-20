@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2640
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_recursive(p_data json)  
 RETURNS integer AS 
@@ -31,15 +31,22 @@ BEGIN
 
 	IF v_status=1 THEN
 	
-		RAISE NOTICE 'Starting pg2epa recurring process.';
+		RAISE NOTICE 'Starting pg2epa recursive process.';
+				
+		-- test recursive
+		INSERT INTO temp_csv2pg (csv2pgcat_id, source, csv1, csv2) 
+		SELECT 35, v_result_id, row_number() over (order by arc_id), arc_id FROM arc;
+		RETURN (SELECT count(*) FROM arc);
 
 	ELSE
 	
-		RAISE NOTICE 'Finishing pg2epa recurring process.';
+		RAISE NOTICE 'Finishing pg2epa recursive process.';
+		
+		-- Deleting variable
+		RETURN 0;
 
 	END IF;
 	
-RETURN 0;
 	
 END;
 $BODY$

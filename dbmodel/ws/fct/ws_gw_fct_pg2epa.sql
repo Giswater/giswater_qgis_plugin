@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2314
 
 drop function if exists SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean)  ;
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean)  
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_isrecursive boolean)  
 RETURNS integer AS 
 $BODY$
 
@@ -30,8 +30,15 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	SELECT * INTO rec_options FROM inp_options;
+	
+	SELECT isrecursive FROM 
 
 	RAISE NOTICE 'Starting pg2epa process.';
+	
+	IF p_isrecursive IS TRUE THEN
+		-- Modify the contourn conditions to dynamic recursive strategy
+		
+	END IF;
 
 	-- Upsert on rpt_cat_table
 	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
@@ -72,10 +79,17 @@ BEGIN
 	-- Calling for the export function
 	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(result_id_var);
 	
+	IF p_isrecursive IS TRUE THEN
+		DELETE FROM temp_csv2pg WHERE csv2pgcat_id=35, source=result_id_var 
+			WHERE csv1 IN (SELECT csv1 FROM temp_csv2pg WHERE csv2pgcat_id=35 AND source=result_id_var LIMIT 1); 
+		IF (SELECT count(*) FROM temp_csv2pg WHERE csv2pgcat_id=35 AND source=result_id_var)>0 THEN
+			RETURN 1;
+		ELSE
+			RETURN 0;
+		END IF;
+	END IF;
 	
-	
-
-RETURN check_count_aux;
+RETURN 0;
 	
 END;
 $BODY$
