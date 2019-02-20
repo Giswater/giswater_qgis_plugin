@@ -13,6 +13,7 @@ from PyQt4.QtGui import QCompleter, QFileDialog
 
 import csv
 import os
+import re
 import subprocess
 
 from functools import partial
@@ -104,9 +105,8 @@ class Go2Epa(ParentAction):
                 sql = ("SELECT result_id FROM " + self.schema_name + ".rpt_cat_result "
                        " WHERE result_id='"+str(result_name)+"' LIMIT 1")
                 row = self.controller.get_row(sql, log_sql=True)
-                self.controller.log_info("ROW: " + str(row))
                 if row:
-                    msg = "Result name already exists"
+                    msg = "Result name already exists, do you want override?"
                     answer = self.controller.ask_question(msg, title="Alert")
                     if not answer:
                         return False
@@ -335,10 +335,22 @@ class Go2Epa(ParentAction):
         for row in full_file:
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
-            sp_n = row.split(' ')
-            for x in range(len(sp_n) - 1, -1, -1):
-                if sp_n[x] == '' or "**" in sp_n[x] or "--" in sp_n[x]:
-                    sp_n.pop(x)
+            dirty_list = row.split(' ')
+            for x in range(len(dirty_list) - 1, -1, -1):
+                if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
+                    dirty_list.pop(x)
+
+            sp_n = []
+            if len(dirty_list) > 0:
+                for x in range(0, len(dirty_list)):
+                    if bool(re.search('[[0-9][-][0-9]]*', str(dirty_list[x]))):
+                        aux = dirty_list[x].split("-")
+                        for y in aux:
+                            sp_n.append(y)
+                    else:
+                        sp_n.append(dirty_list[x])
+
+
             if len(sp_n) > 0:
                 sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
                 values = "VALUES(11, "
@@ -356,9 +368,11 @@ class Go2Epa(ParentAction):
             if progress % 500 == 0:
                 self.controller.execute_sql(sql, log_sql=False, commit=True)
                 sql = ""
-        self.controller.execute_sql(sql, log_sql=False, commit=True)
+        if sql != "":
+            self.controller.execute_sql(sql, log_sql=False, commit=True)
         _file.close()
         del _file
+
 
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
