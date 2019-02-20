@@ -14,7 +14,7 @@
 New function trigger (2644) gw_trg_visit_user_manager
 Update geometry generator of psector using ONLY doables=TRUE
 New function trigger (2646) gw_trg_calculate_period
-
+Add config_param_system unique constraint
 
 New api functions 
 -----------------
