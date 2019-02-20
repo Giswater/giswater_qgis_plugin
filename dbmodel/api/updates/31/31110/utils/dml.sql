@@ -96,4 +96,4 @@ INSERT INTO config_api_form_tabs VALUES (566,'ve_connec','tab_hydrometer_val','C
 -- add api parameter config param system
 -----------------------
 
-INSERT INTO config_param_system VALUES (90,'ApiVersion','0.9.101',NULL,NULL,NULL,NULL,NULL,NULL,TRUE,NULL,NULL,NULL,TRUE,TRUE,NULL,NULL,NULL);
+INSERT INTO config_param_system (id, parameter, value)VALUES (90,'ApiVersion','0.9.101');
