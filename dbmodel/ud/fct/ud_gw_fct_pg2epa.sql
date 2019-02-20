@@ -25,15 +25,17 @@ BEGIN
 	IF p_isrecursive IS TRUE THEN
 		-- Modify the contourn conditions to dynamic recursive strategy
 		
+	ELSE
+		-- Upsert on rpt_cat_table
+		DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
+		INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
+		
+		-- Upsert on node rpt_inp result manager table
+		DELETE FROM inp_selector_result WHERE cur_user=current_user;
+		INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+		
 	END IF;
 	
-	-- Upsert on rpt_cat_table
-	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
-	INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
-	
-	-- Upsert on node rpt_inp result manager table
-	DELETE FROM inp_selector_result WHERE cur_user=current_user;
-	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 	
 	IF p_use_networkgeom IS FALSE THEN
 
@@ -50,9 +52,6 @@ BEGIN
 		PERFORM gw_fct_pg2epa_nod2arc_data(result_id_var);
 	
 	END IF;
-	
-	-- Check data quality
-	SELECT gw_fct_pg2epa_check_data(result_id_var) INTO check_count_aux;
 	
 	IF p_dumpsubcatchment THEN
 		-- Dump subcatchments

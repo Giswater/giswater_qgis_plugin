@@ -35,16 +35,16 @@ BEGIN
 	IF p_isrecursive IS TRUE THEN
 		-- Modify the contourn conditions to dynamic recursive strategy
 		
-	END IF;
-
-	-- Upsert on rpt_cat_table
-	DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
-	INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
+	ELSE
+		-- Upsert on rpt_cat_table
+		DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
+		INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
 	
-	-- Upsert on node rpt_inp result manager table
-	DELETE FROM inp_selector_result WHERE cur_user=current_user;
-	INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+		-- Upsert on node rpt_inp result manager table
+		DELETE FROM inp_selector_result WHERE cur_user=current_user;
+		INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 
+	END IF;
 	
 	IF p_use_networkgeom IS FALSE THEN
 		-- Fill inprpt tables
@@ -60,9 +60,7 @@ BEGIN
 			
 		-- Calling for gw_fct_pg2epa_pump_additional function;
 		PERFORM gw_fct_pg2epa_pump_additional(result_id_var);
-
-		-- Check data quality
-		SELECT gw_fct_pg2epa_check_data(result_id_var) INTO check_count_aux;	
+		
 	END IF;
 
 	-- Real values of demand if rtc is enabled;
