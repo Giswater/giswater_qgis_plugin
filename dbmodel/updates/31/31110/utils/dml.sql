@@ -16,8 +16,6 @@ UPDATE config_param_system SET label='custom_giswater_folder:' ,isenabled=FALSE 
 
 INSERT INTO sys_fprocess_cat VALUES (35, 'Recursive go2epa process', 'EPA', 'Recursive go2epa process', 'ud');
 
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2640, 'gw_fct_pg2epa_recursive', 'role_epa', FALSE, 'Function to enable recursive calculations on epa workflow');
-
 /*
 
 REMIX
@@ -205,7 +203,9 @@ UPDATE audit_cat_param_user SET     WHERE parameter='soilcat_vdefault', 'config'
 
 -- 2019/01/26
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2640, 'gw_api_getvisitmanager', 'role_om', FALSE, 'To call visit from user');
-INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2642, 'gw_api_setvisitmanager', 'role_om', FALSE,'To update values');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2642, 'gw_api_setvisitmanagerstart', 'role_om', FALSE,'To start visit manager');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2644, 'gw_api_setvisitmanagerend', 'role_om', FALSE,'To start visit manager');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2646, 'gw_fct_pg2epa_recursive', 'role_epa', FALSE, 'Function to enable recursive calculations on epa workflow');
 
 
 -- 2019/01/31

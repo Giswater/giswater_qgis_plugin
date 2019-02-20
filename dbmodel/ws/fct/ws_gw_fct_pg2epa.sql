@@ -12,7 +12,7 @@ RETURNS integer AS
 $BODY$
 
 /*EXAMPLE
- SELECT SCHEMA_NAME.gw_fct_pg2epa('test1', false)  
+ SELECT SCHEMA_NAME.gw_fct_pg2epa('test1', false, false, false)  
 */
 
 DECLARE
@@ -30,8 +30,6 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	SELECT * INTO rec_options FROM inp_options;
-	
-	SELECT isrecursive FROM 
 
 	RAISE NOTICE 'Starting pg2epa process.';
 	
