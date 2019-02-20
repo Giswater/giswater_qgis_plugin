@@ -286,6 +286,11 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+		
+		-- rotation
+		IF NEW.rotation != OLD.rotation THEN
+			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
+		END IF;
 			
 		-- The geom
 		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN

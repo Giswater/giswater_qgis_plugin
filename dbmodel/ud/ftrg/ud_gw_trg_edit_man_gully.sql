@@ -270,7 +270,12 @@ BEGIN
 		PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);	
 		END IF;
 
-			--link_path
+		-- rotation
+		IF NEW.rotation != OLD.rotation THEN
+			UPDATE gully SET rotation=NEW.rotation WHERE gully_id = OLD.gully_id;
+		END IF;		
+		
+		--link_path
 		SELECT link_path INTO link_path_aux FROM gully_type WHERE id=NEW.gully_type;
 		IF link_path_aux IS NOT NULL THEN
 			NEW.link = replace(NEW.link, link_path_aux,'');
