@@ -1264,7 +1264,7 @@ class UpdateSQL(ParentAction):
                                 if status is False:
                                     status=False
                     else:
-                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
+                        if str(sub_folder) <= str(self.version_metadata).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + '/' + sub_folder + '/utils/',
                                                    '') is False:
                                 status=False
@@ -1395,10 +1395,11 @@ class UpdateSQL(ParentAction):
         available = False
         for row in rows:
             if str(project_name) == str(row[0]):
-                msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(project_name) + "_bk' ?"
+                i = 0
+                msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
+                    project_name) + "_bk_" + str(i) + "' ?"
                 result = self.controller.ask_question(msg, "Info")
                 if result:
-                    i = 0
                     while available is False:
                         for row in rows:
                             if str(project_name) + "_bk" == str(row[0]) or \

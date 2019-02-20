@@ -194,6 +194,7 @@ class ApiConfig(ApiParent):
 
     def construct_form_param_user(self, row, pos):
 
+        widget = None
         for field in row[pos]['fields']:
             if field['label']:
                 lbl = QLabel()
@@ -282,6 +283,8 @@ class ApiConfig(ApiParent):
                     self.order_widgets(field, self.system_form, lbl, chk, widget)
 
     def construct_form_param_system(self, row, pos):
+
+        widget = None
         for field in row[pos]['fields']:
             if field['label']:
                 lbl = QLabel()
@@ -300,11 +303,11 @@ class ApiConfig(ApiParent):
                     self.populate_combo(widget, field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'check':
+                elif field['widgettype'] == 'checkbox':
                     widget = QCheckBox()
                     if field['value'].lower() == 'true':
                         widget.setChecked(True)
-                    elif field['value'].lower() == 'false':
+                    elif field['value'].lower() == 'FALSE':
                         widget.setChecked(False)
                     widget.stateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
