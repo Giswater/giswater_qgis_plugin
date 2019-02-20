@@ -444,7 +444,7 @@ BEGIN
 
 		-- rotation
 		IF NEW.rotation != OLD.rotation THEN
-			UPDATE node SET rotation=NEW.rotation;
+			UPDATE node SET rotation=NEW.rotation WHERE node_id = OLD.node_id;
 		END IF;
         
 		-- The geom
