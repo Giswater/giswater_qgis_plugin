@@ -231,6 +231,11 @@ BEGIN
         IF (NEW.state != OLD.state) THEN   
 			PERFORM gw_fct_state_control('CONNEC', NEW.connec_id, NEW.state, TG_OP);	
 		END IF;
+		
+		-- rotation
+		IF NEW.rotation != OLD.rotation THEN
+			UPDATE connec SET rotation=NEW.rotation WHERE connec_id = OLD.connec_id;
+		END IF;
 
 		--link_path
 		SELECT link_path INTO link_path_aux FROM connec_type JOIN cat_connec ON cat_connec.connectype_id=connec_type.id WHERE cat_connec.id=NEW.connecat_id;

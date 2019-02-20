@@ -182,7 +182,7 @@ BEGIN
 					NEW.node_2 := nodeRecord2.node_id;
 			ELSE 
 
-				IF ((sys_elev1_aux > sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE) OR ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS TRUE OR geom_slp_direction_bool IS FALSE))) THEN
+				IF (((sys_elev1_aux >= sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE)) OR ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS TRUE)) OR (geom_slp_direction_bool IS FALSE)) THEN
 					NEW.node_1 := nodeRecord1.node_id; 
 					NEW.node_2 := nodeRecord2.node_id;
 					NEW.sys_elev1 := sys_elev1_aux;

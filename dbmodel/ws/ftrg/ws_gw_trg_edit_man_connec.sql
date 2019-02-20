@@ -293,6 +293,11 @@ BEGIN
 				UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.connec_id LIMIT 1)::integer;
 			END IF;
 		END IF;
+		
+		-- rotation
+		IF NEW.rotation != OLD.rotation THEN
+			UPDATE connec SET rotation=NEW.rotation WHERE connec_id = OLD.connec_id;
+		END IF;
 
 		--link_path
 		SELECT link_path INTO link_path_aux FROM connec_type JOIN cat_connec ON cat_connec.connectype_id=connec_type.id WHERE cat_connec.id=NEW.connecat_id;

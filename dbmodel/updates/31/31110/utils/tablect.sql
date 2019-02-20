@@ -26,3 +26,6 @@ FOREIGN KEY (lot_id) REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE
 
 --ALTER TABLE om_visit_file ADD CONSTRAINT selector_workcat_workcat_id_fkey 
 --FOREIGN KEY (filetype) REFERENCES om_visit_lot (filetype, fextension) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+-- 2019/02/20
+ALTER TABLE config_param_system ADD CONSTRAINT config_param_system_parameter_unique UNIQUE (parameter);
