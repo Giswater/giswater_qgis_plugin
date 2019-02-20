@@ -173,11 +173,12 @@ class ApiConfig(ApiParent):
         self.get_event_combo_parent('fields', complet_list[0]['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
-        self.chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
-        self.chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
-
-        self.chk_dma.stateChanged.connect(partial(self.check_child_to_parent, self.chk_dma,self.chk_expl))
-        self.chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  self.chk_expl,self.chk_dma))
+        # TODO:: Descomentar cuando la tabla config param user este populada
+        # self.chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
+        # self.chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
+        #
+        # self.chk_dma.stateChanged.connect(partial(self.check_child_to_parent, self.chk_dma,self.chk_expl))
+        # self.chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  self.chk_expl,self.chk_dma))
 
         # Open form
         self.dlg_config.show()
