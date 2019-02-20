@@ -69,6 +69,10 @@ BEGIN
 	-- Calling for modify the valve status
 	PERFORM gw_fct_pg2epa_valve_status(result_id_var, v_mandatory_nodarc);
 	
+	-- Calling for the export function
+	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(result_id_var);
+	
+	
 	
 
 RETURN check_count_aux;
