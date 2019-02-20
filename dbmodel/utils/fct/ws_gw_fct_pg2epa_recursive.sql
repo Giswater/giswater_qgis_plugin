@@ -13,11 +13,12 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"status":1, "result_id":"test1"}]}}$$)
+"data":{"status":1, "result_id":"test1"}}$$)
 */
 
 DECLARE
-
+v_status integer;
+v_result_id text;
 
 BEGIN
 
@@ -34,17 +35,15 @@ BEGIN
 		RAISE NOTICE 'Starting pg2epa recursive process.';
 				
 		-- test recursive
-		INSERT INTO temp_csv2pg (csv2pgcat_id, source, csv1, csv2) 
-		SELECT 35, v_result_id, row_number() over (order by arc_id), arc_id FROM arc;
+		INSERT INTO temp_table (fprocesscat_id, text_column) 
+		SELECT 35, concat('{','"result_id":"',v_result_id,'", "id":"',row_number() over (order by arc_id),'", "arc_id":"', arc_id, '"}') FROM arc;
 		RETURN (SELECT count(*) FROM arc);
-
 	ELSE
-	
 		RAISE NOTICE 'Finishing pg2epa recursive process.';
-		
-		-- Deleting variable
-		RETURN 0;
 
+		-- test recursive
+		DELETE FROM temp_table WHERE id IN (SELECT id FROM temp_table WHERE fprocesscat_id=35 AND text_column::json->>'result_id'=v_result_id); 
+		RETURN 0;
 	END IF;
 	
 	

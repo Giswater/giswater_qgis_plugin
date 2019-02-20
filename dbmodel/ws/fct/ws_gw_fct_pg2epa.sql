@@ -6,13 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2314
 
-drop function if exists SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean)  ;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_isrecursive boolean)  
 RETURNS integer AS 
 $BODY$
 
 /*EXAMPLE
- SELECT SCHEMA_NAME.gw_fct_pg2epa('test1', false, false, false)  
+ SELECT SCHEMA_NAME.gw_fct_pg2epa('test1', false, false)  
 */
 
 DECLARE
@@ -30,7 +29,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
 	SELECT * INTO rec_options FROM inp_options;
-
+	
 	RAISE NOTICE 'Starting pg2epa process.';
 	
 	IF p_isrecursive IS TRUE THEN
@@ -75,12 +74,11 @@ BEGIN
 	PERFORM gw_fct_pg2epa_valve_status(result_id_var, v_mandatory_nodarc);
 	
 	-- Calling for the export function
-	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(result_id_var);
+	PERFORM gw_fct_utils_csv2pg_export_epanet_inp(result_id_var, null);
 	
 	IF p_isrecursive IS TRUE THEN
-		DELETE FROM temp_csv2pg WHERE csv2pgcat_id=35, source=result_id_var 
-			WHERE csv1 IN (SELECT csv1 FROM temp_csv2pg WHERE csv2pgcat_id=35 AND source=result_id_var LIMIT 1); 
-		IF (SELECT count(*) FROM temp_csv2pg WHERE csv2pgcat_id=35 AND source=result_id_var)>0 THEN
+		DELETE FROM temp_table WHERE id IN (SELECT id FROM temp_table WHERE fprocesscat_id=35 AND text_column::json->>'result_id'=result_id_var LIMIT 1); 
+		IF (SELECT count(*) FROM temp_table WHERE fprocesscat_id=35 AND text_column::json->>'result_id'=result_id_var)>0 THEN
 			RETURN 1;
 		ELSE
 			RETURN 0;
