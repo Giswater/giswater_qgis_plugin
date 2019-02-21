@@ -90,19 +90,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QRadioButton" name="rdb_no_ct">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>Constrains disabled</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item row="6" column="2">
@@ -281,7 +268,6 @@
   <tabstop>rdb_import_data</tabstop>
   <tabstop>rdb_sample</tabstop>
   <tabstop>rdb_sample_dev</tabstop>
-  <tabstop>rdb_no_ct</tabstop>
   <tabstop>data_file</tabstop>
   <tabstop>btn_push_file</tabstop>
   <tabstop>btn_accept</tabstop>

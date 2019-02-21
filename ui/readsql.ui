@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>626</height>
+    <width>345</width>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,6 +18,19 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
+    <item row="4" column="13">
+     <widget class="QPushButton" name="btn_close">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Close</string>
+      </property>
+     </widget>
+    </item>
     <item row="4" column="2">
      <widget class="QLabel" name="lbl_status">
       <property name="enabled">
@@ -34,7 +47,7 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="4">
+    <item row="4" column="12">
      <spacer name="horizontalSpacer_2">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -47,20 +60,21 @@
       </property>
      </spacer>
     </item>
-    <item row="4" column="5">
-     <widget class="QPushButton" name="btn_close">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+    <item row="4" column="3">
+     <widget class="QLabel" name="lbl_status_text">
       <property name="text">
-       <string>Close</string>
+       <string/>
       </property>
      </widget>
     </item>
-    <item row="3" column="0" colspan="6">
+    <item row="4" column="4">
+     <widget class="QLabel" name="lbl_schema_name">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="14">
      <widget class="QTabWidget" name="tab_main">
       <property name="enabled">
        <bool>true</bool>
@@ -73,148 +87,105 @@
         <string>General</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="2" column="0">
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Project data schema</string>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="btn_schema_create">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <layout class="QGridLayout" name="gridLayout_6">
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_custom_node_type_4">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Create</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="title">
+           <string>Water project</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label">
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
              </property>
              <property name="text">
-              <string>Date:</string>
+              <string>Project Type:</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="margin">
-              <number>3</number>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_custom_node_type_3">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <property name="text">
-              <string>Author:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="margin">
-              <number>3</number>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="project_schema_last_update">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="project_schema_author">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
+            <widget class="QComboBox" name="cmb_connection">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QComboBox" name="cmb_project_type">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="lbl_connection">
+             <property name="text">
+              <string>Connection name:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+          <zorder>cmb_project_type</zorder>
+          <zorder>label</zorder>
+          <zorder>lbl_connection</zorder>
+          <zorder>cmb_connection</zorder>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Project schema information</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_7">
+           <item row="2" column="2" colspan="2">
             <widget class="QComboBox" name="project_schema_name">
              <property name="enabled">
               <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
              <property name="frame">
               <bool>true</bool>
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="btn_schema_create">
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Create</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_custom_node_type_2">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <property name="text">
-              <string>Title:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="margin">
-              <number>3</number>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="project_schema_title">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
             <widget class="QLabel" name="label_custom_node_type">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="font">
               <font>
                <pointsize>8</pointsize>
@@ -237,114 +208,20 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="2">
-            <widget class="QPushButton" name="btn_delete">
-             <property name="text">
-              <string>Delete</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QPushButton" name="btn_copy">
-             <property name="text">
-              <string>Copy</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QPushButton" name="btn_schema_rename">
-             <property name="text">
-              <string>Rename</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_4">
-          <property name="title">
-           <string>Water project</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <widget class="QLabel" name="lbl_connection">
-             <property name="text">
-              <string>Connection name:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QComboBox" name="cmb_project_type">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="cmb_connection">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label">
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
-             <property name="text">
-              <string>Project Type:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-          </layout>
-          <zorder>cmb_project_type</zorder>
-          <zorder>horizontalSpacer</zorder>
-          <zorder>label</zorder>
-          <zorder>lbl_connection</zorder>
-          <zorder>cmb_connection</zorder>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QGroupBox" name="groupBox_3">
-          <property name="title">
-           <string>Information about versions</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_7">
-           <item row="1" column="0" colspan="4">
+           <item row="4" column="1" colspan="4">
             <widget class="QTextEdit" name="software_version_info">
              <property name="enabled">
               <bool>false</bool>
              </property>
             </widget>
            </item>
-           <item row="0" column="3">
+           <item row="2" column="4">
             <widget class="QPushButton" name="btn_info">
              <property name="enabled">
               <bool>true</bool>
              </property>
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -370,6 +247,9 @@
              <property name="checkable">
               <bool>false</bool>
              </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
              <property name="default">
               <bool>false</bool>
              </property>
@@ -378,18 +258,48 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+           <item row="5" column="1" colspan="4">
+            <layout class="QGridLayout" name="gridLayout_6">
+             <item row="2" column="1">
+              <widget class="QPushButton" name="btn_delete">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Delete</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QPushButton" name="btn_copy">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Copy</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QPushButton" name="btn_schema_rename">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Rename</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -401,19 +311,6 @@
         <string>Schema Manager</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <item row="3" column="1">
-         <widget class="QPushButton" name="btn_schema_file_to_db">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>File to DB</string>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="1">
          <spacer name="verticalSpacer_2">
           <property name="orientation">
@@ -433,6 +330,22 @@
            <string>Update</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
+           <item row="0" column="1">
+            <widget class="QPushButton" name="btn_update_schema">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Execute</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_5">
              <property name="font">
@@ -446,16 +359,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="btn_update_schema">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>Execute</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -465,36 +368,7 @@
            <string>Reload</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_9">
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Reload triggers</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="chk_schema_trigger">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
+           <item row="0" column="0">
             <widget class="QLabel" name="label_30">
              <property name="font">
               <font>
@@ -507,20 +381,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Reload constraints</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
+           <item row="0" column="1">
             <widget class="QCheckBox" name="chk_schema_funcion">
              <property name="text">
               <string/>
@@ -536,23 +397,20 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="chk_schema_fk">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
           </layout>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="btn_schema_file_to_db">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>File to DB</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -577,6 +435,12 @@
         </item>
         <item row="2" column="1">
          <widget class="QPushButton" name="btn_api_file_to_db">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>File to DB</string>
           </property>
@@ -588,40 +452,8 @@
            <string>Reload</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_12">
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="chk_api_trigger">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="chk_api_fk">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>19</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_10">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_34">
              <property name="font">
               <font>
                <weight>50</weight>
@@ -629,11 +461,11 @@
               </font>
              </property>
              <property name="text">
-              <string>Reload triggers</string>
+              <string>Reload functions &amp; trigger functions      </string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="0" column="1">
             <widget class="QCheckBox" name="chk_api_funcion">
              <property name="text">
               <string/>
@@ -646,32 +478,6 @@
              </property>
              <property name="checked">
               <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Reload constraints</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_34">
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Reload functions &amp; trigger functions      </string>
              </property>
             </widget>
            </item>
@@ -699,6 +505,12 @@
           <layout class="QGridLayout" name="gridLayout_13">
            <item row="0" column="1">
             <widget class="QPushButton" name="btn_update_api">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>Execute</string>
              </property>
@@ -740,10 +552,22 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="btn_custom_select_file">
+           <item row="1" column="2">
+            <widget class="QPushButton" name="btn_custom_load_file">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
              <property name="text">
-              <string>...</string>
+              <string>Load SQL custom file</string>
              </property>
             </widget>
            </item>
@@ -771,22 +595,16 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="QPushButton" name="btn_custom_load_file">
+           <item row="0" column="2">
+            <widget class="QPushButton" name="btn_custom_select_file">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
              <property name="text">
-              <string>Load SQL custom file</string>
+              <string>...</string>
              </property>
             </widget>
            </item>
@@ -810,13 +628,6 @@
       </widget>
      </widget>
     </item>
-    <item row="4" column="3">
-     <widget class="QLabel" name="lbl_status_text">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <action name="action_create_sample">
@@ -833,25 +644,15 @@
  <tabstops>
   <tabstop>cmb_connection</tabstop>
   <tabstop>cmb_project_type</tabstop>
-  <tabstop>project_schema_name</tabstop>
-  <tabstop>project_schema_title</tabstop>
-  <tabstop>project_schema_author</tabstop>
-  <tabstop>project_schema_last_update</tabstop>
-  <tabstop>btn_schema_create</tabstop>
   <tabstop>btn_close</tabstop>
   <tabstop>btn_update_schema</tabstop>
   <tabstop>tab_main</tabstop>
-  <tabstop>btn_info</tabstop>
   <tabstop>software_version_info</tabstop>
   <tabstop>btn_custom_load_file</tabstop>
-  <tabstop>chk_schema_fk</tabstop>
   <tabstop>chk_schema_funcion</tabstop>
-  <tabstop>chk_schema_trigger</tabstop>
   <tabstop>btn_schema_file_to_db</tabstop>
   <tabstop>btn_update_api</tabstop>
-  <tabstop>chk_api_fk</tabstop>
   <tabstop>chk_api_funcion</tabstop>
-  <tabstop>chk_api_trigger</tabstop>
   <tabstop>btn_api_file_to_db</tabstop>
   <tabstop>btn_api_create</tabstop>
   <tabstop>custom_path_folder</tabstop>

@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView
+from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView,QLabel
 from PyQt4.QtGui import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand, QPixmap
 from PyQt4.QtCore import QSettings, Qt
 
@@ -77,16 +77,13 @@ class UpdateSQL(ParentAction):
         self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
         self.btn_update_schema = self.dlg_readsql.findChild(QPushButton, 'btn_update_schema')
         self.btn_update_api = self.dlg_readsql.findChild(QPushButton, 'btn_update_api')
+        self.lbl_schema_name = self.dlg_readsql.findChild(QLabel, 'lbl_schema_name')
 
         # Checkbox SCHEMA & API
         self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
-        self.chk_schema_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_fk')
         self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
-        self.chk_schema_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_trigger')
         self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
-        self.chk_api_fk = self.dlg_readsql.findChild(QCheckBox, 'chk_api_fk')
         self.chk_api_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_api_funcion')
-        self.chk_api_trigger = self.dlg_readsql.findChild(QCheckBox, 'chk_api_trigger')
         self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
         btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
@@ -171,10 +168,6 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
 
-
-        #TODO:: QGIS project file (hidden)
-        # self.dlg_readsql.btn_qgis_project_create.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "path_folder"))
-
         self.dlg_readsql.btn_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
         self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, self.project_type_selected))
         self.dlg_readsql.btn_update_api.clicked.connect(partial(self.update_api))
@@ -195,7 +188,7 @@ class UpdateSQL(ParentAction):
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
 
         # Open dialog
-        self.dlg_readsql.setWindowTitle('Giswater - ' + str(self.plugin_version))
+        self.dlg_readsql.setWindowTitle('Giswater (' + str(utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)) + ' - ' + str(self.plugin_version) + ')')
         self.dlg_readsql.show()
 
         if connection_status is False:
@@ -639,8 +632,6 @@ class UpdateSQL(ParentAction):
 
         else:
             if not os.path.exists(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + ''):
-                # self.controller.show_message("The project_type folder was not found in sql folder.", 1)
-                # self.error_count = self.error_count + 1
                 return
             folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + '')
             for folder in folders:
@@ -883,8 +874,6 @@ class UpdateSQL(ParentAction):
 
         else:
             if not os.path.exists(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + ''):
-                # self.controller.show_message("The project_type folder was not found in sql folder.", 1)
-                # self.error_count = self.error_count + 1
                 return
             folders = os.listdir(self.sql_dir + '/' + str(project_type) + '/' + '\updates/' + '')
             for folder in folders:
@@ -1427,14 +1416,7 @@ class UpdateSQL(ParentAction):
             self.execute_import_data()
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
-            
-        elif self.rdb_no_ct.isChecked():
-            self.load_base_no_ct(project_type=project_type)
-            self.update_30to31(new_project=True, project_type=project_type)
-            self.load_views(project_type=project_type)
-            self.update_31to39(new_project=True, project_type=project_type, no_ct=True)
-            self.api(project_type=project_type)
-            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+
             
         elif self.rdb_sample.isChecked():
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
@@ -1879,13 +1861,11 @@ class UpdateSQL(ParentAction):
     
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
+        # Set label schema name
+        self.lbl_schema_name.setText('-  ' + str(schema_name))
+
         if schema_name is None:
-            utils_giswater.setWidgetText(self.dlg_readsql,
-                                         self.dlg_readsql.project_schema_title, '')
-            utils_giswater.setWidgetText(self.dlg_readsql,
-                                         self.dlg_readsql.project_schema_author, '')
-            utils_giswater.setWidgetText(self.dlg_readsql,
-                                         self.dlg_readsql.project_schema_last_update, '')
+
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
         else:
@@ -1893,22 +1873,13 @@ class UpdateSQL(ParentAction):
             row = self.controller.get_row(sql)
             if row is None:
                 result = ['{"title":"","author":"","date":""}']
-                utils_giswater.setWidgetText(self.dlg_readsql,
-                                             self.dlg_readsql.project_schema_title, '')
-                utils_giswater.setWidgetText(self.dlg_readsql,
-                                             self.dlg_readsql.project_schema_author, '')
             else:
                 result = [json.loads(row[0])]
-                utils_giswater.setWidgetText(self.dlg_readsql,
-                                             self.dlg_readsql.project_schema_title, result[0]['title'])
-                utils_giswater.setWidgetText(self.dlg_readsql,
-                                             self.dlg_readsql.project_schema_author, result[0]['author'])
+
             sql = "SELECT giswater, date::date FROM " + schema_name + ".version order by id desc LIMIT 1"
             row = self.controller.get_row(sql)
             if row is not None:
                 self.project_data_schema_version = str(row[0])
-                utils_giswater.setWidgetText(self.dlg_readsql,
-                                            self.dlg_readsql.project_schema_last_update, str(row[1]))
 
         # Get parameters
         sql = ("SELECT version();")
@@ -1935,18 +1906,16 @@ class UpdateSQL(ParentAction):
 
         self.software_version_info.setText('Database version: ' + str(database_version[0]) + '\n' +
                                            '' + str(postgis_version[0]) + ' \n \n' +
-                                           'Schema name: ' + schema_name + '\n' +
-                                           'Schema version: ' + self.project_data_schema_version + ' \n \n' +
-                                           'Schema Title: ' + str(result[0]['title']) + '\n' +
-                                           'Schema Author: ' + str(result[0]['author']) + '\n' +
-                                           'Schema Date: ' + str(result[0]['date']))
+                                           'Name: ' + schema_name + '\n' +
+                                           'Version: ' + self.project_data_schema_version + ' \n' +
+                                           'Title: ' + str(result[0]['title']) + '\n' +
+                                           'Author: ' + str(result[0]['author']) + '\n' +
+                                           'Date: ' + str(result[0]['date']))
 
-        # Enable or Disable rename button according schema version
-        if str(self.version_metadata) != str(self.project_data_schema_version):
-            self.dlg_readsql.btn_schema_rename.setEnabled(False)
-        else:
-            self.dlg_readsql.btn_schema_rename.setEnabled(True)
-
+        # Update windowTitle
+        self.dlg_readsql.setWindowTitle('Giswater (' + str(
+            utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)) + ' - ' + str(
+            self.plugin_version) + ')')
 
     def process_folder(self, folderPath, filePattern):
     
@@ -1963,20 +1932,11 @@ class UpdateSQL(ParentAction):
         
     def schema_file_to_db(self):
 
-        if self.chk_schema_fk.isChecked():
-            self.set_wait_cursor()
-            self.reload_tablect(self.project_type_selected)
-            self.set_arrow_cursor()
-
         if self.chk_schema_funcion.isChecked():
             self.set_wait_cursor()
             self.reload_fct_ftrg(self.project_type_selected)
             self.set_arrow_cursor()
 
-        if self.chk_schema_trigger.isChecked():
-            self.set_wait_cursor()
-            self.reload_trg(self.project_type_selected)
-            self.set_arrow_cursor()
 
         # Show message if precess execute correctly
         if self.error_count == 0:
@@ -1995,17 +1955,9 @@ class UpdateSQL(ParentAction):
         
     def api_file_to_db(self):
 
-        if self.chk_api_fk.isChecked():
-            self.set_wait_cursor()
-            self.reload_tablect('api')
-            self.set_arrow_cursor()
         if self.chk_api_funcion.isChecked():
             self.set_wait_cursor()
             self.reload_fct_ftrg('api')
-            self.set_arrow_cursor()
-        if self.chk_api_trigger.isChecked():
-            self.set_wait_cursor()
-            self.reload_trg('api')
             self.set_arrow_cursor()
 
         # Show message if precess execute correctly
@@ -2035,7 +1987,6 @@ class UpdateSQL(ParentAction):
         self.project_author = self.dlg_readsql_create_project.findChild(QLineEdit, 'author')
         self.project_date = self.dlg_readsql_create_project.findChild(QLineEdit, 'date')
 
-        self.rdb_no_ct = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_no_ct')
         self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
         self.rdb_sample_dev = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_dev')
         self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
@@ -2046,7 +1997,6 @@ class UpdateSQL(ParentAction):
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
                 
         if self.dev_user != 'TRUE':
-            self.rdb_no_ct.setEnabled(False)
             self.rdb_sample_dev.setEnabled(False)
 
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
@@ -2064,10 +2014,10 @@ class UpdateSQL(ParentAction):
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type))
         self.change_project_type(self.cmb_create_project_type)
 
-        # enable_disable data file widgets
+        # Enable_disable data file widgets
         self.enable_datafile()
 
-        #Get combo locale
+        # Get combo locale
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
 
         # Set listeners
@@ -2096,6 +2046,12 @@ class UpdateSQL(ParentAction):
         
     def open_rename(self):
     
+        # Open rename if schema is updated
+        if str(self.version_metadata) != str(self.project_data_schema_version):
+            msg = "The schema version has to be updated to make rename ."
+            result = self.controller.show_info_box(msg, "Info")
+            return
+
         # Create dialog
         self.dlg_readsql_rename = ReadsqlRename()
         self.load_settings(self.dlg_readsql_rename)
