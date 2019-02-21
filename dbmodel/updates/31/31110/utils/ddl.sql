@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -36,12 +36,14 @@ ALTER TABLE audit_cat_param_user ADD COLUMN iseditable boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN dv_orderby_id boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN dv_isnullvalue boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN stylesheet json;
+ALTER TABLE audit_cat_param_user ADD COLUMN placeholder text;
 
 
 ALTER TABLE rpt_cat_result ADD COLUMN user_name text;
 ALTER TABLE rpt_cat_result ALTER COLUMN user_name SET DEFAULT current_user;
 
 ALTER TABLE dma ADD COLUMN effc double precision;
+ALTER TABLE dma ADD COLUMN pattern_id double precision;
 
 ALTER TABLE audit_cat_function ADD COLUMN istoolbox boolean;
 ALTER TABLE audit_cat_function ADD COLUMN alias varchar(30);
@@ -68,6 +70,7 @@ ALTER TABLE config_param_system ADD COLUMN dv_orderby_id boolean;
 ALTER TABLE config_param_system ADD COLUMN dv_isnullvalue boolean;
 ALTER TABLE config_param_system ADD COLUMN stylesheet json;
 ALTER TABLE config_param_system ADD COLUMN widgetcontrols json;
+ALTER TABLE config_param_system ADD COLUMN placeholder text;
 
 
 

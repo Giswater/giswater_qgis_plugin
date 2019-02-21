@@ -82,7 +82,8 @@ BEGIN
 		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, reg_exp,
 		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked,
 		(CASE WHEN (widgetcontrols->>''minValue'') IS NOT NULL THEN widgetcontrols->>''minValue'' ELSE NULL END) AS minvalue,
-		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue
+		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue,
+		placeholder
 		FROM SCHEMA_NAME.audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 		AND formname ='||quote_literal(lower(v_formname))||'
@@ -97,7 +98,8 @@ BEGIN
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		 SELECT label, audit_cat_param_user.id as widgetname, datatype, widgettype, layout_id, layout_order,layout_name,
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		 row_number()over(ORDER BY layout_id, layout_order) AS orderby, value,project_type, dv_querytext,dv_parent_id, isparent, sys_role_id
+		 row_number()over(ORDER BY layout_id, layout_order) AS orderby, value,project_type, dv_querytext,dv_parent_id, isparent, sys_role_id,
+		 placeholder
 		 FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		 WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
   		 AND formname ='||quote_literal(lower(v_formname))||'
@@ -131,7 +133,8 @@ BEGIN
 				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, audit_cat_param_user.id as widgetname, datatype, widgettype, 
 					layout_id, layout_order,layout_name,
 					(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-					project_type, dv_querytext,dv_querytext_filterc,dv_parent_id, isparent, sys_role_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby
+					project_type, dv_querytext,dv_querytext_filterc,dv_parent_id, isparent, sys_role_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby,
+					placeholder
 					FROM audit_cat_param_user WHERE dv_parent_id='||quote_literal(aux_json->>'widgetname')||') a WHERE widgettype = ''combo'''
 					INTO combo_rows_child;
 					combo_rows_child := COALESCE(combo_rows_child, '{}');
@@ -199,14 +202,16 @@ BEGIN
 		-- Get fields for admin enabled
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
 			widgettype, datatype, layout_id, layout_order, row_number() over (order by layout_id, layout_order) as orderby, tooltip, 
-			(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable
+			(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
+			placeholder
 			FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
 			INTO fields_array;
 
 	ELSE 
 		-- Get fields for admin disabled (only to show)
 		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
-			widgettype, datatype, layout_id, layout_order, row_number() over (order by layout_id, layout_order) as orderby, tooltip, FALSE AS iseditable
+			widgettype, datatype, layout_id, layout_order, row_number() over (order by layout_id, layout_order) as orderby, tooltip, FALSE AS iseditable,
+			placeholder
 			FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
 			INTO fields_array;
 	END IF;

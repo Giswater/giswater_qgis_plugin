@@ -15,7 +15,7 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_demand_multiplier', 'epaop
 INSERT INTO audit_cat_param_user VALUES ('inp_options_emitter_exponent', 'epaoptions', NULL, 'role_epa', NULL, 'EMITTER EXPONENT', 'Emitter exponent:', NULL, NULL, true, 3, 2, 'ws', NULL, NULL, NULL, NULL, NULL, 'float', 'text', true, '{"minValue":0.001, "maxValue":100}', '0.5', 'grl_hyd_3', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_options_maxcheck', 'epaoptions', NULL, 'role_epa', NULL, 'MAXCHECK', 'Max check:', NULL, NULL, true, 3, 4, 'ws', NULL, NULL, NULL, NULL, NULL, 'float', 'text', true, '{"minValue":0.001, "maxValue":100}', '10.00', 'grl_hyd_3', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_report_links', 'epaoptions', NULL, 'role_epa', NULL, 'LINKS', 'Links:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 13, 9, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'ALL', 'grl_reports_17', NULL, false);
-INSERT INTO audit_cat_param_user VALUES ('inp_options_rtc_coefficient', 'epaoptions', NULL, 'role_epa', NULL, 'RTC_COEFFICIENT', 'Coefficient:', NULL, NULL, true, 10, 1, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_crm_10', NULL);
+INSERT INTO audit_cat_param_user VALUES ('inp_options_rtc_coefficient', 'epaoptions', NULL, 'role_epa', NULL, 'RTC_COEFFICIENT', 'Coefficient:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_opti_rtc_coef''', NULL, true, 10, 1, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, NULL, 'grl_crm_10', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_options_specific_gravity', 'epaoptions', NULL, 'role_epa', NULL, 'SPECIFIC GRAVITY', 'Specific gravety:', NULL, NULL, true, 4, 5, 'ws', NULL, NULL, NULL, NULL, NULL, 'float', 'text', true, '{"minValue":0.001, "maxValue":100}', '1.00', 'grl_hyd_4', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_options_trials', 'epaoptions', NULL, 'role_epa', NULL, 'TRIALS', 'Trials:', NULL, NULL, true, 3, 5, 'ws', NULL, NULL, NULL, NULL, NULL, 'float', 'text', true, '{"minValue":0.001, "maxValue":100}', '40.00', 'grl_hyd_3', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_options_unbalanced_n', 'epaoptions', NULL, 'role_epa', NULL, 'UNBALANCED_N', 'Unbalanced n:', NULL, NULL, true, 4, 7, 'ws', NULL, NULL, NULL, NULL, NULL, 'float', 'text', true, '{"minValue":0.001, "maxValue":100}', '40.00', 'grl_hyd_4', NULL);
@@ -24,7 +24,7 @@ INSERT INTO audit_cat_param_user VALUES ('inp_report_energy', 'epaoptions', NULL
 INSERT INTO audit_cat_param_user VALUES ('inp_report_pagesize', 'epaoptions', NULL, 'role_epa', NULL, 'PAGESIZE', 'Pagesize:', NULL, NULL, true, 14, 2, 'ws', NULL, NULL, NULL, NULL, NULL, 'integer', 'text', true, NULL, NULL, 'grl_reports_18', NULL, false);
 INSERT INTO audit_cat_param_user VALUES ('inp_report_status', 'epaoptions', NULL, 'role_epa', NULL, 'STATUS', 'Status:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesnofull''', NULL, true, 14, 7, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'YES', 'grl_reports_18', NULL, false);
 INSERT INTO audit_cat_param_user VALUES ('inp_times_duration', 'epaoptions', NULL, 'role_epa', NULL, 'DURATION', 'Duration:', NULL, NULL, true, 11, 1, 'ws', NULL, NULL, NULL, NULL, NULL, 'integer', 'text', true, '{"minValue":0.001, "maxValue":100}', '24', 'grl_date_13', '[\d]+:[0-5][0-9]:[0-5][0-9]');
-INSERT INTO audit_cat_param_user VALUES ('inp_options_rtc_period_id', 'epaoptions', NULL, 'role_epa', NULL, 'RTC_PERIOD_ID', 'Time period:', NULL, NULL, true, 9, 2, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_crm_9', NULL);
+INSERT INTO audit_cat_param_user VALUES ('inp_options_rtc_period_id', 'epaoptions', NULL, 'role_epa', NULL, 'RTC_PERIOD_ID', 'Time period:', 'SELECT id AS id, code AS idval FROM ext_cat_period', NULL, true, 9, 2, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_crm_9', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_options_node_id', 'epaoptions', NULL, 'role_epa', NULL, 'NODE_ID', 'Node id:', NULL, NULL, true, 6, 1, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_quality_6', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_times_quality_timestep', 'epaoptions', NULL, 'role_epa', NULL, 'QUALITY TIMESTEP', 'Quality timestep:', NULL, NULL, true, 11, 3, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_13', '[\d]+:[0-5][0-9]:[0-5][0-9]');
 INSERT INTO audit_cat_param_user VALUES ('inp_options_viscosity', 'epaoptions', NULL, 'role_epa', NULL, 'VISCOSITY', 'Viscosity:', NULL, NULL, true, 3, 7, 'ws', NULL, NULL, NULL, NULL, NULL, 'float', 'text', true, '{"minValue":0.001, "maxValue":100}', '1.00', 'grl_hyd_3', NULL);
@@ -36,11 +36,11 @@ INSERT INTO audit_cat_param_user VALUES ('inp_report_file', 'epaoptions', NULL, 
 INSERT INTO audit_cat_param_user VALUES ('inp_report_flow', 'epaoptions', NULL, 'role_epa', NULL, 'FLOW', 'Flow:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 13, 6, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'YES', 'grl_reports_17', NULL, false);
 INSERT INTO audit_cat_param_user VALUES ('inp_report_head', 'epaoptions', NULL, 'role_epa', NULL, 'HEAD', 'Head:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 13, 7, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'YES', 'grl_reports_17', NULL, false);
 INSERT INTO audit_cat_param_user VALUES ('inp_report_length', 'epaoptions', NULL, 'role_epa', NULL, 'LENGTH', 'Length:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 13, 8, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'YES', 'grl_reports_17', NULL, false);
-INSERT INTO audit_cat_param_user VALUES ('inp_times_pattern_timestep', 'epaoptions', NULL, 'role_epa', NULL, 'PATTERN TIMESTEP', 'Pattern timestep:', NULL, NULL, true, 11, 2, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_13', '[\d]+:[0-5][0-9]:[0-5][0-9]');
-INSERT INTO audit_cat_param_user VALUES ('inp_times_report_start', 'epaoptions', NULL, 'role_epa', NULL, 'REPORT START', 'Report start:', NULL, NULL, true, 12, 3, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_14', '[\d]+:[0-5][0-9]:[0-5][0-9]');
-INSERT INTO audit_cat_param_user VALUES ('inp_times_report_timestep', 'epaoptions', NULL, 'role_epa', NULL, 'REPORT TIMESTEP', 'Report timestep:', NULL, NULL, true, 11, 4, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_13', '[\d]+:[0-5][0-9]:[0-5][0-9]');
-INSERT INTO audit_cat_param_user VALUES ('inp_times_rule_timestep', 'epaoptions', NULL, 'role_epa', NULL, 'RULE TIMESTEP', 'Rule timestep:', NULL, NULL, true, 12, 4, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_14', '[\d]+:[0-5][0-9]:[0-5][0-9]');
-INSERT INTO audit_cat_param_user VALUES ('inp_times_start_clocktime', 'epaoptions', NULL, 'role_epa', NULL, 'START CLOCKTIME', 'Start clocktime:', NULL, NULL, true, 11, 5, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_13', '[\d]+:[0-5][0-9]:[0-5][0-9]');
+INSERT INTO audit_cat_param_user VALUES ('inp_times_pattern_timestep', 'epaoptions', NULL, 'role_epa', NULL, 'PATTERN TIMESTEP', 'Pattern timestep:', NULL, NULL, true, 11, 2, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_13', '[\d]+:[0-5][0-9]:[0-5][0-9]',null, null, null, null, 'placeholder');
+INSERT INTO audit_cat_param_user VALUES ('inp_times_report_start', 'epaoptions', NULL, 'role_epa', NULL, 'REPORT START', 'Report start:', NULL, NULL, true, 12, 3, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_14', '[\d]+:[0-5][0-9]:[0-5][0-9]',null, null, null, null, 'placeholder');
+INSERT INTO audit_cat_param_user VALUES ('inp_times_report_timestep', 'epaoptions', NULL, 'role_epa', NULL, 'REPORT TIMESTEP', 'Report timestep:', NULL, NULL, true, 11, 4, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_13', '[\d]+:[0-5][0-9]:[0-5][0-9]',null, null, null, null, 'placeholder');
+INSERT INTO audit_cat_param_user VALUES ('inp_times_rule_timestep', 'epaoptions', NULL, 'role_epa', NULL, 'RULE TIMESTEP', 'Rule timestep:', NULL, NULL, true, 12, 4, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_14', '[\d]+:[0-5][0-9]:[0-5][0-9]',null, null, null, null, 'placeholder');
+INSERT INTO audit_cat_param_user VALUES ('inp_times_start_clocktime', 'epaoptions', NULL, 'role_epa', NULL, 'START CLOCKTIME', 'Start clocktime:', NULL, NULL, true, 11, 5, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'text', true, NULL, NULL, 'grl_date_13', '[\d]+:[0-5][0-9]:[0-5][0-9]',null, null, null, null, 'placeholder');
 INSERT INTO audit_cat_param_user VALUES ('inp_report_summary', 'epaoptions', NULL, 'role_epa', NULL, 'SUMMARY', 'Summary:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 14, 8, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'YES', 'grl_reports_18', NULL, false);
 INSERT INTO audit_cat_param_user VALUES ('inp_report_velocity', 'epaoptions', NULL, 'role_epa', NULL, 'VELOCITY', 'Velocity:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 14, 9, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'YES', 'grl_reports_18', NULL, false);
 INSERT INTO audit_cat_param_user VALUES ('inp_options_quality_mode', 'epaoptions', NULL, 'role_epa', NULL, 'QUALITY', 'Quality Mode:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_opti_qual''', NULL, true, 5, 1, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'NONE', 'grl_quality_5', NULL);
@@ -62,6 +62,7 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_tolerance', 'epaoptions', 
 INSERT INTO audit_cat_param_user VALUES ('inp_options_units', 'epaoptions', NULL, 'role_epa', NULL, 'UNITS', 'Units:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_opti_units''', NULL, true, 1, 2, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'LPS', 'grl_general_1', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_report_nodes', 'epaoptions', NULL, 'role_epa', NULL, 'NODES', 'Nodes:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 14, 1, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'ALL', 'grl_reports_18', NULL, false);
 INSERT INTO audit_cat_param_user VALUES ('inp_times_statistic', 'epaoptions', NULL, 'role_epa', NULL, 'STATISTIC', 'Statistic:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_times''', NULL, true, 12, 5, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'NONE', 'grl_date_14', '[\d]+:[0-5][0-9]:[0-5][0-9]');
+INSERT INTO audit_cat_param_user VALUES ('inp_other_recursive_function', 'epaoptions', NULL, 'role_epa', NULL, 'RECURSIVE', 'Recursive:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_times''', NULL, true, 15, 1, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'NONE', 'grl_other_15');
 
 
 /*
@@ -150,10 +151,10 @@ INSERT INTO audit_cat_param_user VALUES ('waterwellcat_vdefault', 'config', 'Def
 -- Records of inp_typevalue
 -----------------------
 
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'PATTERN_PUMP', 'PATTERN', NULL);
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'HEAD_PUMP', 'HEAD', NULL);
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'SPEED_PUMP', 'SPEED', NULL);
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'POWER_PUMP', 'POWER', NULL);
+--INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'PATTERN_PUMP', 'PATTERN', NULL);
+--INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'HEAD_PUMP', 'HEAD', NULL);
+--INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'SPEED_PUMP', 'SPEED', NULL);
+--INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'POWER_PUMP', 'POWER', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_reactions_gl', 'GLOBAL_GL', 'GLOBAL', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_qual', 'AGE', 'AGE', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_energy', 'DEMAND CHARGE', 'DEMAND CHARGE', NULL);
@@ -237,6 +238,24 @@ INSERT INTO inp_typevalue VALUES ('inp_value_opti_qual', 'TRACE', 'TRACE', NULL)
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_reactions_gl', 'ROUGHNESS CORRELATION', 'ROUGHNESS CORRELATION', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_reactions_gl', 'ORDER', 'ORDER', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_reactions_gl', 'LIMITING POTENTIAL', 'LIMITING POTENTIAL', NULL);
+
+
+
+UPDATE inp_energy_gl SET parameter='GLOBAL_GL' WHERE parameter='GLOBAL';
+UPDATE inp_energy_gl SET parameter='BULK_GL' WHERE parameter='BULK';
+UPDATE inp_energy_gl SET parameter='TANK_GL' WHERE parameter='TANK';
+UPDATE inp_energy_gl SET parameter='WALL_GL' WHERE parameter='WALL';
+UPDATE inp_energy_el SET parameter='BULK_EL' WHERE parameter='BULK';
+UPDATE inp_energy_el SET parameter='TANK_EL' WHERE parameter='TANK';
+UPDATE inp_energy_el SET parameter='WALL_EL' WHERE parameter='WALL';
+UPDATE inp_pipe SET status='CLOSED_PIPE' WHERE status='CLOSED';
+UPDATE inp_pipe SET status='CV_PIPE' WHERE status='CV';
+UPDATE inp_pipe SET status='OPEN_PIPE' WHERE status='OPEN';
+UPDATE inp_pump SET status='CLOSED_PUMP' WHERE status='CLOSED';
+UPDATE inp_pump SET status='OPEN_PUMP' WHERE status='OPEN';
+UPDATE inp_valve SET status='OPEN_VALVE' WHERE status='OPEN';
+UPDATE inp_valve SET status='ACTIVE_VALVE' WHERE status='ACTIV';
+UPDATE inp_valve SET status='CLOSED_VALVE' WHERE status='CLOSED';
 
 
 -----------------------

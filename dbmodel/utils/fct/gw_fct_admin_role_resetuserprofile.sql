@@ -12,13 +12,13 @@ $BODY$
 
 /* example
 -- reset values
-SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"user1", "values":{}}$$)
 
 -- taking values from another user
-SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{"copyFromUserSameRole":"postgres"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"user1", "values":{"copyFromUserSameRole":"user2"}}$$)
 
 -- Setting specific values (todo)
-SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{"exploitation":{1,2,3}, "state":{1}}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"user1", "values":{"exploitation":{1,2,3}, "state":{1}}}$$)
 */
 
 
@@ -63,16 +63,16 @@ BEGIN
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, v_user FROM selector_expl WHERE cur_user=v_copyfromuser;
 		INSERT INTO selector_psector (psector_id, cur_user) SELECT psector_id, v_user FROM selector_psector WHERE cur_user=v_copyfromuser;
 		INSERT INTO selector_state (state_id, cur_user) SELECT state_id, v_user FROM selector_state WHERE cur_user=v_copyfromuser;
-		INSERT INTO selector_date (state_id, cur_user) SELECT state_id, v_user FROM selector_date WHERE cur_user=v_copyfromuser;
+		INSERT INTO selector_date (from_date, to_date, context, cur_user) SELECT from_date, to_date, context, v_user FROM selector_date WHERE cur_user=v_copyfromuser;
 		INSERT INTO selector_hydrometer (state_id, cur_user) SELECT state_id, v_user FROM selector_hydrometer WHERE cur_user=v_copyfromuser;
-		INSERT INTO selector_workcat (state_id, cur_user) SELECT state_id, v_user FROM selector_workcat WHERE cur_user=v_copyfromuser;
+		INSERT INTO selector_workcat (workcat_id, cur_user) SELECT workcat_id, v_user FROM selector_workcat WHERE cur_user=v_copyfromuser;
 	
 		-- role epa
 		DELETE FROM inp_selector_sector WHERE cur_user=v_user;
 		DELETE FROM inp_selector_result WHERE cur_user=v_user;
 		
 		INSERT INTO inp_selector_sector (sector_id, cur_user) SELECT sector_id, v_user FROM inp_selector_sector WHERE cur_user=v_copyfromuser;
-		INSERT INTO inp_selector_result (sector_id, cur_user) SELECT sector_id, v_user FROM inp_selector_result WHERE cur_user=v_copyfromuser;
+		INSERT INTO inp_selector_result (result_id, cur_user) SELECT result_id, v_user FROM inp_selector_result WHERE cur_user=v_copyfromuser;
 		
 		IF v_projecttype ='UD' THEN
 			DELETE FROM inp_selector_hydrology WHERE cur_user=v_user;

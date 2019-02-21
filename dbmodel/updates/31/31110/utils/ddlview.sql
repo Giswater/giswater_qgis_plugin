@@ -296,7 +296,7 @@ CREATE OR REPLACE VIEW ve_visit_user_manager AS
   WHERE b.user_id::name = "current_user"();
   
 
-  
+drop view IF EXISTS v_ui_element_x_connec;
 CREATE OR REPLACE VIEW v_ui_element_x_connec AS
 SELECT
 element_x_connec.id,
