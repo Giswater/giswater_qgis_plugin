@@ -7,9 +7,10 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2648
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_fk(p_data)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_fk(p_data json)
   RETURNS void AS
 $BODY$
+
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_fk($${
 "client":{"lang":"ES"}, 
@@ -25,6 +26,7 @@ DECLARE
 	v_schemaname text;
 	v_tablerecord record;
 	v_query_text text;
+	v_action text;
 BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -33,10 +35,11 @@ BEGIN
 	v_action = (p_data->>'data')::json->>'action';
 
 	IF v_action = 'DROP' THEN
-	
+
 		-- Insert fk on temp_table
-		INSERT INTO ws_sample.temp_table (fprocesscat_id, text_column)
-		SELECT 
+		DELETE FROM SCHEMA_NAME.temp_table WHERE fprocesscat_id=36;
+		INSERT INTO SCHEMA_NAME.temp_table (fprocesscat_id, text_column)
+		SELECT distinct on (conname)
 		36,
 		concat(
 		'{"tablename":"',
@@ -51,12 +54,14 @@ BEGIN
 		join   information_schema.table_constraints tc ON conname=constraint_name
 		WHERE  contype IN ('f', 'p ')
 		AND constraint_type = 'FOREIGN KEY'
-		ORDER  BY conrelid::regclass::text, contype DESC;
+		AND nspname =v_schemaname;
 
 		-- Drop fk
-		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=36
+		FOR v_tablerecord IN SELECT * FROM SCHEMA_NAME.temp_table WHERE fprocesscat_id=36
 		LOOP
-			v_query_text:= 'DROP CONSTRAINT IF EXISTS '||v_tablerecord.id::json->>'constraintname'||';';
+			v_query_text:= 'ALTER TABLE '||((v_tablerecord.text_column)::json->>'tablename')||
+				       ' DROP CONSTRAINT IF EXISTS '||((v_tablerecord.text_column)::json->>'constraintname')||';';
+			raise notice 'asgsdg %',v_query_text;
 			EXECUTE v_query_text;
 		END LOOP;
 	
@@ -64,9 +69,9 @@ BEGIN
 		
 		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=36
 		LOOP
-			v_query_text:=  'ALTER TABLE '||v_tablerecord.id::json->>'tablename'|| 
-							' ADD CONSTRAINT '||v_tablerecord.id::json->>'constraintname'||
-							' '||v_tablerecord.id::json->>'definition';
+			v_query_text:=  'ALTER TABLE '||((v_tablerecord.text_column::json)->>'tablename')|| 
+							' ADD CONSTRAINT '||((v_tablerecord.text_column::json)->>'constraintname')||
+							' '||((v_tablerecord.text_column::json)->>'definition');
 			EXECUTE v_query_text;
 		END LOOP;
 		
