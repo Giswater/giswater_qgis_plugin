@@ -1508,11 +1508,16 @@ class UpdateSQL(ParentAction):
         
     def rename_project_data_schema(self, schema, create_project=None):
 
-        self.set_wait_cursor()
         if create_project is None or create_project is False:
             self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
+            if str(self.schema) == str(schema):
+                msg = "Please, select a diferent project name than current."
+                result = self.controller.show_info_box(msg, "Info")
+                return
         else:
             self.schema = str(create_project)
+
+        self.set_wait_cursor()
         sql = 'ALTER SCHEMA ' + str(schema) + ' RENAME TO ' + str(self.schema) + ''
         status = self.controller.execute_sql(sql, commit=False)
         if status:
@@ -1884,18 +1889,20 @@ class UpdateSQL(ParentAction):
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
         else:
-            sql = "SELECT title, author FROM " + schema_name + ".inp_project_id"
+            sql = "SELECT value FROM " + schema_name + ".config_param_system WHERE parameter = 'schema_manager'"
             row = self.controller.get_row(sql)
             if row is None:
+                result = ['{"title":"","author":"","date":""}']
                 utils_giswater.setWidgetText(self.dlg_readsql,
                                              self.dlg_readsql.project_schema_title, '')
                 utils_giswater.setWidgetText(self.dlg_readsql,
                                              self.dlg_readsql.project_schema_author, '')
             else:
+                result = [json.loads(row[0])]
                 utils_giswater.setWidgetText(self.dlg_readsql,
-                                             self.dlg_readsql.project_schema_title, str(row[0]))
+                                             self.dlg_readsql.project_schema_title, result[0]['title'])
                 utils_giswater.setWidgetText(self.dlg_readsql,
-                                             self.dlg_readsql.project_schema_author, str(row[1]))
+                                             self.dlg_readsql.project_schema_author, result[0]['author'])
             sql = "SELECT giswater, date::date FROM " + schema_name + ".version order by id desc LIMIT 1"
             row = self.controller.get_row(sql)
             if row is not None:
