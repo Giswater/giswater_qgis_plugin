@@ -15,6 +15,9 @@ UPDATE config_param_system SET label='Node geom 1 tolerance:' ,isenabled=TRUE,la
 UPDATE config_param_system SET label='custom_giswater_folder:' ,isenabled=FALSE ,layout_id=NULL ,layout_order=NULL ,project_type=NULL , datatype='string' ,widgettype='linetext' WHERE parameter='custom_giswater_folder';
 
 INSERT INTO sys_fprocess_cat VALUES (35, 'Recursive go2epa process', 'EPA', 'Recursive go2epa process', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (36, 'Drop fk', 'admin', 'Drop fk', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (37, 'Create fk', 'admin', 'Create fk', 'utils');
+
 
 /*
 
@@ -206,6 +209,8 @@ INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, de
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2642, 'gw_api_setvisitmanagerstart', 'role_om', FALSE,'To start visit manager');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2644, 'gw_api_setvisitmanagerend', 'role_om', FALSE,'To start visit manager');
 INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2646, 'gw_fct_pg2epa_recursive', 'role_epa', FALSE, 'Function to enable recursive calculations on epa workflow');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2648, 'gw_fct_admin_schema_manage_fk', 'role_admin', FALSE, 'Function to manage fk');
+INSERT INTO audit_cat_function (id, function_name, sys_role_id, isdeprecated, descript) VALUES (2650, 'gw_fct_admin_schema_lastprocess', 'role_admin', FALSE, 'Function to create fk');
 
 
 -- 2019/01/31

@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_dropdeprecated_rel()
   RETURNS void AS
 $BODY$
 /*
-select ud5.gw_fct_admin_schema_dropdeprecated_rel()
+select SCHEMA_NAME.gw_fct_admin_schema_dropdeprecated_rel()
 */
 
 DECLARE
