@@ -444,7 +444,7 @@ class ParentDialog(QDialog):
         """ Execute action of button 34 """
                 
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
-        doc.manage_document(feature=feature)
+        doc.manage_document(feature=feature, geom_type=self.geom_type)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
                  

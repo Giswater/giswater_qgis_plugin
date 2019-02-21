@@ -32,7 +32,7 @@ class ManageDocument(ParentManage):
         self.manage_document()
                 
 
-    def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None):
+    def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None):
         """ Button 34: Add document """
 
         # Create the dialog and signals
@@ -83,10 +83,10 @@ class ManageDocument(ParentManage):
         self.set_completer_object(self.dlg_add_doc, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
-        geom_type = "arc"
+        if geom_type is None:
+            geom_type = "arc"
         viewname = "v_edit_" + geom_type
         self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
-
         # Set signals
         self.dlg_add_doc.path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
