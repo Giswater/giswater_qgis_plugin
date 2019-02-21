@@ -6,31 +6,32 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-
-from PyQt4.QtCore import QTime, QDate, Qt
+from PyQt4.QtCore import QObject
+from PyQt4.QtCore import QTime, QDate, Qt, QThread, SIGNAL
 from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QStringListModel
 from PyQt4.QtGui import QCompleter, QFileDialog
 
-import csv
-import os
-import re
-import subprocess
+import csv, os, re, subprocess, sys, time, threading
 
 from functools import partial
 
+from PyQt4.QtGui import QMessageBox
+
 import utils_giswater
-from giswater.actions.update_sql import UpdateSQL
 from giswater.actions.api_go2epa_options import Go2EpaOptions
-from giswater.actions.parent import ParentAction
+from giswater.actions.api_parent import ApiParent
+from giswater.actions.update_sql import UpdateSQL
 from giswater.ui_manager import FileManager, Multirow_selector, HydrologySelector
 from giswater.ui_manager import EpaResultCompareSelector, EpaResultManager
 
 
-class Go2Epa(ParentAction):
+
+
+class Go2Epa(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'go2epa' """
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.g2epa_opt = Go2EpaOptions(iface, settings, controller, plugin_dir)
 
 
@@ -41,7 +42,7 @@ class Go2Epa(ParentAction):
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
         self.get_last_gsw_file()
-
+        self.imports_canceled = False
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
@@ -50,7 +51,8 @@ class Go2Epa(ParentAction):
 
         self.dlg_go2epa.progressBar.setMaximum(0)
         self.dlg_go2epa.progressBar.setMinimum(0)
-        self.dlg_go2epa.progressBar.setVisible(False)
+        self.show_widgets(False)
+
         # Set widgets
         self.dlg_go2epa.chk_recurrent.setEnabled(False)
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
@@ -66,6 +68,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
+        self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.cancel_imports))
         self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.rejected.connect(partial(self.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
@@ -87,6 +90,10 @@ class Go2Epa(ParentAction):
         # Open dialog
         self.dlg_go2epa.show()
 
+
+    def cancel_imports(self):
+        self.counter = self.iterations
+        self.imports_canceled =True
 
     def active_recurrent(self, state):
         if state == 2:  # Checked
@@ -119,7 +126,7 @@ class Go2Epa(ParentAction):
 
 
 
-    def chk_control(self):
+    def check_fields(self):
         if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
             file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
             result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
@@ -139,7 +146,7 @@ class Go2Epa(ParentAction):
             else:
                 sql = ("SELECT result_id FROM " + self.schema_name + ".rpt_cat_result "
                        " WHERE result_id='"+str(result_name)+"' LIMIT 1")
-                row = self.controller.get_row(sql, log_sql=True)
+                row = self.controller.get_row(sql, log_sql=False)
                 if row:
                     msg = "Result name already exists, do you want override?"
                     answer = self.controller.ask_question(msg, title="Alert")
@@ -326,10 +333,11 @@ class Go2Epa(ParentAction):
 
     def insert_into_inp(self, folder_path=None, all_rows=None):
         progress = 0
+        #sys.stdout.flush()
         self.dlg_go2epa.progressBar.setFormat("The INP file is begin imported...")
         self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
-        self.dlg_go2epa.progressBar.setVisible(True)
         self.dlg_go2epa.progressBar.setValue(progress)
+        #self.show_widgets(True)
         row_count = sum(1 for rows in all_rows)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
         file1 = open(folder_path, "w")
@@ -363,8 +371,8 @@ class Go2Epa(ParentAction):
         progress = 0
         self.dlg_go2epa.progressBar.setFormat("The RPT file is begin imported...")
         self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
-        self.dlg_go2epa.progressBar.setVisible(True)
         self.dlg_go2epa.progressBar.setValue(progress)
+
         row_count = sum(1 for rows in full_file)  # @UnusedVariable
         self.dlg_go2epa.progressBar.setMaximum(row_count)
         for row in full_file:
@@ -414,15 +422,19 @@ class Go2Epa(ParentAction):
         _file.close()
         del _file
 
+    def show_widgets(self, visible=False):
+        self.dlg_go2epa.progressBar.setVisible(visible)
+        self.dlg_go2epa.lbl_counter.setVisible(visible)
+
+
 
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
+
         self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid gray")
-        status = self.chk_control()
+        status = self.check_fields()
         if not status:
             return
-
-        self.dlg_go2epa.progressBar.setVisible(True)
 
         # Get widgets values
         self.result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
@@ -433,7 +445,19 @@ class Go2Epa(ParentAction):
         exec_epa = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
         self.file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         import_result = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
-        is_recurrent = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent)
+        is_recursive = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent)
+        if export_inp:
+            sql = ("SELECT sector_id FROM " + self.schema_name + ".inp_selector_sector LIMIT 1")
+            row = self.controller.get_row(sql, log_sql=False)
+            if row is None:
+                msg = "You need to select some sector"
+                # self.controller.show_info_box(text=msg, title="Info")
+                msg_box = QMessageBox()
+                msg_box.setIcon(3)
+                msg_box.setWindowTitle("Warning")
+                msg_box.setText(msg)
+                msg_box.exec_()
+                return
 
         if self.result_name is 'null':
             message = "You have to set this parameter"
@@ -442,26 +466,30 @@ class Go2Epa(ParentAction):
 
         if self.project_type in 'ws':
             opener = self.plugin_dir + "/epa/ws_epanet20012.exe"
-            epa_function_call = "gw_fct_pg2epa($$"+str(self.result_name)+"$$, "+str(prev_net_geom)+")"
+            epa_function_call = "gw_fct_pg2epa($$"+str(self.result_name)+"$$, "+str(prev_net_geom)+", "+str(is_recursive)+")"
         elif self.project_type in 'ud':
             opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
-            epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", "+str(export_subcatch)+")"
+            epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", "+str(export_subcatch)+", "+str(is_recursive)+")"
+        # export_function = "gw_fct_utils_csv2pg_export_epa_inp('" + str(self.result_name) + "')"
+        self.iterations = 1
+        self.counter = 0
+        if is_recursive:
+            extras = '"status":"1"'
+            extras += ', "result_id":"'+str(self.result_name)+'"'
+            body = self.create_body(extras=extras)
+            sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
+            row = self.controller.get_row(sql, log_sql=False)
+            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, "0/"+str(row[0]))
+            self.iterations = int(str(row[0]))
 
-        # if is_recurrent:
-        #     # TODO montar body
-        #     extras = '"status":"' + 1 + '"'
-        #     body = self.create_body(extras=extras)
-        #     sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
-        #     row = self.controller.get_row(sql, log_sql=True)
 
+        self.show_widgets(True)
+        while self.counter < self.iterations:
+            print("{}:{}".format(self.counter, self.iterations))
+            #time.sleep(0.1)
+            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, str(self.counter) + "/" + str(self.iterations))
+            self.counter += 1
 
-
-        recurrent = [1]
-        x=0
-        while recurrent[0] == 1:
-            x += 1
-            if x == 2:
-                break
             common_msg = ""
             # Export to inp file
             if export_inp is True:
@@ -472,22 +500,23 @@ class Go2Epa(ParentAction):
                     return
                 # Call function gw_fct_pg2epa
                 sql = ("SELECT " + self.schema_name + "." + epa_function_call)
-                recurrent = self.controller.get_row(sql, log_sql=True)
-                self.controller.log_info(str(recurrent))
+                exit = self.controller.get_row(sql, log_sql=False)
+                if int(str(exit[0])) == 0:
+                    self.counter = self.iterations
 
                 # # Call function gw_fct_utils_csv2pg_export_epa_inp
                 # sql = ("SELECT " + self.schema_name + "." + export_function)
-                # row = self.controller.get_row(sql, log_sql=True)
+                # row = self.controller.get_row(sql, log_sql=False)
 
                 # Get values from temp_csv2pg and insert into INP file
                 sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12 "
                        " FROM " + self.schema_name + ".temp_csv2pg "
                        " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
-                rows = self.controller.get_rows(sql, log_sql=True)
+                rows = self.controller.get_rows(sql, log_sql=False)
 
                 if rows is None:
                     self.controller.show_message("NOT ROW FOR: " + sql, 2)
-                    self.dlg_go2epa.progressBar.setVisible(False)
+                    self.show_widgets(False)
                     return
                 self.insert_into_inp(self.file_inp, rows)
                 common_msg += "Export INP finished. "
@@ -497,14 +526,15 @@ class Go2Epa(ParentAction):
                 if self.file_rpt == "null":
                     message = "You have to set this parameter"
                     self.controller.show_warning(message, parameter="RPT file")
-                    self.dlg_go2epa.progressBar.setVisible(False)
+                    self.show_widgets(False)
                     return
-                self.dlg_go2epa.progressBar.setMaximum(0)
-                self.dlg_go2epa.progressBar.setMinimum(0)
+                # self.dlg_go2epa.progressBar.setMaximum(0)
+                # self.dlg_go2epa.progressBar.setMinimum(0)
                 self.dlg_go2epa.progressBar.setFormat("Epa software is running...")
                 self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
-                self.dlg_go2epa.progressBar.setVisible(True)
-                subprocess.call([opener, self.file_inp, self.file_rpt])
+
+
+                subprocess.call([opener, self.file_inp, self.file_rpt],shell=False)
                 common_msg += "EPA model finished. "
 
             # Import to DB
@@ -512,7 +542,7 @@ class Go2Epa(ParentAction):
                 if os.path.exists(self.file_rpt):
                     sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
                            " WHERE user_name=current_user AND csv2pgcat_id=11")
-                    self.controller.execute_sql(sql, log_sql=True)
+                    self.controller.execute_sql(sql, log_sql=False)
                     self.insert_rpt_into_db(self.file_rpt)
                     common_msg += "Import RPT finished."
                 else:
@@ -521,20 +551,21 @@ class Go2Epa(ParentAction):
 
 
         # if is_recurrent:
-        #     # TODO montar body
+        #     # TODO descomentar esto cuando la funcion gw_fct_pg2epa_recursive este lista
         #     extras = '"status":"' + 0 + '"'
         #     body = self.create_body(extras=extras)
         #     sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
-        #     row = self.controller.get_row(sql, log_sql=True)
+        #     row = self.controller.get_row(sql, log_sql=False)
 
 
-        if common_msg != "":
+        if common_msg != "" and self.imports_canceled is False:
             self.controller.show_info(common_msg)
+
 
         # Save INP, RPT and result name into GSW file
         self.save_file_parameters()
 
-        self.dlg_go2epa.progressBar.setVisible(False)
+        self.show_widgets(False)
         # Close form
         self.close_dialog(self.dlg_go2epa)
 
