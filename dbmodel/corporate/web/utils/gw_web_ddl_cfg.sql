@@ -55,7 +55,7 @@ CREATE TABLE "config_web_layer_child"(
 
 
 CREATE TABLE config_web_tabs
-( id integer NOT NULL,
+( id integer NOT NULL primari,
   layer_id character varying(50),
   formtab text,
   tablabel text,
@@ -77,7 +77,7 @@ CREATE TABLE "config_web_tableinfo_x_inforole"(
 
 
 
-CREATE TABLE ws.config_web_fields(
+CREATE TABLE config_web_fields(
   id serial PRIMARY KEY,
   table_id character varying(50),
   name character varying(30),
@@ -94,7 +94,7 @@ CREATE TABLE ws.config_web_fields(
   sql_text text,
   is_enabled boolean,
   orderby integer,
-  is_navigation boolean)
+  is_navigation boolean);
     
   
 
