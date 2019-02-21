@@ -35,7 +35,7 @@ BEGIN
 
     -- Get parameters
     SELECT * INTO rec FROM config;
-	SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
+	--SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
 
 
 	-- For state=0
