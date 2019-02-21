@@ -55,7 +55,7 @@ CREATE TABLE "config_web_layer_child"(
 
 
 CREATE TABLE config_web_tabs
-( id integer NOT NULL primari,
+( id integer NOT NULL,
   layer_id character varying(50),
   formtab text,
   tablabel text,
