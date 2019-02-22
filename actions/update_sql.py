@@ -1517,7 +1517,8 @@ class UpdateSQL(ParentAction):
             self.controller.dao.commit()
             self.event_change_connection()
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
-            self.close_dialog(self.dlg_readsql_rename)
+            if self.dlg_readsql_rename is not None:
+                self.close_dialog(self.dlg_readsql_rename)
             msg = "Rename project has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
 
