@@ -25,10 +25,10 @@ ud		- grl_dyn_11
 ud		- grl_dyn_12
 utils	- grl_date_13
 utils	- grl_date_14
-utils	- grl_other_15
-utils	- grl_other_16
+utils	- grl_inpother_15
+utils	- grl_inpother_16
 utils	- grl_reports_17
 utils	- grl_reports_18
-utils	- grl_other_19
-utils	- grl_other_20
+utils	- drl_rptother_19
+utils	- drl_rptother_20
 */
