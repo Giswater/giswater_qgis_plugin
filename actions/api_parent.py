@@ -1069,9 +1069,9 @@ class ApiParent(ParentAction):
                 lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
                 chk = None
                 if put_chk is True:
+                    chk = QCheckBox()
+                    chk.setObjectName('chk_' + field['widgetname'])
                     if field['checked'] == "True":
-                        chk = QCheckBox()
-                        chk.setObjectName('chk_' + field['widgetname'])
                         chk.setChecked(True)
                     elif field['checked'] == "False":
                         chk.setChecked(False)
@@ -1093,7 +1093,11 @@ class ApiParent(ParentAction):
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, chk, field, _json))
+                    if field['value'].lower() == "true":
+                        widget.setChecked(True)
+                    else:
+                        widget.setChecked(False)
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datepickertime':
                     widget = QDateEdit()
@@ -1116,7 +1120,8 @@ class ApiParent(ParentAction):
                         if str(field['iseditable']) == "False":
                             widget.setReadOnly(True)
                             widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-
+                        if 'placeholder' in field:
+                            widget.setPlaceholderText(field['placeholder'])
                     elif type(widget) in (QComboBox, QCheckBox):
                         if str(field['iseditable']) == "False":
                             widget.setEnabled(False)
@@ -1135,10 +1140,12 @@ class ApiParent(ParentAction):
         if layout is None:
             return
         layout.addWidget(lbl, int(field['layout_order']), 0)
-        if chk is not None:
+        # This if put auxiliar checkbox into config form
+        if chk is not None and type(widget) is not QCheckBox:
             layout.addWidget(chk, int(field['layout_order']), 1)
-        if field['widgettype'] != 'check':
-            layout.addWidget(widget, int(field['layout_order']), 2)
+
+        layout.addWidget(widget, int(field['layout_order']), 2)
+
 
     def get_values_changed_param_user(self, dialog, chk, widget, field, list, value=None):
 
@@ -1148,20 +1155,21 @@ class ApiParent(ParentAction):
         elif type(widget) is QComboBox:
             value = utils_giswater.get_item_data(dialog, widget, 0)
         elif type(widget) is QCheckBox:
-            value = utils_giswater.isChecked(dialog, chk)
+            value = utils_giswater.isChecked(dialog, widget)
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(dialog, widget)
-        if chk is None:
-            elem[widget.objectName()] = value
-            #elem['value'] = value
-            if 'sys_role_id' in field:
-                elem['sys_role_id'] = str(field['sys_role_id'])
+        # if chk is None:
+        #     elem[widget.objectName()] = value
+        elem['widget'] = str(widget.objectName())
+        elem['value'] = value
+        if chk is not None:
+            if chk.isChecked():
+                # elem['widget'] = str(widget.objectName())
+                elem['chk'] = str(chk.objectName())
+                elem['isChecked'] = str(utils_giswater.isChecked(dialog, chk))
+                # elem['value'] = value
 
-        elif chk.isChecked():
-            elem['widget'] = str(widget.objectName())
-            elem['chk'] = str(chk.objectName())
-            elem['isChecked'] = str(utils_giswater.isChecked(dialog, chk))
-            elem['value'] = value
+        if 'sys_role_id' in field:
             elem['sys_role_id'] = str(field['sys_role_id'])
         list.append(elem)
         self.controller.log_info(str(list))

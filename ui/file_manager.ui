@@ -106,14 +106,14 @@
           <item row="0" column="2">
            <widget class="QCheckBox" name="chk_only_check">
             <property name="text">
-             <string>Use previous network geometry</string>
+             <string>Use result network geometry</string>
             </property>
            </widget>
           </item>
           <item row="1" column="2">
            <widget class="QCheckBox" name="chk_recurrent">
             <property name="text">
-             <string>Recurrent</string>
+             <string>Use recursive function</string>
             </property>
            </widget>
           </item>
