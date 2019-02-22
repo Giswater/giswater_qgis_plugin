@@ -245,7 +245,7 @@ class GwToolBox(ApiParent):
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(feature=feature_field, extras=extras)
         sql = ("SELECT " + self.schema_name + "."+str(function_name)+"($${" + body + "}$$)::text")
-        self.controller.execute_sql_notify(sql)
+        self.controller.execute_sql(sql, log_sql=True)
 
 
     def populate_functions_dlg(self, dialog, result):
