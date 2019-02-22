@@ -164,18 +164,23 @@ class ParentManage(ParentAction, object):
                 if row_aux:
                     expl_id = row_aux[0]
 
-            utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
-            utils_giswater.setWidgetText(dialog, "state", state)
-            utils_giswater.setWidgetText(dialog, "expl_id", expl_id)
+            utils_giswater.setWidgetText(dialog, "code", row['code'])
             sql = ("SELECT elementtype_id FROM " + self.schema_name + ".cat_element"
                    " WHERE id = '" + str(row['elementcat_id']) + "'")
             row_type = self.controller.get_row(sql)
             if row_type:
                 utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
-            utils_giswater.setWidgetText(dialog, "code", row['code'])
+            utils_giswater.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
+            utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
+            utils_giswater.setWidgetText(dialog, "state", state)
+            utils_giswater.setWidgetText(dialog, "expl_id", expl_id)
             utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
             utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
+            builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
+            enddate = QDate.fromString(str(row['enddate']), 'yyyy-MM-dd')
+            dialog.builtdate.setDate(builtdate)
+            dialog.enddate.setDate(enddate)
             utils_giswater.setWidgetText(dialog, "workcat_id", row['workcat_id'])
             utils_giswater.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
             utils_giswater.setWidgetText(dialog, "comment", row['comment'])
@@ -185,11 +190,6 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "rotation", row['rotation'])
             if str(row['undelete']) == 'True':
                 dialog.undelete.setChecked(True)
-            builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
-            enddate = QDate.fromString(str(row['enddate']), 'yyyy-MM-dd')
-
-            dialog.builtdate.setDate(builtdate)
-            dialog.enddate.setDate(enddate)
             
               
     def get_records_geom_type(self, dialog, table_object, geom_type):
