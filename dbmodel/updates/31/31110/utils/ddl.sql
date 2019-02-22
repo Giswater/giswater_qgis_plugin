@@ -273,9 +273,3 @@ CREATE TABLE inp_typevalue
   descript text,
   CONSTRAINT inp_typevalue_pkey PRIMARY KEY (typevalue, id)
 );
-
------------------------
--- create inp tables
------------------------
-ALTER TABLE audit_cat_function ADD COLUMN function_type_ json;
-ALTER TABLE audit_cat_function ADD COLUMN input_params_ json;
