@@ -1491,12 +1491,14 @@ class UpdateSQL(ParentAction):
     def rename_project_data_schema(self, schema, create_project=None):
 
         if create_project is None or create_project is False:
+            close_dlg_rename = True
             self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
                 result = self.controller.show_info_box(msg, "Info")
                 return
         else:
+            close_dlg_rename = False
             self.schema = str(create_project)
 
         self.set_wait_cursor()
@@ -1517,7 +1519,7 @@ class UpdateSQL(ParentAction):
             self.controller.dao.commit()
             self.event_change_connection()
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
-            if self.dlg_readsql_rename is not None:
+            if close_dlg_rename:
                 self.close_dialog(self.dlg_readsql_rename)
             msg = "Rename project has been executed correctly."
             result = self.controller.show_info_box(msg, "Info")
