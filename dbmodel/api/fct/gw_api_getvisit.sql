@@ -12,21 +12,12 @@ $BODY$
 
 /*EXAMPLE:
 
--- setform for insert offline
+-- new call for visit not associated to infraestructure element
 SELECT SCHEMA_NAME.gw_api_getvisit($${
-"client":{"device":3, "infoType":100, "lang":"ES", "status":"offline"},
-"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id", "id":9, "offlineId":true},
-"form":{"tabData":{"active":true}, "tabFiles":{"active":false}, "navigation":{"currentActiveTab":"tabData"}},
-"data":{"relatedFeature":{"type":"arc", "id":"2001"},
-    "fields":{"class_id":"1","arc_id":"2001","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},
-    "tstamp":{"init":"2019-01-01 17:06:52", "end":"2019-01-01 17:09:00"},
-    "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}},    
-    "newFile": [{"fileFields":{"visit_id":9, "hash":"testhash", "url":"urltest", "filetype":"png", "idval":"image1"},"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}},
-		{"fileFields":{"visit_id":9, "hash":"testhash", "url":"urltest", "filetype":"png", "idval":"image2"},"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}},
-		{"fileFields":{"visit_id":9, "hash":"testhash", "url":"urltest", "filetype":"png", "idval":"image3"},"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}},
-		{"fileFields":{"visit_id":9, "hash":"testhash", "url":"urltest", "filetype":"png", "idval":"image4"},"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}]}$$)
-
-3 items have been added: tstamp, offlineId, array of fileFields
+"client":{"device":3,"infoType":100,"lang":"es"},
+"form":{},
+"data":{"relatedFeature":{"type":"", "id":""},
+	"fields":{},"pageInfo":null}}$$)
 
 
 --new call
@@ -36,11 +27,20 @@ SELECT SCHEMA_NAME.gw_api_getvisit($${
 "data":{"relatedFeature":{"type":"arc", "id":"2080"},
 	"fields":{},"pageInfo":null}}$$)
 
+
+--upsert class from multievent to singlevent
+SELECT SCHEMA_NAME.gw_api_getvisit($${"client":{"device":3,"infoType":100,"lang":"es"},
+"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id","id":10455},
+"form":{"tabData":{"active":true},"tabFiles":{"active":false},"navigation":{"currentActiveTab":"tabData"}},
+"data":{"relatedFeature":{"type":"arc", "id":"2048"},
+"fields":{"class_id":"1","visit_id":"10455","arc_id":"2048","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},"pageInfo":null}}$$) AS result
+
+
 --insertfile action with insert visit (visit null or visit not existing yet on database)
 SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id", "id":null},
-"form":{"tabData":{"active":true}, "tabFiles":{"active":false}, "navigation":{"currentActiveTab":"tabData"}},
+"form":{"tabData":{"active":true}, "tabFiles":{"active":false}, "navigation":{"currentActiveTab":"tabData", "actionClicked":"insertFile"}},
 "data":{"relatedFeature":{"type":"arc", "id":"2001"},
     "fields":{"class_id":"1","arc_id":"2001","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
@@ -51,7 +51,7 @@ SELECT SCHEMA_NAME.gw_api_getvisit($${
 SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3,"infoType":100,"lang":"es"},
 "feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id","id":1001},
-"form":{"tabData":{"active":false}, "tabFiles":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
+"form":{"tabData":{"active":false}, "tabFiles":{"active":true},"navigation":{"currentActiveTab":"tabData","actionClicked":null}},
 "data":{"relatedFeature":{"type":"arc", "id":"2080"},
         "fields":{"class_id":"1","arc_id":"2001","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},
 	"pageInfo":null}}$$)
@@ -70,12 +70,36 @@ SELECT SCHEMA_NAME.gw_api_getvisit($${
 SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"id":1135},
-"form":{"tabData":{"active":false},"tabFiles":{"active":true}, "},
+"form":{"tabData":{"active":false},"tabFiles":{"active":true},"navigation":{"currentActiveTab":"tabData","actionClicked":deleteFile}},
 "data":{"relatedFeature":{"type":"arc"},
     "filterFields":{"filetype":"doc","limit":10},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
     "deleteFile": {"feature":{"id":1127}}}}$$)
+
+	
+MAIN ISSUES
+-----------	
+
+LOGICS
+- On click after info feature	
+	- Use the visit duration parameter from param user table to choose a new visit or use the last one
+	- Identify if visits exist or not
+		When visit is new, 
+		- choose the visitclass vdefault of user	
+		When visit exists		
+		- Identify if class have been changed or not -> This is especially crictic because may it affect the editable view used to upsert data
+
+- On click without previous info (no infraestucture visit)
+	- New incidency visit is showed
+	
+ACTIONS
+- Change tab (from data to file, from file to data)
+- Used to add / delete files
+- Used to reload form when class have been changed  (reload without upsert)	
 */
+
+
+
 
 DECLARE
 	v_apiversion text;
@@ -123,6 +147,15 @@ DECLARE
 	v_values json;
 	array_index integer DEFAULT 0;
 	v_fieldvalue text;
+	v_geometry json;
+	v_noinfra boolean = FALSE;
+	v_parameter text;
+	v_ismultievent boolean;
+	v_inputtablename text;
+	v_inputformname text;
+	v_isclasschanged boolean = false;
+	v_visitduration text;
+	v_existvisit_id int8;
 
 BEGIN
 
@@ -133,6 +166,11 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
+
+	-- fix diferent ways to say null on client
+	p_data = REPLACE (p_data::text, '"NULL"', 'null');
+	p_data = REPLACE (p_data::text, '"null"', 'null');
+	p_data = REPLACE (p_data::text, '""', 'null');
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -149,35 +187,82 @@ BEGIN
 	v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
 	v_currentactivetab = (((p_data ->>'form')::json->>'navigation')::json->>'currentActiveTab')::text;
 	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
+	v_inputtablename = ((p_data ->>'feature')::json->>'tableName');
 
 	--  get visitclass
-	IF v_visitclass IS NULL THEN 
-		IF v_id IS NULL OR (SELECT id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint) IS NULL THEN
+	IF v_visitclass IS NULL THEN
 	
-			v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
-			IF v_visitclass IS NULL THEN
-				v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
+		-- infraestructure visit
+		IF v_featuretype IS NOT NULL THEN
+			--new visit
+			IF v_id IS NULL OR (SELECT id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint) IS NULL THEN
+		
+				v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
+				IF v_visitclass IS NULL THEN
+					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
+				END IF;
+			-- existing visit
+			ELSE 
+				v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
+				IF v_visitclass IS NULL THEN
+					v_visitclass := 0;
+				END IF;
 			END IF;
+			
+		-- no infraestructure visit
 		ELSE 
-			v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
-			IF v_visitclass IS NULL THEN
-				v_visitclass := 0;
+			--new visit
+			IF v_id IS NULL OR (SELECT id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint) IS NULL THEN
+				v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type IS NULL LIMIT 1);
+			
+			-- existing visit
+			ELSE 
+				v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
 			END IF;
+			v_noinfra = TRUE;
 		END IF;
 	END IF;
 	
-	-- getting visit id
-	IF v_id IS NULL THEN
-		v_id := ((SELECT max(id)+1 FROM om_visit)+1);
-		isnewvisit = true;
-	ELSE
-		isnewvisit = false;
-	END IF;
-
 	--  get formname and tablename
 	v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
+	v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
 
+	-- getting visit id and identify change class
+	IF v_id IS NULL THEN
+		v_id := (SELECT max(id)+1 FROM om_visit);
+		isnewvisit = true;
+
+		-- exists some visit on related feature on last defined period?
+		v_visitduration = (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter ='visit_duration_vdefault' LIMIT 1);
+
+		------------------------------ ONLY FOR DEV (FOR ALL USER ON DEV
+		v_visitduration = '24 hours';
+		----------------------------------------------------------------
+		
+		EXECUTE 'SELECT v.id FROM om_visit_x_'||v_featuretype||' a JOIN om_visit v ON v.id=a.visit_id WHERE (now()-startdate)<'||quote_literal(v_visitduration)||' AND '||v_featuretype||'_id ='||v_featureid||'::text ORDER BY enddate DESC LIMIT 1'
+			INTO v_existvisit_id;
+			
+		IF v_existvisit_id IS NOT NULL THEN
+			v_id = v_existvisit_id;
+			v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
+			v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
+			v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
+			v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
+			isnewvisit = false;
+		END IF;
+		
+	ELSE
+		IF v_inputtablename != v_tablename THEN
+			v_isclasschanged = true;
+			v_message = '{"text":"Visit class have been changed"}';
+			isnewvisit = true;
+		ELSE
+			isnewvisit = false;
+		END IF;
+	END IF;
+
+	
 	-- Get id column
 	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
 		INTO v_idname
@@ -207,16 +292,18 @@ BEGIN
 			USING v_schemaname, v_tablename, v_idname
 			INTO v_columntype;
 
-	RAISE NOTICE '--- VISIT PARAMETERS: newvisitform: % featuretype: %,  visitclass: %,  v_visit: %,  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',isnewvisit, v_featuretype, v_visitclass, v_id, v_formname, v_tablename, v_idname, v_columntype, v_device;
+	RAISE NOTICE '--- VISIT PARAMETERS: isnewvisit: % featuretype: %,  v_isclasschanged: % visitclass: %,  v_visit: %,  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',isnewvisit, v_featuretype, v_isclasschanged, v_visitclass, v_id, v_formname, v_tablename, v_idname, v_columntype, v_device;
 
 	-- upserting data on tabData
-	IF v_currentactivetab = 'tabData' THEN
-					
+	IF v_currentactivetab = 'tabData' AND v_isclasschanged IS FALSE THEN
+
+		RAISE NOTICE '--- UPSERT VISIT CALLING gw_api_setvisit WITH INPUT PARAMETER: % ---', p_data;
+		
 		SELECT gw_api_setvisit (p_data) INTO v_return;
 		v_id = ((v_return->>'body')::json->>'feature')::json->>'id';
 		v_message = (v_return->>'message');
 
-		RAISE NOTICE '--- UPSERT VISIT CALLING gw_api_setvisit WITH MESSAGE: % ---', v_message;
+		RAISE NOTICE '--- UPSERT VISIT CALLED gw_api_setvisit WITH MESSAGE: % ---', v_message;
 		
 	END IF;
 
@@ -295,10 +382,18 @@ BEGIN
 	
 					END IF;
 
-					
+					-- setting parameter in case of singleparameter visit
+					IF v_ismultievent IS FALSE THEN
+						IF (aux_json->>'column_id') = 'parameter_id' THEN
+							v_parameter := (SELECT parameter_id FROM om_visit_class_x_parameter WHERE class_id=v_visitclass LIMIT 1);
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
+							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_parameter ;
+						END IF;
+					END IF;
 				END LOOP;
 			ELSE 
-				
+
+			
 				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT % ---',v_fields ;
@@ -316,12 +411,20 @@ BEGIN
 				LOOP          
 					array_index := array_index + 1;
 					v_fieldvalue := (v_values->>(aux_json->>'column_id'));
-		
+
 					IF (aux_json->>'widgettype')='combo' THEN 
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
+
+						-- setting parameter in case of singleevent visit
+						IF v_ismultievent IS FALSE AND (aux_json->>'column_id') = 'parameter_id' THEN
+							v_parameter := (SELECT parameter_id FROM om_visit_class_x_parameter WHERE class_id=v_visitclass LIMIT 1);
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
+						END IF;
+					
 					ELSE 
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_fieldvalue, ''));
 					END IF;
+					
 				END LOOP;			
 			END IF;	
 
@@ -421,14 +524,22 @@ BEGIN
 	v_formtabs := (v_formtabs ||']');
 
 	-- header form
-	v_formheader :=concat('VISIT - ',v_id);	
+	IF v_noinfra IS TRUE THEN
+		v_formheader :=concat('INCIDENCY - ',v_id);	
+	ELSE
+		v_formheader :=concat('PLANNED VISIT - ',v_id);	
+	END IF;
 
 	-- actions and layermanager
 	EXECUTE 'SELECT actions, layermanager FROM config_api_form WHERE formname = ''visit'' AND (projecttype ='||quote_literal(LOWER(v_projecttype))||' OR projecttype=''utils'')'
 			INTO v_formactions, v_layermanager;
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
-		
+
+	-- getting geometry
+	EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id='||v_id||')a'
+            INTO v_geometry;
+    		
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
@@ -442,12 +553,15 @@ BEGIN
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
 	v_layermanager := COALESCE(v_layermanager, '{}');
+	v_geometry := COALESCE(v_geometry, '{}');
+
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
-		    ', "data":{"layerManager":'||v_layermanager||'}}'||
+		    ', "data":{"layerManager":'||v_layermanager||
+		               ',"geometry":'|| v_geometry ||'}}'||
 		    '}')::json;
 END;
 $BODY$
