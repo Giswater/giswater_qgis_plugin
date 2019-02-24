@@ -12,20 +12,20 @@ $BODY$
 
 /*EXAMPLE
 --INSERT
-SELECT SCHEMA_NAME.gw_api_setvisit($${
+SELECT SCHEMA_NAME.gw_api_setvisitmanager($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName":"visit_id"},
-"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
+"feature":{"featureType":"visit", "tableName":"ve_visit_user_manager", "id":null, "idName":"visit_id"},
+"data":{"fields":{"user_id":1, "date":'null', "team_id":1, "vehicle_id":1, "starttime":null, "endtime":null},
 	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
-
+	
 --UPDATE
-SELECT SCHEMA_NAME.gw_api_setvisit($${
+SELECT SCHEMA_NAME.gw_api_setvisitmanager($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1159,"idName":"visit_id"},
-"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":100, "desperfectes_arc":1, "neteja_arc":3},
+"feature":{"featureType":"visit", "tableName":"ve_visit_user_manager", "id":1, "idName":"visit_id"},
+"data":{"fields":{"user_id":1, "date":'null', "team_id":1, "vehicle_id":1, "starttime":null, "endtime":null},
 	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
 	}$$)
 */
