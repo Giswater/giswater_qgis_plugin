@@ -196,9 +196,6 @@ UPDATE audit_cat_param_user SET     WHERE parameter='elementcat_vdefault', 'conf
 UPDATE audit_cat_param_user SET     WHERE parameter='pavementcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Pavement catalog:', 'SELECT cat_pavement.id AS id, cat_pavement.id as idval FROM cat_pavement WHERE id IS NOT NULL', NULL, true, 5, 2, 'utils', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
 UPDATE audit_cat_param_user SET     WHERE parameter='soilcat_vdefault', 'config', NULL, 'role_edit', NULL, 'Soil catalog:', 'SELECT cat_soil.id AS id, cat_soil.id as idval FROM cat_soil WHERE id IS NOT NULL', NULL, true, 5, 3, 'utils', false, NULL, 'soilcat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
 
-
-
-
 */
 
 
@@ -253,5 +250,7 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript,
 VALUES ('connec_proximity_control', 'true', 'boolean', NULL, NULL,'Connec proximity control:', NULL, NULL, true, 13, 4, 'utils', false, false, 'boolean', 'checkbox', NULL);
 
 
-
+-- 2019/02/24
+INSERT INTO audit_cat_param_user VALUES ('visit_duration_vdef', 'om', 'Duration for user', 'role_om', NULL, Visit expires time vdefault', 
+NULL, NULL, true, 9, 9, 'utils', false, NULL, NULL, NULL, false, 'date', 'text', NULL, NULL, NULL, NULL, NULL););
 
