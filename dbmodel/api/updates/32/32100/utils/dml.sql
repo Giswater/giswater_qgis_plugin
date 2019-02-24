@@ -97,13 +97,6 @@ INSERT INTO config_api_form_tabs VALUES (302, 've_arc', 'tab_elements', 'Elem', 
 INSERT INTO config_api_message VALUES (10, 2, 'There are not exists the class of visit provided', NULL);
 
 
-INSERT INTO config_api_visit VALUES (2, 'visit_connec_insp', 've_visit_multievent_x_connec');
-INSERT INTO config_api_visit VALUES (1, 'visit_arc_leak', 've_visit_singlevent_x_arc');
-INSERT INTO config_api_visit VALUES (6, 'visit_arc_insp', 've_visit_multievent_x_arc');
-INSERT INTO config_api_visit VALUES (5, 'visit_node_insp', 've_visit_multievent_x_node');
-INSERT INTO config_api_visit VALUES (4, 'visit_connec_leak', 've_visit_singlevent_x_connec');
-INSERT INTO config_api_visit VALUES (3, 'visit_node_leak', 've_visit_singlevent_x_node');
-
 -----------------------
 -- sys values
 -----------------------
