@@ -17,6 +17,8 @@ INSERT INTO om_visit_class VALUES (0, 'Open visit', NULL, true, true, false, NUL
 INSERT INTO om_visit_class VALUES (2, 'Inspection and clean connec', NULL, true, false, true, 'CONNEC', 'role_om');
 INSERT INTO om_visit_class VALUES (4, 'Leak on connec', NULL, true, false, false, 'CONNEC', 'role_om');
 INSERT INTO om_visit_class VALUES (3, 'Leak on node', NULL, true, false, false, 'NODE', 'role_om');
+INSERT INTO om_visit_class VALUES (8, 'Type A incident', NULL, true, false, true, null, 'role_om');
+INSERT INTO om_visit_class VALUES (9, 'Type B incident', NULL, true, false, true, null, 'role_om');
 
 
 
@@ -29,6 +31,8 @@ INSERT INTO om_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC
 INSERT INTO om_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'leak on connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');
 INSERT INTO om_visit_parameter VALUES ('sediments_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Sediments in connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_sed');
 INSERT INTO om_visit_parameter VALUES ('sediments_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Sediments in node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_sed');
+INSERT INTO om_visit_parameter VALUES ('typea_comment', NULL, 'INSPECTION', null, 'TEXT', NULL, 'Comentari incidència tipus A', 'event_standard', 'defaultvalue',FALSE, 'typea_comment');
+INSERT INTO om_visit_parameter VALUES ('typeb_comment', NULL, 'INSPECTION', null, 'TEXT', NULL, 'Comentari incidència tipus B', 'event_standard', 'defaultvalue',FALSE, 'typeb_comment');
 
 
 INSERT INTO om_visit_class_x_parameter VALUES (1, 6, 'sediments_node');
@@ -40,6 +44,10 @@ INSERT INTO om_visit_class_x_parameter VALUES (4, 2, 'sediments_connec');
 INSERT INTO om_visit_class_x_parameter VALUES (7, 5, 'sediments_arc');
 INSERT INTO om_visit_class_x_parameter VALUES (8, 6, 'leak_node');
 INSERT INTO om_visit_class_x_parameter VALUES (9, 6, 'clean_node');
-
+INSERT INTO om_visit_class_x_parameter VALUES (10, 1, '3');
+INSERT INTO om_visit_class_x_parameter VALUES (11, 3, '10');
+INSERT INTO om_visit_class_x_parameter VALUES (12, 4, '6');
+INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'typea_comment');
+INSERT INTO om_visit_class_x_parameter VALUES (14, 9, 'typeb_comment');
 
 

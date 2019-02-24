@@ -6,16 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2644
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getvisitform(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getprojectvisitforms(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 -- getform for use offline
-SELECT SCHEMA_NAME.gw_api_getvisitform($${
+SELECT SCHEMA_NAME.gw_api_getprojectvisitforms($${
 "client":{"device":3,"infoType":100,"lang":"es"},
-"data":{"relatedFeature":{"type":"arc","tableName":"v_edit_arc"},
-	"fields":{},"pageInfo":null}}$$)
+"data":{"projectLayers":{"v_edit_arc","v_edit_node","v_edit_connec"}}}$$)
 */
 
 DECLARE
@@ -75,6 +74,11 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
+
+/*
+TODO
+Generate one form for layer and one form for visitclass=incident
+
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -205,7 +209,8 @@ BEGIN
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
 	v_layermanager := COALESCE(v_layermanager, '{}');
-  
+
+  */
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||

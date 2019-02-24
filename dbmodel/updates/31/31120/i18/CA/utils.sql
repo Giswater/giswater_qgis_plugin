@@ -17,7 +17,8 @@ INSERT INTO om_visit_class VALUES (0, 'Open visit', NULL, true, true, false, NUL
 INSERT INTO om_visit_class VALUES (2, 'Inspecció i neteja connec', NULL, true, false, true, 'CONNEC', 'role_om');
 INSERT INTO om_visit_class VALUES (4, 'Avaria connec', NULL, true, false, false, 'CONNEC', 'role_om');
 INSERT INTO om_visit_class VALUES (3, 'Avaria node', NULL, true, false, false, 'NODE', 'role_om');
-
+INSERT INTO om_visit_class VALUES (8, 'Incidència tipus A', NULL, true, false, true, null, 'role_om');
+INSERT INTO om_visit_class VALUES (9, 'Incidència tipus B', NULL, true, false, true, null, 'role_om');
 
 
 INSERT INTO om_visit_parameter VALUES ('desperfectes_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Desperfectes en arc', 'event_standard', 'defaultvalue', FALSE, 'arc_insp_des');
@@ -29,6 +30,8 @@ INSERT INTO om_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC
 INSERT INTO om_visit_parameter VALUES ('desperfectes_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Desperfectes en connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');
 INSERT INTO om_visit_parameter VALUES ('sediments_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Sediments en connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_sed');
 INSERT INTO om_visit_parameter VALUES ('sediments_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Sediments en node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_sed');
+INSERT INTO om_visit_parameter VALUES ('comentari_typea', NULL, 'INSPECTION', null, 'TEXT', NULL, 'Comentari incidència tipus A', 'event_standard', 'defaultvalue',FALSE, 'comentari_typea');
+INSERT INTO om_visit_parameter VALUES ('comentari_typeb', NULL, 'INSPECTION', null, 'TEXT', NULL, 'Comentari incidència tipus B', 'event_standard', 'defaultvalue',FALSE, 'comentari_typeb');
 
 
 INSERT INTO om_visit_class_x_parameter VALUES (1, 6, 'sediments_node');
@@ -40,5 +43,9 @@ INSERT INTO om_visit_class_x_parameter VALUES (4, 2, 'sediments_connec');
 INSERT INTO om_visit_class_x_parameter VALUES (7, 5, 'sediments_arc');
 INSERT INTO om_visit_class_x_parameter VALUES (8, 6, 'desperfectes_node');
 INSERT INTO om_visit_class_x_parameter VALUES (9, 6, 'neteja_node');
-
+INSERT INTO om_visit_class_x_parameter VALUES (10, 1, '3');
+INSERT INTO om_visit_class_x_parameter VALUES (11, 3, '10');
+INSERT INTO om_visit_class_x_parameter VALUES (12, 4, '6');
+INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'comentari_typea');
+INSERT INTO om_visit_class_x_parameter VALUES (14, 9, 'comentari_typeb');
 
