@@ -46,7 +46,7 @@ CREATE TABLE config_api_form_fields(
   isreload boolean,
   stylesheet json,
   isnotupdate boolean,
-  threshold integer,
+  threshold json,
   CONSTRAINT config_api_form_fields_pkey PRIMARY KEY (id),
   CONSTRAINT config_api_form_fields_pkey2 UNIQUE (formname, formtype, column_id)
 );
@@ -54,7 +54,7 @@ CREATE TABLE config_api_form_fields(
 
 
 CREATE TABLE config_api_form_tabs(
-  id integer PRIMARY KEY,
+  id integer NOT NULL,
   formname character varying(50),
   tabname text,
   tablabel text,
@@ -62,7 +62,9 @@ CREATE TABLE config_api_form_tabs(
   sys_role text,
   tooltip text,
   tabfunction json,
-  tabactions json
+  tabactions json,
+  device integer,
+  CONSTRAINT config_web_tabs_pkey PRIMARY KEY (id)
 );  
 
 
@@ -116,9 +118,9 @@ CREATE TABLE config_api_visit (
   formname character varying(30),
   tablename character varying(30),
   CONSTRAINT config_api_visit_pkey PRIMARY KEY (visitclass_id),
-  CONSTRAINT config_api_vist_fkey FOREIGN KEY (visitclass_id)
-      REFERENCES om_visit_class (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT,
+--  CONSTRAINT config_api_vist_fkey FOREIGN KEY (visitclass_id)
+-- REFERENCES om_visit_class (id) MATCH SIMPLE
+  --    ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT config_api_visit_formname_key UNIQUE (formname)
 );
 

@@ -266,6 +266,6 @@ VALUES ('connec_proximity_control', 'true', 'boolean', NULL, NULL,'Connec proxim
 
 
 -- 2019/02/24
-INSERT INTO audit_cat_param_user VALUES ('visit_duration_vdef', 'om', 'Duration for user', 'role_om', NULL, Visit expires time vdefault', 
-NULL, NULL, true, 9, 9, 'utils', false, NULL, NULL, NULL, false, 'date', 'text', NULL, NULL, NULL, NULL, NULL););
+INSERT INTO audit_cat_param_user VALUES ('visit_duration_vdef', 'visit', 'Duration for user', 'role_om', NULL, 'Visit expires time vdefault', 
+'Visit duration', NULL, NULL, TRUE, 9, 9, 'utils', false, NULL, NULL, NULL, false, 'date', 'text', FALSE, NULL, '24 hours', 'grl_om', NULL, TRUE, NULL, NULL, NULL);
 

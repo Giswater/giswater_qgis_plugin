@@ -14,52 +14,6 @@ CREATE TRIGGER gw_trg_om_visit AFTER INSERT OR DELETE ON "SCHEMA_NAME".om_visit
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit();
 
 
-CREATE TRIGGER gw_trg_om_visit_multievent
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_arc_insp
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('arc');
-
-
-CREATE TRIGGER gw_trg_om_visit_multievent
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_node_insp
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('node');
-
-
-CREATE TRIGGER gw_trg_om_visit_multievent
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_connec_insp
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('connec');
-
-
-CREATE TRIGGER gw_trg_om_visit_singlevent
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_singlevent_x_arc
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('arc');
-
-
-CREATE TRIGGER gw_trg_om_visit_singlevent
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_singlevent_x_connec
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('connec');
-
-
-CREATE TRIGGER gw_trg_om_visit_singlevent
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_singlevent_x_node
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_singlevent('node');
-  
-
-DROP TRIGGER IF EXISTS gw_trg_visit_user_manager on SCHEMA_NAME.ve_visit_user_manager;
-CREATE TRIGGER gw_trg_visit_user_manager INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.ve_visit_user_manager
-FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_user_manager();
-
 -- REVISAR
 DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_node_control ON node;
 CREATE TRIGGER gw_trg_man_addfields_value_node_control AFTER UPDATE OF node_id OR DELETE ON SCHEMA_NAME.node
