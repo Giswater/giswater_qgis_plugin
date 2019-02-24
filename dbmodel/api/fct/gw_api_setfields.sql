@@ -17,7 +17,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_api_setfields($${
 "client":{"device":9, "infoType":100, "lang":"ES"},
 "form":{},
-"feature":{"featureType":"node", "tableName":"ve_node_t", "id":"1251521"},
+"feature":{"featureType":"node", "tableName":"v_edit_man_junction", "id":"1251521"},
 "data":{"fields":{"macrosector_id": "1", "sector_id": "2", 
 "undelete": "False", "inventory": "False", "epa_type": "PUMP", "state": "1", "arc_id": "113854", "publish": "False", "verified": "TO REVIEW",
 "expl_id": "1", "builtdate": "2018/11/29", "muni_id": "2", "workcat_id": "22", "buildercat_id": "builder1", "enddate": "2018/11/29", 
@@ -39,13 +39,12 @@ DECLARE
     v_tablename text;
     v_id  character varying;
     v_fields json;
-    column_type character varying;
-    sql_query varchar;
+    v_columntype character varying;
+    v_querytext varchar;
     v_idname varchar;
     column_type_id character varying;
     api_version json;
     v_text text[];
-    json_field json;
     text text;
     i integer=1;
     v_field text;
@@ -53,6 +52,8 @@ DECLARE
     v_return text;
     v_schemaname text;
     v_featuretype text;
+    v_jsonfield json;
+
 
 BEGIN
 
@@ -105,37 +106,62 @@ BEGIN
             USING v_schemaname, v_tablename, v_idname
             INTO column_type_id;
 
-         
-    FOREACH text IN ARRAY v_text 
-    LOOP
 
-	-- Get field and value from json
-	SELECT v_text [i] into json_field;
-	v_field:= (SELECT (json_field ->> 'key')) ;
-	v_value:= (SELECT (json_field ->> 'value')) ;
+	-- query text, step1
+	v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
 
-	i=i+1;
+	-- query text, step2
+	i=1;
+	FOREACH text IN ARRAY v_text 
+	LOOP
+		SELECT v_text [i] into v_jsonfield;
+		v_field:= (SELECT (v_jsonfield ->> 'key')) ;
+		v_value := (SELECT (v_jsonfield ->> 'value')) ;
+		
+		-- Get column type
+		EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
+			USING v_schemaname, v_field
+			INTO v_columntype;
+
+		-- control column_type
+		IF v_columntype IS NULL THEN
+			v_columntype='text';
+		END IF;
+			
+		-- control geometry fields
+		IF v_field ='the_geom' OR v_field ='geom' THEN 
+			v_columntype='geometry';
+		END IF;
+
+		IF v_value !='null' OR v_value !='NULL' THEN 
 	
-	-- Get column type
-	EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
-		USING v_schemaname, v_field
-		INTO column_type;
+			IF v_field='state' THEN
+				PERFORM gw_fct_state_control(v_featuretype, v_id, v_value::integer, 'UPDATE');
+			END IF;
+			
+			IF v_field in ('geom', 'the_geom') THEN			
+				v_value := (SELECT ST_SetSRID((v_value)::geometry, 25831));				
+			END IF;
+			
+			--building the query text
+			IF i=1 THEN
+				v_querytext := concat (v_querytext, quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
+			ELSIF i>1 THEN
+				v_querytext := concat (v_querytext, ' , ',  quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
+			END IF;
+		END IF;
+		i=i+1;
 
-		--RAISE NOTICE '--- UPDATE FIELDS using v_field % v_tablename % column_type % v_idname % v_id % column_type_id % ---'  , v_field, v_tablename, column_type, v_idname, v_id, column_type_id;
+	END LOOP;
 
-	IF v_field='state' THEN
-		PERFORM gw_fct_state_control(v_featuretype, v_id, v_value::integer, 'UPDATE');
-	END IF;
+	-- query text, final step
+	v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';	
 
-	--    Value update
-	sql_query := 'UPDATE ' || quote_ident(v_tablename) || ' SET ' || quote_ident(v_field) || ' = CAST(' || quote_nullable(v_value) || ' AS ' 
-	|| column_type || ') WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';
+	raise notice 'v_querytext %', v_querytext;
 
-	--RAISE NOTICE ' --- UPDATE FIELDS USING QUERY % ---', sql_query;
-	
-	EXECUTE sql_query;
-	
-   END LOOP;
+	-- execute query text
+	EXECUTE v_querytext;
+
 
 --    Return
     RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||'}')::json;    
