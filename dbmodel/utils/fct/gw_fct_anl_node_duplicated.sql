@@ -41,10 +41,17 @@ BEGIN
 	raise notice 'v_worklayer % v_nodetolerance % v_id %',v_worklayer ,v_nodetolerance ,v_array;
 	
 	-- Computing process
-	EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
-			SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state, t2.node_id, t2.nodecat_id, t2.state, t1.expl_id, 6, t1.the_geom
-			FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
-			WHERE t1.node_id != t2.node_id AND t1.node_id IN '||v_array||' ORDER BY t1.node_id';
+	IF v_array != '()' THEN
+		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
+				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state, t2.node_id, t2.nodecat_id, t2.state, t1.expl_id, 6, t1.the_geom
+				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+				WHERE t1.node_id != t2.node_id AND t1.node_id IN '||v_array||' ORDER BY t1.node_id';
+	ELSE
+		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
+				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state, t2.node_id, t2.nodecat_id, t2.state, t1.expl_id, 6, t1.the_geom
+				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+				WHERE t1.node_id != t2.node_id ORDER BY t1.node_id';
+	END IF;
 
 	-- get results
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=6) row; 
