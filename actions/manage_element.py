@@ -141,7 +141,6 @@ class ManageElement(ParentManage):
             # Set calendars date from config_param_user
             self.set_calendars(self.dlg_add_element, 'builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
             utils_giswater.setWidgetText(self.dlg_add_element, 'num_elements', '1')
-            self.dlg_add_element.enddate.setEnabled(False)
 
         # Open the dialog    
         self.open_dialog(self.dlg_add_element, maximize_button=False)
@@ -188,7 +187,6 @@ class ManageElement(ParentManage):
         if rotation == 0 or rotation is None or rotation == 'null':
             rotation = '0'
         builtdate = self.dlg_add_element.builtdate.dateTime().toString('yyyy-MM-dd')
-        enddate = self.dlg_add_element.enddate.dateTime().toString('yyyy-MM-dd')
         undelete = self.dlg_add_element.undelete.isChecked()
 
         # Check mandatory fields
@@ -305,7 +303,7 @@ class ManageElement(ParentManage):
                    ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
                    ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
                    ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
-                   ", enddate = '" + str(enddate) + "', builtdate = '" + str(builtdate) + "'")
+                   ", builtdate = '" + str(builtdate) + "'")
             if ownercat_id:
                 sql += ", ownercat_id = '" + str(ownercat_id) + "'"
             else:

@@ -170,6 +170,7 @@ class ParentManage(ParentAction, object):
             row_type = self.controller.get_row(sql)
             if row_type:
                 utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
+
             utils_giswater.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
             utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
             utils_giswater.setWidgetText(dialog, "state", state)
@@ -178,9 +179,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
             utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
             builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
-            enddate = QDate.fromString(str(row['enddate']), 'yyyy-MM-dd')
             dialog.builtdate.setDate(builtdate)
-            dialog.enddate.setDate(enddate)
             utils_giswater.setWidgetText(dialog, "workcat_id", row['workcat_id'])
             utils_giswater.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
             utils_giswater.setWidgetText(dialog, "comment", row['comment'])
@@ -255,12 +254,8 @@ class ParentManage(ParentAction, object):
             self.reset_model(dialog, table_object, "element")
             if self.project_type == 'ud':
                 self.reset_model(dialog, table_object, "gully")
-            if table_object != 'doc':
-                dialog.enddate.setEnabled(False)
-            return
 
-        if table_object != 'doc':
-            dialog.enddate.setEnabled(True)
+            return
 
 
         # Fill input widgets with data of the @row
