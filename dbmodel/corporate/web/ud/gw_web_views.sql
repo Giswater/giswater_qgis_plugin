@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+-- definiton updated on 3.1.110
 -- VIEW PARENT
 
 CREATE OR REPLACE VIEW v_web_parent_arc AS 

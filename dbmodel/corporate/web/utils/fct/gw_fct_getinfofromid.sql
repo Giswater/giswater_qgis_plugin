@@ -198,9 +198,19 @@ BEGIN
 	END IF;
 
 	-- Identify Name of feature type (to put on header of form)
-	EXECUTE' SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1'
-		INTO v_formheader
-		USING id;
+	
+	IF  (SELECT value::json->>'id' FROM config_param_system WHERE parameter='customer_info')::integer=1 THEN 
+	
+		-- customer=1 (and others) needs descript to show improved names.
+		EXECUTE' SELECT descript FROM '||tableparent_id_arg||' WHERE nid::text=$1'
+			INTO v_formheader
+			USING id;
+	ELSE 
+		EXECUTE' SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1'
+			INTO v_formheader
+			USING id;
+	END IF;
+	
 		
 	raise notice'Parent-Child. Table child: %, p_info_type: %' , table_id_arg, p_info_type;
 
