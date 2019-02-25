@@ -56,27 +56,3 @@ CREATE OR REPLACE VIEW ve_lot_x_arc AS
      WHERE selector_lot.lot_id = om_visit_lot.id AND cur_user=current_user;
 
 	 
-drop view IF EXISTS v_ui_element_x_connec;
-CREATE OR REPLACE VIEW v_ui_element_x_connec AS
-SELECT
-element_x_connec.id,
-element_x_connec.connec_id,
-element_x_connec.element_id,
-element.elementcat_id,
-cat_element.descript,
-element.num_elements,
-element.state,
-element.state_type,
-element.observ,
-element.comment,
-element.builtdate,
-element.enddate,
-element.link,
-element.publish,
-element.inventory,
-element.location_type
-FROM element_x_connec
-JOIN element ON element.element_id = element_x_connec.element_id
-LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
-JOIN selector_state ON element.state=selector_state.state_id
-AND selector_state.cur_user = "current_user"()::text;
