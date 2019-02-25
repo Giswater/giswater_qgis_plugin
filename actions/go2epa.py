@@ -484,11 +484,8 @@ class Go2Epa(ApiParent):
 
 
         self.show_widgets(True)
+        print("{}:{}".format(self.counter, self.iterations))
         while self.counter < self.iterations:
-            print("{}:{}".format(self.counter, self.iterations))
-            #time.sleep(0.1)
-            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, str(self.counter) + "/" + str(self.iterations))
-            self.counter += 1
 
             common_msg = ""
             # Export to inp file
@@ -500,9 +497,7 @@ class Go2Epa(ApiParent):
                     return
                 # Call function gw_fct_pg2epa
                 sql = ("SELECT " + self.schema_name + "." + epa_function_call)
-                exit = self.controller.get_row(sql, log_sql=False)
-                if int(str(exit[0])) == 0:
-                    self.counter = self.iterations
+                row = self.controller.get_row(sql, log_sql=False)
 
                 # # Call function gw_fct_utils_csv2pg_export_epa_inp
                 # sql = ("SELECT " + self.schema_name + "." + export_function)
@@ -548,14 +543,17 @@ class Go2Epa(ApiParent):
                 else:
                     msg = "Can't export rpt, File not found"
                     self.controller.show_warning(msg, parameter=self.file_rpt)
+                    
+            self.counter += 1
+            print("{}:{}".format(self.counter, self.iterations))
+            utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter,
+                                         str(self.counter) + "/" + str(self.iterations))
 
-
-        # if is_recurrent:
-        #     # TODO descomentar esto cuando la funcion gw_fct_pg2epa_recursive este lista
-        #     extras = '"status":"' + 0 + '"'
-        #     body = self.create_body(extras=extras)
-        #     sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
-        #     row = self.controller.get_row(sql, log_sql=False)
+        if is_recursive:
+            extras = '"status":"0"'
+            body = self.create_body(extras=extras)
+            sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
+            row = self.controller.get_row(sql, log_sql=False)
 
 
         if common_msg != "" and self.imports_canceled is False:

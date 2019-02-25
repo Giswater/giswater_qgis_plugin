@@ -1093,7 +1093,7 @@ class Giswater(QObject):
 
 
     def hide_actions(self):
-        """ This function was vreated added in order to hide actions """
+        """ This function was created added in order to hide actions """
         # Example to fill list_to hide: ['74', '75', '83']
         list_to_hide = []
         if len(list_to_hide) > 0:
