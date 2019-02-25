@@ -1093,10 +1093,13 @@ class Giswater(QObject):
 
 
     def hide_actions(self):
-        list_to_hide = ['74', '75']
-        action_list = self.iface.mainWindow().findChildren(QAction)
-        for action in action_list:
-            _property = action.property('index_action')
-            if _property is not None:
-                if str(action.property('index_action')) in list_to_hide:
-                    action.setVisible(False)
+        """ This function was vreated added in order to hide actions """
+        # Example to fill list_to hide: ['74', '75', '83']
+        list_to_hide = []
+        if len(list_to_hide) > 0:
+            action_list = self.iface.mainWindow().findChildren(QAction)
+            for action in action_list:
+                _property = action.property('index_action')
+                if _property is not None:
+                    if str(action.property('index_action')) in list_to_hide:
+                        action.setVisible(False)
