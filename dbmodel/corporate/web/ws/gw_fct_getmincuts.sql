@@ -232,7 +232,7 @@ BEGIN
     formTabs := formtabs ||']';
 
 --    Create new form for mincut
-        form_info := json_build_object('formId','F45','formName','MINCUT MANAGER');    
+        form_info := json_build_object('formId','F45','formName',(SELECT name FROM config_web_layer_cat_form WHERE id='F45'));    
 
 
 --    Control NULL's
