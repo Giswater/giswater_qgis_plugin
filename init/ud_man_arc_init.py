@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
+from PyQt4.QtGui import QAction, QComboBox, QLineEdit, QMessageBox, QPushButton, QTableView, QTabWidget
 from qgis.core import QgsExpression, QgsFeatureRequest
 
 from functools import partial
@@ -103,7 +103,14 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'arc'))
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(partial(self.action_copy_paste, self.geom_type))
-        
+
+        field_y1 = self.dialog.findChild(QLineEdit, 'y1')
+        if field_y1 is not None:
+            field_y1.textChanged.connect(partial(self.compare_depth, 'node_1'))
+        field_y2 = self.dialog.findChild(QLineEdit, 'y2')
+        if field_y2 is not None:
+            field_y2.textChanged.connect(partial(self.compare_depth, 'node_2'))
+
         # Manage tab 'Relations'
         self.manage_tab_relations("v_ui_arc_x_relations", "arc_id")
         
@@ -133,6 +140,25 @@ class ManArcDialog(ParentDialog):
 
         self.load_state_type(self.dialog, state_type, self.geom_type)
         self.load_dma(self.dialog, dma_id, self.geom_type)
+
+
+    def compare_depth(self, widget_name, y):
+        widget = self.dialog.findChild(QLineEdit, widget_name)
+        node_id = utils_giswater.getWidgetText(self.dialog, widget)
+        if widget is not None:
+            sql = ("SELECT ymax FROM " + self.schema_name + ".v_edit_node "
+                   "WHERE node_id='"+str(node_id)+"'")
+            row = self.controller.get_row(sql, log_sql=True)
+
+        if row is not None:
+            if float(y) > float(row['ymax']):
+                msg = "The depth of {} is less than the y{}".format(widget.objectName(), widget.objectName()[5:6])
+                # self.controller.show_info_box(text=msg, title="Info")
+                msg_box = QMessageBox()
+                msg_box.setIcon(3)
+                msg_box.setWindowTitle("Warning")
+                msg_box.setText(msg)
+                msg_box.exec_()
 
 
     def get_nodes(self):

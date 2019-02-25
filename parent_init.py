@@ -484,6 +484,7 @@ class ParentDialog(QDialog):
         if element_id:
             utils_giswater.setWidgetText(elem.dlg_add_element, "element_id", element_id)
 
+        elem.dlg_add_element.setWindowTitle("Manage element")
         # Open dialog
         elem.open_dialog(elem.dlg_add_element)
 
