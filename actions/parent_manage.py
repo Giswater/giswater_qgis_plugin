@@ -136,47 +136,50 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "rotation", "")
             utils_giswater.setWidgetText(dialog, "verified", "")
             utils_giswater.setWidgetText(dialog, dialog.num_elements, "")
-                    
-    
+
     def fill_widgets(self, dialog, table_object, row):
         """ Fill input widgets with data int he @row """
-        
+
         if table_object == "doc":
-            
+
             utils_giswater.setWidgetText(dialog, "doc_type", row["doc_type"])
-            utils_giswater.setWidgetText(dialog, "observ",  row["observ"])
-            utils_giswater.setWidgetText(dialog, "path",  row["path"])
-             
+            utils_giswater.setWidgetText(dialog, "observ", row["observ"])
+            utils_giswater.setWidgetText(dialog, "path", row["path"])
+
         elif table_object == "element":
-                    
-            state = ""  
-            if row['state']:          
+
+            state = ""
+            if row['state']:
                 sql = ("SELECT name FROM " + self.schema_name + ".value_state"
-                       " WHERE id = '" + str(row['state']) + "'")
+                                                                " WHERE id = '" + str(row['state']) + "'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     state = row_aux[0]
-    
+
             expl_id = ""
             if row['expl_id']:
                 sql = ("SELECT name FROM " + self.schema_name + ".exploitation"
-                       " WHERE expl_id = '" + str(row['expl_id']) + "'")
+                                                                " WHERE expl_id = '" + str(row['expl_id']) + "'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     expl_id = row_aux[0]
 
-            utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
-            utils_giswater.setWidgetText(dialog, "state", state)
-            utils_giswater.setWidgetText(dialog, "expl_id", expl_id)
+            utils_giswater.setWidgetText(dialog, "code", row['code'])
             sql = ("SELECT elementtype_id FROM " + self.schema_name + ".cat_element"
-                   " WHERE id = '" + str(row['elementcat_id']) + "'")
+                                                                      " WHERE id = '" + str(row['elementcat_id']) + "'")
             row_type = self.controller.get_row(sql)
             if row_type:
                 utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
-            utils_giswater.setWidgetText(dialog, "code", row['code'])
+
+            utils_giswater.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
+            utils_giswater.setWidgetText(dialog, "num_elements", row['num_elements'])
+            utils_giswater.setWidgetText(dialog, "state", state)
+            utils_giswater.setWidgetText(dialog, "expl_id", expl_id)
             utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
             utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
+            builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
+            dialog.builtdate.setDate(builtdate)
             utils_giswater.setWidgetText(dialog, "workcat_id", row['workcat_id'])
             utils_giswater.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
             utils_giswater.setWidgetText(dialog, "comment", row['comment'])
@@ -186,12 +189,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "rotation", row['rotation'])
             if str(row['undelete']) == 'True':
                 dialog.undelete.setChecked(True)
-            builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
-            enddate = QDate.fromString(str(row['enddate']), 'yyyy-MM-dd')
 
-            dialog.builtdate.setDate(builtdate)
-            dialog.enddate.setDate(enddate)
-            
               
     def get_records_geom_type(self, dialog, table_object, geom_type):
         """ Get records of @geom_type associated to selected @table_object """
@@ -256,12 +254,7 @@ class ParentManage(ParentAction, object):
             self.reset_model(dialog, table_object, "element")
             if self.project_type == 'ud':
                 self.reset_model(dialog, table_object, "gully")
-            if table_object != 'doc':
-                dialog.enddate.setEnabled(False)
             return
-
-        if table_object != 'doc':
-            dialog.enddate.setEnabled(True)
 
 
         # Fill input widgets with data of the @row
