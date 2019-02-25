@@ -14,7 +14,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 
-changelog=Version 3.1.108 (14/02/2019)
+changelog=Version 3.1.108 (25/02/2019)
     - Bug fix: delete enddate from manage element #634 [26f5dac]
     - Enhance: new function added in order to hide actions [34b0ec0]
     - Enhance control on UD arc form (y1 and y2 widgets) #633 [2226267]
