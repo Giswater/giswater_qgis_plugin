@@ -181,6 +181,8 @@ class Giswater(QObject):
         else:
             action = QAction(icon, text, action_group)
         action.setObjectName(function_name)
+        action.setProperty('index_action', index_action)
+
         # Button add_node or add_arc: add drop down menu to button in toolbar
         if self.schema_exists and (index_action == '01' or index_action == '02'):
             action = self.manage_dropdown_menu(action, index_action)
@@ -601,7 +603,7 @@ class Giswater(QObject):
         
         # Manage project variable 'expl_id'
         self.manage_expl_id()           
-        
+        self.hide_actions()
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)
@@ -1087,5 +1089,15 @@ class Giswater(QObject):
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
-            
-            
+
+
+    def hide_actions(self):
+        """ Function added in order to hide actions (by index_action) temporarily"""
+        # Example list_to_hide = ['74', '75']
+        list_to_hide = []
+        action_list = self.iface.mainWindow().findChildren(QAction)
+        for action in action_list:
+            _property = action.property('index_action')
+            if _property is not None:
+                if str(action.property('index_action')) in list_to_hide:
+                    action.setVisible(False)
