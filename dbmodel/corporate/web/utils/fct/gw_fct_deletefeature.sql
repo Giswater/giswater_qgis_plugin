@@ -5,7 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_deletefeature"(table_id varchar, id int8) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_deletefeature"(table_id varchar, id int8) RETURNS pg_catalog.json AS 
+$BODY$
+
+/*
+SELECT SCHEMA_NAME.gw_fct_deletefeature('v_edit_man_junction',36) AS result
+*/
+
 DECLARE
 
     schemas_array name[];
@@ -34,28 +40,29 @@ BEGIN
 
 --    For views is the first column
     IF table_pkey ISNULL THEN
-        EXECUTE 'SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND ordinal_position = 1'
+        EXECUTE FORMAT ('SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = %s AND ordinal_position = 1',
+	quote_literal(table_id))
         INTO table_pkey
         USING schemas_array[1];
     END IF;
 
 --    Get column type
-    EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND column_name = $2'
+    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = %s AND column_name = $2', 
+	quote_literal(table_id))
         USING schemas_array[1], table_pkey
         INTO column_type;
 
 --    Get parameter id
-    EXECUTE 'SELECT EXISTS(SELECT 1 FROM ' || table_id || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type || '))'
-    USING id
-    INTO res_delete;
-
-RAISE NOTICE 'Res: %', column_type;
+    EXECUTE FORMAT ('SELECT EXISTS(SELECT 1 FROM %s WHERE %s = CAST( %s AS %s ))',
+	table_id ,quote_ident(table_pkey) ,quote_literal(id), column_type)
+	INTO res_delete;
 
 --    Return
     IF res_delete THEN
 
-        EXECUTE 'DELETE FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type || ')'
-            USING id;
+        EXECUTE FORMAT ('DELETE FROM %s WHERE %s = CAST( %s AS %s)',
+		quote_ident(table_id), quote_ident(table_pkey),  quote_literal(id), column_type);
+
 
         RETURN ('{"status":"Accepted", "apiVersion":'|| api_version ||'}')::json;
     ELSE
@@ -63,8 +70,8 @@ RAISE NOTICE 'Res: %', column_type;
     END IF;
 
 --    Exception handling
-  --  EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

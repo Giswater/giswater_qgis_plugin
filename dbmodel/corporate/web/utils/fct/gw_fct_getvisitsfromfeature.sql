@@ -5,7 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getvisitsfromfeature"(element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getvisitsfromfeature"(element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp) RETURNS pg_catalog.json AS 
+$BODY$
+
+/*
+SELECT SCHEMA_NAME.gw_fct_getvisitsfromfeature('arc', '2078', 3,'2014-03-26T00:00:00.000Z','2019-03-27T00:00:00.000Z') AS result
+*/
+
 DECLARE
 
 --    Variables
@@ -13,10 +19,7 @@ DECLARE
     query_result_visits json;
     api_version json;
 
-
-
 BEGIN
-
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
@@ -54,11 +57,10 @@ BEGIN
 
 --    Get visits
     IF query_result IS NOT NULL THEN
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ') a'
+    EXECUTE format ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( %s ) a',query_result)
         INTO query_result_visits
         USING id;
     END IF;
-
 
 --    Control NULL's
     query_result_visits := COALESCE(query_result_visits, '{}');

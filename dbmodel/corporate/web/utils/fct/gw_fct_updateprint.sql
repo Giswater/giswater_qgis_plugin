@@ -1,4 +1,12 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updateprint"(p_data json, p_x1 float8, p_y1 float8, p_x2 float8, p_y2 float8, p_istilemap bool, p_device int4) RETURNS pg_catalog.json AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updateprint"(p_data json, p_x1 float8, p_y1 float8, p_x2 float8, p_y2 float8, p_istilemap bool, p_device int4) RETURNS pg_catalog.json AS 
+$BODY$
+/*
+SELECT SCHEMA_NAME.gw_fct_updateprint($${"composer":"mincutA3","scale":"10000","ComposerTemplates":
+[{"ComposerTemplate":"mincutA4","ComposerMap":[{"width":"179.414","height":"140.826","name":"map0"},
+{"width":"77.729","height":"55.9066","name":"map7"}]},{"ComposerTemplate":"mincutA3","ComposerMap":
+[{"width":"53.44","height":"55.9066","name":"map7"},{"width":"337.865","height":"275.914","name":"map6"}]}],
+"extent":"418284.06010078074,4576197.139572782,419429.332014571,4576756.056126544"}$$,418284.06010078074,4576197.139572782,419429.332014571,4576756.056126544,False,3)
+*/
 DECLARE
 
 --    Variables
@@ -85,33 +93,28 @@ BEGIN
     select array_agg(row_to_json(a)) into v_text from json_each(p_data)a;
     FOREACH text IN ARRAY v_text
     LOOP
-     -- Get field and value from json
-     SELECT v_text [i] into json_field;
-     v_field:= (SELECT (json_field ->> 'key')) ;
-     v_value:= (SELECT (json_field ->> 'value'));
+	-- Get field and value from json
+	SELECT v_text [i] into json_field;
+	v_field:= (SELECT (json_field ->> 'key')) ;
+	v_value:= (SELECT (json_field ->> 'value'));
  
-     i=i+1;
+	i=i+1;
+  
+	IF v_field!='ComposerTemplates' THEN
 
-     raise notice 'v_field % v_value %', v_field, v_value;
-     
-     IF v_field!='ComposerTemplates' THEN
-
-         -- Upsert values
-         sql_query := 'DELETE FROM selector_composer WHERE field_id = ' || quote_literal(v_field) || ' AND user_name = '||quote_literal(current_user);
-         EXECUTE sql_query;
+		-- Upsert values
+		EXECUTE 'DELETE FROM selector_composer WHERE field_id = $1 AND user_name = '||quote_literal(current_user)
+			USING v_field;
  
-         sql_query := 'DELETE FROM selector_composer WHERE field_id = ' || quote_literal(v_field) || ' AND user_name = '||quote_literal(v_publish_user);
-         EXECUTE sql_query;
+		EXECUTE'DELETE FROM selector_composer WHERE field_id = $1 AND user_name = '||quote_literal(v_publish_user)
+			USING v_field;
  
-         sql_query := 'INSERT INTO selector_composer (field_id, field_value, user_name) VALUES ('|| quote_literal(v_field) ||','|| quote_nullable(v_value)||','||quote_literal(current_user)||')';
-         EXECUTE sql_query;
-
-         RAISE NOTICE 'sql_query %', sql_query;
- 
-         sql_query := 'INSERT INTO selector_composer (field_id, field_value, user_name) VALUES ('|| quote_literal(v_field) ||','|| quote_nullable(v_value)||','||quote_literal(v_publish_user)||')';
-         EXECUTE sql_query;
-     END IF;
-     
+		EXECUTE 'INSERT INTO selector_composer (field_id, field_value, user_name) VALUES ($1,$2,'||quote_literal(current_user)||')'
+			USING v_field, quote_nullable(v_value);
+         
+		EXECUTE 'INSERT INTO selector_composer (field_id, field_value, user_name) VALUES ($1,$2,'||quote_literal(v_publish_user)||')'
+			USING v_field, quote_nullable(v_value);
+	END IF;
     END LOOP;
 
 --calulate the extend
@@ -140,16 +143,12 @@ BEGIN
     v_geometry = '{"st_astext":"POLYGON(('  || p21x ||' '|| p21y || ',' || p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || '))"}';
     v_extent = '"[' || p21x || ',' || p21y || ',' || p02x || ',' || p02y || ']"';
    
-
-raise notice 'v_geometry %', v_geometry;
-
 --    Control NULL's
     api_version := COALESCE(api_version, '{}');
     v_tiled_layers := COALESCE(v_tiled_layers, '{}');
     v_geometry := COALESCE(v_geometry, '{}');
     v_mapcomposer_name := COALESCE(v_mapcomposer_name, '{}');
     v_extent := COALESCE(v_extent, '{}');
-
 
   --Return
     RETURN ('{"status":"Accepted",'||
@@ -161,10 +160,8 @@ raise notice 'v_geometry %', v_geometry;
         ',"extent":'||v_extent ||'}}')::json;
 
 --    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-  --      RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
-
-
+    EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;

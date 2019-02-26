@@ -10,7 +10,8 @@ RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 /* EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getinfofromid('id', 'om_visit_lot', '1', false, false, 3, 100, 'es') 
+
+
 */
 
 --    Variables
@@ -129,7 +130,7 @@ BEGIN
 --     Get geometry (to feature response)
 ------------------------------------------
     IF v_the_geom IS NOT NULL THEN
-        EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText(St_simplify('||v_the_geom||',0)) FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
+        EXECUTE FORMAT ('SELECT row_to_json(row) FROM (SELECT St_AsText(St_simplify('||v_the_geom||',0)) FROM %s WHERE '||v_idname||' = CAST( %s AS '||column_type||'))row', table_id_arg, quote_literal(id))
             INTO v_geometry;
     END IF;
 
@@ -141,7 +142,7 @@ BEGIN
 
     IF  link_id_aux IS NOT NULL THEN      
         -- Get link field value
-        EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||link_id_aux||' AS link FROM '||table_id_arg||' WHERE '||v_idname||' = CAST('||quote_literal(id)||' AS '||column_type||'))row'
+        EXECUTE FORMAT ('SELECT row_to_json(row) FROM (SELECT '||link_id_aux||' AS link FROM %s WHERE %s = CAST( '||v_idname||' AS '||column_type||'))row', table_id_arg, quote_literal(id))
         INTO link_path;
 	raise notice 'Layer link path: % ', link_path;
    END IF;
@@ -202,11 +203,11 @@ BEGIN
 	IF  (SELECT value::json->>'id' FROM config_param_system WHERE parameter='customer_info')::integer=1 THEN 
 	
 		-- customer=1 (and others) needs descript to show improved names.
-		EXECUTE' SELECT descript FROM '||tableparent_id_arg||' WHERE nid::text=$1'
+		EXECUTE FORMAT ('SELECT descript FROM %s WHERE nid::text=$1', tableparent_id_arg)
 			INTO v_formheader
 			USING id;
 	ELSE 
-		EXECUTE' SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1'
+		EXECUTE FORMAT ('SELECT custom_type FROM %s WHERE nid::text=$1', tableparent_id_arg)
 			INTO v_formheader
 			USING id;
 	END IF;
@@ -243,8 +244,8 @@ BEGIN
 -- Propierties of info layer's
 ------------------------------
     IF table_id_arg IS NOT NULL THEN 
-	EXECUTE 'SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = '||quote_literal(schemas_array[1])||' 
-		AND table_name = '||quote_literal(table_id_arg)||')'
+	EXECUTE FORMAT ('SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = '||quote_literal(schemas_array[1])||' 
+		AND table_name = %s )', quote_literal(table_id_arg))
 		INTO v_query_text;
             
 	IF v_query_text::boolean IS FALSE THEN
@@ -369,8 +370,8 @@ ELSE
 END IF;
 
 --    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+       RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

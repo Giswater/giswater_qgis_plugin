@@ -88,13 +88,13 @@ IF tab_arg = 'address' THEN
     
     -- Get address
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||v_address_layer||'.'||v_address_display_field||' as display_name, st_x ('||v_address_layer||'.'||v_address_geom_id_field||') as sys_x
-        ,st_y ('||v_address_layer||'.'||v_address_geom_id_field||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid
-        FROM '||v_address_layer||'
-        JOIN '||v_street_layer||' ON '||v_street_layer||'.'||v_street_id_field||' = '||v_address_layer||'.'||v_address_street_id_field ||'
-        WHERE '||v_street_layer||'.'||v_street_display_field||' = $$'||id_arg||'$$
-        AND '||v_address_layer||'.'||v_address_display_field||' ILIKE '''||text_arg||''' LIMIT 10 
-        )a'
+        FROM (SELECT a.'||quote_ident(v_address_display_field)||' as display_name, st_x (a.'||quote_ident(v_address_geom_id_field)||') as sys_x
+        ,st_y (a.'||quote_ident(v_address_geom_id_field)||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid
+        FROM '||quote_ident(v_address_layer)||' a
+        JOIN '||quote_ident(v_street_layer)||' b ON b.'||quote_ident(v_street_id_field)||' = a.'||quote_ident(v_address_street_id_field) ||'
+        WHERE b.'||quote_ident(v_street_display_field)||' = $1 
+        AND a.'||quote_ident(v_address_display_field)||' ILIKE $2 LIMIT 10 )a'
+        USING id_arg, text_arg
         INTO response_json;
 
 END IF;
@@ -109,8 +109,8 @@ END IF;
         '}')::json;
 
 --    Exception handling
-    --EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+      EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;$BODY$

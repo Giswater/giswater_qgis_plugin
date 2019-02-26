@@ -5,7 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfovisits"(p_element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp, p_parameter_type varchar, p_parameter_id varchar, visit_id int8) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfovisits"(p_element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp, p_parameter_type varchar, p_parameter_id varchar, visit_id int8) RETURNS pg_catalog.json AS 
+$BODY$
+
+/*
+SELECT SCHEMA_NAME.gw_fct_getinfovisits('arc', '2078', 3,'2014-03-26T00:00:00.000Z','2019-03-27T00:00:00.000Z','INSPECTION','desperfectes_arc',NULL) AS result
+*/
+
 DECLARE
 
 --    Variables
@@ -17,9 +23,7 @@ DECLARE
     parameter_id_options json;
     api_version json;
 
-    
 BEGIN
-
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
@@ -79,7 +83,6 @@ raise notice 'p_parameter_type %', p_parameter_type;
    (SELECT om_visit_parameter.id FROM om_visit_parameter WHERE parameter_type=p_parameter_type AND om_visit_parameter.id=p_parameter_id) IS NULL THEN
     p_parameter_id=null;
    END IF;
-    
 
 --    Add parameter_id filter
     IF p_parameter_id IS NOT NULL THEN
@@ -94,12 +97,12 @@ raise notice 'p_parameter_type %', p_parameter_type;
 
 --    Get visits with all the filters
    IF query_result IS NOT NULL THEN
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' ORDER by sys_date desc) a'
+    EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( %s ORDER by sys_date desc) a', query_result)
         INTO query_result_visits
         USING id;
 
 --    Get visits with just date filters
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || 'ORDER by sys_date desc) a'
+    EXECUTE fORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( %s ORDER by sys_date desc) a', query_result)
         INTO query_result_visits_dates
         USING id;
     END IF;
@@ -113,19 +116,14 @@ raise notice 'p_parameter_type %', p_parameter_type;
         ORDER BY x.order_number) b) a'      
             INTO parameter_type_options
             USING p_element_type, p_parameter_type;
-    
    ELSE
-    
-        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT sys_parameter_type AS "id", sys_parameter_type AS "name" FROM (
-        SELECT DISTINCT sys_parameter_type FROM (' || query_result_dates || ') c) b
+        EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT sys_parameter_type AS "id", sys_parameter_type AS "name" FROM (
+        SELECT DISTINCT sys_parameter_type FROM ( %s ) c) b
         LEFT JOIN (VALUES ($1, 1)) AS x(value, order_number) ON sys_parameter_type = x.value 
-        ORDER BY x.order_number) a'
+        ORDER BY x.order_number) a',query_result_dates)
             INTO parameter_type_options
                     USING p_parameter_type;
-
-
-raise notice 'parameter_type_options %', parameter_type_options;
-
+                    
     END IF;
         
 --    Get query_result_parameter_id_options
@@ -136,17 +134,12 @@ raise notice 'parameter_type_options %', parameter_type_options;
             WHERE  feature_type = UPPER($1) AND parameter_type = $2 order by name) t  ) r'  
             INTO parameter_id_options
             USING p_element_type, p_parameter_type;
-            
     ELSE    
-    
-        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT '' '' as id, '' '' as name FROM om_visit_parameter UNION 
-        SELECT DISTINCT sys_parameter_id AS "id", sys_parameter_name AS "name" FROM (' || query_result_dates || ')b WHERE sys_parameter_type=$1 order by name asc) a'
+        EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT '' '' as id, '' '' as name FROM om_visit_parameter UNION 
+        SELECT DISTINCT sys_parameter_id AS "id", sys_parameter_name AS "name" FROM ( %s )b WHERE sys_parameter_type=$1 order by name asc) a', query_result_dates)
         INTO parameter_id_options
         USING p_parameter_type;
-    
-    
     END IF;
-
 
 --    Control NULL's
     query_result_visits := COALESCE(query_result_visits, '{}');
@@ -163,8 +156,8 @@ raise notice 'parameter_type_options %', parameter_type_options;
 
 
 --    Exception handling
-  --  EXCEPTION WHEN OTHERS THEN 
-   --     RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
         
 END;
 $BODY$

@@ -10,8 +10,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getprint(p_active_composer text, p
 $BODY$
 DECLARE
 
--- SELECT SCHEMA_NAME.gw_fct_getprint('{A4-mincut, A3-mincut}', 3)
-    
+/*
+SELECT SCHEMA_NAME.gw_fct_getprint('{A4-mincut, A3-mincut}', 3)
+*/  
     
 --    Variables
     column_type character varying;
@@ -65,45 +66,39 @@ BEGIN
 
     -- Update combos
     FOREACH aux_json IN ARRAY combo_rows
-    LOOP
+	LOOP
 
---      Get combo id's
-	IF aux_json->>'dv_table' = 'config_web_composer' THEN
-		EXECUTE 'SELECT array_to_json(''' || p_active_composer ||'''::text[])'
-			INTO combo_json; 
-
-		RAISE NOTICE 'combo_json 11 %', combo_json;
-	ELSE
-		EXECUTE 'SELECT array_to_json(array_agg((' || (quote_ident(aux_json->>'dv_id_column')) || ')::text)) FROM (SELECT (' || (quote_ident(aux_json->>'dv_id_column')) ||') FROM ' 
-		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_id_column') || ') a'
-			INTO combo_json; 
-
-		RAISE NOTICE 'combo_json 13 %', combo_json;
-
-	END IF;
---      Update array
-        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
-        
---      Get combo values
-	IF aux_json->>'dv_table' = 'config_web_composer' THEN
-		EXECUTE 'SELECT array_to_json(''' || p_active_composer ||'''::text[])'
-			INTO combo_json; 
-
-			RAISE NOTICE 'combo_json 15 %', combo_json;
-	ELSE
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM '
+		-- Get combo id's
+		IF aux_json->>'dv_table' = 'config_web_composer' THEN
+			EXECUTE 'SELECT array_to_json($1::text[])'
+				USING p_active_composer
+				INTO combo_json; 
+		ELSE
+			EXECUTE 'SELECT array_to_json(array_agg((' || (quote_ident(aux_json->>'dv_id_column')) || ')::text)) FROM (SELECT (' || (quote_ident(aux_json->>'dv_id_column')) ||') FROM ' 
 			|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_id_column') || ') a'
-			INTO combo_json; 
-	END IF;
+				INTO combo_json; 
+		END IF;
+
+		-- Update array
+		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
+        
+		-- Get combo values
+		IF aux_json->>'dv_table' = 'config_web_composer' THEN
+			EXECUTE 'SELECT array_to_json($1::text[])'
+				USING p_active_composer
+				INTO combo_json; 
+		ELSE
+			EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_name_column') ||  ' FROM '
+				|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_id_column') || ') a'
+				INTO combo_json; 
+		END IF;
 	
-	combo_json := COALESCE(combo_json, '[]');
+		combo_json := COALESCE(combo_json, '[]');
 	
---      Update array
-        fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
+		-- Update array
+		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', combo_json);
 
 	END LOOP;
-
-	raise notice 'fields_array %', fields_array;
 
 --        Fill every value
         FOREACH aux_json IN ARRAY fields_array
@@ -112,8 +107,10 @@ BEGIN
 		array_index := array_index + 1;
 		
 		-- Get values
-		EXECUTE 'SELECT field_value FROM selector_composer WHERE field_id= '|| quote_literal(aux_json->>'name') ||' AND user_name = '||quote_literal(current_user)
+		EXECUTE 'SELECT field_value FROM selector_composer WHERE field_id= $1 AND user_name = '||quote_literal(current_user)
+		USING (aux_json->>'name')
                 INTO field_value; 
+                
 		field_value := COALESCE(field_value, '');
 
 		-- Update array
@@ -160,8 +157,8 @@ BEGIN
 
 
 --    Exception handling
---    EXCEPTION WHEN OTHERS THEN 
-        --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

@@ -23,7 +23,6 @@ BEGIN
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
-
 --      Check exists and set
     EXECUTE format('SELECT COUNT(*) FROM %I WHERE %I = $1 AND cur_user = current_user', tabName, tabIdName)
     USING id_arg

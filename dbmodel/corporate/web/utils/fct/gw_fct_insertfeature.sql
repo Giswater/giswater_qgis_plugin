@@ -5,7 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_insertfeature"(layer_id varchar, table_id varchar, srid int4, the_geom varchar, insert_data json) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_insertfeature"(layer_id varchar, table_id varchar, srid int4, the_geom varchar, insert_data json) RETURNS pg_catalog.json AS 
+$BODY$
+
+/*
+SELECT SCHEMA_NAME.gw_fct_insertfeature('Junction','v_edit_man_junction',25831,'POINT(419093.4610180535 4576608.050609055)',
+'{"nodecat_id":"AIR VALVE DN50","builtdate":null,"state":1,"enddate":null,"undelete":"false","publish":"false","inventory":"false"}')
+*/
 DECLARE
 
 --    Variables
@@ -17,10 +23,7 @@ DECLARE
     inputstring text;
     api_version json;
 
-
-
 BEGIN
-
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;    
@@ -28,7 +31,6 @@ BEGIN
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
-
 
 --    COMMON TASKS:
 
@@ -48,16 +50,13 @@ BEGIN
 --    Set table name
     table_name := table_id;
 
-    RAISE NOTICE 'Res: % ', insert_data;
-
 --    Get columns names
     SELECT string_agg(quote_ident(key),',') INTO inputstring FROM json_object_keys(insert_data) AS X (key);
 
 --    Perform INSERT
-    EXECUTE 'INSERT INTO '|| quote_ident(table_name) || '(' || inputstring || ') SELECT ' ||  inputstring || 
-        ' FROM json_populate_record( NULL::' || quote_ident(table_name) || ' , $1)'
-    USING insert_data;
-
+    EXECUTE FORMAT('INSERT INTO %s (%s) SELECT %s FROM json_populate_record( NULL::%s , $1)' ,
+		quote_ident(table_name), inputstring, inputstring, quote_ident(table_name))
+		USING insert_data;
 
 --    Control NULL's
     id_insert := COALESCE(id_insert, '');
@@ -69,8 +68,8 @@ BEGIN
         '}')::json;
 
 --    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-     --   RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

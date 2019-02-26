@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_upsertmincut(
     mincut_id_arg integer,
     x double precision,
@@ -23,7 +22,6 @@ SELECT SCHEMA_NAME.gw_fct_upsertmincut(477,419203.72254917,4576479.7842369,25831
 "forecast_start":null,"forecast_end":null,"muni_id":"Sant Boi del Llobregat","postcode":"08830","streetaxis_id":"1-10100C","postnumber":null,"exec_start":null,"exec_descript":null,"exec_from_plot":null,"exec_depth":null,
 "exec_user":null,"exec_appropiate":"false","exec_end":null}$$,'arc','2021')
 */
-
 
 DECLARE
 
@@ -56,9 +54,7 @@ DECLARE
     v_rectgeometry json;
     v_rectgeometry_geom public.geometry;
     v_geometry_return text;
-
-
-    
+   
 BEGIN
 
 --    Set search path to local schema
@@ -183,7 +179,6 @@ BEGIN
  
     insert_data := gw_fct_json_object_set_key(insert_data, 'mincut_class', mincut_class);
 
-
 --    Update user
     insert_data := gw_fct_json_object_set_key(insert_data, 'anl_user', current_user_var);
 
@@ -196,18 +191,18 @@ BEGIN
 --    Get columns names
     SELECT string_agg(quote_ident(key),',') INTO inputstring FROM json_object_keys(insert_data) AS X (key);
 
---    Perform UPDATE (<9.5)
+--    Perform UPDATE 
     FOR column_name_var, column_type_var IN SELECT column_name, data_type FROM information_schema.Columns WHERE table_schema = schemas_array[1]::TEXT AND table_name = 'anl_mincut_result_cat' LOOP
         IF (insert_data->>column_name_var) IS NOT NULL THEN
-            EXECUTE 'UPDATE anl_mincut_result_cat SET ' || quote_ident(column_name_var) || ' = $1::' || column_type_var || ' WHERE anl_mincut_result_cat.id = $2'
+        
+            EXECUTE FORMAT ('UPDATE anl_mincut_result_cat SET %s = $1::%s WHERE anl_mincut_result_cat.id = $2',  quote_ident(column_name_var), column_type_var)
             USING insert_data->>column_name_var, v_mincut_id;
+           
         END IF;
     END LOOP;
 
-
 --    specific tasks
     IF mincut_id_arg ISNULL THEN
-
     
         IF v_mincut_class = 2 THEN
             INSERT INTO anl_mincut_result_connec(result_id, connec_id, the_geom) VALUES (v_mincut_id, id_arg, point_geom);
@@ -251,8 +246,8 @@ BEGIN
         '}')::json;
 
 --    Exception handling
- --   EXCEPTION WHEN OTHERS THEN 
-  --  RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+       RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
