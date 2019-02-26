@@ -12,6 +12,8 @@ $BODY$
 
 /*EXAMPLE:
 
+SELECT SCHEMA_NAME.gw_api_getvisit($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$) AS result
+
 -- new call for visit not associated to infraestructure element
 SELECT SCHEMA_NAME.gw_api_getvisit($${
 "client":{"device":3,"infoType":100,"lang":"es"},
@@ -27,13 +29,18 @@ SELECT SCHEMA_NAME.gw_api_getvisit($${
 "data":{"relatedFeature":{"type":"arc", "id":"2080"},
 	"fields":{},"pageInfo":null}}$$)
 
+-- get info from existing visit
+SELECT SCHEMA_NAME.gw_api_getvisit($${
+"client":{"device":3,"infoType":100,"lang":"es"},
+"feature":{"featureType":"visit","tableName":"om_visit","idName":"id","id":10455},
+"data":{"relatedFeature":{"type":"", "id":""},
+	"fields":{},"pageInfo":null}}$$)
+
 
 --upsert class from multievent to singlevent
 SELECT SCHEMA_NAME.gw_api_getvisit($${"client":{"device":3,"infoType":100,"lang":"es"},
-"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idName":"visit_id","id":10455},
-"form":{"tabData":{"active":true},"tabFiles":{"active":false},"navigation":{"currentActiveTab":"tabData"}},
-"data":{"relatedFeature":{"type":"arc", "id":"2048"},
-"fields":{"class_id":"1","visit_id":"10455","arc_id":"2048","visitcat_id":"1","desperfectes_arc":"2","neteja_arc":"3"},"pageInfo":null}}$$) AS result
+"feature":{"featureType":"visit","tableName":"om_visit","idName":"id","id":1042},
+"data":{}}$$)
 
 
 --insertfile action with insert visit (visit null or visit not existing yet on database)
@@ -218,6 +225,10 @@ BEGIN
 			-- existing visit
 			ELSE 
 				v_visitclass := (SELECT class_id FROM SCHEMA_NAME.om_visit WHERE id=v_id::bigint);
+				IF v_visitclass IS NULL THEN
+					v_visitclass := 0;
+				END IF;
+
 			END IF;
 			v_noinfra = TRUE;
 		END IF;
@@ -227,6 +238,7 @@ BEGIN
 	v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
+
 
 	-- getting visit id and identify change class
 	IF v_id IS NULL THEN
@@ -239,9 +251,10 @@ BEGIN
 		------------------------------ ONLY FOR DEV (FOR ALL USER ON DEV
 		v_visitduration = '24 hours';
 		----------------------------------------------------------------
-		
-		EXECUTE 'SELECT v.id FROM om_visit_x_'||v_featuretype||' a JOIN om_visit v ON v.id=a.visit_id WHERE (now()-startdate)<'||quote_literal(v_visitduration)||' AND '||v_featuretype||'_id ='||v_featureid||'::text ORDER BY enddate DESC LIMIT 1'
-			INTO v_existvisit_id;
+		IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
+			EXECUTE 'SELECT v.id FROM om_visit_x_'||v_featuretype||' a JOIN om_visit v ON v.id=a.visit_id WHERE (now()-startdate)<'||quote_literal(v_visitduration)||' AND '||v_featuretype||'_id ='||v_featureid||'::text ORDER BY enddate DESC LIMIT 1'
+				INTO v_existvisit_id;
+		END IF;
 			
 		IF v_existvisit_id IS NOT NULL THEN
 			v_id = v_existvisit_id;
@@ -255,14 +268,14 @@ BEGIN
 	ELSE
 		IF v_inputtablename != v_tablename THEN
 			v_isclasschanged = true;
-			v_message = '{"text":"Visit class have been changed"}';
+			-- getting message
+			SELECT gw_api_getmessage(v_feature, 60) INTO v_message;
 			isnewvisit = true;
 		ELSE
 			isnewvisit = false;
 		END IF;
 	END IF;
 
-	
 	-- Get id column
 	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
 		INTO v_idname
@@ -352,7 +365,7 @@ BEGIN
        
 		-- Data tab
 		-----------
-		IF v_activedatatab OR (v_activedatatab IS NOT TRUE AND v_visitclass > 0 AND v_activefilestab IS NOT TRUE) THEN
+		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
 
 			IF isnewvisit IS TRUE THEN
 				
@@ -478,8 +491,10 @@ BEGIN
 
 				-- setting filterfields
 				v_data := (p_data->>'data');
-				v_filterfields := gw_fct_json_object_set_key(v_filterfields, 'visit_id', v_id);
 				v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
+
+				-- setting filterfeaturefields using id
+				v_data := gw_fct_json_object_set_key(v_data, 'filterFeatureField','{"id":'||v_id||'}');
 				p_data := gw_fct_json_object_set_key(p_data, 'data', v_data);
 
 				-- getting feature
@@ -539,6 +554,13 @@ BEGIN
 	-- getting geometry
 	EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id='||v_id||')a'
             INTO v_geometry;
+
+        IF v_geometry IS NULL AND v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
+		EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM '||v_featuretype||' WHERE '||v_featuretype||'_id::text='||v_featureid||'::text)a'
+			INTO v_geometry;
+	END IF;
+
+	RAISE NOTICE 'v_geometry %', v_geometry;
     		
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);

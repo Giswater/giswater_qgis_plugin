@@ -50,6 +50,8 @@ DECLARE
 	v_thegeom public.geometry;
 	v_class integer;
 	v_ckeckchangeclass int8;
+	v_xcoord float;
+	v_ycoord float;
 
 BEGIN
 
@@ -65,10 +67,14 @@ BEGIN
     v_feature = p_data ->>'feature';
     v_class = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
     v_tablename = ((p_data ->>'feature')::json->>'tableName');
-    v_thegeom = st_setsrid(st_makepoint((((p_data ->>'data')::json->>'canvas')::json->>'xcoord')::float, (((p_data ->>'data')::json->>'canvas')::json->>'ycoord')::float),25831);
+    v_xcoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
+    v_ycoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
     
+    v_thegeom = st_setsrid(st_makepoint(v_xcoord, v_ycoord),25831);
 
-	-- setting output parameter
+ raise notice ' v_thegeom  %', v_thegeom ;
+ 
+   -- setting output parameter
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
 	
 	--upsert visit

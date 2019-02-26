@@ -17,7 +17,7 @@ $BODY$
 /* example
 visit:
 SELECT SCHEMA_NAME.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
-		"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1130, "idName": "visit_id"}}')
+		"feature":{"featureType":"visit", "tableName":"om_visit", "id":10465, "idName": "id"}}')
 connec:
 SELECT SCHEMA_NAME.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
 		"feature":{"featureType":"connec", "tableName":"v_edit_connec", "id":3008, "idName": "connec_id"}}')

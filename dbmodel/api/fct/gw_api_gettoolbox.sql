@@ -1,6 +1,6 @@
-﻿-- Function: ws_sample.gw_api_gettoolbox(json)
+﻿-- Function: SCHEMA_NAME.gw_api_gettoolbox(json)
 
--- DROP FUNCTION ws_sample.gw_api_gettoolbox(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_api_gettoolbox(json);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_gettoolbox(p_data json)
   RETURNS json AS

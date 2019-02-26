@@ -58,7 +58,8 @@ In case of different listtype actions must be defined on config_api_form_tabs';
 
 COMMENT ON TABLE config_api_message IS 
 'INSTRUCIONS TO WORK WITH THIS TABLE:
-With this table api messages are configured';
+With this table api messages are configured. The field mtype it means message type and therer two options. With feature or alone.
+Using with feature the message is writted using the feature id before. Alone it means tha message is alone without nothing else merged';
 
 
 COMMENT ON TABLE config_api_visit IS 

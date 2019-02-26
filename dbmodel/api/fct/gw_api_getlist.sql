@@ -18,13 +18,13 @@ TOC
 SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
-"data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},
+"data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},"filterFeatureField":{"arc_id":"2001},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- attribute table using canvas filter
 SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},
+"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},"filterFeatureField":{"arc_id":"2001},
 "data":{"canvasExtend":{"canvascheck":true, "x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":1}}}$$)
 
@@ -34,7 +34,7 @@ VISIT
 SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_x_arc" ,"idName":"id"},
-"data":{"filterFields":{"arc_id":2001, "limit":10},
+"data":{"filterFields":{"arc_id":2001, "limit":10},"filterFeatureField":{"arc_id":"2001},
     "pageInfo":{"orderBy":"visit_id", "orderType":"DESC", "offsset":"10", "currentPage":null}}}$$)
 
 
@@ -42,7 +42,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
-"data":{"filterFields":{"visit_id":232, "limit":10},
+"data":{"filterFields":{"visit_id":232, "limit":10},"filterFeatureField":{"arc_id":"2001},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- Visit -> files
@@ -57,7 +57,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 SELECT SCHEMA_NAME.gw_api_getlist($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"om_visit_file"},
-"data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},
+"data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},"filterFeatureField":{"arc_id":"2001},
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 SELECT SCHEMA_NAME.gw_api_getlist($$
@@ -93,6 +93,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 DECLARE
 	v_apiversion text;
 	v_filter_fields  json[];
+	v_filter_feature json;
 	v_fields_json json;
 	v_filter_values  json;
 	v_schemaname text;
@@ -134,6 +135,7 @@ DECLARE
 	v_pageinfo json;
 	v_vdefault text;
 	v_listclass text;
+	v_sign text;
 BEGIN
 
 -- Set search path to local schema
@@ -159,6 +161,7 @@ BEGIN
 	v_filter_values := (p_data ->> 'data')::json->> 'filterFields';
 	v_ordertype := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'orderType';
 	v_currentpage := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'currentPage';
+	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
 
 	raise notice 'v_filter_values %', v_filter_values;
 
@@ -249,9 +252,9 @@ BEGIN
 		END IF;	
 	END IF;
 
-	--  add filters
+	--  add filters (fields)
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
-
+	
 	IF v_text IS NOT NULL THEN
 		FOREACH text IN ARRAY v_text
 		LOOP
@@ -260,13 +263,35 @@ BEGIN
 			v_field:= (SELECT (v_json_field ->> 'key')) ;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
 			i=i+1;
+	
+			-- Getting the sign of the filter
+			SELECT action_function INTO v_sign FROM config_api_form_fields WHERE formname=v_tablename  AND column_id=v_field;
+			IF v_sign IS NULL THEN
+				v_sign = '=';
+			END IF;
+			
 			-- creating the query_text
 			IF v_value IS NOT NULL AND v_field != 'limit' THEN
-				v_query_result := v_query_result || ' AND '||v_field||'::text = '|| quote_literal(v_value) ||'::text';
+				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_value) ||'::text';
 			ELSIF v_field='limit' THEN
 				v_query_result := v_query_result;
 				v_limit := v_value;
 			END IF;
+		END LOOP;
+	END IF;
+
+	-- add feature filter
+	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
+	IF v_text IS NOT NULL THEN
+		FOREACH text IN ARRAY v_text
+		LOOP
+			-- Get field and value from json
+			SELECT v_text [1] into v_json_field;
+			v_field:= (SELECT (v_json_field ->> 'key')) ;
+			v_value:= (SELECT (v_json_field ->> 'value')) ;
+				
+			-- creating the query_text
+			v_query_result := v_query_result || ' AND '||v_field||'::text = '||quote_literal(v_value) ||'::text';
 		END LOOP;
 	END IF;
 
@@ -299,7 +324,7 @@ BEGIN
 	IF v_limit IS NULL THEN
 		v_limit = 10;
 	END IF;
-	
+
 	-- calculating last page
 	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
 		INTO v_lastpage;
@@ -330,9 +355,10 @@ BEGIN
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
 
-   
+      
 -- getting the list of filters fields
 -------------------------------------
+
    	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device)
 		INTO v_filter_fields;
 

@@ -12,9 +12,6 @@ $BODY$
 
 /*EXAMPLE:
 
-
-SELECT SCHEMA_NAME.gw_api_getvisitmanager($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"", "id":""},"fields":{},"pageInfo":null}}$$) AS result
-
 -- calling button from feature
 SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
 "client":{"device":3,"infoType":100,"lang":"es"},
@@ -105,6 +102,8 @@ DECLARE
 	v_team text;
 	v_vehicle integer;
 	v_user_id text;
+	v_featureidname text;
+	v_filterfeature json;
 
 BEGIN
 
@@ -132,6 +131,7 @@ BEGIN
 	v_idname = ((p_data ->>'feature')::json->>'idName')::text;
 	v_data = (p_data ->>'data')::text;
 	v_featureid = (((p_data ->>'data')::json->>'relatedFeature')::json->>'id');
+	v_featureidname = (((p_data ->>'data')::json->>'relatedFeature')::json->>'idName');
 	v_featuretype = (((p_data ->>'data')::json->>'relatedFeature')::json->>'type');
 	v_activedatatab = (((p_data ->>'form')::json->>'tabData')::json->>'active')::boolean;
 	v_activelotstab = (((p_data ->>'form')::json->>'tabLots')::json->>'active')::boolean;
@@ -147,6 +147,13 @@ BEGIN
 		v_idname = concat(v_featuretype, '_id');
 	END IF;	
 
+	-- forcing idname in case not exists
+	IF v_featureidname IS NULL THEN
+		v_featureidname = concat(v_featuretype, '_id');
+	END IF;	
+	
+	raise notice ' v_featuretype % v_idname %',v_featuretype, v_featureidname;
+
 	-- setting values
 	v_tablename := 've_visit_user_manager';
 	v_user_id := 'user_id';
@@ -154,19 +161,25 @@ BEGIN
 	
 	-- Set firstcall
 	IF v_currentactivetab IS NULL THEN 
+	
 		v_firstcall := TRUE;
-		v_activedatatab := TRUE;
-		v_activelotstab := FALSE;
-		v_activedonetab := FALSE;
+		
+		IF v_featureid IS NOT NULL THEN 
+			v_activedatatab := FALSE;
+			v_activelotstab := FALSE;
+			v_activedonetab := TRUE;
+		ELSE
+			v_activedatatab := TRUE;
+			v_activelotstab := FALSE;
+			v_activedonetab := FALSE;
+		END IF;
 	END IF;
+
+       raise notice 'v_currentactivetab % v_activedatatab % v_activelotstab % v_activedonetab %', v_currentactivetab, v_activedatatab, v_activelotstab,v_activedonetab;
+
 
 	-- Set calling visits from feature id
-	IF v_featureid IS NOT NULL THEN 
-		v_activedatatab := FALSE;
-		v_activelotstab := FALSE;
-		v_activedonetab := TRUE;
-	END IF;
-
+	
 
 	-- upserting data on tabData
 	IF v_currentactivetab = 'tabData' THEN
@@ -182,8 +195,6 @@ BEGIN
        
 		-- Data tab
 		-----------
-		IF v_featureid IS NOT NULL THEN
-		
 			IF v_activedatatab THEN
 		
 				SELECT gw_api_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
@@ -213,8 +224,6 @@ BEGIN
 				v_fields_json := COALESCE(v_fields_json, '{}');	
 			END IF;		
 			
-		END IF;
-
 		-- building
 		SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabData' and device = v_device LIMIT 1;
 		IF v_tab IS NULL THEN 
@@ -229,7 +238,7 @@ BEGIN
 	
 		-- Active lots tab
 		------------------
-		IF 1=1 THEN
+		   IF v_activelotstab THEN
 
 			-- setting table feature
 			v_feature := '{"tableName":"userLotList"}';		
@@ -240,7 +249,7 @@ BEGIN
 			--refactor tabNames
 			p_data := replace (p_data::text, 'tabFeature', 'feature');
 			
-			RAISE NOTICE '--- CALLING gw_api_getlist USING p_data: % ---', p_data;
+			RAISE NOTICE '--- CALLING gw_api_getlist ON LOTS TAB USING p_data: % ---', p_data;
 			SELECT gw_api_getlist (p_data) INTO v_fields_json;
 
 			-- getting pageinfo and list values
@@ -266,22 +275,40 @@ BEGIN
 		
 		-- Done visits tab
 		------------------
-		IF v_featureid IS NOT NULL THEN
+		   IF v_activedonetab THEN
 
+			IF v_featuretype IS NULL THEN
+				-- setting table feature	
+				v_feature := '{"tableName":"UserVisitList"}';				
+			ELSE
 				-- setting table feature
-				v_feature := '{"tableName":"'||v_featuretype||'UserVisitList"}';	
+				v_feature := concat('{"tableName":"',v_featuretype,'UserVisitList"}');	
+			END IF;
 
 				-- setting feature
 				p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
 
-				-- setting filter feature
-				p_data := REPLACE (p_data::text, '"fields":{}',concat('"filterFields":{"',v_idname,'":"',v_featureid,'"}') );
+				-- refactor fields by filterFields
+				v_filterfields := ((p_data->>'data')::json->>'fields')::json;
+				v_data := (p_data->>'data');
+				v_data := gw_fct_json_object_set_key(v_data, 'filterFields', v_filterfields);
+				
+				-- setting filter fields of feature id
+				IF v_featuretype IS NOT NULL THEN				
 
+					-- setting filterfeaturefields using feature id
+					v_filterfeature = (concat('{"',v_featuretype,'_id":"',v_featureid,'"}'))::json;
+					v_data := gw_fct_json_object_set_key(v_data, 'filterFeatureField', v_filterfeature);
+					p_data := gw_fct_json_object_set_key(p_data, 'data', v_data);
+
+				END IF;
+	
 				--refactor tabNames
 				p_data := replace (p_data::text, 'tabFeature', 'feature');
 			
-				RAISE NOTICE '--- CALLING gw_api_getlist USING p_data: % ---', p_data;
+				RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
 				SELECT gw_api_getlist (p_data) INTO v_fields_json;
+
 
 				-- getting pageinfo and list values
 				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
