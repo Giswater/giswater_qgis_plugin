@@ -1361,6 +1361,7 @@ class UpdateSQL(ParentAction):
         self.date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
         project_name = str(utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_name))
         schema_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_create_project_type)
+        self.filter_srid_value = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.srid_id)
 
         if project_name == 'null':
             msg = "The 'Project_name' field is required."
