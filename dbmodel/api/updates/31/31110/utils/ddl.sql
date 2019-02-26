@@ -64,7 +64,7 @@ CREATE TABLE config_api_form_tabs(
   tabfunction json,
   tabactions json,
   device integer,
-  CONSTRAINT config_web_tabs_pkey PRIMARY KEY (id)
+  CONSTRAINT config_api_form_tabs_pkey PRIMARY KEY (id)
 );  
 
 
