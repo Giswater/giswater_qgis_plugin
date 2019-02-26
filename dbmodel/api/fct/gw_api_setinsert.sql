@@ -76,6 +76,11 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
+		
+	-- fix diferent ways to say null on client
+	p_data = REPLACE (p_data::text, '"NULL"', 'null');
+	p_data = REPLACE (p_data::text, '"null"', 'null');
+	p_data = REPLACE (p_data::text, '""', 'null');
        
 	-- Get input parameters:
 	v_feature  := (p_data ->> 'feature');

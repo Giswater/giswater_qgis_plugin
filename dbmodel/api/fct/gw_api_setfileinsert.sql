@@ -37,6 +37,11 @@ BEGIN
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
 	
+	-- fix diferent ways to say null on client
+	p_data = REPLACE (p_data::text, '"NULL"', 'null');
+	p_data = REPLACE (p_data::text, '"null"', 'null');
+	p_data = REPLACE (p_data::text, '""', 'null');
+	
 	-- set output parameter
 	v_fextension = (((p_data)->>'data')::json->>'fields')::json->>'fextension';
 	v_filetype = (SELECT filetype FROM om_visit_filetype_x_extension WHERE fextension=v_fextension);
