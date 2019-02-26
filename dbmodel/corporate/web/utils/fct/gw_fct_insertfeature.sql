@@ -12,6 +12,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_insertfeature('Junction','v_edit_man_junction',25831,'POINT(419093.4610180535 4576608.050609055)',
 '{"nodecat_id":"AIR VALVE DN50","builtdate":null,"state":1,"enddate":null,"undelete":"false","publish":"false","inventory":"false"}')
 */
+
 DECLARE
 
 --    Variables
@@ -32,6 +33,11 @@ BEGIN
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
+-- fix diferent ways to say null on client
+	insert_data = REPLACE (insert_data::text, '"NULL"', 'null');
+	insert_data = REPLACE (insert_data::text, '"null"', 'null');
+	insert_data = REPLACE (insert_data::text, '""', 'null');
+		
 --    COMMON TASKS:
 
 --    Construct geom in device coordinates
