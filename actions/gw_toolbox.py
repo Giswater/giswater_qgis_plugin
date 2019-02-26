@@ -22,10 +22,10 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4 import QtCore, QtNetwork
     from PyQt4.QtCore import Qt, QDate, QPoint, QUrl
     from PyQt4.QtWebKit import QWebView, QWebSettings, QWebPage
-    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu, QApplication, QSpinBox, QDoubleSpinBox
+    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu, QApplication, QSpinBox, QDoubleSpinBox, QTextEdit
     from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
     from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget
-    from PyQt4.QtGui import QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget
+    from PyQt4.QtGui import QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QRadioButton
     from PyQt4.QtGui import QAbstractItemView, QPrinter, QTreeWidgetItem
     from PyQt4.QtSql import QSqlTableModel
     import urlparse
@@ -37,8 +37,8 @@ else:
     from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QStandardItem, QStandardItemModel
     from qgis.PyQt.QtWebKit import QWebView, QWebSettings, QWebPage
     from qgis.PyQt.QtWidgets import QTreeWidgetItem, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
-    from qgis.PyQt.QtWidgets import QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget
-    from qgis.PyQt.QtWidgets import QTabWidget, QAbstractItemView, QMenu,  QApplication,QSpinBox, QDoubleSpinBox
+    from qgis.PyQt.QtWidgets import QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QTextEdit
+    from qgis.PyQt.QtWidgets import QTabWidget, QAbstractItemView, QMenu,  QApplication,QSpinBox, QDoubleSpinBox, QRadioButton
     from qgis.PyQt.QtSql import QSqlTableModel, QListWidgetItem
     import urllib.parse as urlparse
 
@@ -61,6 +61,7 @@ class GwToolBox(ApiParent):
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.function_list = []
         self.rbt_checked = {}
+        self.is_paramtetric = True
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -108,6 +109,10 @@ class GwToolBox(ApiParent):
             return
 
         self.dlg_functions = ApiFunctionTb()
+        self.dlg_functions.progressBar.setVisible(True)
+        self.dlg_functions.progressBar.setValue(0)
+        self.dlg_functions.progressBar.setMaximum(100)
+
         extras = '"filterText":"' + alias_function + '"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
@@ -123,6 +128,7 @@ class GwToolBox(ApiParent):
             msg = "Function not found"
             self.controller.show_message(msg, parameter=alias_function)
             return
+
         self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
                                                                           self.dlg_functions.cmb_layers))
         self.dlg_functions.rbt_previous.toggled.connect(partial(self.rbt_state, self.dlg_functions.rbt_previous))
@@ -161,17 +167,23 @@ class GwToolBox(ApiParent):
         if layer is None:
             return
         function_name = ''
-    #     if rbt.objectName() == 'rbt_previous' and state is True:
-    #         self.rbt_checked['widget'] = 'previousSelection'
-    #     elif rbt.objectName() == 'rbt_layer' and state is True:
-    #         self.rbt_checked['widget'] = 'wholeSelection'
         extras = '"selectionMode":"'+selection_mode+'",'
 
         for group, function in result['fields'].items():
             if len(function) != 0:
+                if 'durationType' in function[0]['function_type']:
+                    if function[0]['function_type']['durationType'] != 'short':
+                        dialog.progressBar.setVisible(True)
+                        dialog.progressBar.setMaximum(0)
+                        dialog.progressBar.setMinimum(0)
                 function_name = function[0]['functionname']
-                feature_type = function[0]['function_type_']['featureType']
+                feature_type = function[0]['function_type']['featureType']
                 break
+
+        if self.is_paramtetric is False:
+            sql = ("SELECT " + self.schema_name + "." + str(function_name) + "()")
+            self.controller.execute_sql(sql, log_sql=True)
+            return
 
         # Check selection mode and get (or not get) all feature id
         feature_id_list = '"id":['
@@ -215,7 +227,7 @@ class GwToolBox(ApiParent):
         extras += '"parameters":{'
         for group, function in result['fields'].items():
             if len(function) != 0:
-                for field in function[0]['input_params_']:
+                for field in function[0]['input_params']:
                     widget = dialog.findChild(QWidget, field['widgetname'])
                     param_name = widget.objectName()
                     if type(widget) in ('', QLineEdit):
@@ -252,16 +264,33 @@ class GwToolBox(ApiParent):
         status = False
         for group, function in result['fields'].items():
             if len(function) != 0:
+                self.populate_layer_combo(function[0]['function_type']['featureType'])
                 dialog.setWindowTitle(function[0]['alias'])
-                self.construct_form_param_user(dialog, function, 0, self.function_list, False)
                 dialog.txt_info.setText(str(function[0]['descript']))
-                if 'durationType' in function[0]['function_type_']:
-                    if function[0]['function_type_']['durationType'] == 'short':
+                self.construct_form_param_user(dialog, function, 0, self.function_list, False)
+
+                if 'durationType' in function[0]['function_type']:
+                    if function[0]['function_type']['durationType'] == 'short':
                         dialog.progressBar.setVisible(False)
-                    self.populate_layer_combo(function[0]['function_type_']['featureType'])
-                    status = True
-                    break
+
+                if str(function[0]['isparametric']) == 'false':
+                    self.is_paramtetric = False
+                    self.control_isparametric(dialog)
+
+                status = True
+                break
         return status
+
+
+    def control_isparametric(self, dialog):
+        """ Control if the function is not parameterized whit a json, is old and we need disable all widgets """
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+                widget.setReadOnly(True)
+                widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+            elif type(widget) in (QCheckBox, QComboBox, QRadioButton):
+                    widget.setEnabled(False)
 
 
     def populate_layer_combo(self, geom_type):
@@ -281,20 +310,20 @@ class GwToolBox(ApiParent):
 
 
     def populate_trv(self, trv_widget, result):
-
         model = QStandardItemModel()
-       # model.setHorizontalHeaderLabels(['Toolbox'])
-
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
         main_parent = QStandardItem('{}'.format('Giswater'))
         self.icon_folder = self.plugin_dir + '/icons/'
         icon_path = self.icon_folder + '36.png'
+
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
             main_parent.setIcon(icon)
-        for group, functions in result['fields'].items():
+
+        for group, functions in sorted(result['fields'].items()):
             parent1 = QStandardItem('{}'.format(group))
+            functions.sort(key=self.sort_list, reverse=False)
             for function in functions:
                 label = QStandardItem('{}'.format(function['alias']))
                 if os.path.exists(icon_path):
@@ -306,3 +335,9 @@ class GwToolBox(ApiParent):
         index = model.indexFromItem(main_parent)
         trv_widget.expand(index)
 
+
+    def sort_list(self, json):
+        try:
+            return json['alias'].upper()
+        except KeyError:
+            return 0
