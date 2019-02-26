@@ -41,7 +41,7 @@ BEGIN
 -- get edit toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname
+		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_edit'') a'
 		USING v_filter
@@ -51,7 +51,7 @@ BEGIN
 -- get admin toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname
+		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin'') a'
 		USING v_filter
@@ -60,7 +60,7 @@ BEGIN
 -- get master toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname
+		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_master'') a'
 		USING v_filter
