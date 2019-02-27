@@ -7,7 +7,7 @@
 
 	--FUNCTION CODE: 2644
 
-	--DROP FUNCTION IF EXISTS "ws_sample".gw_trg_visit_user_manager();
+	--DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_trg_visit_user_manager();
 	CREATE OR REPLACE FUNCTION gw_trg_visit_user_manager() RETURNS pg_catalog.trigger AS $BODY$
 	DECLARE 
 	rec record;

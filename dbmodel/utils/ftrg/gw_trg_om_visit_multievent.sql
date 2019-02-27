@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_om_visit_multievent()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_om_visit_multievent()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -23,17 +23,22 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
 
 	IF NEW.visit_id IS NULL THEN
-		PERFORM setval('SCHEMA_NAME.om_visit_id_seq', (SELECT max(id) FROM om_visit), true);
+		PERFORM setval('"SCHEMA_NAME".om_visit_id_seq', (SELECT max(id) FROM om_visit), true);
 		NEW.visit_id = (SELECT nextval('om_visit_id_seq'));
 	END IF;
 
 	IF NEW.startdate IS NULL THEN
-		NEW.startdate = now();
+		--NEW.startdate = now();
+		NEW.startdate = left (date_trunc('second', now())::text, 19);
 	END IF;
 	
-            INSERT INTO om_visit(id, visitcat_id, ext_code, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, suspendendcat_id, lot_id, status) 
-            VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
+            INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, suspendendcat_id, lot_id, status) 
+            VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
             NEW.is_done, NEW.class_id, NEW.suspendendcat_id, NEW.lot_id, NEW.status);
+
+        IF  NEW.enddate IS NOT NULL THEN
+	    UPDATE om_visit SET enddate=NEW.enddate WHERE id=NEW.id;
+	END IF;
 
             FOR v_parameters IN SELECT * FROM om_visit_parameter 
             JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
@@ -66,7 +71,7 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
     
-            UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, startdate=NEW.startdate, enddate=NEW.enddate,
+            UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate::timestamp,
             webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
             suspendendcat_id=NEW.suspendendcat_id, lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
 
