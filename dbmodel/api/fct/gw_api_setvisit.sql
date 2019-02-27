@@ -87,9 +87,8 @@ BEGIN
 		v_id=(((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer;
 
 		-- updating visit
-		UPDATE om_visit SET startdate=now(), enddate=now(), the_geom=v_thegeom WHERE id=v_id;
+		UPDATE om_visit SET the_geom=v_thegeom WHERE id=v_id;
 					
-
 		-- updating v_feature setting new id
 		v_feature =  gw_fct_json_object_set_key (v_feature, 'id', v_id);
 

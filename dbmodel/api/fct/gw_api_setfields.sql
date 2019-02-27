@@ -47,6 +47,7 @@ DECLARE
     v_text text[];
     text text;
     i integer=1;
+    n integer=1;
     v_field text;
     v_value text;
     v_return text;
@@ -116,7 +117,6 @@ BEGIN
 	v_querytext := 'UPDATE ' || quote_ident(v_tablename) ||' SET ';
 
 	-- query text, step2
-	i=1;
 	FOREACH text IN ARRAY v_text 
 	LOOP
 		SELECT v_text [i] into v_jsonfield;
@@ -149,11 +149,12 @@ BEGIN
 			END IF;
 			
 			--building the query text
-			IF i=1 THEN
+			IF n=1 THEN
 				v_querytext := concat (v_querytext, quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
 			ELSIF i>1 THEN
 				v_querytext := concat (v_querytext, ' , ',  quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
 			END IF;
+			n=n+1;			
 		END IF;
 		i=i+1;
 

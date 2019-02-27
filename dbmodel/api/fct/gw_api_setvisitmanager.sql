@@ -6,28 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2642
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setvisitmanager(p_data json)
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_api_setvisitmanager(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
---INSERT
-SELECT SCHEMA_NAME.gw_api_setvisitmanager($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_user_manager", "id":null, "idName":"visit_id"},
-"data":{"fields":{"user_id":1, "date":'null', "team_id":1, "vehicle_id":1, "starttime":null, "endtime":null},
-	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
-	}$$)
-	
---UPDATE
-SELECT SCHEMA_NAME.gw_api_setvisitmanager($${
-"client":{"device":3, "infoType":100, "lang":"ES"},
-"form":{},
-"feature":{"featureType":"visit", "tableName":"ve_visit_user_manager", "id":1, "idName":"visit_id"},
-"data":{"fields":{"user_id":1, "date":'null', "team_id":1, "vehicle_id":1, "starttime":null, "endtime":null},
-	"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}
-	}$$)
+
+--ONLY UPDATE ARE POSSIBLE. 
+SELECT "SCHEMA_NAME".gw_api_setvisitmanager($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+"feature":{"featureType":"visit", "tableName":"ve_visit_user_manager", "idName":"user_id", "id":"geoadmin"}, 
+"data":{"fields":{"team_id":4, "vehicle_id":2, "starttime":"2019-01-01", "endtime":null},
+"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 */
 
 DECLARE
@@ -55,12 +44,14 @@ BEGIN
 		
 --  get input values
     v_id = ((p_data ->>'feature')::json->>'id')::text;
-    v_feature = p_data ->>'feature';
+    v_feature = '{"featureType":"visit", "tableName":"ve_visit_user_manager", "idName":"user_id", "id":"'||current_user||'"}';
+
 
 -- set output parameter
+	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',v_feature, ', "data":',((p_data)->>'data'),'}')::json;
 
-	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
-	
+	RAISE NOTICE '--- UPDATE VISIT MANAGER USING % ---',v_outputparameter;
+
 		--setting the update
 		PERFORM gw_api_setfields (v_outputparameter);
 

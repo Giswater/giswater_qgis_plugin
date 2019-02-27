@@ -27,6 +27,9 @@ DECLARE
 	v_data json;
 	v_filetype text;
 	v_fextension text;
+	v_value text;
+	v_text text;
+	v_fields json;
 
 BEGIN
 
@@ -36,6 +39,11 @@ BEGIN
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
 		INTO v_apiversion;
+
+
+	--get input parameter
+	v_value = ((p_data->>'data')::json->>'fields')::json->>'url';
+	v_text = ((p_data->>'data')::json->>'fields')::json->>'idval';
 	
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -46,10 +54,17 @@ BEGIN
 	v_fextension = (((p_data)->>'data')::json->>'fields')::json->>'fextension';
 	v_filetype = (SELECT filetype FROM om_visit_filetype_x_extension WHERE fextension=v_fextension);
 
-	raise notice 'v_fextension % v_filetype %', v_fextension, v_filetype;
-	
-	v_data = (p_data)->>'data';
-	v_data = gw_fct_json_object_set_key(v_data, 'filetype', (v_filetype));
+	v_data = (p_data->>'data')::json;
+	v_fields = ((p_data->>'data')::json->>'fields')::json;
+	v_fields = gw_fct_json_object_set_key(v_fields, 'filetype', v_filetype);
+
+	v_fields = gw_fct_json_object_set_key(v_fields, 'value', v_value);
+	v_fields = gw_fct_json_object_set_key(v_fields, 'text', v_text::text);
+	v_fields = gw_fct_json_object_delete_keys(v_fields, 'url', 'idval'::text);
+
+	raise notice 'v_fields %', v_fields;
+
+	v_data =  gw_fct_json_object_set_key(v_data, 'fields', v_fields);
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',v_data,'}')::json;
 
 	RAISE NOTICE '--- CALL gw_api_setinsert USING v_outputparameter: % ---', v_outputparameter;
@@ -61,7 +76,7 @@ BEGIN
 	v_id=(((v_insertresult->>'body')::json->>'feature')::json->>'id')::integer;
 
 	-- update table with device parameters
-	UPDATE om_visit_file SET xcoord=(((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float,
+	UPDATE om_visit_event_photo SET xcoord=(((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float,
 				  ycoord=(((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float,
 				  compass=(((p_data ->>'data')::json->>'deviceTrace')::json->>'compass')::float
 				  WHERE id=v_id;
@@ -82,4 +97,3 @@ BEGIN
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
-

@@ -93,6 +93,7 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 DECLARE
 	v_apiversion text;
 	v_filter_fields  json[];
+	v_footer_fields json[];
 	v_filter_feature json;
 	v_fields_json json;
 	v_filter_values  json;
@@ -136,6 +137,7 @@ DECLARE
 	v_vdefault text;
 	v_listclass text;
 	v_sign text;
+	v_data json;
 BEGIN
 
 -- Set search path to local schema
@@ -168,8 +170,6 @@ BEGIN
 	v_currentpage := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'currentPage';
 	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
 
-	raise notice 'v_filter_values %', v_filter_values;
-
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
 	END IF;
@@ -179,12 +179,26 @@ BEGIN
 		RAISE EXCEPTION 'The config table is bad configured. v_tablename is null';
 	END IF;
 
+	RAISE NOTICE 'gw_api_getlist - Init Values: v_tablename %  v_filter_values  % v_filter_feature %', v_tablename, v_filter_values, v_filter_feature;
+
+
+-- setting value default for filter fields
+-------------------------------------
+	IF v_filter_values::text IS NULL OR v_filter_values::text = '{}' THEN 
+	
+		v_data = '{"client":{"device":9, "infoType":100, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
+		
+		SELECT gw_api_get_filtervaluesvdef(v_data) INTO v_filter_values;
+
+	END IF;
+
+	RAISE NOTICE 'FILTER VALUES %', v_filter_values;
+	
+--  Creating the list fields
+----------------------------
 	-- control not existing table
 	IF v_tablename IN (SELECT table_name FROM information_schema.tables WHERE table_schema = v_schemaname) THEN
 
-		
-		--  Creating the list fields
-		----------------------------
 		-- Get idname column
 		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
 			INTO v_idname
@@ -268,9 +282,11 @@ BEGIN
 			v_field:= (SELECT (v_json_field ->> 'key')) ;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
 			i=i+1;
+
+			raise notice 'v_field % v_value %', v_field, v_value;
 	
 			-- Getting the sign of the filter
-			SELECT action_function INTO v_sign FROM config_api_form_fields WHERE formname=v_tablename  AND column_id=v_field;
+			SELECT listfilterparam->>'sign' INTO v_sign FROM config_api_form_fields WHERE formname=v_tablename  AND column_id=v_field;
 			IF v_sign IS NULL THEN
 				v_sign = '=';
 			END IF;
@@ -312,7 +328,6 @@ BEGIN
 		-- adding on the query text the extend filter
 		v_query_result := v_query_result || ' AND ST_dwithin ( '|| v_tablename || '.' || v_the_geom || ',' || 
 		'ST_MakePolygon(ST_GeomFromText(''LINESTRING ('||v_x1||' '||v_y1||', '||v_x1||' '||v_y2||', '||v_x2||' '||v_y2||', '||v_x2||' '||v_y1||', '||v_x1||' '||v_y1||')'','||v_srid||')),1)';
-		
 	END IF;
 
 	-- add orderby
@@ -326,11 +341,10 @@ BEGIN
 		
 	END IF;
 
+	-- calculating last page
 	IF v_limit IS NULL THEN
 		v_limit = 10;
 	END IF;
-
-	-- calculating last page
 	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
 		INTO v_lastpage;
 	
@@ -341,104 +355,58 @@ BEGIN
 	IF v_currentpage IS NULL THEN 
 		v_currentpage=1;
 	END IF;
-	
-	v_offset := (v_currentpage-1)*v_limit;
 
 	-- add offset
+	v_offset := (v_currentpage-1)*v_limit;
 	IF v_offset IS NOT NULL THEN
 		v_query_result := v_query_result || ' OFFSET '|| v_offset;
 	END IF;
 
-	RAISE NOTICE '--- QUERY LIST % ---', v_query_result;
+	RAISE NOTICE '--- gw_api_getlist - Query Result: % ---', v_query_result;
 
 	-- Execute query result
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
 
-	RAISE NOTICE '--- RESULT LIST % ---', v_result_list;
+	RAISE NOTICE '--- gw_api_getlist - List: % ---', v_result_list;
 
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
 
-      
--- getting the list of filters fields
--------------------------------------
-
-   	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device)
+	-- getting filter fields
+	SELECT gw_api_get_formfields(v_tablename, 'listHeader', v_tabname, null, null, null, null,'INSERT', null, v_device)
 		INTO v_filter_fields;
 
-	--  setting values of filter fields
-	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
-	i=1;
-	IF v_text IS NOT NULL THEN
-		FOREACH text IN ARRAY v_text
-		LOOP
-			-- get value
-			SELECT v_text [i] into v_json_field;
-			v_value:= (SELECT (v_json_field ->> 'value')) ;
+		--  setting values of filter fields
+		SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
+		i=1;
+		IF v_text IS NOT NULL THEN
+			FOREACH text IN ARRAY v_text
+			LOOP
+				-- get value
+				SELECT v_text [i] into v_json_field;
+				v_value:= (SELECT (v_json_field ->> 'value')) ;
 
-			-- get value (vdefault)
-			IF v_value IS NULL THEN
-				v_vdefault:=quote_ident(v_filter_fields[i]->>'column_id');
-				IF v_vdefault IS NOT NULL THEN
-					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter 
-						WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
-						INTO v_value;
+				-- set value (from v_value)
+				IF v_filter_fields[i] IS NOT NULL THEN
+					
+					IF (v_filter_fields[i]->>'widgettype')='combo' THEN
+						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
+					ELSE
+						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
+					END IF;
 				END IF;
-			END IF;
 
-			-- set value (from v_value)
-			IF v_filter_fields[i] IS NOT NULL THEN
-				
-				IF (v_filter_fields[i]->>'widgettype')='combo' THEN
-					v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
-				ELSE
-					v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
-				END IF;
-			END IF;
+				--raise notice 'v_value % v_filter_fields %', v_value, v_filter_fields[i];
 
-			raise notice 'v_value % v_filter_fields %', v_value, v_filter_fields[i];
-
-			i=i+1;			
-		END LOOP;
-	END IF;
-
-	raise notice 'v_filter_fields %', v_filter_fields;
-	
-	-- adding common filter fields
-	-- adding spacer
-	IF v_device=9 THEN
-		-- getting cardinality
-		v_i = cardinality(v_filter_fields) ;
-		-- setting new element
-		v_filter_fields[v_i+1] := gw_fct_createwidgetjson('text', 'spacer', 'spacer', 'string', null, FALSE, '');
-	END IF;
-
-	-- adding line text of limit
-	IF v_limit IS NULL THEN 
-		v_limit=20; 
-	END IF;
-
-	-- getting cardinality
-	v_i = cardinality(v_filter_fields);
-	-- setting new element
-	v_filter_fields[v_i+1] := gw_fct_createwidgetjson('Limit', 'limit', 'text', 'integer', null, FALSE, v_limit::text);
-
-	-- adding check of canvas extend
-	IF v_the_geom IS NOT NULL THEN
-		IF v_canvascheck IS NULL THEN 
-			v_canvascheck = FALSE; 
+				i=i+1;			
+		
+			END LOOP;
 		END IF;
-		-- getting cardinality
-		v_i = cardinality(v_filter_fields);
-		-- setting new element
-		v_filter_fields[v_i+2] := gw_fct_createwidgetjson('Canvas extend', 'canvasextend', 'check', 'boolean', null, FALSE, v_canvascheck::text);
-	END IF;
 
 	-- adding the widget of list
-	-- getting cardinality
 	v_i = cardinality(v_filter_fields) ;
-
+	
 	EXECUTE 'SELECT listclass FROM config_api_list WHERE tablename = $1 LIMIT 1'
 		INTO v_listclass
 		USING v_tablename;
@@ -450,10 +418,17 @@ BEGIN
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
 
-	raise notice 'v_filter_fields %', v_filter_fields;
+	-- getting footer buttons
+	SELECT gw_api_get_formfields(v_tablename, 'listFooter', v_tabname, null, null, null, null,'INSERT', null, v_device)
+		INTO v_footer_fields;
 
+	FOREACH aux_json IN ARRAY v_footer_fields
+	LOOP
+		v_filter_fields[v_i+2] := json_build_object('type','button','label', aux_json->>'label' ,'widgetAction',  aux_json->>'widgetfunction', 'position','footer');
+		v_i=v_i+1;
+	END LOOP;
 
-	-- converting to json
+-- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
 
 --    Control NULL's
