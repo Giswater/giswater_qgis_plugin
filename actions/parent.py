@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle, QgsMapLayerRegistry
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap, QCompleter
 from PyQt4.QtGui import QStringListModel, QAction
@@ -827,3 +827,14 @@ class ParentAction(object):
 
     def set_arrow_cursor(self):
         QApplication.instance().setOverrideCursor(Qt.ArrowCursor)
+
+
+    def delete_layer_from_toc(self, layer_name):
+        """ Delete layer from toc if exist """
+        layer = None
+        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+            if lyr.name() == layer_name:
+                layer = lyr
+                break
+        if layer is not None:
+            QgsMapLayerRegistry.instance().removeMapLayer(layer)
