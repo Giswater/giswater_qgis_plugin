@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2562
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_api_get_formfields(
     p_formname character varying,
     p_formtype character varying,
     p_tabname character varying,
@@ -21,14 +21,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
 $BODY$
 
 /*EXAMPLE
-
-SELECT SCHEMA_NAME.gw_api_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT "SCHEMA_NAME".gw_api_get_formfields('visit_arc_insp', 'visit', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 only 32
-SELECT SCHEMA_NAME.gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
-SELECT SCHEMA_NAME.gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-SELECT SCHEMA_NAME.gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
-
-
+SELECT "SCHEMA_NAME".gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
+SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 */
 
 
@@ -86,10 +83,14 @@ BEGIN
 --   Get fields	
 	IF p_formname!='infoplan' THEN 
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT label, column_id, concat('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, widgettype,
-			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", (CASE WHEN layout_id=0 THEN ''header'' WHEN layout_id=9 THEN ''footer'' ELSE ''body'' END) AS "position",(CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,
+
+			widgettype as type, column_id as name, datatype AS "dataType",widgetfunction as "widgetAction", widgetfunction as "updateAction",widgetfunction as "changeAction", widgetfunction,
+			(CASE WHEN layout_id=0 THEN ''header'' WHEN layout_id=9 THEN ''footer'' ELSE ''body'' END) AS "position",
+			(CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,
+
 			widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layout_id, layout_order) AS orderby, layout_id, 
-			concat('||quote_literal(p_tabname)||',''_'',layout_id) as layoutname, layout_order, dv_parent_id, isparent, widgetfunction, dv_querytext, dv_querytext_filterc, 
-			action_function, isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
+			concat('||quote_literal(p_tabname)||',''_'',layout_id) as layoutname, layout_order, dv_parent_id, isparent, action_function, dv_querytext, dv_querytext_filterc, 
+			isautoupdate, isnotupdate, dv_orderby_id, dv_isnullvalue, isreload, stylesheet, typeahead FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
 				INTO fields_array
 				USING p_formname, p_formtype;
 	ELSE
@@ -124,6 +125,12 @@ BEGIN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'parentId', COALESCE((aux_json->>'dv_parent_id'), ''));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isNullValue', (aux_json->>'dv_isnullvalue'));
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'orderById', (aux_json->>'dv_orderby_id'));
+		END IF;
+
+		-- Refactor widget
+		IF (aux_json->>'widgettype')='image' THEN
+		      	EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 		END IF;
 
 		-- setting the not updateable fields
@@ -267,7 +274,8 @@ BEGIN
 
 						--removing the not used fields
 						fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json_child->>'orderby')::INT],
-						'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'typeahead');								
+						'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'typeahead');
+						
 					  END IF;
 				END IF;
 			END LOOP;
