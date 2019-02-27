@@ -49,3 +49,17 @@ INSERT INTO om_visit_class_x_parameter VALUES (12, 4, '6');
 INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'comentari_typea');
 INSERT INTO om_visit_class_x_parameter VALUES (14, 9, 'comentari_typeb');
 
+INSERT INTO om_visit_cat_status VALUES (0, 'Tancada', NULL);
+INSERT INTO om_visit_cat_status VALUES (1, 'En curs', NULL);
+INSERT INTO om_visit_cat_status VALUES (2, 'Stand by', NULL);
+INSERT INTO om_visit_cat_status VALUES (3, 'Cancelada', NULL);
+
+INSERT INTO om_visit_filetype_x_extension VALUES ('Document', 'doc');
+INSERT INTO om_visit_filetype_x_extension VALUES ('Pdf', 'pdf');
+INSERT INTO om_visit_filetype_x_extension VALUES ('Imatge', 'jpg');
+INSERT INTO om_visit_filetype_x_extension VALUES ('Imatge', 'png');
+INSERT INTO om_visit_filetype_x_extension VALUES ('Video', 'mp4');
+
+
+
+

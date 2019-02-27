@@ -7,11 +7,26 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+CREATE OR REPLACE VIEW ve_lot_x_arc AS 
+ SELECT arc.arc_id,
+    om_visit_lot_x_arc.lot_id,
+    om_visit_lot_x_arc.status,
+    arc.the_geom
+    FROM selector_lot, om_visit_lot
+     JOIN om_visit_lot_x_arc ON lot_id=id
+     JOIN arc ON arc.arc_id=om_visit_lot_x_arc.arc_id
+     WHERE selector_lot.lot_id = om_visit_lot.id AND cur_user=current_user;
+
+	 
+
  
 CREATE OR REPLACE VIEW ve_visit_user_manager AS 
  SELECT a.id AS user_id,
-    d.id AS team_id,
-    e.id AS vehicle_id,
+    b.team_id,
+    c.vehicle_id,
+    c.starttime,
+    c.endtime,
     now()::date AS date
    FROM cat_users a
      LEFT JOIN om_visit_team_x_user b ON b.user_id::text = a.id::text
@@ -19,7 +34,6 @@ CREATE OR REPLACE VIEW ve_visit_user_manager AS
      LEFT JOIN cat_team d ON b.team_id = d.id
      LEFT JOIN cat_vehicle e ON e.id = c.vehicle_id
   WHERE b.user_id::name = "current_user"();
-  
 
   
 CREATE OR REPLACE VIEW ve_lot_x_arc AS 
@@ -40,8 +54,8 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
     om_visit_x_arc.arc_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    om_visit.startdate,
-    om_visit.enddate,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,
@@ -75,8 +89,8 @@ CREATE OR REPLACE VIEW ve_visit_arc_singlevent AS
     om_visit_x_arc.arc_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    om_visit.startdate,
-    om_visit.enddate,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,
@@ -118,8 +132,8 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
     om_visit_x_connec.connec_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    om_visit.startdate,
-    om_visit.enddate,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,
@@ -154,8 +168,8 @@ CREATE OR REPLACE VIEW ve_visit_connec_singlevent AS
     om_visit_x_connec.connec_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    om_visit.startdate,
-    om_visit.enddate,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,
@@ -195,8 +209,8 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
     om_visit_x_node.node_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    om_visit.startdate,
-    om_visit.enddate,
+    left (date_trunc('second', startdate)::text, 19) as startdate,
+    left (date_trunc('second', enddate)::text, 19) as enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,
@@ -231,8 +245,8 @@ CREATE OR REPLACE VIEW ve_visit_node_singlevent AS
     om_visit_x_node.node_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    om_visit.startdate,
-    om_visit.enddate,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,
@@ -272,8 +286,8 @@ CREATE OR REPLACE VIEW ve_visit_noinfra_typea AS
  SELECT om_visit.id AS visit_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    om_visit.startdate,
-    om_visit.enddate,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,
@@ -301,8 +315,8 @@ CREATE OR REPLACE VIEW ve_visit_noinfra_typeb AS
  SELECT a.visit_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    om_visit.startdate,
-    om_visit.enddate,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,

@@ -44,15 +44,3 @@ select * FROM om_visit_lot;
 create OR REPLACE view v_ui_om_visit_x_doc
 as 
 SELECT * FROM doc_x_visit;
-
-CREATE OR REPLACE VIEW ve_lot_x_arc AS 
- SELECT arc.arc_id,
-    om_visit_lot_x_arc.lot_id,
-    om_visit_lot_x_arc.status,
-    arc.the_geom
-    FROM selector_lot, om_visit_lot
-     JOIN om_visit_lot_x_arc ON lot_id=id
-     JOIN arc ON arc.arc_id=om_visit_lot_x_arc.arc_id
-     WHERE selector_lot.lot_id = om_visit_lot.id AND cur_user=current_user;
-
-	 

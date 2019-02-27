@@ -8,14 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-  CREATE TABLE om_visit_lot_x_gully( 
-  lot_id integer,
-  gully_id varchar (16),
-  code varchar(30),
-  status integer,
-  observ text,
-  constraint om_visit_lot_x_gully_pkey PRIMARY KEY (lot_id, gully_id));
-
 
 DROP TABLE IF EXISTS inp_evaporation CASCADE;
 CREATE TABLE inp_evaporation
