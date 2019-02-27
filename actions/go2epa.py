@@ -6,6 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+
+
 from PyQt4.QtCore import QObject
 from PyQt4.QtCore import QTime, QDate, Qt, QThread, SIGNAL
 from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QStringListModel
@@ -478,7 +480,7 @@ class Go2Epa(ApiParent):
             extras += ', "result_id":"'+str(self.result_name)+'"'
             body = self.create_body(extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
-            row = self.controller.get_row(sql, log_sql=False)
+            row = self.controller.get_row(sql, log_sql=True)
             utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, "0/"+str(row[0]))
             self.iterations = int(str(row[0]))
 
@@ -497,7 +499,7 @@ class Go2Epa(ApiParent):
                     return
                 # Call function gw_fct_pg2epa
                 sql = ("SELECT " + self.schema_name + "." + epa_function_call)
-                row = self.controller.get_row(sql, log_sql=False)
+                row = self.controller.get_row(sql, log_sql=True)
 
                 # # Call function gw_fct_utils_csv2pg_export_epa_inp
                 # sql = ("SELECT " + self.schema_name + "." + export_function)
@@ -507,7 +509,7 @@ class Go2Epa(ApiParent):
                 sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12 "
                        " FROM " + self.schema_name + ".temp_csv2pg "
                        " WHERE csv2pgcat_id=10 AND user_name = current_user ORDER BY id")
-                rows = self.controller.get_rows(sql, log_sql=False)
+                rows = self.controller.get_rows(sql, log_sql=True)
 
                 if rows is None:
                     self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -528,8 +530,7 @@ class Go2Epa(ApiParent):
                 self.dlg_go2epa.progressBar.setFormat("Epa software is running...")
                 self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
 
-
-                subprocess.call([opener, self.file_inp, self.file_rpt],shell=False)
+                subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
                 common_msg += "EPA model finished. "
 
             # Import to DB
@@ -553,7 +554,7 @@ class Go2Epa(ApiParent):
             extras = '"status":"0"'
             body = self.create_body(extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
-            row = self.controller.get_row(sql, log_sql=False)
+            row = self.controller.get_row(sql, log_sql=True)
 
 
         if common_msg != "" and self.imports_canceled is False:

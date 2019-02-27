@@ -179,7 +179,7 @@ class ManageNewPsector(ParentManage):
             row = self.controller.get_row(sql)
             if not row:
                 return
-            
+            self.dlg_plan_psector.setWindowTitle("Plan psector - " + str(row['name']))
             self.psector_id.setText(str(row['psector_id']))
             sql = ("SELECT name FROM " + self.schema_name + ".plan_psector_cat_type WHERE id = " + str(row['psector_type']))
             result = self.controller.get_row(sql)

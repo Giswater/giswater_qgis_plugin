@@ -401,11 +401,13 @@ class GwToolBox(ApiParent):
         # Commit changes
         virtual_layer.commitChanges()
 
-        QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
+        QgsMapLayerRegistry.instance().addMapLayer(virtual_layer, False)
 
+        root = QgsProject.instance().layerTreeRoot()
 
+        root.insertLayer(0, virtual_layer)
     def add_table_from_pg(self, schema_name, table_name, field_id, group_to_be_inserted=None):
-
+        #schema_name = self.schema_name.replace('"', '')
         #self.add_table_from_pg(schema_name, 'temp_csv2pg', 'id', 'EPANET')
         layer = self.controller.get_layer_by_tablename(table_name)
         if layer is not None:
