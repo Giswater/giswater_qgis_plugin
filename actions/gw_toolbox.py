@@ -11,6 +11,8 @@ import json
 import sys
 import operator
 
+import re
+from PyQt4.QtCore import QVariant
 from PyQt4.QtGui import QIcon
 
 try:
@@ -43,8 +45,8 @@ else:
     import urllib.parse as urlparse
 
 
-from qgis.core import QgsMapLayerRegistry, QgsProject
-
+from qgis.core import QgsMapLayerRegistry, QgsProject, QgsPoint, QgsFeature, QgsGeometry, QgsDataSourceURI
+from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField
 
 from collections import OrderedDict
 from datetime import datetime
@@ -74,9 +76,9 @@ class GwToolBox(ApiParent):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         body = self.create_body()
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_message("No results for: " + sql, 2)
             return False
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -91,9 +93,9 @@ class GwToolBox(ApiParent):
         extras = '"filterText":"' + text + '"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_message("No results for: " + sql, 2)
             return False
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -103,7 +105,7 @@ class GwToolBox(ApiParent):
     def open_function(self, index):
         # this '0' refers to the index of the item in the selected row (alias in this case)
         alias_function = index.sibling(index.row(), 0).data()
-        
+        self.controller.log_info(str(index.sibling(index.row(), 1).data()))
         # Control no clickable items
         if alias_function in ('Giswater', 'edit', 'master', 'admin'):
             return
@@ -116,9 +118,9 @@ class GwToolBox(ApiParent):
         extras = '"filterText":"' + alias_function + '"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
-        if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_message("No results for: " + sql, 2)
             return False
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
@@ -160,7 +162,9 @@ class GwToolBox(ApiParent):
 
 
     def execute_function(self, dialog, combo, result):
-
+        print(datetime.now())
+        dialog.progressBar.setValue(0)
+        dialog.progressBar.setVisible(True)
         layer_name = utils_giswater.get_item_data(dialog, combo, 1)
         layer = self.set_selected_layer(dialog, combo)
         selection_mode = self.rbt_checked['widget']
@@ -169,11 +173,11 @@ class GwToolBox(ApiParent):
         function_name = ''
         extras = '"selectionMode":"'+selection_mode+'",'
 
+        # Check if time functions is short or long, activate and set undetermined  if not short
         for group, function in result['fields'].items():
             if len(function) != 0:
                 if 'durationType' in function[0]['function_type']:
                     if function[0]['function_type']['durationType'] != 'short':
-                        dialog.progressBar.setVisible(True)
                         dialog.progressBar.setMaximum(0)
                         dialog.progressBar.setMinimum(0)
                 function_name = function[0]['functionname']
@@ -257,7 +261,13 @@ class GwToolBox(ApiParent):
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(feature=feature_field, extras=extras)
         sql = ("SELECT " + self.schema_name + "."+str(function_name)+"($${" + body + "}$$)::text")
-        self.controller.execute_sql(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_message("Function : " + str(function_name)+" executed with no result ", 3)
+            return False
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        self.add_void_layer(dialog, complet_result[0]['body']['data'])
+        print(datetime.now())
 
 
     def populate_functions_dlg(self, dialog, result):
@@ -272,8 +282,8 @@ class GwToolBox(ApiParent):
                 if 'durationType' in function[0]['function_type']:
                     if function[0]['function_type']['durationType'] == 'short':
                         dialog.progressBar.setVisible(False)
-
-                if str(function[0]['isparametric']) == 'false':
+                print(function[0]['isparametric'])
+                if str(function[0]['isparametric']) in ('false', False, 'None',  None, 'null'):
                     self.is_paramtetric = False
                     self.control_isparametric(dialog)
 
@@ -341,3 +351,80 @@ class GwToolBox(ApiParent):
             return json['alias'].upper()
         except KeyError:
             return 0
+
+
+
+
+    def add_void_layer(self, dialog, result):
+        self.delete_layer_from_toc('temp_result')
+
+        counter = len(result['result'])
+        dialog.progressBar.setMaximum(counter)
+        srid = self.controller.plugin_settings_value('srid')
+        the_geom = result['result'][0]['the_geom']
+        sql = ("SELECT St_AsText('" + str(the_geom) + "')")
+        row = self.controller.get_row(sql, log_sql=False)
+        sql = ("SELECT ST_GeometryType(ST_GeomFromText('"+str(row[0])+"'))")
+        geom_type = self.controller.get_row(sql, log_sql=False)
+        # create layer
+        virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
+        if 'ST_LineString' in str(geom_type):
+            virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
+        elif 'ST_Point' in str(geom_type):
+            virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
+
+        prov = virtual_layer.dataProvider()
+
+        # Enter editing mode
+        virtual_layer.startEditing()
+
+        for key, value in result['result'][0].items():
+            # add columns
+            prov.addAttributes([QgsField(str(key), QVariant.String)])
+        x = 0
+        # Add features
+        for item in result['result']:
+            x += 1
+            dialog.progressBar.setValue(x)
+            attributes = []
+            fet = QgsFeature()
+            for k, v in item.items():
+                attributes.append(v)
+                if str(k) in ('the_geom'):
+                    sql = ("SELECT St_AsText('"+str(v)+"')")
+                    row = self.controller.get_row(sql, log_sql=False)
+                    geometry = QgsGeometry.fromWkt(str(row[0]))
+                    fet.setGeometry(geometry)
+            fet.setAttributes(attributes)
+            prov.addFeatures([fet])
+
+        # Commit changes
+        virtual_layer.commitChanges()
+
+        QgsMapLayerRegistry.instance().addMapLayer(virtual_layer)
+
+
+    def add_table_from_pg(self, schema_name, table_name, field_id, group_to_be_inserted=None):
+
+        #self.add_table_from_pg(schema_name, 'temp_csv2pg', 'id', 'EPANET')
+        layer = self.controller.get_layer_by_tablename(table_name)
+        if layer is not None:
+            return
+
+        layer = self.controller.get_layer_by_tablename("version")
+        credentials = self.controller.get_layer_source(layer)
+        #self.controller.log_info(str(credentials))
+
+        foreign_uri = QgsDataSourceURI()
+        foreign_uri.setConnection(credentials['host'], credentials['port'], credentials['db'], credentials['user'], credentials['password'])
+        foreign_uri.setDataSource(schema_name, table_name, None, "", field_id)
+        new_layer = QgsVectorLayer(foreign_uri.uri(), table_name, "postgres")
+
+        if group_to_be_inserted is None:
+            QgsMapLayerRegistry.instance().addMapLayer(new_layer)
+            return
+
+        root = QgsProject.instance().layerTreeRoot()
+        mygroup = root.findGroup(group_to_be_inserted)
+        QgsMapLayerRegistry.instance().addMapLayer(new_layer, False)
+        mygroup.insertLayer(0, new_layer)
