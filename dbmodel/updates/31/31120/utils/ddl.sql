@@ -23,17 +23,6 @@ ALTER TABLE om_visit_event_photo ADD COLUMN fextension varchar(16);
 
 ALTER TABLE om_visit_parameter ADD COLUMN short_descript varchar(30);
 
-ALTER TABLE config_api_form_fields ADD COLUMN listfilterparam json;
-
-
-
-CREATE TABLE om_visit_cat_status(
-  id serial NOT NULL,
-  idval character varying(30),
-  descript text,
-  CONSTRAINT om_visit_cat_status_pkey PRIMARY KEY (id)
-);
-
 
 CREATE TABLE om_visit_typevalue(
   parameter_id text PRIMARY KEY,
@@ -129,7 +118,7 @@ CREATE TABLE om_visit_lot_x_arc(
   CREATE TABLE om_visit_team_x_user(
   team_id integer,
   user_id varchar(16),
-  stattime timestamp DEFAULT now(),
+  starttime timestamp DEFAULT now(),
   endtime timestamp,
   constraint om_visit_team_x_user_pkey PRIMARY KEY (team_id, user_id));
   
@@ -137,20 +126,18 @@ CREATE TABLE om_visit_lot_x_arc(
   CREATE TABLE om_visit_user_x_vehicle(
   user_id varchar(16),
   vehicle_id integer,
-  stattime timestamp DEFAULT now(),
+  starttime timestamp DEFAULT now(),
   endtime timestamp,
   constraint om_visit_user_x_vehicle_pkey PRIMARY KEY (user_id, vehicle_id));
   
- CREATE TABLE om_visit_cat_status
-(
+  
+ CREATE TABLE om_visit_cat_status(
   id serial NOT NULL primary key,
   idval character varying(30),
-  descript text
-)
+  descript text);
+
   
-  CREATE TABLE om_visit_filetype_x_extension
-(
+  CREATE TABLE om_visit_filetype_x_extension(
   filetype varchar (30),
   fextension varchar (16),
-  CONSTRAINT om_visit_filetype_x_extension_pkey PRIMARY KEY (filetype, fextension)
-);
+  CONSTRAINT om_visit_filetype_x_extension_pkey PRIMARY KEY (filetype, fextension));

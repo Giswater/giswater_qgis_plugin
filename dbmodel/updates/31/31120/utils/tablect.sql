@@ -18,9 +18,6 @@ FOREIGN KEY (class_id) REFERENCES om_visit_class(id) ON UPDATE CASCADE ON DELETE
 ALTER TABLE ONLY om_visit_class_x_parameter ADD CONSTRAINT om_visit_class_x_parameter_parameter_fkey 
 FOREIGN KEY (parameter_id) REFERENCES om_visit_parameter(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE ONLY om_visit_file ADD CONSTRAINT om_visit_file_visit_id_fkey 
-FOREIGN KEY (visit_id) REFERENCES om_visit (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
 ALTER TABLE selector_lot ADD CONSTRAINT selector_lot_lot_id_fkey 
 FOREIGN KEY (lot_id) REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 

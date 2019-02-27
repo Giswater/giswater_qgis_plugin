@@ -8,6 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+create OR REPLACE view v_ui_om_lot AS
+select * FROM om_visit_lot;
+
+
 CREATE OR REPLACE VIEW ve_lot_x_arc AS 
  SELECT arc.arc_id,
     om_visit_lot_x_arc.lot_id,

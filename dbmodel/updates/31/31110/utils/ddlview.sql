@@ -31,15 +31,10 @@ JOIN ext_cat_period ON cat_period_id=ext_cat_period.id
 ORDER BY 3, 6 DESC ;
 
 
-
-
-
 CREATE OR REPLACE VIEW v_ui_om_event AS 
  SELECT *     
    FROM om_visit_event;
  
-create OR REPLACE view v_ui_om_lot AS
-select * FROM om_visit_lot;
 
 create OR REPLACE view v_ui_om_visit_x_doc
 as 
