@@ -65,6 +65,9 @@ BEGIN
 		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (6, current_user);
 	END IF;
 
+	-- control null's
+	v_result := COALESCE(v_result, '[]');  
+	
 --    Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"3.1.105"'||
              ',"body":{"form":{}'||

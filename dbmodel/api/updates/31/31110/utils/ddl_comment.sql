@@ -7,13 +7,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
+/*
 COMMENT ON TABLE config_api_toolbar_buttons IS 
 'INSTRUCIONS TO WORK WITH THIS TABLE:
 With this table buttons on toolbar are configured.
 The function gw_api_gettoolbarbuttons is called when session is started passing the list of project buttons. 
 In function of role of user, buttons are parameters are passed to client';
-
+*/
 
 /*
 COMMENT ON TABLE config_api_form_actions IS 
