@@ -17,21 +17,6 @@ UPDATE config_param_system SET label='custom_giswater_folder:' ,isenabled=FALSE 
 INSERT INTO sys_fprocess_cat VALUES (35, 'Recursive go2epa process', 'EPA', 'Recursive go2epa process', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (36, 'store fk', 'admin', 'store fk', 'utils');
 
--- update audit_cat_function
-
-UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_edit', alias='anl_arc_no_startend_node', function_type='{"featureType":"node", "durationType":"long"}' ,input_params='[{"widgetname":"anl_arc_no_startend_node", "label":"anl_arc_no_startend_node:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_fct_anl_arc_no_startend_node';
-
-UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_edit', alias='Node duplicated', function_type='{"featureType":"node", "durationType":"short"}' ,input_params='[{"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":0},{"widgetname":"nodeTolerance2", "label":"Node tolerance2:", "widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":2,"value":""},{"label": "Headloss:","widgetname": "inp_options_headloss","value": "H-W","datatype": "text","widgettype": "combo","layout_order": 3,"layout_name": "grl_option_parameters","comboIds": ["C-M","D-W","H-W"],"selectedId": "H-W","comboNames": ["C-M","D-W","H-W"]}]' WHERE function_name='gw_fct_anl_node_duplicated';
-
-UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_edit', alias='Node orphan', function_type='{"featureType":"node", "durationType":"short"}' ,input_params='[{"widgetname":"nodeOrphan", "label":"Node orphan:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_fct_anl_node_orphan';
-
-UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_master', alias='estimate result', function_type='{"featureType":"node", "durationType":"short"}' ,input_params='[{"widgetname":"estimateResult", "label":"Estimate Result:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_fct_plan_estimate_result';
-
-UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_admin', alias='state control', function_type='{"featureType":"node", "durationType":"short"}' ,input_params='[{"widgetname":"stateControl", "label":"State Control:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_state_control';
-
-UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_admin', alias='state search nodes', function_type='{"featureType":"node"}' ,input_params='[{"widgetname":"stateSearchnodes", "label":"State Searchnodesl:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_state_searchnodes';
-
-UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_master', alias='Visit event update xy', function_type='{"featureType":"node"}' ,input_params='[{"widgetname":"visitEventUpdateXY", "label":"visitEventUpdateXY:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_trg_visit_event_update_xy';
 
 /*
 
@@ -229,10 +214,6 @@ INSERT INTO sys_csv2pg_cat VALUES (10, 'Export inp', 'Export inp', null, 'role_e
 INSERT INTO sys_csv2pg_cat VALUES (11, 'Import rpt', 'Import rpt', null, 'role_epa');
 INSERT INTO sys_csv2pg_cat VALUES (12, 'Import inp', 'Import inp', null, 'role_admin');
 
--- 2019/02/02
-UPDATE audit_cat_function SET istoolbox=TRUE,  descript=return_type, context=project_type, project_type='utils', function_type='{"featureType":"node"}', 
-return_type=null, input_params='[{"name":"nodeTolerance", "type":"float"}]' , sys_role_id='role_edit', isparametric=true WHERE function_name='gw_fct_anl_node_duplicated';
-
 -- 2019/02/08
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
@@ -268,4 +249,21 @@ VALUES ('connec_proximity_control', 'true', 'boolean', NULL, NULL,'Connec proxim
 -- 2019/02/24
 INSERT INTO audit_cat_param_user VALUES ('visit_duration_vdef', 'visit', 'Duration for user', 'role_om', NULL, 'Visit expires time vdefault', 
 'Visit duration', NULL, NULL, TRUE, 9, 9, 'utils', false, NULL, NULL, NULL, false, 'date', 'text', FALSE, NULL, '24 hours', 'grl_om', NULL, TRUE, NULL, NULL, NULL);
+
+-- 2019/02/27update audit_cat_function
+
+UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_edit', alias='anl_arc_no_startend_node', function_type='{"featureType":"node", "durationType":"long"}' ,input_params='[{"widgetname":"anl_arc_no_startend_node", "label":"anl_arc_no_startend_node:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_fct_anl_arc_no_startend_node';
+
+UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_edit', alias='Node duplicated', function_type='{"featureType":"node", "durationType":"short"}' ,input_params='[{"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":0},{"widgetname":"nodeTolerance2", "label":"Node tolerance2:", "widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":2,"value":""},{"label": "Headloss:","widgetname": "inp_options_headloss","value": "H-W","datatype": "text","widgettype": "combo","layout_order": 3,"layout_name": "grl_option_parameters","comboIds": ["C-M","D-W","H-W"],"selectedId": "H-W","comboNames": ["C-M","D-W","H-W"]}]' WHERE function_name='gw_fct_anl_node_duplicated';
+
+UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_edit', alias='Node orphan', function_type='{"featureType":"node", "durationType":"short"}' ,input_params='[{"widgetname":"nodeOrphan", "label":"Node orphan:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_fct_anl_node_orphan';
+
+UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_master', alias='estimate result', function_type='{"featureType":"node", "durationType":"short"}' ,input_params='[{"widgetname":"estimateResult", "label":"Estimate Result:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_fct_plan_estimate_result';
+
+UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_admin', alias='state control', function_type='{"featureType":"node", "durationType":"short"}' ,input_params='[{"widgetname":"stateControl", "label":"State Control:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_state_control';
+
+UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_admin', alias='state search nodes', function_type='{"featureType":"node"}' ,input_params='[{"widgetname":"stateSearchnodes", "label":"State Searchnodesl:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_state_searchnodes';
+
+UPDATE audit_cat_function SET istoolbox=TRUE, sys_role_id='role_master', alias='Visit event update xy', function_type='{"featureType":"node"}' ,input_params='[{"widgetname":"visitEventUpdateXY", "label":"visitEventUpdateXY:","widgettype":"text","datatype":"float","layout_name":"grl_option_parameters","layout_order":1,"value":""}]' WHERE function_name='gw_trg_visit_event_update_xy';
+
 
