@@ -2152,6 +2152,10 @@ class UpdateSQL(ParentAction):
 
     def delete_schema(self):
         project_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        if project_name is None:
+            msg = "You cant delete a None project. Please, select correct one."
+            result = self.controller.show_info_box(msg, "Info")
+            return
         msg = "Are you sure you want delete schema '" + str(project_name) + "' ?"
         result = self.controller.ask_question(msg, "Info")
         if result:
