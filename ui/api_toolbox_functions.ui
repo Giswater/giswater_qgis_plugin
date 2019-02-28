@@ -50,7 +50,10 @@
       <number>-1</number>
      </property>
      <property name="textVisible">
-      <bool>false</bool>
+      <bool>true</bool>
+     </property>
+     <property name="format">
+      <string>%p%</string>
      </property>
     </widget>
    </item>

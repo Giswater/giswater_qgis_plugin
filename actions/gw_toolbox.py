@@ -176,14 +176,15 @@ class GwToolBox(ApiParent):
         # Check if time functions is short or long, activate and set undetermined  if not short
         for group, function in result['fields'].items():
             if len(function) != 0:
+                function_name = function[0]['functionname']
+                feature_type = function[0]['function_type']['featureType']
                 if 'durationType' in function[0]['function_type']:
                     if function[0]['function_type']['durationType'] != 'short':
                         dialog.progressBar.setMaximum(0)
                         dialog.progressBar.setMinimum(0)
-                function_name = function[0]['functionname']
-                feature_type = function[0]['function_type']['featureType']
                 break
-
+        dialog.progressBar.setFormat("Running function: " + str(function_name))
+        dialog.progressBar.setAlignment(Qt.AlignCenter)
         if self.is_paramtetric is False:
             sql = ("SELECT " + self.schema_name + "." + str(function_name) + "()")
             self.controller.execute_sql(sql, log_sql=True)
@@ -360,6 +361,7 @@ class GwToolBox(ApiParent):
 
         counter = len(result['result'])
         dialog.progressBar.setMaximum(counter)
+        dialog.progressBar.setValue(0)
         srid = self.controller.plugin_settings_value('srid')
         the_geom = result['result'][0]['the_geom']
         sql = ("SELECT St_AsText('" + str(the_geom) + "')")
@@ -406,6 +408,7 @@ class GwToolBox(ApiParent):
         root = QgsProject.instance().layerTreeRoot()
 
         root.insertLayer(0, virtual_layer)
+
     def add_table_from_pg(self, schema_name, table_name, field_id, group_to_be_inserted=None):
         #schema_name = self.schema_name.replace('"', '')
         #self.add_table_from_pg(schema_name, 'temp_csv2pg', 'id', 'EPANET')
@@ -430,3 +433,4 @@ class GwToolBox(ApiParent):
         mygroup = root.findGroup(group_to_be_inserted)
         QgsMapLayerRegistry.instance().addMapLayer(new_layer, False)
         mygroup.insertLayer(0, new_layer)
+
