@@ -89,6 +89,8 @@ class UpdateSQL(ParentAction):
         btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
         self.set_icon(btn_info, '73')
 
+        btn_test = self.dlg_readsql.findChild(QPushButton, 'btn_test')
+
         self.message_update = ''
 
         #Declare error counter variable
@@ -183,6 +185,7 @@ class UpdateSQL(ParentAction):
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
+        self.dlg_readsql.btn_test.clicked.connect(partial(self.btn_test_changed, btn_test))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -211,7 +214,13 @@ class UpdateSQL(ParentAction):
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
 
-            
+
+    def btn_test_changed(self, button):
+        if button.text() == 'ON':
+            button.setText("OFF")
+        elif button.text() == 'OFF':
+            button.setText("ON")
+        return
     """ Declare all read sql process """
 
     def load_base(self, project_type=False):

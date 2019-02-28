@@ -18,6 +18,33 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
+    <item row="4" column="4">
+     <widget class="QLabel" name="lbl_schema_name">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="12">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="4" column="3">
+     <widget class="QLabel" name="lbl_status_text">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
     <item row="4" column="13">
      <widget class="QPushButton" name="btn_close">
       <property name="sizePolicy">
@@ -44,33 +71,6 @@
       </property>
       <property name="scaledContents">
        <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="12">
-     <spacer name="horizontalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="4" column="3">
-     <widget class="QLabel" name="lbl_status_text">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="4">
-     <widget class="QLabel" name="lbl_schema_name">
-      <property name="text">
-       <string/>
       </property>
      </widget>
     </item>
@@ -311,7 +311,7 @@
         <string>Schema Manager</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <item row="4" column="1">
+        <item row="5" column="3">
          <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -324,45 +324,20 @@
           </property>
          </spacer>
         </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="title">
-           <string>Update</string>
+        <item row="3" column="3">
+         <widget class="QPushButton" name="btn_schema_file_to_db">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <layout class="QGridLayout" name="gridLayout_5">
-           <item row="0" column="1">
-            <widget class="QPushButton" name="btn_update_schema">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Execute</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Update all</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <property name="text">
+           <string>File to DB</string>
+          </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
+        <item row="2" column="0" colspan="4">
          <widget class="QGroupBox" name="groupBox_10">
           <property name="title">
            <string>Reload</string>
@@ -400,16 +375,55 @@
           </layout>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="btn_schema_file_to_db">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+        <item row="0" column="0" colspan="4">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Update</string>
           </property>
+          <layout class="QGridLayout" name="gridLayout_5">
+           <item row="0" column="1">
+            <widget class="QPushButton" name="btn_update_schema">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Execute</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Update all</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>File to DB</string>
+           <string>Enable constrains:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="btn_test">
+          <property name="text">
+           <string>ON</string>
           </property>
          </widget>
         </item>
@@ -629,6 +643,11 @@
      </widget>
     </item>
    </layout>
+   <zorder>tab_main</zorder>
+   <zorder>btn_close</zorder>
+   <zorder>lbl_status</zorder>
+   <zorder>lbl_status_text</zorder>
+   <zorder>lbl_schema_name</zorder>
   </widget>
   <action name="action_create_sample">
    <property name="text">
