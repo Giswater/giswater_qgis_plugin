@@ -416,14 +416,24 @@
         <item row="3" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Enable constrains:</string>
+           <string>Use constrains:</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QPushButton" name="btn_test">
+         <widget class="QPushButton" name="btn_constrains">
           <property name="text">
            <string>ON</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="lbl_constrains_info">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string/>
           </property>
          </widget>
         </item>

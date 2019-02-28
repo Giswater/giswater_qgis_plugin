@@ -89,7 +89,8 @@ class UpdateSQL(ParentAction):
         btn_info = self.dlg_readsql.findChild(QPushButton, 'btn_info')
         self.set_icon(btn_info, '73')
 
-        btn_test = self.dlg_readsql.findChild(QPushButton, 'btn_test')
+        self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
+        self.btn_constrains_changed(self.btn_constrains)
 
         self.message_update = ''
 
@@ -185,7 +186,7 @@ class UpdateSQL(ParentAction):
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
-        self.dlg_readsql.btn_test.clicked.connect(partial(self.btn_test_changed, btn_test))
+        self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -215,11 +216,14 @@ class UpdateSQL(ParentAction):
         self.set_info_project()
 
 
-    def btn_test_changed(self, button):
+    def btn_constrains_changed(self, button):
+        lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
         if button.text() == 'ON':
             button.setText("OFF")
+            lbl_constrains_info.setText('(Constrains enabled)')
         elif button.text() == 'OFF':
             button.setText("ON")
+            lbl_constrains_info.setText('(Constrains dissabled)')
         return
     """ Declare all read sql process """
 
@@ -1478,6 +1482,15 @@ class UpdateSQL(ParentAction):
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
         self.set_arrow_cursor()
+
+        # Enable/disable constrains
+
+        if self.btn_constrains.text() == 'ON':
+            sql = 'SELECT ' + self.schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
+            self.controller.execute_sql(sql)
+        elif self.btn_constrains.text() == 'OFF':
+            sql = 'SELECT ' + self.schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
+            self.controller.execute_sql(sql)
 
         # Show message if process executed correctly
         if self.error_count == 0:
