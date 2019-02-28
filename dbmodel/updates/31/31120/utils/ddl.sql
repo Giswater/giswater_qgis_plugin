@@ -15,7 +15,7 @@ ALTER TABLE om_visit ADD COLUMN feature_type text;
 
 ALTER TABLE om_visit ALTER COLUMN visitcat_id DROP NOT NULL;
 
-ALTER TABLE om_visit ALTER COLUMN startdate SET DEFAULT ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone
+ALTER TABLE om_visit ALTER COLUMN startdate SET DEFAULT ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone;
 
 
 -- om_visit_event_photo
@@ -27,6 +27,20 @@ ALTER TABLE om_visit_event_photo ADD COLUMN fextension varchar(16);
 
 
 ALTER TABLE om_visit_parameter ADD COLUMN short_descript varchar(30);
+
+
+CREATE TABLE sys_combo_cat (
+  id serial NOT NULL,
+  idval text,
+  CONSTRAINT sys_combo_cat_pkey PRIMARY KEY (id) );
+
+
+CREATE TABLE sys_combo_values(
+  sys_combo_cat_id integer NOT NULL,
+  id integer NOT NULL,
+  idval text,
+  descript text,
+  CONSTRAINT sys_combo_pkey PRIMARY KEY (sys_combo_cat_id, id));
 
 
 CREATE TABLE om_visit_typevalue(

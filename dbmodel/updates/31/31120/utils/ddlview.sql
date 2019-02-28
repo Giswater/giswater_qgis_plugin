@@ -298,7 +298,6 @@ CREATE OR REPLACE VIEW ve_visit_node_singlevent AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.suspendendcat_id,
     om_visit.lot_id,
     om_visit.status,
     a.param_1 AS tipus_incidencia,

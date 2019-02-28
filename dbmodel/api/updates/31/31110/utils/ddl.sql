@@ -77,6 +77,7 @@ CREATE TABLE config_api_list(
   actionfields json,
   listtype character varying(30),
   listclass character varying(30),
+  vdefault json,
   CONSTRAINT config_api_list_pkey PRIMARY KEY (id)
 );
 

@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/02/14
 DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".om_visit;
-CREATE TRIGGER gw_trg_om_visit AFTER INSERT OR UPDATE class_id, status OR DELETE ON "SCHEMA_NAME".om_visit
+CREATE TRIGGER gw_trg_om_visit AFTER INSERT OR DELETE ON "SCHEMA_NAME".om_visit
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit();
 
 -- REVISAR
