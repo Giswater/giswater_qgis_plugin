@@ -563,6 +563,7 @@ class DrawProfiles(ParentMapTool):
         """ Get parameters from data base. Fill self.memory with parameters postgres """
 
         self.memory = []
+        test_id_list = []
         i = 0
         # Get parameters and fill the memory
         for node_id in self.node_id:
@@ -580,8 +581,7 @@ class DrawProfiles(ParentMapTool):
 
             if row:
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None:
-                    message = "Some parameters are missing for node (Values Defaults used for)"
-                    self.controller.show_info_box(message, "Info", node_id)
+                    test_id_list.append(node_id)
                 # Check if we have all data for drawing
                 for x in range(0, len(columns)):
                     if row[x] is None:
@@ -609,8 +609,7 @@ class DrawProfiles(ParentMapTool):
 
             if row:
                 if row[0] is None:
-                    message = "Some parameters are missing for node catalog (Values Defaults used for)"
-                    self.controller.show_info_box(message, "Info", node_id)
+                    test_id_list.append(node_id)
                 # Check if we have all data for drawing
                 for x in range(0, len(columns)):
                     if row[x] is None:
@@ -640,8 +639,7 @@ class DrawProfiles(ParentMapTool):
                 # Check if we have all data for drawing
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
                    row[5] is None or row[6] is None or row[7] is None:
-                    message = "Some parameters are missing for arc (Values Defaults used for)"
-                    self.controller.show_info_box(message, "Info", element_id)
+                    test_id_list.append(element_id)
                 for x in range(0, len(columns)):
                     if row[x] is None:
                         sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
@@ -655,11 +653,13 @@ class DrawProfiles(ParentMapTool):
                 self.memory[n][5] = row[2]
                 self.memory[n][8] = row[3]
                 self.memory[n][9] = row[4]
-                self.memory[n][10] = row[5
-				]
+                self.memory[n][10] = row[5]
                 self.memory[n][11] = row[6]
                 self.memory[n][7] = row[7]
                 n = n + 1
+
+        message = "Some parameters are missing (Values Defaults used for)"
+        self.controller.show_info_box(message, "Info", str(test_id_list))
 
 
     def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx): #@UnusedVariable
