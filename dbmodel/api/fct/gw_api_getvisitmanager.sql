@@ -290,7 +290,7 @@ BEGIN
 
 			IF v_featuretype IS NULL THEN
 				-- setting table feature	
-				v_feature := '{"tableName":"UserVisitList"}';				
+				v_feature := '{"tableName":"userVisitList"}';				
 			ELSE
 				-- setting table feature
 				v_feature := concat('{"tableName":"',v_featuretype,'UserVisitList"}');	

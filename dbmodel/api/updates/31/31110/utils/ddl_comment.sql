@@ -73,4 +73,9 @@ Wiht this table tabs on form are configured
 Field actions is mandatory in exception of attributeTable. In case of attribute table actions must be defined on config_api_list';
 
 
+COMMENT ON TABLE config_api_visit_x_featuretable
+  IS 'INSTRUCIONS TO WORK WITH THIS TABLE:
+It is mandatory to relate table with visitclass. In case of offline funcionality client devices needs projects with tables related only with one visitclass, 
+because on the previous download process only one visitclass form per layer stored on project will be donwloaded. 
+In case of only online projects more than one visitclass must be related to layer.'
 

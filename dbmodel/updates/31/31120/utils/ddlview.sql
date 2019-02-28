@@ -285,13 +285,12 @@ CREATE OR REPLACE VIEW ve_visit_node_singlevent AS
   
   
   
-  
-CREATE OR REPLACE VIEW ve_visit_noinfra_typea AS 
+  CREATE OR REPLACE VIEW ve_visit_noinfra AS 
  SELECT om_visit.id AS visit_id,
     om_visit.visitcat_id,
     om_visit.ext_code,
-    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
-    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
+    "left"(date_trunc('second'::text, om_visit.startdate)::text, 19) AS startdate,
+    "left"(date_trunc('second'::text, om_visit.enddate)::text, 19) AS enddate,
     om_visit.user_name,
     om_visit.webclient_id,
     om_visit.expl_id,
@@ -299,46 +298,19 @@ CREATE OR REPLACE VIEW ve_visit_noinfra_typea AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
+    om_visit.suspendendcat_id,
     om_visit.lot_id,
     om_visit.status,
-    a.param_1 AS comentari_typea
+    a.param_1 AS tipus_incidencia,
+    a.param_2 AS comentari_incidencia
    FROM om_visit
      JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
      LEFT JOIN ( SELECT ct.visit_id,
-            ct.param_1
+            ct.param_1,
+            ct.param_2
            FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
 			FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
 			JOIN om_visit_class on om_visit_class.id=om_visit.class_id
 			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
-			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''comentari_typea'')'::text) ct(visit_id integer, param_1 text)) a ON a.visit_id = om_visit.id
+			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''tipus_incidencia''),(''comentari_incidencia'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
-  
-  
-  
-CREATE OR REPLACE VIEW ve_visit_noinfra_typeb AS 
- SELECT a.visit_id,
-    om_visit.visitcat_id,
-    om_visit.ext_code,
-    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
-    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
-    om_visit.user_name,
-    om_visit.webclient_id,
-    om_visit.expl_id,
-    om_visit.the_geom,
-    om_visit.descript,
-    om_visit.is_done,
-    om_visit.class_id,
-    om_visit.lot_id,
-    om_visit.status,
-    a.param_1 AS comentari_typeb
-   FROM om_visit
-     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
-     LEFT JOIN ( SELECT ct.visit_id,
-            ct.param_1
-           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
-			FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id 
-			JOIN om_visit_class on om_visit_class.id=om_visit.class_id
-			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
-			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''comentari_typea'')'::text) ct(visit_id integer, param_1 text)) a ON a.visit_id = om_visit.id
-  WHERE om_visit_class.ismultievent = true;
-  

@@ -36,9 +36,9 @@ INSERT INTO config_api_cat_widgettype VALUES ('combotext', NULL);
 INSERT INTO config_api_cat_widgettype VALUES ('hyperlink', NULL);
 
 
-INSERT INTO SCHEMA_NAME.config_api_form_actions VALUES (20, 've_arc', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionSection"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
-INSERT INTO SCHEMA_NAME.config_api_form_actions VALUES (30, 've_connec', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
-INSERT INTO SCHEMA_NAME.config_api_form_actions VALUES (10, 've_node', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionRotation"},{"actionName":"actionInterpolate"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
+INSERT INTO config_api_form_actions VALUES (20, 've_arc', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionSection"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
+INSERT INTO config_api_form_actions VALUES (30, 've_connec', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
+INSERT INTO config_api_form_actions VALUES (10, 've_node', 'ws', '[{"actionName":"actionEdit"},{"actionName":"actionZoom"},{"actionName":"actionCentered"},{"actionName":"actionZoomOut"},{"actionName":"actionCatalog"},{"actionName":"actionWorkcat"},{"actionName":"actionCopyPaste"},{"actionName":"actionRotation"},{"actionName":"actionInterpolate"},{"actionName":"actionAdd"},{"actionName":"actionDelete"},{"actionName":"actionOpen"},{"actionName":"actionLink"},{"actionName":"actionHelp"}]');
 
 
 
@@ -94,28 +94,6 @@ INSERT INTO config_api_form_tabs VALUES (207, 've_node', 'tab_visit', 'Visit', '
 INSERT INTO config_api_form_tabs VALUES (302, 've_arc', 'tab_elements', 'Elem', 'Lista de elementos relacionados', NULL, NULL, NULL, NULL);
 
 
-INSERT INTO config_api_message VALUES (10, 2, 'There are not exists the class of visit provided', NULL);
-
-
------------------------
--- sys values
------------------------
-INSERT INTO sys_combo_cat VALUES (1, NULL);
-INSERT INTO sys_combo_cat VALUES (2, NULL);
-INSERT INTO sys_combo_cat VALUES (3, NULL);
-
-INSERT INTO sys_combo_values VALUES (1, 1, 'combo1', NULL);
-INSERT INTO sys_combo_values VALUES (1, 2, 'combo2', NULL);
-INSERT INTO sys_combo_values VALUES (1, 3, 'combo3', NULL);
-INSERT INTO sys_combo_values VALUES (1, 4, 'combo4', NULL);
-INSERT INTO sys_combo_values VALUES (1, 5, 'combo5', NULL);
-INSERT INTO sys_combo_values VALUES (2, 1, 'combo1', NULL);
-INSERT INTO sys_combo_values VALUES (2, 2, 'combo2', NULL);
-INSERT INTO sys_combo_values VALUES (2, 3, 'combo3', NULL);
-INSERT INTO sys_combo_values VALUES (3, 1, 'combo1', NULL);
-INSERT INTO sys_combo_values VALUES (3, 2, 'combo2', NULL);
-INSERT INTO sys_combo_values VALUES (3, 3, 'combo3', NULL);
-INSERT INTO sys_combo_values VALUES (3, 4, 'combo4', NULL);
 
 -----------------------
 -- value type values

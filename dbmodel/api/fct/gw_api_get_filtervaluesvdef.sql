@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-CREATE OR REPLACE FUNCTION gw_api_get_filtervaluesvdef(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_filtervaluesvdef(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -42,12 +42,14 @@ BEGIN
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_formname := (p_data ->> 'data')::json->> 'formName';
-	v_formtype = 'listfilter';
+	v_formtype = 'listHeader';
 
 	IF (SELECT column_id FROM config_api_form_fields WHERE formname = v_formname AND formtype= v_formtype LIMIT 1) IS NOT NULL THEN
+	
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_id, layout_order as orderby FROM config_api_form_fields WHERE formname = $1 AND formtype= $2 ORDER BY orderby) a'
 				INTO fields_array
 				USING v_formname, v_formtype;
+
 		-- v_fields (1step)
 		v_fields = '{';
 		

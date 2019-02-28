@@ -138,6 +138,7 @@ DECLARE
 	v_listclass text;
 	v_sign text;
 	v_data json;
+	v_default json;
 BEGIN
 
 -- Set search path to local schema
@@ -190,9 +191,11 @@ BEGIN
 		
 		SELECT gw_api_get_filtervaluesvdef(v_data) INTO v_filter_values;
 
+		RAISE NOTICE 'gw_api_getlist - Init Values setted by default %', v_filter_values;
+
 	END IF;
 
-	RAISE NOTICE 'FILTER VALUES %', v_filter_values;
+
 	
 --  Creating the list fields
 ----------------------------
@@ -259,14 +262,14 @@ BEGIN
 
 	ELSE
 		--  get querytext
-		EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 AND device = $2'
-			INTO v_query_result
+		EXECUTE 'SELECT query_text, vdefault FROM config_api_list WHERE tablename = $1 AND device = $2'
+			INTO v_query_result, v_default
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_api_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE 'SELECT query_text FROM config_api_list WHERE tablename = $1 LIMIT 1'
-				INTO v_query_result
+			EXECUTE 'SELECT query_text, vdefault FROM config_api_list WHERE tablename = $1 LIMIT 1'
+				INTO v_query_result, v_default
 				USING v_tablename;
 		END IF;	
 	END IF;
@@ -331,20 +334,27 @@ BEGIN
 	END IF;
 
 	-- add orderby
-	IF v_orderby IS NOT NULL THEN
-		v_query_result := v_query_result || ' ORDER BY '||v_orderby;
-
-		-- adding ordertype
-		IF v_ordertype IS NOT NULL THEN
-			v_query_result := v_query_result ||' '||v_ordertype;
-		END IF;
-		
+	IF v_orderby IS NULL THEN
+		v_orderby = v_default->>'orderBy';
+		v_ordertype = v_default->>'orderType';
 	END IF;
+
+
+	IF v_orderby IS NOT NULL THEN
+		v_query_result := v_query_result || ' ORDER BY '||v_orderby::integer;
+	END IF;
+
+	-- adding ordertype
+	IF v_ordertype IS NOT NULL THEN
+		v_query_result := v_query_result ||' '||v_ordertype;
+	END IF;
+		raise notice '%', v_query_result;
 
 	-- calculating last page
 	IF v_limit IS NULL THEN
 		v_limit = 10;
 	END IF;
+	
 	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
 		INTO v_lastpage;
 	

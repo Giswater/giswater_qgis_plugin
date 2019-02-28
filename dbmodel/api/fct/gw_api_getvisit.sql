@@ -389,6 +389,10 @@ BEGIN
 		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
 
 			IF isnewvisit OR v_isclasschanged THEN
+
+				IF v_formname IS NULL THEN
+					RAISE EXCEPTION 'Api is bad configured. There is no form related to tablename';
+				END IF;
 				
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
 				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;

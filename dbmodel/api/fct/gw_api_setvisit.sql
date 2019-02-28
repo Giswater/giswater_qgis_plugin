@@ -109,10 +109,7 @@ BEGIN
 		
 		--setting the update
 		PERFORM gw_api_setfields (v_outputparameter);
-
-		-- setting the date
-		UPDATE om_visit SET enddate=now() WHERE id=v_id;
-		
+	
 		-- getting message
 		SELECT gw_api_getmessage(v_feature, 50) INTO v_message;
 

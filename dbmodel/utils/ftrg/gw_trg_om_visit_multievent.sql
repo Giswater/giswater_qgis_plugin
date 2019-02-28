@@ -13,6 +13,7 @@ DECLARE
     v_sql varchar;
     v_parameters record;
     v_new_value_param text;
+    v_query_text text;
     
 BEGIN
 
@@ -28,23 +29,29 @@ BEGIN
 	END IF;
 
 	IF NEW.startdate IS NULL THEN
-		--NEW.startdate = now();
 		NEW.startdate = left (date_trunc('second', now())::text, 19);
 	END IF;
-	
-            INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, suspendendcat_id, lot_id, status) 
-            VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
-            NEW.is_done, NEW.class_id, NEW.suspendendcat_id, NEW.lot_id, NEW.status);
+	 
 
-        IF  NEW.enddate IS NOT NULL THEN
-	    UPDATE om_visit SET enddate=NEW.enddate WHERE id=NEW.id;
+        INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, suspendendcat_id, lot_id, status) 
+        VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
+        NEW.is_done, NEW.class_id, NEW.suspendendcat_id, NEW.lot_id, NEW.status);
+
+
+	IF visit_table IS NULL THEN
+	v_query_text=' SELECT * FROM om_visit_parameter 
+			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
+			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
+			WHERE om_visit_parameter.feature_type IS NULL AND om_visit_class.ismultievent is true';
+	ELSE
+	v_query_text='	SELECT * FROM om_visit_parameter 
+			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
+			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
+			WHERE om_visit_parameter.feature_type = upper('||visit_table||') AND om_visit_class.ismultievent is true';
 	END IF;
 
-            FOR v_parameters IN SELECT * FROM om_visit_parameter 
-            JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
-            JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-            WHERE om_visit_parameter.feature_type = upper(visit_table) AND om_visit_class.ismultievent is true
-            LOOP
+	FOR v_parameters IN EXECUTE  v_query_text
+        LOOP
           
                 EXECUTE 'SELECT $1.' || v_parameters.id
                     USING NEW
@@ -70,17 +77,30 @@ BEGIN
         RETURN NEW; 
 
     ELSIF TG_OP = 'UPDATE' THEN
+ 
+ 
+ 	    IF  NEW.enddate IS NOT NULL THEN
+		UPDATE om_visit SET enddate=left (date_trunc('second', NEW.enddate)::text, 19)::timestamp WHERE id=NEW.visit_id;	
+	    END IF;
     
-            UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate::timestamp,
+            UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, 
             webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
             suspendendcat_id=NEW.suspendendcat_id, lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
 
-            FOR v_parameters IN SELECT * FROM om_visit_parameter 
-            JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
-            JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-            WHERE om_visit_parameter.feature_type = upper(visit_table) AND om_visit_class.ismultievent is true
+            IF visit_table IS NULL THEN
+		v_query_text=' SELECT * FROM om_visit_parameter 
+				JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
+				JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
+				WHERE om_visit_parameter.feature_type IS NULL AND om_visit_class.ismultievent is true';
+	    ELSE
+		v_query_text='	SELECT * FROM om_visit_parameter 
+				JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
+				JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
+				WHERE om_visit_parameter.feature_type = upper('||visit_table||') AND om_visit_class.ismultievent is true';
+	    END IF;
+
+            FOR v_parameters IN EXECUTE v_query_text 
             LOOP
-          
                 EXECUTE 'SELECT $1.' || v_parameters.id
                     USING NEW
                     INTO v_new_value_param;

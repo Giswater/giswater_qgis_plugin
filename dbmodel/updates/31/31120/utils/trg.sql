@@ -51,16 +51,10 @@ CREATE TRIGGER gw_trg_om_visit_multievent
   
   CREATE TRIGGER gw_trg_om_visit_multievent
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_noinfra_typea
+  ON SCHEMA_NAME.ve_visit_noinfra
   FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('noinfra');
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent();
 
-  
-  CREATE TRIGGER gw_trg_om_visit_multievent
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_noinfra_typeb
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('noinfra');
 
   CREATE TRIGGER gw_trg_visit_user_manager
   INSTEAD OF INSERT OR UPDATE OR DELETE

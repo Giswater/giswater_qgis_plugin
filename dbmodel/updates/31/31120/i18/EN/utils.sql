@@ -17,8 +17,7 @@ INSERT INTO om_visit_class VALUES (0, 'Open visit', NULL, true, true, false, NUL
 INSERT INTO om_visit_class VALUES (2, 'Inspection and clean connec', NULL, true, false, true, 'CONNEC', 'role_om');
 INSERT INTO om_visit_class VALUES (4, 'Leak on connec', NULL, true, false, false, 'CONNEC', 'role_om');
 INSERT INTO om_visit_class VALUES (3, 'Leak on node', NULL, true, false, false, 'NODE', 'role_om');
-INSERT INTO om_visit_class VALUES (8, 'Type A incident', NULL, true, false, true, null, 'role_om');
-INSERT INTO om_visit_class VALUES (9, 'Type B incident', NULL, true, false, true, null, 'role_om');
+INSERT INTO om_visit_class VALUES (8, 'Incident', NULL, true, false, true, null, 'role_om');
 
 
 
@@ -31,8 +30,8 @@ INSERT INTO om_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC
 INSERT INTO om_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'leak on connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');
 INSERT INTO om_visit_parameter VALUES ('sediments_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Sediments in connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_sed');
 INSERT INTO om_visit_parameter VALUES ('sediments_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Sediments in node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_sed');
-INSERT INTO om_visit_parameter VALUES ('typea_comment', NULL, 'INSPECTION', null, 'TEXT', NULL, 'Comentari incidència tipus A', 'event_standard', 'defaultvalue',FALSE, 'typea_comment');
-INSERT INTO om_visit_parameter VALUES ('typeb_comment', NULL, 'INSPECTION', null, 'TEXT', NULL, 'Comentari incidència tipus B', 'event_standard', 'defaultvalue',FALSE, 'typeb_comment');
+INSERT INTO om_visit_parameter VALUES ('comment', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'Tipus d''incidència', 'event_standard', 'e', 'comment');
+INSERT INTO om_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'Comentari tipus A', 'event_standard', NULL, 'incident_type');
 
 
 INSERT INTO om_visit_class_x_parameter VALUES (1, 6, 'sediments_node');
@@ -47,8 +46,8 @@ INSERT INTO om_visit_class_x_parameter VALUES (9, 6, 'clean_node');
 INSERT INTO om_visit_class_x_parameter VALUES (10, 1, '3');
 INSERT INTO om_visit_class_x_parameter VALUES (11, 3, '10');
 INSERT INTO om_visit_class_x_parameter VALUES (12, 4, '6');
-INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'typea_comment');
-INSERT INTO om_visit_class_x_parameter VALUES (14, 9, 'typeb_comment');
+INSERT INTO om_visit_class_x_parameter VALUES (9, 8, 'comment');
+INSERT INTO om_visit_class_x_parameter VALUES (15, 8, 'incident_type');
 
 
 INSERT INTO om_visit_cat_status VALUES (0, 'Closed', NULL);
@@ -62,7 +61,20 @@ INSERT INTO om_visit_filetype_x_extension VALUES ('Image', 'jpg');
 INSERT INTO om_visit_filetype_x_extension VALUES ('Image', 'png');
 INSERT INTO om_visit_filetype_x_extension VALUES ('Video', 'mp4');
 
-
+INSERT INTO sys_combo_values VALUES (1, 1, 'YES', NULL);
+INSERT INTO sys_combo_values VALUES (1, 2, 'NO', NULL);
+INSERT INTO sys_combo_values VALUES (1, 3, 'NOT ALL', NULL);
+INSERT INTO sys_combo_values VALUES (2, 1, 'GOOD', NULL);
+INSERT INTO sys_combo_values VALUES (2, 2, 'SOME', NULL);
+INSERT INTO sys_combo_values VALUES (2, 3, 'BAD', NULL);
+INSERT INTO sys_combo_values VALUES (4, 1, 'BROKEN COVER', NULL);
+INSERT INTO sys_combo_values VALUES (4, 2, 'WATER ON STREET', NULL);
+INSERT INTO sys_combo_values VALUES (4, 3, 'KEYS ON GULLY', NULL);
+INSERT INTO sys_combo_values VALUES (4, 4, 'SMELT', NULL);
+INSERT INTO sys_combo_values VALUES (4, 5, 'COVER NOISE', NULL);
+INSERT INTO sys_combo_values VALUES (4, 6, 'NOISE WITH SMELT', NULL);
+INSERT INTO sys_combo_values VALUES (4, 7, 'NOISE WITH SMELT AND MORE', NULL);
+INSERT INTO sys_combo_values VALUES (4, 8, 'OTHER', NULL);
 
 
 

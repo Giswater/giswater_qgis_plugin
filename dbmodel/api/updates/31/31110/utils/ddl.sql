@@ -121,3 +121,9 @@ CREATE TABLE config_api_form_groupbox(
   layout_id integer,
   label text
 );
+
+CREATE TABLE config_api_visit_x_featuretable(
+  tablename character varying(30) NOT NULL,
+  visitclass_id integer NOT NULL,
+  CONSTRAINT config_api_visit_x_table_pkey PRIMARY KEY (visitclass_id, tablename)
+);

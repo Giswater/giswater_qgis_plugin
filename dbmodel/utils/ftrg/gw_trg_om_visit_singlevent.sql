@@ -34,9 +34,6 @@ BEGIN
 	INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, webclient_id, expl_id, the_geom, descript, is_done, class_id, suspendendcat_id, lot_id, status) 
             VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, NEW.is_done, NEW.class_id, NEW.suspendendcat_id, NEW.lot_id, NEW.status);
 
-        IF  NEW.enddate IS NOT NULL THEN
-	    UPDATE om_visit SET enddate=NEW.enddate WHERE id=NEW.id;
-	END IF;
 
             -- event table
             INSERT INTO om_visit_event( event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, xcoord, ycoord, 
@@ -61,12 +58,11 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 	    -- visit table
-            UPDATE om_visit SET id=NEW.visit_id, visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, startdate=NEW.startdate::timestamp, enddate=NEW.enddate::timestamp,
+            UPDATE om_visit SET id=NEW.visit_id, visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, startdate=NEW.startdate::timestamp, enddate=null,
             webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
             suspendendcat_id=NEW.suspendendcat_id, lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;
 
-            -- event table
-            
+            -- event table           
   	    -- Delete parameters in case of inconsistency againts visitclass and events (due class of visit have been changed)
    	    DELETE FROM om_visit_event WHERE visit_id=NEW.visit_id AND parameter_id NOT IN (SELECT parameter_id FROM om_visit_class_x_parameter WHERE class_id=NEW.class_id);
 

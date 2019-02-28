@@ -13,6 +13,11 @@ ALTER TABLE om_visit ADD COLUMN class_id integer;
 ALTER TABLE om_visit ADD COLUMN status integer;
 ALTER TABLE om_visit ADD COLUMN feature_type text;
 
+ALTER TABLE om_visit ALTER COLUMN visitcat_id DROP NOT NULL;
+
+ALTER TABLE om_visit ALTER COLUMN startdate SET DEFAULT ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone
+
+
 -- om_visit_event_photo
 ALTER TABLE om_visit_event_photo ADD COLUMN hash text;
 ALTER TABLE om_visit_event_photo ADD COLUMN filetype text;
