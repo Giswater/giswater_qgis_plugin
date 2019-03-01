@@ -12,6 +12,7 @@ ALTER TABLE om_visit ADD column lot_id integer;
 ALTER TABLE om_visit ADD COLUMN class_id integer;
 ALTER TABLE om_visit ADD COLUMN status integer;
 ALTER TABLE om_visit ADD COLUMN feature_type text;
+ALTER TABLE om_visit ADD COLUMN vtype integer;
 
 ALTER TABLE om_visit ALTER COLUMN visitcat_id DROP NOT NULL;
 
@@ -138,8 +139,13 @@ CREATE TABLE om_visit_lot_x_arc(
   id serial NOT NULL primary key,
   idval character varying(30),
   descript text);
-
   
+ CREATE TABLE om_visit_cat_type(
+  id serial NOT NULL primary key,
+  idval character varying(30),
+  descript text);
+ 
+   
   CREATE TABLE om_visit_filetype_x_extension(
   filetype varchar (30),
   fextension varchar (16),
