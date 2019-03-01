@@ -47,7 +47,7 @@ ALTER TABLE dma ADD COLUMN pattern_id double precision;
 
 ALTER TABLE audit_cat_function ADD COLUMN istoolbox boolean;
 ALTER TABLE audit_cat_function ADD COLUMN alias varchar(60);
-ALTER TABLE audit_cat_function ADD COLUMN isparametric boolean;
+ALTER TABLE audit_cat_function ADD COLUMN isparametric boolean NOT NULL DEFAULT false;
 
 
 

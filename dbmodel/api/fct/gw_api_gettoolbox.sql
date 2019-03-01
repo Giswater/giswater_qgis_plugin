@@ -90,11 +90,11 @@ BEGIN
 		INTO v_admin_fields;
 		
 		--    Control NULL's
-	v_om_fields := COALESCE(v_om_fields, '{}');
-	v_edit_fields := COALESCE(v_edit_fields, '{}');
-	v_epa_fields := COALESCE(v_epa_fields, '{}');
-	v_master_fields := COALESCE(v_master_fields, '{}');
-	v_admin_fields := COALESCE(v_admin_fields, '{}');
+	v_om_fields := COALESCE(v_om_fields, '[]');
+	v_edit_fields := COALESCE(v_edit_fields, '[]');
+	v_epa_fields := COALESCE(v_epa_fields, '[]');
+	v_master_fields := COALESCE(v_master_fields, '[]');
+	v_admin_fields := COALESCE(v_admin_fields, '[]');
 		
 --    Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
