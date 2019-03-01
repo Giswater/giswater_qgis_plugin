@@ -1420,6 +1420,10 @@ class UpdateSQL(ParentAction):
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
+
+        # Get value from combo locale
+        self.locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale)
+
         self.set_wait_cursor()
         if self.rdb_import_data.isChecked():
             self.load_base_no_ct(project_type=project_type)
