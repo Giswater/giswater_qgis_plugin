@@ -18,9 +18,11 @@ DECLARE
 	v_role text;
 	v_projectype text;
 	v_filter text;
+	v_om_fields json;
 	v_edit_fields json;
-	v_admin_fields json;
+	v_epa_fields json;
 	v_master_fields json;
+	v_admin_fields json;
 
 		
 BEGIN
@@ -37,47 +39,73 @@ BEGIN
 	v_filter := COALESCE(v_filter, '');
 -- get project type
         SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
+		
 
+-- get om toolbox parameters
+
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
+		 FROM audit_cat_function
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_om'') a'
+		USING v_filter
+		INTO v_edit_fields;
+		raise notice 'aaa - %',v_edit_fields;
+		
 -- get edit toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname, isparametric
+		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_edit'') a'
 		USING v_filter
 		INTO v_edit_fields;
 		raise notice 'aaa - %',v_edit_fields;
 
--- get admin toolbox parameters
+-- get epa toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname, isparametric
+		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin'') a'
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa'') a'
 		USING v_filter
-		INTO v_admin_fields;
+		INTO v_master_fields;
 
+		
 -- get master toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, function_type::json,input_params::json, sys_role_id, function_name as functionname, isparametric
+		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_master'') a'
 		USING v_filter
 		INTO v_master_fields;
         
---    Control NULL's
+-- get admin toolbox parameters
+
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
+		 FROM audit_cat_function
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin'') a'
+		USING v_filter
+		INTO v_admin_fields;
+		
+		--    Control NULL's
+	v_om_fields := COALESCE(v_om_fields, '{}');
 	v_edit_fields := COALESCE(v_edit_fields, '{}');
-	v_admin_fields := COALESCE(v_admin_fields, '{}');
+	v_epa_fields := COALESCE(v_epa_fields, '{}');
 	v_master_fields := COALESCE(v_master_fields, '{}');
-	
+	v_admin_fields := COALESCE(v_admin_fields, '{}');
+		
 --    Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
-		     ',"data":{"fields":{"edit":' || v_edit_fields ||'' ||
-					',"master":' || v_admin_fields ||'' ||
-					',"admin":' || v_master_fields ||'}}}'||
+		     ',"data":{"fields":{'||
+					   ' "om":' || v_om_fields ||
+					 ' , "edit":' || v_edit_fields ||
+					 ' , "epa":' || v_epa_fields ||
+					 ' , "master":' || v_master_fields ||
+					 ' , "admin":' || v_admin_fields ||'}}}'||
 	    '}')::json;
        
 --    Exception handling
