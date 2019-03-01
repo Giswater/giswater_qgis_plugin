@@ -74,6 +74,13 @@ INSERT INTO sys_combo_values VALUES (4, 5, 'SOROLL DE TAPA', NULL);
 INSERT INTO sys_combo_values VALUES (4, 6, 'OLORS AMB SOROLL', NULL);
 INSERT INTO sys_combo_values VALUES (4, 7, 'OLORS AMB SOROLL I MAL ASPECTE', NULL);
 INSERT INTO sys_combo_values VALUES (4, 8, 'ALTRES', NULL);
+INSERT INTO sys_combo_values VALUES (5, 1, 'EN PLANIFICACIÓ', NULL);
+INSERT INTO sys_combo_values VALUES (5, 2, 'PLANIFICAT', NULL);
+INSERT INTO sys_combo_values VALUES (5, 3, 'ASSIGNAT', NULL);
+INSERT INTO sys_combo_values VALUES (5, 4, 'EN CURS', NULL);
+INSERT INTO sys_combo_values VALUES (5, 5, 'FINALITZAT', NULL);
+INSERT INTO sys_combo_values VALUES (5, 6, 'VERIFICAT', NULL);
+INSERT INTO sys_combo_values VALUES (5, 7, 'CANCELAT', NULL);
 
 
 

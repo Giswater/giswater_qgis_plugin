@@ -95,7 +95,7 @@ subfolder structure of ud/ws/utils folder
 		trg
 	- Same behaviour of WS/UD will be done with the unique difference of the location of folders
 
-8) MANDATORY TO PUT ALL FOLDERS.
+8) MANDATORY FOLDERS 
 	- Some times reader of SQL crash. To prevent some bugs is mandatory to define al folders in spite of no information needs. Put sql file with 'SET SEARCH_PATH' as unique row
 
 -- Changelog file

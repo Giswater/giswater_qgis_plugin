@@ -47,7 +47,7 @@ BEGIN
 	v_query_text='	SELECT * FROM om_visit_parameter 
 			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
 			JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-			WHERE om_visit_parameter.feature_type = upper('||visit_table||') AND om_visit_class.ismultievent is true';
+			WHERE om_visit_parameter.feature_type = upper('||quote_literal(visit_table)||') AND om_visit_class.ismultievent is true';
 	END IF;
 
 	FOR v_parameters IN EXECUTE  v_query_text
@@ -80,7 +80,7 @@ BEGIN
  
  
  	    IF  NEW.enddate IS NOT NULL THEN
-		UPDATE om_visit SET enddate=left (date_trunc('second', NEW.enddate)::text, 19)::timestamp WHERE id=NEW.visit_id;	
+		UPDATE om_visit SET enddate=left (date_trunc('second', NEW.enddate::date)::text, 19)::timestamp WHERE id=NEW.visit_id;	
 	    END IF;
     
             UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, 
@@ -96,7 +96,7 @@ BEGIN
 		v_query_text='	SELECT * FROM om_visit_parameter 
 				JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_parameter.id
 				JOIN om_visit_class ON om_visit_class.id=om_visit_class_x_parameter.class_id
-				WHERE om_visit_parameter.feature_type = upper('||visit_table||') AND om_visit_class.ismultievent is true';
+				WHERE om_visit_parameter.feature_type = upper('||quote_literal(visit_table)||') AND om_visit_class.ismultievent is true';
 	    END IF;
 
             FOR v_parameters IN EXECUTE v_query_text 

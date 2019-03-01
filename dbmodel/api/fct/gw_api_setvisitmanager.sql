@@ -14,8 +14,8 @@ $BODY$
 
 --ONLY UPDATE ARE POSSIBLE. 
 SELECT "SCHEMA_NAME".gw_api_setvisitmanager($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
-"feature":{"featureType":"visit", "tableName":"ve_visit_user_manager", "idName":"user_id", "id":"geoadmin"}, 
-"data":{"fields":{"team_id":4, "vehicle_id":2, "starttime":"2019-01-01", "endtime":null},
+"feature":{"featureType":"visit", "tableName":"ve_visit_user_manager", "idName":"id"}, 
+"data":{"fields":{"user_id":"geoadmin", "team_id":"4", "lot_id":"1"},
 "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 */
 
@@ -27,6 +27,12 @@ DECLARE
 	v_insertresult json;
 	v_message json;
 	v_feature json;
+	v_lot integer;
+	v_team integer;
+	v_thegeom public.geometry;
+	v_x float;
+	v_y float;
+	
 
 BEGIN
 
@@ -43,22 +49,19 @@ BEGIN
 	p_data = REPLACE (p_data::text, '""', 'null');
 		
 --  get input values
-    v_id = ((p_data ->>'feature')::json->>'id')::text;
-    v_feature = '{"featureType":"visit", "tableName":"ve_visit_user_manager", "idName":"user_id", "id":"'||current_user||'"}';
+    v_team = (((p_data ->>'data')::json->>'fields')::json->>'team_id')::integer;
+    v_lot = (((p_data ->>'data')::json->>'fields')::json->>'lot_id')::integer;
+    v_x = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
+    v_y = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
+    v_thegeom = ST_SetSRID(ST_MakePoint(v_x, v_y), (SELECT st_srid(the_geom) from .arc limit 1));
 
+ 
+    INSERT INTO om_visit_lot_x_user (team_id, lot_id , the_geom) VALUES (v_team, v_lot, v_thegeom);
+    UPDATE .om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone
+	WHERE id = (SELECT id FROM (SELECT * FROM .om_visit_lot_x_user WHERE user_id=current_user ORDER BY id DESC) a LIMIT 1 OFFSET 1);
 
--- set output parameter
-	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',v_feature, ', "data":',((p_data)->>'data'),'}')::json;
-
-	RAISE NOTICE '--- UPDATE VISIT MANAGER USING % ---',v_outputparameter;
-
-		--setting the update
-		PERFORM gw_api_setfields (v_outputparameter);
-
-		-- getting message
-		SELECT gw_api_getmessage(v_feature, 50) INTO v_message;
-
-		RAISE NOTICE '--- UPDATE VISIT gw_api_setfields USING v_id % WITH MESSAGE: % ---', v_id, v_message;
+	-- getting message
+	SELECT gw_api_getmessage(v_feature, 50) INTO v_message;
 
 				  
 --    Return

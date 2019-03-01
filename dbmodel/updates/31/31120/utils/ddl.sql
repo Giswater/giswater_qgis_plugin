@@ -125,14 +125,6 @@ CREATE TABLE om_visit_lot_x_arc(
   descript text,
   active boolean DEFAULT true);
   
-
-  CREATE TABLE cat_vehicle(
-  id serial NOT NULL,
-  idval text,
-  descript text,
-  active boolean DEFAULT true,
-  CONSTRAINT cat_vehicle_pkey PRIMARY KEY (id));
-
  
   CREATE TABLE om_visit_team_x_user(
   team_id integer,
@@ -140,15 +132,7 @@ CREATE TABLE om_visit_lot_x_arc(
   starttime timestamp DEFAULT now(),
   endtime timestamp,
   constraint om_visit_team_x_user_pkey PRIMARY KEY (team_id, user_id));
-  
- 
-  CREATE TABLE om_visit_user_x_vehicle(
-  user_id varchar(16),
-  vehicle_id integer,
-  starttime timestamp DEFAULT now(),
-  endtime timestamp,
-  constraint om_visit_user_x_vehicle_pkey PRIMARY KEY (user_id, vehicle_id));
-  
+    
   
  CREATE TABLE om_visit_cat_status(
   id serial NOT NULL primary key,
@@ -160,3 +144,14 @@ CREATE TABLE om_visit_lot_x_arc(
   filetype varchar (30),
   fextension varchar (16),
   CONSTRAINT om_visit_filetype_x_extension_pkey PRIMARY KEY (filetype, fextension));
+
+  
+  CREATE TABLE om_visit_lot_x_user(
+  id serial NOT NULL,
+  user_id character varying(16) NOT NULL DEFAULT "current_user"(),
+  team_id integer NOT NULL,
+  lot_id integer NOT NULL,
+  starttime timestamp without time zone DEFAULT ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone,
+  endtime timestamp without time zone,
+  the_geom geometry(Point,SRID_VALUE),
+  CONSTRAINT om_visit_lot_x_user_pkey PRIMARY KEY (id));

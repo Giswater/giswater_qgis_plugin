@@ -28,7 +28,7 @@ COMMENT ON TABLE config_api_form_fields IS
 'INSTRUCIONS TO WORK WITH THIS TABLE:
 Wiht this table form fields are configured:
 The function gw_api_get_formfields is called to build widget forms usint this table.
-formname
+formname: warning with formname. If it is used to work with listFilter fields tablename of an existing relation on database must be mandatory to put here
 formtype: There are diferent formtypes:
 	feature: the standard one. Used to show fields from feature tables
 	info: used to build the infoplan widget
@@ -52,6 +52,7 @@ Image must be located on the server (folder data of postgres instalation path)';
 COMMENT ON TABLE config_api_list IS 
 'INSTRUCIONS TO WORK WITH THIS TABLE:
 With this table lists are configured. There are two types of lists: List on tabs and lists on attribute table
+tablename must be mandatory to use a name of an existing relation on database. Code needs to identify the datatype of filter to work with
 The field actionfields is required only for list on attribute table (listtype attributeTable). 
 In case of different listtype actions must be defined on config_api_form_tabs';
 

@@ -27,14 +27,14 @@ SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
 "data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_api_getvisitmanager($${"client":{"device":3,"infoType":100,"lang":"es"},
-     "feature":{"featureType":"visit","tableName":"ve_visit_user_manager","idName":"user_id","id":"xtorret"},"form":{"tabData":{"active":false},"tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
+     "feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"xtorret"},"form":{"tabData":{"active":false},"tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
        "data":{"relatedFeature":{"type":"arc", "id":"2079"},"fields":{"user_id":"xtorret","date":"2019-01-28","team_id":"1","vehicle_id":"3"},"pageInfo":null}}$$) AS result
 
 
 -- change from tab data to tab files (upserting data on tabData)
 SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
 "client":{"device":3,"infoType":100,"lang":"es"},
-"feature":{"featureType":"visit","tableName":"ve_visit_user_manager","idName":"user_id","id":"xtorret"},
+"feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"xtorret"},
 "form":{"tabData":{"active":false}, "tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
 "data":{"fields":{"user_id":"xtorret","team_id":1,"vehicle_id":1,"date":"2019-01-01"}}}$$)
 
@@ -156,7 +156,7 @@ BEGIN
 	raise notice ' v_featuretype % v_idname %',v_featuretype, v_featureidname;
 
 	-- setting values
-	v_tablename := 've_visit_user_manager';
+	v_tablename := 'v_visit_lot_user';
 	v_user_id := 'user_id';
 	v_columntype := 'varchar(30)';
 
@@ -251,7 +251,7 @@ BEGIN
 			   IF v_activelotstab THEN
 
 				-- setting table feature
-				v_feature := '{"tableName":"userLotList"}';		
+				v_feature := '{"tableName":"om_visit_lot"}';		
 				
 				-- setting feature
 				p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
@@ -290,10 +290,20 @@ BEGIN
 
 			IF v_featuretype IS NULL THEN
 				-- setting table feature	
-				v_feature := '{"tableName":"userVisitList"}';				
-			ELSE
-				-- setting table feature
-				v_feature := concat('{"tableName":"',v_featuretype,'UserVisitList"}');	
+				v_feature := '{"tableName":"om_visit"}';
+
+			ELSIF v_featuretype='arc' THEN
+				v_feature := '{"tableName":"v_ui_om_visitman_x_arc"}';
+
+			ELSIF v_featuretype='node' THEN
+				v_feature := '{"tableName":"v_ui_om_visitman_x_node"}';
+
+			ELSIF v_featuretype='connec' THEN
+				v_feature := '{"tableName":"v_ui_om_visitman_x_connec"}';
+
+			ELSIF v_featuretype='gully' THEN
+				v_feature := '{"tableName":"v_ui_om_visitman_x_gully"}';
+
 			END IF;
 
 				-- setting feature
@@ -319,7 +329,6 @@ BEGIN
 			
 				RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
 				SELECT gw_api_getlist (p_data) INTO v_fields_json;
-
 
 				-- getting pageinfo and list values
 				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';

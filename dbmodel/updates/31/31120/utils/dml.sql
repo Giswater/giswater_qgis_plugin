@@ -14,10 +14,12 @@ VALUES ('om_visit_duration_vdefault','{"class1":"1 hours","class2":"1 hours","cl
 
 
 
+
 INSERT INTO sys_combo_cat VALUES (1, 'om_visit_clean');
 INSERT INTO sys_combo_cat VALUES (2, 'om_visit_desperfect');
 INSERT INTO sys_combo_cat VALUES (3, 'om_visit_status');
 INSERT INTO sys_combo_cat VALUES (4, 'incidency');
+INSERT INTO sys_combo_cat VALUES (5, 'om_lot_status');
 
 
 

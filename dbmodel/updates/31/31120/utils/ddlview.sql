@@ -25,19 +25,19 @@ CREATE OR REPLACE VIEW ve_lot_x_arc AS
 	 
 
  
-CREATE OR REPLACE VIEW ve_visit_user_manager AS 
- SELECT a.id AS user_id,
-    b.team_id,
-    c.vehicle_id,
-    c.starttime,
-    c.endtime,
-    now()::date AS date
-   FROM cat_users a
-     LEFT JOIN om_visit_team_x_user b ON b.user_id::text = a.id::text
-     LEFT JOIN om_visit_user_x_vehicle c ON c.user_id::text = b.user_id::text
-     LEFT JOIN cat_team d ON b.team_id = d.id
-     LEFT JOIN cat_vehicle e ON e.id = c.vehicle_id
-  WHERE b.user_id::name = "current_user"();
+CREATE OR REPLACE VIEW v_visit_lot_user_manager AS 
+ SELECT om_visit_lot_x_user.id,
+    om_visit_lot_x_user.user_id,
+    om_visit_lot_x_user.team_id,
+    om_visit_lot_x_user.lot_id,
+    om_visit_lot_x_user.starttime,
+    om_visit_lot_x_user.endtime,
+    om_visit_lot_x_user.date
+   FROM om_visit_lot_x_user
+  WHERE om_visit_lot_x_user.user_id::name = "current_user"()
+  ORDER BY om_visit_lot_x_user.id DESC
+ LIMIT 1;
+
 
   
 CREATE OR REPLACE VIEW ve_lot_x_arc AS 

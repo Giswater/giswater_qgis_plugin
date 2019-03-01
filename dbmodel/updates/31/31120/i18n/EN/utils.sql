@@ -75,6 +75,13 @@ INSERT INTO sys_combo_values VALUES (4, 5, 'COVER NOISE', NULL);
 INSERT INTO sys_combo_values VALUES (4, 6, 'NOISE WITH SMELT', NULL);
 INSERT INTO sys_combo_values VALUES (4, 7, 'NOISE WITH SMELT AND MORE', NULL);
 INSERT INTO sys_combo_values VALUES (4, 8, 'OTHER', NULL);
+INSERT INTO sys_combo_values VALUES (5, 1, 'ON PLANNING', NULL);
+INSERT INTO sys_combo_values VALUES (5, 2, 'PLANNED', NULL);
+INSERT INTO sys_combo_values VALUES (5, 3, 'ASSIGNED', NULL);
+INSERT INTO sys_combo_values VALUES (5, 4, 'ON GOING', NULL);
+INSERT INTO sys_combo_values VALUES (5, 5, 'FINISHED', NULL);
+INSERT INTO sys_combo_values VALUES (5, 6, 'VERIFIED', NULL);
+INSERT INTO sys_combo_values VALUES (5, 7, 'CANCELED', NULL);
 
 
 

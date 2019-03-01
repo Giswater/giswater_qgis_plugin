@@ -60,11 +60,4 @@ CREATE TRIGGER gw_trg_om_visit_multievent
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent();
 
 
-  CREATE TRIGGER gw_trg_visit_user_manager
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON SCHEMA_NAME.ve_visit_user_manager
-  FOR EACH ROW
-  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_visit_user_manager();
-
-
   
