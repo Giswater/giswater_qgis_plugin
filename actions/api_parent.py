@@ -1058,8 +1058,8 @@ class ApiParent(ParentAction):
     def construct_form_param_user(self, dialog, row, pos, _json, put_chk=True):
         if 'fields' in row[pos]:
             field = 'fields'
-        elif 'input_params' in row[pos]:
-            field = 'input_params'
+        elif 'return_type' in row[pos]:
+            field = 'return_type'
         for field in row[pos][field]:
             if field['label']:
                 lbl = QLabel()
