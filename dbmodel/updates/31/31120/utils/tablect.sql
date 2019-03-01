@@ -8,6 +8,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE om_visit_event_photo DROP CONSTRAINT IF EXISTS om_visit_event_foto_event_id_fkey;
 
+ALTER TABLE om_visit_parameter ALTER COLUMN feature_type DROP NOT NULL;
+
 ALTER TABLE  om_visit_class_x_parameter  DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_class_fkey;
 ALTER TABLE  om_visit_class_x_parameter DROP CONSTRAINT IF EXISTS om_visit_class_x_parameter_parameter_fkey;
 ALTER TABLE  selector_lot DROP CONSTRAINT IF EXISTS selector_workcat_workcat_id_fkey;

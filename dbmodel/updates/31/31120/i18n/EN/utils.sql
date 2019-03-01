@@ -30,23 +30,23 @@ INSERT INTO om_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC
 INSERT INTO om_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'leak on connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');
 INSERT INTO om_visit_parameter VALUES ('sediments_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Sediments in connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_sed');
 INSERT INTO om_visit_parameter VALUES ('sediments_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Sediments in node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_sed');
-INSERT INTO om_visit_parameter VALUES ('comment', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'Tipus d''incidència', 'event_standard', 'e', 'comment');
-INSERT INTO om_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'Comentari tipus A', 'event_standard', NULL, 'incident_type');
+INSERT INTO om_visit_parameter VALUES ('comment', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'comment', 'event_standard', 'e', FALSE, 'comment');
+INSERT INTO om_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', NULL, 'TEXT', NULL, 'incident type', 'event_standard', NULL, FALSE, 'incident_type');
 
 
 INSERT INTO om_visit_class_x_parameter VALUES (1, 6, 'sediments_node');
 INSERT INTO om_visit_class_x_parameter VALUES (2, 2, 'clean_connec');
 INSERT INTO om_visit_class_x_parameter VALUES (3, 2, 'leak_connec');
-INSERT INTO om_visit_class_x_parameter VALUES (5, 5, 'leak_arc');
-INSERT INTO om_visit_class_x_parameter VALUES (6, 5, 'clean_arc');
+INSERT INTO om_visit_class_x_parameter VALUES (5, 6, 'leak_arc');
+INSERT INTO om_visit_class_x_parameter VALUES (6, 6, 'clean_arc');
 INSERT INTO om_visit_class_x_parameter VALUES (4, 2, 'sediments_connec');
-INSERT INTO om_visit_class_x_parameter VALUES (7, 5, 'sediments_arc');
-INSERT INTO om_visit_class_x_parameter VALUES (8, 6, 'leak_node');
-INSERT INTO om_visit_class_x_parameter VALUES (9, 6, 'clean_node');
-INSERT INTO om_visit_class_x_parameter VALUES (10, 1, '3');
-INSERT INTO om_visit_class_x_parameter VALUES (11, 3, '10');
-INSERT INTO om_visit_class_x_parameter VALUES (12, 4, '6');
-INSERT INTO om_visit_class_x_parameter VALUES (9, 8, 'comment');
+INSERT INTO om_visit_class_x_parameter VALUES (7, 6, 'sediments_arc');
+INSERT INTO om_visit_class_x_parameter VALUES (8, 5, 'leak_node');
+INSERT INTO om_visit_class_x_parameter VALUES (9, 5, 'clean_node');
+INSERT INTO om_visit_class_x_parameter VALUES (10, 1, 'leak_arc');
+INSERT INTO om_visit_class_x_parameter VALUES (11, 3, 'leak_node');
+INSERT INTO om_visit_class_x_parameter VALUES (12, 4, 'leak_connec');
+INSERT INTO om_visit_class_x_parameter VALUES (13, 8, 'comment');
 INSERT INTO om_visit_class_x_parameter VALUES (15, 8, 'incident_type');
 
 
