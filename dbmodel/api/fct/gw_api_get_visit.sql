@@ -6,17 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-CREATE OR REPLACE FUNCTION .gw_api_get_visit(p_visittype text, p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit(p_visittype text, p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- unexpected first call
-SELECT .gw_api_getvisit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT SCHEMA_NAME.gw_api_getvisit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT .gw_api_getvisit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT SCHEMA_NAME.gw_api_getvisit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
 
 	
@@ -108,7 +108,7 @@ BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname := '';
+	v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -117,7 +117,7 @@ BEGIN
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
-	p_data = REPLACE (p_data::text, '"SCHEMA_NAME"', 'null');
+	p_data = REPLACE (p_data::text, '""', 'null');
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;

@@ -31,9 +31,8 @@ CREATE OR REPLACE VIEW v_visit_lot_user_manager AS
     om_visit_lot_x_user.team_id,
     om_visit_lot_x_user.lot_id,
     om_visit_lot_x_user.starttime,
-    om_visit_lot_x_user.endtime,
-    om_visit_lot_x_user.date
-   FROM om_visit_lot_x_user
+    om_visit_lot_x_user.endtime
+  FROM om_visit_lot_x_user
   WHERE om_visit_lot_x_user.user_id::name = "current_user"()
   ORDER BY om_visit_lot_x_user.id DESC
  LIMIT 1;

@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2640
 
-CREATE OR REPLACE FUNCTION .gw_api_getlot(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlot(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- calling form
-SELECT .gw_api_getlot($${"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"om_visit_lot", "idName":"id", "id":"1"}}$$)
+SELECT SCHEMA_NAME.gw_api_getlot($${"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"om_visit_lot", "idName":"id", "id":"1"}}$$)
 */
 
 DECLARE
