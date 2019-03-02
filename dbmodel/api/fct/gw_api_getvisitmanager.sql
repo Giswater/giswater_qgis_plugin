@@ -143,6 +143,7 @@ BEGIN
 	v_currentactivetab = (((p_data ->>'form')::json->>'navigation')::json->>'currentActiveTab')::text;
 	v_team = ((p_data ->>'data')::json->>'fields')::json->>'team'::text;
 	v_vehicle = ((p_data ->>'data')::json->>'fields')::json->>'vehicle'::text;
+	v_message = ((p_data ->>'data')::json->>'message');
 
 	-- forcing idname in case not exists
 	IF v_idname IS NULL THEN
@@ -370,6 +371,7 @@ BEGIN
 			INTO v_formactions, v_layermanager;
 
 		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
+
 		
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);

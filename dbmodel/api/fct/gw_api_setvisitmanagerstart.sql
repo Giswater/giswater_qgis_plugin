@@ -19,18 +19,27 @@ SELECT SCHEMA_NAME.gw_api_setvisitmanagerstart($${
 */
 
 DECLARE
-
+	v_message json;
+	v_data json;
 
 BEGIN
 
+	-- search_path
+	SET search_path='SCHEMA_NAME';
+	
+	-- setting values on table om_visit_lot_x_user 
+	-- TOD DO: set starttime
+	
+	-- message
+	SELECT gw_api_getmessage(null, 70) INTO v_message;
+	v_data = p_data->>'data';
+	v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
+	p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);	
   
 	-- Return
-	RETURN gw_api_getvisitmanager($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{}}$$);
+	RETURN gw_api_getvisitmanager(p_data);
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-

@@ -24,6 +24,10 @@ SELECT SCHEMA_NAME.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lan
 file:
 SELECT SCHEMA_NAME.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
 		"feature":{"featureType":"file", "tableName":"om_visit_file", "id":2, "idName": "id"}}')
+lot:
+SELECT SCHEMA_NAME.gw_api_setdelete('{"client":{"device":3, "infoType":100, "lang":"ES"}, 
+		"feature":{"featureType":"lot", "tableName":"om_visit_lot", "id":44, "idName": "id"}}')
+
 */
 
 DECLARE

@@ -4,18 +4,19 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2642
+--FUNCTION CODE: 2644
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setvisitmanagerend(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setlot(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 --new call
-SELECT SCHEMA_NAME.gw_api_setvisitmanagerend($${
+SELECT SCHEMA_NAME.gw_api_setlot($${
 "client":{"device":3,"infoType":100,"lang":"es"},
+"feature":{"featureType":"lot", "tableName":"om_visit_lot", "idName":"id", "id":"1"},
 "form":{},
-"data":{}}$$)
+"data":{"fields":{}}}$$)
 */
 
 DECLARE
@@ -28,21 +29,19 @@ BEGIN
 	SET search_path='SCHEMA_NAME';
 	
 	-- setting values on table om_visit_lot_x_user 
-	-- TOD DO: set endtime
+	-- TOD DO: set lot
+	
 	
 	-- message
-	SELECT gw_api_getmessage(null, 80) INTO v_message;
+	SELECT gw_api_getmessage(null, 90) INTO v_message;
 	v_data = p_data->>'data';
 	v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 	p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);	
   
 	-- Return
-	RETURN gw_api_getvisitmanager(p_data);
+	RETURN gw_api_getlot(p_data);
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-

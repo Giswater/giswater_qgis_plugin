@@ -19,16 +19,12 @@ SELECT SCHEMA_NAME.gw_api_getlot($${"client":{"device":3,"infoType":100,"lang":"
 DECLARE
 	v_apiversion text;
 	v_schemaname text;
-	v_featuretype text;
-	v_visitclass integer;
 	v_id text;
 	v_idname text;
 	v_columntype text;
 	v_device integer;
-	v_formname text;
 	v_tablename text;
 	v_fields json [];
-	v_fields_text text [];
 	v_fields_json json;
 	v_forminfo json;
 	v_formheader text;
@@ -36,43 +32,16 @@ DECLARE
 	v_formtabs text;
 	v_tabaux json;
 	v_active boolean;
-	v_featureid varchar ;
 	aux_json json;
 	v_tab record;
 	v_projecttype varchar;
-	v_list json;
 	v_activedatatab boolean;
-	v_activelotstab boolean;
-	v_activetodotab boolean;
-	v_activedonetab boolean;
 	v_client json;
-	v_pageinfo json;
 	v_layermanager json;
-	v_filterfields json;
-	v_data json;
-	isnewvisit boolean;
-	v_feature json;
-	v_addfile json;
-	v_deletefile json;
-	v_filefeature json;
-	v_fileid text;
 	v_message json;
-	v_message1 text;
-	v_message2 text;
-	v_return json;
-	v_currentactivetab text;
 	v_values json;
 	array_index integer DEFAULT 0;
 	v_fieldvalue text;
-	v_disabled boolean = true;
-	v_firstcall boolean = false;
-	v_team text;
-	v_vehicle integer;
-	v_user_id text;
-	v_featureidname text;
-	v_filterfeature json;
-	v_isfeaturemanager boolean;
-	v_isusermanager boolean;
 
 BEGIN
 
@@ -99,6 +68,8 @@ BEGIN
 	v_id = ((p_data ->>'feature')::json->>'id')::text;
 	v_idname = ((p_data ->>'feature')::json->>'idName')::text;
 	v_tablename = (p_data ->>'feature')::json->>'tableName'::text;
+	v_message = ((p_data ->>'data')::json->>'message');
+
 
 	v_columntype = 'integer';
 	
@@ -172,7 +143,7 @@ BEGIN
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
-             ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"user_id", "id":"'||current_user||'"}'||
+             ',"body":{"feature":{"featureType":"lot", "tableName":"'||v_tablename||'", "idName":"lot_id", "id":"'||v_id||'"}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||'}}'||
 		    '}')::json;

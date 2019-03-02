@@ -14,3 +14,7 @@ INSERT INTO config_api_message VALUES (30, 1, 'does not exists, impossible to de
 INSERT INTO config_api_message VALUES (50, 0, 'sucessfully updated', NULL, 'withfeature');
 INSERT INTO config_api_message VALUES (40, 0, 'sucessfully inserted', NULL, 'withfeature');
 INSERT INTO config_api_message VALUES (60, 1, 'Visit class have been changed. Previous data have been deleted', NULL, 'alone');
+INSERT INTO config_api_message VALUES (70, 0, 'Visit manager have been initialized', NULL, 'alone');
+INSERT INTO config_api_message VALUES (80, 0, 'Visit manager have been finished', NULL, 'alone');
+INSERT INTO config_api_message VALUES (90, 0, 'Lot succesfully saved', NULL, 'alone');
+INSERT INTO config_api_message VALUES (100, 0, 'Lot succesfully deleted', NULL, 'alone');

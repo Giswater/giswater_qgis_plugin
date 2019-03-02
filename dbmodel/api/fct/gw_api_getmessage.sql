@@ -26,7 +26,7 @@ BEGIN
     SELECT * INTO v_record FROM config_api_message WHERE id=p_message;
     
 
-    IF v_record.mtype='alone' THEN
+    IF v_record.mtype='alone' OR p_data IS NULL THEN
 		v_message = concat('{"level":"',v_record.loglevel,'", "text":"',v_record.message,'", "hint":"',v_record.hintmessage,'"}');
     ELSE 
 		v_message = concat('{"level":"',v_record.loglevel,'", "text":"',(p_data)->>'featureType',' ',(p_data)->>'id',' ',v_record.message,'", "hint":"',v_record.hintmessage,'"}');
