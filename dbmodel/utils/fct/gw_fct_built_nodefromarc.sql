@@ -7,28 +7,37 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2118
 
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc();
-
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc() RETURNS void AS
+DROP FUNCTION IF EXISTS "ws_sample".gw_fct_built_nodefromarc();
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_built_nodefromarc() RETURNS json AS
 $BODY$
 
+/*EXAMPLE
+SELECT ws_sample.gw_fct_built_nodefromarc()
+*/
+
 DECLARE
-rec_arc record;
-rec_table record;
-rec record;
-numnodes integer;
+	rec_arc record;
+	rec_table record;
+	rec record;
+	numnodes integer;
+	v_version text;
+	v_saveondatabase boolean = true;
+	v_result json;
 
 BEGIN
 
-    -- Search path
-    SET search_path = SCHEMA_NAME, public;
+	-- Search path
+	SET search_path = ws_sample, public;
+
+	-- select version
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- Get data from config tables
 	SELECT * INTO rec FROM config;
 	
 	--  Reset values
 	DELETE FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16;
+	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id=16;
 
 	-- inserting all extrem nodes on temp_node
 	INSERT INTO temp_table (fprocesscat_id, geom_point)
@@ -45,26 +54,37 @@ BEGIN
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
-		numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(rec_table.geom_point, rec.node_proximity));
+		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, rec.node_proximity));
 		IF numNodes = 0 THEN
-			INSERT INTO node (the_geom, state) VALUES (rec_table.geom_point,1);
+			INSERT INTO anl_node (the_geom, state, fprocesscat_id) VALUES (rec_table.geom_point,1,16);
 		ELSE
 
 		END IF;
 	END LOOP;
 
+	-- get results
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=16) row; 
+  
+  	IF v_saveondatabase IS FALSE THEN 
+		-- delete previous results
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=16;
+	ELSE
+		-- set selector
+		DELETE FROM selector_audit WHERE fprocesscat_id=16 AND cur_user=current_user;    
+		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (16, current_user);
+	END IF;
+		
+	--    Control nulls
+	v_result := COALESCE(v_result, '[]'); 
 
-	-- udpdate arc table
-	FOR rec_arc IN SELECT * FROM arc
-	LOOP
-	UPDATE arc  SET node_1= (SELECT node_id FROM node WHERE ST_DWithin(node.the_geom, ST_StartPoint(rec_arc.the_geom),rec.node_proximity) 
-					ORDER BY ST_Distance(node.the_geom, ST_StartPoint(rec_arc.the_geom)) LIMIT 1),
-				node_2= (SELECT node_id FROM node WHERE ST_DWithin(node.the_geom, ST_EndPoint(rec_arc.the_geom), rec.node_proximity) 
-					ORDER BY ST_Distance(node.the_geom, ST_EndPoint(rec_arc.the_geom)) LIMIT 1) 
-					WHERE rec_arc.arc_id=arc_id;
-	END LOOP;
-   
-  RETURN;
+	--  Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	     ',"body":{"form":{}'||
+		     ',"data":{"result":' || v_result ||
+			     '}'||
+		       '}'||
+	    '}')::json;
+
             
 END;
 $BODY$

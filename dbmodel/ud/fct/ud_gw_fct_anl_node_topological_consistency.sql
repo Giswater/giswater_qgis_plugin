@@ -7,28 +7,59 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2212
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_topological_consistency();
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_topological_consistency() RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_topological_consistency() 
+RETURNS json AS 
+$BODY$
+
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_anl_node_topological_consistency()
+*/
+
 DECLARE
-    rec_node record;
-    rec record;
+	rec_node record;
+	rec record;
+	v_version text;
+	v_saveondatabase boolean = true;
+	v_result json;
 
 BEGIN
 
-    SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "SCHEMA_NAME", public;
 
-    -- Reset values
-    DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=8;
-    
+	-- select version
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+
+	-- Reset values
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=8;
+	    
 	-- Computing process
-    INSERT INTO anl_node (node_id, node_type, expl_id, num_arcs, fprocesscat_id, the_geom)
-    SELECT node_id, node_type, v_edit_node.expl_id, COUNT(*), 8, v_edit_node.the_geom 
-    FROM v_edit_node INNER JOIN v_edit_arc ON v_edit_arc.node_1 = v_edit_node.node_id OR v_edit_arc.node_2 = v_edit_node.node_id 
-    WHERE v_edit_node.node_type != 'OUTFALL' GROUP BY v_edit_node.node_id HAVING COUNT(*) = 1;
+	INSERT INTO anl_node (node_id, nodecat_id, expl_id, num_arcs, fprocesscat_id, the_geom)
+	SELECT node_id, nodecat_id, v_edit_node.expl_id, COUNT(*), 8, v_edit_node.the_geom 
+	FROM v_edit_node INNER JOIN v_edit_arc ON v_edit_arc.node_1 = v_edit_node.node_id OR v_edit_arc.node_2 = v_edit_node.node_id 
+	WHERE v_edit_node.node_type != 'OUTFALL' GROUP BY v_edit_node.node_id,v_edit_node.nodecat_id, v_edit_node.expl_id, v_edit_node.the_geom HAVING COUNT(*) = 1;
 
-    DELETE FROM selector_audit WHERE fprocesscat_id=8 AND cur_user=current_user;    
-	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (8, current_user);
+	-- get results
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=8) row; 
 
-    RETURN 1;
+	IF v_saveondatabase IS FALSE THEN 
+		-- delete previous results
+		DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fprocesscat_id=8;
+	ELSE
+		-- set selector
+		DELETE FROM selector_audit WHERE fprocesscat_id=8 AND cur_user=current_user;    
+		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (8, current_user);
+	END IF;
+		
+	--    Control nulls
+	v_result := COALESCE(v_result, '[]'); 
+
+	--  Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	     ',"body":{"form":{}'||
+		     ',"data":{"result":' || v_result ||
+			     '}'||
+		       '}'||
+	    '}')::json;
 
 END;
 $BODY$

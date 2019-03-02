@@ -38,6 +38,8 @@ ALTER TABLE audit_cat_param_user ADD COLUMN dv_isnullvalue boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN stylesheet json;
 ALTER TABLE audit_cat_param_user ADD COLUMN placeholder text;
 
+ALTER TABLE anl_node ALTER COLUMN node_id SET DEFAULT nextval('SCHEMA_NAME.urn_id_seq'::regclass);
+
 
 ALTER TABLE rpt_cat_result ADD COLUMN user_name text;
 ALTER TABLE rpt_cat_result ALTER COLUMN user_name SET DEFAULT current_user;

@@ -6,27 +6,56 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2104
 
+DROP FUNCTION IF EXISTS "ws_sample".gw_fct_anl_arc_same_startend();
+CREATE OR REPLACE FUNCTION "ws_sample".gw_fct_anl_arc_same_startend() RETURNS json AS 
+$BODY$
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_same_startend() RETURNS void AS $BODY$
+/*EXAMPLE
+SELECT ws_sample.gw_fct_anl_arc_same_startend()
+*/
+
 DECLARE
-
+	v_version text;
+	v_saveondatabase boolean = true;
+	v_result json;
 BEGIN
 
-    SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 
-    -- Reset values
-    DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4;
-    
+	-- select version
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+
+	-- Reset values
+	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4;
+	
 	-- Computing process
-    INSERT INTO anl_arc (arc_id, state, expl_id, fprocesscat_id, the_geom)
-    SELECT arc_id, state, expl_id, 4, the_geom
-    FROM arc WHERE node_1::text=node_2::text;
+	INSERT INTO anl_arc (arc_id, state, expl_id, fprocesscat_id, the_geom)
+	SELECT arc_id, state, expl_id, 4, the_geom
+	FROM v_edit_arc WHERE node_1::text=node_2::text;
 
-    DELETE FROM selector_audit WHERE fprocesscat_id=4 AND cur_user=current_user;	
-    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (4, current_user);
+	-- get results
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4) row; 
 
-    RETURN;
-            
+	IF v_saveondatabase IS FALSE THEN 
+		-- delete previous results
+		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4;
+	ELSE
+		-- set selector
+		DELETE FROM selector_audit WHERE fprocesscat_id=4 AND cur_user=current_user;    
+		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (4, current_user);
+	END IF;
+		
+	--    Control nulls
+	v_result := COALESCE(v_result, '[]'); 
+
+	--  Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	     ',"body":{"form":{}'||
+		     ',"data":{"result":' || v_result ||
+			     '}'||
+		       '}'||
+	    '}')::json; 
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

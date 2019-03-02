@@ -6,31 +6,42 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2206
 
+DROP FUNCTION IF EXISTS "ud_sample".gw_fct_anl_node_exit_upper_intro();
+CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_anl_node_exit_upper_intro() 
+RETURNS json AS 
+$BODY$
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_exit_upper_intro() RETURNS integer AS $BODY$
+/*EXAMPLE
+SELECT ud_sample.gw_fct_anl_node_exit_upper_intro()
+*/
+
 
 DECLARE
-sys_elev1_var numeric(12,3);
-sys_elev2_var numeric(12,3);
-rec_node record;
-rec_arc record;
-
+	sys_elev1_var numeric(12,3);
+	sys_elev2_var numeric(12,3);
+	rec_node record;
+	rec_arc record;
+	v_version text;
+	v_saveondatabase boolean = true;
+	v_result json;
 
 BEGIN
 
 
-    SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ud_sample", public;
 
-    -- Reset values
-    DELETE FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=11;
+	-- Reset values
+	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11;
+    
+    	-- select version
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
-
--- Init variables
+	-- Init variables
 	sys_elev1_var=0;
 	sys_elev2_var=0;
 
 
-    -- Comptuing process
+	-- Comptuing process
 	FOR rec_node IN SELECT * FROM v_edit_node
 	LOOP
 	
@@ -51,11 +62,28 @@ BEGIN
 		
 	END LOOP;
 	
-    DELETE FROM selector_audit WHERE fprocesscat_id=11 AND cur_user=current_user;	
-	INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (11, current_user);
+	-- get results
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11) row; 
 
-RETURN 1;
-        
+	IF v_saveondatabase IS FALSE THEN 
+		-- delete previous results
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11;
+	ELSE
+		-- set selector
+		DELETE FROM selector_audit WHERE fprocesscat_id=11 AND cur_user=current_user;    
+		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (11, current_user);
+	END IF;
+		
+	--    Control nulls
+	v_result := COALESCE(v_result, '[]'); 
+
+	--  Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	     ',"body":{"form":{}'||
+		     ',"data":{"result":' || v_result ||
+			     '}'||
+		       '}'||
+	    '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

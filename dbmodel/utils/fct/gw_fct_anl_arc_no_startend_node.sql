@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2102
 
-
+DROP FUNCTION IF EXISTS "ws_sample".gw_fct_anl_arc_no_startend_node();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_arc_no_startend_node(p_data json)  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${
+SELECT ws_sample.gw_fct_anl_arc_no_startend_node($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "id":["2004","2005"]},
 "data":{"selectionMode":"previousSelection",

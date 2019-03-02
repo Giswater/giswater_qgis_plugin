@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2108
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_duplicated(p_data json) RETURNS json AS 
+CREATE OR REPLACE FUNCTION "ws_sample".gw_fct_anl_node_duplicated(p_data json) RETURNS json AS 
 $BODY$
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_anl_node_duplicated($${
+SELECT ws_sample.gw_fct_anl_node_duplicated($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_junction", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection",
-	"parameters":{"nodeTolerance":3},
+	"parameters":{"nodeTolerance":300},
 	"saveOnDatabase":true}}$$)
 */
 
@@ -28,7 +28,7 @@ DECLARE
 
 BEGIN
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -43,14 +43,16 @@ BEGIN
 	-- Computing process
 	IF v_array != '()' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
-				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state, t2.node_id, t2.nodecat_id, t2.state, t1.expl_id, 6, t1.the_geom
+				SELECT * FROM (
+				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 6, t1.the_geom
 				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
-				WHERE t1.node_id != t2.node_id AND t1.node_id IN '||v_array||' ORDER BY t1.node_id';
+				WHERE t1.node_id != t2.node_id AND t1.node_id IN '||v_array||' ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
 	ELSE
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
-				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state, t2.node_id, t2.nodecat_id, t2.state, t1.expl_id, 6, t1.the_geom
+				SELECT * FROM (
+				SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 6, t1.the_geom
 				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
-				WHERE t1.node_id != t2.node_id ORDER BY t1.node_id';
+				WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
 	END IF;
 
 	-- get results
