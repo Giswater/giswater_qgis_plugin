@@ -9,11 +9,11 @@ This version of Giswater is provided by Giswater Association
 -- gw_fct_repair_arc_searchnodes (json)
 -- gw_fct_repair_arc_searchnodes (tex, bgint, bint):
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_repair_arc() RETURNS json AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_arc() RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_repair_arc()
+SELECT SCHEMA_NAME.gw_fct_repair_arc()
 */
 
 DECLARE 
@@ -28,7 +28,7 @@ DECLARE
 
 BEGIN 
 
-	SET search_path= 'ws_sample','public';
+	SET search_path= 'SCHEMA_NAME','public';
 
 	-- Delete previous log results
 	DELETE FROM audit_log_data WHERE fprocesscat_id=3 AND user_name=current_user;
@@ -94,14 +94,14 @@ $BODY$
 
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_repair_arc( p_arc_id text, counter bigint default 0, total bigint default 0)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_arc( p_arc_id text, counter bigint default 0, total bigint default 0)
 RETURNS character varying AS
 
 $BODY$
 
 /*
 EXAMPLE
-SELECT ws_sample.gw_fct_repair_arc(arc_id, (row_number() over (order by arc_id)), (select count(*) from ws_sample.arc)) FROM ws_sample.arc
+SELECT SCHEMA_NAME.gw_fct_repair_arc(arc_id, (row_number() over (order by arc_id)), (select count(*) from SCHEMA_NAME.arc)) FROM SCHEMA_NAME.arc
 
 RESULTS:
 After process log result are stored on audit_log_data whith fprocesscat_i=3 and 4
@@ -111,7 +111,7 @@ DECLARE
 
 BEGIN
 	  -- set search_path
-	  SET search_path='ws_sample';
+	  SET search_path='SCHEMA_NAME';
 
       -- Set config parameter
       UPDATE config_param_system SET value = TRUE WHERE parameter = 'edit_topocontrol_dsbl_error' ;

@@ -7,13 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2436
 
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_plan_audit_check_data(integer);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_plan_audit_check_data(p_data json)  
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_audit_check_data(integer);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_audit_check_data(p_data json)  
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_plan_audit_check_data($${
+SELECT SCHEMA_NAME.gw_fct_plan_audit_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
 "data":{"parameters":{"saveOnDatabase":true}}}$$)
@@ -35,7 +35,7 @@ v_saveondatabase boolean;
 BEGIN 
 
 	-- init function
-	SET search_path=ws_sample, public;
+	SET search_path=SCHEMA_NAME, public;
 	result_id_var:=0;
 	return_aux:=0;
     count_global_aux:=0;

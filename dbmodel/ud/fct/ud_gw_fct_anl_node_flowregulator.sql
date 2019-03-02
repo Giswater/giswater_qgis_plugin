@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 
 --FUNCTION CODE: 2208
-DROP FUNCTION IF EXISTS "ud_sample".gw_fct_anl_node_flowregulator();
-CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_anl_node_flowregulator() 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_flowregulator();
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_flowregulator() 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT ud_sample.gw_fct_anl_node_flowregulator()
+SELECT SCHEMA_NAME.gw_fct_anl_node_flowregulator()
 */
 
 
@@ -24,7 +24,7 @@ DECLARE
 	v_saveondatabase boolean = true;
 	v_result json;
 BEGIN
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;

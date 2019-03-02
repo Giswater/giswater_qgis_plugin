@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2430
 
-drop FUNCTION IF EXISTS ws_sample.gw_fct_pg2epa_check_data(text);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_pg2epa_check_data(p_data json)
+drop FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_check_data(text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_pg2epa_check_data($${
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
 "data":{"parameters":{"resultId":"test1"},
@@ -38,7 +38,7 @@ v_version		text;
 BEGIN
 
 	--  Search path	
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- getting input data 	
 	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;

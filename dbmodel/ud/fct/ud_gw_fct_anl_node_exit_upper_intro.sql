@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2206
 
-DROP FUNCTION IF EXISTS "ud_sample".gw_fct_anl_node_exit_upper_intro();
-CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_anl_node_exit_upper_intro() 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_exit_upper_intro();
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_exit_upper_intro() 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT ud_sample.gw_fct_anl_node_exit_upper_intro()
+SELECT SCHEMA_NAME.gw_fct_anl_node_exit_upper_intro()
 */
 
 
@@ -28,7 +28,7 @@ DECLARE
 BEGIN
 
 
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=11;

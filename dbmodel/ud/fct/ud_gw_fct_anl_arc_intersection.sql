@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2202
 
-DROP FUNCTION IF EXISTS "ud_sample".gw_fct_anl_arc_intersection();
-CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_anl_arc_intersection() 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_arc_intersection();
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_intersection() 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT ud_sample.gw_fct_anl_arc_intersection()
+SELECT SCHEMA_NAME.gw_fct_anl_arc_intersection()
 */
 
 DECLARE
@@ -23,7 +23,7 @@ DECLARE
 
 BEGIN
 
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;

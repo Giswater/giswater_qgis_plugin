@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2210
 
-DROP FUNCTION IF EXISTS "ud_sample".gw_fct_anl_node_sink();
-CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_anl_node_sink() 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_sink();
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_sink() 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT ud_sample.gw_fct_anl_node_sink()
+SELECT SCHEMA_NAME.gw_fct_anl_node_sink()
 */
 
 DECLARE
@@ -25,7 +25,7 @@ DECLARE
 	v_result json;
 BEGIN
 
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
     	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;

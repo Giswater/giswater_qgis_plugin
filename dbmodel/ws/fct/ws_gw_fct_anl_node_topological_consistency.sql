@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2302
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_anl_node_topological_consistency() ;
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_anl_node_topological_consistency() 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_anl_node_topological_consistency() ;
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_topological_consistency() 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_anl_node_topological_consistency()
+SELECT SCHEMA_NAME.gw_fct_anl_node_topological_consistency()
 */
 
 DECLARE
@@ -22,7 +22,7 @@ DECLARE
 	v_saveondatabase boolean = true;
 	v_result json;
 BEGIN
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;

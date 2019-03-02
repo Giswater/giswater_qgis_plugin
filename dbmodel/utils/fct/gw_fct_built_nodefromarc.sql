@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2118
 
 
-DROP FUNCTION IF EXISTS "ws_sample".gw_fct_built_nodefromarc();
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_built_nodefromarc() RETURNS json AS
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_built_nodefromarc();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc() RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_built_nodefromarc()
+SELECT SCHEMA_NAME.gw_fct_built_nodefromarc()
 */
 
 DECLARE
@@ -27,7 +27,7 @@ DECLARE
 BEGIN
 
 	-- Search path
-	SET search_path = ws_sample, public;
+	SET search_path = SCHEMA_NAME, public;
 
 	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;

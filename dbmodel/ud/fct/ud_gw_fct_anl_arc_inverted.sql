@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2204
 
-DROP FUNCTION IF EXISTS "ud_sample".gw_fct_anl_arc_inverted();
-CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_anl_arc_inverted() 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_arc_inverted();
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_inverted() 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT ud_sample.gw_fct_anl_arc_inverted()
+SELECT SCHEMA_NAME.gw_fct_anl_arc_inverted()
 */
 
 DECLARE
@@ -22,7 +22,7 @@ DECLARE
 BEGIN
 
 	
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
     	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;

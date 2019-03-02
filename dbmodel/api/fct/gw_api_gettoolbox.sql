@@ -38,7 +38,7 @@ BEGIN
 	v_filter := (p_data ->> 'data')::json->> 'filterText';
 	v_filter := COALESCE(v_filter, '');
 -- get project type
-        SELECT wsoftware INTO v_projectype FROM version LIMIT 1;
+        SELECT lower(wsoftware) INTO v_projectype FROM version LIMIT 1;
 		
 
 -- get om toolbox parameters
@@ -46,37 +46,40 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_om'') a'
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_om''
+		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
-		INTO v_edit_fields;
-		raise notice 'aaa - %',v_edit_fields;
+		INTO v_om_fields;
 		
 -- get edit toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_edit'') a'
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_edit''
+		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_edit_fields;
-		raise notice 'aaa - %',v_edit_fields;
 
 -- get epa toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa'') a'
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa''
+		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
-		INTO v_master_fields;
+		INTO v_epa_fields;
 
+raise notice 
 		
 -- get master toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_master'') a'
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_master''
+		 AND (project_type='||quote_literal(v_projectype)||' OR project_type=''utils'')) a'
 		USING v_filter
 		INTO v_master_fields;
         
@@ -85,7 +88,8 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin'') a'
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin''
+		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_admin_fields;
 		
@@ -95,6 +99,7 @@ BEGIN
 	v_epa_fields := COALESCE(v_epa_fields, '[]');
 	v_master_fields := COALESCE(v_master_fields, '[]');
 	v_admin_fields := COALESCE(v_admin_fields, '[]');
+
 		
 --    Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
