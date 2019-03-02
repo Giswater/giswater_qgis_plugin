@@ -42,6 +42,7 @@ DECLARE
 	v_values json;
 	array_index integer DEFAULT 0;
 	v_fieldvalue text;
+	v_geometry json;
 
 BEGIN
 
@@ -127,7 +128,12 @@ BEGIN
 		INTO v_formactions, v_layermanager;
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
-		
+
+	-- getting geometry
+	EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit_lot WHERE id='||v_id||')a'
+            INTO v_geometry;
+            
+ 		
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
@@ -140,13 +146,16 @@ BEGIN
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
 	v_layermanager := COALESCE(v_layermanager, '{}');
+	v_geometry := COALESCE(v_geometry, '{}');
+
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
              ',"body":{"feature":{"featureType":"lot", "tableName":"'||v_tablename||'", "idName":"lot_id", "id":"'||v_id||'"}'||
 		    ', "form":'||v_forminfo||
-		    ', "data":{"layerManager":'||v_layermanager||'}}'||
-		    '}')::json;
+		    ', "data":{"layerManager":'||v_layermanager||
+		               ',"geometry":'|| v_geometry ||'}}'||
+		               '}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
