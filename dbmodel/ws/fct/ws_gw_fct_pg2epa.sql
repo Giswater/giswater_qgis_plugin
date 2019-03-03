@@ -15,20 +15,17 @@ $BODY$
 */
 
 DECLARE
-
-
-
-rec_options 	record;
-valve_rec	record;
-check_count_aux integer;
-v_mandatory_nodarc boolean = false;
+	valve_rec	record;
+	check_count_aux integer;
+	v_mandatory_nodarc boolean = false;
       
 BEGIN
 
---  Search path
-    SET search_path = "SCHEMA_NAME", public;
+	--  Search path
+	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT * INTO rec_options FROM inp_options;
+	-- Getting user parameteres
+	v_mandatory_nodarc = (SELECT value FROM config_param_user WHERE parameter='inp_options_nodarc_onlymandatory' AND cur_user=current_user);
 	
 	RAISE NOTICE 'Starting pg2epa process.';
 	
@@ -64,7 +61,7 @@ BEGIN
 	END IF;
 
 	-- Real values of demand if rtc is enabled;
-	IF rec_options.rtc_enabled IS TRUE THEN
+	IF (SELECT value FROM config_param_user WHERE parameter='inp_options_rtc_enabled' AND cur_user=current_user ) THEN
 		PERFORM gw_fct_pg2epa_rtc(result_id_var);
 	END IF;
 

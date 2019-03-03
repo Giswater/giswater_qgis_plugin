@@ -46,7 +46,7 @@ BEGIN
 	
 	-- todo: improve with controls
 	--IF (v_copyfromuser IS NOT NULL) AND (v_copyfromuser not exists as user) AND (v_copyfromuser not has same role than v_user) THEN
-	
+
 		-- config_param_user
 		DELETE FROM config_param_user WHERE cur_user=v_user;
 		INSERT INTO config_param_user (parameter, value, cur_user) 
@@ -76,10 +76,10 @@ BEGIN
 		
 		IF v_projecttype ='UD' THEN
 			DELETE FROM inp_selector_hydrology WHERE cur_user=v_user;
-			INSERT INTO inp_selector_hydrology (hydrology_id, cur_user) SELECT hydrology_id, 'user_name' FROM inp_selector_hydrology WHERE cur_user='postgres';
+			INSERT INTO inp_selector_hydrology (hydrology_id, cur_user) SELECT hydrology_id, v_user FROM inp_selector_hydrology WHERE cur_user=v_copyfromuser;
 		ELSE
 			DELETE FROM inp_selector_dscenario WHERE cur_user=v_user;
-			INSERT INTO inp_selector_dscenario (dscenario_id, cur_user) SELECT dscenario_id, 'user_name' FROM inp_selector_dscenario WHERE cur_user='postgres';
+			INSERT INTO inp_selector_dscenario (dscenario_id, cur_user) SELECT dscenario_id, v_user FROM inp_selector_dscenario WHERE cur_user=v_copyfromuser;
 		END IF;
 
 	-- setting values wihtout user sample

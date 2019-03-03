@@ -11,43 +11,42 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varch
 AS $BODY$
 
 DECLARE
-    
-   record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
-    record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
-    record_arc2 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
-    record_new_arc SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
-    node_diameter double precision;
-    valve_arc_geometry geometry;
-    valve_arc_node_1_geom geometry;
-    valve_arc_node_2_geom geometry;
-    arc_reduced_geometry geometry;
-    node_id_aux text;
-    num_arcs integer;
-    shortpipe_record record;
-    to_arc_aux text;
-    arc_id_aux text;
-	rec_options record;
+	record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
+	record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+	record_arc2 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+	record_new_arc SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+	node_diameter double precision;
+	valve_arc_geometry geometry;
+	valve_arc_node_1_geom geometry;
+	valve_arc_node_2_geom geometry;
+	arc_reduced_geometry geometry;
+	node_id_aux text;
+	num_arcs integer;
+	shortpipe_record record;
+	to_arc_aux text;
+	arc_id_aux text;
 	error_var text;
-	rec record;
+	v_nod2arc float;
 	v_query_text text;
-	
-    
+	v_arcsearchnodes float;
 
 BEGIN
 
---  Search path
-    SET search_path = "SCHEMA_NAME", public;
+	--  Search path
+	SET search_path = "SCHEMA_NAME", public;
 
---  Looking for parameters
-    SELECT * INTO rec_options FROM inp_options;
-    SELECT * INTO rec FROM config;
+	--  Looking for parameters
+	v_nod2arc := (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nod2arc_length' and cur_user='current_user')::float;
+	IF v_nod2arc is null then 
+		v_nod2arc = 0.3;
+	END IF;
 	
     
---  Move valves to arc
-    RAISE NOTICE 'Start loop.....';
+	--  Move valves to arc
+	RAISE NOTICE 'Start loop.....';
 
-    IF p_only_mandatory_nodarc THEN
-	v_query_text = 'SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
+	IF p_only_mandatory_nodarc THEN
+		v_query_text = 'SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_valve ON rpt_inp_node.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||' 
 				UNION 
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
@@ -55,8 +54,8 @@ BEGIN
 				UNION
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_shortpipe ON rpt_inp_node.node_id=inp_shortpipe.node_id WHERE result_id='||quote_literal(result_id_var)||' AND to_arc IS NOT NULL';
-    ELSE
-	v_query_text = 	'SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
+	ELSE
+		v_query_text = 	'SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
 			JOIN inp_valve ON rpt_inp_node.node_id=inp_valve.node_id WHERE result_id='||quote_literal(result_id_var)||'
 				UNION 
 			SELECT rpt_inp_node.node_id FROM rpt_inp_node JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id 
@@ -92,7 +91,7 @@ BEGIN
     
                 -- TODO: Control pipe shorter than 0.5 m!
                 valve_arc_node_1_geom := ST_StartPoint(record_arc1.the_geom);
-                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, (SELECT node2arc FROM config) / ST_Length(record_arc1.the_geom));
+                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, v_nod2arc / ST_Length(record_arc1.the_geom));
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
@@ -108,7 +107,7 @@ BEGIN
                 record_new_arc = record_arc2;
 
                 valve_arc_node_2_geom := ST_EndPoint(record_arc2.the_geom);
-                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - (SELECT node2arc FROM config) / ST_Length(record_arc2.the_geom));
+                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - v_nod2arc / ST_Length(record_arc2.the_geom));
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
@@ -134,8 +133,8 @@ BEGIN
                 record_new_arc = record_arc1;
     
                 -- TODO: Control pipe shorter than 0.5 m!
-                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - (SELECT node2arc FROM config) / ST_Length(record_arc2.the_geom) / 2);
-                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, 1 - (SELECT node2arc FROM config) / ST_Length(record_arc1.the_geom) / 2);
+                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - v_nod2arc / ST_Length(record_arc2.the_geom) / 2);
+                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, 1 - v_nod2arc / ST_Length(record_arc1.the_geom) / 2);
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,0,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom));
@@ -164,8 +163,8 @@ BEGIN
                 record_new_arc = record_arc1;
     
                 -- TODO: Control arc shorter than 0.5 m!
-                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, (SELECT node2arc FROM config) / ST_Length(record_arc2.the_geom) / 2);
-                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, (SELECT node2arc FROM config) / ST_Length(record_arc1.the_geom) / 2);
+                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, v_nod2arc / ST_Length(record_arc2.the_geom) / 2);
+                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, v_nod2arc / ST_Length(record_arc1.the_geom) / 2);
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
@@ -190,8 +189,8 @@ BEGIN
                 record_new_arc = record_arc1;
     
                 -- TODO: Control pipe shorter than 0.5 m!
-                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - (SELECT node2arc FROM config) / ST_Length(record_arc2.the_geom) / 2);
-                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, (SELECT node2arc FROM config) / ST_Length(record_arc1.the_geom) / 2);
+                valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - v_nod2arc / ST_Length(record_arc2.the_geom) / 2);
+                valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, v_nod2arc / ST_Length(record_arc1.the_geom) / 2);
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
@@ -236,7 +235,7 @@ BEGIN
 		SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM inp_valve UNION SELECT node_id,to_arc FROM inp_shortpipe UNION 
 										SELECT node_id,to_arc FROM inp_pump) a WHERE node_id=node_id_aux;
 
-		SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, rec.arc_searchnodes)) AND result_id=result_id_var
+		SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, v_arcsearchnodes)) AND result_id=result_id_var
 					ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
 
 		IF arc_id_aux=to_arc_aux THEN

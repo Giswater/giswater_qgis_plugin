@@ -8,6 +8,43 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+CREATE VIEW v_edit_typevalue as 
+SELECT row_number() OVER (ORDER BY cat_arc.id) + 1000 AS rid, 'cat_arc', id, id as idval FROM cat_arc
+UNION
+SELECT row_number() OVER (ORDER BY cat_builder.id) + 2000 AS rid, 'cat_builder', id, descript FROM cat_builder
+UNION
+SELECT row_number() OVER (ORDER BY cat_element.id) + 3000 AS rid, 'cat_element', id, id FROM cat_element
+UNION
+SELECT row_number() OVER (ORDER BY cat_node.id) + 4000 AS rid, 'cat_node', id, descript FROM cat_node
+UNION
+SELECT row_number() OVER (ORDER BY cat_owner.id) + 5000 AS rid, 'cat_owner', id, descript FROM cat_owner
+UNION
+SELECT row_number() OVER (ORDER BY cat_presszone.id) + 6000 AS rid, 'cat_presszone', id, descript FROM cat_presszone
+UNION
+SELECT row_number() OVER (ORDER BY cat_soil.id) + 7000 AS rid, 'cat_soil', id, descript FROM cat_soil
+UNION
+SELECT row_number() OVER (ORDER BY cat_work.id) + 8000 AS rid, 'cat_work', id, descript FROM cat_work
+UNION
+SELECT row_number() OVER (ORDER BY ext_streetaxis.id) + 9000 AS rid, 'ext_streetaxis', id, name FROM ext_streetaxis
+UNION
+SELECT row_number() OVER (ORDER BY ext_plot.id) + 10000 AS rid, 'ext_plot', id, postnumber FROM ext_plot
+UNION
+SELECT row_number() OVER (ORDER BY man_type_category.id) + 11000 AS rid, concat('category_',lower(feature_type)), id::varchar, category_type FROM man_type_category
+UNION
+SELECT row_number() OVER (ORDER BY man_type_fluid.id) + 12000 AS rid, 'man_type_function', id::varchar, fluid_type FROM man_type_fluid
+UNION
+SELECT row_number() OVER (ORDER BY man_type_function.id) + 13000 AS rid, 'man_type_location', id::varchar, function_type FROM man_type_function
+UNION
+SELECT row_number() OVER (ORDER BY man_type_location.id) + 14000 AS rid, 'cat_builder', id::varchar, location_type FROM man_type_location
+UNION
+SELECT row_number() OVER (ORDER BY value_state.id) + 15000 AS rid, 'value_state', id::varchar, name FROM value_state
+UNION
+SELECT row_number() OVER (ORDER BY value_state_type.id) + 16000 AS rid, 'value_state_type', id::varchar, name FROM value_state_type
+UNION
+SELECT row_number() OVER (ORDER BY value_verified.id) + 17000 AS rid, 'value_verified', id::varchar, id as idval FROM value_verified
+order by 2,4;
+
+
 -- 2019/02/12
 CREATE OR REPLACE VIEW v_om_visit AS 
 SELECT DISTINCT ON (visit_id) * FROM (
@@ -93,6 +130,41 @@ factor_17,
 factor_18
 FROM inp_pattern_value
 order by 1;
+
+
+
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
+ SELECT ext_rtc_hydrometer.id AS hydrometer_id,
+    ext_cat_period.id AS period_id,
+    connec.dma_id,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
+            ELSE ext_rtc_hydrometer_x_data.sum
+        END AS m3_total_period,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+        END AS lps_avg
+   FROM ext_rtc_hydrometer
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id
+     JOIN connec ON connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     WHERE ext_cat_period.id = (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_rtc_period_id');
+
+	 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer_x_arc AS 
+ SELECT rtc_hydrometer_x_connec.hydrometer_id,
+    rtc_hydrometer_x_connec.connec_id,
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2
+   FROM SCHEMA_NAME.rtc_hydrometer_x_connec
+     JOIN SCHEMA_NAME.v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     JOIN SCHEMA_NAME.rpt_inp_arc ON rpt_inp_arc.arc_id::text = v_edit_connec.arc_id::text
+      where rpt_inp_arc.result_id = (SELECT result_id FROM SCHEMA_NAME.inp_selector_result WHERE cur_user=current_user);
+
 
 DROP VIEW IF EXISTS "v_rtc_hydrometer_x_node_period";
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
@@ -407,7 +479,6 @@ CREATE OR REPLACE VIEW vi_pipes AS
    JOIN inp_pipe ON rpt_inp_arc.arc_id::text = inp_pipe.arc_id::text
    LEFT JOIN inp_typevalue ON inp_typevalue.id=inp_pipe.status
   WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text 
-  AND inp_typevalue.typevalue='inp_value_status_pipe'
 UNION
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
@@ -420,8 +491,7 @@ UNION
    FROM inp_selector_result, rpt_inp_arc
    JOIN inp_shortpipe ON rpt_inp_arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
    LEFT JOIN inp_typevalue ON inp_typevalue.id=inp_shortpipe.status
-  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-  AND inp_typevalue.typevalue='inp_value_status_pipe';
+  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
 
 
  
@@ -436,7 +506,7 @@ SELECT arc_id::text,
    FROM inp_selector_result, inp_pump
      JOIN rpt_inp_arc ON rpt_inp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a')
   WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-union
+UNION
 SELECT arc_id::text,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
@@ -589,9 +659,9 @@ SELECT  text
             a.text
            FROM ( SELECT inp_controls_x_arc.id,
                     inp_controls_x_arc.text
-                   FROM SCHEMA_NAME.inp_selector_result,
-                    SCHEMA_NAME.inp_controls_x_arc
-                     JOIN SCHEMA_NAME.rpt_inp_arc ON inp_controls_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+                   FROM inp_selector_result,
+                    inp_controls_x_arc
+                     JOIN rpt_inp_arc ON inp_controls_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
                   WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
                   ORDER BY inp_controls_x_arc.id) a
         UNION
@@ -599,9 +669,9 @@ SELECT  text
             b.text
            FROM ( SELECT (inp_controls_x_node.id+1000000) as id,
                     inp_controls_x_node.text
-                   FROM SCHEMA_NAME.inp_selector_result,
-                    SCHEMA_NAME.inp_controls_x_node
-                     JOIN SCHEMA_NAME.rpt_inp_node ON inp_controls_x_node.node_id::text = rpt_inp_node.node_id::text
+                   FROM inp_selector_result,
+                    inp_controls_x_node
+                     JOIN rpt_inp_node ON inp_controls_x_node.node_id::text = rpt_inp_node.node_id::text
                   WHERE inp_selector_result.result_id::text = rpt_inp_node.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
                   ORDER BY inp_controls_x_node.id) b) c
                   ORDER BY id;
@@ -614,9 +684,9 @@ SELECT  text
             a.text
            FROM ( SELECT inp_rules_x_arc.id,
                     inp_rules_x_arc.text
-                   FROM SCHEMA_NAME.inp_selector_result,
-                    SCHEMA_NAME.inp_rules_x_arc
-                     JOIN SCHEMA_NAME.rpt_inp_arc ON inp_rules_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+                   FROM inp_selector_result,
+                    inp_rules_x_arc
+                     JOIN rpt_inp_arc ON inp_rules_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
                   WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
                   ORDER BY inp_rules_x_arc.id) a
         UNION
@@ -624,9 +694,9 @@ SELECT  text
             b.text
            FROM ( SELECT (inp_rules_x_node.id+1000000) as id,
                     inp_rules_x_node.text
-                   FROM SCHEMA_NAME.inp_selector_result,
-                    SCHEMA_NAME.inp_rules_x_node
-                     JOIN SCHEMA_NAME.rpt_inp_node ON inp_rules_x_node.node_id::text = rpt_inp_node.node_id::text
+                   FROM inp_selector_result,
+                    inp_rules_x_node
+                     JOIN rpt_inp_node ON inp_rules_x_node.node_id::text = rpt_inp_node.node_id::text
                   WHERE inp_selector_result.result_id::text = rpt_inp_node.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
                   ORDER BY inp_rules_x_node.id) b) c
                   ORDER BY id; 
@@ -701,12 +771,12 @@ CREATE OR REPLACE VIEW vi_mixing AS
 
 CREATE OR REPLACE VIEW vi_options AS 
 SELECT a.idval as parameter,
-	     case when (a.idval ='UNBALANCED' AND value='CONTINUE') THEN concat(value,' ',(SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_unbalanced_n')) 
-		  when (a.idval ='QUALITY' AND value='TRACE') THEN concat(value,' ',(SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_node_id')) 
-  		  when (a.idval ='HYDRAULICS' AND (value='USE' OR value='SAVE')) THEN concat(value,' ',(SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_hydraulics_fname')) 
+	     case when (a.idval ='UNBALANCED' AND value='CONTINUE') THEN concat(value,' ',(SELECT value FROM config_param_user WHERE parameter='inp_options_unbalanced_n' AND cur_user=current_user)) 
+		  when (a.idval ='QUALITY' AND value='TRACE') THEN concat(value,' ',(SELECT value FROM config_param_user WHERE parameter='inp_options_node_id' AND cur_user=current_user)) 
+  		  when (a.idval ='HYDRAULICS' AND (value='USE' OR value='SAVE')) THEN concat(value,' ',(SELECT value FROM config_param_user WHERE parameter='inp_options_hydraulics_fname' AND cur_user=current_user)) 
 		  else value END AS value
-   FROM SCHEMA_NAME.audit_cat_param_user a
-     JOIN SCHEMA_NAME.config_param_user b ON a.id = b.parameter::text
+   FROM audit_cat_param_user a
+     JOIN config_param_user b ON a.id = b.parameter::text
   WHERE (a.layout_name = ANY (ARRAY['grl_general_1'::text, 'grl_general_2'::text, 'grl_hyd_3'::text, 'grl_hyd_4'::text, 'grl_quality_5'::text, 'grl_quality_6'::text])) 
   AND a.idval NOT IN ('UNBALANCED_N', 'NODE_ID', 'HYDRAULICS_FNAME') AND b.cur_user::name = "current_user"()
   AND cur_user=current_user

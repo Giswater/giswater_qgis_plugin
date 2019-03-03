@@ -38,15 +38,18 @@ BEGIN
 	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
 		
 	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES ('[TITLE]',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (';Created by Giswater',v_pg2csvcat_id);
-	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Giswater, the open water','management tool.',v_pg2csvcat_id);
+	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (';Created by Giswater, the water management open source tool',v_pg2csvcat_id);
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Project name: ',title_aux, v_pg2csvcat_id);
 	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Result name: ',p_result_id,v_pg2csvcat_id); 
+	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_pg2csvcat_id); 
+	INSERT INTO temp_csv2pg (csv1,csv2,csv2pgcat_id) VALUES (';User: ',current_user, v_pg2csvcat_id); 
+
 	INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (NULL,v_pg2csvcat_id); 
 
 	--node
 	FOR rec_table IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=v_pg2csvcat_id order by id
 	LOOP
+
 		-- insert header
 		INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (NULL,v_pg2csvcat_id); 
 		EXECUTE 'INSERT INTO temp_csv2pg(csv2pgcat_id,csv1) VALUES ('||v_pg2csvcat_id||','''|| rec_table.target||''');';
