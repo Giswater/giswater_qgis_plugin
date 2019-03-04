@@ -14,7 +14,7 @@ from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeE
 from PyQt4.QtGui import QCompleter, QFileDialog
 
 import csv, os, re, subprocess, sys, time, threading
-
+import ConfigParser
 from functools import partial
 
 from PyQt4.QtGui import QMessageBox
@@ -50,6 +50,16 @@ class Go2Epa(ApiParent):
         self.load_settings(self.dlg_go2epa)
         if self.project_type in 'ws':
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
+            
+        # Check if user can use recursion or not
+        config = ConfigParser.ConfigParser()
+        ruta = self.plugin_dir + "/config/giswater.config"
+        self.controller.log_info(str(ruta))
+        config.read(ruta)
+        go2eparecurisve = config.get("system_variables", "go2eparecurisve")
+        if str(go2eparecurisve).lower() == "false":
+            self.dlg_go2epa.chk_recurrent.setVisible(False)
+            self.dlg_go2epa.chk_recurrent.setChecked(False)
 
         self.dlg_go2epa.progressBar.setMaximum(0)
         self.dlg_go2epa.progressBar.setMinimum(0)
@@ -117,15 +127,20 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_exec.setEnabled(True)
             self.dlg_go2epa.chk_import_result.setEnabled(True)
         elif state == 2:
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
-            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, True)
-            self.dlg_go2epa.chk_export.setEnabled(False)
-            self.dlg_go2epa.chk_export_subcatch.setEnabled(False)
-            self.dlg_go2epa.chk_exec.setEnabled(False)
-            self.dlg_go2epa.chk_import_result.setEnabled(False)
+            msg = ("You have activated the recursive functionality. It will take a lot of time. Check recursive "
+                   "function is well configured and your python console is open. Would you like to contiue?")
+            title = "Activate recursive"
+            answer = self.controller.ask_question(msg, title)
+            if answer:
 
+                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
+                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
+                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
+                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, True)
+                self.dlg_go2epa.chk_export.setEnabled(False)
+                self.dlg_go2epa.chk_export_subcatch.setEnabled(False)
+                self.dlg_go2epa.chk_exec.setEnabled(False)
+                self.dlg_go2epa.chk_import_result.setEnabled(False)
 
 
     def check_fields(self):
