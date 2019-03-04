@@ -104,7 +104,7 @@ class GwToolBox(ApiParent):
         self.function_list = []
         self.rbt_checked = {}
         self.is_paramtetric = True
-        self.list_of_parents = ['Giswater']
+        self.no_clickable_items = ['Giswater']
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -123,8 +123,6 @@ class GwToolBox(ApiParent):
         body = self.create_body()
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-        #row = self.dao.get_row_notify(sql,  commit=True)
-        self.controller.log_info(str(row))
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
             return False
@@ -147,18 +145,18 @@ class GwToolBox(ApiParent):
             return False
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'])
+        self.populate_trv(self.dlg_toolbox.trv, complet_result[0]['body']['data'], expand=True)
 
 
     def open_function(self, index):
         self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
         alias_function = index.sibling(index.row(), 0).data()
-        #self.controller.log_info(str(index.sibling(index.row(), 1).data()))
-        # Control no clickable items
-        if alias_function in self.list_of_parents:
-            return
 
+        # Control no clickable items
+        if alias_function in self.no_clickable_items:
+            return
+           
         self.dlg_functions = ApiFunctionTb()
         self.dlg_functions.progressBar.setVisible(True)
         self.dlg_functions.progressBar.setValue(0)
@@ -179,8 +177,8 @@ class GwToolBox(ApiParent):
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
             return False
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         status = self.populate_functions_dlg(self.dlg_functions, complet_result[0]['body']['data'])
 
         if not status:
@@ -188,10 +186,6 @@ class GwToolBox(ApiParent):
             msg = "Function not found"
             self.controller.show_message(msg, parameter=alias_function)
             return
-
-
-
-
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
                                                    self.dlg_functions.cmb_layers, complet_result[0]['body']['data']))
@@ -273,20 +267,21 @@ class GwToolBox(ApiParent):
             dialog.rbt_previous.setChecked(True)
         else:
             dialog.rbt_layer.setChecked(True)
-        if self.is_paramtetric == True:
-            for item in function[0]['return_type']:
-                widget = dialog.findChild(QWidget, item['widgetname'])
-
-                value = self.controller.plugin_settings_value(str(function_name) + "_" + cur_user + "_" + widget.objectName())
-
-                if str(value) != '':
-                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
-                        utils_giswater.setWidgetText(dialog, widget, value)
-                    elif type(widget) in (QComboBox):
-                        utils_giswater.set_combo_itemData(widget, value, 1)
-                    elif type(widget) in (QCheckBox, QRadioButton):
-                        if value.lower() == "true":
-                            widget.setChecked(True)
+        # TODO In the future, control the widgets that come from the database
+        # if self.is_paramtetric == True:
+        #     for item in function[0]['return_type']:
+        #         widget = dialog.findChild(QWidget, item['widgetname'])
+        #
+        #         value = self.controller.plugin_settings_value(str(function_name) + "_" + cur_user + "_" + widget.objectName())
+        #
+        #         if str(value) != '':
+        #             if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+        #                 utils_giswater.setWidgetText(dialog, widget, value)
+        #             elif type(widget) in (QComboBox):
+        #                 utils_giswater.set_combo_itemData(widget, value, 1)
+        #             elif type(widget) in (QCheckBox, QRadioButton):
+        #                 if value.lower() == "true":
+        #                     widget.setChecked(True)
 
     def save_settings_values(self, dialog, function):
         """ Save QGIS settings related with toolbox options """
@@ -297,22 +292,22 @@ class GwToolBox(ApiParent):
                                                   dialog.rbt_previous.isChecked())
         self.controller.plugin_settings_set_value(str(function_name)+"_" + cur_user + "_chk_save",
                                                   dialog.chk_save.isChecked())
-
-        if self.is_paramtetric == True:
-            for item in function[0]['return_type']:
-                widget = dialog.findChild(QWidget, item['widgetname'])
-                self.controller.log_info(str(type(widget)))
-                self.controller.log_info(str((widget.objectName())))
-                if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
-                    value = utils_giswater.getWidgetText(dialog, widget)
-
-                elif type(widget) == QComboBox:
-                    value = utils_giswater.get_item_data(dialog, widget, 1)
-                elif type(widget) in (QCheckBox, QRadioButton):
-                    value = widget.isChecked()
-                self.controller.log_info(str(value))
-                self.controller.plugin_settings_set_value(
-                    str(function_name) + "_" + cur_user + "_" + str(widget.objectName()), value)
+        # TODO In the future, control the widgets that come from the database
+        # if self.is_paramtetric == True:
+        #     for item in function[0]['return_type']:
+        #         widget = dialog.findChild(QWidget, item['widgetname'])
+        #         self.controller.log_info(str(type(widget)))
+        #         self.controller.log_info(str((widget.objectName())))
+        #         if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+        #             value = utils_giswater.getWidgetText(dialog, widget)
+        #
+        #         elif type(widget) == QComboBox:
+        #             value = utils_giswater.get_item_data(dialog, widget, 1)
+        #         elif type(widget) in (QCheckBox, QRadioButton):
+        #             value = widget.isChecked()
+        #         self.controller.log_info(str(value))
+        #         self.controller.plugin_settings_set_value(
+        #             str(function_name) + "_" + cur_user + "_" + str(widget.objectName()), value)
 
     def execute_function(self, dialog, combo, result):
         print(datetime.now())
@@ -335,29 +330,23 @@ class GwToolBox(ApiParent):
 
         # If function is not parametrized, call function(old) without json
         if self.is_paramtetric is False:
-
-            dialog.progressBar.setMinimum(0)
-            dialog.progressBar.setFormat("Running function: " + str(function_name))
-            dialog.progressBar.setAlignment(Qt.AlignCenter)
-            sql = ("SELECT " + self.schema_name + "." + str(function_name) + "()")
-            self.controller.execute_sql(sql, log_sql=True)
-            dialog.progressBar.setMaximum(100)
-            dialog.progressBar.setValue(0)
-            dialog.progressBar.setFormat("")
-            dialog.progressBar.setAlignment(Qt.AlignCenter)
+            self.execute_no_parametric(dialog, function_name)
+            print(datetime.now())
             return
+
         layer_name = utils_giswater.get_item_data(dialog, combo, 1)
-        layer = self.set_selected_layer(dialog, combo)
-        selection_mode = self.rbt_checked['widget']
-        if layer is None:
-            return
+        if layer_name != -1:
+            layer = self.set_selected_layer(dialog, combo)
 
+            # if layer is None:
+            #     return
+        selection_mode = self.rbt_checked['widget']
         extras = '"selectionMode":"'+selection_mode+'",'
         # Check selection mode and get (or not get) all feature id
         feature_id_list = '"id":['
-        if selection_mode == 'wholeSelection':
+        if (selection_mode == 'wholeSelection') or(selection_mode == 'previousSelection' and layer is None):
             feature_id_list += ']'
-        elif selection_mode == 'previousSelection':
+        elif selection_mode == 'previousSelection' and layer is not None:
             features = layer.selectedFeatures()
             for feature in features:
                 feature_id = feature.attribute(feature_type+"_id")
@@ -366,31 +355,36 @@ class GwToolBox(ApiParent):
                 feature_id_list = feature_id_list[:-2] + ']'
             else:
                 feature_id_list += ']'
-        feature_field = '"tableName":"' + layer_name + '", ' + feature_id_list
 
+
+        feature_field = ''
+        if layer_name != -1:
+            feature_field = '"tableName":"' + layer_name + '", '
+        feature_field += feature_id_list
         widget_list = dialog.grb_parameters.findChildren(QWidget)
         widget_is_void = False
         extras += '"parameters":{'
         for group, function in result['fields'].items():
             if len(function) != 0:
-                for field in function[0]['return_type']:
-                    widget = dialog.findChild(QWidget, field['widgetname'])
-                    param_name = widget.objectName()
-                    if type(widget) in ('', QLineEdit):
-                        widget.setStyleSheet("border: 1px solid gray")
-                        value = utils_giswater.getWidgetText(dialog, widget, False, False)
-                        extras += '"' + param_name + '":"' + str(value) + '", '
-                        if value is '':
-                            widget_is_void = True
-                            widget.setStyleSheet("border: 1px solid red")
-                    elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
-                        value = utils_giswater.getWidgetText(dialog, widget, False, False)
-                        if value == '':
-                            value = 0
-                        extras += '"' + param_name + '":"' + str(value) + '", '
-                    elif type(widget) in ('', QComboBox):
-                        value = utils_giswater.get_item_data(dialog, widget, 0)
-                        extras += '"' + param_name + '":"' + str(value).lower() + '", '
+                if function[0]['return_type'] not in (None, ''):
+                    for field in function[0]['return_type']:
+                        widget = dialog.findChild(QWidget, field['widgetname'])
+                        param_name = widget.objectName()
+                        if type(widget) in ('', QLineEdit):
+                            widget.setStyleSheet("border: 1px solid gray")
+                            value = utils_giswater.getWidgetText(dialog, widget, False, False)
+                            extras += '"' + param_name + '":"' + str(value) + '", '
+                            if value is '':
+                                widget_is_void = True
+                                widget.setStyleSheet("border: 1px solid red")
+                        elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
+                            value = utils_giswater.getWidgetText(dialog, widget, False, False)
+                            if value == '':
+                                value = 0
+                            extras += '"' + param_name + '":"' + str(value) + '", '
+                        elif type(widget) in ('', QComboBox):
+                            value = utils_giswater.get_item_data(dialog, widget, 0)
+                            extras += '"' + param_name + '":"' + str(value).lower() + '", '
 
         if widget_is_void:
             message = "This paramater is mandatory. Please, set a value"
@@ -414,12 +408,37 @@ class GwToolBox(ApiParent):
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        if len(complet_result[0]['body']['data']['result']) == 0:
-            self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
-            return True
-        self.add_void_layer(dialog, complet_result[0]['body']['data'])
+        # if len(complet_result[0]['body']['data']['result']) == 0:
+        #     self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
+        #     return True
+        self.add_temp_layer(dialog, complet_result[0]['body']['data'])
+        dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
+        dialog.progressBar.setAlignment(Qt.AlignCenter)
         print(datetime.now())
 
+    def execute_no_parametric(self, dialog, function_name):
+        dialog.progressBar.setMinimum(0)
+        dialog.progressBar.setFormat("Running function: " + str(function_name))
+        dialog.progressBar.setAlignment(Qt.AlignCenter)
+        dialog.progressBar.setMaximum(100)
+        dialog.progressBar.setValue(0)
+        dialog.progressBar.setFormat("")
+
+        sql = ("SELECT " + self.schema_name + "." + str(function_name) + "()::text")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+
+        if not row or row[0] is None:
+            self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
+            return True
+
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        # if len(complet_result[0]['body']['data']['result']) == 0:
+        #     self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
+        #     return True
+        self.add_temp_layer(dialog, complet_result[0]['body']['data'])
+        dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
+        dialog.progressBar.setAlignment(Qt.AlignCenter)
+        return True
 
     def populate_functions_dlg(self, dialog, result):
         status = False
@@ -434,14 +453,12 @@ class GwToolBox(ApiParent):
                     self.load_settings_values(dialog, function)
                     status = True
                     break
+
                 self.populate_layer_combo(function[0]['input_params']['featureType'])
                 self.construct_form_param_user(dialog, function, 0, self.function_list, False)
-                # TODO hacer el load de settings de usuario
+
                 self.load_settings_values(dialog, function)
-                # if 'function_type' in function[0]:
-                #     if 'durationType' in function[0]['function_type']:
-                #         if function[0]['function_type']['durationType'] == 'short':
-                #             dialog.progressBar.setVisible(False)
+
                 status = True
                 break
         return status
@@ -462,6 +479,13 @@ class GwToolBox(ApiParent):
         dialog.rbt_layer.setChecked(True)
         dialog.chk_save.setChecked(True)
 
+        dialog.lbl_input_layer.setEnabled(False)
+        dialog.grb_parameters.setEnabled(False)
+        dialog.grb_parameters.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+        #dialog.chk_save.setEnabled(True)
+        dialog.txt_info.setReadOnly(True)
+        dialog.txt_info.setStyleSheet("QWidget { background: rgb(255, 255, 255); color: rgb(10, 10, 10)}")
+
 
     def populate_layer_combo(self, geom_type):
         self.layers = []
@@ -477,7 +501,7 @@ class GwToolBox(ApiParent):
         utils_giswater.set_item_data(self.dlg_functions.cmb_layers, layers)
 
 
-    def populate_trv(self, trv_widget, result):
+    def populate_trv(self, trv_widget, result, expand=False):
         model = QStandardItemModel()
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
@@ -489,9 +513,9 @@ class GwToolBox(ApiParent):
             icon = QIcon(path_icon_blue)
             main_parent.setIcon(icon)
 
-        for group, functions in sorted(result['fields'].items()):
+        for group, functions in result['fields'].items():
             parent1 = QStandardItem('{}'.format(group))
-            self.list_of_parents.append('{}'.format(group))
+            self.no_clickable_items.append('{}'.format(group))
             functions.sort(key=self.sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem('{}'.format(function['functionname']))
@@ -504,6 +528,7 @@ class GwToolBox(ApiParent):
                         label.setForeground(QColor(255, 0, 0))
                         label.setToolTip('Function configured on the table audit_cat_function, '
                                          'but not found in the data base')
+                        self.no_clickable_items.append('{}'.format(function['alias']))
                 else:
                     if os.path.exists(path_icon_blue):
                         icon = QIcon(path_icon_blue)
@@ -514,6 +539,8 @@ class GwToolBox(ApiParent):
         model.appendRow(main_parent)
         index = model.indexFromItem(main_parent)
         trv_widget.expand(index)
+        if expand:
+            trv_widget.expandAll()
 
 
     def sort_list(self, json):
@@ -525,34 +552,36 @@ class GwToolBox(ApiParent):
 
 
 
-    def add_void_layer(self, dialog, result):
+    def add_temp_layer(self, dialog, result):
         self.delete_layer_from_toc('temp_result')
 
         counter = len(result['result'])
-        dialog.progressBar.setMaximum(counter)
+        dialog.progressBar.setMaximum(counter+1)
         dialog.progressBar.setValue(0)
         srid = self.controller.plugin_settings_value('srid')
-        the_geom = result['result'][0]['the_geom']
-        sql = ("SELECT St_AsText('" + str(the_geom) + "')")
-        row = self.controller.get_row(sql, log_sql=False)
-        sql = ("SELECT ST_GeometryType(ST_GeomFromText('"+str(row[0])+"'))")
-        geom_type = self.controller.get_row(sql, log_sql=False)
-        # create layer
         virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
-        if 'ST_LineString' in str(geom_type):
-            virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
-        elif 'ST_Point' in str(geom_type):
-            virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
+        if counter > 0:
+            if 'the_geom' in result['result'][0]:
+                the_geom = result['result'][0]['the_geom']
+                sql = ("SELECT St_AsText('" + str(the_geom) + "')")
+                row = self.controller.get_row(sql, log_sql=False)
+                sql = ("SELECT ST_GeometryType(ST_GeomFromText('"+str(row[0])+"'))")
+                geom_type = self.controller.get_row(sql, log_sql=False)
+                # create layer
+                if 'ST_LineString' in str(geom_type):
+                    virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
+                elif 'ST_Point' in str(geom_type):
+                    virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
 
         prov = virtual_layer.dataProvider()
 
         # Enter editing mode
         virtual_layer.startEditing()
-
-        for key, value in result['result'][0].items():
-            # add columns
-            prov.addAttributes([QgsField(str(key), QVariant.String)])
-        x = 0
+        if counter > 0:
+            for key, value in result['result'][0].items():
+                # add columns
+                prov.addAttributes([QgsField(str(key), QVariant.String)])
+        x = 1
         # Add features
         for item in result['result']:
             x += 1
@@ -568,7 +597,7 @@ class GwToolBox(ApiParent):
                     fet.setGeometry(geometry)
             fet.setAttributes(attributes)
             prov.addFeatures([fet])
-
+        dialog.progressBar.setValue(x)
         # Commit changes
         virtual_layer.commitChanges()
 

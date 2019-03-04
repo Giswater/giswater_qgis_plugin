@@ -1056,82 +1056,87 @@ class ApiParent(ParentAction):
             self.vertex_marker.hide()
 
     def construct_form_param_user(self, dialog, row, pos, _json, put_chk=True):
+        field_id = ''
         if 'fields' in row[pos]:
-            field = 'fields'
+            field_id = 'fields'
         elif 'return_type' in row[pos]:
-            field = 'return_type'
-        for field in row[pos][field]:
-            if field['label']:
-                lbl = QLabel()
-                lbl.setObjectName('lbl' + field['widgetname'])
-                lbl.setText(field['label'])
-                lbl.setMinimumSize(160, 0)
-                lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-                chk = None
-                if put_chk is True:
-                    chk = QCheckBox()
-                    chk.setObjectName('chk_' + field['widgetname'])
-                    if field['checked'] == "True":
-                        chk.setChecked(True)
-                    elif field['checked'] == "False":
-                        chk.setChecked(False)
-                    chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            if row[pos]['return_type'] not in ('', None):
+                self.controller.log_info(str(row[pos]['return_type']))
+                field_id = 'return_type'
+        self.controller.log_info(str(field_id))
+        if field_id != '':
+            for field in row[pos][field_id]:
+                if field['label']:
+                    lbl = QLabel()
+                    lbl.setObjectName('lbl' + field['widgetname'])
+                    lbl.setText(field['label'])
+                    lbl.setMinimumSize(160, 0)
+                    lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                    chk = None
+                    if put_chk is True:
+                        chk = QCheckBox()
+                        chk.setObjectName('chk_' + field['widgetname'])
+                        if field['checked'] == "True":
+                            chk.setChecked(True)
+                        elif field['checked'] == "False":
+                            chk.setChecked(False)
+                        chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-                if field['widgettype'] == 'text':
-                    widget = QLineEdit()
-                    widget.setText(field['value'])
-                    if 'reg_exp' in field:
-                        if field['reg_exp'] is not None:
-                            reg_exp = QRegExp(str(field['reg_exp']))
-                            widget.setValidator(QRegExpValidator(reg_exp))
-                    widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    if field['widgettype'] == 'text':
+                        widget = QLineEdit()
+                        widget.setText(field['value'])
+                        if 'reg_exp' in field:
+                            if field['reg_exp'] is not None:
+                                reg_exp = QRegExp(str(field['reg_exp']))
+                                widget.setValidator(QRegExpValidator(reg_exp))
+                        widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-                elif field['widgettype'] == 'combo':
-                    widget = self.add_combobox(field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'check':
-                    widget = QCheckBox()
-                    if field['value'].lower() == "true":
-                        widget.setChecked(True)
-                    else:
-                        widget.setChecked(False)
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'datepickertime':
-                    widget = QDateEdit()
-                    widget.setCalendarPopup(True)
-                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
-                    widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'spinbox':
-                    widget = QDoubleSpinBox()
-                    if 'value' in field and field['value'] not in(None, ""):
-                        value = float(str(field['value']))
-                        widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    elif field['widgettype'] == 'combo':
+                        widget = self.add_combobox(field)
+                        widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    elif field['widgettype'] == 'check':
+                        widget = QCheckBox()
+                        if field['value'].lower() == "true":
+                            widget.setChecked(True)
+                        else:
+                            widget.setChecked(False)
+                        widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    elif field['widgettype'] == 'datepickertime':
+                        widget = QDateEdit()
+                        widget.setCalendarPopup(True)
+                        date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                        widget.setDate(date)
+                        widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    elif field['widgettype'] == 'spinbox':
+                        widget = QDoubleSpinBox()
+                        if 'value' in field and field['value'] not in(None, ""):
+                            value = float(str(field['value']))
+                            widget.setValue(value)
+                        widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-                # Set editable/readonly
-                if 'iseditable' in field:
-                    if type(widget) in (QLineEdit, QDoubleSpinBox):
-                        if str(field['iseditable']) == "False":
-                            widget.setReadOnly(True)
-                            widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-                        if 'placeholder' in field:
-                            widget.setPlaceholderText(field['placeholder'])
-                    elif type(widget) in (QComboBox, QCheckBox):
-                        if str(field['iseditable']) == "False":
-                            widget.setEnabled(False)
-                widget.setObjectName(field['widgetname'])
+                    # Set editable/readonly
+                    if 'iseditable' in field:
+                        if type(widget) in (QLineEdit, QDoubleSpinBox):
+                            if str(field['iseditable']) == "False":
+                                widget.setReadOnly(True)
+                                widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                            if 'placeholder' in field:
+                                widget.setPlaceholderText(field['placeholder'])
+                        elif type(widget) in (QComboBox, QCheckBox):
+                            if str(field['iseditable']) == "False":
+                                widget.setEnabled(False)
+                    widget.setObjectName(field['widgetname'])
 
 
-                # Set signals
-                if put_chk is True:
-                    chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
-                self.put_widgets(dialog, field, field['layout_name'], lbl, chk, widget)
+                    # Set signals
+                    if put_chk is True:
+                        chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
+                    self.put_widgets(dialog, field, field['layout_name'], lbl, chk, widget)
 
 
     def put_widgets(self, dialog, field, layout_name, lbl, chk, widget):
