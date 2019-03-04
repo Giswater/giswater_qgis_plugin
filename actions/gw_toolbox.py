@@ -451,6 +451,7 @@ class GwToolBox(ApiParent):
                     self.is_paramtetric = False
                     self.control_isparametric(dialog)
                     self.load_settings_values(dialog, function)
+                    self.construct_form_param_user(dialog, function, 0, self.function_list, False)
                     status = True
                     break
 
