@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+-- 'definiton updated on 3.1.110'
 DROP VIEW IF EXISTS v_ext_streetaxis CASCADE;
 CREATE VIEW v_ext_streetaxis AS SELECT
 ext_streetaxis.id,

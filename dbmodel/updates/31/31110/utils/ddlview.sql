@@ -39,3 +39,27 @@ CREATE OR REPLACE VIEW v_ui_om_event AS
 create OR REPLACE view v_ui_om_visit_x_doc
 as 
 SELECT * FROM doc_x_visit;
+
+
+-- 2019/03/04
+CREATE OR REPLACE VIEW v_ext_streetaxis AS SELECT
+ext_streetaxis.id,
+code,
+type,
+name,
+text,
+the_geom,
+ext_streetaxis.expl_id,
+muni_id,
+CASE
+    WHEN type IS NULL THEN name
+    WHEN text IS NULL THEN name || ', ' || type ||'.'
+    WHEN type IS NULL AND text IS NULL THEN name
+    ELSE name || ', ' || type || '. ' || text
+END AS descript
+FROM selector_expl,ext_streetaxis
+WHERE ((ext_streetaxis.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
+
+
+
