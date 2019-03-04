@@ -69,6 +69,7 @@ class ManageElement(ParentManage):
 
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
+        self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.update_location_cmb))
 
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id) FROM " + self.schema_name + ".cat_element ORDER BY elementtype_id"
@@ -142,10 +143,22 @@ class ManageElement(ParentManage):
             self.set_calendars(self.dlg_add_element, 'builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
             utils_giswater.setWidgetText(self.dlg_add_element, 'num_elements', '1')
 
+        self.update_location_cmb()
         # Open the dialog    
         self.open_dialog(self.dlg_add_element, maximize_button=False)
         return self.dlg_add_element
 
+
+    def update_location_cmb(self):
+        element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
+        sql = ("SELECT location_type FROM " + self.schema_name + ".man_type_location"
+               " WHERE feature_type = 'ELEMENT' "
+               " AND featurecat_id='"+str(element_type)+"'"
+               " ORDER BY location_type")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
+        utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)
+        if rows:
+            utils_giswater.setCurrentIndex(self.dlg_add_element, "location_type", 0)
 
     def set_layer_visible(self, layer, visible):
         """ Restore visible state when finish process """
