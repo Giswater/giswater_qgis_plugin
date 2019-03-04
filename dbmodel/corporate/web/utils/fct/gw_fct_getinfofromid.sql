@@ -11,7 +11,6 @@ DECLARE
 
 /* EXAMPLE
 
-
 */
 
 --    Variables
@@ -46,7 +45,8 @@ DECLARE
     visit_act boolean;
     v_visitability boolean;
     table_id_arg_new text;
-
+    v_isdbeditable boolean = FALSE;
+    
     -- fixed info type parameter(to do)
     --p_info_type integer=200;
     
@@ -238,6 +238,10 @@ BEGIN
 	raise notice 'NO parent-child, NO editable NO informable: %' , table_id_arg;
 
 	table_id_arg= null;
+
+    -- Check if it is editable
+    ELSIF table_id_arg IN (SELECT layer_id FROM config_web_layer WHERE is_editable IS TRUE) THEN 
+	v_isdbeditable = true;
 	
     END IF;
     
@@ -309,6 +313,8 @@ BEGIN
 	form_info := gw_fct_json_object_set_key(form_info, 'tabLabel', form_tablabel_json);
 	form_info := gw_fct_json_object_set_key(form_info, 'tabText', form_tabtext_json);
 
+	
+
 	--  Calling form function
 	-------------------------
 	IF editable THEN
@@ -318,10 +324,20 @@ BEGIN
 		USING table_id_arg, lang, id;
 
 	ELSIF table_id_arg is not null THEN
-		-- call getinfoform using table information
-		EXECUTE 'SELECT gw_fct_getinfoform($1, $2, $3, $4)'
-		INTO editable_data
-		USING table_id_arg, lang, id, formid_arg;
+
+		IF v_isdbeditable IS FALSE THEN
+
+			-- call getinfoform using table information
+			EXECUTE 'SELECT gw_fct_getinfoform($1, $2, $3, $4)'
+			INTO editable_data
+			USING table_id_arg, lang, id, formid_arg;
+		ELSE
+			-- call ediable form using table information
+			EXECUTE 'SELECT gw_fct_getinsertformdisabled($1, $2, $3)'
+			INTO editable_data
+			USING table_id_arg, lang, id;
+		END IF;
+		
 	END IF;
 
     END IF;

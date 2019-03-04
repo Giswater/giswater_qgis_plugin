@@ -45,7 +45,7 @@ BEGIN
     (SELECT a.attname as label, a.attname as name, 
 	(case when a.atttypid=16 then ''check'' else ''text'' end ) as type, 
 	(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "dataType", 
-	''''::TEXT as placeholder, false as "disabled" 
+	''''::TEXT as placeholder, ''true'' as "disabled" 
 	FROM pg_attribute a
 	JOIN pg_class t on a.attrelid = t.oid
 	JOIN pg_namespace s on t.relnamespace = s.oid
