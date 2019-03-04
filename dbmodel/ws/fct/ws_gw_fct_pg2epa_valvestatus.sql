@@ -20,7 +20,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 	
 	-- get values from user
-	v_valvemode := (SELECT value from config_param_user where cur_user=current_user AND parameter ='inp_options_valve_mode')
+	v_valvemode := (SELECT value from config_param_user where cur_user=current_user AND parameter ='inp_options_valve_mode');
 
     IF p_mandatory_nodarc IS FALSE THEN
 	

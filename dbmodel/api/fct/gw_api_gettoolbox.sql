@@ -71,7 +71,6 @@ BEGIN
 		USING v_filter
 		INTO v_epa_fields;
 
-raise notice 
 		
 -- get master toolbox parameters
 

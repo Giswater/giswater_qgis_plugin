@@ -53,12 +53,12 @@ BEGIN
     v_lot = (((p_data ->>'data')::json->>'fields')::json->>'lot_id')::integer;
     v_x = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
     v_y = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
-    v_thegeom = ST_SetSRID(ST_MakePoint(v_x, v_y), (SELECT st_srid(the_geom) from .arc limit 1));
+    v_thegeom = ST_SetSRID(ST_MakePoint(v_x, v_y), (SELECT st_srid(the_geom) from arc limit 1));
 
  
     INSERT INTO om_visit_lot_x_user (team_id, lot_id , the_geom) VALUES (v_team, v_lot, v_thegeom);
-    UPDATE .om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone
-	WHERE id = (SELECT id FROM (SELECT * FROM .om_visit_lot_x_user WHERE user_id=current_user ORDER BY id DESC) a LIMIT 1 OFFSET 1);
+    UPDATE om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone
+	WHERE id = (SELECT id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=current_user ORDER BY id DESC) a LIMIT 1 OFFSET 1);
 
 	-- getting message
 	SELECT gw_api_getmessage(v_feature, 50) INTO v_message;
