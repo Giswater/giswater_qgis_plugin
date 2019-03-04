@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 CREATE VIEW v_edit_typevalue as 
-SELECT row_number() OVER (ORDER BY cat_arc.id) + 1000 AS rid, 'cat_arc', id, id as idval FROM cat_arc
+SELECT row_number() OVER (ORDER BY cat_arc.id) + 1000 AS rid, 'cat_arc'::text as typevalue, id, id as idval FROM cat_arc
 UNION
 SELECT row_number() OVER (ORDER BY cat_builder.id) + 2000 AS rid, 'cat_builder', id, descript FROM cat_builder
 UNION
