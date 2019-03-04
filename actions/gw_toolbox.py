@@ -151,10 +151,10 @@ class GwToolBox(ApiParent):
     def open_function(self, index):
         self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
-        alias_function = index.sibling(index.row(), 0).data()
+        self.alias_function = index.sibling(index.row(), 0).data()
 
         # Control no clickable items
-        if alias_function in self.no_clickable_items:
+        if self.alias_function in self.no_clickable_items:
             return
            
         self.dlg_functions = ApiFunctionTb()
@@ -170,7 +170,7 @@ class GwToolBox(ApiParent):
 
 
 
-        extras = '"filterText":"' + alias_function + '"'
+        extras = '"filterText":"' + self.alias_function + '"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
@@ -182,9 +182,9 @@ class GwToolBox(ApiParent):
         status = self.populate_functions_dlg(self.dlg_functions, complet_result[0]['body']['data'])
 
         if not status:
-            alias_function = index.sibling(index.row(), 1).data()
+            self.alias_function = index.sibling(index.row(), 1).data()
             msg = "Function not found"
-            self.controller.show_message(msg, parameter=alias_function)
+            self.controller.show_message(msg, parameter=self.alias_function)
             return
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
@@ -411,7 +411,7 @@ class GwToolBox(ApiParent):
         # if len(complet_result[0]['body']['data']['result']) == 0:
         #     self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
         #     return True
-        self.add_temp_layer(dialog, complet_result[0]['body']['data'])
+        self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
         dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         print(datetime.now())
@@ -435,7 +435,7 @@ class GwToolBox(ApiParent):
         # if len(complet_result[0]['body']['data']['result']) == 0:
         #     self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
         #     return True
-        self.add_temp_layer(dialog, complet_result[0]['body']['data'])
+        self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
         dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         return True
@@ -552,14 +552,15 @@ class GwToolBox(ApiParent):
 
 
 
-    def add_temp_layer(self, dialog, result):
-        self.delete_layer_from_toc('temp_result')
-
+    def add_temp_layer(self, dialog, result, function_name):
+        self.delete_layer_from_toc(function_name)
+        print(result)
         counter = len(result['result'])
         dialog.progressBar.setMaximum(counter+1)
         dialog.progressBar.setValue(0)
         srid = self.controller.plugin_settings_value('srid')
-        virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
+
+        virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', function_name, "memory")
         if counter > 0:
             if 'the_geom' in result['result'][0]:
                 the_geom = result['result'][0]['the_geom']
@@ -569,9 +570,9 @@ class GwToolBox(ApiParent):
                 geom_type = self.controller.get_row(sql, log_sql=False)
                 # create layer
                 if 'ST_LineString' in str(geom_type):
-                    virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
+                    virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', function_name, "memory")
                 elif 'ST_Point' in str(geom_type):
-                    virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', 'temp_result', "memory")
+                    virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', function_name, "memory")
 
         prov = virtual_layer.dataProvider()
 
@@ -604,8 +605,11 @@ class GwToolBox(ApiParent):
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer, False)
 
         root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup('Functions results')
 
-        root.insertLayer(0, virtual_layer)
+        if my_group is None:
+            my_group = root.insertGroup(0, 'Functions results')
+        my_group.insertLayer(0, virtual_layer)
 
 
     def add_table_from_pg(self, schema_name, table_name, field_id, group_to_be_inserted=None):
