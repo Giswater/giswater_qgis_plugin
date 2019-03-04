@@ -7,7 +7,7 @@
 
 31107-utils-existing views
 --------------------------
-
+Add descript to v_ext_streetaxis
 
 31107-utils-other
 -----------------
@@ -47,6 +47,7 @@ Editable link values of feature tables #622
 31107-ud-existing views
 -----------------------
 Bug fix on v_anl_flow_connec and hydrometer definition
+Redefinition of upstream/downstream views
 
 
 31107-ud-other
