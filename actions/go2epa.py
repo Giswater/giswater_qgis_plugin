@@ -52,12 +52,8 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
             
         # Check if user can use recursion or not
-        config = ConfigParser.ConfigParser()
-        ruta = self.plugin_dir + "/config/giswater.config"
-        self.controller.log_info(str(ruta))
-        config.read(ruta)
-        go2eparecurisve = config.get("system_variables", "go2eparecurisve")
-        if str(go2eparecurisve).lower() == "false":
+        go2eparecurisve = self.settings.value('system_variables/go2eparecurisve')
+        if str(go2eparecurisve) == "FALSE":
             self.dlg_go2epa.chk_recurrent.setVisible(False)
             self.dlg_go2epa.chk_recurrent.setChecked(False)
 
@@ -141,6 +137,8 @@ class Go2Epa(ApiParent):
                 self.dlg_go2epa.chk_export_subcatch.setEnabled(False)
                 self.dlg_go2epa.chk_exec.setEnabled(False)
                 self.dlg_go2epa.chk_import_result.setEnabled(False)
+            else:
+                utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, False)
 
 
     def check_fields(self):
@@ -487,7 +485,9 @@ class Go2Epa(ApiParent):
         elif self.project_type in 'ud':
             opener = self.plugin_dir + "/epa/ud_swmm50022.exe"
             epa_function_call = "gw_fct_pg2epa($$" + str(self.result_name) + "$$, " + str(prev_net_geom) + ", "+str(export_subcatch)+", "+str(is_recursive)+")"
+
         # export_function = "gw_fct_utils_csv2pg_export_epa_inp('" + str(self.result_name) + "')"
+        self.show_widgets(True)
         self.iterations = 1
         self.counter = 0
         if is_recursive:
@@ -499,11 +499,8 @@ class Go2Epa(ApiParent):
             utils_giswater.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.lbl_counter, "0/"+str(row[0]))
             self.iterations = int(str(row[0]))
 
-
-        self.show_widgets(True)
         print("{}:{}".format(self.counter, self.iterations))
         while self.counter < self.iterations:
-
             common_msg = ""
             # Export to inp file
             if export_inp is True:
@@ -540,8 +537,8 @@ class Go2Epa(ApiParent):
                     self.controller.show_warning(message, parameter="RPT file")
                     self.show_widgets(False)
                     return
-                # self.dlg_go2epa.progressBar.setMaximum(0)
-                # self.dlg_go2epa.progressBar.setMinimum(0)
+                self.dlg_go2epa.progressBar.setMaximum(0)
+                self.dlg_go2epa.progressBar.setMinimum(0)
                 self.dlg_go2epa.progressBar.setFormat("Epa software is running...")
                 self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
 

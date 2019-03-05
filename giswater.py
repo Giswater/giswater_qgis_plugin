@@ -1055,23 +1055,25 @@ class Giswater(QObject):
             return False
 
         elif row[0] > 0:
-            message = "Some layers of your role not found. Do you want to view them?"
-            answer = self.controller.ask_question(message, "Warning")
-            if answer:
-                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
-                       " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
-                rows = self.controller.get_rows(sql, log_sql=True)
-                if rows:
-                    self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
-                    self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
-                    self.dlg_audit_project.exec_()
-                    # Fill log file with the names of the layers
-                    message = "Layers of your role not found"
-                    self.controller.log_info(message)
-                    message = ""
-                    for row in rows:
-                        message += str(row["table_id"]) + "\n"
-                    self.controller.log_info(message)
+            show_msg = self.settings.value('system_variables/show_msg_layer')
+            if show_msg == 'TRUE':
+                message = "Some layers of your role not found. Do you want to view them?"
+                answer = self.controller.ask_question(message, "Warning")
+                if answer:
+                    sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                           " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
+                    rows = self.controller.get_rows(sql, log_sql=True)
+                    if rows:
+                        self.populate_table_by_query(self.dlg_audit_project.tbl_result, sql)
+                        self.dlg_audit_project.tbl_result.horizontalHeader().setResizeMode(0)
+                        self.dlg_audit_project.exec_()
+                        # Fill log file with the names of the layers
+                        message = "Layers of your role not found"
+                        self.controller.log_info(message)
+                        message = ""
+                        for row in rows:
+                            message += str(row["table_id"]) + "\n"
+                        self.controller.log_info(message)
             
         return True
 
@@ -1094,8 +1096,9 @@ class Giswater(QObject):
 
     def hide_actions(self):
         """ This function was created added in order to hide actions """
-        # Example to fill list_to hide: ['74', '75', '83']
-        list_to_hide = []
+        # Configure list_to_hide into file giswater.config -> [system_variables]-> action_to_hide in format n,n,n
+        # Example action_to_hide=19,74,75
+        list_to_hide = self.settings.value('system_variables/action_to_hide')
         if len(list_to_hide) > 0:
             action_list = self.iface.mainWindow().findChildren(QAction)
             for action in action_list:

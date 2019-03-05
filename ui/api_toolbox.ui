@@ -36,20 +36,6 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <widget class="QPushButton" name="btn_accept">
-        <property name="text">
-         <string>Accept</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_close">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item row="0" column="0">

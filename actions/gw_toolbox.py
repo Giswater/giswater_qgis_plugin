@@ -50,7 +50,7 @@ else:
 
 
 from qgis.core import QgsMapLayerRegistry, QgsProject, QgsPoint, QgsFeature, QgsGeometry, QgsDataSourceURI
-from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField
+from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField, QgsMarkerSymbolV2
 
 from collections import OrderedDict
 from datetime import datetime
@@ -239,12 +239,6 @@ class GwToolBox(ApiParent):
 
     def check_exist_function(self, func_name):
         status = False
-        sql = ("SELECT routines.routine_name, parameters.data_type, parameters.ordinal_position"
-               " FROM information_schema.routines "
-               " LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name "
-               " WHERE routines.specific_schema='ws_sample' AND routines.routine_name='gw_fct_anl_node_proximity' "
-               " ORDER BY routines.routine_name, parameters.ordinal_position;")
-
         sql = ("SELECT routines.routine_name FROM information_schema.routines"
                " WHERE routines.specific_schema='"+self.schema_name.replace('"', '')+"'"
                " AND routines.routine_name ='"+str(func_name)+"'"
@@ -256,7 +250,7 @@ class GwToolBox(ApiParent):
         return status
     def load_settings_values(self, dialog, function):
         """ Load QGIS settings related with csv options """
-        print(self.is_paramtetric)
+
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
 
@@ -451,6 +445,8 @@ class GwToolBox(ApiParent):
                     self.is_paramtetric = False
                     self.control_isparametric(dialog)
                     self.load_settings_values(dialog, function)
+                    # TODO cuando el campo is_parametric_msg este listo, quitar el construct_form_param_user y
+                    # TODO mostrar el mensage que llegue en un label, en el group box
                     self.construct_form_param_user(dialog, function, 0, self.function_list, False)
                     status = True
                     break
@@ -479,11 +475,11 @@ class GwToolBox(ApiParent):
         dialog.rbt_previous.setChecked(False)
         dialog.rbt_layer.setChecked(True)
         dialog.chk_save.setChecked(True)
+        dialog.chk_save.setEnabled(False)
 
-        dialog.lbl_input_layer.setEnabled(False)
         dialog.grb_parameters.setEnabled(False)
         dialog.grb_parameters.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-        #dialog.chk_save.setEnabled(True)
+
         dialog.txt_info.setReadOnly(True)
         dialog.txt_info.setStyleSheet("QWidget { background: rgb(255, 255, 255); color: rgb(10, 10, 10)}")
 
@@ -515,7 +511,7 @@ class GwToolBox(ApiParent):
             main_parent.setIcon(icon)
 
         for group, functions in result['fields'].items():
-            parent1 = QStandardItem('{}'.format(group))
+            parent1 = QStandardItem('{}   [{} GW_geoalgorithm]'.format(group, len(functions)))
             self.no_clickable_items.append('{}'.format(group))
             functions.sort(key=self.sort_list, reverse=False)
             for function in functions:
@@ -561,7 +557,8 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setValue(0)
         srid = self.controller.plugin_settings_value('srid')
 
-        virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', function_name, "memory")
+        virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', function_name, "memory")
+
         if counter > 0:
             if 'the_geom' in result['result'][0]:
                 the_geom = result['result'][0]['the_geom']
@@ -606,11 +603,13 @@ class GwToolBox(ApiParent):
         QgsMapLayerRegistry.instance().addMapLayer(virtual_layer, False)
 
         root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup('Functions results')
+        my_group = root.findGroup('GW Functions results')
 
         if my_group is None:
-            my_group = root.insertGroup(0, 'Functions results')
+            my_group = root.insertGroup(0, 'GW Functions results')
+
         my_group.insertLayer(0, virtual_layer)
+
 
 
     def add_table_from_pg(self, schema_name, table_name, field_id, group_to_be_inserted=None):

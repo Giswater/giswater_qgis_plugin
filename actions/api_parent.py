@@ -169,8 +169,11 @@ class ApiParent(ParentAction):
             self.save_settings(dlg)
             dlg.close()
 
-        except AttributeError:
+        except AttributeError as e:
+            print(type(e).__name__)
             pass
+        except Exception as e:
+            print(type(e).__name__)
 
             
     def check_expression(self, expr_filter, log_info=False):
@@ -1150,7 +1153,7 @@ class ApiParent(ParentAction):
             layout.addWidget(chk, int(field['layout_order']), 1)
 
         layout.addWidget(widget, int(field['layout_order']), 2)
-
+        layout.setColumnStretch(2, 1)
 
     def get_values_changed_param_user(self, dialog, chk, widget, field, list, value=None):
 
