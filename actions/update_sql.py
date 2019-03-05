@@ -218,11 +218,11 @@ class UpdateSQL(ParentAction):
 
     def btn_constrains_changed(self, button):
         lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
-        if button.text() == 'ON':
-            button.setText("OFF")
-            lbl_constrains_info.setText('(Constrains enabled)')
-        elif button.text() == 'OFF':
+        if button.text() == 'OFF':
             button.setText("ON")
+            lbl_constrains_info.setText('(Constrains enabled)')
+        elif button.text() == 'ON':
+            button.setText("OFF")
             lbl_constrains_info.setText('(Constrains dissabled)')
         return
     """ Declare all read sql process """
@@ -1489,10 +1489,10 @@ class UpdateSQL(ParentAction):
 
         # Enable/disable constrains
 
-        if self.btn_constrains.text() == 'ON':
+        if self.btn_constrains.text() == 'OFF':
             sql = 'SELECT ' + self.schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
             self.controller.execute_sql(sql)
-        elif self.btn_constrains.text() == 'OFF':
+        elif self.btn_constrains.text() == 'ON':
             sql = 'SELECT ' + self.schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
             self.controller.execute_sql(sql)
 
