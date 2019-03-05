@@ -151,6 +151,7 @@ BEGIN
 
             -- Arcs has different types
             ELSE
+                --INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (1, node_id_arg);
                 RETURN audit_function(2004,2112);
             END IF;
          
