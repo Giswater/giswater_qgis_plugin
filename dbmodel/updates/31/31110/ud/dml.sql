@@ -62,17 +62,6 @@ INSERT INTO audit_cat_param_user VALUES ('inp_report_controls', 'epaoptions', NU
 
 
 
-/*
-
--- example on 31107/utils/dml
-UPDATE audit_cat_param_user SET     WHERE parameter='arccat_vdefault', 'config', NULL, 'role_edit', NULL, 'Arc catalog:', 'SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL', NULL, true, 10, 2, 'ud', false, NULL, 'arccat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
-UPDATE audit_cat_param_user SET     WHERE parameter='nodecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Node catalog:', 'SELECT cat_node.id AS id, cat_node.id as idval FROM cat_node WHERE id IS NOT NULL', NULL, true, 10, 2, 'ud', false, NULL, 'nodecat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
-UPDATE audit_cat_param_user SET     WHERE parameter='connecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Connec catalog:', 'SELECT cat_connec.id AS id, cat_connec.id as idval FROM cat_connec WHERE id IS NOT NULL', NULL, true, 10, 3, 'ud', false, NULL, 'connecat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
-UPDATE audit_cat_param_user SET     WHERE parameter='gratecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Grate catalog:', 'SELECT id AS id, id AS idval FROM connec_type WHERE id IS NOT NULL', NULL, true, 10, 4, 'ud', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
-
-*/
-
-
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_divider';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_evap';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_orifice';
@@ -436,3 +425,15 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 '{"CFS":0, "GPM":0, "MGD":0, "CMS":1, "LPS":1000, "MLD":86.4}', 'json', 'Epa', 'Conversion factors of CRM flows in function of EPA units choosed by user');
 
 
+-- 2019/03/05
+
+-- INSERTS
+
+INSERT INTO audit_cat_param_user (id,formname,description,sys_role_id,qgis_message,label,dv_querytext,dv_parent_id,isenabled,layout_id,layout_order,project_type,isparent,dv_querytext_filterc,feature_field_id,feature_dv_parent_value,isautoupdate,datatype,widgettype,ismandatory,widgetcontrols,vdefault,layout_name,reg_exp) VALUES('gratecat_vdefault', 'config', NULL, 'role_edit', NULL, 'Grate catalog:', 'SELECT id AS id, id AS idval FROM connec_type WHERE id IS NOT NULL', NULL, true, 10, 4, 'ud', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL);
+
+-- UPDATES
+
+UPDATE audit_cat_param_user SET  label='Connec Type:', dv_querytext='SELECT id AS id, id AS idval FROM connec_type WHERE id IS NOT NULL', dv_parent_id=NULL, isenabled=true , layout_id=9 ,layout_order=3 , project_type='ud' ,isparent=false ,dv_querytext_filterc=NULL, feature_field_id='connecat_id', feature_dv_parent_value='', isautoupdate=false, datatype='string' , widgettype='combo', ismandatory=false , widgetcontrols=NULL , vdefault=NULL, layout_name=NULL, reg_exp=NULL WHERE id='connectype_vdefault';
+UPDATE audit_cat_param_user SET  label='Arc catalog:', formname='config', dv_querytext='SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL', dv_parent_id=NULL, isenabled=true , layout_id=10 ,layout_order=1 , project_type='ud' ,isparent=false ,dv_querytext_filterc=NULL, feature_field_id='arccat_id', feature_dv_parent_value='', isautoupdate=false, datatype='string' , widgettype='combo', ismandatory=false , widgetcontrols=NULL , vdefault=NULL, layout_name=NULL, reg_exp=NULL WHERE id='arccat_vdefault';
+UPDATE audit_cat_param_user SET  label='Node catalog:', formname='config', dv_querytext='SELECT cat_node.id AS id, cat_node.id as idval FROM cat_node WHERE id IS NOT NULL', dv_parent_id=NULL, isenabled=true , layout_id=10 ,layout_order=2 , project_type='ud' ,isparent=false ,dv_querytext_filterc=NULL, feature_field_id='nodecat_id', feature_dv_parent_value='', isautoupdate=false, datatype='string' , widgettype='combo', ismandatory=false , widgetcontrols=NULL , vdefault=NULL, layout_name=NULL, reg_exp=NULL WHERE id='nodecat_vdefault';
+UPDATE audit_cat_param_user SET  label='Connec catalog:', formname='config', dv_querytext='SELECT cat_connec.id AS id, cat_connec.id as idval FROM cat_connec WHERE id IS NOT NULL', dv_parent_id=NULL, isenabled=true , layout_id=10 ,layout_order=3 , project_type='ud' ,isparent=false ,dv_querytext_filterc=NULL, feature_field_id='connecat_id', feature_dv_parent_value='', isautoupdate=false, datatype='string' , widgettype='combo', ismandatory=false , widgetcontrols=NULL , vdefault=NULL, layout_name=NULL, reg_exp=NULL WHERE id='connecat_vdefault';
