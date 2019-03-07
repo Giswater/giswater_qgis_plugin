@@ -2536,3 +2536,171 @@ man_netelement.serial_number
 FROM v_node
   JOIN man_netelement ON man_netelement.node_id = v_node.node_id;
 
+
+CREATE OR REPLACE VIEW vu_node AS 
+ SELECT node.node_id,
+    node.code,
+    node.top_elev,
+    node.custom_top_elev,
+        CASE
+            WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
+            ELSE node.top_elev
+        END AS sys_top_elev,
+    node.ymax,
+    node.custom_ymax,
+        CASE
+            WHEN node.custom_ymax IS NOT NULL THEN node.custom_ymax
+            ELSE node.ymax
+        END AS sys_ymax,
+    node.elev,
+    node.custom_elev,
+        CASE
+            WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
+            WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
+            ELSE NULL::numeric(12,3)
+        END AS sys_elev,
+    node.node_type,
+    node_type.type AS sys_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    node.epa_type,
+    node.sector_id,
+    sector.macrosector_id,
+    node.state,
+    node.state_type,
+    node.annotation,
+    node.observ,
+    node.comment,
+    node.dma_id,
+    node.soilcat_id,
+    node.function_type,
+    node.category_type,
+    node.fluid_type,
+    node.location_type,
+    node.workcat_id,
+    node.workcat_id_end,
+    node.buildercat_id,
+    node.builtdate,
+    node.enddate,
+    node.ownercat_id,
+    node.muni_id,
+    node.postcode,
+    node.streetaxis_id,
+    node.postnumber,
+    node.postcomplement,
+    node.postcomplement2,
+    node.streetaxis2_id,
+    node.postnumber2,
+    node.descript,
+    cat_node.svg,
+    node.rotation,
+    concat(node_type.link_path, node.link) AS link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x,
+    node.label_y,
+    node.label_rotation,
+    node.publish,
+    node.inventory,
+    node.uncertain,
+    node.xyz_date,
+    node.unconnected,
+    dma.macrodma_id,
+    node.expl_id,
+    node.num_value
+   FROM node
+     LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+     LEFT JOIN node_type ON node_type.id::text = node.node_type::text
+     LEFT JOIN dma ON node.dma_id = dma.dma_id
+     LEFT JOIN sector ON node.sector_id = sector.sector_id;
+
+
+
+CREATE OR REPLACE VIEW v_arc_x_node AS 
+ SELECT v_arc.arc_id,
+    v_arc.code,
+    v_arc.node_1,
+    v_arc.y1,
+    v_arc.custom_y1,
+    v_arc.elev1,
+    v_arc.custom_elev1,
+    v_arc.sys_elev1,
+    a.sys_top_elev - v_arc.sys_elev1 AS sys_y1,
+    a.sys_top_elev - v_arc.sys_elev1 - v_arc.geom1 AS r1,
+       CASE
+            WHEN a.sys_elev IS NOT NULL THEN (v_arc.sys_elev1 - a.sys_elev)
+            ELSE  (v_arc.sys_elev1 -(a.sys_top_elev - a.sys_ymax))::numeric(12,3)
+        END AS z1,
+    v_arc.node_2,
+    v_arc.y2,
+    v_arc.custom_y2,
+    v_arc.elev2,
+    v_arc.custom_elev2,
+    v_arc.sys_elev2,
+    b.sys_top_elev - v_arc.sys_elev2 AS sys_y2,
+    b.sys_top_elev - v_arc.sys_elev2 - v_arc.geom1 AS r2,
+        CASE
+            WHEN b.sys_elev IS NOT NULL THEN (v_arc.sys_elev2 - b.sys_elev)
+            ELSE  (v_arc.sys_elev2 -(b.sys_top_elev - b.sys_ymax))::numeric(12,3)
+        END AS z2,
+    v_arc.sys_slope AS slope,
+    v_arc.arc_type,
+    arc_type.type AS sys_type,
+    v_arc.arccat_id,
+    v_arc.matcat_id,
+    v_arc.shape,
+    v_arc.geom1,
+    v_arc.geom2,
+    v_arc.width,
+    v_arc.epa_type,
+    v_arc.sector_id,
+    sector.macrosector_id,
+    v_arc.state,
+    v_arc.state_type,
+    v_arc.annotation,
+    v_arc.custom_length,
+    v_arc.gis_length,
+    v_arc.observ,
+    v_arc.comment,
+    v_arc.inverted_slope,
+    v_arc.dma_id,
+    dma.macrodma_id,
+    v_arc.soilcat_id,
+    v_arc.function_type,
+    v_arc.category_type,
+    v_arc.fluid_type,
+    v_arc.location_type,
+    v_arc.workcat_id,
+    v_arc.workcat_id_end,
+    v_arc.buildercat_id,
+    v_arc.builtdate,
+    v_arc.enddate,
+    v_arc.ownercat_id,
+    v_arc.muni_id,
+    v_arc.postcode,
+    v_arc.streetaxis_id,
+    v_arc.postnumber,
+    v_arc.postcomplement,
+    v_arc.postcomplement2,
+    v_arc.streetaxis2_id,
+    v_arc.postnumber2,
+    v_arc.descript,
+    concat(arc_type.link_path, v_arc.link) AS link,
+    v_arc.verified,
+    v_arc.the_geom,
+    v_arc.undelete,
+    v_arc.label_x,
+    v_arc.label_y,
+    v_arc.label_rotation,
+    v_arc.publish,
+    v_arc.inventory,
+    v_arc.uncertain,
+    v_arc.expl_id,
+    v_arc.num_value
+   FROM v_arc
+     JOIN sector ON sector.sector_id = v_arc.sector_id
+     JOIN arc_type ON v_arc.arc_type::text = arc_type.id::text
+     JOIN dma ON v_arc.dma_id = dma.dma_id
+     LEFT JOIN vu_node a ON a.node_id::text = v_arc.node_1::text
+     LEFT JOIN vu_node b ON b.node_id::text = v_arc.node_2::text;

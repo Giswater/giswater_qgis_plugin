@@ -48,7 +48,7 @@ Editable link values of feature tables #622
 -----------------------
 Bug fix on v_anl_flow_connec and hydrometer definition
 Redefinition of upstream/downstream views
-
+Bug fix on sys_elev calculation in nodes and r1,r2 in arcs
 
 31107-ud-other
 ---------------
