@@ -25,7 +25,8 @@ from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
 
 from snapping_utils import SnappingConfigManager
 
-import ctypes
+if 'nt' in sys.builtin_module_names:
+    import ctypes
 import os
 import sys
 
@@ -232,11 +233,9 @@ class ParentMapTool(QgsMapTool):
         except AttributeError:
             pass
 
+
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
-        screens = ctypes.windll.user32
-        screen_x = screens.GetSystemMetrics(78)
-        screen_y = screens.GetSystemMetrics(79)
 
         if dialog is None:
             dialog = self.dlg
@@ -250,6 +249,9 @@ class ParentMapTool(QgsMapTool):
             if int(x) < 0 or int(y) < 0:
                 dialog.resize(int(width), int(height))
             else:
+                screens = ctypes.windll.user32
+                screen_x = screens.GetSystemMetrics(78)
+                screen_y = screens.GetSystemMetrics(79)
                 if int(x) > screen_x:
                     x = int(screen_x) - int(width)
                 if int(y) > screen_y:

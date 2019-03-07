@@ -7,7 +7,9 @@ from PyQt4.QtSql import QSqlTableModel
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 
 from functools import partial
-import ctypes
+if 'nt' in sys.builtin_module_names:
+    import ctypes
+
 import operator
 import os
 import csv
@@ -1421,12 +1423,10 @@ class SearchPlus(QObject):
         for column in columns_to_delete:
             widget.hideColumn(column)
 
+            
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
-        screens = ctypes.windll.user32
-        screen_x = screens.GetSystemMetrics(78)
-        screen_y = screens.GetSystemMetrics(79)
-
+        
         if dialog is None:
             dialog = self.dlg
 
@@ -1439,6 +1439,9 @@ class SearchPlus(QObject):
             if int(x) < 0 or int(y) < 0:
                 dialog.resize(int(width), int(height))
             else:
+                screens = ctypes.windll.user32
+                screen_x = screens.GetSystemMetrics(78)
+                screen_y = screens.GetSystemMetrics(79)                
                 if int(x) > screen_x:
                     x = int(screen_x) - int(width)
                 if int(y) > screen_y:
