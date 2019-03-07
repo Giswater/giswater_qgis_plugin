@@ -14,11 +14,11 @@ from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
 
+import sys
 import ConfigParser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 import os
-import sys
 import utils_giswater
 import webbrowser
 

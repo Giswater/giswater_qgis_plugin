@@ -23,10 +23,10 @@ from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from functools import partial
 from datetime import datetime
 
+import sys  
 if 'nt' in sys.builtin_module_names:
     import ctypes
 import os
-import sys  
 import urlparse
 import webbrowser
 import subprocess
