@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 # -*- coding: utf-8 -*-
 import logging
 import inspect
@@ -5,7 +7,7 @@ import os
 import time
 
 
-class Logger():
+class Logger(object):
     
     def __init__(self, controller, log_name, log_level, log_suffix, 
                  folder_has_tstamp=False, file_has_tstamp=True, remove_previous=False): 

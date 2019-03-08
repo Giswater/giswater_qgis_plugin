@@ -4,10 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QDate
-from PyQt4.QtGui import QStandardItem, QStandardItemModel, QDateEdit, QFileDialog, QCheckBox, QDoubleSpinBox
+from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
+from qgis.PyQt.QtWidgets import QDateEdit, QFileDialog, QCheckBox, QDoubleSpinBox
 
 import os
 import csv
@@ -254,7 +257,7 @@ class Utils(ParentAction):
         """ Populate combo with full list of codes """
 
         unicode_list = []
-        for item in aliases.items():
+        for item in list(aliases.items()):
             unicode_list.append(str(item[0]))
             sorted_list = sorted(unicode_list, key=str.lower)
         utils_giswater.set_autocompleter(combo, sorted_list)
@@ -480,7 +483,7 @@ class Utils(ParentAction):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select CSV file")
-        file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
+        file_csv, __ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
         self.dlg_csv.txt_file_csv.setText(file_csv)
         self.save_settings_values()
         self.preview_csv(self.dlg_csv)

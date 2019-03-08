@@ -17,6 +17,7 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
+from __future__ import absolute_import
 
 import os
 import sys
@@ -30,5 +31,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
-    from giswater import Giswater
+    from .giswater import Giswater
     return Giswater(iface)

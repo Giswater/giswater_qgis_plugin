@@ -4,9 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
+from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QComboBox
 from qgis.core import QgsExpression, QgsFeatureRequest
 
 from functools import partial
@@ -182,7 +184,7 @@ class ManArcDialog(ParentDialog):
             return
 
         # List of nodes from node_type_cat_type - nodes which we are using
-        for feature_cat in self.feature_cat.itervalues():
+        for feature_cat in self.feature_cat.values():
             if feature_cat.type == 'NODE':
                 layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 if layer:

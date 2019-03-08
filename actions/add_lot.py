@@ -5,6 +5,8 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import range
 
 
 try:
@@ -15,16 +17,17 @@ except:
 import os
 import re
 
-from PyQt4.QtCore import QDate, Qt, QPyNullVariant
-from PyQt4.QtGui import QCompleter, QLineEdit, QTableView, QStringListModel, QComboBox, QAction, QAbstractItemView
-from PyQt4.QtGui import QCheckBox, QHBoxLayout, QStandardItem, QStandardItemModel, QWidget, QColor
+from qgis.PyQt.QtCore import QDate, Qt, QPyNullVariant
+from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QAction, QAbstractItemView
+from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget
+from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QColor
 
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsRubberBand
 
 from functools import partial
 
-from PyQt4.QtGui import QToolButton
+from qgis.PyQt.QtWidgets import QToolButton
 from PyQt4.QtSql import QSqlTableModel
 
 import utils_giswater
@@ -680,7 +683,7 @@ class AddNewLot(ParentManage):
         keys = ""
         values = ""
         update = ""
-        for key, value in lot.items():
+        for key, value in list(lot.items()):
             if value != '':
                 keys += ""+key+", "
                 if type(value) in (int, bool):
@@ -713,7 +716,7 @@ class AddNewLot(ParentManage):
         for item in model_rows:
             keys = "lot_id, "
             values = "$$"+str(lot_id)+"$$, "
-            for key, value in item.items():
+            for key, value in list(item.items()):
                 if key != 'lot_id':
                     if value not in('', None) and type(value) != QPyNullVariant:
                         keys += ""+key+", "

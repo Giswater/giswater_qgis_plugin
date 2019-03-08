@@ -1,13 +1,14 @@
+from builtins import str
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint
 from qgis.core import QgsProject, QgsSingleSymbolRendererV2, QgsMarkerSymbolV2, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QDoubleValidator
+from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtGui import QDoubleValidator
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ui_manager import Cad_add_point
+from .ui_manager import Cad_add_point
 from functools import partial
 
 

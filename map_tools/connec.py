@@ -16,11 +16,12 @@
  ***************************************************************************/
 
 """
+from builtins import str
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QGis
-from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication
+from qgis.PyQt.QtCore import QPoint, QRect, Qt
+from qgis.PyQt.QtWidgets import QApplication
 
 from map_tools.parent import ParentMapTool
 

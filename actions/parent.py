@@ -4,17 +4,23 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle, QgsMapLayerRegistry
-from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon, QApplication, QCursor, QPixmap, QCompleter
-from PyQt4.QtGui import QStringListModel, QAction
+from qgis.PyQt.QtCore import Qt, QSettings
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter
+from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
+from qgis.PyQt.QtWidgets import QAction
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
 
-import ConfigParser
+import configparser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 import os
@@ -65,7 +71,7 @@ class ParentAction(object):
             self.controller.show_warning(message, parameter=metadata_file)
             return None
           
-        metadata = ConfigParser.ConfigParser()
+        metadata = configparser.ConfigParser()
         metadata.read(metadata_file)
         plugin_version = metadata.get('general', 'version')
         if plugin_version is None:
@@ -201,7 +207,7 @@ class ParentAction(object):
         self.controller.start_program(program)               
         
         # Compare Java and Plugin versions
-        if self.plugin_version <> self.giswater_build_version:
+        if self.plugin_version != self.giswater_build_version:
             msg = ("Giswater and plugin versions are different. "
                    "Giswater version: " + self.giswater_build_version + ""
                    " - Plugin version: " + self.plugin_version)
@@ -833,7 +839,7 @@ class ParentAction(object):
     def delete_layer_from_toc(self, layer_name):
         """ Delete layer from toc if exist """
         layer = None
-        for lyr in QgsMapLayerRegistry.instance().mapLayers().values():
+        for lyr in list(QgsMapLayerRegistry.instance().mapLayers().values()):
             if lyr.name() == layer_name:
                 layer = lyr
                 break

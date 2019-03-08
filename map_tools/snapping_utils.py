@@ -15,13 +15,14 @@
  *                                                                         *
  ***************************************************************************/
 """
+from builtins import object
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsProject
 from qgis.gui import QgsMapCanvasSnapper
 
 
-class SnappingConfigManager():
+class SnappingConfigManager(object):
 
     def __init__(self, iface):
         """ Class constructor """

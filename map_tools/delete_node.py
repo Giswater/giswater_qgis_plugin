@@ -16,15 +16,17 @@
  ***************************************************************************/
 
 """
+from builtins import str
+from builtins import next
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest
-from PyQt4.QtCore import QPoint, Qt, QDate
+from qgis.PyQt.QtCore import QPoint, Qt, QDate
 
 import utils_giswater
 from functools import partial
 from map_tools.parent import ParentMapTool
-from ui_manager import ArcFusion
+from .ui_manager import ArcFusion
 
 
 class DeleteNodeMapTool(ParentMapTool):

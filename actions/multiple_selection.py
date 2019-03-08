@@ -4,12 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import next
+from builtins import range
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle, QGis
 from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand
-from PyQt4.QtCore import Qt, pyqtSignal, QPoint
-from PyQt4.QtGui import QApplication, QColor
+from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
+from qgis.PyQt.QtWidgets import QApplication
+from qgis.PyQt.QtGui import QColor
 
 
 class MultipleSelection(QgsMapTool):

@@ -4,11 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import str
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView,QLabel
-from PyQt4.QtGui import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand, QPixmap
-from PyQt4.QtCore import QSettings, Qt
+from qgis.PyQt.QtWidgets import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit, QPushButton, QTableView, QLabel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtCore import QSettings, Qt
 
 import os
 import sys

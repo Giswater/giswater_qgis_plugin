@@ -4,9 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from builtins import str
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLineEdit, QComboBox
+from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QLineEdit, QComboBox
 
 from functools import partial
 

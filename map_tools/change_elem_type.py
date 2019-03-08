@@ -4,17 +4,19 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from builtins import next
+from builtins import str
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest
-from PyQt4.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import QPoint, Qt
 
 from functools import partial
 
 import utils_giswater
-from ui_manager import ChangeNodeType
-from ui_manager import UDcatalog
-from ui_manager import WScatalog
+from .ui_manager import ChangeNodeType
+from .ui_manager import UDcatalog
+from .ui_manager import WScatalog
 from map_tools.parent import ParentMapTool
 
 

@@ -5,10 +5,12 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import range
 
-from PyQt4.QtCore import Qt, QDate, pyqtSignal, QObject
-from PyQt4.QtGui import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView, QStringListModel
-from PyQt4.QtGui import QTextEdit, QPushButton, QComboBox, QTabWidget
+from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject
+from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView
+from qgis.PyQt.QtWidgets import QTextEdit, QPushButton, QComboBox, QTabWidget
 import os
 import sys
 import subprocess

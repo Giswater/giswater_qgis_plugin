@@ -1,7 +1,8 @@
+from builtins import object
 # -*- coding: utf-8 -*-
 
 
-class ManAddfieldsParameter():
+class ManAddfieldsParameter(object):
     """ Class to serialize table 'man_addfields_parameter' """
     
     def __init__(self, row):

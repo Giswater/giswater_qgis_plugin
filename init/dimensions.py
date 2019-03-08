@@ -4,9 +4,12 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import next
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QLineEdit, QColor
-from PyQt4.QtCore import QObject, QTimer, QPoint, SIGNAL
+from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtCore import QObject, QTimer, QPoint
 from qgis.core import QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapCanvasSnapper, QgsVertexMarker
 
@@ -73,7 +76,7 @@ class Dimensions(ParentDialog):
     def orientation(self):
         
         # Disconnect previous snapping
-        QObject.disconnect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_snapping)
+        self.emit_point.canvasClicked.disconnect(self.click_button_snapping)
         self.emit_point.canvasClicked.connect(self.click_button_orientation)
 
 
@@ -81,9 +84,9 @@ class Dimensions(ParentDialog):
                    
         # Set active layer and set signals
         self.iface.setActiveLayer(self.layer_node)
-        QObject.disconnect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_orientation)
+        self.emit_point.canvasClicked.disconnect(self.click_button_orientation)
         self.canvas.xyCoordinates.connect(self.mouse_move)
-        QObject.connect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_snapping)
+        self.emit_point.canvasClicked.connect(self.click_button_snapping)
 
 
     def mouse_move(self, p):

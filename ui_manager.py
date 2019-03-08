@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt4 import QtGui, uic, QtCore
-from PyQt4.QtGui import QMainWindow
+from qgis.PyQt import QtGui, uic, QtCore
+from qgis.PyQt.QtWidgets import QMainWindow
 import os
 
 

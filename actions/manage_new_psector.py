@@ -4,15 +4,18 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 import subprocess
 
 from qgis.core import QgsComposition,  QgsRectangle, QgsPoint
-from PyQt4.QtGui import QAbstractItemView, QDoubleValidator,QIntValidator, QTableView, QKeySequence, QCompleter
-from PyQt4.QtGui import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel, QStringListModel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
+from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
-from PyQt4.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 
 import os
 import sys

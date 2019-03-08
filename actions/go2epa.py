@@ -4,20 +4,25 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 
 
-from PyQt4.QtCore import QObject
-from PyQt4.QtCore import QTime, QDate, Qt, QThread, SIGNAL
-from PyQt4.QtGui import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QStringListModel
-from PyQt4.QtGui import QCompleter, QFileDialog
+from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QTime, QDate, Qt, QThread
+from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
+from qgis.PyQt.QtWidgets import QCompleter, QFileDialog
 
 import csv, os, re, subprocess, sys, time, threading
-import ConfigParser
+import configparser
 from functools import partial
 
-from PyQt4.QtGui import QMessageBox
+from qgis.PyQt.QtWidgets import QMessageBox
 
 import utils_giswater
 from giswater.actions.api_go2epa_options import Go2EpaOptions

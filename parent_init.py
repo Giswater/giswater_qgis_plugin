@@ -4,6 +4,12 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
@@ -11,12 +17,14 @@ from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, Qg
 from qgis.utils import iface
 
 from PyQt4.Qt import QDate, QDateTime
-from PyQt4.QtCore import QSettings, Qt, QPoint, QUrl
-from PyQt4.QtGui import QLabel,QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
-from PyQt4.QtGui import QAction, QAbstractItemView, QCompleter, QStringListModel, QIntValidator, QDoubleValidator, QCheckBox, QColor, QFormLayout
-from PyQt4.QtGui import QTableView, QPushButton, QLineEdit, QIcon, QWidget, QDialog, QTextEdit
+from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QUrl
+from qgis.PyQt.QtWidgets import QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
+from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCompleter, QCheckBox, QFormLayout
+from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor
+from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QWidget, QDialog, QTextEdit
+from qgis.PyQt.QtGui import QIcon
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from PyQt4.QtWebKit import QWebView, QWebSettings
+from qgis.PyQt.QtWebKitWidgets import QWebView
 from functools import partial
 from datetime import datetime
 
@@ -24,25 +32,25 @@ if 'nt' in sys.builtin_module_names:
     import ctypes
 import os
 import sys  
-import urlparse
+import urllib.parse
 import webbrowser
 import subprocess
 
-import utils_giswater
-from dao.controller import DaoController
-from ui_manager import AddSum
-from ui_manager import CFWScatalog
-from ui_manager import CFUDcatalog
-from ui_manager import LoadDocuments
-from ui_manager import EventFull
-from ui_manager import AddPicture
-from actions.manage_document import ManageDocument
-from actions.manage_element import ManageElement
-from actions.manage_gallery import ManageGallery
-from models.sys_feature_cat import SysFeatureCat
-from models.man_addfields_parameter import ManAddfieldsParameter
-from map_tools.snapping_utils import SnappingConfigManager
-from actions.manage_visit import ManageVisit
+from . import utils_giswater
+from .dao.controller import DaoController
+from .ui_manager import AddSum
+from .ui_manager import CFWScatalog
+from .ui_manager import CFUDcatalog
+from .ui_manager import LoadDocuments
+from .ui_manager import EventFull
+from .ui_manager import AddPicture
+from .actions.manage_document import ManageDocument
+from .actions.manage_element import ManageElement
+from .actions.manage_gallery import ManageGallery
+from .models.sys_feature_cat import SysFeatureCat
+from .models.man_addfields_parameter import ManAddfieldsParameter
+from .map_tools.snapping_utils import SnappingConfigManager
+from .actions.manage_visit import ManageVisit
 
 
 class ParentDialog(QDialog):
@@ -1018,7 +1026,7 @@ class ParentDialog(QDialog):
             path = str(row[0])
 
             # Parse a URL into components
-            url = urlparse.urlsplit(path)
+            url = urllib.parse.urlsplit(path)
 
             # Open selected document
             # Check if path is URL
@@ -1067,7 +1075,7 @@ class ParentDialog(QDialog):
         path = str(row[0])
 
         # Parse a URL into components
-        url = urlparse.urlsplit(path)
+        url = urllib.parse.urlsplit(path)
 
         # Open selected document
         # Check if path is URL
@@ -1733,7 +1741,7 @@ class ParentDialog(QDialog):
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
             if uri_table is not None:
-                if uri_table in self.feature_cat.keys():
+                if uri_table in list(self.feature_cat.keys()):
                     elem = self.feature_cat[uri_table]
                     elem.layername = cur_layer.name()
 
@@ -1960,7 +1968,7 @@ class ParentDialog(QDialog):
 
         # Iterate over all widgets and execute one insert per widget
         # Abort process if any mandatory field is not set        
-        for parameter_id, parameter in self.parameters.iteritems():
+        for parameter_id, parameter in self.parameters.items():
             widget = parameter.widget
             if type(widget) is QDateEdit or type(widget) is QDateTimeEdit or type(widget) is QgsDateTimeEdit:
                 value_param = utils_giswater.getCalendarDate(self.dialog, widget, 'dd/MM/yyyy', 'dd/MM/yyyy hh:mm:ss')
@@ -2046,7 +2054,7 @@ class ParentDialog(QDialog):
             return None
             
         # Iterate over all dictionary
-        for feature_cat in self.feature_cat.itervalues():           
+        for feature_cat in self.feature_cat.values():           
             if sys_feature_cat_id == feature_cat.id:
                 layer = self.controller.get_layer_by_layername(feature_cat.layername)
                 return layer
@@ -2413,7 +2421,7 @@ class ParentDialog(QDialog):
             return
         
         # Get field_id from model 'sys_feature_cat'       
-        if tablename not in self.feature_cat.keys():
+        if tablename not in list(self.feature_cat.keys()):
             return 
                          
         field_id = self.feature_cat[tablename].type.lower() + "_id"      

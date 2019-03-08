@@ -6,9 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QDate, QRegExp
-from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit
-from PyQt4.QtGui import QGridLayout, QWidget, QLabel, QRegExpValidator
+from qgis.PyQt.QtCore import QDate, QRegExp
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit
+from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
 
 import csv
 import json

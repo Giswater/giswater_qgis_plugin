@@ -4,11 +4,14 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from builtins import next
+from builtins import str
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
-from PyQt4.QtGui import QMessageBox
-from PyQt4.QtCore import QPoint, Qt, SIGNAL
+from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
 

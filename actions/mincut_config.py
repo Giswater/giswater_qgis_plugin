@@ -4,10 +4,12 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt, QDate
-from PyQt4.QtGui import QTableView, QMenu, QPushButton, QLineEdit, QStringListModel, QCompleter, QAbstractItemView
+from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial

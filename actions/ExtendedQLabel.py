@@ -1,5 +1,5 @@
-from PyQt4.QtGui import QLabel
-from PyQt4.QtCore import pyqtSignal
+from qgis.PyQt.QtWidgets import QLabel
+from qgis.PyQt.QtCore import pyqtSignal
  
  
 class ExtendedQLabel(QLabel):

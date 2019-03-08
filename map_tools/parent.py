@@ -16,14 +16,16 @@
  ***************************************************************************/
 
 """
+from __future__ import absolute_import
+from builtins import str
 
 # -*- coding: utf-8 -*-
 from qgis.core import QGis, QgsPoint, QgsExpression
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
-from PyQt4.QtCore import Qt, QPoint
-from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
+from qgis.PyQt.QtCore import Qt, QPoint
+from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
 
-from snapping_utils import SnappingConfigManager
+from .snapping_utils import SnappingConfigManager
 
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -181,9 +183,9 @@ class ParentMapTool(QgsMapTool):
     def remove_markers(self):
         """ Remove previous markers """
              
-        vertex_items = [i for i in self.canvas.scene().items() if issubclass(type(i), QgsVertexMarker)]
+        vertex_items = [i for i in list(self.canvas.scene().items()) if issubclass(type(i), QgsVertexMarker)]
         for ver in vertex_items:
-            if ver in self.canvas.scene().items():
+            if ver in list(self.canvas.scene().items()):
                 self.canvas.scene().removeItem(ver)
         
 

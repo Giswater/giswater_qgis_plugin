@@ -1,10 +1,13 @@
+from builtins import str
+from builtins import range
 # -*- coding: utf-8 -*-
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
-from PyQt4 import uic
-from PyQt4.QtCore import QObject, QPyNullVariant, Qt
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QObject, QPyNullVariant, Qt
 from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
+from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
+from qgis.PyQt.QtCore import QSortFilterProxyModel
 
 from functools import partial
 if 'nt' in sys.builtin_module_names:
@@ -432,7 +435,7 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        for value in self.feature_cat.itervalues():
+        for value in self.feature_cat.values():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
@@ -979,7 +982,7 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        for value in self.feature_cat.itervalues():
+        for value in self.feature_cat.values():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:

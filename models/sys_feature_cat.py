@@ -1,7 +1,8 @@
+from builtins import object
 # -*- coding: utf-8 -*-
 
 
-class SysFeatureCat():
+class SysFeatureCat(object):
     """ Class to serialize table 'sys_feature_cat' """
     
     def __init__(self, id_, type_, orderby, tablename, shortcut_key, layername=None):

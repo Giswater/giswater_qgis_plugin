@@ -4,6 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from __future__ import print_function
+from builtins import next
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 try:

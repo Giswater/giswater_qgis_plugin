@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 
@@ -11,10 +13,11 @@ or (at your option) any later version.
 from qgis.core import QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper,QgsVertexMarker
 from PyQt4.Qt import QDate
-from PyQt4.QtGui import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
-from PyQt4.QtGui import QColor, QCompleter, QStringListModel, QAbstractItemView
+from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtCore import Qt, QPoint, SIGNAL
+from qgis.PyQt.QtCore import Qt, QPoint
 
 from functools import partial
 

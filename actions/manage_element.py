@@ -4,11 +4,12 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import str
 
 # -*- coding: utf-8 -*-    
 from functools import partial
 
-from PyQt4.QtGui import QAbstractItemView, QTableView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 
 import utils_giswater
 from giswater.ui_manager import AddElement                

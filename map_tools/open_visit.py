@@ -16,12 +16,13 @@
  ***************************************************************************/
 
 """
+from builtins import next
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QAction
-from PyQt4.QtGui import QCursor
+from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtGui import QCursor
 from qgis.core import QgsPoint, QgsFeatureRequest
-from PyQt4.QtCore import QPoint, Qt, QDate
+from qgis.PyQt.QtCore import QPoint, Qt, QDate
 
 from map_tools.parent import ParentMapTool
 

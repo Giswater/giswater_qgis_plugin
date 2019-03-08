@@ -4,11 +4,14 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from builtins import str
+from builtins import range
+from builtins import object
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
-from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
-from PyQt4.QtSql import QSqlDatabase
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
+from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
+from qgis.PyQt.QtSql import QSqlDatabase
 from PyQt4.Qt import QToolBox
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QgsDataSourceURI, QgsCredentials
 
@@ -20,7 +23,7 @@ from giswater.dao.pg_dao import PgDao
 from giswater.dao.logger import Logger
 
 
-class DaoController():
+class DaoController(object):
     
     def __init__(self, settings, plugin_name, iface, logger_name='plugin', create_logger=True):
         """ Class constructor """
@@ -107,7 +110,7 @@ class DaoController():
         
     def check_actions(self, check=True):
         """ Utility to check/uncheck all actions """
-        for action_index, action in self.actions.iteritems():   #@UnusedVariable
+        for action_index, action in self.actions.items():   #@UnusedVariable
             action.setChecked(check)    
                     
                            
@@ -749,27 +752,27 @@ class DaoController():
         pos_password = uri.find(' password=')
         pos_sslmode = uri.find(' sslmode=')        
         pos_key = uri.find(' key=')        
-        if pos_db <> -1 and pos_host <> -1:
+        if pos_db != -1 and pos_host != -1:
             uri_db = uri[pos_db + 8:pos_host - 1]
             layer_source['db'] = uri_db     
-        if pos_host <> -1 and pos_port <> -1:
+        if pos_host != -1 and pos_port != -1:
             uri_host = uri[pos_host + 6:pos_port]     
             layer_source['host'] = uri_host     
-        if pos_port <> -1:
-            if pos_user <> -1:
+        if pos_port != -1:
+            if pos_user != -1:
                 pos_end = pos_user
-            elif pos_sslmode <> -1:
+            elif pos_sslmode != -1:
                 pos_end = pos_sslmode
-            elif pos_key <> -1:
+            elif pos_key != -1:
                 pos_end = pos_key
             else:
                 pos_end = pos_port + 10
             uri_port = uri[pos_port + 6:pos_end]     
             layer_source['port'] = uri_port               
-        if pos_user <> -1 and pos_password <> -1:
+        if pos_user != -1 and pos_password != -1:
             uri_user = uri[pos_user + 7:pos_password - 1]
             layer_source['user'] = uri_user     
-        if pos_password <> -1 and pos_sslmode <> -1:
+        if pos_password != -1 and pos_sslmode != -1:
             uri_password = uri[pos_password + 11:pos_sslmode - 1]     
             layer_source['password'] = uri_password                     
          
@@ -777,7 +780,7 @@ class DaoController():
         pos_table = uri.find('table=')
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
-        if pos_table <> -1 and pos_fi <> -1:
+        if pos_table != -1 and pos_fi != -1:
             uri_schema = uri[pos_table + 6:pos_end_schema]
             uri_table = uri[pos_end_schema + 2:pos_fi]
             layer_source['schema'] = uri_schema            
@@ -797,7 +800,7 @@ class DaoController():
         pos_ini = uri.find('table=')
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
-        if pos_ini <> -1 and pos_fi <> -1:
+        if pos_ini != -1 and pos_fi != -1:
             uri_table = uri[pos_end_schema+2:pos_fi]
 
         return uri_table    
@@ -814,7 +817,7 @@ class DaoController():
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('key=')
         pos_end = uri.rfind('srid=')
-        if pos_ini <> -1:
+        if pos_ini != -1:
             uri_pk = uri[pos_ini + 5:pos_end-2]
 
         return uri_pk

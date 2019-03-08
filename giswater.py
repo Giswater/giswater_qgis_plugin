@@ -4,43 +4,47 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpressionContextUtils, QgsProject
-from PyQt4.QtCore import QObject, QSettings, Qt
-from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu, QApplication, QAbstractItemView, QToolButton
+from qgis.PyQt.QtCore import QObject, QSettings, Qt
+from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton
+from qgis.PyQt.QtGui import QIcon
 from PyQt4.QtSql import QSqlQueryModel
 import os.path
 import sys  
 from functools import partial
 
 
-from actions.basic import Basic
-from actions.edit import Edit
-from actions.go2epa import Go2Epa
-from actions.master import Master
-from actions.mincut import MincutParent
-from actions.om import Om
-from actions.update_sql import UpdateSQL
-from actions.utils import Utils
+from .actions.basic import Basic
+from .actions.edit import Edit
+from .actions.go2epa import Go2Epa
+from .actions.master import Master
+from .actions.mincut import MincutParent
+from .actions.om import Om
+from .actions.update_sql import UpdateSQL
+from .actions.utils import Utils
 
-from dao.controller import DaoController
-from map_tools.cad_add_circle import CadAddCircle
-from map_tools.cad_add_point import CadAddPoint
-from map_tools.change_elem_type import ChangeElemType
-from map_tools.connec import ConnecMapTool
-from map_tools.delete_node import DeleteNodeMapTool
-from map_tools.dimensioning import Dimensioning
-from map_tools.draw_profiles import DrawProfiles
-from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
-from map_tools.move_node import MoveNodeMapTool
-from map_tools.replace_node import ReplaceNodeMapTool
-from map_tools.open_visit import OpenVisit
-from models.plugin_toolbar import PluginToolbar
-from models.sys_feature_cat import SysFeatureCat
-from search.search_plus import SearchPlus
+from .dao.controller import DaoController
+from .map_tools.cad_add_circle import CadAddCircle
+from .map_tools.cad_add_point import CadAddPoint
+from .map_tools.change_elem_type import ChangeElemType
+from .map_tools.connec import ConnecMapTool
+from .map_tools.delete_node import DeleteNodeMapTool
+from .map_tools.dimensioning import Dimensioning
+from .map_tools.draw_profiles import DrawProfiles
+from .map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
+from .map_tools.move_node import MoveNodeMapTool
+from .map_tools.replace_node import ReplaceNodeMapTool
+from .map_tools.open_visit import OpenVisit
+from .models.plugin_toolbar import PluginToolbar
+from .models.sys_feature_cat import SysFeatureCat
+from .search.search_plus import SearchPlus
 
-from ui_manager import AuditCheckProjectResult
+from .ui_manager import AuditCheckProjectResult
 
 
 class Giswater(QObject):  
@@ -144,7 +148,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.om, function_name)
                 action.triggered.connect(callback_function)
             # Edit toolbar actions
-            elif int(index_action) in (01, 02, 33, 34, 66, 67, 68):
+            elif int(index_action) in (0o1, 0o2, 33, 34, 66, 67, 68):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
@@ -207,21 +211,21 @@ class Giswater(QObject):
         menu = QMenu()
 
         # List of nodes from node_type_cat_type - nodes which we are using
-        for feature_cat in self.feature_cat.itervalues():
+        for feature_cat in list(self.feature_cat.values()):
             if (index_action == '01' and feature_cat.type == 'NODE') or (index_action == '02' and feature_cat.type == 'ARC'):
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
         menu.addSeparator()
-        for feature_cat in self.feature_cat.itervalues():
+        for feature_cat in list(self.feature_cat.values()):
             if (index_action == '01' and feature_cat.type == 'CONNEC'):
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
         menu.addSeparator()
-        for feature_cat in self.feature_cat.itervalues():
+        for feature_cat in list(self.feature_cat.values()):
             if (index_action == '01' and feature_cat.type == 'GULLY' and self.wsoftware == 'ud'):
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
@@ -339,7 +343,7 @@ class Giswater(QObject):
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()           
-        for plugin_toolbar in self.plugin_toolbars.itervalues():
+        for plugin_toolbar in list(self.plugin_toolbars.values()):
             ag = QActionGroup(parent)
             for index_action in plugin_toolbar.list_actions:
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)                                                                            
@@ -441,7 +445,7 @@ class Giswater(QObject):
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
             if uri_table:
-                if uri_table in self.feature_cat.keys():
+                if uri_table in list(self.feature_cat.keys()):
                     elem = self.feature_cat[uri_table]
                     elem.layername = cur_layer.name()
 
@@ -450,11 +454,11 @@ class Giswater(QObject):
         """ Removes the plugin menu item and icon from QGIS GUI """
         
         try:
-            for action in self.actions.itervalues():
+            for action in list(self.actions.values()):
                 self.iface.removePluginMenu(self.plugin_name, action)
                 self.iface.removeToolBarIcon(action)
                 
-            for plugin_toolbar in self.plugin_toolbars.itervalues():
+            for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:
                     plugin_toolbar.toolbar.setVisible(False)                
                     del plugin_toolbar.toolbar
@@ -463,7 +467,7 @@ class Giswater(QObject):
                 self.search_plus.unload()
             
             # unload all loaded giswater related modules
-            for modName, mod in sys.modules.items():
+            for modName, mod in list(sys.modules.items()):
                 if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
                     del sys.modules[modName]
 
@@ -497,7 +501,7 @@ class Giswater(QObject):
         self.enable_actions(visible)
         
         try:
-            for plugin_toolbar in self.plugin_toolbars.itervalues():
+            for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:                
                     plugin_toolbar.toolbar.setVisible(visible)
         except AttributeError:

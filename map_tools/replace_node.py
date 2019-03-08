@@ -4,11 +4,14 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
+from builtins import next
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest
-from PyQt4.QtGui import QCompleter, QStringListModel
-from PyQt4.QtCore import QPoint, Qt
+from qgis.PyQt.QtWidgets import QCompleter
+from qgis.PyQt.QtCore import QPoint, Qt
 from PyQt4.Qt import QDate
 
 from functools import partial
@@ -16,10 +19,10 @@ from datetime import datetime
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ui_manager import UDcatalog
-from ui_manager import WScatalog
-from ui_manager import NodeReplace
-from ui_manager import NewWorkcat
+from .ui_manager import UDcatalog
+from .ui_manager import WScatalog
+from .ui_manager import NodeReplace
+from .ui_manager import NewWorkcat
 
 
 class ReplaceNodeMapTool(ParentMapTool):

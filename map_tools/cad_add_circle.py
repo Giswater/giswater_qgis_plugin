@@ -9,12 +9,12 @@ or (at your option) any later version.
 from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2
 from qgis.core import QgsProject, QgsSingleSymbolRendererV2
 from qgis.gui import QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QDoubleValidator
+from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtGui import QDoubleValidator
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from ui_manager import Cad_add_circle
+from .ui_manager import Cad_add_circle
 from functools import partial
 
 

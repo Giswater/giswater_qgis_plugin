@@ -4,14 +4,18 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from builtins import next
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
-from PyQt4.QtGui import QLineEdit, QTextEdit, QAction, QStringListModel, QCompleter, QColor, QAbstractItemView
+from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
+from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
+from qgis.PyQt.QtGui import QColor
 from PyQt4.QtSql import QSqlTableModel
-from PyQt4.QtXml import QDomDocument
+from qgis.PyQt.QtXml import QDomDocument
 
 import os
 import operator
@@ -464,10 +468,10 @@ class MincutParent(ParentAction, MultipleSelection):
                 " (current_user, " + str(result_mincut_id) + ");")
         
         # Check if any 'connec' or 'hydro' associated
-        if self.sql_connec <> "":
+        if self.sql_connec != "":
             sql += self.sql_connec
                 
-        if self.sql_hydro <> "":
+        if self.sql_hydro != "":
             sql += self.sql_hydro
                             
         status = self.controller.execute_sql(sql, log_error=True, log_sql=False)
@@ -2038,7 +2042,7 @@ class MincutParent(ParentAction, MultipleSelection):
         records = [[-1, '']]  
         
         # Get 'portal' layer
-        if 'portal_layer' not in self.layers.keys():
+        if 'portal_layer' not in list(self.layers.keys()):
             message = "Layer not found"
             self.controller.show_warning(message, parameter='portal_layer')
             return

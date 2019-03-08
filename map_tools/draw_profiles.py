@@ -8,13 +8,17 @@
  *                                                                         *
  ***************************************************************************/
 """
+from __future__ import absolute_import
+from builtins import next
+from builtins import str
+from builtins import range
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition, QgsVectorLayer
 from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt, SIGNAL
-from PyQt4.QtGui import QListWidget, QListWidgetItem, QLineEdit
-from PyQt4.QtXml import QDomDocument
+from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
+from qgis.PyQt.QtXml import QDomDocument
 
 from functools import partial
 from decimal import Decimal
@@ -23,9 +27,9 @@ import math
 import os
 
 import utils_giswater
-from parent import ParentMapTool
-from ui_manager import DrawProfile
-from ui_manager import LoadProfiles
+from .parent import ParentMapTool
+from .ui_manager import DrawProfile
+from .ui_manager import LoadProfiles
 
 
 class DrawProfiles(ParentMapTool):

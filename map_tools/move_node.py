@@ -16,11 +16,13 @@
  ***************************************************************************/
 
 """
+from builtins import str
+from builtins import next
 
 # -*- coding: utf-8 -*-
 from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import QPoint, Qt
 
 from map_tools.parent import ParentMapTool
 

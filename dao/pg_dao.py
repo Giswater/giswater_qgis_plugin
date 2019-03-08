@@ -1,9 +1,11 @@
+from __future__ import print_function
+from builtins import object
 # -*- coding: utf-8 -*-
 import psycopg2         #@UnusedImport
 import psycopg2.extras
 
 
-class PgDao():
+class PgDao(object):
 
     def __init__(self):
         self.last_error = None
@@ -16,8 +18,9 @@ class PgDao():
             self.conn = psycopg2.connect(self.conn_string)
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
-        except psycopg2.DatabaseError, e:
-            print '{pg_dao} Error %s' % e
+        except psycopg2.DatabaseError as e:
+            # fix_print_with_import
+            print('{pg_dao} Error %s' % e)
             self.last_error = e            
             status = False
         return status
@@ -34,7 +37,7 @@ class PgDao():
                 self.conn.close()
             del self.cursor
             del self.conn
-        except Exception, e:
+        except Exception as e:
             self.last_error = e            
             status = False
             
@@ -102,7 +105,8 @@ class PgDao():
         try:
             name = self.cursor.description[index][0]
         except Exception as e:
-            print "get_column_name: {0}".format(e)        
+            # fix_print_with_import
+            print("get_column_name: {0}".format(e))        
         finally:
             return name
         
@@ -114,7 +118,8 @@ class PgDao():
         try:
             total = len(self.cursor.description)
         except Exception as e:
-            print "get_columns_length: {0}".format(e)        
+            # fix_print_with_import
+            print("get_columns_length: {0}".format(e))        
         finally:
             return total
 

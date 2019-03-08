@@ -4,23 +4,30 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 
 # -*- coding: latin-1 -*-
 import os
-import json, thread
+import json, _thread
 import sys
 import operator
 import re, time,threading
 
-from PyQt4 import QtCore, QtNetwork
-from PyQt4.QtCore import Qt, QDate, QPoint, QUrl, QThread, pyqtSignal, QVariant
-from PyQt4.QtWebKit import QWebView, QWebSettings, QWebPage
-from PyQt4.QtGui import QColor, QIcon
-from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu, QApplication, QSpinBox, QDoubleSpinBox, QTextEdit
-from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
-from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget
-from PyQt4.QtGui import QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QRadioButton
-from PyQt4.QtGui import QAbstractItemView, QPrinter, QTreeWidgetItem
+from qgis.PyQt import QtCore, QtNetwork
+from qgis.PyQt.QtCore import Qt, QDate, QPoint, QUrl, QThread, pyqtSignal, QVariant
+from qgis.PyQt.QtWebKitWidgets import QWebView, QWebPage
+from qgis.PyQt.QtGui import QColor, QIcon
+from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator
+from qgis.PyQt.QtWidgets import QMenu, QApplication, QSpinBox, QDoubleSpinBox, QTextEdit
+from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
+from qgis.PyQt.QtWidgets import QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QListWidget
+from qgis.PyQt.QtWidgets import QTableView, QListWidgetItem, QTabWidget, QRadioButton
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTreeWidgetItem
+from qgis.PyQt.QtPrintSupport import QPrinter
 from PyQt4.QtSql import QSqlTableModel
 
 from qgis.core import QgsMapLayerRegistry, QgsProject, QgsPoint, QgsFeature, QgsGeometry, QgsDataSourceURI
@@ -283,7 +290,7 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setValue(0)
         dialog.progressBar.setVisible(True)
         # Check if time functions is short or long, activate and set undetermined  if not short
-        for group, function in result['fields'].items():
+        for group, function in list(result['fields'].items()):
             if len(function) != 0:
                 self.save_settings_values(dialog, function)
                 function_name = function[0]['functionname']
@@ -332,7 +339,7 @@ class GwToolBox(ApiParent):
         widget_list = dialog.grb_parameters.findChildren(QWidget)
         widget_is_void = False
         extras += '"parameters":{'
-        for group, function in result['fields'].items():
+        for group, function in list(result['fields'].items()):
             if len(function) != 0:
                 if function[0]['return_type'] not in (None, ''):
                     for field in function[0]['return_type']:
@@ -410,7 +417,7 @@ class GwToolBox(ApiParent):
 
     def populate_functions_dlg(self, dialog, result):
         status = False
-        for group, function in result['fields'].items():
+        for group, function in list(result['fields'].items()):
             if len(function) != 0:
 
                 dialog.setWindowTitle(function[0]['alias'])
@@ -484,7 +491,7 @@ class GwToolBox(ApiParent):
             icon = QIcon(path_icon_blue)
             main_parent.setIcon(icon)
 
-        for group, functions in result['fields'].items():
+        for group, functions in list(result['fields'].items()):
             parent1 = QStandardItem('{}   [{} GW_geoalgorithm]'.format(group, len(functions)))
             self.no_clickable_items.append('{}'.format(group))
             functions.sort(key=self.sort_list, reverse=False)
@@ -551,7 +558,7 @@ class GwToolBox(ApiParent):
         # Enter editing mode
         virtual_layer.startEditing()
         if counter > 0:
-            for key, value in result['result'][0].items():
+            for key, value in list(result['result'][0].items()):
                 # add columns
                 prov.addAttributes([QgsField(str(key), QVariant.String)])
         x = 1
@@ -561,7 +568,7 @@ class GwToolBox(ApiParent):
             dialog.progressBar.setValue(x)
             attributes = []
             fet = QgsFeature()
-            for k, v in item.items():
+            for k, v in list(item.items()):
                 attributes.append(v)
                 if str(k) in ('the_geom'):
                     sql = ("SELECT St_AsText('"+str(v)+"')")
