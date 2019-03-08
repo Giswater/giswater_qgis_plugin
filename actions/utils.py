@@ -6,18 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtCore import QDate
-    from PyQt4.QtGui import QStandardItem, QStandardItemModel, QDateEdit, QFileDialog, QCheckBox, QDoubleSpinBox
-else:
-    from qgis.PyQt.QtCore import QDate
-    from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
-    from qgis.PyQt.QtWidgets import QDateEdit, QFileDialog, QCheckBox, QDoubleSpinBox
+from PyQt4.QtCore import QDate
+from PyQt4.QtGui import QStandardItem, QStandardItemModel, QDateEdit, QFileDialog, QCheckBox, QDoubleSpinBox
 
 import os
 import csv
@@ -32,7 +22,6 @@ from giswater.actions.parent import ParentAction
 from giswater.actions.manage_visit import ManageVisit
 from giswater.ui_manager import Toolbox
 from giswater.ui_manager import Csv2Pg
-
 
 
 class Utils(ParentAction):

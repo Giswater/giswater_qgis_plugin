@@ -12,26 +12,13 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer, QDate, SIGNAL, QRegExp
-    from PyQt4.QtGui import QAction, QCheckBox, QComboBox, QCompleter, QColor, QGridLayout, QLineEdit, QSizePolicy, QWidget,  QSpacerItem, QLabel
-    from PyQt4.QtGui import  QStringListModel, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
-    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QDateEdit, QRegExpValidator
-
-    from PyQt4.QtSql import QSqlTableModel
     from qgis.gui import QgsMapCanvasSnapper
 else:
-    from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel, QRegExp
-    from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
-    from qgis.PyQt.QtWidgets import QAction, QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
-    from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
-    from qgis.PyQt.QtSql import QSqlTableModel
-    from qgis.PyQt.QtWidgets import QAction
     from qgis.core import QgsWkbTypes
 
 from qgis.core import QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
-
 
 import json
 import os

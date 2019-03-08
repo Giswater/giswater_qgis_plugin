@@ -10,44 +10,18 @@ import os
 import json, thread
 import sys
 import operator
-
 import re, time,threading
 
-from PyQt4.QtCore import QThread, pyqtSignal
-from PyQt4.QtCore import QVariant
-from PyQt4.QtGui import QColor
-
-from PyQt4.QtGui import QIcon
-
-try:
-    from qgis.core import Qgis
-except:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4 import QtCore, QtNetwork
-    from PyQt4.QtCore import Qt, QDate, QPoint, QUrl
-    from PyQt4.QtWebKit import QWebView, QWebSettings, QWebPage
-    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu, QApplication, QSpinBox, QDoubleSpinBox, QTextEdit
-    from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
-    from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget
-    from PyQt4.QtGui import QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QRadioButton
-    from PyQt4.QtGui import QAbstractItemView, QPrinter, QTreeWidgetItem
-    from PyQt4.QtSql import QSqlTableModel
-    import urlparse
-    import win32gui
-
-else:
-    from qgis.PyQt import QtCore
-    from qgis.PyQt.QtCore import Qt, QDate, QStringListModel,QPoint
-    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QStandardItem, QStandardItemModel
-    from qgis.PyQt.QtWebKit import QWebView, QWebSettings, QWebPage
-    from qgis.PyQt.QtWidgets import QTreeWidgetItem, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox
-    from qgis.PyQt.QtWidgets import QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QTextEdit
-    from qgis.PyQt.QtWidgets import QTabWidget, QAbstractItemView, QMenu,  QApplication,QSpinBox, QDoubleSpinBox, QRadioButton
-    from qgis.PyQt.QtSql import QSqlTableModel, QListWidgetItem
-    import urllib.parse as urlparse
-
+from PyQt4 import QtCore, QtNetwork
+from PyQt4.QtCore import Qt, QDate, QPoint, QUrl, QThread, pyqtSignal, QVariant
+from PyQt4.QtWebKit import QWebView, QWebSettings, QWebPage
+from PyQt4.QtGui import QColor, QIcon
+from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu, QApplication, QSpinBox, QDoubleSpinBox, QTextEdit
+from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
+from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget
+from PyQt4.QtGui import QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QRadioButton
+from PyQt4.QtGui import QAbstractItemView, QPrinter, QTreeWidgetItem
+from PyQt4.QtSql import QSqlTableModel
 
 from qgis.core import QgsMapLayerRegistry, QgsProject, QgsPoint, QgsFeature, QgsGeometry, QgsDataSourceURI
 from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField, QgsMarkerSymbolV2
