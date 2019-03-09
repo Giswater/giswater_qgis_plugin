@@ -156,6 +156,7 @@ class UpdateSQL(ParentAction):
         # Declare all directorys
         if self.schema_name is not None and self.project_type is not None:
             self.folderSoftware = self.sql_dir + os.sep + self.project_type + os.sep
+
         self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + str(self.locale) + os.sep
         self.folderUtils = self.sql_dir + os.sep + 'utils' + os.sep
         self.folderUpdates = self.sql_dir + os.sep + 'updates' + os.sep
@@ -227,6 +228,7 @@ class UpdateSQL(ParentAction):
         elif button.text() == 'ON':
             button.setText("OFF")
             lbl_constrains_info.setText('(Constrains dissabled)')
+
         return
 
 
@@ -1113,6 +1115,7 @@ class UpdateSQL(ParentAction):
             status = self.executeFiles(archivos, path, no_ct=no_ct)
             if status is False:
                 status = False
+
         return True
 
 
@@ -1367,6 +1370,7 @@ class UpdateSQL(ParentAction):
         status = self.controller.execute_sql(sql, commit=False)
         if status is False:
             self.error_count = self.error_count + 1
+
         return
 
 
@@ -1384,19 +1388,19 @@ class UpdateSQL(ParentAction):
 
         if project_name == 'null':
             msg = "The 'Project_name' field is required."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
             return
         elif any(c.isupper() for c in project_name) is True:
             msg = "The 'Project_name' field require only lower caracters"
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
             return
         elif (bool(re.match('^[a-z0-9_]*$', project_name))) is False:
             msg = "The 'Project_name' field have invalid character"
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
             return
         if self.title == 'null':
             msg = "The 'Title' field is required."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
             return
 
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
@@ -1441,7 +1445,6 @@ class UpdateSQL(ParentAction):
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
 
-
         elif self.rdb_sample.isChecked():
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
                 msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
@@ -1481,9 +1484,7 @@ class UpdateSQL(ParentAction):
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
 
-
         elif self.rdb_data.isChecked():
-
             self.load_base(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -1491,6 +1492,7 @@ class UpdateSQL(ParentAction):
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+
         self.set_arrow_cursor()
 
         # Enable/disable constrains
@@ -1506,12 +1508,12 @@ class UpdateSQL(ParentAction):
         if self.error_count == 0:
             self.controller.dao.commit()
             msg = "The project has been created correctly."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
             self.close_dialog(self.dlg_readsql_create_project)
         else:
             self.controller.dao.rollback()
             msg = "Some errors has occurred. Process has not been executed."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1528,7 +1530,7 @@ class UpdateSQL(ParentAction):
             self.schema = utils_giswater.getWidgetText(self.dlg_readsql_rename,self.dlg_readsql_rename.schema_rename)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
-                result = self.controller.show_info_box(msg, "Info")
+                self.controller.show_info_box(msg, "Info")
                 return
         else:
             close_dlg_rename = False
@@ -1555,12 +1557,12 @@ class UpdateSQL(ParentAction):
             if close_dlg_rename:
                 self.close_dialog(self.dlg_readsql_rename)
             msg = "Rename project has been executed correctly."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         else:
             self.controller.dao.rollback()
             msg = "Some error has occurred while the rename process was running."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1576,12 +1578,12 @@ class UpdateSQL(ParentAction):
         if self.error_count == 0:
             self.controller.dao.commit()
             msg = "Api has been updated correctly."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         else:
             self.controller.dao.rollback()
             msg = "Some error has occurred while the api updated process was running."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1605,12 +1607,12 @@ class UpdateSQL(ParentAction):
         if self.error_count == 0:
             self.controller.dao.commit()
             msg = "The process has been executed correctly."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         else:
             self.controller.dao.rollback()
             msg = "Some error has occurred while the process was running."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1633,14 +1635,14 @@ class UpdateSQL(ParentAction):
         if self.error_count == 0:
             self.controller.dao.commit()
             msg = "The update has been executed correctly."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
             # Close dialog when process has been execute correctly
             self.close_dialog(self.dlg_readsql_show_info)
         else:
             self.controller.dao.rollback()
             msg = "Some error has occurred while the update process was running."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1667,11 +1669,11 @@ class UpdateSQL(ParentAction):
             if self.error_count == 0:
                 self.controller.dao.commit()
                 msg = "The update has been executed correctly."
-                result = self.controller.show_info_box(msg, "Info")
+                self.controller.show_info_box(msg, "Info")
             else:
                 self.controller.dao.rollback()
                 msg = "Some error has occurred while the update process was running."
-                result = self.controller.show_info_box(msg, "Info")
+                self.controller.show_info_box(msg, "Info")
 
             # Reset count error variable to 0
             self.error_count = 0
@@ -1713,7 +1715,7 @@ class UpdateSQL(ParentAction):
                                                credentials['db'], credentials['user'],
                                                credentials['password'])
 
-        if self.logged == False:
+        if not self.logged:
             self.controller.show_message("Connection Failed. Please, check connection parameters.", 1)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, False, ignore_widgets='cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
@@ -1802,7 +1804,6 @@ class UpdateSQL(ParentAction):
             sub_folders = os.listdir(self.folderUpdates + folder)
             for sub_folder in sub_folders:
                 if str(sub_folder) > str(self.project_data_schema_version).replace('.',''):
-
                     if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, '') is False:
                         status=False
                     else:
@@ -1812,6 +1813,7 @@ class UpdateSQL(ParentAction):
                             status=False
                 else:
                     status = False
+
         return True
 
 
@@ -1856,7 +1858,7 @@ class UpdateSQL(ParentAction):
         result_list = []
 
         # Populate Project data schema Name
-        sql = ("SELECT schema_name FROM information_schema.schemata")
+        sql = "SELECT schema_name FROM information_schema.schemata"
         rows = self.controller.get_rows(sql)
         for row in rows:
             sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = '" + str(row[0]) + "' "
@@ -1868,6 +1870,7 @@ class UpdateSQL(ParentAction):
                 if result is not None and result[0] == filter.upper():
                     elem = [row[0], row[0]]
                     result_list.append(elem)
+
         utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
 
 
@@ -1909,14 +1912,14 @@ class UpdateSQL(ParentAction):
                 self.project_data_schema_version = str(row[0])
 
         # Get parameters
-        sql = ("SELECT version();")
+        sql = "SELECT version();"
         result = self.controller.get_row(sql)
         if result:
             database_version = result[0].split(',')
         else:
             database_version = ''
 
-        sql = ("SELECT PostGIS_FULL_VERSION();")
+        sql = "SELECT PostGIS_FULL_VERSION();"
         result = self.controller.get_row(sql)
         if result:
             postgis_version = result[0].split('GEOS=')
@@ -1944,6 +1947,7 @@ class UpdateSQL(ParentAction):
             utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)) + ' - ' + str(
             self.plugin_version) + ')')
 
+
     def process_folder(self, folderPath, filePattern):
 
         status = True
@@ -1969,12 +1973,12 @@ class UpdateSQL(ParentAction):
         if self.error_count == 0:
             self.controller.dao.commit()
             msg = "The reload has been executed correctly."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         else:
             self.controller.dao.rollback()
             msg = "Some error has occurred while the reload process was running."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1991,12 +1995,12 @@ class UpdateSQL(ParentAction):
         if self.error_count == 0:
             self.controller.dao.commit()
             msg = "The reload has been executed correctly."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         else:
             self.controller.dao.rollback()
             msg = "Some error has occurred while the reload process was running."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -2076,7 +2080,7 @@ class UpdateSQL(ParentAction):
         # Open rename if schema is updated
         if str(self.version_metadata) != str(self.project_data_schema_version):
             msg = "The schema version has to be updated to make rename ."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
             return
 
         # Create dialog
@@ -2174,10 +2178,11 @@ class UpdateSQL(ParentAction):
 
 
     def delete_schema(self):
+
         project_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         if project_name is None:
             msg = "You cant delete a None project. Please, select correct one."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
             return
         msg = "Are you sure you want delete schema '" + str(project_name) + "' ?"
         result = self.controller.ask_question(msg, "Info")
@@ -2186,8 +2191,10 @@ class UpdateSQL(ParentAction):
             status = self.controller.execute_sql(sql)
             if status:
                 msg = "The Schema was deleted correctly."
-                result = self.controller.show_info_box(msg, "Info")
+                self.controller.show_info_box(msg, "Info")
+
         self.populate_data_schema_name(self.cmb_project_type)
+
 
     """ Take current project type changed """
 
