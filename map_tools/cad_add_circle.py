@@ -6,16 +6,16 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry, QgsVectorLayer, QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel, QgsFillSymbolV2
-from qgis.core import QgsProject, QgsSingleSymbolRendererV2
+from qgis.core import QgsFeature, QgsGeometry, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QDoubleValidator
 
+from functools import partial
+
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from .ui_manager import Cad_add_circle
-from functools import partial
+from ui_manager import Cad_add_circle
 
 
 class CadAddCircle(ParentMapTool):

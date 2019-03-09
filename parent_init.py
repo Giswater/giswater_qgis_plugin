@@ -37,12 +37,12 @@ import subprocess
 
 from . import utils_giswater
 from .dao.controller import DaoController
-from .ui_manager import AddSum
-from .ui_manager import CFWScatalog
-from .ui_manager import CFUDcatalog
-from .ui_manager import LoadDocuments
-from .ui_manager import EventFull
-from .ui_manager import AddPicture
+from ui_manager import AddSum
+from ui_manager import CFWScatalog
+from ui_manager import CFUDcatalog
+from ui_manager import LoadDocuments
+from ui_manager import EventFull
+from ui_manager import AddPicture
 from .actions.manage_document import ManageDocument
 from .actions.manage_element import ManageElement
 from .actions.manage_gallery import ManageGallery

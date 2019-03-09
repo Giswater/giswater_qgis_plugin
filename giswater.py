@@ -14,10 +14,10 @@ from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtSql import QSqlQueryModel
+
 import os.path
 import sys  
 from functools import partial
-
 
 from .actions.basic import Basic
 from .actions.edit import Edit
@@ -27,7 +27,6 @@ from .actions.mincut import MincutParent
 from .actions.om import Om
 from .actions.update_sql import UpdateSQL
 from .actions.utils import Utils
-
 from .dao.controller import DaoController
 from .map_tools.cad_add_circle import CadAddCircle
 from .map_tools.cad_add_point import CadAddPoint
@@ -43,7 +42,6 @@ from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
 from .search.search_plus import SearchPlus
-
 from .ui_manager import AuditCheckProjectResult
 
 
@@ -96,12 +94,12 @@ class Giswater(QObject):
         # Set default encoding 
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable
-       
 
         
     def set_signals(self): 
         """ Define widget and event signals """
         self.iface.projectRead.connect(self.project_read)                
+
 
     def set_info_button(self, connection_status):
         self.toolButton = QToolButton()
@@ -118,6 +116,7 @@ class Giswater(QObject):
 
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
         action.triggered.connect(partial(self.update_sql.init_sql, connection_status))
+
 
     def tr(self, message):
         if self.controller:
@@ -370,7 +369,6 @@ class Giswater(QObject):
         self.enable_toolbar("basic")           
 
            
-           
     def manage_toolbar(self, toolbar_id, list_actions): 
         """ Manage action of selected plugin toolbar """
                 
@@ -521,6 +519,7 @@ class Giswater(QObject):
                           
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
+
         self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
@@ -770,7 +769,7 @@ class Giswater(QObject):
 
 
     def manage_snapping_layers(self):
-        ''' Manage snapping of layers '''
+        """ Manage snapping of layers """
         
         layer = self.controller.get_layer_by_tablename('v_edit_man_pipe')
         if layer:
@@ -1100,6 +1099,7 @@ class Giswater(QObject):
 
     def hide_actions(self):
         """ This function was created added in order to hide actions """
+
         # Configure list_to_hide into file giswater.config -> [system_variables]-> action_to_hide in format n,n,n
         # Example action_to_hide=19,74,75
         list_to_hide = self.settings.value('system_variables/action_to_hide')

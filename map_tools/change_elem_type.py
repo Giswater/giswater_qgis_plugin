@@ -14,9 +14,9 @@ from qgis.PyQt.QtCore import QPoint, Qt
 from functools import partial
 
 import utils_giswater
-from .ui_manager import ChangeNodeType
-from .ui_manager import UDcatalog
-from .ui_manager import WScatalog
+from ui_manager import ChangeNodeType
+from ui_manager import UDcatalog
+from ui_manager import WScatalog
 from map_tools.parent import ParentMapTool
 
 

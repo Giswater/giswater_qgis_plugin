@@ -18,10 +18,10 @@ from datetime import datetime
 
 import utils_giswater
 from map_tools.parent import ParentMapTool
-from .ui_manager import UDcatalog
-from .ui_manager import WScatalog
-from .ui_manager import NodeReplace
-from .ui_manager import NewWorkcat
+from ui_manager import UDcatalog
+from ui_manager import WScatalog
+from ui_manager import NodeReplace
+from ui_manager import NewWorkcat
 
 
 class ReplaceNodeMapTool(ParentMapTool):
