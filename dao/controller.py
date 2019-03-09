@@ -9,10 +9,20 @@ from builtins import range
 from builtins import object
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsMapLayerRegistry as QgsProject, QgsDataSourceURI as QgsDataSourceUri
+else:
+    from qgis.core import QgsProject, QgsDataSourceUri
+
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QgsDataSourceURI, QgsCredentials
+from qgis.core import QgsMessageLog, QgsCredentials
 
 import os.path
 import subprocess
@@ -155,7 +165,7 @@ class DaoController(object):
             not_version = False
             credentials = self.get_layer_source(layer)
             self.schema_name = credentials['schema']
-            conn_info = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).connectionInfo()
+            conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
 
             attempts = 1
             logged = self.connect_to_database(credentials['host'], credentials['port'],
@@ -678,7 +688,7 @@ class DaoController(object):
     def get_layer_by_layername(self, layername, log_info=False):
         """ Get layer with selected @layername (the one specified in the TOC) """
         
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
+        layer = QgsProject.instance().mapLayersByName(layername)
         if layer:         
             layer = layer[0] 
         elif layer is None and log_info:

@@ -14,8 +14,16 @@ from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsComposition, QgsVectorLayer
-from qgis.gui import  QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsComposition
+
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsVectorLayer
+from qgis.gui import  QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
 from qgis.PyQt.QtXml import QDomDocument
@@ -337,7 +345,7 @@ class DrawProfiles(ParentMapTool):
     def activate_snapping(self, emit_point):
 
         self.canvas.setMapTool(emit_point)
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.get_snapper()
 
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
@@ -348,7 +356,7 @@ class DrawProfiles(ParentMapTool):
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
 
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
@@ -1274,7 +1282,10 @@ class DrawProfiles(ParentMapTool):
 
 
     def generate_composer(self):
-        
+
+        if Qgis.QGIS_VERSION_INT > 29900:
+            return
+
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         composers = self.iface.activeComposers()

@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
-from qgis.PyQt import QtGui, uic
+# -*- coding: utf-8 -*-QDialog
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDialog
 import os
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'hydro_info.ui'))
 
 
-class HydroInfo(QtGui.QDialog, FORM_CLASS):
+class HydroInfo(QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """ Constructor """
         super(HydroInfo, self).__init__(parent)

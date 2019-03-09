@@ -20,9 +20,16 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import QgsWkbTypes
 
-from qgis.core import QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
+
+from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel
+from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator
+from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
+from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QAction
 
 import json
 import os

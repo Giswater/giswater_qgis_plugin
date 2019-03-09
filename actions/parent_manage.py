@@ -9,7 +9,7 @@ from builtins import range
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView
@@ -329,7 +329,7 @@ class ParentManage(ParentAction, object):
         self.vertex_marker.setPenWidth(3)
 
         # Snapper
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.previous_map_tool = self.canvas.mapTool()
@@ -340,8 +340,8 @@ class ParentManage(ParentAction, object):
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
 
-
     def mouse_move(self, p):
+
         self.snapped_point = None
         self.vertex_marker.hide()
         map_point = self.canvas.getCoordinateTransform().transform(p)
@@ -361,6 +361,7 @@ class ParentManage(ParentAction, object):
                 self.vertex_marker.show()
         else:
             self.vertex_marker.hide()
+
 
     def get_xy(self, point):
         """ Get coordinates of selected point """
@@ -384,11 +385,13 @@ class ParentManage(ParentAction, object):
         self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
         self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
         self.description = utils_giswater.getWidgetText(dialog, "descript")
-        
+
+
     def tab_feature_changed(self, dialog, table_object, feature_id=None):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
+
         self.get_values_from_form(dialog)
         if dialog.tab_feature.currentIndex() == 3:
             dialog.btn_snapping.setEnabled(False)
@@ -834,6 +837,7 @@ class ParentManage(ParentAction, object):
 
 
     def enable_feature_type(self, dialog):
+
         feature_type = dialog.findChild(QComboBox, 'feature_type')
         assigned_to = dialog.findChild(QComboBox, 'cmb_assigned_to')
         visit_class = dialog.findChild(QComboBox, 'cmb_visit_class')
@@ -857,6 +861,7 @@ class ParentManage(ParentAction, object):
         """ Select feature with entered id. Set a model with selected filter.
             Attach that model to selected table
         """
+
         self.disconnect_signal_selection_changed()
 
         # Clear list of ids

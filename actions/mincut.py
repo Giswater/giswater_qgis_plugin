@@ -9,9 +9,17 @@ from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsComposition, QgsVectorLayer
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
-from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsComposition
+
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsVectorLayer
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime
 from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -74,11 +82,12 @@ class MincutParent(ParentAction, MultipleSelection):
         
     def init_mincut_form(self):
         """ Custom form initial configuration """
+
         self.is_new = True
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.connec_list = []
         self.hydro_list = []
         self.deleted_list = []
@@ -1309,7 +1318,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def auto_mincut_snapping(self, point, btn):  #@UnusedVariable
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
         
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1373,7 +1382,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
 
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1522,9 +1531,10 @@ class MincutParent(ParentAction, MultipleSelection):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
         # Need this 3 lines here becouse if between one action and another we activate Pan, we cant open another valve
         # This is a safety measure
+
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
@@ -1608,7 +1618,7 @@ class MincutParent(ParentAction, MultipleSelection):
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
         """ Custom mincut snapping function """
 
-        snapper = QgsMapCanvasSnapper(self.canvas)        
+        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -2009,7 +2019,7 @@ class MincutParent(ParentAction, MultipleSelection):
             attrs = feature.attributes()
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
-            if not type(value_code) is QPyNullVariant and geom is not None:
+            if value_code is not None and geom is not None:
                 elem = [value_code, value_name, geom.exportToWkt()]
             else:
                 elem = [value_code, value_name, None]

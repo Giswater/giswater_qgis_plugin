@@ -10,6 +10,11 @@ standard_library.install_aliases()
 from builtins import str
 
 # -*- coding: latin-1 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
 import os
 import json, _thread
 import sys
@@ -30,8 +35,13 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTreeWidgetItem
 from qgis.PyQt.QtPrintSupport import QPrinter
 from qgis.PyQt.QtSql import QSqlTableModel
 
-from qgis.core import QgsMapLayerRegistry, QgsProject, QgsPoint, QgsFeature, QgsGeometry, QgsDataSourceURI
-from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField, QgsMarkerSymbolV2
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsMapLayerRegistry as QgsProject, QgsDataSourceURI as QgsDataSourceUri
+else:
+    from qgis.core import QgsProject, QgsDataSourceUri
+
+from qgis.core import QgsPoint, QgsFeature, QgsGeometry
+from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField
 
 from collections import OrderedDict
 from datetime import datetime
@@ -581,7 +591,7 @@ class GwToolBox(ApiParent):
         # Commit changes
         virtual_layer.commitChanges()
 
-        QgsMapLayerRegistry.instance().addMapLayer(virtual_layer, False)
+        QgsProject.instance().addMapLayer(virtual_layer, False)
 
         root = QgsProject.instance().layerTreeRoot()
         my_group = root.findGroup('GW Functions results')
@@ -604,17 +614,17 @@ class GwToolBox(ApiParent):
         credentials = self.controller.get_layer_source(layer)
         #self.controller.log_info(str(credentials))
 
-        foreign_uri = QgsDataSourceURI()
+        foreign_uri = QgsDataSourceUri()
         foreign_uri.setConnection(credentials['host'], credentials['port'], credentials['db'], credentials['user'], credentials['password'])
         foreign_uri.setDataSource(schema_name, table_name, None, "", field_id)
         new_layer = QgsVectorLayer(foreign_uri.uri(), table_name, "postgres")
 
         if group_to_be_inserted is None:
-            QgsMapLayerRegistry.instance().addMapLayer(new_layer)
+            QgsProject.instance().addMapLayer(new_layer)
             return
 
         root = QgsProject.instance().layerTreeRoot()
         mygroup = root.findGroup(group_to_be_inserted)
-        QgsMapLayerRegistry.instance().addMapLayer(new_layer, False)
+        QgsProject.instance().addMapLayer(new_layer, False)
         mygroup.insertLayer(0, new_layer)
 

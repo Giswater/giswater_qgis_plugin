@@ -20,17 +20,22 @@ from __future__ import absolute_import
 from builtins import str
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis, QgsPoint, QgsExpression
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker, QgsRubberBand
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+from qgis.core import QgsPoint, QgsExpression
+from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
 
 from .snapping_utils import SnappingConfigManager
 
+import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 import os
-import sys
 
 
 class ParentMapTool(QgsMapTool):
@@ -63,7 +68,7 @@ class ParentMapTool(QgsMapTool):
 
         # Snapper
         self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.snapper_manager.get_snapper()
         
         # Change map tool cursor
         self.cursor = QCursor()
@@ -82,7 +87,7 @@ class ParentMapTool(QgsMapTool):
                  
         # Set default rubber band
         color_selection = QColor(254, 178, 76, 63)
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Polygon)   
+        self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
         self.rubber_band.setColor(color)
         self.rubber_band.setFillColor(color_selection)           
         self.rubber_band.setWidth(1)           
@@ -163,7 +168,7 @@ class ParentMapTool(QgsMapTool):
     def reset(self):
                 
         # Graphic elements
-        self.rubber_band.reset(QGis.Polygon)
+        self.rubber_band.reset(Qgis.Polygon)
 
         # Selection
         self.snapped_feat = None      

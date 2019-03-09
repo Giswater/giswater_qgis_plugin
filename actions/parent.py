@@ -11,7 +11,19 @@ from builtins import range
 from builtins import object
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle, QgsMapLayerRegistry
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsMapLayerRegistry as QgsProject
+    from qgis.gui import QgsMapCanvasSnapper
+else:
+    from qgis.core import QgsProject
+    from qgis.gui import QgsMapCanvas
+
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
 from qgis.PyQt.QtCore import Qt, QSettings
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
@@ -20,11 +32,11 @@ from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
 
+import sys
 import configparser
 if 'nt' in sys.builtin_module_names:
     import ctypes
 import os
-import sys
 import utils_giswater
 import webbrowser
 
@@ -773,6 +785,7 @@ class ParentAction(object):
 
             self.iface.mapCanvas().zoomScale(float(scale))
 
+
     def set_completer(self, tablename, widget, field_search, color='black'):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
@@ -839,9 +852,27 @@ class ParentAction(object):
     def delete_layer_from_toc(self, layer_name):
         """ Delete layer from toc if exist """
         layer = None
-        for lyr in list(QgsMapLayerRegistry.instance().mapLayers().values()):
+        for lyr in list(QgsProject.instance().mapLayers().values()):
             if lyr.name() == layer_name:
                 layer = lyr
                 break
         if layer is not None:
-            QgsMapLayerRegistry.instance().removeMapLayer(layer)
+            QgsProject.instance().removeMapLayer(layer)
+
+
+    def get_snapper(self):
+        """ Return snapper """
+
+        snapper = None
+        try:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                snapper = QgsMapCanvasSnapper(self.canvas)
+            else:
+                # TODO: 3.x
+                # snapper = QgsMapCanvas.snappingUtils()
+                snapper = None
+        except:
+            pass
+
+        return snapper
+

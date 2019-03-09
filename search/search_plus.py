@@ -4,12 +4,13 @@ from builtins import range
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QObject, QPyNullVariant, Qt
+from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 from qgis.PyQt.QtCore import QSortFilterProxyModel
 
 from functools import partial
+import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
@@ -1036,7 +1037,7 @@ class SearchPlus(QObject):
             attrs = feature.attributes()                
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
-            if not type(value_code) is QPyNullVariant and geom is not None:
+            if value_code is not None and geom is not None:
                 elem = [value_code, value_name, geom.exportToWkt()]
             else:
                 elem = [value_code, value_name, None]
@@ -1110,7 +1111,7 @@ class SearchPlus(QObject):
             for feature in it:
                 attrs = feature.attributes()
                 field_number = attrs[idx_field_number]
-                if not type(field_number) is QPyNullVariant:
+                if field_number is None:
                     elem = [code, field_number]
                     records.append(elem)
 

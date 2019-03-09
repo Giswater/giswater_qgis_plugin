@@ -18,8 +18,17 @@
 from builtins import object
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.gui import QgsMapCanvasSnapper
+else:
+    from qgis.gui import QgsMapCanvas
+
 from qgis.core import QgsProject
-from qgis.gui import QgsMapCanvasSnapper
 
 
 class SnappingConfigManager(object):
@@ -149,4 +158,21 @@ class SnappingConfigManager(object):
         if self.layer_gully_man:
             if snapped_layer in self.layer_gully_man:
                 return 1
-        
+
+
+    def get_snapper(self):
+        """ Return snapper """
+
+        snapper = None
+        try:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                snapper = QgsMapCanvasSnapper(self.canvas)
+            else:
+                # TODO: 3.x
+                # snapper = QgsMapCanvas.snappingUtils()
+                snapper = None
+        except:
+            pass
+
+        return snapper
+

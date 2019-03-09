@@ -8,8 +8,13 @@ from builtins import next
 from builtins import range
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle, QGis
-from qgis.gui import QgsMapTool, QgsMapCanvasSnapper, QgsRubberBand
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle
+from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtGui import QColor
@@ -41,8 +46,25 @@ class MultipleSelection(QgsMapTool):
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)
         self.reset()
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.selected_features = []
+
+
+    def get_snapper(self):
+        """ Return snapper """
+
+        snapper = None
+        try:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                snapper = QgsMapCanvasSnapper(self.canvas)
+            else:
+                # TODO: 3.x
+                # snapper = QgsMapCanvas.snappingUtils()
+                snapper = None
+        except:
+            pass
+
+        return snapper
 
 
     def reset(self):
@@ -84,7 +106,7 @@ class MultipleSelection(QgsMapTool):
         for i in range(len(self.layers)):
             
             layer = self.layers[i]
-            if (i == len(self.layers) - 1):     
+            if i == len(self.layers) - 1:
                 if self.mincut:                              
                     self.mincut.connect_signal_selection_changed("mincut_connec")
                 if self.parent_manage:                          

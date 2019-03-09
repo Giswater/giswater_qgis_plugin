@@ -8,27 +8,22 @@ or (at your option) any later version.
 from builtins import str
 from builtins import range
 
-
 try:
     from qgis.core import Qgis
 except:
     from qgis.core import QGis as Qgis
 
-import os
-import re
-
-from qgis.PyQt.QtCore import QDate, Qt, QPyNullVariant
-from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QAction, QAbstractItemView
+from qgis.PyQt.QtCore import QDate, Qt
+from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QAction, QAbstractItemView, QToolButton
 from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QColor
+from qgis.PyQt.QtSql import QSqlTableModel
 
-from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
+from qgis.core import QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsRubberBand
 
+import re
 from functools import partial
-
-from qgis.PyQt.QtWidgets import QToolButton
-from qgis.PyQt.QtSql import QSqlTableModel
 
 import utils_giswater
 from giswater.actions.manage_visit import ManageVisit
@@ -506,7 +501,7 @@ class AddNewLot(ParentManage):
             item = [lot_id, feature_id, feature.attribute('code'), 0]
             row = []
             for value in item:
-                if value not in ('', None) and type(value) != QPyNullVariant:
+                if value not in ('', None):
                     row.append(QStandardItem(str(value)))
                 else:
                     row.append(QStandardItem(None))
@@ -718,7 +713,7 @@ class AddNewLot(ParentManage):
             values = "$$"+str(lot_id)+"$$, "
             for key, value in list(item.items()):
                 if key != 'lot_id':
-                    if value not in('', None) and type(value) != QPyNullVariant:
+                    if value not in('', None):
                         keys += ""+key+", "
                         if type(value) in (int, bool):
                             values += "$$"+str(value)+"$$, "

@@ -20,7 +20,12 @@ from builtins import str
 from builtins import next
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+from qgis.core import QgsPoint, QgsMapToPixel, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt
 
@@ -135,7 +140,7 @@ class MoveNodeMapTool(ParentMapTool):
             self.iface.setActiveLayer(self.active_layer)           
 
         try:
-            self.rubber_band.reset(QGis.Line)
+            self.rubber_band.reset(Qgis.Line)
         except AttributeError:
             pass
 
