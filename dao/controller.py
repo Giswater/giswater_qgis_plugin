@@ -983,13 +983,16 @@ class DaoController(object):
         return row
     
     
-    def check_role_user(self, role_name):
+    def check_role_user(self, role_name, username=None):
         """ Check if current user belongs to @role_name """
         
         if not self.check_role(role_name):
             return False
-        
-        sql = ("SELECT pg_has_role('" + self.user + "', '" + role_name + "', 'MEMBER');")
+
+        if username is None:
+            username = self.user
+
+        sql = ("SELECT pg_has_role('" + username + "', '" + role_name + "', 'MEMBER');")
         row = self.get_row(sql)
         return row[0]
          
@@ -997,7 +1000,7 @@ class DaoController(object):
     def get_current_user(self):
         """ Get current user connected to database """
         
-        sql = ("SELECT current_user")
+        sql = "SELECT current_user"
         row = self.get_row(sql)
         cur_user = ""
         if row:

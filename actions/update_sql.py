@@ -200,12 +200,15 @@ class UpdateSQL(ParentAction):
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, 'Connection Failed. Please, check connection parameters')
             return
+
         else:
-            if self.check_roladmin_user(self.username) is False or self.username != 'postgres':
-                self.controller.show_message("You don't have permissions to administrate project schemas on this connection", 1)
+            role_admin = self.controller.check_role_user("role_admin", self.username)
+            if not role_admin and self.username != 'postgres' and self.username != 'gisadmin':
+                msg = "You don't have permissions to administrate project schemas on this connection"
+                self.controller.show_message(msg, 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, "You don't have permissions to administrate project schemas on this connection")
+                utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             else:
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -1722,12 +1725,12 @@ class UpdateSQL(ParentAction):
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
 
         self.populate_data_schema_name(self.cmb_project_type)
-
         self.set_last_connection(connection_name)
 
-        if self.logged == True:
+        if self.logged:
             self.username = self.get_user_connection(self.get_last_connection())
-            if self.check_roladmin_user(self.username) is False or self.username != 'postgres':
+            role_admin = self.controller.check_role_user("role_admin", self.username)
+            if not role_admin and self.username != 'postgres' and self.username != 'gisadmin':
                 self.controller.show_message("Connection Failed. You dont have permisions for this connection.", 1)
                 utils_giswater.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
@@ -1736,6 +1739,7 @@ class UpdateSQL(ParentAction):
 
 
     def set_last_connection(self, connection_name):
+
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
         settings.setValue('selected', connection_name)
@@ -1743,6 +1747,7 @@ class UpdateSQL(ParentAction):
 
 
     def get_last_connection(self):
+
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
         connection_name = settings.value('selected')
@@ -1751,6 +1756,7 @@ class UpdateSQL(ParentAction):
 
 
     def get_user_connection(self, connection_name):
+
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections/" + connection_name)
         connection_username = settings.value('username')
@@ -1759,18 +1765,6 @@ class UpdateSQL(ParentAction):
 
 
     """ Other functions """
-
-
-    def check_roladmin_user(self, username):
-        res = False
-        sql = ("SELECT r.rolname as username,r1.rolname FROM pg_catalog.pg_roles r "
-               "JOIN pg_catalog.pg_auth_members m ON (m.member = r.oid) "
-               "JOIN pg_roles r1 ON (m.roleid=r1.oid) "
-               "WHERE r.rolname = '" + str(username) + "' and r1.rolname = 'role_admin'")
-        row = self.controller.get_row(sql)
-        if row is not None:
-            res = True
-        return res
 
 
     def show_info(self):
