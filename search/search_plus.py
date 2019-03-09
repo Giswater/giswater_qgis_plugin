@@ -147,7 +147,7 @@ class SearchPlus(QObject):
             if row[0] is None or row[0] == 'null':
                 msg = "Cant zoom to selection because has no geometry: "
                 self.controller.show_warning(msg, parameter=polygon_name)
-                self.iface.legendInterface().setLayerVisible(layer, False)
+                self.controller.set_layer_visible(layer, False)
                 return
 
         # Select features of @layer applying @expr
@@ -156,7 +156,7 @@ class SearchPlus(QObject):
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.controller.set_layer_visible(layer)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 
@@ -445,7 +445,7 @@ class SearchPlus(QObject):
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.iface.setActiveLayer(layer)
-                        self.iface.legendInterface().setLayerVisible(layer, True)
+                        self.controller.set_layer_visible(layer)
                         self.open_custom_form(layer, expr)
                         self.zoom_to_selected_features(layer, geom_type)
                         return
@@ -562,7 +562,7 @@ class SearchPlus(QObject):
         """ Iterate over all layers to get the ones set in config file """
         
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         if len(layers) == 0:
             return            
         
@@ -737,7 +737,7 @@ class SearchPlus(QObject):
                 # If any feature found, zoom it and exit function
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
-                    self.iface.legendInterface().setLayerVisible(layer, True)
+                    self.controller.set_layer_visible(layer)
                     self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
@@ -993,7 +993,7 @@ class SearchPlus(QObject):
                     if layer.selectedFeatureCount() > 0:
                         self.zoom_to_selected_features(layer, geom_type)
                         # Set the layer checked (i.e. set it's visibility)
-                        self.iface.legendInterface().setLayerVisible(layer, True)
+                        self.controller.set_layer_visible(layer)
                         self.open_custom_form(layer, expr)
                         return
 
@@ -1346,7 +1346,7 @@ class SearchPlus(QObject):
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.controller.set_layer_visible(layer)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 

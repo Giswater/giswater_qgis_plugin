@@ -1730,7 +1730,7 @@ class ParentDialog(QDialog):
         """ Manage layers """
 
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         if len(layers) == 0:
             return
 

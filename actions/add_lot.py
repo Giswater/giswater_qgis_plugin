@@ -556,17 +556,19 @@ class AddNewLot(ParentManage):
 
 
     def set_active_layer(self):
+
         self.current_layer = self.iface.activeLayer()
         # Set active layer
         layer_name = 'v_edit_' + utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
 
         self.layer_lot = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(self.layer_lot)
-        self.iface.legendInterface().setLayerVisible(self.layer_lot, True)
+        self.controller.set_layer_visible(self.layer_lot)
 
 
     def selection_init(self, dialog):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
+
         self.disconnect_signal_selection_changed()
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed(dialog)
@@ -579,12 +581,15 @@ class AddNewLot(ParentManage):
         except Exception:
             pass
 
+
     def set_feature_type_cmb(self):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         utils_giswater.set_combo_itemData(self.feature_type, feature_type, 1)
         self.feature_type.setEnabled(False)
 
+
     def set_dates(self):
+
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
@@ -606,6 +611,7 @@ class AddNewLot(ParentManage):
 
 
     def reload_table_visit(self):
+
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         object_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.txt_filter)
         visit_start = self.dlg_lot.date_event_from.date()
@@ -617,6 +623,7 @@ class AddNewLot(ParentManage):
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
             return
+
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
@@ -657,6 +664,7 @@ class AddNewLot(ParentManage):
 
 
     def get_dialog(self):
+
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
@@ -665,7 +673,9 @@ class AddNewLot(ParentManage):
         self.controller.log_info(str("TODO: ABRIR FORMULARIOS"))
         self.controller.log_info(str(row))
 
+
     def save_lot(self):
+
         lot = {}
         lot['idval'] = utils_giswater.getWidgetText(self.dlg_lot, 'txt_idval', False, False)
         lot['startdate'] = utils_giswater.getCalendarDate(self.dlg_lot, 'startdate')
@@ -748,6 +758,7 @@ class AddNewLot(ParentManage):
 
 
     def zoom_to_feature(self, qtable):
+
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -781,12 +792,15 @@ class AddNewLot(ParentManage):
         points = self.get_points(list_coord)
         self.draw_polygon(points)
 
+
     def manage_rejected(self):
         self.disconnect_signal_selection_changed()
         self.close_dialog(self.dlg_lot)
 
+
     # TODO delete function draw_polygon(*args) when api_parent.py is integrated into giswater proyect
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+
         self.rubber_polygon = QgsRubberBand(self.canvas)
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
@@ -802,6 +816,7 @@ class AddNewLot(ParentManage):
             self.vMarker.setIconSize(width)
             self.vMarker.setCenter(points)
             self.vMarker.show()
+
 
     # TODO delete function get_points(*args) when api_parent.py is integrated into giswater proyect
     def get_points(self, list_coord=None):
@@ -986,7 +1001,9 @@ class AddNewLot(ParentManage):
         # Open form
         self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
 
+
     def delete_lot(self, qtable):
+
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -1026,8 +1043,10 @@ class AddNewLot(ParentManage):
         # if hasattr(self, 'previous_dialog'):
         self.manage_lot(selected_object_id, is_new=False, visitclass_id=visitclass_id)
 
+
     def filter_lot(self, dialog, widget_table, widget_txt):
-        """ Filter om_visit in self.dlg_lot_man.tbl_visit based on (id AND text AND between dates)"""
+        """ Filter om_visit in self.dlg_lot_man.tbl_visit based on (id AND text AND between dates) """
+
         object_id = utils_giswater.getWidgetText(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
@@ -1050,5 +1069,4 @@ class AddNewLot(ParentManage):
         # Refresh model with selected filter
         widget_table.model().setFilter(expr_filter)
         widget_table.model().select()
-
 

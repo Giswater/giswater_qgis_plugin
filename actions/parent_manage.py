@@ -1087,21 +1087,21 @@ class ParentManage(ParentAction, object):
         
         layer = self.controller.get_layer_by_tablename("v_edit_arc")
         if layer:
-            self.iface.legendInterface().setLayerVisible(layer, visible)
+            self.controller.set_layer_visible(layer)
         layer = self.controller.get_layer_by_tablename("v_edit_node")
         if layer:
-            self.iface.legendInterface().setLayerVisible(layer, visible)
+            self.controller.set_layer_visible(layer)
         layer = self.controller.get_layer_by_tablename("v_edit_connec")
         if layer:
-            self.iface.legendInterface().setLayerVisible(layer, visible)
+            self.controller.set_layer_visible(layer)
         layer = self.controller.get_layer_by_tablename("v_edit_element")
         if layer:
-            self.iface.legendInterface().setLayerVisible(layer, visible)
+            self.controller.set_layer_visible(layer)
             
         if self.project_type == 'ud':
             layer = self.controller.get_layer_by_tablename("v_edit_gully")
             if layer:
-                self.iface.legendInterface().setLayerVisible(layer, visible)            
+                self.controller.set_layer_visible(layer)
         
     
     def connect_signal_selection_changed(self, dialog, table_object, query=False):

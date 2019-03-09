@@ -476,11 +476,13 @@ class GwToolBox(ApiParent):
 
 
     def populate_layer_combo(self, geom_type):
+
         self.layers = []
         self.layers = self.controller.get_group_layers(geom_type)
         layers = []
+        list_layers = self.controller.get_layers()
         for layer in self.layers:
-            if layer in self.iface.legendInterface().layers():
+            if layer in list_layers:
                 elem = []
                 layer_name = self.controller.get_layer_source_table_name(layer)
                 elem.append(layer.name())
@@ -490,6 +492,7 @@ class GwToolBox(ApiParent):
 
 
     def populate_trv(self, trv_widget, result, expand=False):
+
         model = QStandardItemModel()
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)

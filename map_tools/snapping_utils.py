@@ -61,7 +61,7 @@ class SnappingConfigManager(object):
         """ Function that collects all the snapping options and put it in an array """
 
         snapping_layers_options = []
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         for layer in layers:
             options = QgsProject.instance().snapSettingsForLayer(layer.id())
             snapping_layers_options.append(
@@ -81,7 +81,7 @@ class SnappingConfigManager(object):
         """ Removing snap """
 
         QgsProject.instance().blockSignals(True)
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         # Loop through all the layers in the project
         for layer in layers:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, snapping_mode, 0, 1, False)

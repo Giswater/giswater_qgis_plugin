@@ -9,6 +9,11 @@ from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton
@@ -71,7 +76,10 @@ class Giswater(QObject):
 
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
-        QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)   
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)
+        else:
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
             
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
@@ -90,10 +98,13 @@ class Giswater(QObject):
 
         # Define signals
         self.set_signals()
-        
-        # Set default encoding 
-        reload(sys)
-        sys.setdefaultencoding('utf-8')   #@UndefinedVariable
+
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            reload(sys)
+            sys.setdefaultencoding('utf-8')  # @UndefinedVariable
+        # TODO: 3.x
+        else:
+            pass
 
         
     def set_signals(self): 
@@ -435,7 +446,7 @@ class Giswater(QObject):
             return
         
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         if len(layers) == 0:
             return
 
@@ -617,7 +628,7 @@ class Giswater(QObject):
         """ Iterate over all layers to get the ones specified in 'db' config section """ 
         
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
             
         if len(layers) == 0:
             return False   
@@ -759,7 +770,7 @@ class Giswater(QObject):
 
         # Set arrow cursor
         QApplication.setOverrideCursor(Qt.ArrowCursor)       
-        layers = self.iface.legendInterface().layers()        
+        layers = self.controller.get_layers()
         status = self.populate_audit_check_project(layers)
         QApplication.restoreOverrideCursor()      
         if not status:

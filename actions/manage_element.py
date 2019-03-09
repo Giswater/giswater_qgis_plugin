@@ -111,11 +111,11 @@ class ManageElement(ParentManage):
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")
         layer_is_visible = False
         if layer_element:
-            layer_is_visible = self.iface.legendInterface().isLayerVisible(layer_element)
+            layer_is_visible = self.controller.is_layer_visible(layer_element)
 
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
-        self.dlg_add_element.btn_accept.clicked.connect(partial(self.set_layer_visible, layer_element, layer_is_visible))
+        self.dlg_add_element.btn_accept.clicked.connect(partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
         self.dlg_add_element.btn_cancel.clicked.connect(partial(self.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.rejected.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
@@ -137,7 +137,7 @@ class ManageElement(ParentManage):
 
         # Force layer v_edit_element set active True
         if layer_element:
-            self.iface.legendInterface().setLayerVisible(layer_element, True)
+            self.controller.set_layer_visible(layer_element)
 
         # If is a new element dont need set enddate
         if self.new_element_id is True:
@@ -160,10 +160,6 @@ class ManageElement(ParentManage):
         utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)
         if rows:
             utils_giswater.setCurrentIndex(self.dlg_add_element, "location_type", 0)
-
-    def set_layer_visible(self, layer, visible):
-        """ Restore visible state when finish process """
-        self.iface.legendInterface().setLayerVisible(layer, visible)
 
 
     def fill_tbl_new_element(self, dialog, geom_type, feature_id):

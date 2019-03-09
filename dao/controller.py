@@ -701,7 +701,7 @@ class DaoController(object):
         """ Iterate over all layers and get the one with selected @tablename """
         
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.get_layers()
         if len(layers) == 0:
             return None
 
@@ -1122,4 +1122,39 @@ class DaoController(object):
     def get_log_folder(self):
         """ Return log folder """
         return self.logger.log_folder
-    
+
+
+    def is_layer_visible(self, layer):
+        """ Is layer visible """
+
+        visible = False
+        if layer:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                visible = self.iface.legendInterface().isLayerVisible(layer)
+            else:
+                visible = QgsProject.instance().layerTreeRoot().findLayer(layer.id()).itemVisibilityChecked()
+
+        return visible
+
+
+    def set_layer_visible(self, layer, visible=True):
+        """ Set layer visible """
+
+        if layer:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                self.iface.legendInterface().setLayerVisible(layer, visible)
+            else:
+                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
+
+
+    def get_layers(self):
+        """ Return layers in the same order as listed in TOC """
+
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            layers = self.iface.legendInterface().layers()
+        else:
+            layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
+
+        return layers
+
+

@@ -43,7 +43,7 @@ class UpdateSQL(ParentAction):
         """ Button 100: Execute SQL. Info show info """
 
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
 
         # Get last database connection from controller
         self.last_connection = self.get_last_connection()
