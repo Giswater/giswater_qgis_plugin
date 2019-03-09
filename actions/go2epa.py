@@ -11,15 +11,11 @@ from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
-
-
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtCore import QTime, QDate, Qt, QThread
+from qgis.PyQt.QtCore import QTime, QDate, Qt, QStringListModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
 from qgis.PyQt.QtWidgets import QCompleter, QFileDialog
 
-import csv, os, re, subprocess, sys, time, threading
-import configparser
+import csv, os, re, subprocess
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QMessageBox
@@ -30,8 +26,6 @@ from giswater.actions.api_parent import ApiParent
 from giswater.actions.update_sql import UpdateSQL
 from giswater.ui_manager import FileManager, Multirow_selector, HydrologySelector
 from giswater.ui_manager import EpaResultCompareSelector, EpaResultManager
-
-
 
 
 class Go2Epa(ApiParent):

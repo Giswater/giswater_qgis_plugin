@@ -8,7 +8,7 @@ from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
 from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel
 

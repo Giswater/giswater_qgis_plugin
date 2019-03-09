@@ -27,10 +27,10 @@ from qgis.PyQt.QtWebKitWidgets import QWebView
 from functools import partial
 from datetime import datetime
 
+import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 import os
-import sys  
 import urllib.parse
 import webbrowser
 import subprocess
@@ -69,9 +69,11 @@ class ParentDialog(QDialog):
         self.init_config()     
         self.set_signals()
         self.dlg_is_destroyed = None
+
         # Set default encoding 
-        reload(sys)
-        sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            reload(sys)
+            sys.setdefaultencoding('utf-8')   #@UndefinedVariable
 
         super(ParentDialog, self).__init__()
 

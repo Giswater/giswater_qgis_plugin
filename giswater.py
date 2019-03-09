@@ -564,7 +564,6 @@ class Giswater(QObject):
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
 
-
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -575,7 +574,6 @@ class Giswater(QObject):
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
-
 
         # Manage layers
         if not self.manage_layers():
@@ -781,35 +779,30 @@ class Giswater(QObject):
 
     def manage_snapping_layers(self):
         """ Manage snapping of layers """
-        
-        layer = self.controller.get_layer_by_tablename('v_edit_man_pipe')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_arc')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_connec')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_node')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_gully')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-        layer = self.controller.get_layer_by_tablename('v_edit_man_conduit')
-        if layer:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)            
-#         layer = self.controller.get_layer_by_tablename('v_edit_man_varc')
-#         if layer:
-#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-#         layer = self.controller.get_layer_by_tablename('v_edit_man_siphon')
-#         if layer:
-#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-#         layer = self.controller.get_layer_by_tablename('v_edit_man_vaccel')
-#         if layer:
-#             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-            
+
+        # TODO 3.x
+        try:
+            layer = self.controller.get_layer_by_tablename('v_edit_man_pipe')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_arc')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_connec')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_node')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_gully')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
+            layer = self.controller.get_layer_by_tablename('v_edit_man_conduit')
+            if layer:
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
+        except:
+            pass
+
                     
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
@@ -907,16 +900,20 @@ class Giswater(QObject):
         elif self.wsoftware == 'ud':
             fieldname_node = "ymax"
             fieldname_connec = "connec_depth"
-            
-        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        if layer_node:
-            display_field = 'depth : [% "' + fieldname_node + '" %]'
-            layer_node.setDisplayField(display_field)
-        
-        layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
-        if layer_connec:
-            display_field = 'depth : [% "' + fieldname_connec + '" %]'
-            layer_connec.setDisplayField(display_field)
+
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+            if layer_node:
+                display_field = 'depth : [% "' + fieldname_node + '" %]'
+                layer_node.setDisplayField(display_field)
+
+            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+            if layer_connec:
+                display_field = 'depth : [% "' + fieldname_connec + '" %]'
+                layer_connec.setDisplayField(display_field)
+        # TODO 3.x
+        else:
+            pass
 
     
     def manage_map_tools(self):
@@ -1004,7 +1001,15 @@ class Giswater(QObject):
         """ Manage project variable 'expl_id' """
         
         # Get project variable 'expl_id'
-        expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')  
+        try:
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
+            # TODO: 3.x
+            else:
+                expl_id = None
+        except:
+            pass
+        
         if expl_id is None:
             return
                     

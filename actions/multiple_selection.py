@@ -13,7 +13,7 @@ try:
 except:
     from qgis.core import QGis as Qgis
 
-from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle
+from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle, QgsWkbTypes
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
 from qgis.PyQt.QtWidgets import QApplication
@@ -71,7 +71,7 @@ class MultipleSelection(QgsMapTool):
         
         self.start_point = self.end_point = None
         self.is_emitting_point = False
-        self.rubber_band.reset(QGis.Polygon)
+        self.reset_rubber_band()
 
 
     def canvasPressEvent(self, e):
@@ -154,7 +154,7 @@ class MultipleSelection(QgsMapTool):
 
     def show_rect(self, start_point, end_point):
         
-        self.rubber_band.reset(QGis.Polygon)
+        self.reset_rubber_band()
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
         point1 = QgsPoint(start_point.x(), start_point.y())
@@ -186,4 +186,16 @@ class MultipleSelection(QgsMapTool):
 
     def activate(self):
         pass
+
+
+    def reset_rubber_band(self):
+
+        try:
+            # Graphic elements
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                self.rubber_band.reset(Qgis.Polygon)
+            else:
+                self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        except:
+            pass
 

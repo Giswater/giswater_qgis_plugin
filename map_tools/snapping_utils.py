@@ -45,7 +45,7 @@ class SnappingConfigManager(object):
         self.controller = None
             
         # Snapper
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         proj = QgsProject.instance()
         proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
 

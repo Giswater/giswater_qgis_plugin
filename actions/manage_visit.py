@@ -8,7 +8,7 @@ or (at your option) any later version.
 from builtins import str
 from builtins import range
 
-from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject
+from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject, QStringListModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView
 from qgis.PyQt.QtWidgets import QTextEdit, QPushButton, QComboBox, QTabWidget
 import os
@@ -16,7 +16,6 @@ import sys
 import subprocess
 import webbrowser
 from functools import partial
-
 
 import utils_giswater
 from giswater.dao.om_visit_event import OmVisitEvent

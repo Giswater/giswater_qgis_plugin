@@ -10,11 +10,10 @@ from builtins import range
 # -*- coding: utf-8 -*-
 from qgis.core import QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
-from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
+from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QPoint, QDate
+from qgis.PyQt.QtCore import Qt, QPoint, QDate, QStringListModel
 
 from functools import partial
 

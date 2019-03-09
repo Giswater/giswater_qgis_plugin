@@ -24,10 +24,9 @@ else:
     from qgis.gui import QgsMapCanvas
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QSettings
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter
+from qgis.PyQt.QtCore import Qt, QSettings, QStringListModel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
-from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial

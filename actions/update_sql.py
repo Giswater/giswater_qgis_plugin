@@ -4,11 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from builtins import str
 
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit, QPushButton, QTableView, QLabel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand
+from qgis.PyQt.QtWidgets import QCheckBox, QRadioButton, QComboBox, QLineEdit,QPushButton, QTableView, QLabel, QAbstractItemView, QTextEdit
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import QSettings, Qt
 
@@ -61,7 +59,6 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
 
         # Set label status connection
-
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
         self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
         self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
@@ -96,7 +93,7 @@ class UpdateSQL(ParentAction):
 
         self.message_update = ''
 
-        #Declare error counter variable
+        # Error counter variable
         self.error_count = 0
 
         # Get locale of QGIS application
@@ -123,15 +120,15 @@ class UpdateSQL(ParentAction):
             self.project_types = self.settings.value('system_variables/project_types_dev')
 
         # Declare sql directory
-        self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + '\sql'
+        self.sql_dir = os.path.normpath(os.path.normpath(os.path.dirname(os.path.abspath(__file__)) + os.sep + os.pardir)) + os.sep + 'sql'
         if not os.path.exists(self.sql_dir):
-            self.controller.show_message("The sql folder was not found in the Giwsater repository.", 1)
+            self.controller.show_message("SQL folder not found", parameter=self.sql_dir)
             return
 
         # Populate combo types
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
-        for type in self.project_types:
-            self.cmb_project_type.addItem(str(type))
+        for project_type in self.project_types:
+            self.cmb_project_type.addItem(str(project_type))
         self.change_project_type(self.cmb_project_type)
 
         # Populate combo connections
@@ -219,6 +216,7 @@ class UpdateSQL(ParentAction):
 
 
     def btn_constrains_changed(self, button):
+
         lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
         if button.text() == 'OFF':
             button.setText("ON")
@@ -227,6 +225,8 @@ class UpdateSQL(ParentAction):
             button.setText("OFF")
             lbl_constrains_info.setText('(Constrains dissabled)')
         return
+
+
     """ Declare all read sql process """
 
     def load_base(self, project_type=False):
@@ -1323,7 +1323,7 @@ class UpdateSQL(ParentAction):
 
 
     def execute_import_data(self):
-        #TODO:: This functions are comment at the moment. We dont enable this function until 3.2
+        #TODO: This functions are comment at the moment. We dont enable this function until 3.2
         return
         # Execute import data
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_import_epa_inp()")
@@ -1331,7 +1331,8 @@ class UpdateSQL(ParentAction):
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
-        # Execute last process function
+        """ Execute last process function """
+
         if new_project is True:
             extras = '"isNewProject":"' + str('TRUE') + '", '
         else:
@@ -1349,7 +1350,7 @@ class UpdateSQL(ParentAction):
 
         self.schema_name = schema_name
 
-        #Get current locale
+        # Get current locale
         if locale:
             locale = ''
         else:
@@ -1395,7 +1396,7 @@ class UpdateSQL(ParentAction):
             result = self.controller.show_info_box(msg, "Info")
             return
 
-        sql = ("SELECT schema_name, schema_name FROM information_schema.schemata")
+        sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
         rows = self.controller.get_rows(sql)
         available = False
         for row in rows:

@@ -25,7 +25,7 @@ try:
 except:
     from qgis.core import QGis as Qgis
 
-from qgis.core import QgsPoint, QgsExpression
+from qgis.core import QgsPoint, QgsExpression, QgsWkbTypes
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
@@ -87,7 +87,10 @@ class ParentMapTool(QgsMapTool):
                  
         # Set default rubber band
         color_selection = QColor(254, 178, 76, 63)
-        self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
+        else:
+            self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
         self.rubber_band.setColor(color)
         self.rubber_band.setFillColor(color_selection)           
         self.rubber_band.setWidth(1)           
@@ -95,9 +98,10 @@ class ParentMapTool(QgsMapTool):
         
         self.force_active_layer = True
         
-        # Set default encoding 
-        reload(sys)
-        sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
+        # Set default encoding
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            reload(sys)
+            sys.setdefaultencoding('utf-8')   #@UndefinedVariable
         
         
     def get_cursor_multiple_selection(self):
@@ -162,15 +166,24 @@ class ParentMapTool(QgsMapTool):
         try:
             self.iface.actionPan().trigger()     
         except Exception:          
-            pass  
+            pass
+
+
+    def reset_rubber_band(self):
+
+        try:
+            # Graphic elements
+            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+                self.rubber_band.reset(Qgis.Polygon)
+            else:
+                self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        except:
+            pass
 
 
     def reset(self):
-                
-        # Graphic elements
-        self.rubber_band.reset(Qgis.Polygon)
 
-        # Selection
+        self.reset_rubber_band()
         self.snapped_feat = None      
         
     
