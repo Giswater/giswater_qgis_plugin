@@ -9,9 +9,8 @@ from builtins import range
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsFeatureRequest
-from PyQt4.Qt import QDate
-from qgis.PyQt.QtCore import Qt
-from PyQt4.QtSql import QSqlTableModel
+from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 
 from functools import partial

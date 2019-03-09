@@ -14,7 +14,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime, QPyNullVariant
 from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
-from PyQt4.QtSql import QSqlTableModel
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
 import os

@@ -17,15 +17,13 @@ from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit
-from qgis.PyQt.QtCore import QSortFilterProxyModel
-from qgis.PyQt.QtWidgets import QSpinBox, QTimeEdit, QPushButton
-from PyQt4.Qt import QDate, QDateTime
+from qgis.PyQt.QtCore import QSortFilterProxyModel, QDate, QDateTime
+from qgis.PyQt.QtWidgets import QPushButton
 from qgis.PyQt.QtCore import QTime, Qt
 from qgis.PyQt.QtWidgets import QTableView, QSpinBox, QTimeEdit
 from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
-import inspect
 import os
 import sys
 import operator

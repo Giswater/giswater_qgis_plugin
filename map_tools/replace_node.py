@@ -11,8 +11,7 @@ from builtins import range
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import QPoint, Qt
-from PyQt4.Qt import QDate
+from qgis.PyQt.QtCore import QPoint, Qt, QDate
 
 from functools import partial
 from datetime import datetime

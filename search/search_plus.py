@@ -5,7 +5,7 @@ from builtins import range
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QObject, QPyNullVariant, Qt
-from PyQt4.QtSql import QSqlTableModel
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 from qgis.PyQt.QtCore import QSortFilterProxyModel
 

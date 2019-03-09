@@ -28,7 +28,7 @@ from qgis.gui import QgsVertexMarker, QgsRubberBand
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QToolButton
-from PyQt4.QtSql import QSqlTableModel
+from qgis.PyQt.QtSql import QSqlTableModel
 
 import utils_giswater
 from giswater.actions.manage_visit import ManageVisit

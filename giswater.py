@@ -13,7 +13,7 @@ from qgis.core import QgsExpressionContextUtils, QgsProject
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton
 from qgis.PyQt.QtGui import QIcon
-from PyQt4.QtSql import QSqlQueryModel
+from qgis.PyQt.QtSql import QSqlQueryModel
 import os.path
 import sys  
 from functools import partial

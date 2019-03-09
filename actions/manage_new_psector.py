@@ -14,7 +14,7 @@ from qgis.core import QgsComposition,  QgsRectangle, QgsPoint
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
-from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
+from qgis.PyQt import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
 import os

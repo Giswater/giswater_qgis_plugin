@@ -10,9 +10,8 @@ from builtins import object
 
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
-from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
+from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
-from PyQt4.Qt import QToolBox
 from qgis.core import QgsMessageLog, QgsMapLayerRegistry, QgsDataSourceURI, QgsCredentials
 
 import os.path

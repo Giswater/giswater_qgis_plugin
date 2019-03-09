@@ -16,14 +16,13 @@ from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
 
-from PyQt4.Qt import QDate, QDateTime
-from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QUrl
+from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QUrl, QDate, QDateTime
 from qgis.PyQt.QtWidgets import QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCompleter, QCheckBox, QFormLayout
 from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor
 from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QWidget, QDialog, QTextEdit
 from qgis.PyQt.QtGui import QIcon
-from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWebKitWidgets import QWebView
 from functools import partial
 from datetime import datetime

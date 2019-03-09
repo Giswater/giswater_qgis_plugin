@@ -10,7 +10,7 @@ from builtins import range
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QDateEdit, QLineEdit, QTableView, QAbstractItemView
 from qgis.PyQt.QtGui import QDoubleValidator
-from PyQt4.QtSql import QSqlTableModel
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
 
 import operator

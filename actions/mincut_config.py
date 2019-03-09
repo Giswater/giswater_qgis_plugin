@@ -10,7 +10,7 @@ from builtins import range
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QCompleter, QAbstractItemView
-from PyQt4.QtSql import QSqlTableModel
+from qgis.PyQt.QtSql import QSqlTableModel
 
 from functools import partial
 

@@ -28,7 +28,7 @@ from qgis.PyQt.QtWidgets import QTableView, QListWidgetItem, QTabWidget, QRadioB
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTreeWidgetItem
 from qgis.PyQt.QtPrintSupport import QPrinter
-from PyQt4.QtSql import QSqlTableModel
+from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.core import QgsMapLayerRegistry, QgsProject, QgsPoint, QgsFeature, QgsGeometry, QgsDataSourceURI
 from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField, QgsMarkerSymbolV2

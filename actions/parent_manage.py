@@ -8,16 +8,13 @@ from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
-
-
 from qgis.core import QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper,QgsVertexMarker
-from PyQt4.Qt import QDate
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView
-from PyQt4.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QPoint
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtCore import Qt, QPoint, QDate
 
 from functools import partial
 

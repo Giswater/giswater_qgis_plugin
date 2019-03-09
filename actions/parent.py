@@ -16,7 +16,7 @@ from qgis.PyQt.QtCore import Qt, QSettings
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtWidgets import QAction
-from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
 
