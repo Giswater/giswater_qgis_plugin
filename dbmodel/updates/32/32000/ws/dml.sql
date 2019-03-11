@@ -103,6 +103,32 @@ UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_valve_lc';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_valve_pr';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='v_inp_vertice';
 
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_energy';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_pump';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_reactions_gl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_source';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_typevalue_valve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_ampm';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_curve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_mixing';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_noneall';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_headloss';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_hyd';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_qual';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_rtc_coef';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_unbal';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_units';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_opti_valvemode';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_param_energy';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_reactions_el';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_reactions_gl';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_status_pipe';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_status_pump';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_status_valve';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_times';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_yesno';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_yesnofull';
+UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_options';
 
 
 --2019/02/11

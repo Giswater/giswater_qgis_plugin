@@ -18,7 +18,6 @@ DECLARE
     arcrec Record; 
     nodeRecord1 Record; 
     nodeRecord2 Record; 
-    optionsRecord Record;
     z1 double precision;
     z2 double precision;
     xvar double precision;
@@ -36,8 +35,6 @@ BEGIN
 
     -- Get parameters
     SELECT * INTO rec FROM config;
-    SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
-
 
     -- Lookig for state=0
     IF NEW.state=0 THEN

@@ -36,16 +36,16 @@ BEGIN
 	-- Drop tables
 	FOR v_tablerecord IN SELECT * FROM audit_cat_table WHERE isdeprecated IS TRUE AND id NOT IN (SELECT table_name FROM information_schema.views WHERE table_schema=v_schemaname) 
 	LOOP
-		v_query_text:= 'DROP TABLE IF EXISTS '||v_tablerecord.id||';';
+		v_query_text:= 'DROP TABLE IF EXISTS '||v_tablerecord.id||' CASCADE;';
 		EXECUTE v_query_text;
 	END LOOP;
 	
 	-- Drop functions
-	FOR v_tablerecord IN SELECT * FROM audit_cat_function WHERE isdeprecated IS TRUE
-	LOOP
-		v_query_text:= 'DROP FUNCTION IF EXISTS '||v_tablerecord.id||';';
-		EXECUTE v_query_text;
-	END LOOP;
+	--FOR v_tablerecord IN SELECT * FROM audit_cat_function WHERE isdeprecated IS TRUE
+	--LOOP
+		--v_query_text:= 'DROP FUNCTION IF EXISTS '||v_tablerecord.id||';';
+		--EXECUTE v_query_text;
+	--END LOOP;
 		
 RETURN;
 	

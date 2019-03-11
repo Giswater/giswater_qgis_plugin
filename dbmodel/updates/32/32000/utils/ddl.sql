@@ -10,6 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2019/03/11
 ALTER TABLE om_visit ALTER COLUMN enddate drop DEFAULT;
+ALTER TABLE dimensions ADD COLUMN observ text;
 
 
 ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN pattern_id character varying(16);
@@ -149,6 +150,3 @@ CREATE TABLE inp_typevalue
   CONSTRAINT inp_typevalue_pkey PRIMARY KEY (typevalue, id)
 );
 
-
---2019/03/11
-ALTER TABLE dimensions ADD COLUMN observ text;

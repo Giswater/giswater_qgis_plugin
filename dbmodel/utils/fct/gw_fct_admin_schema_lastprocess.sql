@@ -58,7 +58,8 @@ BEGIN
 	IF v_isnew IS TRUE THEN
 	
 		-- clean schema of all tables/views/triggers not used in this version
-		IF v_gwversion > '3.99' THEN
+		IF v_gwversion > '3.2.999' THEN
+		--IF v_gwversion > '3.1.999' THEN
 			PERFORM gw_fct_admin_schema_dropdeprecated_rel();	
 		END IF;	
 
