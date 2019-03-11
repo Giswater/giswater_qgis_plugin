@@ -756,11 +756,15 @@ class SearchPlus(QObject):
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
         if expl_name == 'null':
             expl_name = ''
+        # sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
+        #        " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
+        #        " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
+        #        " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%'")
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
-               " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
-               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
-               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%'")
-        rows = self.controller.get_rows(sql)
+               " WHERE connec_id = '" + connec_id + "'"
+               " AND hydrometer_customer_code = '" + hydrometer_customer_code + "'"
+               " AND expl_name ILIKE '%" + str(expl_name) + "%'")
+        rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
             row = rows[0]
         else:
@@ -1379,12 +1383,15 @@ class SearchPlus(QObject):
         self.proxy_model = QSortFilterProxyModel()
         self.proxy_model.setSourceModel(model)
         self.proxy_model.setFilterKeyColumn(0)
+
         proxy_model_aux = QSortFilterProxyModel()
         proxy_model_aux.setSourceModel(model)
         proxy_model_aux.setFilterKeyColumn(0)
+
         widget.setModel(proxy_model_aux)
         widget.setModelColumn(0)
         completer = QCompleter()
+
         completer.setModel(self.proxy_model)
         completer.setCompletionColumn(0)
         completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
