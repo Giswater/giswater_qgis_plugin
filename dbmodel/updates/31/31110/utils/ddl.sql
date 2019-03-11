@@ -144,3 +144,7 @@ CREATE TABLE inp_typevalue
   descript text,
   CONSTRAINT inp_typevalue_pkey PRIMARY KEY (typevalue, id)
 );
+
+
+--2019/03/11
+ALTER TABLE dimensions ADD COLUMN observ text;
