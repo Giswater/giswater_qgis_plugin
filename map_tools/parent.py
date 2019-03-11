@@ -25,11 +25,11 @@ from PyQt4.QtGui import QCursor, QColor, QIcon, QPixmap
 
 from snapping_utils import SnappingConfigManager
 
-if 'nt' in sys.builtin_module_names:
-    import ctypes
+
 import os
 import sys
-
+if 'nt' in sys.builtin_module_names:
+    import ctypes
 
 class ParentMapTool(QgsMapTool):
 

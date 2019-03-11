@@ -20,13 +20,13 @@ from PyQt4.QtWebKit import QWebView, QWebSettings
 from functools import partial
 from datetime import datetime
 
-if 'nt' in sys.builtin_module_names:
-    import ctypes
 import os
 import sys  
 import urlparse
 import webbrowser
 import subprocess
+if 'nt' in sys.builtin_module_names:
+    import ctypes
 
 import utils_giswater
 from dao.controller import DaoController
