@@ -16,12 +16,13 @@ from functools import partial
 
 import sys
 import ConfigParser
-if 'nt' in sys.builtin_module_names:
-    import ctypes
+
 import os
 import utils_giswater
 import webbrowser
 
+if 'nt' in sys.builtin_module_names:
+    import ctypes
 
 class ParentAction(object):
 

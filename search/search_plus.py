@@ -7,13 +7,14 @@ from PyQt4.QtSql import QSqlTableModel
 from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 
 from functools import partial
+
 import sys
-if 'nt' in sys.builtin_module_names:
-    import ctypes
 import operator
 import os
 import csv
 import webbrowser
+if 'nt' in sys.builtin_module_names:
+    import ctypes
 
 import utils_giswater
 from giswater.search.ui.list_items import ListItems
