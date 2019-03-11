@@ -36,6 +36,9 @@ INSERT INTO sys_csv2pg_cat VALUES (12, 'Import inp', 'Import inp', null, 'role_a
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('vdefault_rtc_period_seconds','2592000','integer', 'rtc', 'Default value used if ext_cat_period doesn''t have date values or they are incorrect');
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('plan_statetype_ficticius','1','integer', 'plan', 'Value used to identify ficticius arcs in case of new creation on planning operations to keep topology');
+
 
 -- 2019/02/14
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
@@ -167,7 +170,7 @@ INSERT INTO audit_cat_function VALUES (2104, 'gw_fct_anl_arc_same_startend', 'ut
 INSERT INTO audit_cat_function VALUES (2204, 'gw_fct_anl_arc_inverted', 'ud', 'function', '{"featureType":"", "durationType":"short"}', NULL, 'Function is not parametrized yet. Only works with the whole layer of v_edit_arc. There are not variables used for this function', 'Check topology assistant. Identifies arcs that have the slope in a oposite sense that the direction', 'role_edit', false, true, 'Check arcs with the slope inverted', false);
 INSERT INTO audit_cat_function VALUES (1238, 'gw_trg_review_audit_connec', 'ud', 'trigger function', NULL, NULL, NULL, NULL, 'role_edit', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2504, 'gw_fct_utils_csv2pg_importblock', 'utils', 'function', NULL, NULL, NULL, 'Enables the possibility to import dxf blocks', 'role_edit', false, false, NULL, false);
-INSERT INTO audit_cat_function VALUES (2632, 'gw_trg_visit_update_enddate', 'utils', 'trigger function', NULL, NULL, NULL, NULL, 'role_basic', false, false, NULL, false);
+INSERT INTO audit_cat_function VALUES (2632, 'gw_trg_visit_update_enddate', 'utils', 'trigger function', NULL, NULL, NULL, NULL, 'role_basic', true, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (1228, 'gw_trg_edit_review_gully', 'ud', 'trigger function', NULL, NULL, NULL, NULL, 'role_om', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2424, 'gw_fct_audit_schema_check', 'utils', 'function', NULL, NULL, NULL, 'This function analyzes the schema', 'role_admin', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (1338, 'gw_trg_review_audit_connec', 'ws', 'trigger function', NULL, NULL, NULL, NULL, 'role_om', false, false, NULL, false);

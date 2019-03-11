@@ -8,6 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+DROP TRIGGER IF EXISTS gw_trg_visit_update_enddate ON om_visit_event;
+DROP TRIGGER IF EXISTS gw_trg_visit_update_enddate ON om_visit;
+
 -- 2019/02/14
 DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".om_visit;
 CREATE TRIGGER gw_trg_om_visit AFTER INSERT OR DELETE ON "SCHEMA_NAME".om_visit
