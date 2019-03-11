@@ -30,6 +30,9 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
+	-- select version
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+	
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
@@ -71,7 +74,7 @@ BEGIN
 	v_result := COALESCE(v_result, '[]');  
 	
 --    Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"3.1.105"'||
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{"result":' || v_result ||
 			     '}'||

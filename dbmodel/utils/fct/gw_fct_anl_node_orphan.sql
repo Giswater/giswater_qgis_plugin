@@ -6,13 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2110
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_orphan();
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".c();
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_orphan() 
 RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_anl_node_orphan()
+SELECT SCHEMA_NAME.gw_fct_anl_node_orphan($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"v_edit_man_junction", "id":["1004","1005"]},
+"data":{"selectionMode":"previousSelection",
+	"saveOnDatabase":true}}$$)
 */
 
 DECLARE
@@ -31,18 +35,42 @@ BEGIN
 	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
+	-- getting input data 	
+	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
+	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
+	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
+	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
+	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
+
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=7;
 
 	-- Computing process
-	FOR rec_node IN SELECT DISTINCT * FROM node a WHERE a.state=1 AND (SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state=1) = 0
-	LOOP
-		--find the closest arc and the distance between arc and node
-		SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
-	
-		INSERT INTO anl_node (node_id, state, expl_id, fprocesscat_id, the_geom, nodecat_id,arc_id,arc_distance) 
-		VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
-	END LOOP;
+
+	IF v_array != '()' THEN
+		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a WHERE a.state=1 AND arc_id IN '||v_array||' AND 
+		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state=1) = 0' 
+		LOOP
+			--find the closest arc and the distance between arc and node
+			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
+			FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
+		
+			INSERT INTO anl_node (node_id, state, expl_id, fprocesscat_id, the_geom, nodecat_id,arc_id,arc_distance) 
+			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
+		END LOOP;
+	ELSE
+		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a WHERE a.state=1 AND 
+		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state=1) = 0' 
+		LOOP
+			--find the closest arc and the distance between arc and node
+			SELECT ST_Distance(arc.the_geom, rec_node.the_geom) as d, arc.arc_id INTO v_closest_arc_distance, v_closest_arc_id 
+			FROM arc ORDER BY arc.the_geom <-> rec_node.the_geom  LIMIT 1;
+		
+			INSERT INTO anl_node (node_id, state, expl_id, fprocesscat_id, the_geom, nodecat_id,arc_id,arc_distance) 
+			VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 7, rec_node.the_geom, rec_node.nodecat_id,v_closest_arc_id,v_closest_arc_distance);
+		END LOOP;
+	END IF;
+
 
 	-- get results
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=7) row; 

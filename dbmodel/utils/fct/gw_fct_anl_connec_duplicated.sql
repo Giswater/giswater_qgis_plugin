@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -6,43 +6,59 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2106
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_connec_duplicated();
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_connec_duplicated() 
-RETURNS json AS 
-$BODY$ 
-
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_connec_duplicated(p_data json) RETURNS json AS 
+$BODY$
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_anl_connec_duplicated()
+SELECT SCHEMA_NAME.gw_fct_anl_connec_duplicated($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{"tableName":"v_edit_man_wjoin", "id":["1004","1005"]},
+"data":{"selectionMode":"previousSelection",
+	"parameters":{"connecTolerance":1},
+	"saveOnDatabase":true}}$$)
 */
 
 DECLARE
-	rec_connec record;
-	rec record;
-	v_version text;
-	v_saveondatabase boolean = true;
-	v_result json;
+    v_id json;
+    v_selectionmode text;
+    v_connectolerance float;
+    v_saveondatabase boolean;
+    v_worklayer text;
+    v_result json;
+    v_array text;
+    v_version text;
 
 BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-
+	
 	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
-	-- Get data from config table
-	SELECT * INTO rec FROM config; 
+	-- getting input data 	
+	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
+	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
+	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
+	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
+	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
+	v_connectolerance := ((p_data ->>'data')::json->>'parameters')::json->>'connecTolerance';
 
-	-- Reset values
-	DELETE FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=5;
-			
+	raise notice 'v_worklayer % v_connectolerance % v_id %',v_worklayer ,v_connectolerance ,v_array;
+
 	-- Computing process
-	INSERT INTO anl_connec (connec_id, connecat_id,state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
-	SELECT * FROM 
-	(SELECT DISTINCT t1.connec_id as c1, t1.connecat_id as cc1,  t1.state as state1, t2.connec_id as c2, t2.connecat_id as cc2, t2.state as state2, t1.expl_id, 5, t1.the_geom
-	FROM connec AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(30)) 
-	WHERE t1.connec_id != t2.connec_id  ORDER BY t1.connec_id) a 
-	WHERE a.state1 > 0 AND a.state2 > 0 ;
-	
+	IF v_array != '()' THEN
+		EXECUTE 'INSERT INTO anl_connec (connec_id, connecat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
+				SELECT * FROM (
+				SELECT DISTINCT t1.connec_id, t1.connecat_id, t1.state as state1, t2.connec_id, t2.connecat_id, t2.state as state2, t1.expl_id, 5, t1.the_geom
+				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_connectolerance||')) 
+				WHERE t1.connec_id != t2.connec_id AND t1.connec_id IN '||v_array||' ORDER BY t1.connec_id ) a where a.state1 > 0 AND a.state2 > 0';
+	ELSE
+		EXECUTE 'INSERT INTO anl_connec (connec_id, connecat_id, state, connec_id_aux, connecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
+				SELECT * FROM (
+				SELECT DISTINCT t1.connec_id, t1.connecat_id, t1.state as state1, t2.connec_id, t2.connecat_id, t2.state as state2, t1.expl_id, 5, t1.the_geom
+				FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_connectolerance||')) 
+				WHERE t1.connec_id != t2.connec_id ORDER BY t1.connec_id ) a where a.state1 > 0 AND a.state2 > 0';
+	END IF;
+
 	-- get results
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=5) row; 
 
