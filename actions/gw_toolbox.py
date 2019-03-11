@@ -60,42 +60,6 @@ import utils_giswater
 from giswater.actions.api_parent import ApiParent
 from giswater.ui_manager import ApiDlgToolbox, ApiFunctionTb
 
-TIME_LIMIT = 100
-
-# class External(QThread):
-#     """
-#     Runs a counter thread.
-#     """
-#     countChanged = pyqtSignal(int)
-#     max_value=0
-#     current_value = 0
-#     def run(self):
-#         count = self.current_value
-#         max = self.max_value
-#         while count < max:
-#             count +=1
-#             #time.sleep(1)
-#             self.countChanged.emit(count)
-#
-#     def set_current_value(self, cur_val):
-#         self.current_value = cur_val
-#     def _get_current_value(self):
-#          return self.current_value
-#     def _set_max_value(self, value):
-#         self.max_value = value
-#     def _get_max_value(self):
-#         return self.max_value
-#
-#
-class FuncThread(threading.Thread):
-    def __init__(self, target, *args):
-        self._target = target
-        self._args = args
-        threading.Thread.__init__(self)
-
-    def run(self):
-        self._target(*self._args)
-
 
 class GwToolBox(ApiParent):
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -111,9 +75,6 @@ class GwToolBox(ApiParent):
 
 
     def open_toolbox(self):
-        # self.controller.log_info(str(TIME_LIMIT))
-        # TIME_LIMIT = 200
-        # self.controller.log_info(str(TIME_LIMIT))
 
         self.dlg_toolbox = ApiDlgToolbox()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
@@ -122,7 +83,7 @@ class GwToolBox(ApiParent):
 
         body = self.create_body()
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
             return False
@@ -139,7 +100,7 @@ class GwToolBox(ApiParent):
         extras = '"filterText":"' + text + '"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
             return False
@@ -168,12 +129,10 @@ class GwToolBox(ApiParent):
         self.dlg_functions.rbt_layer.toggled.connect(partial(self.rbt_state, self.dlg_functions.rbt_layer))
         self.dlg_functions.rbt_layer.setChecked(True)
 
-
-
         extras = '"filterText":"' + self.alias_function + '"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
             return False
@@ -211,31 +170,6 @@ class GwToolBox(ApiParent):
 
         self.rbt_checked['value'] = state
 
-    # def update_pgbar(self, max_value):
-    #     self.calc = External()
-    #     self.calc._set_max_value(max_value)
-    #     self.calc.countChanged.connect(self.onCountChanged)
-    #     self.calc.start()
-
-
-    # def onCountChanged(self, value):
-    #     self.dlg_functions.progressBar.setValue(value)
-    #     self.controller.log_info(str(value))
-
-
-    # def execute_function(self, dialog, combo, result):
-    #     if self.is_paramtetric is False:
-    #         self.controller.log_info("TEST 10")
-    #         self._execute_function(dialog, combo, result)
-    #     else:
-    #         self.controller.log_info("TEST 20")
-    #         t1 = FuncThread(self._execute_function, dialog, combo, result)
-
-    #         t1.start()
-    #         t1.join()
-
-    #        # SOLO CON ESTA LINEA YA FUNCIONA, PERO GENERA VOLCADO
-    #         #t1 = thread.start_new_thread(self._execute_function, (dialog, combo, result))
 
     def check_exist_function(self, func_name):
         status = False
@@ -248,6 +182,8 @@ class GwToolBox(ApiParent):
             if func_name in row['routine_name']:
                 status = True
         return status
+
+
     def load_settings_values(self, dialog, function):
         """ Load QGIS settings related with csv options """
 
@@ -261,50 +197,19 @@ class GwToolBox(ApiParent):
             dialog.rbt_previous.setChecked(True)
         else:
             dialog.rbt_layer.setChecked(True)
-        # TODO In the future, control the widgets that come from the database
-        # if self.is_paramtetric == True:
-        #     for item in function[0]['return_type']:
-        #         widget = dialog.findChild(QWidget, item['widgetname'])
-        #
-        #         value = self.controller.plugin_settings_value(str(function_name) + "_" + cur_user + "_" + widget.objectName())
-        #
-        #         if str(value) != '':
-        #             if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
-        #                 utils_giswater.setWidgetText(dialog, widget, value)
-        #             elif type(widget) in (QComboBox):
-        #                 utils_giswater.set_combo_itemData(widget, value, 1)
-        #             elif type(widget) in (QCheckBox, QRadioButton):
-        #                 if value.lower() == "true":
-        #                     widget.setChecked(True)
+
 
     def save_settings_values(self, dialog, function):
         """ Save QGIS settings related with toolbox options """
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
-        layer_name = utils_giswater.get_item_data(dialog, dialog.cmb_layers, 1)
         self.controller.plugin_settings_set_value(str(function_name)+"_" + cur_user + "_rbt_previous",
                                                   dialog.rbt_previous.isChecked())
         self.controller.plugin_settings_set_value(str(function_name)+"_" + cur_user + "_chk_save",
                                                   dialog.chk_save.isChecked())
-        # TODO In the future, control the widgets that come from the database
-        # if self.is_paramtetric == True:
-        #     for item in function[0]['return_type']:
-        #         widget = dialog.findChild(QWidget, item['widgetname'])
-        #         self.controller.log_info(str(type(widget)))
-        #         self.controller.log_info(str((widget.objectName())))
-        #         if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
-        #             value = utils_giswater.getWidgetText(dialog, widget)
-        #
-        #         elif type(widget) == QComboBox:
-        #             value = utils_giswater.get_item_data(dialog, widget, 1)
-        #         elif type(widget) in (QCheckBox, QRadioButton):
-        #             value = widget.isChecked()
-        #         self.controller.log_info(str(value))
-        #         self.controller.plugin_settings_set_value(
-        #             str(function_name) + "_" + cur_user + "_" + str(widget.objectName()), value)
+
 
     def execute_function(self, dialog, combo, result):
-        print(datetime.now())
 
         dialog.progressBar.setValue(0)
         dialog.progressBar.setVisible(True)
@@ -325,7 +230,6 @@ class GwToolBox(ApiParent):
         # If function is not parametrized, call function(old) without json
         if self.is_paramtetric is False:
             self.execute_no_parametric(dialog, function_name)
-            print(datetime.now())
             return
 
         layer_name = utils_giswater.get_item_data(dialog, combo, 1)
@@ -396,19 +300,19 @@ class GwToolBox(ApiParent):
         body = self.create_body(feature=feature_field, extras=extras)
 
         sql = ("SELECT " + self.schema_name + "."+str(function_name)+"($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
+
         if not row or row[0] is None:
             self.controller.show_message("Function : " + str(function_name)+" executed with no result ", 3)
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        # if len(complet_result[0]['body']['data']['result']) == 0:
-        #     self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
-        #     return True
+
         self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
+
         dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
-        print(datetime.now())
+
 
     def execute_no_parametric(self, dialog, function_name):
         dialog.progressBar.setMinimum(0)
@@ -419,20 +323,18 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setFormat("")
 
         sql = ("SELECT " + self.schema_name + "." + str(function_name) + "()::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
 
         if not row or row[0] is None:
             self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        # if len(complet_result[0]['body']['data']['result']) == 0:
-        #     self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
-        #     return True
         self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
         dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         return True
+
 
     def populate_functions_dlg(self, dialog, result):
         status = False
@@ -445,9 +347,16 @@ class GwToolBox(ApiParent):
                     self.is_paramtetric = False
                     self.control_isparametric(dialog)
                     self.load_settings_values(dialog, function)
-                    # TODO cuando el campo is_parametric_msg este listo, quitar el construct_form_param_user y
-                    # TODO mostrar el mensage que llegue en un label, en el group box
-                    self.construct_form_param_user(dialog, function, 0, self.function_list, False)
+                    if str(function[0]['isnotparammsg']) is not None:
+                        layout = dialog.findChild(QGridLayout, 'grl_option_parameters')
+                        if layout is None:
+                            status = True
+                            break
+                        label = QLabel()
+                        label.setWordWrap(True)
+                        label.setText("Info: " + str(function[0]['isnotparammsg']))
+                        layout.addWidget(label, 0, 0)
+
                     status = True
                     break
 
@@ -547,11 +456,10 @@ class GwToolBox(ApiParent):
             return 0
 
 
-
-
     def add_temp_layer(self, dialog, result, function_name):
+
         self.delete_layer_from_toc(function_name)
-        print(result)
+
         counter = len(result['result'])
         dialog.progressBar.setMaximum(counter+1)
         dialog.progressBar.setValue(0)
@@ -579,7 +487,9 @@ class GwToolBox(ApiParent):
         if counter > 0:
             for key, value in result['result'][0].items():
                 # add columns
-                prov.addAttributes([QgsField(str(key), QVariant.String)])
+                if str(key) != 'the_geom':
+                    prov.addAttributes([QgsField(str(key), QVariant.String)])
+
         x = 1
         # Add features
         for item in result['result']:
@@ -588,7 +498,8 @@ class GwToolBox(ApiParent):
             attributes = []
             fet = QgsFeature()
             for k, v in item.items():
-                attributes.append(v)
+                if str(k) != 'the_geom':
+                    attributes.append(v)
                 if str(k) in ('the_geom'):
                     sql = ("SELECT St_AsText('"+str(v)+"')")
                     row = self.controller.get_row(sql, log_sql=False)
@@ -597,6 +508,7 @@ class GwToolBox(ApiParent):
             fet.setAttributes(attributes)
             prov.addFeatures([fet])
         dialog.progressBar.setValue(x)
+
         # Commit changes
         virtual_layer.commitChanges()
 
@@ -613,15 +525,12 @@ class GwToolBox(ApiParent):
 
 
     def add_table_from_pg(self, schema_name, table_name, field_id, group_to_be_inserted=None):
-        #schema_name = self.schema_name.replace('"', '')
-        #self.add_table_from_pg(schema_name, 'temp_csv2pg', 'id', 'EPANET')
         layer = self.controller.get_layer_by_tablename(table_name)
         if layer is not None:
             return
 
         layer = self.controller.get_layer_by_tablename("version")
         credentials = self.controller.get_layer_source(layer)
-        #self.controller.log_info(str(credentials))
 
         foreign_uri = QgsDataSourceURI()
         foreign_uri.setConnection(credentials['host'], credentials['port'], credentials['db'], credentials['user'], credentials['password'])
