@@ -13,9 +13,8 @@ SET search_path = "crm", public, pg_catalog;
 -- CRM FUNCTIONS
 -- ----------------------------
 
-
 CREATE OR REPLACE FUNCTION crm.gw_fct_crm2gis()
-  RETURNS void AS
+  RETURNS integer AS
 $BODY$DECLARE
 
 
@@ -36,7 +35,7 @@ BEGIN
 	PERFORM crm.gw_fct_crm2gis_hydro_flow();
 
 
-    RETURN;
+    RETURN 0;
         
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
