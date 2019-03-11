@@ -222,10 +222,10 @@ BEGIN
 	
 		ELSIF (state_aux=1 AND state_node_arg=2 AND plan_arc_vdivision_dsbl_aux IS NOT TRUE) THEN 
 			rec_aux1.state=2;
-			rec_aux1.state_type=(SELECT value::smallint FROM config_param_user WHERE "parameter"='statetype_plan_vdefault' AND cur_user=current_user);
+			rec_aux1.state_type=(SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius');
 			
 			rec_aux2.state=2;
-			rec_aux2.state_type=(SELECT value::smallint FROM config_param_user WHERE "parameter"='statetype_plan_vdefault' AND cur_user=current_user);
+			rec_aux2.state_type=(SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius');
 			
 			-- Insert new records into arc table
 			-- downgrade temporary the state_topocontrol to prevent conflicts	

@@ -36,6 +36,8 @@ INSERT INTO sys_csv2pg_cat VALUES (12, 'Import inp', 'Import inp', null, 'role_a
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('vdefault_rtc_period_seconds','2592000','integer', 'rtc', 'Default value used if ext_cat_period doesn''t have date values or they are incorrect');
+
+-- 2019/03/11
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('plan_statetype_ficticius','1','integer', 'plan', 'Value used to identify ficticius arcs in case of new creation on planning operations to keep topology');
 
