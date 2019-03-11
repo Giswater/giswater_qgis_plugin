@@ -1,13 +1,13 @@
-﻿-- Function: SCHEMA_NAME.gw_api_gettoolbox(json)
+﻿-- Function: ws_sample.gw_api_gettoolbox(json)
 
--- DROP FUNCTION SCHEMA_NAME.gw_api_gettoolbox(json);
+-- DROP FUNCTION ws_sample.gw_api_gettoolbox(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_gettoolbox(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_gettoolbox(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT SCHEMA_NAME.gw_api_gettoolbox($${
+SELECT ws_sample.gw_api_gettoolbox($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"filterText":""}}$$)
 */
@@ -28,7 +28,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample", public;
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -44,7 +44,7 @@ BEGIN
 -- get om toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
+		 SELECT alias, descript, input_params::json,return_type::json, context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_om''
 		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
@@ -54,7 +54,7 @@ BEGIN
 -- get edit toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
+		 SELECT alias, descript, input_params::json, return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_edit''
 		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
@@ -64,7 +64,7 @@ BEGIN
 -- get epa toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
+		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa''
 		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
@@ -75,7 +75,7 @@ BEGIN
 -- get master toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
+		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_master''
 		 AND (project_type='||quote_literal(v_projectype)||' OR project_type=''utils'')) a'
@@ -85,7 +85,7 @@ BEGIN
 -- get admin toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json,return_type::json, sys_role_id, function_name as functionname, isparametric
+		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
 		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin''
 		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
@@ -120,5 +120,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_gettoolbox(json)
+ALTER FUNCTION ws_sample.gw_api_gettoolbox(json)
   OWNER TO postgres;
