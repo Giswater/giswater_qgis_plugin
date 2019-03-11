@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws.gw_trg_om_visit()
+CREATE OR REPLACE FUNCTION gw_trg_om_visit()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -11,7 +11,7 @@ BEGIN
 
    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-   v_version = (SELECT giswater FROM ws.version ORDER by 1 desc LIMIT 1);
+   v_version = (SELECT giswater FROM version ORDER by 1 desc LIMIT 1);
 
    IF TG_OP='INSERT' THEN
 	
