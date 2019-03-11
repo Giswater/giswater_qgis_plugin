@@ -36,15 +36,17 @@ BEGIN
     	-- select version
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
-	-- Init variables
-	sys_elev1_var=0;
-	sys_elev2_var=0;
 
 
 	-- Comptuing process
-	FOR rec_node IN SELECT * FROM v_edit_node
+	FOR rec_node IN SELECT * FROM v_edit_node where node_id in (select node_1 from v_edit_arc) and node_id in (select node_2 from v_edit_arc)
 	LOOP
-	
+
+		-- Init variables
+		sys_elev1_var=0;
+		sys_elev2_var=0;
+		
+
 		FOR rec_arc IN SELECT * FROM v_edit_arc where node_1=rec_node.node_id
 		LOOP
 			sys_elev1_var=greatest(sys_elev1_var,rec_arc.sys_elev1);
