@@ -6,7 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView, QColor
+from PyQt4.QtGui import QMessageBox
 from PyQt4.QtCore import QPoint, Qt, SIGNAL
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker
@@ -130,6 +132,11 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.dialog.findChild(QAction, "actionInterpolate").triggered.connect(partial(self.activate_snapping, emit_point))
+        
+        widget_ymax = self.dialog.findChild(QLineEdit, 'ymax')
+        if widget_ymax is not None:
+            widget_ymax.textChanged.connect(partial(self.compare_depth, widget_ymax, False))
+            widget_ymax.lostFocus.connect(partial(self.compare_depth, widget_ymax, True))
 
         # Manage tab 'Scada'
         self.manage_tab_scada()        
@@ -186,6 +193,38 @@ class ManNodeDialog(ParentDialog):
 
         self.load_state_type(self.dialog, state_type, self.geom_type)
         self.load_dma(self.dialog, dma_id, self.geom_type)
+
+
+    def compare_depth(self, widget_ymax, show_message):
+        widget_ymax.setStyleSheet("border: 1px solid gray")
+        node_id = utils_giswater.getWidgetText(self.dialog, 'node_id')
+        ymax = utils_giswater.getWidgetText(self.dialog, widget_ymax)
+        bad_alert = False
+        sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_upstream "
+               " WHERE node_id = '" + str(node_id) + "'")
+        rows = self.controller.get_rows(sql, log_sql=True)
+        if len(rows) > 0:
+            for row in rows:
+                if float(ymax) < float(row['downstream_depth']):
+                    widget_ymax.setStyleSheet("border: 1px solid red")
+                    bad_alert = True
+        sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_downstream "
+               " WHERE node_id = '" + str(node_id) + "'")
+        rows = self.controller.get_rows(sql, log_sql=True)
+        if len(rows) > 0:
+            for row in rows:
+                if float(ymax) < float(row['upstream_depth']):
+                    widget_ymax.setStyleSheet("border: 1px solid red")
+                    bad_alert = True
+
+        if show_message and bad_alert:
+            msg = "The depth of Y max is less than the arc"
+            # self.controller.show_info_box(text=msg, title="Info")
+            msg_box = QMessageBox()
+            msg_box.setIcon(3)
+            msg_box.setWindowTitle("Warning")
+            msg_box.setText(msg)
+            msg_box.exec_()
 
 
     def activate_snapping(self, emit_point):
