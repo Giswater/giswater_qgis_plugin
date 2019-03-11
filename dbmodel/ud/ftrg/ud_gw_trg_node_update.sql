@@ -56,6 +56,23 @@ BEGIN
 			ELSIF (numNodes =1) AND (rec.node_proximity_control IS TRUE) THEN
 				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
 				IF (NEW.state=1 AND node_rec.state=1) OR (NEW.state=2 AND node_rec.state=1) THEN
+				
+					/*
+					TO DO: MAKE PROCEDURE:
+					------------------------------------------------------------------------------------------
+					INSERT INTO plan_psector_x_node (psector_id, node_id, state_id) VALUES (psector, node_id, 0);
+					LOOP ALS ARCS QUE ARRIBEN AL NODE
+						IF arc pertany alternativa
+							es reconnecta al nou node planificat
+						ELSIF arc no pertany a alternativa 
+							INSERT INTO plan_psector_x_arc OLD ARC (psector_id, arc_id, state_id) VALUES (psector, node_id, 0);
+							CREATE NEW ARC connectant al nou node
+							INSERT INTO plan_psector_x_arc NEW ARC (psector_id, arc_id, state_id) VALUES (psector, node_id, 1, state_type='ficitius');
+						END IF;
+					END LOOP;
+					----------------------------------------------------------------------------------------------
+					*/
+				
 					PERFORM audit_function(1098,1234);
 				ELSIF (NEW.state=2 AND node_rec.state=2) THEN
 					PERFORM audit_function(1100,1234);

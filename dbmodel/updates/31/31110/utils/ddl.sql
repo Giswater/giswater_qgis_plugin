@@ -7,6 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN pattern_id character varying(16);
+
+
 --audit_cat_param_user
 ALTER TABLE audit_cat_param_user RENAME context  TO formname;
 ALTER TABLE audit_cat_param_user RENAME data_type TO idval;
