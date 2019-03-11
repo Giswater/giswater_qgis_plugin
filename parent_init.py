@@ -841,7 +841,7 @@ class ParentDialog(QDialog):
         # If object already exist show warning message
         if row:
             message = "Object already associated with this feature"
-            self.controller.show_warning(message)
+            self.controller.show_message(message, message_level=0)
 
         # If object not exist perform an INSERT
         else:

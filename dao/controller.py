@@ -269,7 +269,7 @@ class DaoController():
     
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
         """ Show message to the user with selected message level
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} """
+        message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
         
         msg = None        
         if text:        
