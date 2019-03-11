@@ -700,10 +700,15 @@ class SearchPlus(QObject):
 
         # Split element. [0]: hydro_id, [1]: connec_customer_code
         row = element.split(' . ', 2)
+
+        # When user select with keyboard, and dont writhe full row, element only take one item and crash
+        if len(row) <= 1:
+            return
+
         hydro_id = str(row[0])
         connec_customer_code = str(row[1])
         expl_name = utils_giswater.getWidgetText(self.dlg_search, expl_name, return_string_null=False)
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ", " + self.params['basic_search_hyd_hydro_field_1'] + ""
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ", connec_id, hydrometer_customer_code"
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '"+str(connec_customer_code)+"' "
                " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%' "
@@ -712,11 +717,12 @@ class SearchPlus(QObject):
         if not row:
             return
 
-        connec_id = row[0]
-        hydrometer_customer_code = row[1]
-
+        field_cc = row[0]
+        connec_id = row[1]
+        hydrometer_customer_code = row[2]
         # Check if the expression is valid
-        aux = "connec_id = '" + connec_id + "'"
+        aux = "connec_id = '" + field_cc + "'"
+        aux = self.params['basic_search_hyd_hydro_field_cc'] + " = '" + field_cc + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
@@ -996,6 +1002,7 @@ class SearchPlus(QObject):
                 
     def address_populate(self, combo, layername, field_code, field_name):
         """ Populate @combo """
+
         self.dlg_search.address_street.blockSignals(True)
         self.dlg_search.address_street.clear()
         self.dlg_search.address_street.blockSignals(False)
