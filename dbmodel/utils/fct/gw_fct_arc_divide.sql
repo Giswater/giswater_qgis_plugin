@@ -108,12 +108,14 @@ BEGIN
 
 		-- Update values of new arc_id (1)
 		rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
+		rec_aux1.code := rec_aux1.arc_id;
 		rec_aux1.node_1 := null;
 		rec_aux1.node_2 := null;
 		rec_aux1.the_geom := line1;
 
 		-- Update values of new arc_id (2)
-		rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');	
+		rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
+		rec_aux2.code := rec_aux2.arc_id;
 		rec_aux2.node_1 := null;
 		rec_aux2.node_2 := null;
 		rec_aux2.the_geom := line2;
