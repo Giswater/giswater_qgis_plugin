@@ -25,21 +25,25 @@ try:
 except:
     from qgis.core import QGis as Qgis
 
-from qgis.core import QgsPoint, QgsExpression, QgsWkbTypes
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    pass
+else:
+    from qgis.core import QgsWkbTypes
+
+from qgis.core import QgsPoint, QgsExpression
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
 
-from .snapping_utils import SnappingConfigManager
-
+import os
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
-import os
+
+from .snapping_utils import SnappingConfigManager
 
 
 class ParentMapTool(QgsMapTool):
-
 
     def __init__(self, iface, settings, action, index_action):  
         """ Class constructor """

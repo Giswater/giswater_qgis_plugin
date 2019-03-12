@@ -13,7 +13,13 @@ try:
 except:
     from qgis.core import QGis as Qgis
 
-from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle, QgsWkbTypes
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.gui import QgsMapCanvasSnapper
+else:
+    from qgis.gui import QgsMapCanvas
+    from qgis.core import QgsWkbTypes
+
+from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
 from qgis.PyQt.QtWidgets import QApplication
