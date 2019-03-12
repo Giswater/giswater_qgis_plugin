@@ -154,7 +154,7 @@ class ManageElement(ParentManage):
         element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = ("SELECT location_type FROM " + self.schema_name + ".man_type_location"
                " WHERE feature_type = 'ELEMENT' "
-               " AND featurecat_id='"+str(element_type)+"'"
+               " AND (featurecat_id = '"+str(element_type)+"' OR featurecat_id is null)"
                " ORDER BY location_type")
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
         utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)
