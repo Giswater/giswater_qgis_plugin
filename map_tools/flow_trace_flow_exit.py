@@ -16,7 +16,6 @@
  ***************************************************************************/
 
 """
-from builtins import str
 from builtins import next
 
 # -*- coding: utf-8 -*-

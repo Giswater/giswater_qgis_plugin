@@ -17,7 +17,6 @@
 
 """
 from __future__ import absolute_import
-from builtins import str
 
 # -*- coding: utf-8 -*-
 try:

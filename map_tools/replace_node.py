@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 from builtins import next
-from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-

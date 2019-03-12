@@ -1,4 +1,3 @@
-from builtins import str
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsMapToPixel
 from qgis.gui import QgsVertexMarker

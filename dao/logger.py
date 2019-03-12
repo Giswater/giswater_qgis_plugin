@@ -1,4 +1,3 @@
-from builtins import str
 from builtins import object
 # -*- coding: utf-8 -*-
 import logging

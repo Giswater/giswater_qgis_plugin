@@ -7,7 +7,6 @@ or (at your option) any later version.
 from __future__ import print_function
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
