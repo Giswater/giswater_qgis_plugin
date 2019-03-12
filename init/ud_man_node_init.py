@@ -194,28 +194,31 @@ class ManNodeDialog(ParentDialog):
         self.load_state_type(self.dialog, state_type, self.geom_type)
         self.load_dma(self.dialog, dma_id, self.geom_type)
 
-
     def compare_depth(self, widget_ymax, show_message):
         widget_ymax.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, 'node_id')
         ymax = utils_giswater.getWidgetText(self.dialog, widget_ymax)
+        if ymax is None:
+            return
         bad_alert = False
         sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_upstream "
-               " WHERE node_id = '" + str(node_id) + "'")
+                                                     " WHERE node_id = '" + str(node_id) + "'")
         rows = self.controller.get_rows(sql, log_sql=True)
         if len(rows) > 0:
             for row in rows:
-                if float(ymax) < float(row['downstream_depth']):
-                    widget_ymax.setStyleSheet("border: 1px solid red")
-                    bad_alert = True
+                if row['upstream_depth'] is not None:
+                    if float(ymax) < float(row['downstream_depth']):
+                        widget_ymax.setStyleSheet("border: 1px solid red")
+                        bad_alert = True
         sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_downstream "
-               " WHERE node_id = '" + str(node_id) + "'")
+                                                     " WHERE node_id = '" + str(node_id) + "'")
         rows = self.controller.get_rows(sql, log_sql=True)
         if len(rows) > 0:
             for row in rows:
-                if float(ymax) < float(row['upstream_depth']):
-                    widget_ymax.setStyleSheet("border: 1px solid red")
-                    bad_alert = True
+                if row['upstream_depth'] is not None:
+                    if float(ymax) < float(row['upstream_depth']):
+                        widget_ymax.setStyleSheet("border: 1px solid red")
+                        bad_alert = True
 
         if show_message and bad_alert:
             msg = "The depth of Y max is less than the arc"
