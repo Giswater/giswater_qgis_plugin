@@ -19,8 +19,10 @@ except:
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
+
 else:
     from qgis.PyQt.QtCore import QStringListModel
+    from qgis.gui import QgsMapCanvas
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
@@ -33,6 +35,8 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCompleter, QCheckBo
 from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QWidget, QDialog, QTextEdit
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWebKitWidgets import QWebView
+from qgis.PyQt.QtWebKit import QWebSettings
+
 from functools import partial
 from datetime import datetime
 
