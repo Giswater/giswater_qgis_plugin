@@ -863,7 +863,6 @@ class ParentAction(object):
     def get_snapper(self):
         """ Return snapper """
 
-        snapper = None
         if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
             snapper = QgsMapCanvasSnapper(self.canvas)
         else:
