@@ -9,10 +9,10 @@ from builtins import range
 
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
@@ -804,22 +804,16 @@ class AddNewLot(ParentManage):
 
     # TODO delete function draw_polygon(*args) when api_parent.py is integrated into giswater proyect
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+        """ Draw 'line' over canvas following list of points """
 
         self.rubber_polygon = QgsRubberBand(self.canvas)
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
-        """ Draw 'line' over canvas following list of points """
-        if Qgis.QGIS_VERSION_INT >= 10900:
-            rb = self.rubber_polygon
-            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
-            rb.setColor(color)
-            rb.setWidth(width)
-            rb.show()
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(width)
-            self.vMarker.setCenter(points)
-            self.vMarker.show()
+        rb = self.rubber_polygon
+        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.show()
 
 
     # TODO delete function get_points(*args) when api_parent.py is integrated into giswater proyect

@@ -11,7 +11,7 @@ standard_library.install_aliases()
 # -*- coding: latin-1 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
 import os
@@ -34,7 +34,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTreeWidgetItem
 from qgis.PyQt.QtPrintSupport import QPrinter
 from qgis.PyQt.QtSql import QSqlTableModel
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsMapLayerRegistry as QgsProject, QgsDataSourceURI as QgsDataSourceUri
 else:
     from qgis.core import QgsProject, QgsDataSourceUri

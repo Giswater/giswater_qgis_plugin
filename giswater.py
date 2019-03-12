@@ -10,7 +10,7 @@ from builtins import range
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
 from qgis.core import QgsExpressionContextUtils, QgsProject
@@ -75,7 +75,7 @@ class Giswater(QObject):
 
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
-        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)
         else:
             QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'svg_path', svg_plugin_dir)
@@ -98,7 +98,7 @@ class Giswater(QObject):
         # Define signals
         self.set_signals()
 
-        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             reload(sys)
             sys.setdefaultencoding('utf-8')  # @UndefinedVariable
         # TODO: 3.x
@@ -900,7 +900,7 @@ class Giswater(QObject):
             fieldname_node = "ymax"
             fieldname_connec = "connec_depth"
 
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             layer_node = self.controller.get_layer_by_tablename("v_edit_node")
             if layer_node:
                 display_field = 'depth : [% "' + fieldname_node + '" %]'
@@ -1001,7 +1001,7 @@ class Giswater(QObject):
         
         # Get project variable 'expl_id'
         try:
-            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            if Qgis.QGIS_VERSION_INT < 29900:
                 expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
             # TODO: 3.x
             else:

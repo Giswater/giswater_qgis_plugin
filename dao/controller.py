@@ -10,10 +10,10 @@ from builtins import object
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsMapLayerRegistry as QgsProject, QgsDataSourceURI as QgsDataSourceUri
 else:
     from qgis.core import QgsProject, QgsDataSourceUri
@@ -1131,7 +1131,7 @@ class DaoController(object):
 
         visible = False
         if layer:
-            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            if Qgis.QGIS_VERSION_INT < 29900:
                 visible = self.iface.legendInterface().isLayerVisible(layer)
             else:
                 visible = QgsProject.instance().layerTreeRoot().findLayer(layer.id()).itemVisibilityChecked()
@@ -1143,7 +1143,7 @@ class DaoController(object):
         """ Set layer visible """
 
         if layer:
-            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            if Qgis.QGIS_VERSION_INT < 29900:
                 self.iface.legendInterface().setLayerVisible(layer, visible)
             else:
                 QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
@@ -1152,7 +1152,7 @@ class DaoController(object):
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             layers = self.iface.legendInterface().layers()
         else:
             layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]

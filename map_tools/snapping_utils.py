@@ -20,10 +20,10 @@ from builtins import object
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import QgsMapCanvasSnapper
 else:
     from qgis.gui import QgsMapCanvas
@@ -163,8 +163,7 @@ class SnappingConfigManager(object):
     def get_snapper(self):
         """ Return snapper """
 
-        snapper = None
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             snapper = QgsMapCanvasSnapper(self.canvas)
         else:
             # TODO: 3.x

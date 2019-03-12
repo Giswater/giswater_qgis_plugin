@@ -10,10 +10,10 @@ from builtins import range
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
     from qgis.PyQt.QtGui import QStringListModel
 else:
@@ -1983,7 +1983,7 @@ class MincutParent(ParentAction, MultipleSelection):
         layer = self.layers[layername]
         records = [(-1, '', '')]
         # TODO 3.x
-        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             idx_field_code = layer.fieldNameIndex(self.params[field_code])
             idx_field_name = layer.fieldNameIndex(self.params[field_name])
         else:
@@ -2067,7 +2067,7 @@ class MincutParent(ParentAction, MultipleSelection):
         # Set filter expression
         layer = self.layers['portal_layer']
         # TODO 3.x
-        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             idx_field_code = layer.fieldNameIndex(field_code)
             idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
         else:
@@ -2315,7 +2315,7 @@ class MincutParent(ParentAction, MultipleSelection):
             plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
             template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
             # TODO 3.x
-            if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            if Qgis.QGIS_VERSION_INT < 29900:
                 template_file = file(template_path, 'rt')
             else:
                 template_file = open(template_path, 'rt')

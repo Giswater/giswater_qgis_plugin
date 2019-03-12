@@ -12,10 +12,10 @@ from builtins import range
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import QgsMapCanvasSnapper
     from qgis.PyQt.QtGui import QStringListModel
 else:
@@ -52,23 +52,19 @@ class ApiParent(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
         self.tabs_removed = 0
-        if Qgis.QGIS_VERSION_INT < 20000:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(10)
-            return
-            
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+
+        if Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_point = QgsRubberBand(self.canvas, Qgis.Point)
         else:
             self.rubber_point = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
 
         self.rubber_point.setColor(Qt.yellow)
-        # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
         self.rubber_point.setIconSize(10)
         self.rubber_polygon = QgsRubberBand(self.canvas)
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
         self.list_update = []
+
 
     def get_editable_project(self):
         """ Get variable 'editable_project' from qgis project variables """
@@ -279,6 +275,7 @@ class ApiParent(ParentAction):
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
 
+        # TODO 3.x
         if Qgis.QGIS_VERSION_INT > 29900:
             return
         
@@ -806,16 +803,10 @@ class ApiParent(ParentAction):
             
     def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
 
-        if Qgis.QGIS_VERSION_INT >= 10900:
-            rb = self.rubber_point
-            rb.setColor(color)
-            rb.setWidth(width)
-            rb.addPoint(point)
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(10)
-            self.vMarker.setCenter(point)
-            self.vMarker.show()
+        rb = self.rubber_point
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.addPoint(point)
 
         # wait to simulate a flashing effect
         if duration_time is not None:
@@ -825,17 +816,11 @@ class ApiParent(ParentAction):
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
 
-        if Qgis.QGIS_VERSION_INT >= 10900:
-            rb = self.rubber_polygon
-            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
-            rb.setColor(color)
-            rb.setWidth(width)
-            rb.show()
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(width)
-            self.vMarker.setCenter(points)
-            self.vMarker.show()
+        rb = self.rubber_polygon
+        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.show()
 
         # wait to simulate a flashing effect
         if duration_time is not None:
@@ -844,11 +829,7 @@ class ApiParent(ParentAction):
 
     def resetRubberbands(self):
     
-        canvas = self.canvas
-        if Qgis.QGIS_VERSION_INT < 20000:
-            self.vMarker.hide()
-            canvas.scene().removeItem(self.vMarker)
-        elif Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_point.reset(Qgis.Point)
             self.rubber_polygon.reset()
         else:
