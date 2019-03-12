@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 from __future__ import absolute_import
+
 from future import standard_library
 standard_library.install_aliases()
 from builtins import next
@@ -2082,7 +2083,7 @@ class ParentDialog(QDialog):
         # Set map tool emit point and signals   
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.canvas.xyCoordinates.connect(self.action_copy_paste_mouse_move)        
         self.emit_point.canvasClicked.connect(self.action_copy_paste_canvas_clicked)
         self.geom_type = geom_type
@@ -2551,3 +2552,16 @@ class ParentDialog(QDialog):
             else:
                 current_date = QDate.currentDate()
                 widget_to.setDate(current_date)
+
+
+    def get_snapper(self):
+        """ Return snapper """
+
+        snapper = None
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            snapper = QgsMapCanvasSnapper(self.canvas)
+        else:
+            # TODO: 3.x
+            snapper = QgsMapCanvas.snappingUtils()
+
+        return snapper

@@ -54,7 +54,7 @@ class Dimensions(ParentDialog):
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
 
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
@@ -136,7 +136,7 @@ class Dimensions(ParentDialog):
         self.iface.setActiveLayer(layer)
         layer.startEditing()
 
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()

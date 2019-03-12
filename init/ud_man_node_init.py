@@ -243,7 +243,7 @@ class ManNodeDialog(ParentDialog):
         self.node1 = None
         self.node2 = None
         self.canvas.setMapTool(emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
 
@@ -443,7 +443,7 @@ class ManNodeDialog(ParentDialog):
         # Set map tool emit point and signals    
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.canvas.xyCoordinates.connect(self.action_rotation_mouse_move)
         self.emit_point.canvasClicked.connect(self.action_rotation_canvas_clicked)
         
