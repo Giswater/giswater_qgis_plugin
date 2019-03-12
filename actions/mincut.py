@@ -2082,7 +2082,7 @@ class MincutParent(ParentAction, MultipleSelection):
             for feature in it:
                 attrs = feature.attributes()
                 field_number = attrs[idx_field_number]
-                if not type(field_number) is QPyNullVariant:
+                if field_number is not None:
                     elem = [code, field_number]
                     records.append(elem)
         

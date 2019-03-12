@@ -1206,13 +1206,12 @@ class SearchPlus(QObject):
             self.controller.show_warning(message)
             return False
 
-
         # Iterate over all features to get distinct records
         list_elements = []
         for feature in layer.getFeatures():                                
             attrs = feature.attributes() 
             field = attrs[idx_field]
-            if not type(field) is QPyNullVariant:
+            if field is not None:
                 if field not in list_elements:
                     elem = [field, field]
                     list_elements.append(field)
