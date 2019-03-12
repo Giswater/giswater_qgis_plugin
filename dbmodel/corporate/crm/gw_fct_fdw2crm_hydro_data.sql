@@ -21,19 +21,16 @@ DECLARE
 
 BEGIN
 
-	-- insert into temporal table of hydrometers
-	DELETE FROM crm.fdw2crm_hydrometer;
+	-- NOTE: Is not good practice to use the incremental issue because data can change on CRM and with incremental never is showed on gis
+	-- As a result, previous delete and insert all
 
-	INSERT INTO crm.fdw2crm_hydrometer
-	SELECT hydrometer_ora.id::int8, code::text, connec_id::integer, municipi_id::integer, plot_code::text, prority_id::integer, catalog_id::integer, us::integer, state_id::integer, 
+	-- insert into temporal table of hydrometers
+	DELETE FROM crm.hydrometer;
+
+	INSERT INTO crm.hydrometer
+	SELECT hydrometer_ora.id::int8, code::text, connec_id::integer, municipi_id::integer, plot_code::integer, prority_id::integer, catalog_id::integer, us::integer, state_id::integer, 
 	hydro_number::text, hydro_man_date::date, crm_number::text, customer_name::text, address1::text, address2::text, address3::text,  address2_1::text,  address2_2::text, address2_3::text, m3_volume::integer,
 	start_date::date, end_date::date, update_date::date, expl_id::integer FROM crm.hydrometer_ora;
-	
-
-	-- insert into hydrometer
-	INSERT INTO crm.hydrometer 
-	SELECT a.* FROM crm.fdw2crm_hydrometer a
-	JOIN (SELECT id FROM crm.fdw2crm_hydrometer EXCEPT SELECT id FROM crm.hydrometer)b ON a.id=b.id;
 
     RETURN;
         
