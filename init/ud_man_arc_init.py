@@ -149,12 +149,16 @@ class ManArcDialog(ParentDialog):
         widget_y.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, widget_node)
         text = utils_giswater.getWidgetText(self.dialog, widget_y)
-        if widget_node is not None:
-            sql = ("SELECT ymax FROM " + self.schema_name + ".v_edit_node "
-                   "WHERE node_id='"+str(node_id)+"'")
-            row = self.controller.get_row(sql, log_sql=True)
 
-        if row is not None:
+        if text is None:
+            return
+        if widget_node is None:
+            return
+        sql = ("SELECT ymax FROM " + self.schema_name + ".v_edit_node "
+               "WHERE node_id='"+str(node_id)+"'")
+        row = self.controller.get_row(sql, log_sql=True)
+
+        if row['ymax'] is not None:
             if float(text) > float(row['ymax']):
                 widget_y.setStyleSheet("border: 1px solid red")
                 if show_message:
