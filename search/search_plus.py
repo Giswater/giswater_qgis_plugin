@@ -1017,9 +1017,13 @@ class SearchPlus(QObject):
         # Get features
         layer = self.layers[layername]        
         records = [(-1, '', '')]
-        idx_field_code = layer.fieldNameIndex(self.params[field_code])
-        idx_field_name = layer.fieldNameIndex(self.params[field_name])
-        
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            idx_field_code = layer.fieldNameIndex(self.params[field_code])
+            idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        else:
+            idx_field_code = layer.fields().indexFromName(self.params[field_code])
+            idx_field_name = layer.fields().indexFromName(self.params[field_name])
         it = layer.getFeatures()
                              
         if layername == 'street_layer':
@@ -1092,8 +1096,13 @@ class SearchPlus(QObject):
         
         # Set filter expression
         layer = self.layers['portal_layer']
-        idx_field_code = layer.fieldNameIndex(field_code)
-        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            idx_field_code = layer.fieldNameIndex(field_code)
+            idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        else:
+            idx_field_code = layer.fields().indexFromName(field_code)
+            idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
         expr_filter = field_code + "  = '" + str(code) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
@@ -1208,7 +1217,12 @@ class SearchPlus(QObject):
         # Fields management
         layer = self.layers[parameter]
         records = []
-        idx_field = layer.fieldNameIndex(fieldname) 
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            idx_field = layer.fieldNameIndex(fieldname)
+        else:
+            idx_field = layer.fields().indexFromName(fieldname)
+
         if idx_field == -1:
             message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)
             self.controller.show_warning(message)

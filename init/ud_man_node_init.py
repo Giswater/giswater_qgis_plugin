@@ -246,7 +246,8 @@ class ManNodeDialog(ParentDialog):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+
+        self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
     def snapping_node(self, point, button):

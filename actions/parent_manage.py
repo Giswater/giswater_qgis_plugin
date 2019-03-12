@@ -343,7 +343,6 @@ class ParentManage(ParentAction, object):
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.previous_map_tool = self.canvas.mapTool()
         self.canvas.setMapTool(self.emit_point)
-        #self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         self.canvas.xyCoordinates.connect(self.mouse_move)
         self.xyCoordinates_conected = True
         self.emit_point.canvasClicked.connect(partial(self.get_xy))

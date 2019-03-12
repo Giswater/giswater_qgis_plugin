@@ -47,7 +47,7 @@ class MultipleSelection(QgsMapTool):
         QgsMapTool.__init__(self, self.canvas)
 
         self.controller = controller
-        self.rubber_band = QgsRubberBand(self.canvas, QGis.Polygon)
+        self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)

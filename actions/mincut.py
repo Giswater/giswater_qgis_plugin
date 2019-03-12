@@ -1983,8 +1983,13 @@ class MincutParent(ParentAction, MultipleSelection):
         # Get features
         layer = self.layers[layername]
         records = [(-1, '', '')]
-        idx_field_code = layer.fieldNameIndex(self.params[field_code])
-        idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            idx_field_code = layer.fieldNameIndex(self.params[field_code])
+            idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        else:
+            idx_field_code = layer.fields().indexFromName(self.params[field_code])
+            idx_field_name = layer.fields().indexFromName(self.params[field_name])
 
         if idx_field_code < 0:
             message = "Adress configuration. Field not found"
@@ -2061,9 +2066,14 @@ class MincutParent(ParentAction, MultipleSelection):
             return
         
         # Set filter expression
-        layer = self.layers['portal_layer']        
-        idx_field_code = layer.fieldNameIndex(field_code)        
-        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])        
+        layer = self.layers['portal_layer']
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+            idx_field_code = layer.fieldNameIndex(field_code)
+            idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        else:
+            idx_field_code = layer.fields().indexFromName(field_code)
+            idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
         expr_filter = field_code + " = '" + str(code) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
@@ -2305,7 +2315,11 @@ class MincutParent(ParentAction, MultipleSelection):
             # Create new composer with template selected in combobox(self.template)
             plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
             template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
-            template_file = file(template_path, 'rt')
+            # TODO 3.x
+            if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+                template_file = file(template_path, 'rt')
+            else:
+                template_file = open(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()
