@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -6,12 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-
---SELECT SCHEMA_NAME.gw_fct_ws_migrate_30to32('SCHEMA_NAME_sample','SCHEMA_NAME');
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_ws_migrate_30to32(p_source_schema varchar,p_target_schema varchar)
   RETURNS numeric AS
 $BODY$
+
+/*
+SELECT SCHEMA_NAME.gw_fct_ws_migrate_30to32('ws_sample','SCHEMA_NAME');
+*/
 
 DECLARE
 
@@ -59,11 +60,11 @@ BEGIN
     'SELECT id FROM '||p_source_schema||'.audit_cat_table WHERE sys_role_id!=''role_admin'' 
     and (id not ilike ''v_%'' and id not ilike ''%selector%'') order by id' 
     LOOP
-    	--direct insert from one schema to another. Special ELSIF for the tables which need transformation
+		--direct insert from one schema to another. Special ELSIF for the tables which need transformation
 		IF rec.id!='ext_streetaxis' AND rec.id!='inp_cat_mat_roughness'  AND rec.id!='inp_pump' AND rec.id!='inp_pipe' AND rec.id!='inp_shortpipe' 
 		AND rec.id!='inp_valve' AND rec.id!='plan_psector_x_node' AND rec.id!='plan_psector_x_arc' AND rec.id!='plan_arc_x_pavement' THEN
 			
-			EXECUTE 'INSERT INTO '||rec.id||' SELECT * FROM '||p_source_schema||'.'||rec.id||';';
+		EXECUTE 'INSERT INTO '||rec.id||' SELECT * FROM '||p_source_schema||'.'||rec.id||';';
 
 		ELSIF rec.id='ext_streetaxis' THEN
 			EXECUTE 'INSERT INTO ext_streetaxis 
@@ -71,11 +72,11 @@ BEGIN
 
 		ELSIF rec.id='plan_psector_x_node' THEN
 			EXECUTE 'INSERT INTO plan_psector_x_node (node_id, psector_id, state, doable, descript) 
-			SELECT node_id, psector_id, state, doable, descript FROM '||p_source_schema||'.'||rec.id||';';
+			SELECT node_id, psector_id, state, doable, descript FROM '||p_source_schema||'.plan_psector_x_node;';
 			
-		ELSIF rec.id='	plan_psector_x_arc' THEN
+		ELSIF rec.id='plan_psector_x_arc' THEN
 			EXECUTE 'INSERT INTO plan_psector_x_arc (arc_id, psector_id, state, doable, descript) 
-			SELECT arc_id, psector_id, state, doable, descript FROM '||p_source_schema||'.'||rec.id||';';
+			SELECT arc_id, psector_id, state, doable, descript FROM '||p_source_schema||'.plan_psector_x_arc;';
 			
 		ELSIF rec.id='inp_pump' THEN
 			EXECUTE 'INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status, to_arc) 
