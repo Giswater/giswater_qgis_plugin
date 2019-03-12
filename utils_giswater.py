@@ -6,18 +6,27 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-
-
 """ Module with utility functions to interact with dialog and its widgets """
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 from builtins import range
+
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+    
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton
-from qgis.PyQt.QtCore import QSortFilterProxyModel, QDate, QDateTime, QTime, Qt, QStringListModel
+from qgis.PyQt.QtCore import QSortFilterProxyModel, QDate, QDateTime, QTime, Qt
 
 from functools import partial
 import os

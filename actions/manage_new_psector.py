@@ -15,13 +15,16 @@ except:
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.core import QgsRectangle, QgsPoint
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QStringListModel
+from qgis.PyQt.QtCore import Qt
 
 import os
 import sys

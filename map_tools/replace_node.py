@@ -9,9 +9,19 @@ from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+
 from qgis.core import QgsPoint, QgsFeatureRequest
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import QPoint, Qt, QDate, QStringListModel
+from qgis.PyQt.QtCore import QPoint, Qt, QDate
 
 from functools import partial
 from datetime import datetime

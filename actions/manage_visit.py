@@ -8,7 +8,17 @@ or (at your option) any later version.
 from builtins import str
 from builtins import range
 
-from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject, QStringListModel
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+
+from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView
 from qgis.PyQt.QtWidgets import QTextEdit, QPushButton, QComboBox, QTabWidget
 import os

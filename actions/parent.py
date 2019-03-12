@@ -17,14 +17,16 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
     from qgis.core import QgsMapLayerRegistry as QgsProject
     from qgis.gui import QgsMapCanvasSnapper
 else:
+    from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsProject
     from qgis.gui import QgsMapCanvas
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QSettings, QStringListModel
+from qgis.PyQt.QtCore import Qt, QSettings
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel

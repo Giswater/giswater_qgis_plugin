@@ -11,14 +11,22 @@ from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QTime, QDate, Qt, QStringListModel
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+
+from qgis.PyQt.QtCore import QTime, QDate, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
-from qgis.PyQt.QtWidgets import QCompleter, QFileDialog
+from qgis.PyQt.QtWidgets import QCompleter, QFileDialog, QMessageBox
 
 import csv, os, re, subprocess
 from functools import partial
-
-from qgis.PyQt.QtWidgets import QMessageBox
 
 import utils_giswater
 from giswater.actions.api_go2epa_options import Go2EpaOptions

@@ -17,8 +17,10 @@ except:
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import QgsMapCanvasSnapper
+    from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.core import QgsWkbTypes
+    from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry

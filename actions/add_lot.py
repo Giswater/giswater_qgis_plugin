@@ -13,7 +13,12 @@ try:
 except:
     from qgis.core import QGis as Qgis
 
-from qgis.PyQt.QtCore import QDate, Qt, QStringListModel
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+
+from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QAction, QAbstractItemView, QToolButton
 from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QColor

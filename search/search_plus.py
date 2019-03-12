@@ -1,10 +1,19 @@
 from builtins import str
 from builtins import range
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QObject, Qt, QSortFilterProxyModel, QStringListModel
+from qgis.PyQt.QtCore import QObject, Qt, QSortFilterProxyModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 
@@ -16,7 +25,6 @@ if 'nt' in sys.builtin_module_names:
 import operator
 import os
 import csv
-import sys
 import webbrowser
 
 import utils_giswater
