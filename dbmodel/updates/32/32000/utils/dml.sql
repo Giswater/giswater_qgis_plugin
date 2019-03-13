@@ -15,8 +15,8 @@ UPDATE config_param_system SET label='Node geom 1 tolerance:' ,isenabled=TRUE,la
 UPDATE config_param_system SET label='custom_giswater_folder:' ,isenabled=FALSE ,layout_id=NULL ,layout_order=NULL ,project_type=NULL , datatype='string' ,widgettype='linetext' WHERE parameter='custom_giswater_folder';
 
 INSERT INTO sys_fprocess_cat VALUES (35, 'Recursive go2epa process', 'EPA', 'Recursive go2epa process', 'utils');
-INSERT INTO sys_fprocess_cat VALUES (36, 'admin check, fk and unique constraints', 'admin', 'drop/add check, fk and unique constraints using temp table to store it', 'utils');
-INSERT INTO sys_fprocess_cat VALUES (37, 'admin not null contraints', 'admin', 'drop/add not null constraints using temp table to store it', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (36, 'admin check, fk and unique constraints', 'admin', 'admin check,fk and unique constraints', 'utils');
+INSERT INTO sys_fprocess_cat VALUES (37, 'admin not null contraints', 'admin', 'admin not null constraints', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (38, 'Check inconsistency on editable data', 'edit', 'Check inconsistency on editable data', 'utils');
 
 
