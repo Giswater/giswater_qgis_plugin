@@ -1,31 +1,20 @@
-from builtins import str
-from builtins import range
 # -*- coding: utf-8 -*-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
-if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtGui import QStringListModel
-else:
-    from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QObject, Qt, QSortFilterProxyModel
-from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QCompleter, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
+from PyQt4 import uic
+from PyQt4.QtCore import QObject, QPyNullVariant, Qt
+from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAbstractItemView, QTableView, QFileDialog, QGridLayout, QPushButton, QLineEdit, QLabel
 
 from functools import partial
-import sys
-if 'nt' in sys.builtin_module_names:
-    import ctypes
 
 import operator
 import os
 import csv
+import sys
 import webbrowser
+if 'nt' in sys.builtin_module_names:
+    import ctypes
 
 import utils_giswater
 from giswater.search.ui.list_items import ListItems
@@ -90,7 +79,7 @@ class SearchPlus(QObject):
         if self.project_type == 'ws':
             self.hydro_create_list()
             self.dlg_search.expl_name.activated.connect(partial(self.expl_name_changed))
-            self.dlg_search.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg_search.hydro_id, self.dlg_search.expl_name))
+            self.dlg_search.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg_search.expl_name))
             self.dlg_search.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg_search.hydro_id))
             self.set_model_by_list(self.list_hydro, self.dlg_search.hydro_id)
             self.filter_by_list(self.dlg_search.hydro_id)
@@ -154,7 +143,7 @@ class SearchPlus(QObject):
             if row[0] is None or row[0] == 'null':
                 msg = "Cant zoom to selection because has no geometry: "
                 self.controller.show_warning(msg, parameter=polygon_name)
-                self.controller.set_layer_visible(layer, False)
+                self.iface.legendInterface().setLayerVisible(layer, False)
                 return
 
         # Select features of @layer applying @expr
@@ -163,7 +152,7 @@ class SearchPlus(QObject):
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
-            self.controller.set_layer_visible(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 
@@ -443,7 +432,7 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        for value in self.feature_cat.values():
+        for value in self.feature_cat.itervalues():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
@@ -452,7 +441,7 @@ class SearchPlus(QObject):
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.iface.setActiveLayer(layer)
-                        self.controller.set_layer_visible(layer)
+                        self.iface.legendInterface().setLayerVisible(layer, True)
                         self.open_custom_form(layer, expr)
                         self.zoom_to_selected_features(layer, geom_type)
                         return
@@ -569,7 +558,7 @@ class SearchPlus(QObject):
         """ Iterate over all layers to get the ones set in config file """
         
         # Check if we have any layer loaded
-        layers = self.controller.get_layers()
+        layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
             return            
         
@@ -668,6 +657,7 @@ class SearchPlus(QObject):
     def hydro_create_list(self):
         
         self.list_hydro = []
+        self.list_hydro_id = []
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
         if expl_name is None or expl_name == "None":
             self.set_model_by_list([], self.dlg_search.hydro_id)
@@ -678,17 +668,21 @@ class SearchPlus(QObject):
 
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'] + ", "
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
-               + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
+               + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + ", "
+               " hydrometer_id, " + self.params['basic_search_hyd_hydro_field_cc']+""
+               ", " + self.params['basic_search_hyd_hydro_field_erhc']+""
+               ", " + self.params['basic_search_hyd_hydro_field_ccc']+""
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " = '" + str(expl_name) + "' "
                " or " + self.params['basic_search_hyd_hydro_field_expl_name'] + " is null"
                # " AND state IN (" + str(list_state) + ") "
                " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
             
         self.list_hydro.append("")
+        self.list_hydro_id.append("")
         for row in rows:
             append_to_list = True
             for x in range(0, len(row)):
@@ -696,38 +690,46 @@ class SearchPlus(QObject):
                     append_to_list = False
             if append_to_list:
                 self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
-                
-        self.list_hydro = sorted(set(self.list_hydro))
+                elem = [row[3], row[4], row[5], row[6]]
+                self.list_hydro_id.append(elem)
+
         self.set_model_by_list(self.list_hydro, self.dlg_search.hydro_id)
 
 
-    def hydro_zoom(self, hydro, expl_name):
+    def hydro_zoom(self, expl_name, index):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
-        
+
         # Get selected code from combo
-        element = utils_giswater.getWidgetText(self.dlg_search, hydro)
+        element = self.list_hydro_id[index]
+
         if element == 'null':
             return
 
-        # Split element. [0]: hydro_id, [1]: connec_customer_code
-        row = element.split(' . ', 2)
-        hydro_id = str(row[0])
-        connec_customer_code = str(row[1])
+        hydro_id = str(element[0])
+        field_cc = str(element[1])
+        field_erhc = str(element[2])
+        field_ccc = str(element[3])
         expl_name = utils_giswater.getWidgetText(self.dlg_search, expl_name, return_string_null=False)
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ", " + self.params['basic_search_hyd_hydro_field_1'] + ""
+
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ""
+               ", " + self.params['basic_search_hyd_hydro_field_erhc'] + ""
+               ", " + self.params['basic_search_hyd_hydro_field_ccc'] + ""
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '"+str(connec_customer_code)+"' "
-               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%' "
-               " AND " + self.params['basic_search_hyd_hydro_field_1'] + " = '" + str(hydro_id) + "'")
-        row = self.controller.get_row(sql)
+               " WHERE hydrometer_id='"+str(hydro_id)+"'"
+               " AND " + self.params['basic_search_hyd_hydro_field_cc'] + " = '"+str(field_cc)+"' "
+               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '"+str(field_erhc)+"' "
+               " AND " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '"+str(field_ccc)+"' "
+               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%' ")
+
+
+        row = self.controller.get_row(sql, log_sql=False)
         if not row:
             return
 
         connec_id = row[0]
         hydrometer_customer_code = row[1]
-
         # Check if the expression is valid
-        aux = "connec_id = '" + connec_id + "'"
+        aux = self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
@@ -744,7 +746,7 @@ class SearchPlus(QObject):
                 # If any feature found, zoom it and exit function
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
-                    self.controller.set_layer_visible(layer)
+                    self.iface.legendInterface().setLayerVisible(layer, True)
                     self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
@@ -765,7 +767,8 @@ class SearchPlus(QObject):
                " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
                " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
                " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%'")
-        rows = self.controller.get_rows(sql)
+
+        rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
             row = rows[0]
         else:
@@ -785,21 +788,18 @@ class SearchPlus(QObject):
             label.setText(str(column_name[x][0] + ": "))
             grid_layout.addWidget(label, x, 0, 1, 1)
             if column_name[x][0] != 'hydrometer_link':
-                lineedit = QLineEdit()
-                lineedit.setObjectName("txt_"+column_name[x][0])
-                lineedit.setText(str(row[x]))
-                lineedit.setDisabled(True)
-                grid_layout.addWidget(lineedit, x, 1, 1, 1)
+                widget = QLineEdit()
+                widget.setText(str(row[x]))
+                widget.setDisabled(True)
             else:
-                button = QPushButton()
-                button.setObjectName("txt_"+column_name[x][0])
-                button.setText(str(row[x]))
-                button.setStyleSheet("Text-align:left")
-                button.setFlat(True)
-                grid_layout.addWidget(button, x, 1, 1, 1)
-                self.button_link = button
+                widget = QPushButton()
+                widget.setText(str(row[x]))
+                widget.setStyleSheet("Text-align:left")
+                widget.setFlat(True)
 
-
+                self.button_link = widget
+            widget.setObjectName("txt_" + column_name[x][0])
+            grid_layout.addWidget(widget, x, 1, 1, 1)
         url = str(row['hydrometer_link'])
         if url is not None or url != '':
             self.button_link.clicked.connect(partial(self.open_url, url))
@@ -990,7 +990,7 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        for value in self.feature_cat.values():
+        for value in self.feature_cat.itervalues():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
@@ -1000,13 +1000,14 @@ class SearchPlus(QObject):
                     if layer.selectedFeatureCount() > 0:
                         self.zoom_to_selected_features(layer, geom_type)
                         # Set the layer checked (i.e. set it's visibility)
-                        self.controller.set_layer_visible(layer)
+                        self.iface.legendInterface().setLayerVisible(layer, True)
                         self.open_custom_form(layer, expr)
                         return
 
                 
     def address_populate(self, combo, layername, field_code, field_name):
         """ Populate @combo """
+
         self.dlg_search.address_street.blockSignals(True)
         self.dlg_search.address_street.clear()
         self.dlg_search.address_street.blockSignals(False)
@@ -1017,13 +1018,9 @@ class SearchPlus(QObject):
         # Get features
         layer = self.layers[layername]        
         records = [(-1, '', '')]
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT < 29900:
-            idx_field_code = layer.fieldNameIndex(self.params[field_code])
-            idx_field_name = layer.fieldNameIndex(self.params[field_name])
-        else:
-            idx_field_code = layer.fields().indexFromName(self.params[field_code])
-            idx_field_name = layer.fields().indexFromName(self.params[field_name])
+        idx_field_code = layer.fieldNameIndex(self.params[field_code])
+        idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        
         it = layer.getFeatures()
                              
         if layername == 'street_layer':
@@ -1048,7 +1045,7 @@ class SearchPlus(QObject):
             attrs = feature.attributes()                
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
-            if value_code is not None and geom is not None:
+            if not type(value_code) is QPyNullVariant and geom is not None:
                 elem = [value_code, value_name, geom.exportToWkt()]
             else:
                 elem = [value_code, value_name, None]
@@ -1096,13 +1093,8 @@ class SearchPlus(QObject):
         
         # Set filter expression
         layer = self.layers['portal_layer']
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT < 29900:
-            idx_field_code = layer.fieldNameIndex(field_code)
-            idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
-        else:
-            idx_field_code = layer.fields().indexFromName(field_code)
-            idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
+        idx_field_code = layer.fieldNameIndex(field_code)
+        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
         expr_filter = field_code + "  = '" + str(code) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)   #@UnusedVariable
         if not is_valid:
@@ -1127,7 +1119,7 @@ class SearchPlus(QObject):
             for feature in it:
                 attrs = feature.attributes()
                 field_number = attrs[idx_field_number]
-                if field_number is None:
+                if not type(field_number) is QPyNullVariant:
                     elem = [code, field_number]
                     records.append(elem)
 
@@ -1217,23 +1209,19 @@ class SearchPlus(QObject):
         # Fields management
         layer = self.layers[parameter]
         records = []
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT < 29900:
-            idx_field = layer.fieldNameIndex(fieldname)
-        else:
-            idx_field = layer.fields().indexFromName(fieldname)
-
+        idx_field = layer.fieldNameIndex(fieldname) 
         if idx_field == -1:
             message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)
             self.controller.show_warning(message)
             return False
+
 
         # Iterate over all features to get distinct records
         list_elements = []
         for feature in layer.getFeatures():                                
             attrs = feature.attributes() 
             field = attrs[idx_field]
-            if field is not None:
+            if not type(field) is QPyNullVariant:
                 if field not in list_elements:
                     elem = [field, field]
                     list_elements.append(field)
@@ -1366,7 +1354,7 @@ class SearchPlus(QObject):
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
-            self.controller.set_layer_visible(layer)
+            self.iface.legendInterface().setLayerVisible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 
@@ -1396,12 +1384,15 @@ class SearchPlus(QObject):
         self.proxy_model = QSortFilterProxyModel()
         self.proxy_model.setSourceModel(model)
         self.proxy_model.setFilterKeyColumn(0)
+
         proxy_model_aux = QSortFilterProxyModel()
         proxy_model_aux.setSourceModel(model)
         proxy_model_aux.setFilterKeyColumn(0)
+
         widget.setModel(proxy_model_aux)
         widget.setModelColumn(0)
         completer = QCompleter()
+
         completer.setModel(self.proxy_model)
         completer.setCompletionColumn(0)
         completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
