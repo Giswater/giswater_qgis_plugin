@@ -49,11 +49,12 @@ class Go2Epa(ApiParent):
 
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
-        self.get_last_gsw_file()
+
         self.imports_canceled = False
         # Create dialog
         self.dlg_go2epa = FileManager()
         self.load_settings(self.dlg_go2epa)
+        self.load_user_values()
         if self.project_type in 'ws':
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
             
@@ -184,35 +185,21 @@ class Go2Epa(ApiParent):
         self.sector_selection(tableleft, tableright, field_id_left, field_id_right)
 
 
-    def get_last_gsw_file(self, show_warning=True):
-        """ Get last GSW file used by Giswater """
-        
-        # Initialize variables
-        self.file_inp = None
-        self.file_rpt = None
-        self.project_name = None
+    def load_user_values(self):
+        """ Load QGIS settings related with csv options """
+        cur_user = self.controller.get_current_user()
+        self.result_name = self.controller.plugin_settings_value('RESULT_NAME' + cur_user)
+        self.file_inp = self.controller.plugin_settings_value('FILE_INP' + cur_user)
+        self.file_rpt = self.controller.plugin_settings_value('FILE_RPT' + cur_user)
 
-        # Get last GSW file from giswater properties file
-        self.set_java_settings(show_warning)
-        # Check if that file exists
-        message = "GSW file not found"
-        if self.file_gsw is not None:
-            if not os.path.exists(self.file_gsw):
-                if show_warning:
-                    self.controller.show_warning(message, parameter=str(self.file_gsw))
-                return False
-        else:
-            if show_warning:
-                self.controller.show_warning(message, parameter=str(self.file_gsw))
-            return False
-        # Get INP, RPT file path and project name from GSW file
-        self.set_gsw_settings()
-        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')
-        self.result_name = self.gsw_settings.value('RESULT_NAME')
-        
-        return True
-            
+
+    def save_user_values(self):
+        """ Save QGIS settings related with csv options """
+        cur_user = self.controller.get_current_user()
+        self.controller.plugin_settings_set_value("RESULT_NAME" + cur_user, utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name'))
+        self.controller.plugin_settings_set_value("FILE_INP" + cur_user, utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp'))
+        self.controller.plugin_settings_set_value("FILE_RPT" + cur_user, utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt'))
+           
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
         """ Load the tables in the selection form """
@@ -578,9 +565,8 @@ class Go2Epa(ApiParent):
         if common_msg != "" and self.imports_canceled is False:
             self.controller.show_info(common_msg)
 
-
-        # Save INP, RPT and result name into GSW file
-        self.save_file_parameters()
+        # Save user values
+        self.save_user_values()
 
         self.show_widgets(False)
         # Close form
