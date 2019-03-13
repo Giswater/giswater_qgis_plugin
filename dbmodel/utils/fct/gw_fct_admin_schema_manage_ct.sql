@@ -5,21 +5,17 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: XXXX
-	UPDATE SCHEMA_NAME.node_type SET epa_table='inp_junction' WHERE id='TAP';
-
-
--- Function: SCHEMA_NAME.gw_fct_admin_schema_manage_fk(json)
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_ct(p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
+SELECT prog.gw_fct_admin_schema_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"DROP"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
+SELECT prog.gw_fct_admin_schema_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"ADD"}}$$)
 

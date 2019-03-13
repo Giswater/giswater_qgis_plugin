@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_ws_migrate_30to32(p_source_schema varchar,p_target_schema varchar)
+CREATE OR REPLACE FUNCTION prog.gw_fct_ws_migrate_30to32(p_source_schema varchar,p_target_schema varchar)
   RETURNS numeric AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_ws_migrate_30to32('ws_sample','SCHEMA_NAME');
+SELECT prog.gw_fct_ws_migrate_30to32('pdap_almoster_des_2018','prog');
 */
 
 DECLARE
@@ -20,7 +20,7 @@ rec record;
 
 BEGIN
     -- Search path
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = prog, public;
 
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 	ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
@@ -58,7 +58,7 @@ BEGIN
 	--loop over tables that are not assigned to role_admin
     FOR rec IN EXECUTE 
     'SELECT id FROM '||p_source_schema||'.audit_cat_table WHERE sys_role_id!=''role_admin'' 
-    and (id not ilike ''v_%'' and id not ilike ''%selector%'') order by id' 
+    and (id not ilike ''v_%'' and id not ilike ''%selector%'' and id  not ilike ''config%'' and id not ilike ''ext_rtc_hydrometer_state'') order by id' 
     LOOP
 		--direct insert from one schema to another. Special ELSIF for the tables which need transformation
 		IF rec.id!='ext_streetaxis' AND rec.id!='inp_cat_mat_roughness'  AND rec.id!='inp_pump' AND rec.id!='inp_pipe' AND rec.id!='inp_shortpipe' 
