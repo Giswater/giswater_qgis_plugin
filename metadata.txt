@@ -4,7 +4,7 @@
 [general]
 name=giswater
 qgisMinimumVersion=2.18
-qgisMinimumVersion=2.99
+qgisMaximumVersion=2.99
 description=Plugin to enable additional features and capabilities of Giswater working together with QGIS and PostgreSQL
 about=Giswater is a open source tool with the goal to move from acquired knowledge to shared knowledge in the areas of water management, such as supply, sewerage, urban drainage or flood risk assessment with to communicate any water simulation software through any Spatial database with any Geographic Information System (GIS) in order to give everybody a real way of open solution of water management.
 
