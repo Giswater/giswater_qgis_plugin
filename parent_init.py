@@ -1409,9 +1409,12 @@ class ParentDialog(QDialog):
         self.cmb_hyd_customer_code = self.dialog.findChild(QComboBox, "cmb_hyd_customer_code")
 
         # Populate combo filter hydrometer value
-        sql = "SELECT id, code FROM " + self.schema_name + ".ext_cat_period ORDER BY code"
+        sql = ("SELECT id, code FROM " + self.schema_name + ".ext_cat_period "
+               " WHERE id IN (SELECT cat_period_id FROM "+ self.schema_name + ".v_edit_rtc_hydro_data_x_connec "
+               " WHERE connec_id='"+str(self.id)+"')"
+               " ORDER BY code")
         rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql, log_sql=False))
+        rows.extend(self.controller.get_rows(sql, log_sql=True))
         utils_giswater.set_item_data(self.cat_period_id_filter, rows, 1)
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
