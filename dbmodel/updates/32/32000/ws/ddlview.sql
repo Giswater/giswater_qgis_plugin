@@ -7,42 +7,109 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-CREATE VIEW v_edit_typevalue as 
-SELECT row_number() OVER (ORDER BY cat_arc.id) + 1000 AS rid, 'cat_arc'::text, id, id as idval FROM cat_arc
+CREATE OR REPLACE VIEW v_edit_typevalue AS 
+ SELECT row_number() OVER (ORDER BY cat_arc.id) + 1000 AS rid,
+    'cat_arc'::text AS catalog,
+    cat_arc.id,
+    cat_arc.id AS idval
+   FROM cat_arc
 UNION
-SELECT row_number() OVER (ORDER BY cat_builder.id) + 2000 AS rid, 'cat_builder', id, descript FROM cat_builder
+ SELECT row_number() OVER (ORDER BY cat_builder.id) + 2000 AS rid,
+    'cat_builder'::text AS catalog,
+    cat_builder.id,
+    cat_builder.descript AS idval
+   FROM cat_builder
 UNION
-SELECT row_number() OVER (ORDER BY cat_element.id) + 3000 AS rid, 'cat_element', id, id FROM cat_element
+ SELECT row_number() OVER (ORDER BY cat_element.id) + 3000 AS rid,
+    'cat_element'::text AS catalog,
+    cat_element.id,
+    cat_element.id AS idval
+   FROM cat_element
 UNION
-SELECT row_number() OVER (ORDER BY cat_node.id) + 4000 AS rid, 'cat_node', id, descript FROM cat_node
+ SELECT row_number() OVER (ORDER BY cat_node.id) + 4000 AS rid,
+    'cat_node'::text AS catalog,
+    cat_node.id,
+    cat_node.id AS idval
+   FROM cat_node
 UNION
-SELECT row_number() OVER (ORDER BY cat_owner.id) + 5000 AS rid, 'cat_owner', id, descript FROM cat_owner
+ SELECT row_number() OVER (ORDER BY cat_owner.id) + 5000 AS rid,
+    'cat_owner'::text AS catalog,
+    cat_owner.id,
+    cat_owner.descript AS idval
+   FROM cat_owner
 UNION
-SELECT row_number() OVER (ORDER BY cat_presszone.id) + 6000 AS rid, 'cat_presszone', id, descript FROM cat_presszone
+ SELECT row_number() OVER (ORDER BY cat_presszone.id) + 6000 AS rid,
+    'cat_presszone'::text AS catalog,
+    cat_presszone.id,
+    cat_presszone.descript AS idval
+   FROM cat_presszone
 UNION
-SELECT row_number() OVER (ORDER BY cat_soil.id) + 7000 AS rid, 'cat_soil', id, descript FROM cat_soil
+ SELECT row_number() OVER (ORDER BY cat_soil.id) + 7000 AS rid,
+    'cat_soil'::text AS catalog,
+    cat_soil.id,
+    cat_soil.descript AS idval
+   FROM cat_soil
 UNION
-SELECT row_number() OVER (ORDER BY cat_work.id) + 8000 AS rid, 'cat_work', id, descript FROM cat_work
+ SELECT row_number() OVER (ORDER BY cat_work.id) + 8000 AS rid,
+    'cat_work'::text AS catalog,
+    cat_work.id,
+    cat_work.descript AS idval
+   FROM cat_work
 UNION
-SELECT row_number() OVER (ORDER BY ext_streetaxis.id) + 9000 AS rid, 'ext_streetaxis', id, name FROM ext_streetaxis
+ SELECT row_number() OVER (ORDER BY ext_streetaxis.id) + 9000 AS rid,
+    'ext_streetaxis'::text AS catalog,
+    ext_streetaxis.id,
+    ext_streetaxis.name AS idval
+   FROM ext_streetaxis
 UNION
-SELECT row_number() OVER (ORDER BY ext_plot.id) + 10000 AS rid, 'ext_plot', id, postnumber FROM ext_plot
+ SELECT row_number() OVER (ORDER BY ext_plot.id) + 10000 AS rid,
+    'ext_plot'::text AS catalog,
+    ext_plot.id,
+    ext_plot.postnumber AS idval
+   FROM ext_plot
 UNION
-SELECT row_number() OVER (ORDER BY man_type_category.id) + 11000 AS rid, concat('category_',lower(feature_type)), id::varchar, category_type FROM man_type_category
+ SELECT row_number() OVER (ORDER BY man_type_category.id) + 11000 AS rid,
+    concat('category_', lower(man_type_category.feature_type::text)) AS catalog,
+    man_type_category.id::character varying AS id,
+    man_type_category.category_type AS idval
+   FROM man_type_category
 UNION
-SELECT row_number() OVER (ORDER BY man_type_fluid.id) + 12000 AS rid, 'man_type_function', id::varchar, fluid_type FROM man_type_fluid
+ SELECT row_number() OVER (ORDER BY man_type_fluid.id) + 12000 AS rid,
+    'man_type_function'::text AS catalog,
+    man_type_fluid.id::character varying AS id,
+    man_type_fluid.fluid_type AS idval
+   FROM man_type_fluid
 UNION
-SELECT row_number() OVER (ORDER BY man_type_function.id) + 13000 AS rid, 'man_type_location', id::varchar, function_type FROM man_type_function
+ SELECT row_number() OVER (ORDER BY man_type_function.id) + 13000 AS rid,
+    'man_type_location'::text AS catalog,
+    man_type_function.id::character varying AS id,
+    man_type_function.function_type AS idval
+   FROM man_type_function
 UNION
-SELECT row_number() OVER (ORDER BY man_type_location.id) + 14000 AS rid, 'cat_builder', id::varchar, location_type FROM man_type_location
+ SELECT row_number() OVER (ORDER BY man_type_location.id) + 14000 AS rid,
+    'cat_builder'::text AS catalog,
+    man_type_location.id::character varying AS id,
+    man_type_location.location_type AS idval
+   FROM man_type_location
 UNION
-SELECT row_number() OVER (ORDER BY value_state.id) + 15000 AS rid, 'value_state', id::varchar, name FROM value_state
+ SELECT row_number() OVER (ORDER BY value_state.id) + 15000 AS rid,
+    'value_state'::text AS catalog,
+    value_state.id::character varying AS id,
+    value_state.name AS idval
+   FROM value_state
 UNION
-SELECT row_number() OVER (ORDER BY value_state_type.id) + 16000 AS rid, 'value_state_type', id::varchar, name FROM value_state_type
+ SELECT row_number() OVER (ORDER BY value_state_type.id) + 16000 AS rid,
+    'value_state_type'::text AS catalog,
+    value_state_type.id::character varying AS id,
+    value_state_type.name AS idval
+   FROM value_state_type
 UNION
-SELECT row_number() OVER (ORDER BY value_verified.id) + 17000 AS rid, 'value_verified', id::varchar, id as idval FROM value_verified
-order by 2,4;
+ SELECT row_number() OVER (ORDER BY value_verified.id) + 17000 AS rid,
+    'value_verified'::text AS catalog,
+    value_verified.id,
+    value_verified.id AS idval
+   FROM value_verified
+  ORDER BY 2, 4;
 
 
 -- 2019/02/12

@@ -77,7 +77,9 @@ BEGIN
 	-- if ismandatory is true. First time for user value is forced
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		SELECT label, audit_cat_param_user.id as widgetname, value, datatype, widgettype, layout_id, layout_order,layout_name, 
+		SELECT label, audit_cat_param_user.id as widgetname, 
+		(CASE WHEN value IS NULL THEN vdefault ELSE value END) AS value , 
+		 datatype, widgettype, layout_id, layout_order,layout_name, 
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, reg_exp,
 		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked,

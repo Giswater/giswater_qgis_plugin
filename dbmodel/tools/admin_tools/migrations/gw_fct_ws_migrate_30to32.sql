@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-CREATE OR REPLACE FUNCTION prog.gw_fct_ws_migrate_30to32(p_source_schema varchar,p_target_schema varchar)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_ws_migrate_30to32(p_source_schema varchar,p_target_schema varchar)
   RETURNS numeric AS
 $BODY$
 
 /*
-SELECT prog.gw_fct_ws_migrate_30to32('pdap_almoster_des_2018','prog');
+SELECT SCHEMA_NAME.gw_fct_ws_migrate_30to32('source','target');
 */
 
 DECLARE
@@ -20,7 +20,7 @@ rec record;
 
 BEGIN
     -- Search path
-    SET search_path = prog, public;
+    SET search_path = SCHEMA_NAME, public;
 
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 	ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
@@ -81,22 +81,22 @@ BEGIN
 		ELSIF rec.id='inp_pump' THEN
 			EXECUTE 'INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status, to_arc) 
 			SELECT node_id, power, curve_id, speed, pattern, inp_typevalue.id, to_arc 
-			FROM '||p_source_schema||'.'||rec.id||' JOIN '||p_target_schema||'.inp_typevalue on status=idval AND typevalue=''inp_value_status_pump'';';
+			FROM '||p_source_schema||'.'||rec.id||' LEFT JOIN '||p_target_schema||'.inp_typevalue on status=idval AND typevalue=''inp_value_status_pump'';';
 
 		ELSIF rec.id='inp_pipe' THEN
 			EXECUTE 'INSERT INTO inp_pipe (arc_id, minorloss, status, custom_roughness, custom_dint) 
 			SELECT arc_id, minorloss, inp_typevalue.id, custom_roughness, custom_dint 
-			FROM '||p_source_schema||'.'||rec.id||' JOIN '||p_target_schema||'.inp_typevalue on status=idval AND typevalue=''inp_value_status_pipe'';';
+			FROM '||p_source_schema||'.'||rec.id||' LEFT JOIN '||p_target_schema||'.inp_typevalue on status=idval AND typevalue=''inp_value_status_pipe'';';
 		
 		ELSIF rec.id='inp_shortpipe' THEN
 			EXECUTE 'INSERT INTO inp_shortpipe (node_id, minorloss, to_arc, status) 
 			SELECT node_id, minorloss, to_arc, inp_typevalue.id 
-			FROM '||p_source_schema||'.'||rec.id||' JOIN '||p_target_schema||'.inp_typevalue on status=idval AND typevalue=''inp_value_status_shortpipe'';';
+			FROM '||p_source_schema||'.'||rec.id||' LEFT JOIN '||p_target_schema||'.inp_typevalue on status=idval AND typevalue=''inp_value_status_shortpipe'';';
 
 		ELSIF rec.id='inp_valve' THEN
 			EXECUTE 'INSERT INTO inp_valve (node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id,minorloss, status, to_arc) 
 			SELECT node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, inp_typevalue.id, to_arc
-			FROM '||p_source_schema||'.'||rec.id||' JOIN '||p_target_schema||'.inp_typevalue on status=idval AND typevalue=''inp_value_status_valve'';';
+			FROM '||p_source_schema||'.'||rec.id||' LEFT JOIN '||p_target_schema||'.inp_typevalue on status=idval AND typevalue=''inp_value_status_valve'';';
 
 		END IF;
     END LOOP;
