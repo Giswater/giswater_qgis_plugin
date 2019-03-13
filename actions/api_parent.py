@@ -1083,7 +1083,7 @@ class ApiParent(ParentAction):
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                     elif field['widgettype'] == 'check':
                         widget = QCheckBox()
-                        if field['value'].lower() == "true":
+                        if field['value'] is not None and field['value'].lower() == "true":
                             widget.setChecked(True)
                         else:
                             widget.setChecked(False)
