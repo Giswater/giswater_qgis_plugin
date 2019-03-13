@@ -8,10 +8,10 @@ from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel, QAb
 
 from functools import partial
 
-import sys
 import operator
 import os
 import csv
+import sys
 import webbrowser
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -79,7 +79,7 @@ class SearchPlus(QObject):
         if self.project_type == 'ws':
             self.hydro_create_list()
             self.dlg_search.expl_name.activated.connect(partial(self.expl_name_changed))
-            self.dlg_search.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg_search.hydro_id, self.dlg_search.expl_name))
+            self.dlg_search.hydro_id.activated.connect(partial(self.hydro_zoom, self.dlg_search.expl_name))
             self.dlg_search.hydro_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg_search.hydro_id))
             self.set_model_by_list(self.list_hydro, self.dlg_search.hydro_id)
             self.filter_by_list(self.dlg_search.hydro_id)
@@ -657,6 +657,7 @@ class SearchPlus(QObject):
     def hydro_create_list(self):
         
         self.list_hydro = []
+        self.list_hydro_id = []
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
         if expl_name is None or expl_name == "None":
             self.set_model_by_list([], self.dlg_search.hydro_id)
@@ -667,17 +668,21 @@ class SearchPlus(QObject):
 
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'] + ", "
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
-               + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
+               + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + ", "
+               " hydrometer_id, " + self.params['basic_search_hyd_hydro_field_cc']+""
+               ", " + self.params['basic_search_hyd_hydro_field_erhc']+""
+               ", " + self.params['basic_search_hyd_hydro_field_ccc']+""
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " = '" + str(expl_name) + "' "
                " or " + self.params['basic_search_hyd_hydro_field_expl_name'] + " is null"
                # " AND state IN (" + str(list_state) + ") "
                " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
             
         self.list_hydro.append("")
+        self.list_hydro_id.append("")
         for row in rows:
             append_to_list = True
             for x in range(0, len(row)):
@@ -685,38 +690,46 @@ class SearchPlus(QObject):
                     append_to_list = False
             if append_to_list:
                 self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
-                
-        self.list_hydro = sorted(set(self.list_hydro))
+                elem = [row[3], row[4], row[5], row[6]]
+                self.list_hydro_id.append(elem)
+
         self.set_model_by_list(self.list_hydro, self.dlg_search.hydro_id)
 
 
-    def hydro_zoom(self, hydro, expl_name):
+    def hydro_zoom(self, expl_name, index):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
-        
+
         # Get selected code from combo
-        element = utils_giswater.getWidgetText(self.dlg_search, hydro)
+        element = self.list_hydro_id[index]
+
         if element == 'null':
             return
 
-        # Split element. [0]: hydro_id, [1]: connec_customer_code
-        row = element.split(' . ', 2)
-        hydro_id = str(row[0])
-        connec_customer_code = str(row[1])
+        hydro_id = str(element[0])
+        field_cc = str(element[1])
+        field_erhc = str(element[2])
+        field_ccc = str(element[3])
         expl_name = utils_giswater.getWidgetText(self.dlg_search, expl_name, return_string_null=False)
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ", " + self.params['basic_search_hyd_hydro_field_1'] + ""
+
+        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ""
+               ", " + self.params['basic_search_hyd_hydro_field_erhc'] + ""
+               ", " + self.params['basic_search_hyd_hydro_field_ccc'] + ""
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '"+str(connec_customer_code)+"' "
-               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%' "
-               " AND " + self.params['basic_search_hyd_hydro_field_1'] + " = '" + str(hydro_id) + "'")
-        row = self.controller.get_row(sql)
+               " WHERE hydrometer_id='"+str(hydro_id)+"'"
+               " AND " + self.params['basic_search_hyd_hydro_field_cc'] + " = '"+str(field_cc)+"' "
+               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '"+str(field_erhc)+"' "
+               " AND " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '"+str(field_ccc)+"' "
+               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%' ")
+
+
+        row = self.controller.get_row(sql, log_sql=False)
         if not row:
             return
 
         connec_id = row[0]
         hydrometer_customer_code = row[1]
-
         # Check if the expression is valid
-        aux = "connec_id = '" + connec_id + "'"
+        aux = self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = expr.parserErrorString() + ": " + aux
@@ -754,7 +767,8 @@ class SearchPlus(QObject):
                " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
                " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
                " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%'")
-        rows = self.controller.get_rows(sql)
+
+        rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
             row = rows[0]
         else:
@@ -774,21 +788,18 @@ class SearchPlus(QObject):
             label.setText(str(column_name[x][0] + ": "))
             grid_layout.addWidget(label, x, 0, 1, 1)
             if column_name[x][0] != 'hydrometer_link':
-                lineedit = QLineEdit()
-                lineedit.setObjectName("txt_"+column_name[x][0])
-                lineedit.setText(str(row[x]))
-                lineedit.setDisabled(True)
-                grid_layout.addWidget(lineedit, x, 1, 1, 1)
+                widget = QLineEdit()
+                widget.setText(str(row[x]))
+                widget.setDisabled(True)
             else:
-                button = QPushButton()
-                button.setObjectName("txt_"+column_name[x][0])
-                button.setText(str(row[x]))
-                button.setStyleSheet("Text-align:left")
-                button.setFlat(True)
-                grid_layout.addWidget(button, x, 1, 1, 1)
-                self.button_link = button
+                widget = QPushButton()
+                widget.setText(str(row[x]))
+                widget.setStyleSheet("Text-align:left")
+                widget.setFlat(True)
 
-
+                self.button_link = widget
+            widget.setObjectName("txt_" + column_name[x][0])
+            grid_layout.addWidget(widget, x, 1, 1, 1)
         url = str(row['hydrometer_link'])
         if url is not None or url != '':
             self.button_link.clicked.connect(partial(self.open_url, url))
@@ -996,6 +1007,7 @@ class SearchPlus(QObject):
                 
     def address_populate(self, combo, layername, field_code, field_name):
         """ Populate @combo """
+
         self.dlg_search.address_street.blockSignals(True)
         self.dlg_search.address_street.clear()
         self.dlg_search.address_street.blockSignals(False)
@@ -1372,12 +1384,15 @@ class SearchPlus(QObject):
         self.proxy_model = QSortFilterProxyModel()
         self.proxy_model.setSourceModel(model)
         self.proxy_model.setFilterKeyColumn(0)
+
         proxy_model_aux = QSortFilterProxyModel()
         proxy_model_aux.setSourceModel(model)
         proxy_model_aux.setFilterKeyColumn(0)
+
         widget.setModel(proxy_model_aux)
         widget.setModelColumn(0)
         completer = QCompleter()
+
         completer.setModel(self.proxy_model)
         completer.setCompletionColumn(0)
         completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
