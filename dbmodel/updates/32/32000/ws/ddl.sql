@@ -12,6 +12,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE rpt_inp_arc ADD COLUMN flw_code text;
 
 
+ALTER TABLE inp_pipe ALTER COLUMN minorloss SET DEFAULT 0;
+
+
 CREATE TABLE rpt_selector_hourly_compare
 ( id serial NOT NULL,
   "time" character varying(100) NOT NULL,

@@ -12,7 +12,7 @@ $BODY$
 
 /* example
 -- reset values
-SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"user1", "values":{}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"postgres", "values":{}}$$)
 
 -- taking values from another user
 SELECT SCHEMA_NAME.gw_fct_admin_role_resetuserprofile($${"user":"user1", "values":{"copyFromUserSameRole":"user2"}}$$)
@@ -97,9 +97,9 @@ BEGIN
 		DELETE FROM selector_state WHERE cur_user=v_user;
 		DELETE FROM selector_hydrometer WHERE cur_user=v_user;
 
-		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, v_user FROM selector_expl;
-		INSERT INTO selector_state (state_id, cur_user) SELECT 1, v_user FROM selector_state LIMIT 1;
-		INSERT INTO selector_hydrometer (state_id, cur_user) SELECT state_id, v_user FROM selector_hydrometer;
+		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, v_user FROM exploitation;
+		INSERT INTO selector_state (state_id, cur_user) SELECT 1, v_user FROM value_state LIMIT 1;
+		INSERT INTO selector_hydrometer (state_id, cur_user) SELECT id, v_user FROM ext_rtc_hydrometer_state;
 		
 	END IF;
 

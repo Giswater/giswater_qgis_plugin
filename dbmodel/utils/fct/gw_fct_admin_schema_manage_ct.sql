@@ -11,11 +11,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_ct(p_data json
 $BODY$
 
 /*
-SELECT prog.gw_fct_admin_schema_manage_ct($${
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"DROP"}}$$)
 
-SELECT prog.gw_fct_admin_schema_manage_ct($${
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"ADD"}}$$)
 

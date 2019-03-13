@@ -49,6 +49,7 @@ SELECT SCHEMA_NAME.gw_api_getconfig($${
     v_tabadmin json;
     v_formgroupbox json[];
     v_formgroupbox_json json;
+    v_querytext json;
 
    
 BEGIN
@@ -74,19 +75,24 @@ BEGIN
     SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND tabname='tabUser';
     IF rec_tab.tabname IS NOT NULL THEN
 
-	-- if ismandatory is true. First time for user value is forced
+	-- ismandatory true are user values we need on config_param_user. If  not exists (one of then inp_options_units) values are forced
+	IF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter = 'inp_options_units') IS NULL THEN 
+
+		-- set current user values
+		v_querytext = '{"user":"'||current_user||'", "values":{}}';
+		PERFORM gw_fct_admin_role_resetuserprofile(v_querytext);		
+	END IF;
+	
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		SELECT label, audit_cat_param_user.id as widgetname, 
-		(CASE WHEN value IS NULL THEN vdefault ELSE value END) AS value , 
-		 datatype, widgettype, layout_id, layout_order,layout_name, 
+		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_id, layout_order,layout_name, 
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, reg_exp,
 		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked,
 		(CASE WHEN (widgetcontrols->>''minValue'') IS NOT NULL THEN widgetcontrols->>''minValue'' ELSE NULL END) AS minvalue,
 		(CASE WHEN (widgetcontrols->>''maxValue'') IS NOT NULL THEN widgetcontrols->>''maxValue'' ELSE NULL END) AS maxvalue,
 		placeholder
-		FROM SCHEMA_NAME.audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
+		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 		AND formname ='||quote_literal(lower(v_formname))||'
 		AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||')
@@ -100,7 +106,7 @@ BEGIN
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		 SELECT label, audit_cat_param_user.id as widgetname, datatype, widgettype, layout_id, layout_order,layout_name,
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		 row_number()over(ORDER BY layout_id, layout_order) AS orderby, value,project_type, dv_querytext,dv_parent_id, isparent, sys_role_id,
+		 row_number()over(ORDER BY layout_id, layout_order) AS orderby, value, project_type, dv_querytext,dv_parent_id, isparent, sys_role_id,
 		 placeholder
 		 FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		 WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
@@ -118,6 +124,7 @@ BEGIN
 			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
 				INTO combo_json;
 
+			raise notice 'aux_json %', aux_json;
 			-- Update array
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
