@@ -656,8 +656,8 @@ class SearchPlus(QObject):
 
     def hydro_create_list(self):
         
-        self.list_hydro = []
-        self.list_hydro_id = []
+        self.list_hydro = []  # List to show
+        self.list_hydro_id = []  # List to work (find feature)
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
         if expl_name is None or expl_name == "None":
             self.set_model_by_list([], self.dlg_search.hydro_id)
@@ -690,6 +690,8 @@ class SearchPlus(QObject):
                     append_to_list = False
             if append_to_list:
                 self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
+                #self.list_hydro.append(row[3] + " . " + row[5] + " . " + row[5] + " . " + row[6])
+                #self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4] + " . " + row[5] + " . " + row[6])
                 elem = [row[3], row[4], row[5], row[6]]
                 self.list_hydro_id.append(elem)
 
@@ -906,33 +908,8 @@ class SearchPlus(QObject):
 
 
     def expl_name_changed(self):
-        #self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id','name')
-        expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
-
-        if expl_name == "null" or expl_name is None or expl_name == "None":
-            expl_name = ""
-        list_hydro = []
-
-        sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''") + ", "
-               + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
-               + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + " "
-               " FROM " + self.schema_name + ".v_rtc_hydrometer "
-               " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name']+" = '" + str(expl_name) + "' "
-               # " AND state IN (" + str(list_state) + ") "
-               " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return
-        
-        for row in rows:
-            append_to_list = True
-            for x in range(0, len(row)):
-                if row[x] is None:
-                    append_to_list = False
-            if append_to_list:
-                list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
-        list_hydro = sorted(set(list_hydro))
-        self.set_model_by_list(list_hydro, self.dlg_search.hydro_id)
+        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id', 'name')
+        self.hydro_create_list()
 
 
     def network_geom_type_changed(self):
