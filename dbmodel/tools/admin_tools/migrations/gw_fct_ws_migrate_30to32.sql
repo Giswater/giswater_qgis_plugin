@@ -24,9 +24,8 @@ BEGIN
 
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 	ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
-
-
-
+	ALTER TABLE node DISABLE TRIGGER gw_trg_node_update;
+	
 
 	--truncate admin tables that may be customized
 	TRUNCATE cat_feature;
@@ -103,6 +102,7 @@ BEGIN
 
 	ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 	ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
+	ALTER TABLE node ENABLE TRIGGER gw_trg_node_update;
 
     return 1;
 END;
