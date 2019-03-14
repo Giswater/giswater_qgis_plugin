@@ -185,6 +185,9 @@
           </item>
           <item>
            <widget class="QTextEdit" name="txt_file_inp">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
               <horstretch>0</horstretch>
@@ -196,6 +199,9 @@
               <width>0</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -267,6 +273,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
