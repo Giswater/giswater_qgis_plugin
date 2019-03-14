@@ -1046,6 +1046,8 @@ class SearchPlus(QObject):
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
             if not type(value_code) is QPyNullVariant and geom is not None:
+                #TODO CONTROLAR CUANDO SE HACE O NO HACE ESTE IF
+                #if str(value_name) in str(self.dlg_search.address_street.currentText()):
                 elem = [value_code, value_name, geom.exportToWkt()]
             else:
                 elem = [value_code, value_name, None]
