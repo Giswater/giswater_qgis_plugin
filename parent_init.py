@@ -2425,7 +2425,8 @@ class ParentDialog(QDialog):
     def fill_table(self, widget, table_name, filter_=None):
         """ Set a model with selected filter.
         Attach that model to selected table """ 
-        
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
