@@ -27,7 +27,6 @@ BEGIN
 	UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=result_id_var;
 	UPDATE rpt_arc SET flow=(-1)*flow WHERE flow<0 and result_id=result_id_var;
 	
-	PERFORM gw_fct_utils_csv2pg_import_epanet_rpt(result_id_var,null);
 	
 RETURN 0;
 		

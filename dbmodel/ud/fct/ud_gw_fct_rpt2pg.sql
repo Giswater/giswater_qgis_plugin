@@ -30,7 +30,6 @@ BEGIN
 	END LOOP;
 	*/
 	
-	PERFORM gw_fct_utils_csv2pg_import_swmm_rpt(result_id_var,null);
 
 RETURN 0;
 

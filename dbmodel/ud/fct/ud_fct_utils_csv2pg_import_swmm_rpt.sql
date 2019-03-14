@@ -195,6 +195,8 @@ BEGIN
 		END IF;
 	END LOOP;
 	
+	PERFORM gw_fct_rpt2pg(p_result_id);
+
 RETURN 0;
 	
 END;

@@ -846,7 +846,8 @@ SELECT a.idval as parameter,
   WHERE (a.layout_name = ANY (ARRAY['grl_general_1'::text, 'grl_general_2'::text, 'grl_hyd_3'::text, 'grl_hyd_4'::text, 'grl_quality_5'::text, 'grl_quality_6'::text])) 
   AND a.idval NOT IN ('UNBALANCED_N', 'NODE_ID', 'HYDRAULICS_FNAME') AND b.cur_user::name = "current_user"()
   AND cur_user=current_user
-  AND value is not null;
+  AND value is not null
+  AND b.value IS NOT NULL AND (parameter !='PATTERN' AND value !='NULLVALUE');
 
 
 CREATE OR REPLACE VIEW vi_times AS 
