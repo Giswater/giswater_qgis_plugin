@@ -535,20 +535,21 @@ class Go2Epa(ApiParent):
             # Import to DB
             if import_result is True:
                 if os.path.exists(self.file_rpt):
-				
+
                     # delete previous values of user on temp table
                     sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
                            " WHERE user_name=current_user AND csv2pgcat_id=11")
                     self.controller.execute_sql(sql, log_sql=False)
                 
-				    # Importing file to temporal table
+                    # Importing file to temporal table
                     self.insert_rpt_into_db(self.file_rpt)
                 
-				    # Call function gw_fct_utils_csv2pg_export_epa_inp to put in order data from temp table to result tables
+                    # Call function gw_fct_utils_csv2pg_export_epa_inp to put in order data from temp table to result tables
                     sql = ("SELECT " + self.schema_name + "." + "gw_fct_utils_csv2pg_import_epa_rpt('" + str(self.result_name) + "')")
                     row = self.controller.get_row(sql, log_sql=True)
-                			
-                    #final message
+
+
+                    # final message
                     common_msg += "Import RPT finished."
                 else:
                     msg = "Can't export rpt, File not found"
@@ -703,7 +704,7 @@ class Go2Epa(ApiParent):
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(result_id) FROM " + self.schema_name + ".v_ui_rpt_cat_result ORDER BY result_id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, rows)
+        utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, rows, allow_nulls=False)
         utils_giswater.fillComboBox(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id, rows)
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
@@ -725,8 +726,12 @@ class Go2Epa(ApiParent):
         """ Update current values to the table """
 
         # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
+        rpt_selector_result_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, return_string_null=False)
+        rpt_selector_compare_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id, return_string_null=False)
+        if rpt_selector_result_id is None or rpt_selector_compare_id in (None, 'null', ''):
+            msg = "You have to select results parameters"
+            self.controller.show_message(msg)
+            return
 
         # Set project user
         user = self.controller.get_project_user()
