@@ -186,7 +186,7 @@ class UpdateSQL(ParentAction):
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
-        self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains))
+        self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -219,17 +219,26 @@ class UpdateSQL(ParentAction):
         self.set_info_project()
 
 
-    def btn_constrains_changed(self, button):
+    def btn_constrains_changed(self, button, call_function=False):
 
         lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
         if button.text() == 'OFF':
             button.setText("ON")
-            lbl_constrains_info.setText('(Constrains enabled)')
+            lbl_constrains_info.setText('(Constrains enabled)  ')
+            if call_function:
+                # Enable constrains
+                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
+                self.controller.execute_sql(sql)
+
         elif button.text() == 'ON':
             button.setText("OFF")
             lbl_constrains_info.setText('(Constrains dissabled)')
-
-        return
+            if call_function:
+                # Disable constrains
+                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
+                self.controller.execute_sql(sql)
 
 
     """ Declare all read sql process """
@@ -1495,15 +1504,6 @@ class UpdateSQL(ParentAction):
 
         self.set_arrow_cursor()
 
-        # Enable/disable constrains
-
-        if self.btn_constrains.text() == 'OFF':
-            sql = 'SELECT ' + self.schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
-            self.controller.execute_sql(sql)
-        elif self.btn_constrains.text() == 'ON':
-            sql = 'SELECT ' + self.schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
-            self.controller.execute_sql(sql)
-
         # Show message if process executed correctly
         if self.error_count == 0:
             self.controller.dao.commit()
@@ -1860,6 +1860,8 @@ class UpdateSQL(ParentAction):
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
         rows = self.controller.get_rows(sql)
+        if rows is None:
+            return
         for row in rows:
             sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = '" + str(row[0]) + "' "
                    " AND table_name = 'version')")
@@ -1917,14 +1919,14 @@ class UpdateSQL(ParentAction):
         if result:
             database_version = result[0].split(',')
         else:
-            database_version = ''
+            database_version = ['']
 
         sql = "SELECT PostGIS_FULL_VERSION();"
         result = self.controller.get_row(sql)
         if result:
             postgis_version = result[0].split('GEOS=')
         else:
-            postgis_version = ''
+            postgis_version = ['']
         if schema_name == 'Nothing to select' or schema_name == '':
             result = None
         else:
@@ -2192,8 +2194,8 @@ class UpdateSQL(ParentAction):
             if status:
                 msg = "The Schema was deleted correctly."
                 self.controller.show_info_box(msg, "Info")
-
         self.populate_data_schema_name(self.cmb_project_type)
+        self.set_info_project()
 
 
     """ Take current project type changed """
