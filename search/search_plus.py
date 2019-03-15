@@ -700,10 +700,13 @@ class SearchPlus(QObject):
 
     def hydro_zoom(self, expl_name, index):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
-
         # Get selected code from combo
-        element = self.list_hydro_id[index]
-
+        try:
+            element = self.list_hydro_id[index]
+        except IndexError:
+            return
+        except Exception as e:
+            self.controller.log_info("An exception occurred: " + str(type(e).__name__))
         if element == 'null':
             return
 
@@ -749,12 +752,12 @@ class SearchPlus(QObject):
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
                     self.iface.legendInterface().setLayerVisible(layer, True)
-                    self.open_hydrometer_dialog(element, connec_id, hydrometer_customer_code)
+                    self.open_hydrometer_dialog(element)
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
                 
 
-    def open_hydrometer_dialog(self, element, connec_id, hydrometer_customer_code):
+    def open_hydrometer_dialog(self, element):
         
         self.hydro_info_dlg = HydroInfo()
         self.load_settings(self.hydro_info_dlg)
