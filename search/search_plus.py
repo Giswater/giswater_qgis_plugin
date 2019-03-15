@@ -749,26 +749,31 @@ class SearchPlus(QObject):
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
                     self.iface.legendInterface().setLayerVisible(layer, True)
-                    self.open_hydrometer_dialog(connec_id, hydrometer_customer_code)
+                    self.open_hydrometer_dialog(element, connec_id, hydrometer_customer_code)
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
                 
 
-    def open_hydrometer_dialog(self, connec_id, hydrometer_customer_code):
+    def open_hydrometer_dialog(self, element, connec_id, hydrometer_customer_code):
         
         self.hydro_info_dlg = HydroInfo()
         self.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
-
+        hydro_id = str(element[0])
+        field_cc = str(element[1])
+        field_erhc = str(element[2])
+        field_ccc = str(element[3])
         expl_name = utils_giswater.getWidgetText(self.dlg_search, self.dlg_search.expl_name)
         if expl_name == 'null':
             expl_name = ''
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
-               " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
-               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
-               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%'")
+               " WHERE hydrometer_id='"+str(hydro_id)+"'"
+               " AND " + self.params['basic_search_hyd_hydro_field_cc'] + " = '"+str(field_cc)+"' "
+               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '"+str(field_erhc)+"' "
+               " AND " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '"+str(field_ccc)+"' "
+               " AND "+self.params['basic_search_hyd_hydro_field_expl_name']+" ILIKE '%" + str(expl_name) + "%' ")
 
         rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
