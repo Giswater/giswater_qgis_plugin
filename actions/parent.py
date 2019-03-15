@@ -6,9 +6,6 @@ or (at your option) any later version.
 """
 from future import standard_library
 standard_library.install_aliases()
-from builtins import range
-from builtins import object
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -23,6 +20,8 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsProject
     from qgis.gui import QgsMapCanvas
+    from builtins import range
+    from builtins import object
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
 from qgis.PyQt.QtCore import Qt, QSettings

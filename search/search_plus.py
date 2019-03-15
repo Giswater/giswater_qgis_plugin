@@ -1,4 +1,3 @@
-from builtins import range
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -9,6 +8,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
+    from builtins import range
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer, QgsExpressionContextUtils
 from qgis.PyQt import uic

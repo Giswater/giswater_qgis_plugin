@@ -7,7 +7,6 @@ or (at your option) any later version.
 from __future__ import print_function
 from future import standard_library
 standard_library.install_aliases()
-from builtins import range
 
 # -*- coding: utf-8 -*-
 try:
@@ -19,6 +18,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.PyQt.QtCore import QStringListModel
+    from builtins import range
 
 from qgis.PyQt.QtCore import QTime, QDate, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
