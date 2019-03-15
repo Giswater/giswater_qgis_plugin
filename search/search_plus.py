@@ -700,7 +700,12 @@ class SearchPlus(QObject):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
 
         # Get selected code from combo
-        element = self.list_hydro_id[index]
+        try:
+            element = self.list_hydro_id[index]
+        except IndexError:
+            return
+        except Exception as e:
+            self.controller.log_info("An exception occurred: " + str(type(e).__name__))
 
         if element == 'null':
             return
