@@ -49,6 +49,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
+    p_data = REPLACE (p_data::text, '''''', 'null');
 	
 	-- set output parameter
 	v_fextension = (((p_data)->>'data')::json->>'fields')::json->>'fextension';

@@ -81,6 +81,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
+    p_data = REPLACE (p_data::text, '''''', 'null');
        
 	-- Get input parameters:
 	v_feature  := (p_data ->> 'feature');

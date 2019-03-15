@@ -53,6 +53,14 @@ BEGIN
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
+-- fix diferent ways to say null on client
+    p_data = REPLACE (p_data::text, '"NULL"', 'null');
+    p_data = REPLACE (p_data::text, '"null"', 'null');
+    p_data = REPLACE (p_data::text, '""', 'null');
+    p_data = REPLACE (p_data::text, '''''', 'null');
+    p_data = REPLACE (p_data::text, '''''', 'null');
+
+
 --  Get project type
     SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 

@@ -47,7 +47,9 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-		
+    p_data = REPLACE (p_data::text, '''''', 'null');
+
+	
 --  get input values
     v_team = (((p_data ->>'data')::json->>'fields')::json->>'team_id')::integer;
     v_lot = (((p_data ->>'data')::json->>'fields')::json->>'lot_id')::integer;

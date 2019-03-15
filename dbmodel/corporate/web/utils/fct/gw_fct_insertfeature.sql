@@ -37,7 +37,9 @@ BEGIN
 	insert_data = REPLACE (insert_data::text, '"NULL"', 'null');
 	insert_data = REPLACE (insert_data::text, '"null"', 'null');
 	insert_data = REPLACE (insert_data::text, '""', 'null');
-		
+    insert_data = REPLACE (insert_data::text, '''''', 'null');
+
+	
 --    COMMON TASKS:
 
 --    Construct geom in device coordinates

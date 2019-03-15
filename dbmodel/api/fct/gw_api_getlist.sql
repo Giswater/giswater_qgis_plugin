@@ -153,6 +153,8 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
+    p_data = REPLACE (p_data::text, '''''', 'null');
+
 
     SELECT epsg INTO v_srid FROM version LIMIT 1;
 

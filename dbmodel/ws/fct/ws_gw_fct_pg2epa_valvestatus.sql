@@ -12,6 +12,7 @@ DECLARE
     v_valverec record;
     v_noderec record;
 	v_valvemode text;
+	v_mincutresult integer;
     
 
 BEGIN
@@ -30,7 +31,10 @@ BEGIN
 		UPDATE rpt_inp_arc SET status=inp_valve.status FROM inp_valve WHERE rpt_inp_arc.arc_id=concat(inp_valve.node_id,'_n2a') AND result_id=result_id_var;
 			
 		IF v_valvemode = 'MINCUT RESULTS' THEN
-			FOR v_valverec IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id = (SELECT value from config_param_user where cur_user=current_user AND parameter ='inp_options_valve_mode_mincut_result') AND (proposed IS TRUE OR closed IS TRUE)
+			-- get mincut result
+			v_mincutresult :=(SELECT value::integer from config_param_user where cur_user=current_user AND parameter ='inp_options_valve_mode_mincut_result') ;
+
+			FOR v_valverec IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id = v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
 			LOOP
 				UPDATE rpt_inp_arc SET status='CLOSED' WHERE concat(v_valverec.node_id,'_n2a')=arc_id AND result_id=result_id_var;
 			END LOOP;
@@ -53,7 +57,7 @@ BEGIN
 		WHERE a.arc_id=rpt_inp_arc.arc_id AND result_id=result_id_var;
 			
 		IF v_valvemode = 'MINCUT RESULTS' THEN
-			FOR v_valverec IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id = (SELECT value from config_param_user where cur_user=current_user AND parameter ='inp_options_valve_mode_mincut_result') AND (proposed IS TRUE OR closed IS TRUE)
+			FOR v_valverec IN SELECT node_id FROM anl_mincut_result_valve WHERE result_id = v_mincutresult AND (proposed IS TRUE OR closed IS TRUE)
 			LOOP
 				UPDATE rpt_inp_arc SET status='CLOSED' FROM (SELECT arc_id, status FROM arc join inp_shortpipe ON node_id=node_1
 									UNION
@@ -79,7 +83,7 @@ BEGIN
 
     -- Reset demands if node is into mincut polygon
     IF v_valvemode = 'MINCUT RESULTS' THEN
-		FOR v_noderec IN SELECT node_id FROM anl_mincut_result_node WHERE result_id=rec_options.valve_mode_mincut_result
+		FOR v_noderec IN SELECT node_id FROM anl_mincut_result_node WHERE result_id=v_mincutresult
 		LOOP
 			UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var;
 		END LOOP;
