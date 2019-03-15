@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2102
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_arc_no_startend_node();
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_arc_no_startend_node(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_arc_no_startend_node(p_data json)  RETURNS json AS
 $BODY$
 
@@ -68,15 +68,15 @@ BEGIN
 		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND node.state=1
 		ORDER BY ST_Distance(node.the_geom, ST_startpoint(arc_rec.the_geom)) LIMIT 1;
 		IF nodeRecord1 IS NULL 	THEN
-			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fprocesscat_id, the_geom, the_geom_p) 
-			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 3, arc_rec.the_geom, st_startpoint(arc_rec.the_geom);
+			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fprocesscat_id, the_geom, the_geom_p, arccat_id) 
+			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 3, arc_rec.the_geom, st_startpoint(arc_rec.the_geom), arc_rec.arccat_id;
 		END IF;
 	
 		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(arc_rec.the_geom), node.the_geom, v_arcsearchnodes) AND node.state=1
 		ORDER BY ST_Distance(node.the_geom, ST_endpoint(arc_rec.the_geom)) LIMIT 1;
 		IF nodeRecord2 IS NULL 	THEN
-			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fprocesscat_id, the_geom, the_geom_p) 
-			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 3, arc_rec.the_geom, st_endpoint(arc_rec.the_geom);
+			INSERT INTO anl_arc_x_node (arc_id, state, expl_id, fprocesscat_id, the_geom, the_geom_p, arccat_id) 
+			SELECT arc_rec.arc_id, arc_rec.state, arc_rec.expl_id, 3, arc_rec.the_geom, st_endpoint(arc_rec.the_geom), arc_rec.arccat_id;
 		END IF;
 		
 		RAISE NOTICE 'Progress %', (v_partcount::float*100/v_totcount::float)::numeric (5,2);

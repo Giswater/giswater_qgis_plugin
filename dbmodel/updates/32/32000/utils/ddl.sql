@@ -150,3 +150,8 @@ CREATE TABLE inp_typevalue
   CONSTRAINT inp_typevalue_pkey PRIMARY KEY (typevalue, id)
 );
 
+
+
+-- 2019/03/15
+ALTER TABLE anl_arc RENAME COLUMN arc_type TO arccat_id;
+ALTER TABLE anl_arc_x_node RENAME COLUMN arc_type TO arccat_id;

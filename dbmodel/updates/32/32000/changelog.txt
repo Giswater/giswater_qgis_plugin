@@ -16,6 +16,7 @@ Update geometry generator of psector using ONLY doables=TRUE
 New function trigger (2646) gw_trg_calculate_period
 Add config_param_system unique constraint
 New field observ on dimensions table to enhance the capacity to store data from migrations #569
+Change arc_type field on anl_arc to arccat_id
 
 New api functions 
 -----------------

@@ -49,12 +49,12 @@ BEGIN
 	
 	-- Computing process
 	IF v_array != '()' THEN
-		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fprocesscat_id, the_geom)
-				SELECT arc_id, state, expl_id, 4, the_geom
+		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fprocesscat_id, the_geom, arccat_id)
+				SELECT arc_id, state, expl_id, 4, the_geom, arccat_id
 				FROM '||v_worklayer||' WHERE node_1::text=node_2::text AND arc_id IN '||v_array||';';
 	ELSE
-		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fprocesscat_id, the_geom)
-				SELECT arc_id, state, expl_id, 4, the_geom
+		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fprocesscat_id, the_geom, arccat_id)
+				SELECT arc_id, state, expl_id, 4, the_geom, arccat_id
 				FROM '||v_worklayer||' WHERE node_1::text=node_2::text;';
 	END IF;
 

@@ -42,6 +42,9 @@ BEGIN
 	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
 	v_connectolerance := ((p_data ->>'data')::json->>'parameters')::json->>'connecTolerance';
 
+	-- Reset values
+    DELETE FROM anl_connec WHERE cur_user="current_user"() AND fprocesscat_id=5;
+	
 	raise notice 'v_worklayer % v_connectolerance % v_id %',v_worklayer ,v_connectolerance ,v_array;
 
 	-- Computing process
