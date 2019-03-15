@@ -69,24 +69,19 @@ class SearchPlus(QObject):
 
         # Set signals
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-                                                                         (self.address_populate,
-                                                                          self.dlg_search.address_street,
-                                                                          'street_layer', 'street_field_code',
-                                                                          'street_field_name'))
+            (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
         # self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
         #     (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
 
         # self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
         #     (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
         self.dlg_search.address_street.activated.connect(partial
-                                                         (self.address_get_numbers, self.dlg_search.address_street,
-                                                          self.params['portal_field_code'], True))
+            (self.address_get_numbers, self.dlg_search.address_street, self.params['portal_field_code'], True))
         self.dlg_search.address_number.activated.connect(partial(self.address_zoom_portal))
 
         self.dlg_search.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg_search.network_code.activated.connect(partial
-                                                       (self.network_zoom, self.dlg_search.network_code,
-                                                        self.dlg_search.network_geom_type))
+            (self.network_zoom, self.dlg_search.network_code, self.dlg_search.network_geom_type))
         self.dlg_search.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg_search.network_code))
         if self.project_type == 'ws':
             self.hydro_create_list()
@@ -115,7 +110,8 @@ class SearchPlus(QObject):
         """ Fill @combo """
 
         sql = ("SELECT name FROM " + self.controller.schema_name + ".plan_psector "
-                                                                   " WHERE expl_id IN(SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user=current_user)")
+               " WHERE expl_id IN("
+               "SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user=current_user)")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(dialog, combo, rows)
         return rows
@@ -124,9 +120,9 @@ class SearchPlus(QObject):
         """  Update table selector_workcat """
 
         sql = ("DELETE FROM " + self.schema_name + ".selector_workcat "
-                                                   " WHERE cur_user = current_user;\n")
-        sql += ("INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
-                                                    " VALUES('" + workcat_id + "', current_user);\n")
+               " WHERE cur_user = current_user;\n"
+               "INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
+               " VALUES('" + workcat_id + "', current_user);\n")
         self.controller.execute_sql(sql)
 
     def zoom_to_polygon(self, widget, table_name, field_id, field_name):
@@ -137,8 +133,7 @@ class SearchPlus(QObject):
 
         polygon_name = utils_giswater.getWidgetText(self.dlg_search, widget)
         sql = ("SELECT " + str(field_id) + " FROM " + self.schema_name + "." + str(table_name) + " "
-                                                                                                 " WHERE " + str(
-            field_name) + "=$$" + str(polygon_name) + "$$")
+               " WHERE " + str(field_name) + "=$$" + str(polygon_name) + "$$")
         row = self.controller.get_row(sql, log_sql=True)
 
         # Check if the expression is valid
@@ -148,8 +143,7 @@ class SearchPlus(QObject):
             return
         if polygon_name is not None:
             sql = ("SELECT the_geom FROM " + self.schema_name + "." + str(table_name) + " "
-                                                                                        " WHERE " + str(
-                field_id) + "=$$" + str(row[0]) + "$$")
+                   " WHERE " + str(field_id) + "=$$" + str(row[0]) + "$$")
             row = self.controller.get_row(sql, log_sql=True)
             if row[0] is None or row[0] == 'null':
                 msg = "Cant zoom to selection because has no geometry: "
@@ -209,15 +203,12 @@ class SearchPlus(QObject):
                     self.items_dialog.txt_path))
 
         self.items_dialog.txt_name.textChanged.connect(partial
-                                                       (self.workcat_filter_by_text, self.items_dialog,
-                                                        self.items_dialog.tbl_psm, self.items_dialog.txt_name,
-                                                        table_name, workcat_id))
+            (self.workcat_filter_by_text, self.items_dialog,  self.items_dialog.tbl_psm, self.items_dialog.txt_name,
+             table_name, workcat_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial
-                                                           (self.workcat_filter_by_text, self.items_dialog,
-                                                            self.items_dialog.tbl_psm_end,
-                                                            self.items_dialog.txt_name_end, table_name_end, workcat_id))
-        self.items_dialog.tbl_psm.doubleClicked.connect(partial
-                                                        (self.workcat_zoom, self.items_dialog.tbl_psm))
+            (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end,
+              self.items_dialog.txt_name_end, table_name_end, workcat_id))
+        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm))
         self.items_dialog.tbl_psm_end.doubleClicked.connect(partial(self.workcat_zoom, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
@@ -240,13 +231,12 @@ class SearchPlus(QObject):
     def force_state(self, qbutton, state, qtable, workcat_id):
         """ Force selected state and set qtable enabled = True """
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
-                                                            " WHERE cur_user=current_user AND state_id ='" + str(
-            state) + "'")
+               " WHERE cur_user=current_user AND state_id ='" + str(state) + "'")
         row = self.controller.get_row(sql)
         if row is not None:
             return
         sql = ("INSERT INTO " + self.schema_name + ".selector_state(state_id, cur_user) "
-                                                   " VALUES('" + str(state) + "', current_user)")
+               " VALUES('" + str(state) + "', current_user)")
         self.controller.execute_sql(sql)
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
@@ -264,8 +254,7 @@ class SearchPlus(QObject):
     def disable_qatable_by_state(self, qtable, _id, qbutton):
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
-                                                            " WHERE cur_user = current_user AND state_id ='" + str(
-            _id) + "'")
+               " WHERE cur_user = current_user AND state_id ='" + str(_id) + "'")
         row = self.controller.get_row(sql)
         if row is None:
             qtable.setEnabled(False)
@@ -276,22 +265,19 @@ class SearchPlus(QObject):
             If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
 
         sql = ("SELECT a.expl_id, a.expl_name FROM "
-               "  (SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature "
-                                                                         "   WHERE workcat_id='" + str(
-            workcat_id) + "' "
-                          "   UNION SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature_end "
-                                                                                          "   WHERE workcat_id='" + str(
-            workcat_id) + "'"
-                          "   ) AS a "
-                          " WHERE expl_id NOT IN "
-                          "  (SELECT expl_id FROM " + self.schema_name + ".selector_expl "
-                                                                         "   WHERE cur_user=current_user)")
+               "(SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature "
+               " WHERE workcat_id='" + str( workcat_id) + "' "
+               " UNION SELECT expl_id, expl_name FROM " + self.schema_name + ".v_ui_workcat_x_feature_end "
+               " WHERE workcat_id='" + str(workcat_id) + "') AS a "
+               " WHERE expl_id NOT IN "
+               " (SELECT expl_id FROM " + self.schema_name + ".selector_expl "
+               "  WHERE cur_user=current_user)")
         rows = self.controller.get_rows(sql)
 
         if len(rows) > 0:
             for row in rows:
                 sql = ("INSERT INTO " + self.schema_name + ".selector_expl(expl_id, cur_user) "
-                                                           " VALUES('" + str(row[0]) + "', current_user)")
+                       " VALUES('" + str(row[0]) + "', current_user)")
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
             self.controller.show_warning(msg)
@@ -304,9 +290,8 @@ class SearchPlus(QObject):
 
         features = ['NODE', 'CONNEC', 'GULLY', 'ELEMENT', 'ARC']
         for feature in features:
-            sql = ("SELECT feature_id "
-                   " FROM " + self.schema_name + "." + str(table_name) + "")
-            sql += (" WHERE workcat_id = '" + str(workcat_id)) + "' AND feature_type = '" + str(feature) + "'"
+            sql = ("SELECT feature_id FROM " + self.schema_name + "." + str(table_name) + ""
+                   " WHERE workcat_id = '" + str(workcat_id) + "' AND feature_type = '" + str(feature) + "'")
             rows = self.controller.get_rows(sql)
             if not rows:
                 pass
@@ -323,7 +308,7 @@ class SearchPlus(QObject):
             total = len(rows)
             # Add data to workcat search form
             widget.setText(str(feature.lower().title()) + "s: " + str(total))
-            # TODO 1 DESCOMENTAR ESTO Y COMPROBAR, FALLA EL gis_length de la capa arc
+
             length = 0
             if feature == 'ARC':
                 for row in rows:
@@ -345,7 +330,7 @@ class SearchPlus(QObject):
 
                 # Add data to workcat search form
                 widget.setText("Total arcs length: " + str(length))
-                # TODO END
+
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
@@ -512,8 +497,7 @@ class SearchPlus(QObject):
         result_select = utils_giswater.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
             expr = ("workcat_id = '" + str(workcat_id) + "'"
-                                                         " and " + self.params[
-                        'basic_search_workcat_filter'] + " ILIKE '%" + str(result_select) + "%'")
+                    " and " + self.params['basic_search_workcat_filter'] + " ILIKE '%" + str(result_select) + "%'")
         else:
             expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
@@ -523,8 +507,8 @@ class SearchPlus(QObject):
         """ Load configuration data from tables """
 
         self.params = {}
-        sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system"
-                                                                               " WHERE context = 'searchplus' ORDER BY parameter")
+        sql = ("SELECT parameter, value FROM " + self.controller.schema_name + ".config_param_system "
+               " WHERE context = 'searchplus' ORDER BY parameter")
         rows = self.controller.get_rows(sql)
         if not rows:
             message = "Parameters related with 'searchplus' not set in table 'config_param_system'"
@@ -623,9 +607,8 @@ class SearchPlus(QObject):
             if expl_id:
                 # Set SQL to get 'expl_name'
                 sql = ("SELECT " + self.params['expl_field_name'] + ""
-                                                                    " FROM " + self.controller.schema_name + "." +
-                       self.params['expl_layer'] + ""
-                                                   " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
+                       " FROM " + self.controller.schema_name + "." + self.params['expl_layer'] + ""
+                       " WHERE " + self.params['expl_field_code'] + " = " + str(expl_id))
                 row = self.controller.get_row(sql)
                 if row:
                     utils_giswater.setSelectedItem(self.dlg_search, self.dlg_search.address_exploitation, row[0])
@@ -653,8 +636,8 @@ class SearchPlus(QObject):
         """ Get states from state selector and return as string list """
 
         sql = ("SELECT t1.name FROM " + self.schema_name + ".value_state AS t1 "
-                                                           " INNER JOIN " + self.schema_name + ".selector_state AS t2 ON t2.state_id = t1.id "
-                                                                                               " WHERE cur_user = current_user")
+               " INNER JOIN " + self.schema_name + ".selector_state AS t2 ON t2.state_id = t1.id "
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
@@ -682,19 +665,14 @@ class SearchPlus(QObject):
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_1'] + ", "
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + ", "
-                                                                                    " hydrometer_id, " + self.params[
-                   'basic_search_hyd_hydro_field_cc'] + ""
-                                                        ", " + self.params['basic_search_hyd_hydro_field_erhc'] + ""
-                                                                                                                  ", " +
-               self.params['basic_search_hyd_hydro_field_ccc'] + ""
-                                                                 " FROM " + self.schema_name + ".v_rtc_hydrometer "
-                                                                                               " WHERE " + self.params[
-                   'basic_search_hyd_hydro_field_expl_name'] + " = '" + str(expl_name) + "' "
-                                                                                         " or " + self.params[
-                   'basic_search_hyd_hydro_field_expl_name'] + " is null"
+               " hydrometer_id, " + self.params['basic_search_hyd_hydro_field_cc'] + ""
+                ", " + self.params['basic_search_hyd_hydro_field_erhc'] + ""
+               ", " + self.params['basic_search_hyd_hydro_field_ccc'] + ""
+               " FROM " + self.schema_name + ".v_rtc_hydrometer "
+               " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " = '" + str(expl_name) + "' "
+               " or " + self.params['basic_search_hyd_hydro_field_expl_name'] + " is null"
                # " AND state IN (" + str(list_state) + ") "
-                                                               " ORDER BY " + self.params[
-                   'basic_search_hyd_hydro_field_1'].replace("'", "''"))
+               " ORDER BY " + self.params['basic_search_hyd_hydro_field_1'].replace("'", "''"))
         rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
@@ -731,19 +709,14 @@ class SearchPlus(QObject):
         expl_name = utils_giswater.getWidgetText(self.dlg_search, expl_name, return_string_null=False)
 
         sql = ("SELECT " + self.params['basic_search_hyd_hydro_field_cc'] + ""
-                                                                            ", " + self.params[
-                   'basic_search_hyd_hydro_field_erhc'] + ""
-                                                          ", " + self.params['basic_search_hyd_hydro_field_ccc'] + ""
-                                                                                                                   " FROM " + self.schema_name + ".v_rtc_hydrometer "
-                                                                                                                                                 " WHERE hydrometer_id='" + str(
-            hydro_id) + "'"
-                        " AND " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + str(field_cc) + "' "
-                                                                                                            " AND " +
-               self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + str(field_erhc) + "' "
-                                                                                             " AND " + self.params[
-                   'basic_search_hyd_hydro_field_ccc'] + " = '" + str(field_ccc) + "' "
-                                                                                   " AND " + self.params[
-                   'basic_search_hyd_hydro_field_expl_name'] + " ILIKE '%" + str(expl_name) + "%' ")
+               ", " + self.params['basic_search_hyd_hydro_field_erhc'] + ""
+               ", " + self.params['basic_search_hyd_hydro_field_ccc'] + ""
+               " FROM " + self.schema_name + ".v_rtc_hydrometer "
+               " WHERE hydrometer_id='" + str(hydro_id) + "'"
+               " AND " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + str(field_cc) + "' "
+               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + str(field_erhc) + "' "
+               " AND " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '" + str(field_ccc) + "' "
+               " AND " + self.params['basic_search_hyd_hydro_field_expl_name'] + " ILIKE '%" + str(expl_name) + "%' ")
 
         row = self.controller.get_row(sql, log_sql=False)
         if not row:
@@ -786,12 +759,9 @@ class SearchPlus(QObject):
         if expl_name == 'null':
             expl_name = ''
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
-                                                                                                              " WHERE " +
-               self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
-                                                                                     " AND " + self.params[
-                   'basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
-                                                                                              " AND " + self.params[
-                   'basic_search_hyd_hydro_field_expl_name'] + " ILIKE '%" + str(expl_name) + "%'")
+               " WHERE " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + connec_id + "'"
+               " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + hydrometer_customer_code + "'"
+               " AND " + self.params['basic_search_hyd_hydro_field_expl_name'] + " ILIKE '%" + str(expl_name) + "%'")
 
         rows = self.controller.get_rows(sql, log_sql=True)
         if rows:
@@ -802,8 +772,8 @@ class SearchPlus(QObject):
         # Get columns name in order of the table
         sql = ("SELECT column_name FROM information_schema.columns"
                " WHERE table_name = '" + "v_rtc_hydrometer'"
-                                         " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
-                                                                                                       " ORDER BY ordinal_position")
+               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
+               " ORDER BY ordinal_position")
         column_name = self.controller.get_rows(sql)
 
         grid_layout = self.hydro_info_dlg.findChild(QGridLayout, 'gridLayout')
@@ -886,17 +856,15 @@ class SearchPlus(QObject):
 
         self.field_to_search = self.params['network_field_' + str(feature_type) + '_code']
         sql = ("SELECT DISTINCT(t1." + str(self.field_to_search) + "), t1." + str(feature_type) + "_id,"
-                                                                                                  " t1." + str(
-            field_type) + ", t2.name , t3.name"
-                          " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
-                                                                                    " INNER JOIN " + self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
-                                                                                                                                   " INNER JOIN " + self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
-                                                                                                                                                                                  " WHERE  t1.expl_id IN "
-                                                                                                                                                                                  " (SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user = current_user)"
-                                                                                                                                                                                                                                           " AND t1.state IN "
-                                                                                                                                                                                                                                           " (SELECT state_id FROM " + self.controller.schema_name + ".selector_state WHERE cur_user = current_user)"
-                                                                                                                                                                                                                                                                                                     " ORDER BY " + str(
-            self.field_to_search))
+               " t1." + str(field_type) + ", t2.name , t3.name"
+               " FROM " + self.controller.schema_name + "." + viewname + " AS t1 "
+               " INNER JOIN " + self.controller.schema_name + ".value_state AS t2 ON t2.id = t1.state"
+               " INNER JOIN " + self.controller.schema_name + ".exploitation AS t3 ON t3.expl_id = t1.expl_id "
+               " WHERE  t1.expl_id IN "
+               " (SELECT expl_id FROM " + self.controller.schema_name + ".selector_expl WHERE cur_user = current_user)"
+               " AND t1.state IN "
+               " (SELECT state_id FROM " + self.controller.schema_name + ".selector_state WHERE cur_user = current_user)"
+               " ORDER BY " + str(self.field_to_search))
         rows = self.controller.get_rows(sql, log_sql=False)
         if not rows:
             return False
@@ -972,7 +940,7 @@ class SearchPlus(QObject):
         geom_type = utils_giswater.getWidgetText(self.dlg_search, network_geom_type).lower()
         if geom_type == "null":
             sql = ("SELECT feature_type FROM " + self.controller.schema_name + ".cat_feature"
-                                                                               " WHERE id = '" + cat_feature_id + "'")
+                   " WHERE id = '" + cat_feature_id + "'")
             row = self.controller.get_row(sql)
             if not row:
                 return
@@ -1152,8 +1120,7 @@ class SearchPlus(QObject):
 
         # select this feature in order to copy to memory layer
         expr_filter = (self.params['portal_field_code'] + " = '" + str(elem[0]) + "'"
-                                                                                  " AND " + self.params[
-                           'portal_field_number'] + " = '" + str(elem[1]) + "'")
+                       " AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'")
         (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
@@ -1223,8 +1190,8 @@ class SearchPlus(QObject):
             utils_giswater.remove_tab_by_tabName(self.dlg_search.tab_main, "tab_hydro")
             return
         sql = ("SELECT t1.name FROM " + self.schema_name + ".exploitation AS t1 "
-                                                           " INNER JOIN " + self.schema_name + ".selector_expl AS t2 ON t2.expl_id = t1.expl_id "
-                                                                                               " WHERE cur_user = current_user")
+               " INNER JOIN " + self.schema_name + ".selector_expl AS t2 ON t2.expl_id = t1.expl_id "
+               " WHERE cur_user = current_user")
         rows = self.controller.get_rows(sql)
         # Create list with selected exploitations
         list_expl = []
@@ -1301,9 +1268,8 @@ class SearchPlus(QObject):
     def open_plan_psector(self):
 
         psector_name = self.dlg_search.psector_id.currentText()
-        sql = ("SELECT psector_id"
-               " FROM " + self.schema_name + ".plan_psector"
-                                             " WHERE name = '" + str(psector_name) + "'")
+        sql = ("SELECT psector_id FROM " + self.schema_name + ".plan_psector"
+               " WHERE name = '" + str(psector_name) + "'")
         row = self.controller.get_row(sql)
         psector_id = row[0]
         self.manage_new_psector.new_psector(psector_id, 'plan')
@@ -1395,10 +1361,9 @@ class SearchPlus(QObject):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
-                                             " WHERE table_id = '" + table_name + "'"
-                                                                                  " ORDER BY column_index")
+        sql = ("SELECT column_index, width, alias, status FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
         if not rows:
             return
@@ -1509,5 +1474,3 @@ class SearchPlus(QObject):
         for child in root.children():
             if isinstance(child, QgsLayerTreeLayer):
                 child.setCustomProperty("showFeatureCount", True)
-
-
