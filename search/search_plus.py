@@ -1041,7 +1041,7 @@ class SearchPlus(QObject):
             attrs = feature.attributes()
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
-            if not type(value_code) is QPyNullVariant and geom is not None:
+            if value_code is not None and geom is not None:
                 elem = [value_code, value_name, geom.exportToWkt()]
             else:
                 elem = [value_code, value_name, None]
@@ -1114,7 +1114,7 @@ class SearchPlus(QObject):
             for feature in it:
                 attrs = feature.attributes()
                 field_number = attrs[idx_field_number]
-                if not type(field_number) is QPyNullVariant:
+                if field_number is not None:
                     elem = [code, field_number]
                     records.append(elem)
 
@@ -1213,7 +1213,7 @@ class SearchPlus(QObject):
         for feature in layer.getFeatures():
             attrs = feature.attributes()
             field = attrs[idx_field]
-            if not type(field) is QPyNullVariant:
+            if field is not None:
                 if field not in list_elements:
                     elem = [field, field]
                     list_elements.append(field)
