@@ -35,8 +35,14 @@ BEGIN
 
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
-            PERFORM audit_function(1022,1304); 
-            RETURN NULL;                   
+        	NEW.connecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		IF (NEW.connecat_id IS NULL) THEN
+			NEW.connecat_id := (SELECT id FROM cat_connec LIMIT 1);
+			IF (NEW.connecat_id IS NULL) THEN
+				PERFORM audit_function(1022,1304); 
+				RETURN NULL;
+			END IF;
+		END IF;
         END IF;
 
         -- Sector ID

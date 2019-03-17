@@ -10,6 +10,10 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc(varchar);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varchar, p_only_mandatory_nodarc boolean)  RETURNS integer 
 AS $BODY$
 
+/*example
+select SCHEMA_NAME.gw_fct_pg2epa ('r1', false, false)
+*/
+
 DECLARE
 	record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
 	record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
@@ -36,11 +40,10 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  Looking for parameters
-	v_nod2arc := (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nod2arc_length' and cur_user='current_user')::float;
+	v_nod2arc := (SELECT value::float FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' and cur_user=current_user limit 1)::float;
 	IF v_nod2arc is null then 
 		v_nod2arc = 0.3;
 	END IF;
-	
     
 	--  Move valves to arc
 	RAISE NOTICE 'Start loop.....';
