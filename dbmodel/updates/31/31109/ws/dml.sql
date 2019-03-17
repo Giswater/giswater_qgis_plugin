@@ -35,6 +35,6 @@ INSERT INTO audit_cat_param_user VALUES ('owndercat_vdefault', 'config', 'Defaul
 DELETE FROM config_param_user WHERE parameter='qgis_template_folder_path';
 
 -- 2019/02/12
-INSERT INTO config_param_system (parameter, value, datatype, context, descript) VALUES ('code_vd', 'No code', 'string', 'OM', 'UD');
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('code_vd', 'No code', 'string', 'OM', 'UD');
 UPDATE config_param_system SET descript='Variable to enable/disable the possibility to use valve unaccess button to open valves with closed status (WS)' WHERE parameter='om_mincut_valvestat_using_valveunaccess';
 UPDATE config_param_system SET descript='Variable to enable/disable the debug messages of mincut (WS)' WHERE parameter='om_mincut_debug';
