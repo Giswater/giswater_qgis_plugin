@@ -8,13 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-DROP TRIGGER IF EXISTS gw_trg_visit_update_enddate ON om_visit_event;
-DROP TRIGGER IF EXISTS gw_trg_visit_update_enddate ON om_visit;
-
--- 2019/02/14
-DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".om_visit;
-CREATE TRIGGER gw_trg_om_visit AFTER INSERT OR DELETE ON "SCHEMA_NAME".om_visit
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit();
 
 -- REVISAR
 DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_node_control ON node;
@@ -29,7 +22,3 @@ DROP TRIGGER IF EXISTS gw_trg_man_addfields_value_connec_control ON connec;
 CREATE TRIGGER gw_trg_man_addfields_value_connec_control AFTER UPDATE OF connec_id OR DELETE ON SCHEMA_NAME.connec
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_man_addfields_value_control('CONNEC');
 
-
-DROP TRIGGER IF EXISTS gw_trg_calculate_period ON "SCHEMA_NAME".ext_cat_period;
-CREATE TRIGGER gw_trg_calculate_period AFTER INSERT ON "SCHEMA_NAME".ext_cat_period 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_calculate_period();
