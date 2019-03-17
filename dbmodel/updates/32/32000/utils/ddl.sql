@@ -8,13 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2019/03/11
-ALTER TABLE om_visit ALTER COLUMN enddate drop DEFAULT;
-ALTER TABLE dimensions ADD COLUMN observ text;
-
-
-ALTER TABLE ext_rtc_scada_dma_period ADD COLUMN pattern_id character varying(16);
-
 
 --audit_cat_param_user
 ALTER TABLE audit_cat_param_user RENAME context  TO formname;
@@ -47,19 +40,10 @@ ALTER TABLE audit_cat_param_user ADD COLUMN dv_isnullvalue boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN stylesheet json;
 ALTER TABLE audit_cat_param_user ADD COLUMN placeholder text;
 
-ALTER TABLE anl_node ALTER COLUMN node_id SET DEFAULT nextval('SCHEMA_NAME.urn_id_seq'::regclass);
-
-
-ALTER TABLE rpt_cat_result ADD COLUMN user_name text;
-ALTER TABLE rpt_cat_result ALTER COLUMN user_name SET DEFAULT current_user;
-
-ALTER TABLE dma ADD COLUMN effc double precision;
-ALTER TABLE dma ADD COLUMN pattern_id double precision;
 
 ALTER TABLE audit_cat_function ADD COLUMN istoolbox boolean;
 ALTER TABLE audit_cat_function ADD COLUMN alias varchar(60);
 ALTER TABLE audit_cat_function ADD COLUMN isparametric boolean DEFAULT false;
-
 
 
 ALTER TABLE config_param_system ADD COLUMN label text;
@@ -149,9 +133,3 @@ CREATE TABLE inp_typevalue
   descript text,
   CONSTRAINT inp_typevalue_pkey PRIMARY KEY (typevalue, id)
 );
-
-
-
--- 2019/03/15
-ALTER TABLE anl_arc RENAME COLUMN arc_type TO arccat_id;
-ALTER TABLE anl_arc_x_node RENAME COLUMN arc_type TO arccat_id;
