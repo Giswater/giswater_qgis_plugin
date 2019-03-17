@@ -10,10 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 20110/02/05
 
-INSERT INTO audit_cat_param_user VALUES ('dim_tooltip', 'config', 'If true, tooltip appears when you are selecting depth from another node with dimensioning tool', 'role_edit', NULL, NULL, NULL, NULL);
-INSERT INTO audit_cat_param_user VALUES ('cad_tools_base_layer_vdefault', 'config', 'Selected layer will be the only one which allow snapping with CAD tools', 'role_edit', NULL, NULL, NULL, NULL);
-
-
 
 INSERT INTO audit_cat_param_user VALUES ('inp_options_ignore_groundwater', 'epaoptions', NULL, 'role_epa', NULL, 'IGNORE_GROUNDWATER', 'inp_options_ignore_groundwater:', 'SELECT idval as id, idval FROM inp_typevalue WHERE typevalue = ''inp_value_yesno''', NULL, true, 2, 7, 'ud', NULL, NULL, NULL, NULL, NULL, 'string', 'combo', true, NULL, 'NO', 'grl_general_2', NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_options_allow_ponding', 'epaoptions', NULL, 'role_epa', NULL, 'ALLOW_PONDING', 'inp_options_allow_ponding:', 'SELECT idval as id, idval FROM inp_typevalue WHERE typevalue = ''inp_value_yesno''', NULL, true, 1, 30, 'ud', NULL, NULL, NULL, NULL, NULL, 'string', 'combo', true, NULL, 'YES', 'grl_general_1', NULL);
@@ -405,27 +401,6 @@ INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, reverse_pg2c
 INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, reverse_pg2csvcat_id) VALUES (67, 11, 'rpt_timestep_critelem', 'Time-Step Critical', NULL);
 INSERT INTO sys_csv2pg_config (id, pg2csvcat_id, tablename, target, reverse_pg2csvcat_id) VALUES (68, 11, 'rpt_high_conterrors', 'Highest Continuity', NULL);
 
---2019/02/08
-DELETE FROM audit_cat_param_user WHERE id='virtual_line_vdefault';
-DELETE FROM audit_cat_param_user WHERE id='virtual_point_vdefault';
-DELETE FROM audit_cat_param_user WHERE id='virtual_polygon_vdefault';
-DELETE FROM audit_cat_param_user WHERE id='qgis_template_folder_path';
-
-
-DELETE FROM config_param_user WHERE parameter='virtual_line_vdefault';
-DELETE FROM config_param_user WHERE parameter='virtual_point_vdefault';
-DELETE FROM config_param_user WHERE parameter='virtual_polygon_vdefault';
-DELETE FROM config_param_user WHERE parameter='qgis_template_folder_path';
-
-
--- 2019/02/12
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_valvestat_using_valveunaccess', 'FALSE', 'Boolean', 'Mincut', 'Variable to enable/disable the possibility to use valve unaccess button to open valves with closed status (WS)');
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('om_mincut_debug', 'FALSE', 'Boolean', 'Mincut', 'Variable to enable/disable the debug messages of mincut (WS)');
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('epa_units_factor', 
-'{"CFS":0, "GPM":0, "MGD":0, "CMS":1, "LPS":1000, "MLD":86.4}', 'json', 'Epa', 'Conversion factors of CRM flows in function of EPA units choosed by user');
-
-
--- 2019/03/05
 
 
 -- UPDATES
