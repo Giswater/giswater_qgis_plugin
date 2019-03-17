@@ -219,7 +219,9 @@ BEGIN
 					END IF;
 
 					-- Force a simple update on arc in order to update direction if necessary
-                    EXECUTE 'UPDATE arc SET observ = ' || quote_literal(arcrec.observ) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+					EXECUTE 'UPDATE arc SET the_geom = $1 WHERE arc_id = ' || quote_literal(arcrec."arc_id")
+						USING arcrec.the_geom; 
+					
 					
 				END IF;
 			END LOOP; 
