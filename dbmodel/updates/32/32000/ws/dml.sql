@@ -8,8 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-UPDATE audit_cat_table SET sys_role_id='role_basic' WHERE id='config_param_user';
-UPDATE audit_cat_table SET sys_role_id='role_basic' WHERE id='config_param_system';
 
 INSERT INTO audit_cat_param_user VALUES ('inp_report_f_factor', 'epaoptions', NULL, 'role_epa', NULL, 'F-FACTOR', 'F Factor:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 2, 3, 'ws', NULL, NULL, NULL, NULL, NULL, 'combo', 'text', true, NULL, 'PRECISION 4', 'grl_reports_17', NULL, false, NULL, NULL, NULL, NULL);
 INSERT INTO audit_cat_param_user VALUES ('inp_report_links', 'epaoptions', NULL, 'role_epa', NULL, 'LINKS', 'Links:', 'SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''', NULL, true, 13, 9, 'ws', NULL, NULL, NULL, NULL, NULL, 'text', 'combo', true, NULL, 'ALL', 'grl_reports_17', NULL, false, NULL, NULL, NULL, NULL);
@@ -131,31 +129,15 @@ UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_value_yesnofull';
 UPDATE audit_cat_table SET isdeprecated=true WHERE id='inp_options';
 
 
---2019/02/11
-SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) VALUES ('epa_units_factor', 
-'{"LPS":1, "LPM":60, "MLD":0.216, "CMH":3.6, "CMD":3.6, "CMD":86.4, "CFS":0, "GPM":0, "MGD":0, "IMGD":0, "AFD":0}', 'json', 'Epa', 'Conversion factors of CRM flows in function of EPA units choosed by user');
-
--- 2019/01/26
-DELETE FROM config_client_forms WHERE table_id='v_ui_anl_mincut_result_cat' AND column_id='macroexpl_id' AND column_index=8;
-UPDATE  config_client_forms SET status=false WHERE table_id='v_ui_anl_mincut_result_cat' AND column_index=2;
-
--- 2019/02/01
-ALTER TABLE anl_mincut_cat_state DROP CONSTRAINT IF EXISTS anl_mincut_cat_state_check;
-INSERT INTO anl_mincut_cat_state VALUES (3, 'Canceled');
-
-INSERT INTO audit_cat_param_user VALUES ('manholecat_vdefault', 'config', 'Default value for manhole element parameter', 'role_edit', null, 'manholecat_vdefault:', 'id', 'SELECT cat_node.id FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''MANHOLE'' AND cat_node.id=', 'text');
-INSERT INTO audit_cat_param_user VALUES ('waterwellcat_vdefault', 'config', 'Default value for waterwell element parameter', 'role_edit', null, 'waterwellcat_vdefault:', 'id', 'SELECT cat_node.id FROM cat_node JOIN node_type ON node_type.id=nodetype_id WHERE type=''WATERWELL'' AND cat_node.id=', 'text');
-
 
 -----------------------
 -- Records of inp_typevalue
 -----------------------
 
---INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'PATTERN_PUMP', 'PATTERN', NULL);
---INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'HEAD_PUMP', 'HEAD', NULL);
---INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'SPEED_PUMP', 'SPEED', NULL);
---INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'POWER_PUMP', 'POWER', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'PATTERN_PUMP', 'PATTERN', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'HEAD_PUMP', 'HEAD', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'SPEED_PUMP', 'SPEED', NULL);
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_pump', 'POWER_PUMP', 'POWER', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_reactions_gl', 'GLOBAL_GL', 'GLOBAL', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_value_opti_qual', 'AGE', 'AGE', NULL);
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_energy', 'DEMAND CHARGE', 'DEMAND CHARGE', NULL);
@@ -293,17 +275,6 @@ INSERT INTO sys_csv2pg_config VALUES (1, 10, 'vi_junctions', '[JUNCTIONS]', 'csv
 INSERT INTO sys_csv2pg_config VALUES (4, 10, 'vi_pipes', '[PIPES]', 'csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8', 12);
 INSERT INTO sys_csv2pg_config VALUES (3, 10, 'vi_tanks', '[TANKS]', 'csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8', 12);
 
---2019/02/08
-INSERT INTO audit_cat_param_user VALUES ('psector_type_vdefault', 'config', 'Default value for psector type parameter', 'role_master', NULL, 'psector_type_vdefault:');
-INSERT INTO audit_cat_param_user VALUES ('owndercat_vdefault', 'config', 'Default value for owner parameter', 'role_edit', NULL, 'owndercat_vdefault:');
-DELETE FROM config_param_user WHERE parameter='qgis_template_folder_path';
-
--- 2019/02/12
-INSERT INTO config_param_system (parameter, value, datatype, context, descript) VALUES ('code_vd', 'No code', 'string', 'OM', 'UD');
-UPDATE config_param_system SET descript='Variable to enable/disable the possibility to use valve unaccess button to open valves with closed status (WS)' WHERE parameter='om_mincut_valvestat_using_valveunaccess';
-UPDATE config_param_system SET descript='Variable to enable/disable the debug messages of mincut (WS)' WHERE parameter='om_mincut_debug';
-
--- 2019/03/05
 
 -- INSERTS
 
