@@ -14,32 +14,6 @@ UPDATE config_param_system SET label='Gully units tolerance:' ,isenabled=TRUE,la
 UPDATE config_param_system SET label='Node geom 1 tolerance:' ,isenabled=TRUE,layout_id=15 ,layout_order=7 ,project_type='ud' ,datatype='double' ,widgettype='spinbox' WHERE parameter='rev_node_geom1_tol';
 UPDATE config_param_system SET label='custom_giswater_folder:' ,isenabled=FALSE ,layout_id=NULL ,layout_order=NULL ,project_type=NULL , datatype='string' ,widgettype='linetext' WHERE parameter='custom_giswater_folder';
 
-INSERT INTO sys_fprocess_cat VALUES (35, 'Recursive go2epa process', 'EPA', 'Recursive go2epa process', 'utils');
-INSERT INTO sys_fprocess_cat VALUES (36, 'admin check, fk and unique constraints', 'admin', 'admin check,fk and unique constraints', 'utils');
-INSERT INTO sys_fprocess_cat VALUES (37, 'admin not null contraints', 'admin', 'admin not null constraints', 'utils');
-INSERT INTO sys_fprocess_cat VALUES (38, 'Check inconsistency on editable data', 'edit', 'Check inconsistency on editable data', 'utils');
-
-
-
--- 2019/01/31
-INSERT INTO sys_csv2pg_cat VALUES (10, 'Export inp', 'Export inp', null, 'role_epa');
-INSERT INTO sys_csv2pg_cat VALUES (11, 'Import rpt', 'Import rpt', null, 'role_epa');
-INSERT INTO sys_csv2pg_cat VALUES (12, 'Import inp', 'Import inp', null, 'role_admin');
-
--- 2019/02/08
-SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
-VALUES ('vdefault_rtc_period_seconds','2592000','integer', 'rtc', 'Default value used if ext_cat_period doesn''t have date values or they are incorrect');
-
--- 2019/03/11
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
-VALUES ('plan_statetype_ficticius','1','integer', 'plan', 'Value used to identify ficticius arcs in case of new creation on planning operations to keep topology');
-
-
--- 2019/02/14
-INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
-VALUES ('customer_code_autofill', 'FALSE', 'boolean', 'System', 'If TRUE, when insert a new connec customer_code will be the same as connec_id');
-
 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, dv_querytext, dv_filterbyfield, isenabled, layout_id, layout_order, project_type, dv_isparent, isautoupdate, datatype, widgettype, tooltip) 
 VALUES ('nodeisert_arcendpoint', 'FALSE', 'boolean', 'edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -66,6 +40,9 @@ VALUES ('connec_proximity_control', 'true', 'boolean', NULL, NULL,'Connec proxim
 -- 2019/02/24
 INSERT INTO audit_cat_param_user VALUES ('visit_duration_vdef', 'visit', 'Duration for user', 'role_om', NULL, 'Visit expires time vdefault', 
 'Visit duration', NULL, NULL, TRUE, 9, 9, 'utils', false, NULL, NULL, NULL, false, 'date', 'text', FALSE, NULL, '24 hours', 'grl_om', NULL, TRUE, NULL, NULL, NULL);
+
+
+
 
 -- 2019/02/27 update audit_cat_function
 DELETE FROM audit_cat_function;
@@ -313,18 +290,6 @@ INSERT INTO audit_cat_function VALUES (2202, 'gw_fct_anl_arc_intersection', 'ud'
 INSERT INTO audit_cat_function VALUES (2208, 'gw_fct_anl_node_flowregulator', 'ud', 'function', '{"featureType":"", "durationType":"short"}', NULL, 'Function is not parametrized yet. Only works with the whole layers of arc and node. There are not variables used for this function', 'Check topology assistant.  Identifies nodes with more than one exit arc', 'role_edit', false, true, 'Check nodes with more than one exit', true);
 INSERT INTO audit_cat_function VALUES (2210, 'gw_fct_anl_node_sink', 'ud', 'function', '{"featureType":"", "durationType":"short"}', NULL, 'Function is not parametrized yet. Only works with the whole layers of arc and node. There are not variables used for this function', 'Check topology assistant. Identifies nodes not disconnecteds without exit arcs.', 'role_edit', false, true, 'Check nodes as a outfall', false);
 INSERT INTO audit_cat_function VALUES (2226, 'gw_fct_pg2epa_flowreg_additional', 'ud', 'function', NULL, NULL, NULL, 'Creates new flow regulator for the same node flow regulator (nodarc) as user have been defined on the tables enabled to do this (inp_flwreg-*)', 'role_epa', false, false, NULL, false);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 -- 2019/03/01
