@@ -8,6 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView,QLabel
 from PyQt4.QtGui import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand, QPixmap
+from PyQt4.QtGui import QFileDialog
 from PyQt4.QtCore import QSettings, Qt
 
 import os
@@ -90,7 +91,6 @@ class UpdateSQL(ParentAction):
         self.set_icon(btn_info, '73')
 
         self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
-        self.btn_constrains_changed(self.btn_constrains)
 
         self.message_update = ''
 
@@ -224,14 +224,14 @@ class UpdateSQL(ParentAction):
             lbl_constrains_info.setText('(Constrains enabled)  ')
             if call_function:
                 # Enable constrains
-                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
+                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
                 self.controller.execute_sql(sql)
         elif button.text() == 'ON':
             button.setText("OFF")
             lbl_constrains_info.setText('(Constrains dissabled)')
             if call_function:
                 # Disable constrains
-                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
+                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
                 self.controller.execute_sql(sql)
 
 
@@ -1331,10 +1331,9 @@ class UpdateSQL(ParentAction):
 
 
     def execute_import_data(self):
-        #TODO:: This functions are comment at the moment. We dont enable this function until 3.2
-        return
+        self.insert_inp_into_db(self.file_inp)
         # Execute import data
-        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_import_epa_inp()")
+        sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp()")
         self.controller.execute_sql(sql, commit=False)
 
 
@@ -1425,7 +1424,6 @@ class UpdateSQL(ParentAction):
                                 available = True
                     self.rename_project_data_schema(str(project_name), str(project_name) + "_bk_" + str(i))
                 else:
-                    self.setArrowCursor()
                     return
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
@@ -1436,6 +1434,12 @@ class UpdateSQL(ParentAction):
 
         self.set_wait_cursor()
         if self.rdb_import_data.isChecked():
+            self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.dlg_readsql_create_project.data_file)
+            if self.file_inp is 'null':
+                self.set_arrow_cursor()
+                msg = "The 'Path' field is required for Import INP data."
+                result = self.controller.show_info_box(msg, "Info")
+                return
             self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -2031,6 +2035,7 @@ class UpdateSQL(ParentAction):
 
         if self.dev_user != 'TRUE':
             self.rdb_sample_dev.setEnabled(False)
+            self.rdb_import_data.setEnabled(False)
 
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
@@ -2056,6 +2061,7 @@ class UpdateSQL(ParentAction):
         # Set listeners
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_create_project))
+        self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self.select_file_inp))
         self.cmb_create_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_create_project_type))
         self.cmb_locale.currentIndexChanged.connect(partial(self.update_locale))
         self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
@@ -2202,6 +2208,61 @@ class UpdateSQL(ParentAction):
         self.project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql, widget)
         self.folderSoftware = self.sql_dir + os.sep + self.project_type_selected + os.sep
 
+
+    def insert_inp_into_db(self, folder_path=None):
+        _file = open(folder_path, "r+")
+        full_file = _file.readlines()
+        sql = ""
+        progress = 0
+
+        for row in full_file:
+            progress += 1
+            dirty_list = row.split(' ')
+            for x in range(len(dirty_list) - 1, -1, -1):
+                if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
+                    dirty_list.pop(x)
+
+            sp_n = dirty_list
+
+            if len(sp_n) > 0:
+                sql += "INSERT INTO " + self.schema + ".temp_csv2pg (csv2pgcat_id, "
+                values = "VALUES(11, "
+                for x in range(0, len(sp_n)):
+                    if "''" not in sp_n[x]:
+                        sql += "csv" + str(x + 1) + ", "
+                        value = "'" + sp_n[x].strip().replace("\n", "") + "', "
+                        values += value.replace("''", "null")
+                    else:
+                        sql += "csv" + str(x + 1) + ", "
+                        values = "VALUES(null, "
+                sql = sql[:-2] + ") "
+                values = values[:-2] + ");\n"
+                sql += values
+
+        if progress % 500 == 0:
+            self.controller.execute_sql(sql, log_sql=False, commit=False)
+            sql = ""
+        if sql != "":
+            self.controller.execute_sql(sql, log_sql=False, commit=False)
+        _file.close()
+        del _file
+
+
+    def select_file_inp(self):
+        """ Select INP file """
+
+        file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+        # Set default value if necessary
+        if file_inp is None or file_inp == '':
+            file_inp = self.plugin_dir
+        # Get directory of that file
+        folder_path = os.path.dirname(file_inp)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        message = self.controller.tr("Select INP file")
+        file_inp = QFileDialog.getOpenFileName(None, message, "", '*.inp')
+        self.dlg_readsql_create_project.data_file.setText(file_inp)
 
     """ Info basic """
     def info_show_info(self):
