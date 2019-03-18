@@ -279,8 +279,8 @@ BEGIN
 		SELECT value FROM config_param_system WHERE parameter='api_publish_user' 
 		INTO v_publish_user;
 		IF v_publish_user IS NOT NULL THEN
-			DELETE FROM anl_mincut_result_selector WHERE result_id = result_id_arg AND cur_user = current_user;
-			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user, result_id_arg);
+			DELETE FROM anl_mincut_result_selector WHERE result_id = result_id_arg AND cur_user = v_publish_user;
+			INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (v_publish_user, result_id_arg);
 		END IF;	
 		
 		IF v_debug THEN
@@ -322,7 +322,7 @@ BEGIN
 
 	-- calculate the boundary of mincut using arcs and valves
 	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM anl_mincut_result_arc WHERE result_id='||result_id_arg||
-		' UNION SELECT the_geom FROM SCHEMA_NAME.anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
+		' UNION SELECT the_geom FROM anl_mincut_result_valve WHERE result_id='||result_id_arg||') a'    
 	        INTO v_geometry;
 
 	-- returning
