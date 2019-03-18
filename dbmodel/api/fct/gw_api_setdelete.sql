@@ -60,6 +60,19 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_idname := (p_data ->> 'feature')::json->> 'idName';
 
+	/* IF don't receive info
+	-- Get featureType
+	IF v_featuretype IS NULL THEN
+		IF v_tablename = 'om_visit_lot' THEN
+			v_featuretype ='lot';
+		ELSIF v_tablename = 'om_visit_event_photo' THEN
+			v_featuretype ='file';
+		ELSIF v_tablename = 'om_visit' THEN
+			v_featuretype ='visit';	
+	END IF;
+	*/
+	
+	
 	-- check if feature exists
 	v_querytext := 'SELECT * FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
 	EXECUTE v_querytext INTO v_result ;
