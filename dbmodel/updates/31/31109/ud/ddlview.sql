@@ -183,7 +183,7 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream AS
     st_x(v_edit_connec.the_geom) AS x,
     st_y(v_edit_connec.the_geom) AS y
    FROM v_edit_connec
-     JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = v_edit_connec.connec_type::text
+     JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = 'CONNEC'
      JOIN node ON link.exit_id::text = node.node_id::text AND link.exit_type::text = 'NODE'::text
      JOIN connec_type ON connec_type.id::text = v_edit_connec.connec_type::text
 UNION
@@ -203,7 +203,7 @@ UNION
     st_x(v_edit_gully.the_geom) AS x,
     st_y(v_edit_gully.the_geom) AS y
    FROM v_edit_gully
-     JOIN link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = v_edit_gully.gully_type::text
+     JOIN link ON link.feature_id::text = v_edit_gully.gully_id::text AND link.feature_type::text = 'GULLY'
      JOIN node ON link.exit_id::text = node.node_id::text AND link.exit_type::text = 'NODE'::text
      JOIN gully_type ON gully_type.id::text = v_edit_gully.gully_type::text;
 
