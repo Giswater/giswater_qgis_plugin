@@ -33,6 +33,7 @@ DECLARE
 	v_nod2arc float;
 	v_query_text text;
 	v_arcsearchnodes float;
+	v_status text;
 
 BEGIN
 
@@ -82,8 +83,8 @@ BEGIN
         SELECT COUNT(*) INTO num_arcs FROM rpt_inp_arc WHERE (node_1 = node_id_aux OR node_2 = node_id_aux) AND result_id=result_id_var;
 
         -- Get arcs
-        SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux AND result_id=result_id_var ;
-        SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux AND result_id=result_id_var ;
+        SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux;
+        SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux;
 
         -- Just 1 arcs
         IF num_arcs = 1 THEN
@@ -237,15 +238,11 @@ BEGIN
         
 
         -- Identifing and updating (if it's needed) the right direction
-		SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM inp_valve UNION SELECT node_id,to_arc FROM inp_shortpipe UNION 
-										SELECT node_id,to_arc FROM inp_pump) a WHERE node_id=node_id_aux;
-
-		IF to_arc_aux IS NOT NULL THEN 
+		SELECT to_arc,status INTO to_arc_aux, v_status FROM (SELECT node_id,to_arc,status FROM inp_valve UNION SELECT node_id,to_arc,status FROM inp_shortpipe UNION 
+										SELECT node_id,to_arc,status FROM inp_pump) a WHERE node_id=node_id_aux;
 
 			SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, v_arcsearchnodes)) AND result_id=result_id_var
 						ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
-
-			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (1, concat(node_id_aux,':',arc_id_aux,'-',to_arc_aux));
 
 			IF arc_id_aux=to_arc_aux THEN
 				record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
@@ -255,13 +252,12 @@ BEGIN
 				record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
 				record_new_arc.the_geom := st_reverse(record_new_arc.the_geom);
 			END IF; 
-			
-		END IF;
+
 
         -- Inserting new arc into arc table
-        INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, diameter, roughness, annotation, length, the_geom)
+        INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, diameter, roughness, annotation, length, status, the_geom)
 		VALUES(result_id_var, record_new_arc.arc_id, record_new_arc.node_1, record_new_arc.node_2, 'NODE2ARC', record_new_arc.arccat_id, record_new_arc.epa_type, record_new_arc.sector_id, 
-			record_new_arc.state, record_new_arc.state_type, record_new_arc.diameter, record_new_arc.roughness, record_new_arc.annotation, record_new_arc.length, record_new_arc.the_geom);
+			record_new_arc.state, record_new_arc.state_type, record_new_arc.diameter, record_new_arc.roughness, record_new_arc.annotation, record_new_arc.length, v_status, record_new_arc.the_geom);
 
         -- Inserting new nodes into node table
         record_node.epa_type := 'JUNCTION';

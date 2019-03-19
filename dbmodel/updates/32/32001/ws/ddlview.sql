@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -9,8 +9,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
-DROP VIEW vi_status;
- SELECT rpt_inp_arc.arc_id,
+DROP VIEW IF EXISTS vi_status;
+CREATE OR REPLACE VIEW vi_status AS SELECT rpt_inp_arc.arc_id,
    idval
    FROM inp_selector_result,
     rpt_inp_arc
