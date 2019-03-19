@@ -398,7 +398,9 @@ conduct_2,
 drytime_2,
 subcatchment.sector_id,
 subcatchment.hydrology_id,
-subcatchment.the_geom
+subcatchment.the_geom,
+subcatchment.parent_id,
+subcatchment.descript
 FROM inp_selector_sector,inp_selector_hydrology, subcatchment
 JOIN v_node ON v_node.node_id=subcatchment.node_id
        WHERE 
@@ -476,8 +478,8 @@ CREATE OR REPLACE VIEW vi_temperature AS
 DROP VIEW IF EXISTS  vi_subcatchments CASCADE;
 CREATE OR REPLACE VIEW vi_subcatchments AS 
  SELECT v_edit_subcatchment.subc_id,
-  v_edit_subcatchment.rg_id,
-    v_edit_subcatchment.node_id,
+    v_edit_subcatchment.rg_id,
+    CASE WHEN parent_id IS NULL THEN node_id ELSE parent_id END AS node_id,
     v_edit_subcatchment.area,
     v_edit_subcatchment.imperv,
     v_edit_subcatchment.width,
