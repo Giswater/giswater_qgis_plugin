@@ -44,6 +44,8 @@ BEGIN
 	IF v_nod2arc is null then 
 		v_nod2arc = 0.3;
 	END IF;
+
+	v_arcsearchnodes := 0.1;
     
 	--  Move valves to arc
 	RAISE NOTICE 'Start loop.....';
@@ -80,8 +82,8 @@ BEGIN
         SELECT COUNT(*) INTO num_arcs FROM rpt_inp_arc WHERE (node_1 = node_id_aux OR node_2 = node_id_aux) AND result_id=result_id_var;
 
         -- Get arcs
-        SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux;
-        SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux;
+        SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux AND result_id=result_id_var ;
+        SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux AND result_id=result_id_var ;
 
         -- Just 1 arcs
         IF num_arcs = 1 THEN
@@ -129,8 +131,8 @@ BEGIN
             IF record_arc1 ISNULL THEN
 
                 -- Get arcs
-                SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-                SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
+                SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_2 = node_id_aux AND result_id=result_id_var ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_2 = node_id_aux AND result_id=result_id_var ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
@@ -159,8 +161,8 @@ BEGIN
             ELSIF record_arc2 ISNULL THEN
 
                 -- Get arcs
-                SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-                SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_1 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
+                SELECT * INTO record_arc1 FROM rpt_inp_arc WHERE node_1 = node_id_aux AND result_id=result_id_var ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO record_arc2 FROM rpt_inp_arc WHERE node_1 = node_id_aux AND result_id=result_id_var ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
@@ -238,17 +240,23 @@ BEGIN
 		SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM inp_valve UNION SELECT node_id,to_arc FROM inp_shortpipe UNION 
 										SELECT node_id,to_arc FROM inp_pump) a WHERE node_id=node_id_aux;
 
-		SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, v_arcsearchnodes)) AND result_id=result_id_var
-					ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
+		IF to_arc_aux IS NOT NULL THEN 
 
-		IF arc_id_aux=to_arc_aux THEN
-			record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
-			record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
-		ELSE
-			record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
-			record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
-			record_new_arc.the_geom := st_reverse(record_new_arc.the_geom);
-		END IF; 
+			SELECT arc_id INTO arc_id_aux FROM rpt_inp_arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), rpt_inp_arc.the_geom, v_arcsearchnodes)) AND result_id=result_id_var
+						ORDER BY ST_Distance(rpt_inp_arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
+
+			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (1, concat(node_id_aux,':',arc_id_aux,'-',to_arc_aux));
+
+			IF arc_id_aux=to_arc_aux THEN
+				record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
+				record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+			ELSE
+				record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
+				record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
+				record_new_arc.the_geom := st_reverse(record_new_arc.the_geom);
+			END IF; 
+			
+		END IF;
 
         -- Inserting new arc into arc table
         INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, diameter, roughness, annotation, length, the_geom)
