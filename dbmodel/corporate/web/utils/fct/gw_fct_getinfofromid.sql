@@ -47,8 +47,6 @@ DECLARE
     table_id_arg_new text;
     v_isdbeditable boolean = FALSE;
     
-    -- fixed info type parameter(to do)
-    --p_info_type integer=200;
     
 
 BEGIN
@@ -147,29 +145,21 @@ BEGIN
 	raise notice 'Layer link path: % ', link_path;
    END IF;
          
---        Get tabs for the layer
+--        Get tabs, label header for the form of the layer
 --------------------------------
-    EXECUTE 'SELECT array_agg(formtab) FROM (SELECT formtab FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
-	INTO form_tabs
-        USING table_id_arg;
+    EXECUTE 'SELECT array_agg(formtab) FROM (SELECT formtab FROM config_web_tabs WHERE layer_id = $1 AND inforole_id =$2 order by id desc) a' INTO form_tabs  USING table_id_arg, p_info_type;
 
-    raise notice 'form_tabs %', form_tabs;
+	IF form_tabs IS NULL THEN
+	
+		EXECUTE 'SELECT array_agg(formtab) FROM (SELECT formtab FROM config_web_tabs WHERE layer_id = $1  AND inforole_id IS NULL order by id desc) a' INTO form_tabs  USING table_id_arg;
+		EXECUTE 'SELECT array_agg(tablabel) FROM (SELECT tablabel FROM config_web_tabs WHERE layer_id = $1  AND inforole_id IS NULL order by id desc) a' INTO form_tablabel USING table_id_arg;
+		EXECUTE 'SELECT array_agg(tabtext) FROM (SELECT tabtext FROM config_web_tabs WHERE layer_id = $1  AND inforole_id IS NULL order by id desc) a' INTO form_tabtext USING table_id_arg;
+	ELSE 
+		EXECUTE 'SELECT array_agg(tablabel) FROM (SELECT tablabel FROM config_web_tabs WHERE layer_id = $1 AND inforole_id =$2 order by id desc) a' INTO form_tablabel USING table_id_arg, p_info_type;
+		EXECUTE 'SELECT array_agg(tabtext) FROM (SELECT tabtext FROM config_web_tabs WHERE layer_id = $1 AND inforole_id =$2 order by id desc) a' INTO form_tabtext USING table_id_arg, p_info_type;
 
-    -- Get tab label for tabs form
-    ------------------------------
-    EXECUTE 'SELECT array_agg(tablabel) FROM (SELECT tablabel FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
-	INTO form_tablabel
-        USING table_id_arg;
+	END IF;	
 
-    raise notice 'form_tablabel; %', form_tablabel;
-
-    -- Get header text for tabs form
-    --------------------------------
-    EXECUTE 'SELECT array_agg(tabtext) FROM (SELECT tabtext FROM config_web_tabs WHERE layer_id = $1 order by id desc) a'
-	INTO form_tabtext
-        USING table_id_arg;
-
-    raise notice 'form_tabtext; %', form_tabtext;
 
 --        Check if it is parent table 
 -------------------------------------
