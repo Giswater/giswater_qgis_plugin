@@ -17,6 +17,13 @@ BEGIN
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
+-- Upsert on rpt_cat_table
+    DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
+    INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
+	
+-- Upsert on node rpt_inp result manager table
+     DELETE FROM inp_selector_result WHERE cur_user=current_user;
+     INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
 	
 -- Upsert on node rpt_inp table
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
