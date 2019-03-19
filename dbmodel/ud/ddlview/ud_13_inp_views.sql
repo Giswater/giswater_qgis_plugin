@@ -194,7 +194,7 @@ FROM inp_lid_control
 	ORDER BY inp_lid_control.id;
 
 
-	
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_options" CASCADE;
 CREATE VIEW "v_inp_options" AS 
 SELECT 
@@ -600,6 +600,8 @@ FROM v_edit_raingage
 -- ----------------------------
 -- View structure for subcatchments
 -- ----------------------------
+
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_infiltration_cu" CASCADE;
 CREATE VIEW "v_inp_infiltration_cu" AS 
 SELECT 
@@ -612,7 +614,7 @@ FROM v_edit_subcatchment
 	WHERE cat_hydrology.infiltration='CURVE_NUMBER';
 
 
-
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_infiltration_gr" CASCADE;
 CREATE VIEW "v_inp_infiltration_gr" AS 
 SELECT
@@ -625,7 +627,7 @@ FROM v_edit_subcatchment
 	WHERE cat_hydrology.infiltration='GREEN_AMPT';
 
 
-
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_infiltration_ho" CASCADE;
 CREATE VIEW "v_inp_infiltration_ho" AS 
 SELECT 
@@ -641,7 +643,7 @@ FROM v_edit_subcatchment
 	OR cat_hydrology.infiltration ='HORTON';
 
 
-
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_subcatch" CASCADE;
 CREATE VIEW "v_inp_subcatch" AS 
 SELECT 
@@ -664,7 +666,7 @@ rted
 FROM v_edit_subcatchment;
 
 
-
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_lidusage" CASCADE;
 CREATE VIEW "v_inp_lidusage" AS 
 SELECT 
@@ -682,7 +684,7 @@ FROM v_edit_subcatchment
 
 
 
-
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_groundwater" CASCADE;
 CREATE VIEW "v_inp_groundwater" AS 
 SELECT 
@@ -704,7 +706,7 @@ FROM v_edit_subcatchment
 
 	
 
-
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_coverages" CASCADE;
 CREATE VIEW "v_inp_coverages" AS 
 SELECT 
@@ -716,7 +718,7 @@ FROM inp_coverage_land_x_subc
 
 
 	
-
+-- updated on 3.1.110
 DROP VIEW IF EXISTS "v_inp_loadings" CASCADE;
 CREATE VIEW "v_inp_loadings" AS 
 SELECT 
@@ -727,8 +729,7 @@ FROM v_edit_subcatchment
 	JOIN inp_loadings_pol_x_subc ON inp_loadings_pol_x_subc.subc_id=v_edit_subcatchment.subc_id;
 
 
-
-
+-- updated on 3.1.110
 DROP VIEW IF EXISTS  "v_inp_subcatch2node" CASCADE;
 CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
 SELECT 
@@ -738,8 +739,7 @@ FROM v_edit_subcatchment subcatchment
    JOIN v_node ON v_node.node_id = subcatchment.node_id;
 
 
-
-   
+-- updated on 3.1.110  
 DROP VIEW IF EXISTS  "v_inp_subcatchcentroid" CASCADE;
 CREATE OR REPLACE VIEW v_inp_subcatchcentroid AS 
 SELECT 

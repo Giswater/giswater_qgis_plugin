@@ -22,39 +22,39 @@ BEGIN
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
 	result_id_var,
-	v_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
-	FROM inp_selector_sector, v_node 
+	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
+	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_junction ON v_node.node_id=inp_junction.node_id
+		JOIN inp_junction ON v_edit_node.node_id=inp_junction.node_id
 		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
-		AND v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+		AND v_edit_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
 	UNION
 	SELECT 
 	result_id_var,
-	v_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
-	FROM inp_selector_sector, v_node 
+	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
+	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_divider ON v_node.node_id=inp_divider.node_id
+		JOIN inp_divider ON v_edit_node.node_id=inp_divider.node_id
 		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
-		AND v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+		AND v_edit_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
 	UNION
 	SELECT 
 	result_id_var,
-	v_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
-	FROM inp_selector_sector, v_node 
+	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, annotation, expl_id, y0, ysur, apond, the_geom
+	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_storage ON v_node.node_id=inp_storage.node_id
+		JOIN inp_storage ON v_edit_node.node_id=inp_storage.node_id
 		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
-		AND v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
+		AND v_edit_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user
 	UNION
 	SELECT 
 	result_id_var,
-	v_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, expl_id, null, null, null, the_geom
-	FROM inp_selector_sector, v_node 
+	v_edit_node.node_id, sys_top_elev, sys_ymax, sys_elev, node_type, nodecat_id, epa_type, v_edit_node.sector_id, v_edit_node.state, v_edit_node.state_type, annotation, expl_id, null, null, null, the_geom
+	FROM inp_selector_sector, v_edit_node 
 		LEFT JOIN value_state_type ON id=state_type
-		JOIN inp_outfall ON v_node.node_id=inp_outfall.node_id
+		JOIN inp_outfall ON v_edit_node.node_id=inp_outfall.node_id
 		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL))
-		AND v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
+		AND v_edit_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
 
 

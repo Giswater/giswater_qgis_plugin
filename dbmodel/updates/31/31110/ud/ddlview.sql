@@ -210,3 +210,45 @@ subcatchment.subc_id,
 st_centroid(subcatchment.the_geom) AS the_geom
 FROM v_edit_subcatchment subcatchment;
 
+
+DROP VIEW IF EXISTS "v_inp_options" CASCADE;
+CREATE VIEW "v_inp_options" AS 
+SELECT 
+inp_options.flow_units,
+cat_hydrology.infiltration,
+inp_options.flow_routing,
+inp_options.link_offsets,
+inp_options.force_main_equation,
+inp_options.ignore_rainfall,
+inp_options.ignore_snowmelt,
+inp_options.ignore_groundwater,
+inp_options.ignore_routing,
+inp_options.ignore_quality,
+inp_options.skip_steady_state,
+inp_options.start_date,
+inp_options.start_time,
+inp_options.end_date,
+inp_options.end_time,
+inp_options.report_start_date,
+inp_options.report_start_time,
+inp_options.sweep_start,
+inp_options.sweep_end,
+inp_options.dry_days,
+inp_options.report_step,
+inp_options.wet_step,
+inp_options.dry_step,
+inp_options.routing_step,
+inp_options.lengthening_step,
+inp_options.variable_step,
+inp_options.inertial_damping,
+inp_options.normal_flow_limited,
+inp_options.min_surfarea,
+inp_options.min_slope,
+inp_options.allow_ponding,
+inp_options.tempdir,
+inp_options.max_trials,
+inp_options.head_tolerance,
+inp_options.sys_flow_tol,
+inp_options.lat_flow_tol
+FROM inp_options, inp_selector_hydrology
+   JOIN cat_hydrology ON inp_selector_hydrology.hydrology_id = cat_hydrology.hydrology_id;
