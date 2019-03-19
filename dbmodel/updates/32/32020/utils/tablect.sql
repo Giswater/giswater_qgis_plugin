@@ -21,7 +21,7 @@ ALTER TABLE ONLY om_visit_class_x_parameter ADD CONSTRAINT om_visit_class_x_para
 FOREIGN KEY (parameter_id) REFERENCES om_visit_parameter(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE selector_lot ADD CONSTRAINT selector_lot_lot_id_fkey 
-FOREIGN KEY (lot_id) REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON CASCADE RESTRICT;
+FOREIGN KEY (lot_id) REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 --ALTER TABLE om_visit_file ADD CONSTRAINT selector_workcat_workcat_id_fkey 
 --FOREIGN KEY (filetype) REFERENCES om_visit_lot (filetype, fextension) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
