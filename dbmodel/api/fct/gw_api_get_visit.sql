@@ -202,10 +202,10 @@ BEGIN
 	
 	-- Check if exists some open visit on related feature with the class configured as vdefault for user
 	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL AND v_visitclass IS NOT NULL THEN
-		EXECUTE 'SELECT v.id FROM om_visit_x_'||v_featuretype||' a JOIN om_visit v ON v.id=a.visit_id '||
-			' WHERE '||v_featuretype||'_id ='||v_featureid||'::text AND (status > 0 OR status = 0 AND (now()- enddate) < ''8 hours'') ' ||
-			' AND class_id = '||v_visitclass||
-			' ORDER BY startdate DESC LIMIT 1'
+		EXECUTE FORMAT ('SELECT v.id FROM om_visit_x_%s a JOIN om_visit v ON v.id=a.visit_id '||
+			' WHERE %s_id = %s::text AND (status > 0 OR status = 0 AND (now()- enddate) < ''8 hours'') ' ||
+			' AND class_id = %s'
+			' ORDER BY startdate DESC LIMIT 1',v_featuretype, v_featuretype, v_featureid, v_visitclass)
 			INTO v_existvisit_id;
 			
 		IF v_existvisit_id IS NOT NULL THEN
@@ -385,8 +385,8 @@ BEGIN
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 
 				-- getting values from feature
-				EXECUTE 'SELECT (row_to_json(a)) FROM 
-					(SELECT * FROM '||v_tablename||' WHERE '||v_idname||' = CAST($1 AS '||v_columntype||'))a'
+				EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM 
+					(SELECT * FROM %s WHERE %s = CAST($1 AS %s))a',v_tablename, v_idname, v_columntype)
 					INTO v_values
 					USING v_id;
 	
@@ -527,11 +527,11 @@ BEGIN
 	END IF;
 
 	-- getting geometry
-	EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id='||v_id||')a'
+	EXECUTE FORMAT ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=%s)a', v_id)
             INTO v_geometry;
 
         IF v_geometry IS NULL AND v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM '||v_featuretype||' WHERE '||v_featuretype||'_id::text='||v_featureid||'::text)a'
+		EXECUTE FORMAT('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM %s WHERE %s_id::text=%s::text)a', v_featuretype, v_featuretype, v_featureid)
 			INTO v_geometry;
 	END IF;
     		

@@ -125,13 +125,13 @@ BEGIN
 	v_formheader :=concat('ORDRE TREBALL - ',v_id);	
 		
 	-- actions and layermanager
-	EXECUTE 'SELECT actions, layermanager FROM config_api_form WHERE formname = ''lot'' AND (projecttype ='||quote_literal(LOWER(v_projecttype))||' OR projecttype = ''utils'')'
+	EXECUTE FORMAT ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''lot'' AND (projecttype = %s OR projecttype = ''utils'')', quote_literal(LOWER(v_projecttype)))
 		INTO v_formactions, v_layermanager;
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
 
 	-- getting geometry
-	EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit_lot WHERE id='||v_id||')a'
+	EXECUTE FORMAT ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit_lot WHERE id=%s)a', v_id)
             INTO v_geometry;
             
  		

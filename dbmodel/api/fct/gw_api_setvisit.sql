@@ -100,7 +100,7 @@ BEGIN
 	ELSE 
 
 		-- refactorize om_visit and om_visit_event in case of update of class the change of parameters is need)
-		EXECUTE 'SELECT visit_id FROM '||v_tablename||' WHERE visit_id = '||v_id INTO v_ckeckchangeclass;
+		EXECUTE FORMAT ('SELECT visit_id FROM %s WHERE visit_id = %s',v_tablename, v_id) INTO v_ckeckchangeclass;
 		IF v_ckeckchangeclass IS NULL THEN
 			DELETE FROM om_visit_event WHERE visit_id = v_id;
 			INSERT INTO om_visit_event (parameter_id, visit_id) SELECT parameter_id, v_id FROM om_visit_class_x_parameter WHERE class_id=v_class;
@@ -125,7 +125,7 @@ BEGIN
 				  WHERE visit_id=v_id;
 
 	-- getting geometry
-	EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id='||v_id||')a'
+	EXECUTE FORMAT ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=%s)a', v_id)
             INTO v_geometry;
 
             raise notice 'v_geometry %', v_geometry;

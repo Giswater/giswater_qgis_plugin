@@ -54,7 +54,7 @@ BEGIN
 
 --    Get visits
     IF query_result IS NOT NULL THEN
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ') a'
+    EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( %s ) a', query_result)
         INTO query_result_visits
         USING id;
     END IF;
