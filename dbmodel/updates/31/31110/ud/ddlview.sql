@@ -200,7 +200,7 @@ st_centroid(subcatchment.the_geom) AS the_geom
 FROM v_edit_subcatchment subcatchment;
 
 
-
+DROP VIEW IF EXISTS "v_inp_options" ;
 CREATE VIEW "v_inp_options" AS 
 SELECT 
 inp_options.flow_units,
