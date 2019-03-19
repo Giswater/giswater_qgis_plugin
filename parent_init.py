@@ -19,9 +19,11 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.gui import QgsMapCanvas
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
@@ -60,7 +62,7 @@ from .actions.manage_element import ManageElement
 from .actions.manage_gallery import ManageGallery
 from .models.sys_feature_cat import SysFeatureCat
 from .models.man_addfields_parameter import ManAddfieldsParameter
-from .map_tools.snapping_utils import SnappingConfigManager
+from .map_tools.snapping_utils_v2 import SnappingConfigManager
 from .actions.manage_visit import ManageVisit
 
 

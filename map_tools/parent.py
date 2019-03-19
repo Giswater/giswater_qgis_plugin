@@ -25,9 +25,10 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    pass
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.core import QgsWkbTypes
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsPoint, QgsExpression
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
@@ -38,8 +39,6 @@ import os
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
-
-from .snapping_utils import SnappingConfigManager
 
 
 class ParentMapTool(QgsMapTool):

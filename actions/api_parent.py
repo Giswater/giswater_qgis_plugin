@@ -18,9 +18,11 @@ except ImportError:
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import QgsMapCanvasSnapper
     from qgis.PyQt.QtGui import QStringListModel
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.core import QgsWkbTypes
     from qgis.PyQt.QtCore import QStringListModel
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
@@ -40,7 +42,7 @@ from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
-from map_tools.snapping_utils import SnappingConfigManager
+from map_tools.snapping_utils_v2 import SnappingConfigManager
 from giswater.actions.parent import ParentAction
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
 

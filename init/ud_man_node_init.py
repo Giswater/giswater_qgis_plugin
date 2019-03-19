@@ -7,6 +7,15 @@ or (at your option) any later version.
 from builtins import next
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+else:
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QMessageBox
@@ -19,7 +28,6 @@ from giswater.init.thread import Thread
 
 import utils_giswater
 from giswater.parent_init import ParentDialog
-from giswater.map_tools.snapping_utils import SnappingConfigManager
 
 
 def formOpen(dialog, layer, feature):
