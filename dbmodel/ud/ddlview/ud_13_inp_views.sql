@@ -729,6 +729,26 @@ FROM v_edit_subcatchment
 
 
 
+DROP VIEW IF EXISTS  "v_inp_subcatch2node" CASCADE;
+CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
+SELECT 
+subcatchment.subc_id,
+st_makeline(st_centroid(subcatchment.the_geom), v_node.the_geom) AS the_geom
+FROM v_edit_subcatchment subcatchment
+   JOIN v_node ON v_node.node_id = subcatchment.node_id;
+
+
+
+   
+DROP VIEW IF EXISTS  "v_inp_subcatchcentroid" CASCADE;
+CREATE OR REPLACE VIEW v_inp_subcatchcentroid AS 
+SELECT 
+subcatchment.subc_id,
+st_centroid(subcatchment.the_geom) AS the_geom
+FROM v_edit_subcatchment subcatchment;
+
+
+
 -- ------------------------------------------------------------------
 -- View structure for arc elements
 -- ------------------------------------------------------------------
@@ -1625,27 +1645,6 @@ value_11,
 value_12
 FROM inp_adjustments
 ORDER BY id;
-
-
-
-
-DROP VIEW IF EXISTS  "v_inp_subcatch2node" CASCADE;
-CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
-SELECT 
-subcatchment.subc_id,
-st_makeline(st_centroid(subcatchment.the_geom), v_node.the_geom) AS the_geom
-FROM v_edit_subcatchment subcatchment
-   JOIN v_node ON v_node.node_id = subcatchment.node_id;
-
-
-
-   
-DROP VIEW IF EXISTS  "v_inp_subcatchcentroid" CASCADE;
-CREATE OR REPLACE VIEW v_inp_subcatchcentroid AS 
-SELECT 
-subcatchment.subc_id,
-st_centroid(subcatchment.the_geom) AS the_geom
-FROM v_edit_subcatchment subcatchment;
 
 
 

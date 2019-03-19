@@ -1,0 +1,212 @@
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
+-- 2019/03/19
+
+DROP VIEW IF EXISTS v_inp_subcatch;
+DROP VIEW IF EXISTS v_inp_infiltration_cu;
+DROP VIEW IF EXISTS v_inp_infiltration_gr;
+DROP VIEW IF EXISTS v_inp_infiltration_ho;
+DROP VIEW IF EXISTS v_inp_lidusage;
+DROP VIEW IF EXISTS v_inp_groundwater;
+DROP VIEW IF EXISTS v_inp_coverages;
+DROP VIEW IF EXISTS v_inp_loadings;
+DROP VIEW IF EXISTS v_inp_subcatch2node;
+DROP VIEW IF EXISTS v_inp_subcatchcentroid;
+
+DROP VIEW IF EXISTS v_edit_subcatchment;
+CREATE OR REPLACE VIEW v_edit_subcatchment AS 
+ SELECT subcatchment.subc_id,
+    subcatchment.node_id,
+    subcatchment.rg_id,
+    subcatchment.area,
+    subcatchment.imperv,
+    subcatchment.width,
+    subcatchment.slope,
+    subcatchment.clength,
+    subcatchment.snow_id,
+    subcatchment.nimp,
+    subcatchment.nperv,
+    subcatchment.simp,
+    subcatchment.sperv,
+    subcatchment.zero,
+    subcatchment.routeto,
+    subcatchment.rted,
+    subcatchment.maxrate,
+    subcatchment.minrate,
+    subcatchment.decay,
+    subcatchment.drytime,
+    subcatchment.maxinfil,
+    subcatchment.suction,
+    subcatchment.conduct,
+    subcatchment.initdef,
+    subcatchment.curveno,
+    subcatchment.conduct_2,
+    subcatchment.drytime_2,
+    subcatchment.sector_id,
+    subcatchment.hydrology_id,
+    subcatchment.the_geom,
+	subcatchment.parent_id,
+	subcatchment.descript
+   FROM inp_selector_sector,
+    inp_selector_hydrology,
+    subcatchment
+     JOIN v_node ON v_node.node_id::text = subcatchment.node_id::text
+  WHERE subcatchment.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text AND subcatchment.hydrology_id = inp_selector_hydrology.hydrology_id AND inp_selector_hydrology.cur_user = "current_user"()::text;
+
+
+
+DROP VIEW IF EXISTS "v_inp_infiltration_cu" CASCADE;
+CREATE VIEW "v_inp_infiltration_cu" AS 
+SELECT 
+subc_id,
+curveno,
+conduct_2,
+drytime_2
+FROM v_edit_subcatchment
+	JOIN cat_hydrology ON cat_hydrology.hydrology_id=v_edit_subcatchment.hydrology_id
+	WHERE cat_hydrology.infiltration='CURVE_NUMBER';
+
+
+
+DROP VIEW IF EXISTS "v_inp_infiltration_gr" CASCADE;
+CREATE VIEW "v_inp_infiltration_gr" AS 
+SELECT
+subc_id, 
+suction, 
+conduct, 
+initdef 
+FROM v_edit_subcatchment
+	JOIN cat_hydrology ON cat_hydrology.hydrology_id=v_edit_subcatchment.hydrology_id
+	WHERE cat_hydrology.infiltration='GREEN_AMPT';
+
+
+
+DROP VIEW IF EXISTS "v_inp_infiltration_ho" CASCADE;
+CREATE VIEW "v_inp_infiltration_ho" AS 
+SELECT 
+subc_id, 
+maxrate, 
+minrate, 
+decay, 
+drytime, 
+maxinfil
+FROM v_edit_subcatchment
+	JOIN cat_hydrology ON cat_hydrology.hydrology_id=v_edit_subcatchment.hydrology_id
+	WHERE cat_hydrology.infiltration='MODIFIED_HORTON' 
+	OR cat_hydrology.infiltration ='HORTON';
+
+
+
+DROP VIEW IF EXISTS "v_inp_subcatch" CASCADE;
+CREATE VIEW "v_inp_subcatch" AS 
+SELECT 
+subc_id, 
+CASE WHEN parent_id IS NULL THEN node_id ELSE parent_id END AS node_id,
+rg_id, 
+area, 
+imperv, 
+width, 
+slope, 
+clength, 
+snow_id, 
+nimp, 
+nperv, 
+simp, 
+sperv, 
+zero, 
+routeto, 
+rted
+FROM v_edit_subcatchment;
+
+
+
+DROP VIEW IF EXISTS "v_inp_lidusage" CASCADE;
+CREATE VIEW "v_inp_lidusage" AS 
+SELECT 
+inp_lidusage_subc_x_lidco.subc_id, 
+inp_lidusage_subc_x_lidco.lidco_id, 
+inp_lidusage_subc_x_lidco."number"::integer, 
+inp_lidusage_subc_x_lidco.area, 
+inp_lidusage_subc_x_lidco.width, 
+inp_lidusage_subc_x_lidco.initsat, 
+inp_lidusage_subc_x_lidco.fromimp, 
+inp_lidusage_subc_x_lidco.toperv::integer, 
+inp_lidusage_subc_x_lidco.rptfile 
+FROM v_edit_subcatchment
+	JOIN inp_lidusage_subc_x_lidco ON inp_lidusage_subc_x_lidco.subc_id=v_edit_subcatchment.subc_id;
+
+
+
+
+DROP VIEW IF EXISTS "v_inp_groundwater" CASCADE;
+CREATE VIEW "v_inp_groundwater" AS 
+SELECT 
+inp_groundwater.subc_id, 
+inp_groundwater.aquif_id, 
+inp_groundwater.node_id, 
+inp_groundwater.surfel, 
+inp_groundwater.a1, 
+inp_groundwater.b1, 
+inp_groundwater.a2, 
+inp_groundwater.b2, 
+inp_groundwater.a3, 
+inp_groundwater.tw, 
+inp_groundwater.h, 
+'LATERAL' || ' ' || (inp_groundwater.fl_eq_lat) AS fl_eq_lat, 
+'DEEP' || ' ' || (inp_groundwater.fl_eq_lat) AS fl_eq_deep
+FROM v_edit_subcatchment
+	JOIN inp_groundwater ON inp_groundwater.subc_id=v_edit_subcatchment.subc_id;
+
+	
+
+
+DROP VIEW IF EXISTS "v_inp_coverages" CASCADE;
+CREATE VIEW "v_inp_coverages" AS 
+SELECT 
+v_edit_subcatchment.subc_id, 
+inp_coverage_land_x_subc.landus_id, 
+inp_coverage_land_x_subc.percent
+FROM inp_coverage_land_x_subc 
+	JOIN v_edit_subcatchment ON inp_coverage_land_x_subc.subc_id = v_edit_subcatchment.subc_id;
+
+
+	
+
+DROP VIEW IF EXISTS "v_inp_loadings" CASCADE;
+CREATE VIEW "v_inp_loadings" AS 
+SELECT 
+inp_loadings_pol_x_subc.poll_id, 
+inp_loadings_pol_x_subc.subc_id, 
+inp_loadings_pol_x_subc.ibuildup
+FROM v_edit_subcatchment 
+	JOIN inp_loadings_pol_x_subc ON inp_loadings_pol_x_subc.subc_id=v_edit_subcatchment.subc_id;
+
+
+
+DROP VIEW IF EXISTS  "v_inp_subcatch2node" CASCADE;
+CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
+SELECT 
+subcatchment.subc_id,
+st_makeline(st_centroid(subcatchment.the_geom), v_node.the_geom) AS the_geom
+FROM v_edit_subcatchment subcatchment
+   JOIN v_node ON v_node.node_id = subcatchment.node_id;
+
+
+
+   
+DROP VIEW IF EXISTS  "v_inp_subcatchcentroid" CASCADE;
+CREATE OR REPLACE VIEW v_inp_subcatchcentroid AS 
+SELECT 
+subcatchment.subc_id,
+st_centroid(subcatchment.the_geom) AS the_geom
+FROM v_edit_subcatchment subcatchment;
+
