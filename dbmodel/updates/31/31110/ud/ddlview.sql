@@ -64,7 +64,6 @@ CREATE OR REPLACE VIEW v_edit_subcatchment AS
 
 
 
-DROP VIEW IF EXISTS "v_inp_infiltration_cu" CASCADE;
 CREATE VIEW "v_inp_infiltration_cu" AS 
 SELECT 
 subc_id,
@@ -77,7 +76,6 @@ FROM v_edit_subcatchment
 
 
 
-DROP VIEW IF EXISTS "v_inp_infiltration_gr" CASCADE;
 CREATE VIEW "v_inp_infiltration_gr" AS 
 SELECT
 subc_id, 
@@ -90,7 +88,6 @@ FROM v_edit_subcatchment
 
 
 
-DROP VIEW IF EXISTS "v_inp_infiltration_ho" CASCADE;
 CREATE VIEW "v_inp_infiltration_ho" AS 
 SELECT 
 subc_id, 
@@ -106,7 +103,6 @@ FROM v_edit_subcatchment
 
 
 
-DROP VIEW IF EXISTS "v_inp_subcatch" CASCADE;
 CREATE VIEW "v_inp_subcatch" AS 
 SELECT 
 subc_id, 
@@ -129,7 +125,6 @@ FROM v_edit_subcatchment;
 
 
 
-DROP VIEW IF EXISTS "v_inp_lidusage" CASCADE;
 CREATE VIEW "v_inp_lidusage" AS 
 SELECT 
 inp_lidusage_subc_x_lidco.subc_id, 
@@ -147,7 +142,6 @@ FROM v_edit_subcatchment
 
 
 
-DROP VIEW IF EXISTS "v_inp_groundwater" CASCADE;
 CREATE VIEW "v_inp_groundwater" AS 
 SELECT 
 inp_groundwater.subc_id, 
@@ -169,7 +163,6 @@ FROM v_edit_subcatchment
 	
 
 
-DROP VIEW IF EXISTS "v_inp_coverages" CASCADE;
 CREATE VIEW "v_inp_coverages" AS 
 SELECT 
 v_edit_subcatchment.subc_id, 
@@ -181,7 +174,6 @@ FROM inp_coverage_land_x_subc
 
 	
 
-DROP VIEW IF EXISTS "v_inp_loadings" CASCADE;
 CREATE VIEW "v_inp_loadings" AS 
 SELECT 
 inp_loadings_pol_x_subc.poll_id, 
@@ -192,7 +184,6 @@ FROM v_edit_subcatchment
 
 
 
-DROP VIEW IF EXISTS  "v_inp_subcatch2node" CASCADE;
 CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
 SELECT 
 subcatchment.subc_id,
@@ -201,9 +192,7 @@ FROM v_edit_subcatchment subcatchment
    JOIN v_node ON v_node.node_id = subcatchment.node_id;
 
 
-
    
-DROP VIEW IF EXISTS  "v_inp_subcatchcentroid" CASCADE;
 CREATE OR REPLACE VIEW v_inp_subcatchcentroid AS 
 SELECT 
 subcatchment.subc_id,
@@ -211,7 +200,7 @@ st_centroid(subcatchment.the_geom) AS the_geom
 FROM v_edit_subcatchment subcatchment;
 
 
-DROP VIEW IF EXISTS "v_inp_options" CASCADE;
+
 CREATE VIEW "v_inp_options" AS 
 SELECT 
 inp_options.flow_units,
@@ -251,4 +240,6 @@ inp_options.head_tolerance,
 inp_options.sys_flow_tol,
 inp_options.lat_flow_tol
 FROM inp_options, inp_selector_hydrology
-   JOIN cat_hydrology ON inp_selector_hydrology.hydrology_id = cat_hydrology.hydrology_id;
+   JOIN cat_hydrology ON inp_selector_hydrology.hydrology_id = cat_hydrology.hydrology_id
+   WHERE cat_hydrology.hydrology_id = inp_selector_hydrology.hydrology_id AND inp_selector_hydrology.cur_user = "current_user"()::text;
+
