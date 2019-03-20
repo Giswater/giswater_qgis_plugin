@@ -67,7 +67,7 @@ BEGIN
 -- Network Tab
 -------------------------
     SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabNetwork' ;
-    IF rec_tab IS NOT NULL THEN
+    IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='net_type';
@@ -117,7 +117,7 @@ BEGIN
 -- Search tab
 -------------
     SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabSearch' ;
-    IF rec_tab IS NOT NULL THEN
+    IF rec_tab.id IS NOT NULL THEN
     
         -- Create search field
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='generic_search';
@@ -148,7 +148,7 @@ BEGIN
 -- Address tab
 -------------
     SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabAddress' ;
-    IF rec_tab IS NOT NULL THEN
+    IF rec_tab.id IS NOT NULL THEN
 
         -- Parameters of the municipality layer
         SELECT ((value::json)->>'sys_table_id') INTO v_search_muni_table FROM config_param_system WHERE parameter='api_search_muni';
@@ -222,7 +222,7 @@ BEGIN
 -- Hydro tab
 ------------
     SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabHydro' ;
-    IF rec_tab IS NOT NULL THEN
+    IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='hydro_expl';
@@ -286,7 +286,7 @@ BEGIN
 -- Workcat tab
 --------------
     SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabWorkcat' ;
-    IF rec_tab IS NOT NULL THEN
+    IF rec_tab.id IS NOT NULL THEN
 
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='workcat_search';
@@ -318,7 +318,7 @@ BEGIN
 -- Psector tab
 --------------
     SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabPsector' ;
-    IF rec_tab IS NOT NULL THEN
+    IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='psector_expl';
@@ -378,7 +378,7 @@ BEGIN
 -- Visit tab
 --------------
     SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F31' AND formtab='tabVisit' ;
-    IF rec_tab IS NOT NULL THEN
+    IF rec_tab.id IS NOT NULL THEN
 
         -- Add edit box to introduce search text
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='visit_search';

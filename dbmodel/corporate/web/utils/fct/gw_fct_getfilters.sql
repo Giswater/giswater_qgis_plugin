@@ -50,7 +50,7 @@ BEGIN
 
 -- Tab Exploitation
         SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F33' AND formtab='tabExploitation' ;
-	IF rec_tab IS NOT NULL THEN
+	IF rec_tab.id IS NOT NULL THEN
 
 		-- Get exploitations, selected and unselected
 		IF p_istilemap THEN	
@@ -92,7 +92,7 @@ BEGIN
 
 -- Tab network state
 	SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F33' AND formtab='tabNetworkState' ;
-	IF rec_tab IS NOT NULL THEN
+	IF rec_tab.id IS NOT NULL THEN
 		
 		-- Get states, selected and unselected
 		IF p_istilemap THEN
@@ -172,7 +172,7 @@ BEGIN
 
 -- Tab hydrometer state
 	SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F33' AND formtab='tabHydroState' ;
-	IF rec_tab IS NOT NULL THEN
+	IF rec_tab.id IS NOT NULL THEN
 	
 		-- Get hydrometer states, selected and unselected
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
@@ -204,7 +204,7 @@ BEGIN
 
 -- Tab lot selector
 	SELECT * INTO rec_tab FROM config_web_tabs WHERE layer_id='F33' AND formtab='tabLotSelector' ;
-	IF rec_tab IS NOT NULL THEN
+	IF rec_tab.id IS NOT NULL THEN
 
 		-- control if user has permisions
 		 IF 'role_om_lot' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
