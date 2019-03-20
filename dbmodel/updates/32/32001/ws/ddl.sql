@@ -8,5 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE prog.inp_shortpipe ALTER COLUMN minorloss SET DEFAULT 0;
-ALTER TABLE prog.inp_pipe ALTER COLUMN minorloss SET DEFAULT 0;
+ALTER TABLE inp_shortpipe ALTER COLUMN minorloss SET DEFAULT 0;
+ALTER TABLE inp_pipe ALTER COLUMN minorloss SET DEFAULT 0;
