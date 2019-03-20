@@ -159,7 +159,7 @@ class ManArcDialog(ParentDialog):
         row = self.controller.get_row(sql, log_sql=True)
 
         if row['ymax'] is not None:
-            if float(text) > float(row['ymax']):
+            if float(row['ymax']) < float(text) :
                 widget_y.setStyleSheet("border: 1px solid red")
                 if show_message:
                     msg = "The depth of {} is less than the y{}".format(widget_node.objectName(), widget_node.objectName()[5:6])
