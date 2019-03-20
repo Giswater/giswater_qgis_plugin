@@ -7,6 +7,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP TRIGGER gw_trg_vi_status ON SCHEMA_NAME.vi_status;
+DROP TRIGGER IF EXISTS gw_trg_vi_status ON SCHEMA_NAME.vi_status;
 CREATE TRIGGER gw_trg_vi_status INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_status FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_status');
 

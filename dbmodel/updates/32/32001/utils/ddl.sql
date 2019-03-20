@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 ALTER TABLE ext_rtc_scada ADD COLUMN node_id character varying(16);
-ALTER TABLE ext_rtc_scada ALTER COLUMN node_id SET NOT NULL;
+--ALTER TABLE ext_rtc_scada ALTER COLUMN node_id SET NOT NULL;
