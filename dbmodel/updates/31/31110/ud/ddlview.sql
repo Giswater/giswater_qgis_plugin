@@ -242,4 +242,29 @@ inp_options.lat_flow_tol
 FROM inp_options, inp_selector_hydrology
    JOIN cat_hydrology ON inp_selector_hydrology.hydrology_id = cat_hydrology.hydrology_id
    WHERE cat_hydrology.hydrology_id = inp_selector_hydrology.hydrology_id AND inp_selector_hydrology.cur_user = "current_user"()::text;
+   
+-- 2019/03/20
+DROP VIEW IF EXISTS v_ui_element_x_gully;
+CREATE OR REPLACE VIEW v_ui_element_x_gully AS
+SELECT element_x_gully.id,
+    element_x_gully.gully_id,
+    element_x_gully.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate
+   FROM element_x_gully
+JOIN element ON element.element_id = element_x_gully.element_id
+JOIN value_state ON element.state = value_state.id
+LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text
+LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
+WHERE element.state = 1 and man_type_location.feature_type='ELEMENT';
+
 

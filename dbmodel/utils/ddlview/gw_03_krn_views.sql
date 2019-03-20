@@ -48,7 +48,7 @@ FROM v_arc
 LEFT JOIN node a ON a.node_id::text = v_arc.node_1::text
 LEFT JOIN node b ON b.node_id::text = v_arc.node_2::text;
 
-
+-- definiton updated on 3.1.110
 drop view if exists v_ui_element_x_arc cascade; 
 CREATE OR REPLACE VIEW v_ui_element_x_arc AS
 SELECT
@@ -73,7 +73,7 @@ LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
 JOIN selector_state ON element.state=selector_state.state_id
 AND selector_state.cur_user = "current_user"()::text;
 
-
+-- definiton updated on 3.1.110
 drop view if exists v_ui_element_x_node cascade; 
 CREATE OR REPLACE VIEW v_ui_element_x_node AS
 SELECT
@@ -98,7 +98,7 @@ LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
 JOIN selector_state ON element.state=selector_state.state_id
 AND selector_state.cur_user = "current_user"()::text;
 
-
+-- definiton updated on 3.1.110
 drop view if exists v_ui_element_x_connec cascade; 
 CREATE OR REPLACE VIEW v_ui_element_x_connec AS
 SELECT

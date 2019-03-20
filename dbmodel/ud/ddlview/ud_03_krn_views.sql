@@ -94,7 +94,7 @@ UNION
   WHERE v_edit_gully.arc_id IS NOT NULL;
 
 
-
+-- definiton updated on 3.1.110
 DROP VIEW IF EXISTS v_ui_element_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_gully AS
 SELECT
