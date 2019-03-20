@@ -530,9 +530,11 @@ BEGIN
 	EXECUTE FORMAT ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=%s)a', v_id)
             INTO v_geometry;
 
-        IF v_geometry IS NULL AND v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-		EXECUTE FORMAT('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM %s WHERE %s_id::text=%s::text)a', v_featuretype, v_featuretype, v_featureid)
-			INTO v_geometry;
+        IF isnewvisit IS FALSE THEN        
+		IF v_geometry IS NULL AND v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
+			EXECUTE FORMAT('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM %s WHERE %s_id::text=%s::text)a', v_featuretype, v_featuretype, v_featureid)
+				INTO v_geometry;
+		END IF;
 	END IF;
     		
 	-- Create new form

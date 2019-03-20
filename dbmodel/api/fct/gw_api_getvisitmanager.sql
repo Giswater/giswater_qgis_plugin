@@ -171,6 +171,9 @@ BEGIN
 		v_isusermanager = TRUE;
 	END IF;
 
+	-- forcing usermanager
+	v_isusermanager = TRUE;
+
 	-- setting tabs in is firstcall
 	IF v_currentactivetab IS NULL THEN 
 		v_firstcall := TRUE;
