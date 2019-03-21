@@ -64,6 +64,7 @@ BEGIN
 	insert_data = REPLACE (insert_data::text, '"NULL"', 'null');
 	insert_data = REPLACE (insert_data::text, '"null"', 'null');
 	insert_data = REPLACE (insert_data::text, '""', 'null');
+    insert_data = REPLACE (insert_data::text, '''''', 'null');
 
 --    Get visible layers
     v_visible_layers := (SELECT value FROM config_param_system WHERE parameter='api_mincut_visible_layers');
