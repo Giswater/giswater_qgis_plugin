@@ -162,7 +162,7 @@ BEGIN
 	END LOOP;
 
 	-- query text, final step
-	v_querytext := v_querytext || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || column_type_id || ')';	
+	v_querytext := quote_literal(v_querytext) || ' WHERE ' || quote_ident(v_idname) || ' = CAST(' || quote_literal(v_id) || ' AS ' || quote_literal(column_type_id) || ')';	
 
 	raise notice 'v_querytext %', v_querytext;
 

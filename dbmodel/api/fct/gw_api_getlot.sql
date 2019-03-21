@@ -83,7 +83,7 @@ BEGIN
 		SELECT gw_api_get_formfields( 'lot', 'lot', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 		-- getting values from feature
-		EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM (SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_idname, v_columntype)
+		EXECUTE ('SELECT (row_to_json(a)) FROM (SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_idname) || ' = CAST($1 AS ' || quote_literal(v_columntype) || '))a')
 			INTO v_values
 			USING v_id;
 		
@@ -125,13 +125,13 @@ BEGIN
 	v_formheader :=concat('ORDRE TREBALL - ',v_id);	
 		
 	-- actions and layermanager
-	EXECUTE FORMAT ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''lot'' AND (projecttype = %s OR projecttype = ''utils'')', quote_literal(LOWER(v_projecttype)))
+	EXECUTE ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''lot'' AND (projecttype = ' || quote_literal(LOWER(v_projecttype)) || ' OR projecttype = ''utils'')')
 		INTO v_formactions, v_layermanager;
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
 
 	-- getting geometry
-	EXECUTE FORMAT ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit_lot WHERE id=%s)a', v_id)
+	EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit_lot WHERE id=' || quote_literal(v_id) || ')a')
             INTO v_geometry;
             
  		

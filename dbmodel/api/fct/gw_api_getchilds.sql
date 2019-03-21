@@ -93,7 +93,7 @@ BEGIN
 		--  Combo rows child CATALOG
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_id, widgettype, column_id as widgetname,
 		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate
-		FROM config_api_form_fields WHERE formname = '''||v_parameter||''' AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
+		FROM config_api_form_fields WHERE formname = '||quote_literal(v_parameter)||' AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
 		v_formtype='catalog';
@@ -117,11 +117,11 @@ BEGIN
 		
 		-- Get combo id's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_combovalue IS NOT NULL THEN
-			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_combovalue)||'
+			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((v_aux_json_child->>'dv_querytext'))||quote_literal((v_aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(quote_literal(v_combovalue))||'
 			 ORDER BY idval) a';
 			execute query_text INTO combo_json_child;
 		ELSE 	
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(v_aux_json_child->>'dv_querytext')||' ORDER BY idval)a' INTO combo_json_child;
+			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((v_aux_json_child->>'dv_querytext'))||' ORDER BY idval)a' INTO combo_json_child;
 		END IF;
 		combo_json_child := COALESCE(combo_json_child, '[]');
 		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
@@ -131,7 +131,7 @@ BEGIN
 			query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_combovalue)||' ORDER BY idval) a';
 			execute query_text INTO combo_json_child;
 		ELSE 	
-			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(v_aux_json_child->>'dv_querytext')||' ORDER BY idval)a'
+			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||quote_literal((v_aux_json_child->>'dv_querytext'))||' ORDER BY idval)a'
 				INTO combo_json_child;
 		END IF;
 		combo_json_child := COALESCE(combo_json_child, '[]');

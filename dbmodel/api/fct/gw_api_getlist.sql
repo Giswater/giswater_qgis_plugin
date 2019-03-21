@@ -357,7 +357,7 @@ BEGIN
 		v_limit = 10;
 	END IF;
 	
-	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
+	EXECUTE 'SELECT count(*)/'||quote_literal(v_limit)||' FROM (' || quote_literal(v_query_result) || ') a'
 		INTO v_lastpage;
 	
 	-- add limit
@@ -377,7 +377,7 @@ BEGIN
 	RAISE NOTICE '--- gw_api_getlist - Query Result: % ---', v_query_result;
 
 	-- Execute query result
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(v_query_result) || ') a'
 		INTO v_result_list;
 
 	RAISE NOTICE '--- gw_api_getlist - List: % ---', v_result_list;

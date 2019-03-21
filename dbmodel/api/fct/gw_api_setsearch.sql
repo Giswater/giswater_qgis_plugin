@@ -283,7 +283,7 @@ IF tab_arg = 'network' THEN
     IF id_arg = '' THEN 
         -- Get Ids for type combo
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||query_text||')b
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||quote_literal(query_text)||')b
                     WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(text_arg) || ' 
                     ORDER BY search_field LIMIT 10) a'
                     INTO response_json;
@@ -302,7 +302,7 @@ raise notice 'qt2 %', qt2;
       
 
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||query_text||')b
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||quote_literal(query_text)||')b
                     WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(text_arg) || ' AND sys_table_id = '||quote_literal(id_arg)||'
                     ORDER BY search_field LIMIT 10) a'
                     INTO response_json;
@@ -354,12 +354,12 @@ ELSIF tab_arg = 'address' THEN
 
     -- Get street
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||v_street_layer||'.'||v_street_id_field||' as id,'||v_street_layer||'.'||v_street_display_field||' as display_name, 
-        st_astext(st_envelope('||v_street_layer||'.'||v_street_geom_field||'))
-        FROM '||v_street_layer||'
-        JOIN '||v_muni_layer||' ON '||v_muni_layer||'.'||v_muni_id_field||' = '||v_street_layer||'.'||v_street_muni_id_field ||'
-        WHERE '||v_muni_layer||'.'||v_muni_display_field||' = '||quote_literal(name_arg)||'
-        AND '||v_street_layer||'.'||v_street_display_field||' ILIKE '''||text_arg||''' LIMIT 10 )a'
+        FROM (SELECT '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' as id,'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' as display_name, 
+        st_astext(st_envelope('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_geom_field)||'))
+        FROM '||quote_ident(v_street_layer)||'
+        JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_identv_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_identv_street_muni_id_field) ||'
+        WHERE '||quote_ident(v_muni_layer)||'.'||quote_identv_muni_display_field)||' = '||quote_literal(name_arg)||'
+        AND '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
         INTO response_json;
     raise notice'response %', response_json;
 
@@ -419,10 +419,10 @@ ELSIF tab_arg = 'address' THEN
 
     --  Search in the workcat
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||v_workcat_display_field||' as display_name, '||quote_literal(v_workcat_layer)||' AS sys_table_id , 
-        '||(v_workcat_id_field)||' AS sys_id, '||quote_literal(v_workcat_layer)||' 
-        AS sys_idname, '||quote_literal(v_filter_text)||' AS filter_text FROM '||v_workcat_layer|| '
-        WHERE '||v_workcat_display_field||'::text ILIKE '''||text_arg||''' LIMIT 10 )a'
+        FROM (SELECT '||quote_ident(v_workcat_display_field)||' as display_name, '||quote_literal(v_workcat_layer)||' AS sys_table_id , 
+        '||quote_ident((v_workcat_id_field))||' AS sys_id, '||quote_literal(v_workcat_layer)||' 
+        AS sys_idname, '||quote_literal(v_filter_text)||' AS filter_text FROM '||quote_ident(v_workcat_layer)|| '
+        WHERE '||quote_ident(v_workcat_display_field)||'::text ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
         INTO response_json;
 
 -- Visit tab
@@ -441,10 +441,10 @@ ELSIF tab_arg = 'address' THEN
 
     --  Search in the visit
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||v_visit_display_field||'::text as display_name, '||quote_literal(v_visit_layer)||' AS sys_table_id , 
-        '||(v_visit_id_field)||' AS sys_id, '||quote_literal(v_visit_layer)||' 
+        FROM (SELECT '||quote_ident(v_visit_display_field)||'::text as display_name, '||quote_literal(v_visit_layer)||' AS sys_table_id , 
+        '||quote_ident((v_visit_id_field))||' AS sys_id, '||quote_literal(v_visit_layer)||' 
         AS sys_idname FROM '||v_visit_layer||'  
-        WHERE '||v_visit_display_field||'::text ILIKE '''||text_arg||''' LIMIT 10 )a'
+        WHERE '||quote_ident(v_visit_display_field)||'::text ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
         INTO response_json;
 
 
@@ -480,12 +480,12 @@ ELSIF tab_arg = 'address' THEN
 
     -- Get psector (improved version)
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT '||v_psector_layer||'.'||v_psector_display_field||' as display_name, '||quote_literal(v_psector_layer)||' AS sys_table_id , 
-        '||v_psector_layer||'.'||(v_psector_id_field)||' AS sys_id, '||quote_literal(v_psector_layer)||' AS sys_idname 
-        FROM '||v_psector_layer||'  
-        JOIN '||v_exploitation_layer||' ON '||v_exploitation_layer||'.'||v_exploitation_id_field||' = '||v_psector_layer||'.'||v_psector_parent_field||'
-        WHERE '||v_exploitation_layer||'.'||v_exploitation_display_field||' = '||quote_literal(name_arg)||'
-        AND '||v_psector_layer||'.'||v_psector_display_field||' ILIKE '''||text_arg||''' LIMIT 10 )a'
+        FROM (SELECT '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_display_field)||' as display_name, '||quote_literal(v_psector_layer)||' AS sys_table_id , 
+        '||quote_ident(v_psector_layer)||'.'||quote_ident((v_psector_id_field))||' AS sys_id, '||quote_literal(v_psector_layer)||' AS sys_idname 
+        FROM '||quote_ident(v_psector_layer)||'  
+        JOIN '||quote_ident(v_exploitation_layer)||' ON '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_id_field)||' = '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_parent_field)||'
+        WHERE '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
+        AND '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_display_field)||' ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
         INTO response_json;
     ELSE
  

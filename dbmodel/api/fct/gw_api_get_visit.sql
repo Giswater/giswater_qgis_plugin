@@ -202,10 +202,10 @@ BEGIN
 	
 	-- Check if exists some open visit on related feature with the class configured as vdefault for user
 	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL AND v_visitclass IS NOT NULL THEN
-		EXECUTE FORMAT ('SELECT v.id FROM om_visit_x_%s a JOIN om_visit v ON v.id=a.visit_id '||
-			' WHERE %s_id = %s::text AND (status > 0 OR status = 0 AND (now()- enddate) < ''8 hours'') ' ||
-			' AND class_id = %s'
-			' ORDER BY startdate DESC LIMIT 1',v_featuretype, v_featuretype, v_featureid, v_visitclass)
+		EXECUTE ('SELECT v.id FROM om_visit_x_' || quote_literal(v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
+			' WHERE ' || quote_ident(v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0 OR status = 0 AND (now()- enddate) < ''8 hours'') ' ||
+			' AND class_id = ' || quote_literal(v_visitclass) || ''
+			' ORDER BY startdate DESC LIMIT 1')
 			INTO v_existvisit_id;
 			
 		IF v_existvisit_id IS NOT NULL THEN
@@ -385,8 +385,8 @@ BEGIN
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 
 				-- getting values from feature
-				EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM 
-					(SELECT * FROM %s WHERE %s = CAST($1 AS %s))a',v_tablename, v_idname, v_columntype)
+				EXECUTE ('SELECT (row_to_json(a)) FROM 
+					(SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_idname) || ' = CAST($1 AS ' || quote_literal(v_columntype) || '))a')
 					INTO v_values
 					USING v_id;
 	
@@ -527,12 +527,12 @@ BEGIN
 	END IF;
 
 	-- getting geometry
-	EXECUTE FORMAT ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=%s)a', v_id)
+	EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=' || quote_literal(v_id) || ')a')
             INTO v_geometry;
 
         IF isnewvisit IS FALSE THEN        
 		IF v_geometry IS NULL AND v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-			EXECUTE FORMAT('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM %s WHERE %s_id::text=%s::text)a', v_featuretype, v_featuretype, v_featureid)
+			EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM ' || quote_ident(v_featuretype) || ' WHERE ' || quote_ident(v_featuretype) || '_id::text=' || quote_literal(v_featureid) || '::text)a')
 				INTO v_geometry;
 		END IF;
 	END IF;

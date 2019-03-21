@@ -97,13 +97,13 @@ IF v_tab = 'address' THEN
 
 	-- Get address
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-		FROM (SELECT '||v_address_layer||'.'||v_address_display_field||' as display_name, st_x ('||v_address_layer||'.'||v_address_geom_id_field||') as sys_x
-		,st_y ('||v_address_layer||'.'||v_address_geom_id_field||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid
-		FROM '||v_address_layer||'
-		JOIN '||v_street_layer||' ON '||v_street_layer||'.'||v_street_id_field||' = '||v_address_layer||'.'||v_address_street_id_field ||'
-		WHERE '||v_street_layer||'.'||v_street_display_field||' = $$'||v_idarg||'$$
-		AND '||v_street_layer||'.'||v_street_muni_id_field||' = '||v_muni||'
-		AND '||v_address_layer||'.'||v_address_display_field||' ILIKE '''||v_searchtext||''' LIMIT 10 
+		FROM (SELECT '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' as display_name, st_x ('||quote_ident(v_address_layer)||'.'||quote_ident(v_address_geom_id_field)||') as sys_x
+		,st_y ('||quote_ident(v_address_layer)||'.'||quote_ident(v_address_geom_id_field)||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid
+		FROM '||quote_ident(v_address_layer)||'
+		JOIN '||quote_ident(v_street_layer)||' ON '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' = '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_street_id_field) ||'
+		WHERE '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' = $$'||quote_literal(v_idarg)||'$$
+		AND '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field)|' = '||quote_literal(v_muni)||'
+		AND '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' ILIKE '||quote_literal(v_searchtext)||' LIMIT 10 
 		)a'
 		INTO v_response;
 

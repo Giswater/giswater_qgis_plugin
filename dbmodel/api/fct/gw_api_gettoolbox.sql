@@ -46,7 +46,7 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json, context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_om''
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| quote_literal(v_filter) ||'%'' AND sys_role_id =''role_om''
 		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_om_fields;
@@ -56,7 +56,7 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json, return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_edit''
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| quote_literal(v_filter) ||'%'' AND sys_role_id =''role_edit''
 		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_edit_fields;
@@ -66,7 +66,7 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa''
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| quote_literal(v_filter) ||'%'' AND sys_role_id =''role_epa''
 		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_epa_fields;
@@ -77,7 +77,7 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_master''
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| quote_literal(v_filter) ||'%'' AND sys_role_id =''role_master''
 		 AND (project_type='||quote_literal(v_projectype)||' OR project_type=''utils'')) a'
 		USING v_filter
 		INTO v_master_fields;
@@ -87,7 +87,7 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
 		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_admin''
+		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| quote_literal(v_filter) ||'%'' AND sys_role_id =''role_admin''
 		 AND (project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
 		USING v_filter
 		INTO v_admin_fields;

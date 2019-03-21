@@ -116,8 +116,8 @@ BEGIN
      raise notice 'v_visiblelayer %', v_visiblelayer;
 
 --  Get element
-     v_sql := 'SELECT layer_id, 0 as orderby FROM  '||v_config_layer||' WHERE layer_id= '||quote_literal(v_activelayer)||' UNION 
-              SELECT layer_id, orderby FROM  '||v_config_layer||' WHERE layer_id = any('''||v_visiblelayer||'''::text[]) ORDER BY orderby';
+     v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '||quote_literal(v_activelayer)||' UNION 
+              SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) ORDER BY orderby';
 
     FOR v_layer IN EXECUTE v_sql 
     LOOP
@@ -152,19 +152,19 @@ BEGIN
 	
 
         --  Indentify geometry type
-        EXECUTE 'SELECT st_geometrytype ('||v_the_geom||') FROM '||v_layer||';' 
+        EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
         INTO v_geometrytype;
 
         IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
 
             --  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
-            EXECUTE 'SELECT '||v_idname||' FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
+            EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
 		    ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc LIMIT 1'
                     INTO v_id
                     USING v_point, v_sensibility;
         ELSE
             --  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-            EXECUTE 'SELECT '||v_idname||' FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
+            EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
 		    ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc LIMIT 1'
                     INTO v_id
                     USING v_point, v_sensibility;
@@ -190,8 +190,8 @@ BEGIN
     END IF;
     
 --   Get editability of layer
-    EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id = any('''||v_visiblelayer||'''::text[]) THEN ''True'' ELSE ''False'' END) 
-            FROM  '||v_config_layer||' WHERE layer_id='||quote_literal(v_layer)||';'
+    EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) THEN ''True'' ELSE ''False'' END) 
+            FROM  '||quote_ident(v_config_layer)||' WHERE layer_id='||quote_literal(v_layer)||';'
             INTO v_iseditable;
 	RAISE NOTICE '----------------%',v_toolbar;
 --   Call and return gw_api_getinfofromid

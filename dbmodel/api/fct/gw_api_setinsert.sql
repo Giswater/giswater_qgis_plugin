@@ -160,7 +160,7 @@ BEGIN
 	END LOOP;
 
 	-- query text, final step
-	v_querytext := concat (v_querytext,' ) RETURNING ',quote_ident(v_idname));
+	v_querytext := concat (quote_literal(v_querytext),' ) RETURNING ',quote_ident(v_idname));
 
 	RAISE NOTICE '--- Insert new file with query:: % ---', v_querytext;
 	

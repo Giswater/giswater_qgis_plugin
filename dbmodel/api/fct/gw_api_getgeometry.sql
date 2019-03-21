@@ -96,7 +96,7 @@ BEGIN
            
 	-- get geometry
 	IF v_the_geom IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||v_the_geom||') FROM '||v_tablename||' WHERE '||v_idname||' = CAST('||quote_nullable(v_id)||' AS '||v_columntype||'))row'
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||quote_literal(v_columntype)||'))row'
 		INTO v_geometry;
 	END IF;
 	

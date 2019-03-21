@@ -121,7 +121,7 @@ BEGIN
 	LOOP	
 		IF (aux_json->>'dv_parent_id') IS null THEN
 			-- Get combo id's
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
+			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((aux_json->>'dv_querytext'))||' ORDER BY idval)a'
 				INTO combo_json;
 
 			raise notice 'aux_json %', aux_json;
@@ -130,7 +130,7 @@ BEGIN
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
 
 			-- Get combo values
-			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
+			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||quote_literal((aux_json->>'dv_querytext'))||' ORDER BY idval)a'
 				INTO combo_json; 
 				combo_json := COALESCE(combo_json, '[]');
 
@@ -154,10 +154,10 @@ BEGIN
 					raise notice 'v_selected_id %',v_selected_id;
 					-- Get combo id's
 					IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN	
-						query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
+						query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||quote_literal((aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
 						execute query_text INTO combo_json_child;
 					ELSE 	
-						EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY idval)a' INTO combo_json_child;
+						EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||' ORDER BY idval)a' INTO combo_json_child;
 					END IF;
 					raise notice 'combo_json_child %',combo_json_child;
 					-- Update array
@@ -165,10 +165,10 @@ BEGIN
 					fields_array[(aux_json->>'orderby')::INT+1] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT+1], 'selectedId', aux_json->>'value');      
 					-- Get combo values
 					IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN
-						query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
+						query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||quote_literal((aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(quote_literal(v_selected_id))||' ORDER BY idval) a';
 						execute query_text INTO combo_json_child;
 					ELSE 	
-						EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY idval)a'
+						EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(quote_literal(aux_json_child->>'dv_querytext'))||' ORDER BY idval)a'
 							INTO combo_json_child;
 					END IF;
 					raise notice 'combo_json_child %',combo_json_child;

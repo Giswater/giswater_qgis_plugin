@@ -69,7 +69,7 @@ BEGIN
 
 		raise notice 'v_activelayer %', v_activelayer;
  		-- set zoom on canvas
-		EXECUTE ' SELECT row_to_json (b) FROM (SELECT st_astext(st_envelope(st_extent(the_geom))) FROM (SELECT the_geom FROM '||v_activelayer||' WHERE lot_id= '||v_id||')a)b'    
+		EXECUTE ' SELECT row_to_json (b) FROM (SELECT st_astext(st_envelope(st_extent(the_geom))) FROM (SELECT the_geom FROM '||quote_ident(v_activelayer)||' WHERE lot_id= '||quote_literal(v_id)||')a)b'    
 			INTO v_rectgeometry;
 		
 		-- set selector

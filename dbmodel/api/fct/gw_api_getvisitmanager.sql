@@ -215,8 +215,8 @@ BEGIN
 				SELECT gw_api_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				-- getting values from feature
-				EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM 
-					(SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_user_id, v_columntype)
+				EXECUTE ('SELECT (row_to_json(a)) FROM 
+					(SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_user_id) || ' = CAST($1 AS ' || quote_literal(v_columntype) || '))a')
 					INTO v_values
 					USING current_user;
 		
@@ -371,7 +371,7 @@ BEGIN
 		END IF;
 	
 		-- actions and layermanager
-		EXECUTE FORMAT ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''visitManager'' AND (projecttype = %s OR projecttype = ''utils'')', quote_literal(LOWER(v_projecttype)))
+		EXECUTE ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''visitManager'' AND (projecttype = ' || quote_literal(LOWER(v_projecttype)) || ' OR projecttype = ''utils'')')
 			INTO v_formactions, v_layermanager;
 
 		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);

@@ -191,7 +191,7 @@ BEGIN
 	FOREACH v_value IN ARRAY list_values
 	LOOP
 		EXECUTE 'SELECT value
-		FROM config_param_user WHERE parameter = '''|| v_value ||''' AND cur_user = current_user'
+		FROM config_param_user WHERE parameter = '|| quote_literal(v_value) ||' AND cur_user = current_user'
 		INTO v_vdefault_values;
 		v_vdefault_array := gw_fct_json_object_set_key(v_vdefault_array, v_value, COALESCE(v_vdefault_values));
 	END LOOP;
@@ -245,7 +245,7 @@ BEGIN
 --     Get geometry (to feature response)
 ------------------------------------------
 	IF v_the_geom IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||v_the_geom||') FROM '||v_tablename||' WHERE '||v_idname||' = CAST('||quote_nullable(v_id)||' AS '||column_type||'))row'
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||quote_literal(column_type)||'))row'
 		INTO v_geometry;
 	END IF;
 
@@ -257,13 +257,13 @@ BEGIN
 
 	IF  link_id_aux IS NOT NULL THEN 
 		-- Get link field value
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||link_id_aux||' FROM '||v_tablename||' WHERE '||v_idname||' = CAST('||quote_nullable(v_id)||' AS '||column_type||'))row'
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||quote_literal(column_type)||'))row'
 		INTO v_linkpath;
 
 		-- IF v_linkpath is null and layer it's child layer --> parent v_linkpath is used
 		IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
 			-- Get link field value
-			EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||link_id_aux||' FROM '||v_tablename||' WHERE '||v_idname||' = CAST('||quote_nullable(v_id)||' AS '||column_type||'))row'
+			EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||quote_literal(column_type)||'))row'
 			INTO v_linkpath;
 		END IF;
 	END IF;
@@ -316,7 +316,7 @@ BEGIN
 		-- Identify tableinfotype_id		
 		EXECUTE' SELECT tableinfotype_id FROM config_api_layer_child
 			JOIN config_api_tableinfo_x_infotype ON config_api_layer_child.tableinfo_id=config_api_tableinfo_x_infotype.tableinfo_id 
-			WHERE featurecat_id= (SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1) 
+			WHERE featurecat_id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 			AND infotype_id=$2'
 			INTO v_tablename
 			USING v_id, v_infotype;
@@ -337,7 +337,7 @@ BEGIN
 			USING v_tablename;
 			
 		-- Identify tableinfo
-		EXECUTE' SELECT epatable FROM '||tableparent_id_arg||' WHERE nid::text=$1'
+		EXECUTE' SELECT epatable FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1'
 			INTO v_tablename
 			USING v_id;
 
@@ -358,7 +358,7 @@ BEGIN
 				-- Identify tableinfotype_id		
 			EXECUTE' SELECT tableinfotype_id FROM config_api_layer_child
 				JOIN config_api_tableinfo_x_infotype ON config_api_layer_child.tableinfo_id=config_api_tableinfo_x_infotype.tableinfo_id 
-				WHERE featurecat_id= (SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text=$1) 
+				WHERE featurecat_id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1) 
 				AND infotype_id=$2'
 				INTO v_tablename
 				USING v_id, v_infotype;	
@@ -444,7 +444,7 @@ BEGIN
 	--   Get editability
 	------------------------
 	IF v_editable THEN 
-		EXECUTE 'SELECT gw_api_getpermissions($${"tableName":"'||v_tablename||'"}$$::json)'
+		EXECUTE 'SELECT gw_api_getpermissions($${"tableName":"'||quote_literal(v_tablename)||'"}$$::json)'
 			INTO v_permissions;
 			v_editable := v_permissions->>'isEditable';
 	ELSE

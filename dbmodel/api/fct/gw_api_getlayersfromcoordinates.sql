@@ -118,8 +118,8 @@ BEGIN
 --   Make point
      SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
 
-     v_sql := 'SELECT layer_id, 0 as orderby FROM  '||v_config_layer||' WHERE layer_id= '''' UNION 
-              SELECT layer_id, orderby FROM  '||v_config_layer||' WHERE layer_id = any('''||v_visibleLayers||'''::text[]) ORDER BY orderby';
+     v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
+              SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visibleLayers)||'::text[]) ORDER BY orderby';
 
 	raise notice 'v_sql -> %', v_sql;
     FOR v_layer IN EXECUTE v_sql 
@@ -157,7 +157,7 @@ BEGIN
 	
 
         --  Indentify geometry type
-        EXECUTE 'SELECT st_geometrytype ('||v_the_geom||') FROM '||v_layer||';' 
+        EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
         INTO v_geometrytype;
 
 	RAISE NOTICE 'Feature geometry: % ', v_geometry;
@@ -179,7 +179,7 @@ BEGIN
 	IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
             --  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
             EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-		    SELECT '||v_idname||' AS id, '||v_the_geom||' as the_geom, (SELECT St_AsText('||v_the_geom||') as geometry) FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
+		    SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
 		    ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc) a'
                     INTO v_ids
                     USING v_point, v_sensibility;
@@ -189,8 +189,8 @@ BEGIN
         raise notice 'v_sensibility %',v_sensibility;
             --  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
             EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-		    SELECT '||v_idname||' AS id, '||v_the_geom||' as the_geom, (SELECT St_AsText('||v_the_geom||') as geometry) FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
-		    ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc) a'
+		    SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+		    ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
                     INTO v_ids
                     USING v_point, v_sensibility;
                     xxx:='SELECT array_agg(row_to_json(a)) FROM (
@@ -204,7 +204,7 @@ BEGIN
        --     Get geometry (to feature response)
 ------------------------------------------
 	IF v_the_geom IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||v_the_geom||') FROM '||v_layer||' WHERE '||v_idname||' = ('||quote_nullable(v_ids)||'))row'
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||' WHERE '||quote_ident(v_idname)||' = ('||quote_nullable(v_ids)||'))row'
 		INTO v_geometry;
 	END IF;
 	

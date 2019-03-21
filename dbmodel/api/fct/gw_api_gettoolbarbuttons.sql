@@ -52,7 +52,7 @@ BEGIN
 
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT idval as "buttonName", buttonoptions as  "buttonOptions" 
 		FROM SCHEMA_NAME.config_api_toolbar_buttons WHERE (project_type =''utils'' or project_type='||quote_literal(LOWER(v_projectype))||')
-		AND idval = any('''||v_clientbuttons||'''::text[]) ) a'
+		AND idval = any('||quote_literal(v_clientbuttons)||'::text[]) ) a'
 		INTO v_buttons;
 
 --    Control NULL's

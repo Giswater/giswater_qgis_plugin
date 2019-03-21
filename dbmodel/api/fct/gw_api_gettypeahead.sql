@@ -67,7 +67,7 @@ BEGIN
 	ELSE
 		v_querytext = concat (v_querytext, v_querytextparent, quote_literal(v_parentvalue)); 
 	END IF;
-	v_querytext = concat ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (', v_querytext, ' AND ', v_fieldtosearch , ' ILIKE ''%', v_textosearch, '%'' LIMIT 10) a');
+	v_querytext = concat ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (', quote_literal(v_querytext), ' AND ', quote_ident(v_fieldtosearch) , ' ILIKE ''%', quote_literal(v_textosearch), '%'' LIMIT 10) a');
 
 	-- execute query text
 	EXECUTE v_querytext INTO v_response;

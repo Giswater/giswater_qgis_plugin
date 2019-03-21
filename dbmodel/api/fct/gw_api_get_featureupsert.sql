@@ -297,16 +297,16 @@ BEGIN
 			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'connecat_id' OR (a->>'param') = 'gratecat_id';
 
 		IF v_project_type ='WS' THEN 
-			EXECUTE 'SELECT pn, dn, matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
+			EXECUTE 'SELECT pn, dn, matcat_id FROM cat_'||quote_literal(lower(v_catfeature.type))||' WHERE id=$1'
 				USING v_catalog
 				INTO v_pnom, v_dnom, v_matcat_id;
 		ELSIF v_projecttype ='UD' THEN 
 			IF v_catfeature.type ='GULLY' THEN
-				EXECUTE 'SELECT matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
+				EXECUTE 'SELECT matcat_id FROM cat_'||quote_literal(lower(v_catfeature.type))||' WHERE id=$1'
 					USING v_catalog
 					INTO v_matcat_id;
 			ELSE
-				EXECUTE 'SELECT shape, geom1, geom2, matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
+				EXECUTE 'SELECT shape, geom1, geom2, matcat_id FROM cat_'||quote_literal(lower(v_catfeature.type))||' WHERE id=$1'
 					USING v_catalog
 					INTO v_shape, v_geom1, v_geom2, v_matcat_id;
 			END IF;
@@ -315,7 +315,7 @@ BEGIN
 	-- getting values on insert from feature
 	ELSIF p_tg_op ='UPDATE' THEN	
 		EXECUTE 'SELECT (row_to_json(a)) FROM 
-			(SELECT * FROM '||p_table_id||' WHERE '||v_idname||' = CAST($1 AS '||v_columntype||'))a'
+			(SELECT * FROM '||quote_ident(p_table_id)||' WHERE '||quote_ident(v_idname)||' = CAST($1 AS '||quote_literal(v_columntype)||'))a'
 			INTO v_values_array
 			USING p_id;
 	END IF;
@@ -341,7 +341,7 @@ BEGIN
 			ELSIF (aux_json->>'column_id') = 'gis_length' THEN
 				field_value = v_gislength;
 			ELSIF  (aux_json->>'column_id')='epa_type' THEN
-				EXECUTE 'SELECT epa_default FROM '||(v_catfeature.type)||'_type WHERE id = $1'
+				EXECUTE 'SELECT epa_default FROM '||quote_literal((v_catfeature.type))||'_type WHERE id = $1'
 					INTO field_value
 					USING v_catfeature.system_id;
 			-- mapzones values

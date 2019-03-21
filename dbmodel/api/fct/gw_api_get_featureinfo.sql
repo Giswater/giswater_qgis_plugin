@@ -129,7 +129,7 @@ BEGIN
 	raise notice 'Layer pkey: % ; Column_type %', table_pkey, column_type;
 --    getting values
     EXECUTE 'SELECT (row_to_json(a)) FROM 
-	    (SELECT * FROM '||p_table_id||' WHERE '||table_pkey||' = CAST($1 AS '||column_type||'))a'
+	    (SELECT * FROM '||quote_ident(p_table_id)||' WHERE '||quote_ident(table_pkey)||' = CAST($1 AS '||quote_literal(column_type)||'))a'
 	    INTO v_values_array
 	    USING p_id;
 --    Fill every value
