@@ -130,9 +130,9 @@ class CadAddPoint(ParentMapTool):
 
         # Snapping
         if self.snap_to_selected_layer:
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
         else:
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
 
         # That's the snapped features
         if result:
@@ -217,7 +217,7 @@ class CadAddPoint(ParentMapTool):
         else:
             # Get current layer
             self.vdefault_layer = self.iface.activeLayer()
-
+        self.controller.log_info(str(self.vdefault_layer.name()))
         # Set snapping
         self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
