@@ -15,7 +15,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 
-changelog=Version 3.2.000
+changelog=Version 3.2.001
     - todo
 
 # Tags are comma separated with spaces allowed
