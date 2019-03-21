@@ -106,7 +106,7 @@ BEGIN
             INTO query_result_def_code;
 
 	-- setting sequence of visit (as profilactic issue)
-	PERFORM setval ('ws_sample.om_visit_id_seq', (SELECT max(id) FROM ws_sample.om_visit), true);
+	PERFORM setval ('om_visit_id_seq', (SELECT max(id) FROM om_visit), true);
 
 --        Insert visit
         EXECUTE 'INSERT INTO om_visit (visitcat_id,the_geom) VALUES ($1, $2) RETURNING id'

@@ -115,7 +115,7 @@ BEGIN
         END IF;     
 
 	-- setting sequence of mincut (as profilactic issue)
-	PERFORM setval ('ws_sample.anl_mincut_result_cat_seq', (SELECT max(id) FROM ws_sample.anl_mincut_result_cat), true);
+	PERFORM setval ('anl_mincut_result_cat_seq', (SELECT max(id) FROM anl_mincut_result_cat), true);
      
         -- Insert mincut
         EXECUTE 'INSERT INTO anl_mincut_result_cat (anl_the_geom) VALUES ($1) RETURNING id'
