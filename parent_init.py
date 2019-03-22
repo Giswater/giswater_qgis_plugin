@@ -779,9 +779,12 @@ class ParentDialog(QDialog):
         self.set_completer_object(dialog, self.table_object)
 
 
-    def set_filter_dates(self, mindate, maxdate, tablename, widget_fromdate, widget_todate):
+    def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate):
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
         sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(maxdate)+")"
-               " FROM {}.{}".format(self.schema_name, str(tablename)))
+               " FROM {}".format(str(table_name)))
         row = self.controller.get_row(sql, log_sql=True)
         if row:
             if row[0]:
@@ -1324,7 +1327,7 @@ class ParentDialog(QDialog):
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
-
+        self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
 
     def set_filter_table_event(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
