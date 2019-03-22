@@ -212,7 +212,7 @@ class ParentDialog(QDialog):
         # Builddate
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'builtdate_vdefault'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_sql=False)
         if row:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
             utils_giswater.setCalendarDate(dialog, "builtdate", date_value)
