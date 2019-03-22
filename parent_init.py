@@ -215,9 +215,7 @@ class ParentDialog(QDialog):
         row = self.controller.get_row(sql)
         if row:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
-        else:
-            date_value = QDateTime.currentDateTime()
-        utils_giswater.setCalendarDate(dialog, "builtdate", date_value)
+            utils_giswater.setCalendarDate(dialog, "builtdate", date_value)
 
         # State
         sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
