@@ -669,24 +669,24 @@ class ParentDialog(QDialog):
         
     def set_filter_table_man(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
-        
-        # Get selected dates
-        date_from = self.date_document_from.date().toString('yyyyMMdd') 
-        date_to = self.date_document_to.date().toString('yyyyMMdd') 
+         # Get selected dates
+        date_from = self.date_document_from.date().toString('yyyyMMdd')
+        date_to = self.date_document_to.date().addDays(1).toString('yyyyMMdd')
+
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message)                   
+            self.controller.show_warning(message)
             return
-        
+
         # Set filter
         expr = self.field_id+" = '"+self.id+"'"
         expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
-        
+
         # Get selected values in Comboboxes        
-        doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type")
-        if doc_type_value != 'null' or doc_type_value is not None:
+        doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type", return_string_null=False)
+        if doc_type_value  not in ('', None):
             expr += " AND doc_type = '"+str(doc_type_value)+"'"
-  
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()  
@@ -770,15 +770,32 @@ class ParentDialog(QDialog):
                " ORDER BY id")
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(dialog, "doc_type", rows)
-        
+
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, expr_filter)
-        
+        self.set_filter_dates('date', 'date', table_name, self.date_document_from, self.date_document_to)
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"        
         self.set_completer_object(dialog, self.table_object)
-        
-        
+
+
+    def set_filter_dates(self, mindate, maxdate, tablename, widget_fromdate, widget_todate):
+        sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(maxdate)+")"
+               " FROM {}.{}".format(self.schema_name, str(tablename)))
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            if row[0]:
+                widget_fromdate.setDate(row[0])
+            else:
+                current_date = QDate.currentDate()
+                widget_fromdate.setDate(current_date)
+            if row[1]:
+                widget_todate.setDate(row[1])
+            else:
+                current_date = QDate.currentDate()
+                widget_todate.setDate(current_date)
+
+
     def set_completer_object(self, dialog, table_object):
         """ Set autocomplete of widget @table_object + "_id" 
             getting id's from selected @table_object 
