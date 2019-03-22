@@ -462,13 +462,13 @@ class ParentDialog(QDialog):
             self.controller.log_info("set_model_to_table: widget not found")
 
 
-    def manage_document(self, dialog, doc_id=None, feature=None):
+    def manage_document(self, dialog, doc_id=None, feature=None, table_name=None):
         """ Execute action of button 34 """
                 
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
         doc.manage_document(feature=feature, geom_type=self.geom_type)
-        doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
-        doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
+        doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc, table_name))
+        doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc, table_name))
                  
         # Set completer
         self.set_completer_object(dialog, self.table_object)
@@ -479,7 +479,7 @@ class ParentDialog(QDialog):
         doc.open_dialog()
 
 
-    def manage_document_new(self, dialog, doc):
+    def manage_document_new(self, dialog, doc, table_name):
         """ Get inserted doc_id and add it to current feature """
 
         if doc.doc_id is None:
@@ -487,6 +487,7 @@ class ParentDialog(QDialog):
 
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_document")
+        self.set_filter_dates('date', 'date', table_name, self.date_document_from, self.date_document_to)
 
 
     def manage_element(self, dialog, element_id=None, feature=None):
@@ -777,7 +778,7 @@ class ParentDialog(QDialog):
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
         btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
-        btn_doc_new.clicked.connect(partial(self.manage_document, dialog, None, self.feature))
+        btn_doc_new.clicked.connect(partial(self.manage_document, dialog, None, self.feature, table_name))
 
         # Set dates
         date = QDate.currentDate()
@@ -958,7 +959,7 @@ class ParentDialog(QDialog):
         manage_visit.edit_visit(self.geom_type, self.id)
 
 
-    def new_visit(self):
+    def new_visit(self, table_name=None):
         """ Call button 64: om_add_visit """
         # Get expl_id to save it on om_visit and show the geometry of visit
         sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation "
@@ -976,6 +977,7 @@ class ParentDialog(QDialog):
         self.controller.get_rows(sql, commit=True)
 
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id, expl_id=expl_id[0])
+        self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
 
 
     # creat the new visit GUI
@@ -1310,7 +1312,7 @@ class ParentDialog(QDialog):
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
 
         btn_open_visit.clicked.connect(self.open_visit)
-        btn_new_visit.clicked.connect(self.new_visit)
+        btn_new_visit.clicked.connect(partial(self.new_visit, table_name))
         btn_open_gallery.clicked.connect(self.open_gallery)
         btn_open_visit_doc.clicked.connect(self.open_visit_doc)
         btn_open_visit_event.clicked.connect(self.open_visit_event)
