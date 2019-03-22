@@ -54,18 +54,18 @@ BEGIN
 
 --    For views is the fir1t column
     IF table_pkey ISNULL THEN
-        EXECUTE FORMAT ('SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = %s AND ordinal_position = 1', quote_literal(table_id))
+        EXECUTE FORMAT ('SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND ordinal_position = 1')
         INTO table_pkey
         USING schemas_array[1];
     END IF;
 
 --    Get column type
-    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = %s AND column_name = $2', quote_literal(table_id))
+    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(table_id) || ' AND column_name = $2')
         USING schemas_array[1], table_pkey
         INTO column_type;
 
 --    Value update
-    EXECUTE FORMAT ('UPDATE %s SET the_geom = $1 WHERE %s = CAST( $2 AS %s )', quote_ident(table_id),  quote_ident(table_pkey) , column_type)
+    EXECUTE FORMAT ('UPDATE ' || quote_ident(table_id) || ' SET the_geom = $1 WHERE ' || quote_ident(table_pkey) || ' = CAST( $2 AS ' || quote_literal(column_type) || ' )')
     USING insert_geom, id;
 
 --    Return

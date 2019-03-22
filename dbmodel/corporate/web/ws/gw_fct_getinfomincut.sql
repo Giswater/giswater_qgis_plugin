@@ -52,7 +52,7 @@ BEGIN
 RAISE NOTICE 'Res: %', query_result;
 
 --    Get mincuts with just date filters
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' ORDER BY "result_id" DESC) a'
+    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' ORDER BY "result_id" DESC) a'
         INTO query_result_mincuts
         USING id;
 

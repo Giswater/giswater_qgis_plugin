@@ -97,12 +97,12 @@ raise notice 'p_parameter_type %', p_parameter_type;
 
 --    Get visits with all the filters
    IF query_result IS NOT NULL THEN
-    EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( %s ORDER by sys_date desc) a', query_result)
+    EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( ' || quote_literal(query_result) || ' ORDER by sys_date desc) a')
         INTO query_result_visits
         USING id;
 
 --    Get visits with just date filters
-    EXECUTE fORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( %s ORDER by sys_date desc) a', query_result)
+    EXECUTE fORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( ' || quote_literal(query_result) || ' ORDER by sys_date desc) a')
         INTO query_result_visits_dates
         USING id;
     END IF;
@@ -117,10 +117,10 @@ raise notice 'p_parameter_type %', p_parameter_type;
             INTO parameter_type_options
             USING p_element_type, p_parameter_type;
    ELSE
-        EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT sys_parameter_type AS "id", sys_parameter_type AS "name" FROM (
-        SELECT DISTINCT sys_parameter_type FROM ( %s ) c) b
+        EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT sys_parameter_type AS "id", sys_parameter_type AS "name" FROM (
+        SELECT DISTINCT sys_parameter_type FROM ( ' || quote_literal(query_result_dates) || ' ) c) b
         LEFT JOIN (VALUES ($1, 1)) AS x(value, order_number) ON sys_parameter_type = x.value 
-        ORDER BY x.order_number) a',query_result_dates)
+        ORDER BY x.order_number) a')
             INTO parameter_type_options
                     USING p_parameter_type;
                     
@@ -135,8 +135,8 @@ raise notice 'p_parameter_type %', p_parameter_type;
             INTO parameter_id_options
             USING p_element_type, p_parameter_type;
     ELSE    
-        EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT '' '' as id, '' '' as name FROM om_visit_parameter UNION 
-        SELECT DISTINCT sys_parameter_id AS "id", sys_parameter_name AS "name" FROM ( %s )b WHERE sys_parameter_type=$1 order by name asc) a', query_result_dates)
+        EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT '' '' as id, '' '' as name FROM om_visit_parameter UNION 
+        SELECT DISTINCT sys_parameter_id AS "id", sys_parameter_name AS "name" FROM ( ' || quote_literal(query_result_dates) || ' )b WHERE sys_parameter_type=$1 order by name asc) a')
         INTO parameter_id_options
         USING p_parameter_type;
     END IF;

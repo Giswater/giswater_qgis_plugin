@@ -42,7 +42,7 @@ RAISE NOTICE 'TYPE: %, %', datatype_arg, value_type;
     IF value_arg ISNULL THEN
         widget_json := gw_fct_json_object_set_key(widget_json, 'value', 'NULL'::TEXT);
     ELSE
-        EXECUTE 'SELECT gw_fct_json_object_set_key($1, ''value'', CAST(' || quote_literal(value_arg) || ' AS ' || value_type || '))'    
+        EXECUTE 'SELECT gw_fct_json_object_set_key($1, ''value'', CAST(' || quote_literal(value_arg) || ' AS ' || quote_literal(value_type) || '))'    
             INTO widget_json
             USING widget_json;
     END IF;

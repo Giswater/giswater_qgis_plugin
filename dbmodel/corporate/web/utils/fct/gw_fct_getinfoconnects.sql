@@ -62,7 +62,7 @@ BEGIN
             raise notice 'query_result %', query_result;
 
 --        Get connects
-        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE arc_id::text = $1::text) a'
+        EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' WHERE arc_id::text = $1::text) a'
             INTO query_result_connects
             USING v_id, v_element_type;
 
@@ -104,7 +104,7 @@ BEGIN
             INTO query_result
             USING device;
 --      Get connects upstream
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE node_id::text = $1) a'
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' WHERE node_id::text = $1) a'
 		INTO query_result_upstream
 		USING v_id;
 
@@ -113,7 +113,7 @@ BEGIN
             INTO query_result
             USING device;
 --        Get connects downstream
-       EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE node_id::text = $1) a'
+       EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' WHERE node_id::text = $1) a'
 		INTO query_result_downstream
 		USING v_id;       
     END IF;

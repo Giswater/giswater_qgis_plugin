@@ -273,18 +273,18 @@ IF tab_arg = 'network' THEN
 
     IF id_arg = '' THEN 
         -- Get Ids for type combo
-        EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( %s ) b
+        EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( ' || quote_literal(query_text) || ' ) b
                     WHERE search_field::text ILIKE $1 
-                    ORDER BY search_field LIMIT 10) a', query_text)
+                    ORDER BY search_field LIMIT 10) a')
                     USING text_arg
                     INTO response_json;
     ELSE 
         -- Get Ids for type combo
-        EXECUTE FORMAT('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( %s ) b
+        EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( ' || quote_literal(query_text) || ' ) b
                     WHERE search_field::text ILIKE $1 AND sys_table_id = $2
-                    ORDER BY search_field LIMIT 10) a',query_text)
+                    ORDER BY search_field LIMIT 10) a')
                     USING text_arg, id_arg
                     INTO response_json;
     END IF;
@@ -401,9 +401,9 @@ ELSIF tab_arg = 'address' THEN
     edit1 := search_data->>'workcat_search';
     text_arg := concat('%', edit1->>'text' ,'%');
 
-    EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT $1 display_name, $2 AS sys_table_id , $3 AS sys_id, $2 AS sys_idname FROM %s
-        WHERE workcat_id ILIKE $4 LIMIT 10 )a', quote_ident(v_workcat_layer))
+    EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) 
+        FROM (SELECT $1 display_name, $2 AS sys_table_id , $3 AS sys_id, $2 AS sys_idname FROM ' || quote_ident(v_workcat_layer) || '
+        WHERE workcat_id ILIKE $4 LIMIT 10 )a')
         USING v_workcat_display_field, quote_literal(v_workcat_layer), v_workcat_id_field, text_arg
         INTO response_json;
 
@@ -422,9 +422,9 @@ ELSIF tab_arg = 'address' THEN
     edit1 := search_data->>'visit_search';
     text_arg := concat('%', edit1->>'text' ,'%');
 
-  EXECUTE FORMAT('SELECT array_to_json(array_agg(row_to_json(a)))
-      FROM (SELECT %s as display_name, $1 AS sys_table_id , $2 AS sys_id, $1 AS sys_idname FROM %s
-      WHERE %s::text ILIKE $3 LIMIT 10 )a',quote_ident(v_visit_display_field), quote_ident(v_visit_layer), quote_ident(v_visit_display_field))
+  EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a)))
+      FROM (SELECT ' || quote_ident(v_visit_display_field) || ' as display_name, $1 AS sys_table_id , $2 AS sys_id, $1 AS sys_idname FROM ' || quote_ident(v_visit_layer) || '
+      WHERE ' || quote_ident(v_visit_display_field) || '::text ILIKE $3 LIMIT 10 )a')
       USING v_visit_layer, v_visit_id_field, text_arg
       INTO response_json;
 
@@ -457,14 +457,11 @@ ELSIF tab_arg = 'address' THEN
     DELETE FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user;
     INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_exploitation_vdefault',id_arg, current_user);
 
-    EXECUTE FORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) 
-        FROM (SELECT a.%s as display_name, $1 AS sys_table_id , a.%s AS sys_id, $1 AS sys_idname 
-        FROM %s AS a JOIN %s AS b ON b.%s = a.%s 
-        WHERE b.%s = $2 AND a.%s ILIKE $3
-        LIMIT 10 )a', 
-        quote_ident(v_psector_display_field), quote_ident(v_psector_id_field),
-        quote_ident(v_psector_layer), quote_ident(v_exploitation_layer), quote_ident(v_exploitation_id_field), quote_ident(v_psector_parent_field), 
-        quote_ident(v_exploitation_display_field),quote_ident(v_psector_display_field))
+    EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) 
+        FROM (SELECT a.' ||  quote_ident(v_psector_display_field) || ' as display_name, $1 AS sys_table_id , a.' || quote_ident(v_psector_id_field) || ' AS sys_id, $1 AS sys_idname 
+        FROM ' || quote_ident(v_psector_layer) || ' AS a JOIN ' || quote_ident(v_exploitation_layer) || ' AS b ON b.' || quote_ident(v_exploitation_id_field) || ' = a.' || quote_ident(v_psector_parent_field) || ' 
+        WHERE b.' || quote_ident(v_exploitation_display_field) || ' = $2 AND a.' || quote_ident(v_psector_display_field) || ' ILIKE $3
+        LIMIT 10 )a')
         USING v_psector_layer, name_arg, text_arg
         INTO response_json;
 

@@ -130,20 +130,20 @@ BEGIN
 
 
         --  Indentify geometry type
-        EXECUTE 'SELECT st_geometrytype ('||v_the_geom||') FROM '||v_layer||';' 
+        EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
         INTO v_geometrytype;
 
         IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
 
             --  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)
-            EXECUTE 'SELECT "'||v_idname||'" FROM "'||v_layer||'" WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
+            EXECUTE 'SELECT '||quote_ident(v_idname?||' FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
             ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc LIMIT 1'
                 INTO v_id
                 USING v_point, v_sensibility;
         ELSE
             --  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-            EXECUTE 'SELECT "'||v_idname||'" FROM "'||v_layer||'" WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
-            ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc LIMIT 1'
+            EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+            ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc LIMIT 1'
                 INTO v_id
                 USING v_point, v_sensibility;
         END IF;
@@ -164,7 +164,7 @@ BEGIN
     END IF;
 
 --   Get editability of layer
-    EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id='||quote_literal(p_active_layer)||' AND layer_id = any('''||p_editable_layer||'''::text[]) THEN TRUE ELSE FALSE END) 
+    EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id='||quote_literal(p_active_layer)||' AND layer_id = any('||quote_literal(p_editable_layer)||'::text[]) THEN TRUE ELSE FALSE END) 
             FROM config_web_layer WHERE layer_id='||quote_literal(v_layer)||';'
         INTO v_iseditable;
 

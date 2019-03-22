@@ -103,14 +103,14 @@ RAISE NOTICE 'Res: %', formToDisplay;
     LOOP
 
 --        Get combo values
-        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM ' || (aux_json->>'dv_table')::TEXT
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM ' || quote_ident((aux_json->>'dv_table')::TEXT)
         INTO combo_json; 
 
 --        Update array
         fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboValues', combo_json);
 
 --        Get combo id's
-        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM ' || (aux_json->>'dv_table')::TEXT
+        EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_name_column') || ')) FROM ' || quote_ident((aux_json->>'dv_table')::TEXT)
         INTO combo_json; 
 
         fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboKeys', combo_json);

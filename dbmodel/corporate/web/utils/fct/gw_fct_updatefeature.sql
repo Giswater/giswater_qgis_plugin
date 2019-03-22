@@ -35,13 +35,13 @@ BEGIN
     schemas_array := current_schemas(FALSE);
 
 --    Get column type
-    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = %s AND column_name = $2', quote_literal(p_table_id))
+    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2')
         USING schemas_array[1], p_column_name
         INTO column_type;
 
 --    Error control
     IF column_type ISNULL THEN
-        RETURN ('{"status":"Failed","SQLERR":"Column ' || p_column_name || ' does not exist in table "}')::json;
+        RETURN ('{"status":"Failed","SQLERR":"Column ' || quote_literal(p_column_name) || ' does not exist in table "}')::json;
     END IF;
 
 --    Get id column, for tables is the key column
@@ -51,18 +51,18 @@ BEGIN
 
 --    For views is the first column
     IF table_pkey ISNULL THEN
-        EXECUTE FORMAT ('SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = %s AND ordinal_position = 1', quote_literal(p_table_id))
+        EXECUTE FORMAT ('SELECT column_name FROM information_schema.columns WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND ordinal_position = 1')
         INTO table_pkey
         USING schemas_array[1];
     END IF;
 
 --    Get column type
-    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = %s AND column_name = $2', quote_literal(p_table_id))
+    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2')
         USING schemas_array[1], table_pkey
         INTO column_type_id;
 
-         EXECUTE FORMAT ('UPDATE %s SET %s = CAST( $1 AS ' || column_type || ') 
-			  WHERE ' || quote_ident(table_pkey) || ' = CAST( %s AS ' || column_type_id || ')',p_table_id, p_column_name, p_id)
+         EXECUTE FORMAT ('UPDATE ' || quote_ident(p_table_id) || ' SET ' || quote_ident(p_column_name) || ' = CAST( $1 AS ' || quote_literal(column_type) || ') 
+			  WHERE ' || quote_ident(table_pkey) || ' = CAST( ' || quote_ident(p_id) || ' AS ' || quote_literal(column_type_id) || ')')
 		USING p_value_new;
 		
 --    Return

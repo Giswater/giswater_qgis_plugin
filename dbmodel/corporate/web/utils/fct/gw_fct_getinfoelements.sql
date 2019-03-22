@@ -37,7 +37,7 @@ BEGIN
     raise notice 'query_result %', query_result;
 
 --    Get elements
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' WHERE ' || quote_ident(element_type) || '_id' || '::text = $1) a'
+    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' WHERE ' || quote_ident(element_type) || '_id' || '::text = $1) a'
         INTO query_result_elements
         USING id;
 

@@ -150,7 +150,7 @@ BEGIN
             array_index := array_index + 1;
 
 --            Get values
-            EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type || ')' 
+            EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || quote_literal(column_type) || ')' 
                 INTO field_value; 
             field_value := COALESCE(field_value, '');
 

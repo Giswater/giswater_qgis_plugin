@@ -128,7 +128,7 @@ BEGIN
 --     Get geometry (to feature response)
 ------------------------------------------
     IF v_the_geom IS NOT NULL THEN
-        EXECUTE FORMAT ('SELECT row_to_json(row) FROM (SELECT St_AsText(St_simplify('||v_the_geom||',0)) FROM %s WHERE '||v_idname||' = CAST( %s AS '||column_type||'))row', table_id_arg, quote_literal(id))
+        EXECUTE ('SELECT row_to_json(row) FROM (SELECT St_AsText(St_simplify('||quote_ident(v_the_geom)||',0)) FROM ' || quote_ident(table_id_arg) || ' WHERE '||quote_ident(v_idname)||' = CAST( ' || quote_literal(id) || ' AS '||quote_literal(column_type)||'))row')
             INTO v_geometry;
     END IF;
 
@@ -140,7 +140,7 @@ BEGIN
 
     IF  link_id_aux IS NOT NULL THEN      
         -- Get link field value
-        EXECUTE FORMAT ('SELECT row_to_json(row) FROM (SELECT '||link_id_aux||' AS link FROM %s WHERE %s = CAST( '||v_idname||' AS '||column_type||'))row', table_id_arg, quote_literal(id))
+        EXECUTE ('SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' AS link FROM ' || quote_ident(table_id_arg) || ' WHERE ' || quote_literal(id) || ' = CAST( '||quote_ident(v_idname)||' AS '||quote_literal(column_type)||'))row')
         INTO link_path;
 	raise notice 'Layer link path: % ', link_path;
    END IF;
@@ -178,8 +178,8 @@ BEGIN
 	-- Identify tableinforole_id 
         v_query_text := ' SELECT tableinforole_id FROM config_web_layer_child
 	JOIN config_web_tableinfo_x_inforole ON config_web_layer_child.tableinfo_id=config_web_tableinfo_x_inforole.tableinfo_id 
-	WHERE featurecat_id= (SELECT custom_type FROM '||tableparent_id_arg||' WHERE nid::text='||id||'::text) 
-	AND inforole_id='||p_info_type;
+	WHERE featurecat_id= (SELECT custom_type FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text='||quote_literal(id)||'::text) 
+	AND inforole_id='||quote_literal(p_info_type);
 
     	-- Identify tableinforole_id 
 	EXECUTE v_query_text INTO table_id_arg_new;
@@ -193,11 +193,11 @@ BEGIN
 	IF  (SELECT value::json->>'id' FROM config_param_system WHERE parameter='customer_info')::integer=1 THEN 
 	
 		-- customer=1 (and others) needs descript to show improved names.
-		EXECUTE FORMAT ('SELECT descript FROM %s WHERE nid::text=$1', tableparent_id_arg)
+		EXECUTE ('SELECT descript FROM ' || quote_ident(tableparent_id_arg) || ' WHERE nid::text=$1')
 			INTO v_formheader
 			USING id;
 	ELSE 
-		EXECUTE FORMAT ('SELECT custom_type FROM %s WHERE nid::text=$1', tableparent_id_arg)
+		EXECUTE FORMAT ('SELECT custom_type FROM ' || quote_ident(tableparent_id_arg) || ' WHERE nid::text=$1')
 			INTO v_formheader
 			USING id;
 	END IF;
@@ -238,8 +238,8 @@ BEGIN
 -- Propierties of info layer's
 ------------------------------
     IF table_id_arg IS NOT NULL THEN 
-	EXECUTE FORMAT ('SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = '||quote_literal(schemas_array[1])||' 
-		AND table_name = %s )', quote_literal(table_id_arg))
+	EXECUTE ('SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = '||quote_literal(schemas_array[1])||' 
+		AND table_name = ' || quote_literal(table_id_arg) || ' )')
 		INTO v_query_text;
             
 	IF v_query_text::boolean IS FALSE THEN

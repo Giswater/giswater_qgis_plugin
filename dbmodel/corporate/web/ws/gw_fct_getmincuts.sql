@@ -93,7 +93,7 @@ BEGIN
 
 
 --     Add order 
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' ORDER BY 1 desc) a'
+    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' ORDER BY 1 desc) a'
         INTO query_result_mincuts;
 
 --    Control NULL's
@@ -146,7 +146,7 @@ BEGIN
     query_result := query_result || ' ORDER BY x.order_number, 2 desc';
 
 --    Get mincuts with just date filters
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' ) a'
+    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' ) a'
         INTO query_result_mincuts;
 
 --    Control NULL's
@@ -195,7 +195,7 @@ BEGIN
     END IF;
 
 --     Add order 
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || query_result || ' ORDER BY 1 desc) a'
+    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' ORDER BY 1 desc) a'
         INTO query_result_mincuts;
 
 --    Control NULL's

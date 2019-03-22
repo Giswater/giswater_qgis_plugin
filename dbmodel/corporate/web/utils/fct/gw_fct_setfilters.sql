@@ -24,14 +24,14 @@ BEGIN
         INTO api_version;
 
 --      Check exists and set
-    EXECUTE format('SELECT COUNT(*) FROM %I WHERE %I = $1 AND cur_user = current_user', tabName, tabIdName)
+    EXECUTE ('SELECT COUNT(*) FROM ' || quote_ident(tabName) || ' WHERE ' || quote_ident(tabIdName) || ' = $1 AND cur_user = current_user')
     USING id_arg
     INTO existing_record;
 
     IF status = FALSE THEN
-        EXECUTE format('DELETE FROM %I WHERE %I = $1 AND cur_user = current_user', tabName, tabIdName) USING id_arg;
+        EXECUTE ('DELETE FROM ' || quote_ident(tabName) || ' WHERE ' || quote_ident(tabIdName) || ' = $1 AND cur_user = current_user') USING id_arg;
     ELSIF (existing_record) = 0 THEN
-        EXECUTE format('INSERT INTO  %I (%I, cur_user) VALUES ($1, current_user);', tabName, tabIdName) USING id_arg;
+        EXECUTE ('INSERT INTO  ' || quote_ident(tabName) || ' (' || quote_ident(tabIdName) || ', cur_user) VALUES ($1, current_user);') USING id_arg;
     END IF;
     
   --Return

@@ -62,8 +62,7 @@ BEGIN
     SELECT string_agg(quote_ident(key),',') INTO inputstring FROM json_object_keys(insert_data) AS X (key);
 
 --    Perform INSERT
-    EXECUTE FORMAT('INSERT INTO %s (%s) SELECT %s FROM json_populate_record( NULL::%s , $1)' ,
-		quote_ident(table_name), inputstring, inputstring, quote_ident(table_name))
+    EXECUTE ('INSERT INTO ' || quote_ident(table_name) || ' (' || inputstring || ') SELECT ' || inputstring || ' FROM json_populate_record( NULL::' || quote_ident(table_name) || ' , $1)')
 		USING insert_data;
 
 --    Control NULL's
