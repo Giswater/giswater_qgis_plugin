@@ -357,8 +357,8 @@ ELSIF tab_arg = 'address' THEN
         FROM (SELECT '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' as id,'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' as display_name, 
         st_astext(st_envelope('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_geom_field)||'))
         FROM '||quote_ident(v_street_layer)||'
-        JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_identv_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_identv_street_muni_id_field) ||'
-        WHERE '||quote_ident(v_muni_layer)||'.'||quote_identv_muni_display_field)||' = '||quote_literal(name_arg)||'
+        JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field) ||'
+        WHERE '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_display_field)||' = '||quote_literal(name_arg)||'
         AND '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
         INTO response_json;
     raise notice'response %', response_json;

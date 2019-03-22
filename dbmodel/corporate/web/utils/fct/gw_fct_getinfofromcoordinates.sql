@@ -136,7 +136,7 @@ BEGIN
         IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
 
             --  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)
-            EXECUTE 'SELECT '||quote_ident(v_idname?||' FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+            EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
             ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc LIMIT 1'
                 INTO v_id
                 USING v_point, v_sensibility;
