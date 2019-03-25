@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2110
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".c();
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_orphan() 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_anl_node_orphan(p_data json);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_orphan(p_data json) 
 RETURNS json AS 
 $BODY$
 
@@ -27,6 +27,11 @@ DECLARE
 	v_version text;
 	v_saveondatabase boolean = true;
 	v_result json;
+	v_id json;
+	v_array text;
+	v_selectionmode text;
+	v_worklayer text;
+	
 BEGIN
 
 	-- Search path
@@ -48,7 +53,7 @@ BEGIN
 	-- Computing process
 
 	IF v_array != '()' THEN
-		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a WHERE a.state=1 AND arc_id IN '||v_array||' AND 
+		FOR rec_node IN EXECUTE 'SELECT DISTINCT * FROM '||v_worklayer||' a WHERE a.state=1 AND node_id IN '||v_array||' AND 
 		(SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id and arc.state=1) = 0' 
 		LOOP
 			--find the closest arc and the distance between arc and node

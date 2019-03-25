@@ -25,7 +25,8 @@ DECLARE
     v_worklayer text;
     v_result json;
     v_array text;
-
+    v_version text;
+    
 BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -42,7 +43,10 @@ BEGIN
 	v_nodetolerance := ((p_data ->>'data')::json->>'parameters')::json->>'nodeTolerance';
 
 	raise notice 'v_worklayer % v_nodetolerance % v_id %',v_worklayer ,v_nodetolerance ,v_array;
-	
+
+	-- Reset values
+    DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=6;
+		
 	-- Computing process
 	IF v_array != '()' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fprocesscat_id, the_geom)
