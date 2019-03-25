@@ -27,7 +27,7 @@ from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTreeWidgetItem
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsMapLayerRegistry as QgsProject, QgsDataSourceURI as QgsDataSourceUri
+    from qgis.core import QgsMapLayerRegistry,  QgsProject, QgsDataSourceURI as QgsDataSourceUri
 else:
     from qgis.core import QgsProject, QgsDataSourceUri
 
@@ -503,8 +503,11 @@ class GwToolBox(ApiParent):
 
         # Commit changes
         virtual_layer.commitChanges()
-
-        QgsProject.instance().addMapLayer(virtual_layer, False)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            QgsMapLayerRegistry.instance().addMapLayer(virtual_layer, False)
+        else:
+            # TODO 3.x
+            QgsProject.instance().addMapLayer(virtual_layer, False)
 
         root = QgsProject.instance().layerTreeRoot()
         my_group = root.findGroup('GW Functions results')
@@ -530,11 +533,20 @@ class GwToolBox(ApiParent):
         new_layer = QgsVectorLayer(foreign_uri.uri(), table_name, "postgres")
 
         if group_to_be_inserted is None:
-            QgsProject.instance().addMapLayer(new_layer)
+            if Qgis.QGIS_VERSION_INT < 29900:
+                QgsMapLayerRegistry.instance().addMapLayer(new_layer)
+            else:
+                # TODO 3.x
+                QgsProject.instance().addMapLayer(new_layer)
             return
 
         root = QgsProject.instance().layerTreeRoot()
         mygroup = root.findGroup(group_to_be_inserted)
-        QgsProject.instance().addMapLayer(new_layer, False)
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            QgsMapLayerRegistry.instance().addMapLayer(new_layer, False)
+        else:
+            # TODO 3.x
+            QgsProject.instance().addMapLayer(new_layer, False)
         mygroup.insertLayer(0, new_layer)
 
