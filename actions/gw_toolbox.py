@@ -373,6 +373,9 @@ class GwToolBox(ApiParent):
             elif type(widget) in (QCheckBox, QComboBox, QRadioButton):
                     widget.setEnabled(False)
 
+
+        dialog.grb_input_layer.setVisible(False)
+        dialog.grb_selection_type.setVisible(False)
         dialog.rbt_previous.setChecked(False)
         dialog.rbt_layer.setChecked(True)
         dialog.chk_save.setChecked(True)
@@ -411,8 +414,9 @@ class GwToolBox(ApiParent):
             icon = QIcon(path_icon_blue)
             main_parent.setIcon(icon)
 
-        for group, functions in list(result['fields'].items()):
-            parent1 = QStandardItem('{}   [{} GW_geoalgorithm]'.format(group, len(functions)))
+        for group, functions in result['fields'].items():
+            parent1 = QStandardItem('{}   [{} Giswater algorithm]'.format(group, len(functions)))
+
             self.no_clickable_items.append('{}'.format(group))
             functions.sort(key=self.sort_list, reverse=False)
             for function in functions:
