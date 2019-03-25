@@ -210,7 +210,7 @@ class GwToolBox(ApiParent):
             if len(function) != 0:
                 self.save_settings_values(dialog, function)
                 function_name = function[0]['functionname']
-                if 'function_type' in function[0]:
+                if 'input_params' in function[0]:
                     if 'featureType' in function[0]['input_params']:
                         feature_type = function[0]['input_params']['featureType']
                     if 'durationType' in function[0]['input_params']:
