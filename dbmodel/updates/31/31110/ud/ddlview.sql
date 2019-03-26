@@ -190,9 +190,9 @@ SELECT s1.subc_id,
             WHEN s1.parent_id IS NULL THEN st_makeline(st_centroid(s1.the_geom), v_node.the_geom)
             ELSE st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))
         END AS the_geom
-   FROM ud.v_edit_subcatchment s1
-     LEFT JOIN ud.v_edit_subcatchment s2 ON s2.subc_id::text = s1.parent_id::text
-     JOIN ud.v_node ON v_node.node_id::text = s1.node_id::text;
+   FROM v_edit_subcatchment s1
+     LEFT JOIN v_edit_subcatchment s2 ON s2.subc_id::text = s1.parent_id::text
+     JOIN v_node ON v_node.node_id::text = s1.node_id::text;
 
 
    
