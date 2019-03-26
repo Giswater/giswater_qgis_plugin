@@ -127,7 +127,7 @@ BEGIN
 			DELETE FROM anl_arc WHERE fprocesscat_id=31 and cur_user=current_user;
 			DELETE FROM anl_node WHERE fprocesscat_id=31 and cur_user=current_user;
 			
-			INSERT INTO anl_arc (arc_id, arc_type, arc_id_aux, fprocesscat_id, cur_user, the_geom) SELECT arc_id, concat ('result_id:', result_id_arg), 
+			INSERT INTO anl_arc (arc_id, arccat_id, arc_id_aux, fprocesscat_id, cur_user, the_geom) SELECT arc_id, concat ('result_id:', result_id_arg), 
 						 concat ('{', conflict_id_text, '}'), 31, current_user, the_geom FROM anl_mincut_result_arc WHERE result_id=id_last;
 			INSERT INTO anl_node (node_id, nodecat_id, node_id_aux, nodecat_id_aux, fprocesscat_id, cur_user, the_geom) SELECT node_id, 
 						concat ('result_id:', result_id_arg), concat ('{', conflict_id_text, '}'), (CASE WHEN proposed=false THEN 'OPEN' ELSE 'CLOSED' END),
