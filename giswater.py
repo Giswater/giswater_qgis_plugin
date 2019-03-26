@@ -112,8 +112,9 @@ class Giswater(QObject):
 
 
     def set_info_button(self, connection_status):
+
         self.toolButton = QToolButton()
-        self.iface.addToolBarWidget(self.toolButton)
+        self.action_info = self.iface.addToolBarWidget(self.toolButton)
 
         icon_path = self.icon_folder + '36.png'
         if os.path.exists(icon_path):
@@ -462,6 +463,10 @@ class Giswater(QObject):
         """ Removes the plugin menu item and icon from QGIS GUI """
         
         try:
+
+            # Remove icon of action 'Info'
+            self.iface.removeToolBarIcon(self.action_info)
+
             for action in list(self.actions.values()):
                 self.iface.removePluginMenu(self.plugin_name, action)
                 self.iface.removeToolBarIcon(action)
@@ -958,7 +963,7 @@ class Giswater(QObject):
             self.actions['32'].setEnabled(status) 
             self.actions['32'].setCheckable(False)
             self.search_plus.feature_cat = self.feature_cat
-        except as e:
+        except Exception as e:
             self.controller.show_warning("Error setting searchplus button: " + str(e))     
                
         
