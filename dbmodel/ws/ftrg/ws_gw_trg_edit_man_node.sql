@@ -360,10 +360,10 @@ BEGIN
 			INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
 			
         ELSIF (NEW.epa_type = 'PUMP') THEN
-			INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN');
+			INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN_PUMP');
 
         ELSIF (NEW.epa_type = 'VALVE') THEN
-			INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE');
+			INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE_VALVE');
 
         ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
 			INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);

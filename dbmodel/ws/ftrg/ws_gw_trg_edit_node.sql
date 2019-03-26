@@ -214,17 +214,19 @@ BEGIN
 			NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,
 			NEW.postcomplement, NEW.postcomplement2, NEW.label_x, NEW.label_y,NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.hemisphere, NEW.num_value);
 
-        -- EPA INSERT
-        IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
-        ELSIF (NEW.epa_type = 'TANK') THEN inp_table:= 'inp_tank';
-        ELSIF (NEW.epa_type = 'RESERVOIR') THEN inp_table:= 'inp_reservoir';
-        ELSIF (NEW.epa_type = 'PUMP') THEN inp_table:= 'inp_pump';
-        ELSIF (NEW.epa_type = 'VALVE') THEN inp_table:= 'inp_valve';
-        ELSIF (NEW.epa_type = 'SHORTPIPE') THEN inp_table:= 'inp_shortpipe';
-        END IF;
-        IF inp_table IS NOT NULL THEN        
-            v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-            EXECUTE v_sql;
+		-- EPA insert
+        IF (NEW.epa_type = 'JUNCTION') THEN 
+			INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
+        ELSIF (NEW.epa_type = 'TANK') THEN 
+			INSERT INTO inp_tank (node_id) VALUES (NEW.node_id);
+        ELSIF (NEW.epa_type = 'RESERVOIR') THEN
+			INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
+        ELSIF (NEW.epa_type = 'PUMP') THEN
+			INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN_PUMP');
+        ELSIF (NEW.epa_type = 'VALVE') THEN
+			INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE_VALVE');
+        ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
+			INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
         END IF;
 
         -- MANAGEMENT INSERT
