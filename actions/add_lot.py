@@ -127,7 +127,8 @@ class AddNewLot(ParentManage):
         self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature,self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
-        self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
+        # TODO pending to make function delete_visit
+        # self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
 
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
@@ -855,93 +856,6 @@ class AddNewLot(ParentManage):
         for x in range(0, qtable.model().columnCount()):
             headers.append(qtable.model().headerData(x, Qt.Horizontal))
         return headers
-
-
-
-    # def edit_visit(self):
-    #     """ Button 65: Edit visit """
-    #
-    #     # Create the dialog
-    #     self.dlg_man = VisitManagement()
-    #     self.load_settings(self.dlg_man)
-    #     # save previous dialog and set new one.
-    #     # previous dialog will be set exiting the current one
-    #     # self.previous_dialog = utils_giswater.dialog()
-    #     self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
-    #
-    #      # Set a model with selected filter. Attach that model to selected table
-    #     table_object = "v_ui_om_visitman_x_" + str(geom_type)
-    #     expr_filter = geom_type + "_id = '" + feature_id + "'"
-    #     # Refresh model with selected filter
-    #     self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
-    #     self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
-    #
-    #     # manage save and rollback when closing the dialog
-    #     self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-    #     self.dlg_man.accepted.connect(
-    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-    #
-    #     # Set dignals
-    #     self.dlg_man.tbl_visit.doubleClicked.connect(
-    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-    #     self.dlg_man.btn_open.clicked.connect(
-    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-    #     self.dlg_man.btn_delete.clicked.connect(
-    #         partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
-    #     self.dlg_man.txt_filter.textChanged.connect(
-    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
-    #                 expr_filter))
-    #
-    #     # set timeStart and timeEnd as the min/max dave values get from model
-    #     current_date = QDate.currentDate()
-    #     sql = ("SELECT MIN(startdate), MAX(enddate)"
-    #            " FROM {}.{}".format(self.schema_name, 'om_visit'))
-    #     row = self.controller.get_row(sql, log_info=False, commit=self.autocommit)
-    #     if row:
-    #         if row[0]:
-    #             self.dlg_man.date_event_from.setDate(row[0])
-    #         if row[1]:
-    #             self.dlg_man.date_event_to.setDate(row[1])
-    #         else:
-    #             self.dlg_man.date_event_to.setDate(current_date)
-    #
-    #     # set date events
-    #     self.dlg_man.date_event_from.dateChanged.connect(
-    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
-    #                 expr_filter))
-    #     self.dlg_man.date_event_to.dateChanged.connect(
-    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
-    #                 expr_filter))
-    #
-    #     # Open form
-    #     self.open_dialog(self.dlg_man, dlg_name="visit_management")
-
-
-    # Attach model to table view
-
-    # def fill_custom_model(self, widget, table_name, expr_filter=None):
-    #     """ Set a model with selected filter. Attach that model to selected table """
-    #     if self.schema_name not in table_name:
-    #         table_name = self.schema_name + "." + table_name
-    #     # Set model
-    #
-    #     model = CustomSqlModel()
-    #     model.setTable(table_name)
-    #     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-    #     model.sort(0, 1)
-    #     if expr_filter:
-    #         model.setFilter(expr_filter)
-    #     model.select()
-    #
-    #     # Check for errors
-    #     if model.lastError().isValid():
-    #         self.controller.show_warning(model.lastError().text())
-    #
-    #     # Attach model to table view
-    #     widget.setModel(model)
-
-
-
 
 
     def lot_manager(self):
