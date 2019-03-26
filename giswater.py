@@ -614,8 +614,10 @@ class Giswater(QObject):
         
         # Manage project variable 'expl_id'
         self.manage_expl_id()
+
+        # Hide actions according parameter action_to_hide from config file
         self.hide_actions()
-        
+
         # Log it
         message = "Project read successfully"
         self.controller.log_info(message)

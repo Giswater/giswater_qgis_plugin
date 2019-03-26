@@ -84,7 +84,6 @@ class MincutParent(ParentAction, MultipleSelection):
     def init_mincut_form(self):
         """ Custom form initial configuration """
 
-        self.is_new = True
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -183,7 +182,7 @@ class MincutParent(ParentAction, MultipleSelection):
         self.set_icon(action, "181")
         self.action_mincut_composer = action
 
-        # # Show future id of mincut
+        # Show future id of mincut
         self.set_id_val()
 
         # Set state name
@@ -195,11 +194,13 @@ class MincutParent(ParentAction, MultipleSelection):
         
         self.dlg_mincut.show()
 
+
     def set_id_val(self):
         # Show future id of mincut
         result_mincut_id = 1
-        sql = ("SELECT setval('" +self.schema_name+".urn_id_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
-        row = self.controller.get_row(sql, log_sql=False)
+        sql = ("SELECT setval('" +self.schema_name+".anl_mincut_result_cat_seq', (SELECT max(id::integer) FROM "+self.schema_name+".anl_mincut_result_cat) , true)")
+        row = self.controller.get_row(sql, log_sql=True)
+
         if row:
             if row[0] is not None:
                 if self.is_new:
@@ -210,7 +211,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
     def mg_mincut(self):
         """ Button 26: New Mincut """
-
+        self.is_new = True
         self.init_mincut_form()
         self.action = "mg_mincut"
 
@@ -365,7 +366,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Manage 'address'
         address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_exploitation)
-        address_postal_code = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code)
+        address_postal_code = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_postal_code, return_string_null=False)
         address_street = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_street)
         address_number = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_number)
 
@@ -488,7 +489,7 @@ class MincutParent(ParentAction, MultipleSelection):
         if status:                                  
             message = "Values has been updated"
             self.controller.show_info(message)
-            self.update_result_selector(result_mincut_id, commit=True)             
+            self.update_result_selector(result_mincut_id, commit=True)
         else:
             message = "Error updating element in table, you need to review data"
             self.controller.show_warning(message)           
@@ -506,27 +507,28 @@ class MincutParent(ParentAction, MultipleSelection):
                 result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
                 sql = ("SELECT " + self.schema_name + ".gw_fct_mincut_result_overlap('"+str(result_mincut_id_text) + "', '" + str(cur_user) + "');")
                 row = self.controller.get_row(sql, log_sql=False, commit=True)
-                if row[0] is not None:
-                        message = "Mincut done, but has conflict and overlaps with "
-                        answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
-                        if answer:
-                            sql = ("SELECT * FROM "+ self.schema_name + ".selector_audit"
-                                   " WHERE fprocesscat_id='31' AND cur_user=current_user")
-                            row = self.controller.get_row(sql, log_sql=False)
-                            if not row:
-                                sql = ("INSERT INTO " + self.schema_name + ".selector_audit(fprocesscat_id, cur_user) "
-                                       " VALUES('31', current_user)")
-                                self.controller.execute_sql(sql, log_sql=False)
-                            views = 'v_anl_arc, v_anl_node, v_anl_connec'
-                            message = "To see the conflicts load the views"
-                            self.controller.show_info_box(message, "See layers", parameter=views)
-                            self.dlg_mincut.closeMainWin = True
-                            self.dlg_mincut.mincutCanceled = False
-                            self.dlg_mincut.close()
-                else:
-                    self.dlg_mincut.closeMainWin = True
-                    self.dlg_mincut.mincutCanceled = False
-                    self.dlg_mincut.close()
+
+                if row:
+                    if row[0] is not None:
+                            message = "Mincut done, but has conflict and overlaps with "
+                            answer = self.controller.ask_question(message, "Change dates", parameter=row[0])
+                            if answer:
+                                sql = ("SELECT * FROM "+ self.schema_name + ".selector_audit"
+                                       " WHERE fprocesscat_id='31' AND cur_user=current_user")
+                                row = self.controller.get_row(sql, log_sql=False)
+                                if not row:
+                                    sql = ("INSERT INTO " + self.schema_name + ".selector_audit(fprocesscat_id, cur_user) "
+                                           " VALUES('31', current_user)")
+                                    self.controller.execute_sql(sql, log_sql=False)
+                                views = 'v_anl_arc, v_anl_node, v_anl_connec'
+                                message = "To see the conflicts load the views"
+                                self.controller.show_info_box(message, "See layers", parameter=views)
+                                self.dlg_mincut.close()
+                    else:
+                        self.dlg_mincut.closeMainWin = True
+                        self.dlg_mincut.mincutCanceled = False
+                        self.dlg_mincut.close()
+
             else:
                 self.dlg_mincut.closeMainWin = True
                 self.dlg_mincut.mincutCanceled = False
@@ -1455,27 +1457,21 @@ class MincutParent(ParentAction, MultipleSelection):
         if self.is_new == True:
             self.set_id_val()
             self.is_new = False
-        result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        # Check if id exist in 'anl_mincut_result_cat'
-        sql = ("SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat"
-               " WHERE id = '" + str(result_mincut_id_text) + "'")
-        row = self.controller.get_row(sql, log_sql=False)
-        # Before of executing 'gw_fct_mincut' we already need to have id in 'anl_mincut_result_cat'
-        if not row:
-            sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (id, mincut_state)"
-                   " VALUES ('" + str(result_mincut_id_text) + "', 0)")
-            self.controller.execute_sql(sql, log_sql=False)
 
-        # Change cursor to 'WaitCursor'
-        #self.set_cursor_wait()
-        
+        sql = ("INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state)"
+               " VALUES (0) RETURNING id;")
+        new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
+        real_mincut_id = new_mincut_id[0]
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
+
         # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
         # feature_id: id of snapped arc/node
         # feature_type: type of snapped element (arc/node)
         # result_mincut_id: result_mincut_id from form
         sql = ("SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "',"
-               " '" + str(elem_type) + "', '" + str(result_mincut_id_text) + "');")
-        row = self.controller.get_row(sql, log_sql=False, commit=True)
+               " '" + str(elem_type) + "', '" + str(real_mincut_id) + "');")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
@@ -1502,8 +1498,9 @@ class MincutParent(ParentAction, MultipleSelection):
                    + str(snapping_position.y()) + "), " + str(srid) + "),"
                    " anl_user = current_user, anl_feature_type = '" + str(elem_type.upper()) + "',"
                    " anl_feature_id = '" + str(elem_id) + "'"
-                   " WHERE id = '" + result_mincut_id_text + "'")
-            status = self.controller.execute_sql(sql, log_sql=False)
+                   " WHERE id = '" + str(real_mincut_id) + "'")
+            status = self.controller.execute_sql(sql, log_sql=True)
+
             if not status:
                 message = "Error updating element in table, you need to review data"
                 self.controller.show_warning(message)
@@ -1518,12 +1515,15 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
 
+            # Update table 'anl_mincut_result_selector'
+            sql = ("DELETE FROM " + self.schema_name + ".anl_mincut_result_selector WHERE cur_user = current_user;\n"
+                   "INSERT INTO " + self.schema_name + ".anl_mincut_result_selector (cur_user, result_id) VALUES"
+                   " (current_user, " + str(real_mincut_id) + ");")
+            self.controller.execute_sql(sql, log_error=True, log_sql=True)
+
             # Refresh map canvas
             self.refresh_map_canvas()
 
-        # Restore default cursor
-        #self.set_cursor_restore()
-        
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
                     
@@ -1720,7 +1720,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # Update table 'anl_mincut_result_selector'
         self.update_result_selector(result_mincut_id)
-
+        self.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
         sql = ("SELECT mincut_class FROM " + self.schema_name + ".anl_mincut_result_cat"
                " WHERE id = '" + str(result_mincut_id) + "'")
@@ -1734,7 +1734,6 @@ class MincutParent(ParentAction, MultipleSelection):
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
         if self.current_state == '0':
-            
             self.dlg_mincut.work_order.setDisabled(False)
             # Group Location
             self.dlg_mincut.address_exploitation.setDisabled(self.search_plus_disabled)
@@ -1766,7 +1765,7 @@ class MincutParent(ParentAction, MultipleSelection):
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             if mincut_class_status == '1':
-                self.action_mincut.setDisabled(False)
+                self.action_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(False)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
@@ -1822,10 +1821,9 @@ class MincutParent(ParentAction, MultipleSelection):
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
-            
+
         # Current_state == '2': Finished, '3':Canceled
         elif self.current_state in ('2', '3'):
-            
             self.dlg_mincut.work_order.setDisabled(True)
             # Group Location
             self.dlg_mincut.address_exploitation.setDisabled(True)

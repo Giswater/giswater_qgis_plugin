@@ -22,10 +22,11 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
     
 from qgis.gui import QgsDateTimeEdit
-from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
-from qgis.PyQt.QtGui import QPixmap, QDoubleValidator
-from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton
+
 from qgis.PyQt.QtCore import QSortFilterProxyModel, QDate, QDateTime, QTime, Qt
+from qgis.PyQt.QtGui import QPixmap, QDoubleValidator
+from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
+from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton
 
 from functools import partial
 import os

@@ -38,6 +38,7 @@ class CadAddCircle(ParentMapTool):
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
         self.layer_circle = None
+        self.snap_to_selected_layer = False
 
 
     def init_create_circle_form(self, point):
@@ -133,13 +134,17 @@ class CadAddCircle(ParentMapTool):
 
         # Snapping
         if Qgis.QGIS_VERSION_INT < 29900:
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+            if self.snap_to_selected_layer:
+                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+            else:
+                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
             # That's the snapped features
             if result:
                 point = QgsPoint(result[0].snappedVertex)
                 self.vertex_marker.setCenter(point)
                 self.vertex_marker.show()
         else:
+            # TODO 3.x if self.snap_to_selected_layer:
             result = self.snapper.snapToMap(event_point)  # @UnusedVariable
             # That's the snapped features
             if result:
@@ -175,7 +180,7 @@ class CadAddCircle(ParentMapTool):
                 result = self.snapper.snapToMap(event_point)  # @UnusedVariable
                 # Create point with snap reference
                 point = QgsPointXY(result.point())
-                if point.x() == 0 and point.y()==0:
+                if point.x() == 0 and point.y() == 0:
                     point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
             self.init_create_circle_form(point)

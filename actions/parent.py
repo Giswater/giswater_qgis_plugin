@@ -13,10 +13,12 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    import ConfigParser as configparser
     from qgis.PyQt.QtGui import QStringListModel
     from qgis.core import QgsMapLayerRegistry as QgsProject
     from qgis.gui import QgsMapCanvasSnapper
 else:
+    import configparser
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsProject
     from qgis.gui import QgsMapCanvas
@@ -32,9 +34,10 @@ from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from functools import partial
 
 import sys
-import configparser
+
 if 'nt' in sys.builtin_module_names:
     import ctypes
+
 import os
 import utils_giswater
 import webbrowser
@@ -520,10 +523,11 @@ class ParentAction(object):
 
     def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected @table_name. Attach that model to selected table """
-        
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         self.model = QSqlTableModel()
-        self.model.setTable(self.schema_name+"."+table_name)
+        self.model.setTable(table_name)
         self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
@@ -539,10 +543,11 @@ class ParentAction(object):
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
-
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         self.model = QSqlTableModel()
-        self.model.setTable(self.schema_name+"."+table_name)
+        self.model.setTable(table_name)
         self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()

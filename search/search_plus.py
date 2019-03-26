@@ -33,6 +33,7 @@ from giswater.actions.manage_new_psector import ManageNewPsector
 
 
 class SearchPlus(QObject):
+
     def __init__(self, iface, srid, controller, settings, plugin_dir):
         """ Constructor """
 
@@ -70,11 +71,6 @@ class SearchPlus(QObject):
         # Set signals
         self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
             (self.address_populate, self.dlg_search.address_street, 'street_layer', 'street_field_code', 'street_field_name'))
-        # self.dlg_search.address_exploitation.currentIndexChanged.connect(partial
-        #     (self.zoom_to_polygon, self.dlg_search.address_exploitation, 'ext_municipality', 'muni_id', 'name'))
-
-        # self.dlg_search.address_postal_code.currentIndexChanged.connect(partial
-        #     (self.address_get_numbers, self.dlg_search.address_postal_code, portal_field_postal, False, False))
         self.dlg_search.address_street.activated.connect(partial
             (self.address_get_numbers, self.dlg_search.address_street, self.params['portal_field_code'], True))
         self.dlg_search.address_number.activated.connect(partial(self.address_zoom_portal))
@@ -98,6 +94,7 @@ class SearchPlus(QObject):
 
         return True
 
+
     def workcat_populate(self, dialog, combo):
         """ Fill @combo """
 
@@ -105,6 +102,7 @@ class SearchPlus(QObject):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(dialog, combo, rows)
         return rows
+
 
     def psector_populate(self, dialog, combo):
         """ Fill @combo """
@@ -116,6 +114,7 @@ class SearchPlus(QObject):
         utils_giswater.fillComboBox(dialog, combo, rows)
         return rows
 
+
     def update_selector_workcat(self, workcat_id):
         """  Update table selector_workcat """
 
@@ -124,6 +123,7 @@ class SearchPlus(QObject):
                "INSERT INTO " + self.schema_name + ".selector_workcat(workcat_id, cur_user) "
                " VALUES('" + workcat_id + "', current_user);\n")
         self.controller.execute_sql(sql)
+
 
     def zoom_to_polygon(self, widget, table_name, field_id, field_name):
 
@@ -160,6 +160,7 @@ class SearchPlus(QObject):
             self.iface.legendInterface().setLayerVisible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
+
 
     def workcat_open_table_items(self):
         """ Create the view and open the dialog with his content """
@@ -228,6 +229,7 @@ class SearchPlus(QObject):
         self.items_dialog.setWindowFlags(Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
         self.items_dialog.open()
 
+
     def force_state(self, qbutton, state, qtable, workcat_id):
         """ Force selected state and set qtable enabled = True """
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
@@ -251,6 +253,7 @@ class SearchPlus(QObject):
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         self.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
 
+
     def disable_qatable_by_state(self, qtable, _id, qbutton):
 
         sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
@@ -259,6 +262,7 @@ class SearchPlus(QObject):
         if row is None:
             qtable.setEnabled(False)
             qbutton.setEnabled(True)
+
 
     def force_expl(self, workcat_id):
         """ Active exploitations are compared with workcat farms.
@@ -281,6 +285,7 @@ class SearchPlus(QObject):
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
             self.controller.show_warning(msg)
+
 
     def fill_label_data(self, table_name, extension=None):
 
@@ -381,6 +386,7 @@ class SearchPlus(QObject):
             self.controller.show_warning(msg)
             pass
 
+
     def write_csv(self, dialog, folder_path=None, all_rows=None):
 
         with open(folder_path, "w") as output:
@@ -389,6 +395,7 @@ class SearchPlus(QObject):
         self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText(dialog, 'txt_path'))
         message = "Values has been updated"
         self.controller.show_info(message)
+
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
@@ -406,6 +413,7 @@ class SearchPlus(QObject):
         folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+
 
     def workcat_zoom(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
@@ -452,6 +460,7 @@ class SearchPlus(QObject):
         message = "Modify values of selectors to see the feature"
         self.controller.show_warning(message)
 
+
     def open_custom_form(self, layer, expr):
         """ Open custom from selected layer """
 
@@ -459,6 +468,7 @@ class SearchPlus(QObject):
         features = [i for i in it]
         if features:
             self.iface.openFeatureForm(layer, features[0])
+
 
     def workcat_fill_table(self, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers,
                            expr=None):
@@ -492,6 +502,7 @@ class SearchPlus(QObject):
         if hidde:
             self.refresh_table(widget)
 
+
     def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id):
 
         result_select = utils_giswater.getWidgetText(dialog, widget_txt)
@@ -502,6 +513,7 @@ class SearchPlus(QObject):
             expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
         self.set_table_columns(dialog, qtable, table_name)
+
 
     def load_config_data(self):
         """ Load configuration data from tables """
@@ -525,6 +537,7 @@ class SearchPlus(QObject):
             self.scale_zoom = self.params['scale_zoom']
 
         return True
+
 
     def dock_dialog(self):
         """ Dock dialog into left dock widget area """
@@ -550,6 +563,7 @@ class SearchPlus(QObject):
         self.dlg_search.setPalette(p)
 
         return True
+
 
     def get_layers(self):
         """ Iterate over all layers to get the ones set in config file """
@@ -584,6 +598,7 @@ class SearchPlus(QObject):
                     self.layers['network_layer_node'] = cur_layer
                 if self.params['basic_search_hyd_hydro_layer_name'] == uri_table:
                     self.layers['basic_search_hyd_hydro_layer_name'] = cur_layer
+
 
     def populate_dialog(self):
         """ Populate the interface with values get from layers """
@@ -632,6 +647,7 @@ class SearchPlus(QObject):
 
         return True
 
+
     def state_list(self):
         """ Get states from state selector and return as string list """
 
@@ -650,6 +666,7 @@ class SearchPlus(QObject):
 
         return list_state
 
+
     def hydro_create_list(self):
 
         self.list_hydro = []  # List to show
@@ -666,7 +683,7 @@ class SearchPlus(QObject):
                + self.params['basic_search_hyd_hydro_field_2'].replace("'", "''") + ", "
                + self.params['basic_search_hyd_hydro_field_3'].replace("'", "''") + ", "
                " hydrometer_id, " + self.params['basic_search_hyd_hydro_field_cc'] + ""
-                ", " + self.params['basic_search_hyd_hydro_field_erhc'] + ""
+               ", " + self.params['basic_search_hyd_hydro_field_erhc'] + ""
                ", " + self.params['basic_search_hyd_hydro_field_ccc'] + ""
                " FROM " + self.schema_name + ".v_rtc_hydrometer "
                " WHERE " + self.params['basic_search_hyd_hydro_field_expl_name'] + " = '" + str(expl_name) + "' "
@@ -686,12 +703,11 @@ class SearchPlus(QObject):
                     append_to_list = False
             if append_to_list:
                 self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2])
-                # self.list_hydro.append(row[3] + " . " + row[5] + " . " + row[5] + " . " + row[6])
-                # self.list_hydro.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4] + " . " + row[5] + " . " + row[6])
                 elem = [row[3], row[4], row[5], row[6]]
                 self.list_hydro_id.append(elem)
 
         self.set_model_by_list(self.list_hydro, self.dlg_search.hydro_id)
+
 
     def hydro_zoom(self, expl_name, index):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
@@ -703,9 +719,6 @@ class SearchPlus(QObject):
             return
         except Exception as e:
             self.controller.log_info("An exception occurred: " + str(type(e).__name__))
-        if element == 'null':
-            return
-
         if element == 'null':
             return
 
@@ -754,6 +767,7 @@ class SearchPlus(QObject):
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
 
+
     def open_hydrometer_dialog(self, element):
 
         self.hydro_info_dlg = HydroInfo()
@@ -769,7 +783,7 @@ class SearchPlus(QObject):
         if expl_name == 'null':
             expl_name = ''
         sql = ("SELECT * FROM " + self.schema_name + "." + self.params['basic_search_hyd_hydro_layer_name'] + ""
-               " WHERE hydrometer_id ='" + str(hydro_id) + "'"
+               " WHERE hydrometer_id = '" + str(hydro_id) + "'"
                " AND " + self.params['basic_search_hyd_hydro_field_cc'] + " = '" + str(field_cc) + "' "
                " AND " + self.params['basic_search_hyd_hydro_field_erhc'] + " = '" + str(field_erhc) + "' "
                " AND " + self.params['basic_search_hyd_hydro_field_ccc'] + " = '" + str(field_ccc) + "' "
@@ -813,10 +827,12 @@ class SearchPlus(QObject):
 
         self.hydro_info_dlg.open()
 
+
     def open_url(self, url):
         """ Open URL """
         if url:
             webbrowser.open(url)
+
 
     def network_code_create_lists(self):
         """ Create one list for each geom type and other one with all geom types """
@@ -848,6 +864,7 @@ class SearchPlus(QObject):
             pass
 
         return True
+
 
     def network_code_layer(self, layername):
         """ Get codes of selected layer and add them to the combo 'network_code' """
@@ -888,6 +905,7 @@ class SearchPlus(QObject):
             list_codes.append(row[0] + " . " + row[1] + " . " + row[2] + " . " + row[3] + " . " + row[4] + "")
         return list_codes
 
+
     def network_geom_type_populate(self):
         """ Populate combo 'network_geom_type' """
 
@@ -909,9 +927,11 @@ class SearchPlus(QObject):
 
         return self.dlg_search.network_geom_type > 0
 
+
     def expl_name_changed(self):
         self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id', 'name')
         self.hydro_create_list()
+
 
     def network_geom_type_changed(self):
         """ Get 'geom_type' to filter 'code' values """
@@ -933,6 +953,7 @@ class SearchPlus(QObject):
         self.set_model_by_list(list_codes, self.dlg_search.network_code)
 
         return True
+
 
     def network_zoom(self, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
@@ -980,6 +1001,7 @@ class SearchPlus(QObject):
                         self.iface.legendInterface().setLayerVisible(layer, True)
                         self.open_custom_form(layer, expr)
                         return
+
 
     def address_populate(self, combo, layername, field_code, field_name):
         """ Populate @combo """
@@ -1041,6 +1063,7 @@ class SearchPlus(QObject):
         combo.blockSignals(False)
 
         return True
+
 
     def address_get_numbers(self, combo, field_code, fill_combo=False, zoom=True):
         """ Populate civic numbers depending on value of selected @combo.
@@ -1112,6 +1135,7 @@ class SearchPlus(QObject):
             # Zoom to selected feature of the layer
             self.zoom_to_selected_features(layer, 'arc')
 
+
     def address_zoom_portal(self):
         """ Show street data on the canvas when selected street and number in street tab """
 
@@ -1147,6 +1171,7 @@ class SearchPlus(QObject):
         # Toggles 'Show feature count'
         self.show_feature_count()
 
+
     def generic_zoom(self, fieldname, combo, field_index=0):  # @UnusedFuntion
         """ Get selected element from the combo, and returns a feature request expression """
 
@@ -1170,6 +1195,7 @@ class SearchPlus(QObject):
             return
 
         return expr
+
 
     def populate_cmb_expl_name(self, parameter, combo, fieldname):
         """ Populate selected combo from features of selected layer """
@@ -1226,6 +1252,7 @@ class SearchPlus(QObject):
         self.expl_name_changed()
         return True
 
+
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
 
@@ -1254,6 +1281,7 @@ class SearchPlus(QObject):
 
             self.iface.mapCanvas().zoomScale(float(scale))
 
+
     def clear_workcat(self):
 
         sql = ("DELETE FROM " + self.schema_name + ".selector_workcat")
@@ -1268,6 +1296,7 @@ class SearchPlus(QObject):
             # Refresh canvas
             self.refresh_map_canvas()
 
+
     def refresh_workcat(self):
 
         sql = "SELECT " + self.schema_name + ".gw_fct_refresh_mat_view();"
@@ -1277,15 +1306,18 @@ class SearchPlus(QObject):
             self.controller.show_info(message)
             self.refresh_map_canvas()
 
+
     def open_plan_psector(self):
 
         psector_name = self.dlg_search.psector_id.currentText()
-        sql = ("SELECT psector_id FROM " + self.schema_name + ".plan_psector"
+        sql = ("SELECT psector_id"
+               " FROM " + self.schema_name + ".plan_psector"
                " WHERE name = '" + str(psector_name) + "'")
         row = self.controller.get_row(sql)
         psector_id = row[0]
         self.manage_new_psector.new_psector(psector_id, 'plan')
         self.zoom_to_psector(self.dlg_search, self.dlg_search.psector_id, 'v_edit_plan_psector', 'psector_id', 'name')
+
 
     def zoom_to_psector(self, dialog, widget, table_name, field_id, field_name):
 
@@ -1324,6 +1356,7 @@ class SearchPlus(QObject):
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 
+
     def refresh_data(self):
 
         self.network_code_create_lists()
@@ -1333,11 +1366,13 @@ class SearchPlus(QObject):
             self.hydro_create_list()
         self.psector_populate(self.dlg_search, self.dlg_search.psector_id)
 
+
     def unload(self):
         """ Removes dialog """
         if self.dlg_search:
             self.dlg_search.deleteLater()
             del self.dlg_search
+
 
     # TODO: Move to a common class
     def set_model_by_list(self, string_list, widget):
@@ -1361,8 +1396,10 @@ class SearchPlus(QObject):
         completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
         widget.setCompleter(completer)
 
+
     def filter_by_list(self, widget):
         self.proxy_model.setFilterFixedString(widget.currentText())
+
 
     def set_table_columns(self, dialog, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """
@@ -1398,6 +1435,7 @@ class SearchPlus(QObject):
         for column in columns_to_delete:
             widget.hideColumn(column)
 
+
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
 
@@ -1424,6 +1462,7 @@ class SearchPlus(QObject):
         except:
             pass
 
+
     def save_settings(self, dialog=None):
         """ Save QGIS settings related with dialog position and size """
 
@@ -1446,6 +1485,7 @@ class SearchPlus(QObject):
         except AttributeError:
             pass
 
+
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr is valid """
 
@@ -1457,6 +1497,7 @@ class SearchPlus(QObject):
             self.controller.log_warning(message, parameter=expr_filter)
             return (False, expr)
         return (True, expr)
+
 
     def select_features_by_expr(self, layer, expr):
         """ Select features of @layer applying @expr """
@@ -1472,12 +1513,14 @@ class SearchPlus(QObject):
             else:
                 layer.removeSelection()
 
+
     def refresh_map_canvas(self):
         """ Refresh all layers present in map canvas """
 
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
+
 
     def show_feature_count(self):
         """ Toggles 'Show Feature Count' of all the layers in the root path of the TOC """
@@ -1486,3 +1529,4 @@ class SearchPlus(QObject):
         for child in root.children():
             if isinstance(child, QgsLayerTreeLayer):
                 child.setCustomProperty("showFeatureCount", True)
+

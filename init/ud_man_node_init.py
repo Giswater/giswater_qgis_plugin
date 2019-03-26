@@ -141,6 +141,11 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.dialog.findChild(QAction, "actionInterpolate").triggered.connect(partial(self.activate_snapping, emit_point))
+        
+        widget_ymax = self.dialog.findChild(QLineEdit, 'ymax')
+        if widget_ymax is not None:
+            widget_ymax.textChanged.connect(partial(self.compare_depth, widget_ymax, False))
+            widget_ymax.lostFocus.connect(partial(self.compare_depth, widget_ymax, True))
 
         widget_ymax = self.dialog.findChild(QLineEdit, 'ymax')
         if widget_ymax is not None:

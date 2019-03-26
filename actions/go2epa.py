@@ -721,8 +721,12 @@ class Go2Epa(ApiParent):
         """ Update current values to the table """
 
         # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
+        rpt_selector_result_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, return_string_null=False)
+        rpt_selector_compare_id = utils_giswater.getWidgetText(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id, return_string_null=False)
+        if rpt_selector_result_id is None or rpt_selector_compare_id in (None, 'null', ''):
+            msg = "You have to select results parameters"
+            self.controller.show_message(msg)
+            return
 
         # Set project user
         user = self.controller.get_project_user()
