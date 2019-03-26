@@ -117,11 +117,11 @@ class Giswater(QObject):
 
         icon_path = self.icon_folder + '36.png'
         if os.path.exists(icon_path):
-            icon =QIcon(icon_path)
-        if icon is None:
-            action = QAction("Show info", self.iface.mainWindow())
-        else:
+            icon = QIcon(icon_path)
             action = QAction(icon, "Show info", self.iface.mainWindow())
+        else:
+            action = QAction("Show info", self.iface.mainWindow())
+
         self.toolButton.setDefaultAction(action)
 
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
