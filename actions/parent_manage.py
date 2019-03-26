@@ -4,16 +4,25 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import str
-from builtins import range
-
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+    from builtins import str
+    from builtins import range
+
 from qgis.core import QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtWidgets import QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox, QCompleter, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QPoint, QDate, QStringListModel
+from qgis.PyQt.QtCore import Qt, QPoint, QDate
 
 from functools import partial
 
@@ -333,7 +342,6 @@ class ParentManage(ParentAction, object):
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.previous_map_tool = self.canvas.mapTool()
         self.canvas.setMapTool(self.emit_point)
-        #self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
         self.canvas.xyCoordinates.connect(self.mouse_move)
         self.xyCoordinates_conected = True
         self.emit_point.canvasClicked.connect(partial(self.get_xy))

@@ -7,6 +7,11 @@ or (at your option) any later version.
 from builtins import str
 from builtins import next
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
 from qgis.PyQt.QtWidgets import QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import QObject, QTimer, QPoint
@@ -49,7 +54,7 @@ class Dimensions(ParentDialog):
         self.canvas = self.iface.mapCanvas()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
 
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
@@ -131,7 +136,7 @@ class Dimensions(ParentDialog):
         self.iface.setActiveLayer(layer)
         layer.startEditing()
 
-        snapper = QgsMapCanvasSnapper(self.canvas)
+        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -194,12 +199,17 @@ class Dimensions(ParentDialog):
         self.timer_map_tips = QTimer(self.canvas)
         self.map_tip_node = QgsMapTip()
         self.map_tip_connec = QgsMapTip()
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.map_tip_changed)
-        self.canvas.connect(self.timer_map_tips, SIGNAL("timeout()"), self.show_map_tip)
-        
-        self.timer_map_tips_clear = QTimer(self.canvas)        
-        self.canvas.connect(self.timer_map_tips_clear, SIGNAL("timeout()"), self.clear_map_tip)
 
+        self.canvas.xyCoordinates.connect(self.map_tip_changed)
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT < 29900:
+            self.canvas.connect(self.timer_map_tips, SIGNAL("timeout()"), self.show_map_tip)
+            self.timer_map_tips_clear = QTimer(self.canvas)
+            #self.canvas.connect(self.timer_map_tips_clear, SIGNAL("timeout()"), self.clear_map_tip)
+        else:
+            self.timer_map_tips.timeout.connect(self.show_map_tip)
+            self.timer_map_tips_clear = QTimer(self.canvas)
+            self.timer_map_tips_clear.timeout.connect(self.clear_map_tip)
             
     def map_tip_changed(self, p):
         """ SLOT. Initialize the Timer to show MapTips on the map """

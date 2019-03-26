@@ -22,7 +22,7 @@ from builtins import next
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
 from qgis.core import QgsPoint, QgsMapToPixel, QgsFeatureRequest

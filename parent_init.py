@@ -5,31 +5,46 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 from __future__ import absolute_import
+
 from future import standard_library
 standard_library.install_aliases()
 from builtins import next
-from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+    from qgis.gui import QgsMapCanvas
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
 
 from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QUrl, QDate, QDateTime
+from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor, QIcon
 from qgis.PyQt.QtWidgets import QLabel, QListWidget, QFileDialog, QListWidgetItem, QComboBox, QDateEdit, QDateTimeEdit
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCompleter, QCheckBox, QFormLayout
-from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QColor
 from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QWidget, QDialog, QTextEdit
-from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWebKitWidgets import QWebView
+from qgis.PyQt.QtWebKit import QWebSettings
+
 from functools import partial
 from datetime import datetime
 
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
+
 import os
 import urllib.parse
 import webbrowser
@@ -48,7 +63,7 @@ from .actions.manage_element import ManageElement
 from .actions.manage_gallery import ManageGallery
 from .models.sys_feature_cat import SysFeatureCat
 from .models.man_addfields_parameter import ManAddfieldsParameter
-from .map_tools.snapping_utils import SnappingConfigManager
+from .map_tools.snapping_utils_v2 import SnappingConfigManager
 from .actions.manage_visit import ManageVisit
 
 
@@ -71,7 +86,7 @@ class ParentDialog(QDialog):
         self.dlg_is_destroyed = None
 
         # Set default encoding 
-        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             reload(sys)
             sys.setdefaultencoding('utf-8')   #@UndefinedVariable
 
@@ -198,12 +213,10 @@ class ParentDialog(QDialog):
         # Builddate
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
                " WHERE cur_user = current_user AND parameter = 'builtdate_vdefault'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, log_sql=False)
         if row:
             date_value = datetime.strptime(row[0], '%Y-%m-%d')
-        else:
-            date_value = QDateTime.currentDateTime()
-        utils_giswater.setCalendarDate(dialog, "builtdate", date_value)
+            utils_giswater.setCalendarDate(dialog, "builtdate", date_value)
 
         # State
         sql = ("SELECT name FROM " + self.schema_name + ".value_state WHERE id::text ="
@@ -450,13 +463,13 @@ class ParentDialog(QDialog):
             self.controller.log_info("set_model_to_table: widget not found")
 
 
-    def manage_document(self, dialog, doc_id=None, feature=None):
+    def manage_document(self, dialog, doc_id=None, feature=None, table_name=None):
         """ Execute action of button 34 """
                 
         doc = ManageDocument(self.iface, self.settings, self.controller, self.plugin_dir)          
         doc.manage_document(feature=feature, geom_type=self.geom_type)
-        doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
-        doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
+        doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc, table_name))
+        doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc, table_name))
                  
         # Set completer
         self.set_completer_object(dialog, self.table_object)
@@ -467,7 +480,7 @@ class ParentDialog(QDialog):
         doc.open_dialog()
 
 
-    def manage_document_new(self, dialog, doc):
+    def manage_document_new(self, dialog, doc, table_name):
         """ Get inserted doc_id and add it to current feature """
 
         if doc.doc_id is None:
@@ -475,6 +488,7 @@ class ParentDialog(QDialog):
 
         utils_giswater.setWidgetText(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_document")
+        self.set_filter_dates('date', 'date', table_name, self.date_document_from, self.date_document_to)
 
 
     def manage_element(self, dialog, element_id=None, feature=None):
@@ -676,32 +690,27 @@ class ParentDialog(QDialog):
         
     def set_filter_table_man(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
-        
-        # Get selected dates
-        date_from = self.date_document_from.date()
-        date_to = self.date_document_to.date()
-        # Create interval dates
-        format_low = 'yyyy-MM-dd 00:00:00.000'
-        format_high = 'yyyy-MM-dd 23:59:59.999'
-        interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            date_from.toString(format_low), date_to.toString(format_high))
-        if date_from > date_to:
+         # Get selected dates
+        date_from = self.date_document_from.date().toString('yyyyMMdd')
+        date_to = self.date_document_to.date().addDays(1).toString('yyyyMMdd')
+
+        if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message)                   
+            self.controller.show_warning(message)
             return
 
         # Set filter
         expr = self.field_id+" = '"+self.id+"'"
-        expr += (" AND(date BETWEEN {0})".format(interval))
+        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
 
-        # Get selected values in Comboboxes        
-        doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type")
-        if doc_type_value != 'null':
+        # Get selected values in Comboboxes
+        doc_type_value = utils_giswater.getWidgetText(self.dialog, "doc_type", return_string_null=False)
+        if doc_type_value  not in ('', None):
             expr += " AND doc_type = '"+str(doc_type_value)+"'"
 
         # Refresh model with selected filter
         widget.model().setFilter(expr)
-        widget.model().select()  
+        widget.model().select()
         
         
     def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
@@ -770,7 +779,7 @@ class ParentDialog(QDialog):
         btn_open_doc.clicked.connect(partial(self.open_selected_document, widget)) 
         btn_doc_delete.clicked.connect(partial(self.delete_records, widget, table_name))            
         btn_doc_insert.clicked.connect(partial(self.add_object, widget, "doc", "v_ui_document"))
-        btn_doc_new.clicked.connect(partial(self.manage_document, dialog, None, self.feature))
+        btn_doc_new.clicked.connect(partial(self.manage_document, dialog, None, self.feature, table_name))
 
         # Set dates
         date = QDate.currentDate()
@@ -785,12 +794,34 @@ class ParentDialog(QDialog):
         
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, expr_filter)
-        
+
+        self.set_filter_dates('date', 'date', table_name, self.date_document_from, self.date_document_to)
+
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"        
         self.set_completer_object(dialog, self.table_object)
-        
-        
+
+
+    def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate):
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(maxdate)+")"
+               " FROM {}".format(str(table_name)))
+        row = self.controller.get_row(sql, log_sql=True)
+        if row:
+            if row[0]:
+                widget_fromdate.setDate(row[0])
+            else:
+                current_date = QDate.currentDate()
+                widget_fromdate.setDate(current_date)
+            if row[1]:
+                widget_todate.setDate(row[1])
+            else:
+                current_date = QDate.currentDate()
+                widget_todate.setDate(current_date)
+
+
     def set_completer_object(self, dialog, table_object):
         """ Set autocomplete of widget @table_object + "_id" 
             getting id's from selected @table_object 
@@ -929,7 +960,7 @@ class ParentDialog(QDialog):
         manage_visit.edit_visit(self.geom_type, self.id)
 
 
-    def new_visit(self):
+    def new_visit(self, table_name=None):
         """ Call button 64: om_add_visit """
         # Get expl_id to save it on om_visit and show the geometry of visit
         sql = ("SELECT expl_id FROM " + self.schema_name + ".exploitation "
@@ -947,6 +978,7 @@ class ParentDialog(QDialog):
         self.controller.get_rows(sql, commit=True)
 
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.id, expl_id=expl_id[0])
+        self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
 
 
     # creat the new visit GUI
@@ -1281,7 +1313,7 @@ class ParentDialog(QDialog):
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
 
         btn_open_visit.clicked.connect(self.open_visit)
-        btn_new_visit.clicked.connect(self.new_visit)
+        btn_new_visit.clicked.connect(partial(self.new_visit, table_name))
         btn_open_gallery.clicked.connect(self.open_gallery)
         btn_open_visit_doc.clicked.connect(self.open_visit_doc)
         btn_open_visit_event.clicked.connect(self.open_visit_event)
@@ -1325,6 +1357,7 @@ class ParentDialog(QDialog):
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
+        self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
 
 
     def set_filter_table_event(self, widget):
@@ -1418,9 +1451,12 @@ class ParentDialog(QDialog):
         self.cmb_hyd_customer_code = self.dialog.findChild(QComboBox, "cmb_hyd_customer_code")
 
         # Populate combo filter hydrometer value
-        sql = "SELECT id, code FROM " + self.schema_name + ".ext_cat_period ORDER BY code"
+        sql = ("SELECT id, code FROM " + self.schema_name + ".ext_cat_period "
+               " WHERE id IN (SELECT cat_period_id FROM "+ self.schema_name + ".v_edit_rtc_hydro_data_x_connec "
+               " WHERE connec_id='"+str(self.id)+"')"
+               " ORDER BY code")
         rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql, log_sql=False))
+        rows.extend(self.controller.get_rows(sql, log_sql=True))
         utils_giswater.set_item_data(self.cat_period_id_filter, rows, 1)
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
@@ -2069,7 +2105,7 @@ class ParentDialog(QDialog):
         # Set map tool emit point and signals   
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.canvas.xyCoordinates.connect(self.action_copy_paste_mouse_move)        
         self.emit_point.canvasClicked.connect(self.action_copy_paste_canvas_clicked)
         self.geom_type = geom_type
@@ -2441,7 +2477,8 @@ class ParentDialog(QDialog):
     def fill_table(self, widget, table_name, filter_=None):
         """ Set a model with selected filter.
         Attach that model to selected table """ 
-        
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -2538,3 +2575,15 @@ class ParentDialog(QDialog):
             else:
                 current_date = QDate.currentDate()
                 widget_to.setDate(current_date)
+
+
+    def get_snapper(self):
+        """ Return snapper """
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            snapper = QgsMapCanvasSnapper(self.canvas)
+        else:
+            # TODO: 3.x
+            snapper = QgsMapCanvas.snappingUtils()
+
+        return snapper

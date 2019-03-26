@@ -7,10 +7,19 @@ or (at your option) any later version.
 from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-from builtins import range
+
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    pass
+else:
+    from builtins import range
+
 from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt

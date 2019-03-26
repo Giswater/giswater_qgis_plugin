@@ -7,36 +7,9 @@ qgisMinimumVersion=2.18
 qgisMaximumVersion=3.99
 description=Plugin to enable additional features and capabilities of Giswater working together with QGIS and PostgreSQL
 about=Giswater is a open source tool with the goal to move from acquired knowledge to shared knowledge in the areas of water management, such as supply, sewerage, urban drainage or flood risk assessment with to communicate any water simulation software through any Spatial database with any Geographic Information System (GIS) in order to give everybody a real way of open solution of water management.
-
-version=3.1.110
+version=3.2.001
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Xavier Torret
-
 # End of mandatory metadata
-
-# Uncomment the following line and add your changelog:
-
-changelog=Version 3.1.105 (22/01/2019)
-    - Recovered the informative label for plan_psector -> add_price
-    - Bug fix, set correct values into go2epa ws_options
-    - Canceled zoom to exploitation
-    - Bug fix: enabled mincut class actions when open existing mincut without class
-    - Bug fix: Mincut canceled when close window from X corner
-    - Added checkbox 'is_done' into add visit form
-    - Added new info button for visits
-    - Enhancement: Populate om visit manager with correct view
-    - Enhancement: activate or deactivate the combo depending on the selection
-    - Enhancement: Show message if  trying to divide an arc when insert node (UD)
-    - Enhancement: Enable to search elements which have NULL code
-    - Enhancement: Change widget type of End feature (workcat id end)
-    - Minor bug fix getting layer on search plus
-    - Bug: unset .lower getting uri params
-    - Enhancement: improve load_settings for multiple screen
-    - Enhancement: improve manage visit when feature is multifeature
-    - Enhancement: populate tables Workcat on search plus
-    - Temporarily canceled the call to the get_last_gsw_file function
-    - Enhancement: Change zoom to node after mincut
-    - Enhancement: Now show code in combo hydrometer info and now filter by hydrometer customer code
-    - Add new button Read SQL
 
 
 # Tags are comma separated with spaces allowed

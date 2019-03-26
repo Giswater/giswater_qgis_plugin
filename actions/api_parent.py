@@ -12,22 +12,27 @@ from builtins import range
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import QgsMapCanvasSnapper
+    from qgis.PyQt.QtGui import QStringListModel
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.core import QgsWkbTypes
+    from qgis.PyQt.QtCore import QStringListModel
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 
-from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel
-from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator
-from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
-from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox
+from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
+from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
+from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
+from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction
 
@@ -38,7 +43,7 @@ from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
-from map_tools.snapping_utils import SnappingConfigManager
+from map_tools.snapping_utils_v2 import SnappingConfigManager
 from giswater.actions.parent import ParentAction
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
 
@@ -50,23 +55,19 @@ class ApiParent(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
         self.tabs_removed = 0
-        if Qgis.QGIS_VERSION_INT < 20000:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(10)
-            return
-            
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+
+        if Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_point = QgsRubberBand(self.canvas, Qgis.Point)
         else:
             self.rubber_point = QgsRubberBand(self.canvas, QgsWkbTypes.PointGeometry)
 
         self.rubber_point.setColor(Qt.yellow)
-        # self.rubberBand.setIcon(QgsRubberBand.IconType.ICON_CIRCLE)
         self.rubber_point.setIconSize(10)
         self.rubber_polygon = QgsRubberBand(self.canvas)
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
         self.list_update = []
+
 
     def get_editable_project(self):
         """ Get variable 'editable_project' from qgis project variables """
@@ -277,13 +278,14 @@ class ApiParent(ParentAction):
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
 
+        # TODO 3.x
         if Qgis.QGIS_VERSION_INT > 29900:
             return
         
         # Set map tool emit point and signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
         self.emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type))
         self.geom_type = geom_type
@@ -804,16 +806,10 @@ class ApiParent(ParentAction):
             
     def draw_point(self, point, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
 
-        if Qgis.QGIS_VERSION_INT >= 10900:
-            rb = self.rubber_point
-            rb.setColor(color)
-            rb.setWidth(width)
-            rb.addPoint(point)
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(10)
-            self.vMarker.setCenter(point)
-            self.vMarker.show()
+        rb = self.rubber_point
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.addPoint(point)
 
         # wait to simulate a flashing effect
         if duration_time is not None:
@@ -823,17 +819,11 @@ class ApiParent(ParentAction):
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
 
-        if Qgis.QGIS_VERSION_INT >= 10900:
-            rb = self.rubber_polygon
-            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
-            rb.setColor(color)
-            rb.setWidth(width)
-            rb.show()
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(width)
-            self.vMarker.setCenter(points)
-            self.vMarker.show()
+        rb = self.rubber_polygon
+        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.show()
 
         # wait to simulate a flashing effect
         if duration_time is not None:
@@ -842,11 +832,7 @@ class ApiParent(ParentAction):
 
     def resetRubberbands(self):
     
-        canvas = self.canvas
-        if Qgis.QGIS_VERSION_INT < 20000:
-            self.vMarker.hide()
-            canvas.scene().removeItem(self.vMarker)
-        elif Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_point.reset(Qgis.Point)
             self.rubber_polygon.reset()
         else:
@@ -984,10 +970,11 @@ class ApiParent(ParentAction):
         self.node1 = None
         self.node2 = None
         self.canvas.setMapTool(emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.layer_node = self.controller.get_layer_by_tablename("ve_node")
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+
+        self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
     def snapping_node(self, point, button):
@@ -1099,7 +1086,7 @@ class ApiParent(ParentAction):
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                     elif field['widgettype'] == 'check':
                         widget = QCheckBox()
-                        if field['value'].lower() == "true":
+                        if field['value'] is not None and field['value'].lower() == "true":
                             widget.setChecked(True)
                         else:
                             widget.setChecked(False)

@@ -4,9 +4,19 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from builtins import str
 
-# -*- coding: utf-8 -*-    
+
+# -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    pass
+else:
+    from builtins import str
+
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
@@ -117,9 +127,9 @@ class ManageElement(ParentManage):
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
-        self.dlg_add_element.btn_cancel.clicked.connect(partial(self.set_layer_visible, layer_element, layer_is_visible))
+        self.dlg_add_element.btn_cancel.clicked.connect(partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.rejected.connect(partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer))
-        self.dlg_add_element.rejected.connect(partial(self.set_layer_visible, layer_element, layer_is_visible))
+        self.dlg_add_element.rejected.connect(partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(partial(self.tab_feature_changed, self.dlg_add_element, table_object))
         self.dlg_add_element.element_id.textChanged.connect(partial(self.exist_object, self.dlg_add_element, table_object))
         self.dlg_add_element.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_element, table_object))
@@ -154,7 +164,7 @@ class ManageElement(ParentManage):
         element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = ("SELECT location_type FROM " + self.schema_name + ".man_type_location"
                " WHERE feature_type = 'ELEMENT' "
-               " AND featurecat_id='"+str(element_type)+"'"
+               " AND (featurecat_id = '"+str(element_type)+"' OR featurecat_id is null)"
                " ORDER BY location_type")
         rows = self.controller.get_rows(sql, log_sql=True, commit=self.autocommit)
         utils_giswater.fillComboBox(self.dlg_add_element, "location_type", rows)

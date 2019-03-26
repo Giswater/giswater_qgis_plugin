@@ -5,9 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 from builtins import next
-from builtins import str
 
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+else:
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QMessageBox
@@ -20,7 +28,6 @@ from giswater.init.thread import Thread
 
 import utils_giswater
 from giswater.parent_init import ParentDialog
-from giswater.map_tools.snapping_utils import SnappingConfigManager
 
 
 def formOpen(dialog, layer, feature):
@@ -134,6 +141,11 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionLink").triggered.connect(partial(self.check_link, self.dialog, True))
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ud', 'node'))
         self.dialog.findChild(QAction, "actionInterpolate").triggered.connect(partial(self.activate_snapping, emit_point))
+        
+        widget_ymax = self.dialog.findChild(QLineEdit, 'ymax')
+        if widget_ymax is not None:
+            widget_ymax.textChanged.connect(partial(self.compare_depth, widget_ymax, False))
+            widget_ymax.lostFocus.connect(partial(self.compare_depth, widget_ymax, True))
 
         widget_ymax = self.dialog.findChild(QLineEdit, 'ymax')
         if widget_ymax is not None:
@@ -202,27 +214,37 @@ class ManNodeDialog(ParentDialog):
         widget_ymax.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, 'node_id')
         ymax = utils_giswater.getWidgetText(self.dialog, widget_ymax)
+        if ymax is None:
+            return
         bad_alert = False
         sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_upstream "
                " WHERE node_id = '" + str(node_id) + "'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=False)
+        arcs_list = ""
         if len(rows) > 0:
+            arcs_list += "Upstream: "
             for row in rows:
-                if float(ymax) < float(row['downstream_depth']):
-                    widget_ymax.setStyleSheet("border: 1px solid red")
-                    bad_alert = True
+                if row['upstream_depth'] is not None:
+                    if float(ymax) < float(row['upstream_depth']):
+                        widget_ymax.setStyleSheet("border: 1px solid red")
+                        arcs_list += str((row['feature_id'] + ", "))
+                        bad_alert = True
         sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_downstream "
                " WHERE node_id = '" + str(node_id) + "'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql, log_sql=False)
         if len(rows) > 0:
+            arcs_list += "Downstream: "
             for row in rows:
-                if float(ymax) < float(row['upstream_depth']):
-                    widget_ymax.setStyleSheet("border: 1px solid red")
-                    bad_alert = True
-        self.controller.log_info(str(show_message))
-        self.controller.log_info(str(bad_alert))
+                if row['downstream_depth'] is not None:
+                    if float(ymax) < float(row['downstream_depth']):
+                        widget_ymax.setStyleSheet("border: 1px solid red")
+                        arcs_list += str((row['feature_id'] + ", "))
+                        bad_alert = True
+        if len(arcs_list)>2:
+            arcs_list = arcs_list[:-2]
+
         if show_message and bad_alert:
-            msg = "The depth of Y max is less than the arc"
+            msg = "The depth of this node is less than the arc/'s {}".format(arcs_list)
             # self.controller.show_info_box(text=msg, title="Info")
             msg_box = QMessageBox()
             msg_box.setIcon(3)
@@ -243,10 +265,11 @@ class ManNodeDialog(ParentDialog):
         self.node1 = None
         self.node2 = None
         self.canvas.setMapTool(emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+
+        self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
     def snapping_node(self, point, button):
@@ -442,7 +465,7 @@ class ManNodeDialog(ParentDialog):
         # Set map tool emit point and signals    
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        self.snapper = self.get_snapper()
         self.canvas.xyCoordinates.connect(self.action_rotation_mouse_move)
         self.emit_point.canvasClicked.connect(self.action_rotation_canvas_clicked)
         

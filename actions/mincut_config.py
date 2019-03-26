@@ -4,11 +4,20 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from builtins import str
-from builtins import range
-
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+    from builtins import str
+    from builtins import range
+
+from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QTableView, QMenu, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel
 

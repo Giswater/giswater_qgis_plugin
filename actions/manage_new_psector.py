@@ -4,24 +4,26 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from builtins import str
-from builtins import range
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+    from builtins import str
+    from builtins import range
 
 from qgis.core import QgsRectangle, QgsPoint
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QStringListModel
+from qgis.PyQt.QtCore import Qt
 
 import os
 import sys
@@ -475,7 +477,7 @@ class ManageNewPsector(ParentManage):
 
     def generate_composer(self, path):
 
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
             comp_view = self.iface.activeComposers()[index]
             my_comp = comp_view.composition()
@@ -1081,10 +1083,11 @@ class ManageNewPsector(ParentManage):
             1: OnRowChange
             2: OnManualSubmit
         """
-
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         model = QSqlTableModel()
-        model.setTable(self.schema_name+"."+table_name)
+        model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()

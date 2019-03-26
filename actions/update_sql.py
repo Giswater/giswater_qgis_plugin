@@ -89,7 +89,6 @@ class UpdateSQL(ParentAction):
         self.set_icon(btn_info, '73')
 
         self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
-        self.btn_constrains_changed(self.btn_constrains)
 
         self.message_update = ''
 
@@ -186,7 +185,7 @@ class UpdateSQL(ParentAction):
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
-        self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains))
+        self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -219,17 +218,26 @@ class UpdateSQL(ParentAction):
         self.set_info_project()
 
 
-    def btn_constrains_changed(self, button):
+    def btn_constrains_changed(self, button, call_function=False):
 
         lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
         if button.text() == 'OFF':
             button.setText("ON")
-            lbl_constrains_info.setText('(Constrains enabled)')
+            lbl_constrains_info.setText('(Constrains enabled)  ')
+            if call_function:
+                # Enable constrains
+                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
+                self.controller.execute_sql(sql)
+
         elif button.text() == 'ON':
             button.setText("OFF")
             lbl_constrains_info.setText('(Constrains dissabled)')
-
-        return
+            if call_function:
+                # Disable constrains
+                sql = 'SELECT ' + schema_name + '.gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
+                self.controller.execute_sql(sql)
 
 
     """ Declare all read sql process """
@@ -1318,10 +1326,9 @@ class UpdateSQL(ParentAction):
 
 
     def execute_import_data(self):
-        #TODO: This functions are comment at the moment. We dont enable this function until 3.2
-        return
+        self.insert_inp_into_db(self.file_inp)
         # Execute import data
-        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg_import_epa_inp()")
+        sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp()")
         self.controller.execute_sql(sql, commit=False)
 
 
@@ -1414,7 +1421,6 @@ class UpdateSQL(ParentAction):
                                 available = True
                     self.rename_project_data_schema(str(project_name), str(project_name) + "_bk_" + str(i))
                 else:
-                    self.setArrowCursor()
                     return
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
@@ -1425,6 +1431,12 @@ class UpdateSQL(ParentAction):
 
         self.set_wait_cursor()
         if self.rdb_import_data.isChecked():
+            self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.dlg_readsql_create_project.data_file)
+            if self.file_inp is 'null':
+                self.set_arrow_cursor()
+                msg = "The 'Path' field is required for Import INP data."
+                result = self.controller.show_info_box(msg, "Info")
+                return
             self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
@@ -1483,14 +1495,6 @@ class UpdateSQL(ParentAction):
             #self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
 
         self.set_arrow_cursor()
-
-        # Enable/disable constrains
-        #if self.btn_constrains.text() == 'OFF':
-        #    sql = 'SELECT ' + self.schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
-        #    self.controller.execute_sql(sql)
-        #elif self.btn_constrains.text() == 'ON':
-        #    sql = 'SELECT ' + self.schema_name + '.gw_fct_admin_schema_manage_fk($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
-        #    self.controller.execute_sql(sql)
 
         # Show message if process executed correctly
         if self.error_count == 0:
@@ -1849,6 +1853,8 @@ class UpdateSQL(ParentAction):
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
         rows = self.controller.get_rows(sql)
+        if rows is None:
+            return
         for row in rows:
             sql = ("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema = '" + str(row[0]) + "' "
                    " AND table_name = 'version')")
@@ -1906,14 +1912,14 @@ class UpdateSQL(ParentAction):
         if result:
             database_version = result[0].split(',')
         else:
-            database_version = ''
+            database_version = ['']
 
         sql = "SELECT PostGIS_FULL_VERSION();"
         result = self.controller.get_row(sql)
         if result:
             postgis_version = result[0].split('GEOS=')
         else:
-            postgis_version = ''
+            postgis_version = ['']
         if schema_name == 'Nothing to select' or schema_name == '':
             result = None
         else:
@@ -2018,6 +2024,7 @@ class UpdateSQL(ParentAction):
 
         if self.dev_user != 'TRUE':
             self.rdb_sample_dev.setEnabled(False)
+            self.rdb_import_data.setEnabled(False)
 
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
@@ -2043,6 +2050,7 @@ class UpdateSQL(ParentAction):
         # Set listeners
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_create_project))
+        self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self.select_file_inp))
         self.cmb_create_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_create_project_type))
         self.cmb_locale.currentIndexChanged.connect(partial(self.update_locale))
         self.rdb_import_data.toggled.connect(partial(self.enable_datafile))
@@ -2194,8 +2202,8 @@ class UpdateSQL(ParentAction):
             if status:
                 msg = "The Schema was deleted correctly."
                 self.controller.show_info_box(msg, "Info")
-
         self.populate_data_schema_name(self.cmb_project_type)
+        self.set_info_project()
 
 
     """ Take current project type changed """
@@ -2204,6 +2212,61 @@ class UpdateSQL(ParentAction):
         self.project_type_selected = utils_giswater.getWidgetText(self.dlg_readsql, widget)
         self.folderSoftware = self.sql_dir + os.sep + self.project_type_selected + os.sep
 
+
+    def insert_inp_into_db(self, folder_path=None):
+        _file = open(folder_path, "r+")
+        full_file = _file.readlines()
+        sql = ""
+        progress = 0
+
+        for row in full_file:
+            progress += 1
+            dirty_list = row.split(' ')
+            for x in range(len(dirty_list) - 1, -1, -1):
+                if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
+                    dirty_list.pop(x)
+
+            sp_n = dirty_list
+
+            if len(sp_n) > 0:
+                sql += "INSERT INTO " + self.schema + ".temp_csv2pg (csv2pgcat_id, "
+                values = "VALUES(11, "
+                for x in range(0, len(sp_n)):
+                    if "''" not in sp_n[x]:
+                        sql += "csv" + str(x + 1) + ", "
+                        value = "'" + sp_n[x].strip().replace("\n", "") + "', "
+                        values += value.replace("''", "null")
+                    else:
+                        sql += "csv" + str(x + 1) + ", "
+                        values = "VALUES(null, "
+                sql = sql[:-2] + ") "
+                values = values[:-2] + ");\n"
+                sql += values
+
+        if progress % 500 == 0:
+            self.controller.execute_sql(sql, log_sql=False, commit=False)
+            sql = ""
+        if sql != "":
+            self.controller.execute_sql(sql, log_sql=False, commit=False)
+        _file.close()
+        del _file
+
+
+    def select_file_inp(self):
+        """ Select INP file """
+
+        file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+        # Set default value if necessary
+        if file_inp is None or file_inp == '':
+            file_inp = self.plugin_dir
+        # Get directory of that file
+        folder_path = os.path.dirname(file_inp)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        message = self.controller.tr("Select INP file")
+        file_inp = QFileDialog.getOpenFileName(None, message, "", '*.inp')
+        self.dlg_readsql_create_project.data_file.setText(file_inp)
 
     """ Info basic """
     def info_show_info(self):

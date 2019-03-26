@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
@@ -151,13 +150,17 @@ class ManArcDialog(ParentDialog):
         widget_y.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, widget_node)
         text = utils_giswater.getWidgetText(self.dialog, widget_y)
-        if widget_node is not None:
-            sql = ("SELECT ymax FROM " + self.schema_name + ".v_edit_node "
-                   "WHERE node_id='"+str(node_id)+"'")
-            row = self.controller.get_row(sql, log_sql=True)
 
-        if row is not None:
-            if float(text) > float(row['ymax']):
+        if text is None:
+            return
+        if widget_node is None:
+            return
+        sql = ("SELECT ymax FROM " + self.schema_name + ".v_edit_node "
+               "WHERE node_id='"+str(node_id)+"'")
+        row = self.controller.get_row(sql, log_sql=True)
+
+        if row['ymax'] is not None:
+            if float(row['ymax']) < float(text) :
                 widget_y.setStyleSheet("border: 1px solid red")
                 if show_message:
                     msg = "The depth of {} is less than the y{}".format(widget_node.objectName(), widget_node.objectName()[5:6])
@@ -167,6 +170,7 @@ class ManArcDialog(ParentDialog):
                     msg_box.setWindowTitle("Warning")
                     msg_box.setText(msg)
                     msg_box.exec_()
+
 
     def get_nodes(self):
         """ Fill fields node_1 and node_2 """

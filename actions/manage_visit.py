@@ -5,10 +5,19 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from builtins import str
-from builtins import range
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
 
-from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject, QStringListModel
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+    from builtins import str
+    from builtins import range
+
+from qgis.PyQt.QtCore import Qt, QDate, pyqtSignal, QObject
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QTableView
 from qgis.PyQt.QtWidgets import QTextEdit, QPushButton, QComboBox, QTabWidget
 import os
@@ -172,8 +181,8 @@ class ManageVisit(ParentManage, QObject):
 
         # Show id of visit. If not set, infer a new value
         if not visit_id:
-            #visit_id = self.current_visit.max_pk(commit=self.autocommit) + 1
             visit_id = self.current_visit.nextval(commit=self.autocommit)
+
         self.visit_id.setText(str(visit_id))
 
         # manage relation locking

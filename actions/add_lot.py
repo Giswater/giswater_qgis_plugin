@@ -5,15 +5,18 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-from builtins import str
-from builtins import range
-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-from qgis.PyQt.QtCore import QDate, Qt, QStringListModel
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+    from builtins import range
+
+from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QAction, QAbstractItemView, QToolButton
 from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QColor
@@ -124,7 +127,8 @@ class AddNewLot(ParentManage):
         self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature,self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
-        self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
+        # TODO pending to make function delete_visit
+        # self.dlg_lot.btn_delete_visit.clicked.connect(partial(self.delete_visit, self.dlg_lot.tbl_visit))
 
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
@@ -800,22 +804,16 @@ class AddNewLot(ParentManage):
 
     # TODO delete function draw_polygon(*args) when api_parent.py is integrated into giswater proyect
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+        """ Draw 'line' over canvas following list of points """
 
         self.rubber_polygon = QgsRubberBand(self.canvas)
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
-        """ Draw 'line' over canvas following list of points """
-        if Qgis.QGIS_VERSION_INT >= 10900:
-            rb = self.rubber_polygon
-            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
-            rb.setColor(color)
-            rb.setWidth(width)
-            rb.show()
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(width)
-            self.vMarker.setCenter(points)
-            self.vMarker.show()
+        rb = self.rubber_polygon
+        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.show()
 
 
     # TODO delete function get_points(*args) when api_parent.py is integrated into giswater proyect
@@ -858,93 +856,6 @@ class AddNewLot(ParentManage):
         for x in range(0, qtable.model().columnCount()):
             headers.append(qtable.model().headerData(x, Qt.Horizontal))
         return headers
-
-
-
-    # def edit_visit(self):
-    #     """ Button 65: Edit visit """
-    #
-    #     # Create the dialog
-    #     self.dlg_man = VisitManagement()
-    #     self.load_settings(self.dlg_man)
-    #     # save previous dialog and set new one.
-    #     # previous dialog will be set exiting the current one
-    #     # self.previous_dialog = utils_giswater.dialog()
-    #     self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
-    #
-    #      # Set a model with selected filter. Attach that model to selected table
-    #     table_object = "v_ui_om_visitman_x_" + str(geom_type)
-    #     expr_filter = geom_type + "_id = '" + feature_id + "'"
-    #     # Refresh model with selected filter
-    #     self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
-    #     self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
-    #
-    #     # manage save and rollback when closing the dialog
-    #     self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-    #     self.dlg_man.accepted.connect(
-    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-    #
-    #     # Set dignals
-    #     self.dlg_man.tbl_visit.doubleClicked.connect(
-    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-    #     self.dlg_man.btn_open.clicked.connect(
-    #         partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-    #     self.dlg_man.btn_delete.clicked.connect(
-    #         partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
-    #     self.dlg_man.txt_filter.textChanged.connect(
-    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
-    #                 expr_filter))
-    #
-    #     # set timeStart and timeEnd as the min/max dave values get from model
-    #     current_date = QDate.currentDate()
-    #     sql = ("SELECT MIN(startdate), MAX(enddate)"
-    #            " FROM {}.{}".format(self.schema_name, 'om_visit'))
-    #     row = self.controller.get_row(sql, log_info=False, commit=self.autocommit)
-    #     if row:
-    #         if row[0]:
-    #             self.dlg_man.date_event_from.setDate(row[0])
-    #         if row[1]:
-    #             self.dlg_man.date_event_to.setDate(row[1])
-    #         else:
-    #             self.dlg_man.date_event_to.setDate(current_date)
-    #
-    #     # set date events
-    #     self.dlg_man.date_event_from.dateChanged.connect(
-    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
-    #                 expr_filter))
-    #     self.dlg_man.date_event_to.dateChanged.connect(
-    #         partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object,
-    #                 expr_filter))
-    #
-    #     # Open form
-    #     self.open_dialog(self.dlg_man, dlg_name="visit_management")
-
-
-    # Attach model to table view
-
-    # def fill_custom_model(self, widget, table_name, expr_filter=None):
-    #     """ Set a model with selected filter. Attach that model to selected table """
-    #     if self.schema_name not in table_name:
-    #         table_name = self.schema_name + "." + table_name
-    #     # Set model
-    #
-    #     model = CustomSqlModel()
-    #     model.setTable(table_name)
-    #     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-    #     model.sort(0, 1)
-    #     if expr_filter:
-    #         model.setFilter(expr_filter)
-    #     model.select()
-    #
-    #     # Check for errors
-    #     if model.lastError().isValid():
-    #         self.controller.show_warning(model.lastError().text())
-    #
-    #     # Attach model to table view
-    #     widget.setModel(model)
-
-
-
 
 
     def lot_manager(self):

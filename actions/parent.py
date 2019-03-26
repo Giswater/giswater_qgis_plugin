@@ -6,25 +6,27 @@ or (at your option) any later version.
 """
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-from builtins import range
-from builtins import object
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
+    import ConfigParser as configparser
+    from qgis.PyQt.QtGui import QStringListModel
     from qgis.core import QgsMapLayerRegistry as QgsProject
     from qgis.gui import QgsMapCanvasSnapper
 else:
+    import configparser
+    from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsProject
     from qgis.gui import QgsMapCanvas
+    from builtins import range
+    from builtins import object
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QSettings, QStringListModel
+from qgis.PyQt.QtCore import Qt, QSettings
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
@@ -32,9 +34,10 @@ from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from functools import partial
 
 import sys
-import configparser
+
 if 'nt' in sys.builtin_module_names:
     import ctypes
+
 import os
 import utils_giswater
 import webbrowser
@@ -520,10 +523,11 @@ class ParentAction(object):
 
     def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected @table_name. Attach that model to selected table """
-        
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         self.model = QSqlTableModel()
-        self.model.setTable(self.schema_name+"."+table_name)
+        self.model.setTable(table_name)
         self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
@@ -539,10 +543,11 @@ class ParentAction(object):
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
-
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         self.model = QSqlTableModel()
-        self.model.setTable(self.schema_name+"."+table_name)
+        self.model.setTable(table_name)
         self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
         self.model.select()
@@ -862,16 +867,11 @@ class ParentAction(object):
     def get_snapper(self):
         """ Return snapper """
 
-        snapper = None
-        try:
-            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-                snapper = QgsMapCanvasSnapper(self.canvas)
-            else:
-                # TODO: 3.x
-                # snapper = QgsMapCanvas.snappingUtils()
-                snapper = None
-        except:
-            pass
+        if Qgis.QGIS_VERSION_INT < 29900:
+            snapper = QgsMapCanvasSnapper(self.canvas)
+        else:
+            # TODO: 3.x
+            snapper = QgsMapCanvas.snappingUtils()
 
         return snapper
 

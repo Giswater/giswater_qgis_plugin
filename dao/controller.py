@@ -4,17 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
 """
-from builtins import str
-from builtins import range
-from builtins import object
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
+    from builtins import range
+    from builtins import object
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsMapLayerRegistry as QgsProject, QgsDataSourceURI as QgsDataSourceUri
 else:
     from qgis.core import QgsProject, QgsDataSourceUri
@@ -278,7 +276,7 @@ class DaoController(object):
     
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
         """ Show message to the user with selected message level
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} """
+        message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
         
         msg = None        
         if text:        
@@ -1132,7 +1130,7 @@ class DaoController(object):
 
         visible = False
         if layer:
-            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            if Qgis.QGIS_VERSION_INT < 29900:
                 visible = self.iface.legendInterface().isLayerVisible(layer)
             else:
                 visible = QgsProject.instance().layerTreeRoot().findLayer(layer.id()).itemVisibilityChecked()
@@ -1144,7 +1142,7 @@ class DaoController(object):
         """ Set layer visible """
 
         if layer:
-            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            if Qgis.QGIS_VERSION_INT < 29900:
                 self.iface.legendInterface().setLayerVisible(layer, visible)
             else:
                 QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
@@ -1153,7 +1151,7 @@ class DaoController(object):
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             layers = self.iface.legendInterface().layers()
         else:
             layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]

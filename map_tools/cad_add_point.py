@@ -1,4 +1,3 @@
-from builtins import str
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
@@ -130,9 +129,9 @@ class CadAddPoint(ParentMapTool):
 
         # Snapping
         if self.snap_to_selected_layer:
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
         else:
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
 
         # That's the snapped features
         if result:

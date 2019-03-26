@@ -10,16 +10,15 @@
 """
 from __future__ import absolute_import
 from builtins import next
-from builtins import str
 from builtins import range
 
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
 
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsVectorLayer
@@ -346,8 +345,7 @@ class DrawProfiles(ParentMapTool):
 
         self.canvas.setMapTool(emit_point)
         snapper = self.get_snapper()
-
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
+        self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node, snapper))
 
 
@@ -359,8 +357,7 @@ class DrawProfiles(ParentMapTool):
         self.snapper = self.get_snapper()
 
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.mouse_move)
-
+        self.canvas.xyCoordinates.connect(self.mouse_move)
         # widget = clicked button
         # self.widget_start_point | self.widget_end_point : QLabels
         if str(widget.objectName()) == "btn_add_start_point":
@@ -1283,6 +1280,7 @@ class DrawProfiles(ParentMapTool):
 
     def generate_composer(self):
 
+        # TODO 3.x
         if Qgis.QGIS_VERSION_INT > 29900:
             return
 
@@ -1310,7 +1308,11 @@ class DrawProfiles(ParentMapTool):
         if index == num_comp:
             # Create new composer with template selected in combobox(self.template)
             template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
-            template_file = file(template_path, 'rt')
+            # TODO 3.x
+            if Qgis.QGIS_VERSION_INT < 29900:
+                template_file = file(template_path, 'rt')
+            else:
+                template_file = open(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()

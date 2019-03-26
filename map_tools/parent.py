@@ -17,29 +17,31 @@
 
 """
 from __future__ import absolute_import
-from builtins import str
 
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
-except:
+except ImportError:
     from qgis.core import QGis as Qgis
 
-from qgis.core import QgsPoint, QgsExpression, QgsWkbTypes
+if Qgis.QGIS_VERSION_INT < 29900:
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+else:
+    from qgis.core import QgsWkbTypes
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+
+from qgis.core import QgsPoint, QgsExpression
 from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon, QPixmap
 
-from .snapping_utils import SnappingConfigManager
-
+import os
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
-import os
 
 
 class ParentMapTool(QgsMapTool):
-
 
     def __init__(self, iface, settings, action, index_action):  
         """ Class constructor """
@@ -87,7 +89,7 @@ class ParentMapTool(QgsMapTool):
                  
         # Set default rubber band
         color_selection = QColor(254, 178, 76, 63)
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
         else:
             self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
@@ -99,7 +101,7 @@ class ParentMapTool(QgsMapTool):
         self.force_active_layer = True
         
         # Set default encoding
-        if Qgis.QGIS_VERSION_INT >= 21400 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             reload(sys)
             sys.setdefaultencoding('utf-8')   #@UndefinedVariable
         
@@ -173,7 +175,7 @@ class ParentMapTool(QgsMapTool):
 
         try:
             # Graphic elements
-            if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            if Qgis.QGIS_VERSION_INT < 29900:
                 self.rubber_band.reset(Qgis.Polygon)
             else:
                 self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
