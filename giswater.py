@@ -482,7 +482,7 @@ class Giswater(QObject):
         except AttributeError:
             self.controller.log_info("unload - AttributeError")
             pass
-        except KeyError:
+        except:
             pass
     
     
@@ -514,7 +514,7 @@ class Giswater(QObject):
                     plugin_toolbar.toolbar.setVisible(visible)
         except AttributeError:
             pass
-        except KeyError:
+        except:
             pass                      
                                   
         
@@ -958,9 +958,7 @@ class Giswater(QObject):
             self.actions['32'].setEnabled(status) 
             self.actions['32'].setCheckable(False)
             self.search_plus.feature_cat = self.feature_cat
-        except KeyError as e:
-            self.controller.show_warning("Error setting searchplus button: " + str(e))                   
-        except RuntimeError as e:
+        except as e:
             self.controller.show_warning("Error setting searchplus button: " + str(e))     
                
         
