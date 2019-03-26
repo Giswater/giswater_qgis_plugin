@@ -50,21 +50,21 @@ BEGIN
 
 	-- Computing process
 	IF v_array != '()' THEN
-		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, num_arcs, the_geom,nodecat_id)
-				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom,nodecat_id
+		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, num_arcs, the_geom,nodecat_id, state)
+				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom,nodecat_id,state
 				FROM arc JOIN '||v_worklayer||' ON node_id=node_1 AND node_id IN '||v_array||'
 				WHERE arc.state=1 and '||v_worklayer||'.state=1
 				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id
 				HAVING count(node_1)> 1 
 				ORDER BY 2 desc;';	
 	ELSE
-		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, num_arcs, the_geom,nodecat_id)
-						SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom, nodecat_id
-						FROM arc JOIN '||v_worklayer||' ON node_id=node_1
-						WHERE arc.state=1 and '||v_worklayer||'.state=1
-						GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id
-						HAVING count(node_1)> 1 
-						ORDER BY 2 desc;';
+		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, num_arcs, the_geom,nodecat_id,state)
+				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom, nodecat_id,state
+				FROM arc JOIN '||v_worklayer||' ON node_id=node_1
+				WHERE arc.state=1 and '||v_worklayer||'.state=1
+				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id
+				HAVING count(node_1)> 1 
+				ORDER BY 2 desc;';
 	END IF;
 
 

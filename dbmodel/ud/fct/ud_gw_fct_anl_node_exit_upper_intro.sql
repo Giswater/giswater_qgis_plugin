@@ -80,8 +80,8 @@ BEGIN
 			END LOOP;
 			
 			IF sys_elev1_var > sys_elev2_var THEN
-				INSERT INTO anl_node (node_id, nodecat_id, expl_id, fprocesscat_id, the_geom, arc_distance) VALUES
-				(rec_node.node_id,rec_node.nodecat_id, rec_node.expl_id, 11, rec_node.the_geom,sys_elev1_var - sys_elev2_var );
+				INSERT INTO anl_node (node_id, nodecat_id, expl_id, fprocesscat_id, the_geom, arc_distance, state) VALUES
+				(rec_node.node_id,rec_node.nodecat_id, rec_node.expl_id, 11, rec_node.the_geom,sys_elev1_var - sys_elev2_var,rec_node.state );
 			END IF;
 		
 		END LOOP;
