@@ -245,130 +245,124 @@ class UpdateSQL(ParentAction):
     def load_base(self, project_type=False):
 
         status = True
-        if str(project_type) == 'ws' or str(project_type) == 'ud':
+        if str(project_type) in ('ws', 'ud'):
 
             folder = self.folderUtils + self.file_pattern_ddl
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderUtils + self.file_pattern_dml
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderUtils + self.file_pattern_fct
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderUtils + self.file_pattern_ftrg
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderSoftware, self.file_pattern_ddl
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderSoftware, self.file_pattern_ddlrule
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderSoftware, self.file_pattern_dml
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
             
             folder = self.folderSoftware, self.file_pattern_tablect
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderSoftware, self.file_pattern_fct
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderSoftware, self.file_pattern_ftrg
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderUtils, self.file_pattern_tablect
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
 
             folder = self.folderUtils, self.file_pattern_ddlrule
             status = self.executeFiles(folder, folder)
-            if status is False:
+            if not status and self.dev_commit == 'FALSE':
                 return False
-
 
             if self.process_folder(self.folderLocale, '') is False:
                 if self.process_folder(self.sql_dir + os.sep + 'i18n' + os.sep, 'EN') is False:
                     return False
                 else:
                     status = self.executeFiles(os.listdir(self.sql_dir + os.sep + 'i18n' + os.sep + 'EN'), self.sql_dir + os.sep + 'i18n' + os.sep + 'EN', True)
-                    if status is False:
+                    if not status and self.dev_commit == 'FALSE':
                         return False
             else:
                 status = self.executeFiles(os.listdir(self.folderLocale), self.folderLocale, True)
-                if status is False:
+                if not status and self.dev_commit == 'FALSE':
                     return False
 
-        else:
-            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep, self.file_pattern_ddl + os.sep) is False:
-                status = False
-            else:
-                status = self.executeFiles(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_ddl), self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_ddl)
-                if status is False:
-                    status = False
-            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep, self.file_pattern_ddlrule + os.sep) is False:
-                status = False
-            else:
-                status = self.executeFiles(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_ddlrule), self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_ddlrule)
-                if status is False:
-                    status = False
-            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep, self.file_pattern_dml + os.sep) is False:
-                status = False
-            else:
-                status = self.executeFiles(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_dml), self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_dml)
-                if status is False:
-                    status = False
-            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep, self.file_pattern_fct + os.sep) is False:
-                status = False
-            else:
-                status = self.executeFiles(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_fct), self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_fct)
-                if status is False:
-                    status = False
-            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep, self.file_pattern_ftrg + os.sep) is False:
-                status = False
-            else:
-                status = self.executeFiles(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_ftrg), self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_ftrg)
-                if status is False:
-                    status = False
-            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep, self.file_pattern_tablect + os.sep) is False:
-                status = False
-            else:
-                status = self.executeFiles(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_tablect), self.sql_dir + os.sep + str(project_type) + os.sep + self.file_pattern_tablect)
-                if status is False:
-                    status = False
+        elif str(project_type) in ('pl', 'tm'):
+
+            folder = self.folderSoftware, self.file_pattern_ddl
+            status = self.executeFiles(folder, folder)
+            if not status and self.dev_commit == 'FALSE':
+                return False
+
+            folder = self.folderSoftware, self.file_pattern_ddlrule
+            status = self.executeFiles(folder, folder)
+            if not status and self.dev_commit == 'FALSE':
+                return False
+
+            folder = self.folderSoftware, self.file_pattern_dml
+            status = self.executeFiles(folder, folder)
+            if not status and self.dev_commit == 'FALSE':
+                return False
+
+            folder = self.folderSoftware, self.file_pattern_fct
+            status = self.executeFiles(folder, folder)
+            if not status and self.dev_commit == 'FALSE':
+                return False
+
+            folder = self.folderSoftware, self.file_pattern_ftrg
+            status = self.executeFiles(folder, folder)
+            if not status and self.dev_commit == 'FALSE':
+                return False
+
+            folder = self.folderSoftware, self.file_pattern_tablect
+            status = self.executeFiles(folder, folder)
+            if not status and self.dev_commit == 'FALSE':
+                return False
+
             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + os.sep, '') is False:
                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep, 'EN') is False:
-                    status = False
+                    return False
                 else:
                     status = self.executeFiles(os.listdir(
                         self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + 'EN'), self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + 'EN', True)
-                    if status is False:
-                        status = False
+                    if not status and self.dev_commit == 'FALSE':
+                        return False
             else:
                 status = self.executeFiles(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + os.sep), self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + os.sep, True)
-                if status is False:
-                    status = False
+                if not status and self.dev_commit == 'FALSE':
+                    return False
 
         return True
 
@@ -2122,7 +2116,7 @@ class UpdateSQL(ParentAction):
                 elif str(self.project_type_selected) + ".sql" in file:
                     self.controller.log_info(str(filedir + os.sep + str(self.project_type_selected) + '.sql'))
                     status = self.read_execute_file(filedir, os.sep + str(self.project_type_selected) + '.sql', schema_name, filter_srid_value)
-                if not status:
+                if not status and self.dev_commit == 'FALSE':
                     return False
 
         else:
@@ -2131,7 +2125,7 @@ class UpdateSQL(ParentAction):
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                         self.controller.log_info(str(filedir + os.sep + file))
                         status = self.read_execute_file(filedir, file, schema_name, filter_srid_value)
-                        if not status:
+                        if not status and self.dev_commit == 'FALSE':
                             return False
 
         return status
