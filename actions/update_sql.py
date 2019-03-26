@@ -6,10 +6,9 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
+from qgis.PyQt.QtWidgets import QCheckBox, QRadioButton, QComboBox, QLineEdit,QPushButton, QTableView, QLabel, QAbstractItemView, QTextEdit
+from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import QSettings, Qt
-from PyQt4.QtGui import QCheckBox, QRadioButton, QAction, QWidget, QComboBox, QLineEdit,QPushButton, QTableView,QLabel
-from PyQt4.QtGui import QAbstractItemView, QTextEdit, QProgressDialog, QProgressBar, QApplication, QRubberBand, QPixmap
-from PyQt4.QtGui import QFileDialog
 
 import os
 import sys
