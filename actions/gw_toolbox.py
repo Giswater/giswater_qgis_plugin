@@ -111,6 +111,7 @@ class GwToolBox(ApiParent):
             return
 
         self.dlg_functions = ApiFunctionTb()
+        self.load_settings(self.dlg_functions)
         self.dlg_functions.progressBar.setVisible(True)
         self.dlg_functions.progressBar.setValue(0)
         self.dlg_functions.progressBar.setMaximum(100)
