@@ -41,14 +41,11 @@ BEGIN
 		and hydrometer.connec_id::text in (SELECT customer_code FROM ws.connec);
 
 	-- insert into rtc_hydrometer_x_connec
+	DELETE FROM ws.rtc_hydrometer_x_connec;
 	INSERT INTO ws.rtc_hydrometer_x_connec (hydrometer_id, connec_id)
 	SELECT hydrometer.id, connec.connec_id 
 		FROM crm.hydrometer 
-		JOIN ws.connec ON hydrometer.connec_id::text=customer_code
-		JOIN (SELECT id FROM crm.hydrometer EXCEPT (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer_x_connec))a ON a.id=hydrometer.id
-		WHERE hydrometer.connec_id is not null
-		and hydrometer.connec_id::text in (SELECT customer_code FROM ws.connec);
-
+		JOIN ws.connec ON hydrometer.connec_id::text=customer_code;
 
 	-- insert into traceability table
 	INSERT INTO crm.crm2gis_traceability (new_hydrometer,  new_hydrometer_x_connec) VALUES (v_new_hydrometer, v_new_hydrometer_x_connec);
