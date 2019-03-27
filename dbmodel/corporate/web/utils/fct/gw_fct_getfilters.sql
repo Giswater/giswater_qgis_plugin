@@ -13,6 +13,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getfilters(
 $BODY$
 
 /*example
+SELECT SCHEMA_NAME.gw_fct_getfilters(true, 3, 'en');
 SELECT SCHEMA_NAME.gw_fct_getfilters(false, 3, 'en');
 */
 
@@ -54,6 +55,17 @@ BEGIN
 
 		-- Get exploitations, selected and unselected
 		IF p_istilemap THEN	
+			
+			-- setting whole exploitations for user when is tilemap acoording sys_exploitation_x_user variable			
+			IF (SELECT value FROM config_param_system WHERE parameter ='sys_exploitation_x_user')::boolean THEN
+				DELETE FROM selector_expl WHERE cur_user = current_user;
+				INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id,current_user FROM exploitation_x_user WHERE user_id=current_user;
+			ELSIF (SELECT value FROM config_param_system WHERE parameter ='sys_exploitation_x_user')::boolean IS false THEN
+				DELETE FROM selector_expl WHERE cur_user = current_user;
+				INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id,current_user FROM exploitation;
+			END IF;
+
+			-- getting json
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , true AS disabled
 			FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ')
@@ -97,6 +109,10 @@ BEGIN
 		-- Get states, selected and unselected
 		IF p_istilemap THEN
 			SELECT ((value::json)->>'istiled_filterstate') as id FROM config_param_system WHERE parameter='api_config_parameters' INTO v_istiled_filterstate;
+
+			-- setting state = 1  for user when is tilemap
+			DELETE FROM selector_state WHERE cur_user = current_user AND state_id=1;
+			INSERT INTO selector_state (state_id, cur_user) VALUES (1,current_user);
 			
 			IF v_istiled_filterstate = 'publish_user' THEN
 				
@@ -112,12 +128,13 @@ BEGIN
 			ELSIF v_istiled_filterstate = 'current_user' THEN
 				
 				EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-				SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , false AS disabled
+				SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", true AS "value" , CASE WHEN id=1 THEN true ELSE false END AS disabled
 				FROM value_state WHERE id IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal(current_user) || ')
 				UNION
-				SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , false AS disabled
+				SELECT name AS label, id AS name, ''check'' AS type, ''boolean'' AS "dataType", false AS "value" , CASE WHEN id=1 THEN true ELSE false END AS disabled
 				FROM value_state WHERE id NOT IN (SELECT state_id FROM selector_state WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY name) a'
 				INTO formTabs_networkStates;	
+				
 				RAISE NOTICE 'TEST20 -> %',formTabs_networkStates;
 				
 			ELSIF v_istiled_filterstate = 'disabled' THEN
@@ -268,4 +285,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
