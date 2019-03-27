@@ -45,9 +45,12 @@ class SnappingConfigManager(object):
         self.controller = None
 
         # Snapper
-        self.snapper = self.get_snapper()
-        proj = QgsProject.instance()
-        proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+        try:
+            self.snapper = self.get_snapper()
+            proj = QgsProject.instance()
+            proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+        except:
+            pass
 
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
@@ -163,8 +166,13 @@ class SnappingConfigManager(object):
 
     def get_snapper(self):
         """ Return snapper """
-        snapper = None
-        if Qgis.QGIS_VERSION_INT < 29900:
-            snapper = QgsMapCanvasSnapper(self.canvas)
-        return snapper
+
+        try:
+            snapper = None
+            if Qgis.QGIS_VERSION_INT < 29900:
+                snapper = QgsMapCanvasSnapper(self.canvas)
+        except Exception:
+            pass
+        finally:
+            return snapper
 
