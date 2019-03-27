@@ -46,7 +46,7 @@ COMMENT ON TABLE config_api_images IS
 Wiht this table images on forms are configured:
 To load a new image into this table use:
 INSERT INTO config_api_images (idval, image) VALUES (''imagename'', pg_read_binary_file(''imagename.png'')::bytea)
-Image must be located on the server (folder data of postgres instalation path)';
+Image must be located on the server (folder data of postgres instalation path. On linux /var/lib/postgresql/x.x/main, on windows postrgreSQL/x.x/data )';
 
 
 COMMENT ON TABLE config_api_list IS 
