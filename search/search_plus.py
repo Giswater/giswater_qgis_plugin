@@ -916,7 +916,6 @@ class SearchPlus(QObject):
 
 
     def expl_name_changed(self):
-        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id', 'name')
         self.hydro_create_list()
 
 
