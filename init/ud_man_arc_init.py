@@ -159,18 +159,18 @@ class ManArcDialog(ParentDialog):
         sql = ("SELECT ymax FROM " + self.schema_name + ".v_edit_node "
                "WHERE node_id='"+str(node_id)+"'")
         row = self.controller.get_row(sql, log_sql=True)
-
-        if row['ymax'] is not None:
-            if float(row['ymax']) < float(text) :
-                widget_y.setStyleSheet("border: 1px solid red")
-                if show_message:
-                    msg = "The depth of {} is less than the y{}".format(widget_node.objectName(), widget_node.objectName()[5:6])
-                    # self.controller.show_info_box(text=msg, title="Info")
-                    msg_box = QMessageBox()
-                    msg_box.setIcon(3)
-                    msg_box.setWindowTitle("Warning")
-                    msg_box.setText(msg)
-                    msg_box.exec_()
+        if row:
+            if row['ymax'] is not None:
+                if float(row['ymax']) < float(text) :
+                    widget_y.setStyleSheet("border: 1px solid red")
+                    if show_message:
+                        msg = "The depth of {} is less than the y{}".format(widget_node.objectName(), widget_node.objectName()[5:6])
+                        # self.controller.show_info_box(text=msg, title="Info")
+                        msg_box = QMessageBox()
+                        msg_box.setIcon(3)
+                        msg_box.setWindowTitle("Warning")
+                        msg_box.setText(msg)
+                        msg_box.exec_()
 
 
     def get_nodes(self):
