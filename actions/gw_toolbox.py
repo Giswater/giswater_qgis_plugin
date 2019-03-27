@@ -43,21 +43,29 @@ from giswater.actions.api_parent import ApiParent
 from giswater.ui_manager import ApiDlgToolbox, ApiFunctionTb
 
 
-
 class GwToolBox(ApiParent):
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
+
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.function_list = []
         self.rbt_checked = {}
         self.is_paramtetric = True
         self.no_clickable_items = ['Giswater']
 
+
     def set_project_type(self, project_type):
         self.project_type = project_type
 
 
     def open_toolbox(self):
+
+        function_name = "gw_api_gettoolbox"
+        row = self.controller.check_function(function_name)
+        if not row:
+            self.controller.show_warning("Function not found in database", parameter=function_name)
+            return
 
         self.dlg_toolbox = ApiDlgToolbox()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
@@ -80,6 +88,7 @@ class GwToolBox(ApiParent):
 
 
     def filter_functions(self, text):
+
         extras = '"filterText":"' + text + '"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
@@ -93,6 +102,7 @@ class GwToolBox(ApiParent):
 
 
     def open_function(self, index):
+
         self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
         self.alias_function = index.sibling(index.row(), 0).data()
@@ -137,6 +147,7 @@ class GwToolBox(ApiParent):
 
 
     def set_selected_layer(self, dialog, combo):
+
         layer_name = utils_giswater.get_item_data(dialog, combo, 1)
         layer = self.controller.get_layer_by_tablename(layer_name)
         if layer is None:
@@ -147,25 +158,13 @@ class GwToolBox(ApiParent):
 
 
     def rbt_state(self, rbt, state):
+
         if rbt.objectName() == 'rbt_previous' and state is True:
             self.rbt_checked['widget'] = 'previousSelection'
         elif rbt.objectName() == 'rbt_layer' and state is True:
             self.rbt_checked['widget'] = 'wholeSelection'
 
         self.rbt_checked['value'] = state
-
-
-    def check_exist_function(self, func_name):
-        status = False
-        sql = ("SELECT routines.routine_name FROM information_schema.routines"
-               " WHERE routines.specific_schema='"+self.schema_name.replace('"', '')+"'"
-               " AND routines.routine_name ='"+str(func_name)+"'"
-               " ORDER BY routines.routine_name;")
-        rows = self.controller.get_rows(sql, log_sql=False)
-        for row in rows:
-            if func_name in row['routine_name']:
-                status = True
-        return status
 
 
     def load_settings_values(self, dialog, function):
@@ -185,6 +184,7 @@ class GwToolBox(ApiParent):
 
     def save_settings_values(self, dialog, function):
         """ Save QGIS settings related with toolbox options """
+
         cur_user = self.controller.get_current_user()
         function_name = function[0]['functionname']
         self.controller.plugin_settings_set_value(str(function_name)+"_" + cur_user + "_rbt_previous",
@@ -220,8 +220,6 @@ class GwToolBox(ApiParent):
         if layer_name != -1:
             layer = self.set_selected_layer(dialog, combo)
 
-            # if layer is None:
-            #     return
         selection_mode = self.rbt_checked['widget']
         extras = '"selectionMode":"'+selection_mode+'",'
         # Check selection mode and get (or not get) all feature id
@@ -237,7 +235,6 @@ class GwToolBox(ApiParent):
                 feature_id_list = feature_id_list[:-2] + ']'
             else:
                 feature_id_list += ']'
-
 
         feature_field = ''
         if layer_name != -1:
@@ -282,10 +279,8 @@ class GwToolBox(ApiParent):
             extras += '}'
         extras += ', "saveOnDatabase":' + str(utils_giswater.isChecked(dialog, dialog.chk_save)).lower()
         body = self.create_body(feature=feature_field, extras=extras)
-
         sql = ("SELECT " + self.schema_name + "."+str(function_name)+"($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
-
         if not row or row[0] is None:
             self.controller.show_message("Function : " + str(function_name)+" executed with no result ", 3)
             return True
@@ -299,6 +294,7 @@ class GwToolBox(ApiParent):
 
 
     def execute_no_parametric(self, dialog, function_name):
+
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setFormat("Running function: " + str(function_name))
         dialog.progressBar.setAlignment(Qt.AlignCenter)
@@ -317,14 +313,15 @@ class GwToolBox(ApiParent):
         self.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
         dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
+
         return True
 
 
     def populate_functions_dlg(self, dialog, result):
+
         status = False
         for group, function in result['fields'].items():
             if len(function) != 0:
-
                 dialog.setWindowTitle(function[0]['alias'])
                 dialog.txt_info.setText(str(function[0]['descript']))
                 if str(function[0]['isparametric']) in ('false', 'False', False, 'None',  None, 'null'):
@@ -340,17 +337,15 @@ class GwToolBox(ApiParent):
                         label.setWordWrap(True)
                         label.setText("Info: " + str(function[0]['isnotparammsg']))
                         layout.addWidget(label, 0, 0)
-
                     status = True
                     break
 
                 self.populate_layer_combo(function[0]['input_params']['featureType'])
                 self.construct_form_param_user(dialog, function, 0, self.function_list, False)
-
                 self.load_settings_values(dialog, function)
-
                 status = True
                 break
+
         return status
 
 
@@ -364,7 +359,6 @@ class GwToolBox(ApiParent):
                 widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
             elif type(widget) in (QCheckBox, QComboBox, QRadioButton):
                     widget.setEnabled(False)
-
 
         dialog.grb_input_layer.setVisible(False)
         dialog.grb_selection_type.setVisible(False)
@@ -381,6 +375,7 @@ class GwToolBox(ApiParent):
 
 
     def populate_layer_combo(self, geom_type):
+
         self.layers = []
         self.layers = self.controller.get_group_layers(geom_type)
         layers = []
@@ -396,13 +391,14 @@ class GwToolBox(ApiParent):
 
 
     def populate_trv(self, trv_widget, result, expand=False):
+
         model = QStandardItemModel()
         trv_widget.setModel(model)
         trv_widget.setUniformRowHeights(False)
         main_parent = QStandardItem('{}'.format('Giswater'))
-        self.icon_folder = self.plugin_dir + '/icons/'
-        path_icon_blue = self.icon_folder + '36.png'
-        path_icon_red = self.icon_folder + '100.png'
+        self.icon_folder = self.plugin_dir + os.sep + 'icons'
+        path_icon_blue = self.icon_folder + + os.sep + '36.png'
+        path_icon_red = self.icon_folder + + os.sep + '100.png'
         if os.path.exists(path_icon_blue):
             icon = QIcon(path_icon_blue)
             main_parent.setIcon(icon)
@@ -415,14 +411,14 @@ class GwToolBox(ApiParent):
             for function in functions:
                 func_name = QStandardItem('{}'.format(function['functionname']))
                 label = QStandardItem('{}'.format(function['alias']))
-                status = self.check_exist_function(function['functionname'])
-                if status is False:
+                row = self.controller.check_function(function['functionname'])
+                if not row:
                     if os.path.exists(path_icon_red):
                         icon = QIcon(path_icon_red)
                         label.setIcon(icon)
                         label.setForeground(QColor(255, 0, 0))
-                        label.setToolTip('Function configured on the table audit_cat_function, '
-                                         'but not found in the data base')
+                        msg = "Function configured on the table audit_cat_function, but not found in the database"
+                        label.setToolTip(msg)
                         self.no_clickable_items.append('{}'.format(function['alias']))
                 else:
                     if os.path.exists(path_icon_blue):
@@ -439,6 +435,7 @@ class GwToolBox(ApiParent):
 
 
     def sort_list(self, json):
+
         try:
             return json['alias'].upper()
         except KeyError:
@@ -453,7 +450,6 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setMaximum(counter+1)
         dialog.progressBar.setValue(0)
         srid = self.controller.plugin_settings_value('srid')
-
         virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', function_name, "memory")
 
         if counter > 0:
@@ -507,7 +503,6 @@ class GwToolBox(ApiParent):
 
         root = QgsProject.instance().layerTreeRoot()
         my_group = root.findGroup('GW Functions results')
-
         if my_group is None:
             my_group = root.insertGroup(0, 'GW Functions results')
 
