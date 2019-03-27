@@ -1,11 +1,10 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinsertform"(table_id varchar, lang varchar, id varchar) RETURNS pg_catalog.json AS $BODY$
+﻿
+CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(
+    table_id character varying,
+    lang character varying,
+    id character varying)
+  RETURNS json AS
+$BODY$
 DECLARE
 
 --    Variables
@@ -36,7 +35,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "arbrat_viari_upgrade", public;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -96,7 +95,7 @@ BEGIN
 		raise notice 'aux_json %', aux_json;
 
 	--      Get combo id's
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
+		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || '::text)) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
 		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
 		INTO combo_json; 
 
@@ -150,7 +149,7 @@ BEGIN
             array_index := array_index + 1;
 
 --            Get values
-            EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || quote_literal(column_type) || ')' 
+            EXECUTE 'SELECT ' || quote_ident(aux_json->>'name') || ' FROM ' || quote_ident(table_id) || ' WHERE ' || quote_ident(table_pkey) || ' = CAST(' || quote_literal(id) || ' AS ' || column_type || ')' 
                 INTO field_value; 
             field_value := COALESCE(field_value, '');
 
@@ -203,5 +202,12 @@ raise notice 'fields %', fields;
 
 END;
 $BODY$
-LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying)
+  OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) TO postgres;
+GRANT EXECUTE ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) TO role_basic;
+GRANT EXECUTE ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) TO qgisserver;
+GRANT EXECUTE ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) TO xtorret;
+REVOKE ALL ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) FROM public;

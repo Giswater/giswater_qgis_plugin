@@ -6,21 +6,21 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2622
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setvisit(p_data json)
+CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_api_setvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 
 -- INSERT WITH GEOMETRY (visit notinfra)
-  SELECT SCHEMA_NAME.gw_api_setvisit($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+  SELECT arbrat_viari_upgrade.gw_api_setvisit($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
   "feature":{"featureType":"visit", "tableName":"ve_visit_noinfra_typea", "id":10373, "idName":"visit_id"},
    "data":{"fields":{"class_id":"8","visit_id":"10373","visitcat_id":"1","startdate":null,"enddate":null},
 	   "canvas":{"xcoord":343434, "ycoord":234235235}}}$$) AS result
 
 
 --INSERT
-SELECT SCHEMA_NAME.gw_api_setvisit($${
+SELECT arbrat_viari_upgrade.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName":"visit_id"},
@@ -29,7 +29,7 @@ SELECT SCHEMA_NAME.gw_api_setvisit($${
 	}$$)
 
 --UPDATE
-SELECT SCHEMA_NAME.gw_api_setvisit($${
+SELECT arbrat_viari_upgrade.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1159,"idName":"visit_id"},
@@ -52,11 +52,15 @@ DECLARE
 	v_ckeckchangeclass int8;
 	v_xcoord float;
 	v_ycoord float;
+	v_visitextcode text;
+	v_visitcat int2;
+	v_status int2;
+
 
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "arbrat_viari_upgrade", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -66,6 +70,10 @@ BEGIN
     v_id = ((p_data ->>'feature')::json->>'id')::integer;
     v_feature = p_data ->>'feature';
     v_class = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
+    v_visitextcode = ((p_data ->>'data')::json->>'fields')::json->>'ext_code';
+    v_visitcat = ((p_data ->>'data')::json->>'fields')::json->>'visitcat_id';
+
+    v_status = ((p_data ->>'data')::json->>'fields')::json->>'status';
     v_tablename = ((p_data ->>'feature')::json->>'tableName');
     v_xcoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
     v_ycoord = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
@@ -74,9 +82,32 @@ BEGIN
 
  raise notice ' v_thegeom  %', v_thegeom ;
  
-   -- setting output parameter
+	-- setting output parameter
 	v_outputparameter := concat('{"client":',((p_data)->>'client'),', "feature":',((p_data)->>'feature'),', "data":',((p_data)->>'data'),'}')::json;
+
+	-- setting users value default
 	
+	-- visitclass_vdefault
+	IF (SELECT id FROM config_param_user WHERE parameter = 'visitclass_vdefault' AND cur_user=current_user) IS NOT NULL THEN
+		UPDATE config_param_user SET value = v_class WHERE parameter = 'visitclass_vdefault' AND cur_user=current_user;
+	ELSE
+		INSERT INTO config_param_user (parameter, value) VALUES ('visitclass_vdefault', v_class);
+	END IF;
+
+	-- visitextcode_vdefault
+	IF (SELECT id FROM config_param_user WHERE parameter = 'visitextcode_vdefault' AND cur_user=current_user) IS NOT NULL THEN
+		UPDATE config_param_user SET value = v_visitextcode WHERE parameter = 'visitextcode_vdefault' AND cur_user=current_user;
+	ELSE
+		INSERT INTO config_param_user (parameter, value) VALUES ('visitextcode_vdefault', v_visitextcode);
+	END IF;
+
+	-- visitcat_vdefault
+	IF (SELECT id FROM config_param_user WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user) IS NOT NULL THEN
+		UPDATE config_param_user SET value = v_visitcat WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user;
+	ELSE
+		INSERT INTO config_param_user (parameter, value) VALUES ('visitcat_vdefault', v_visitcat);
+	END IF;
+
 	--upsert visit
 	IF (SELECT id FROM om_visit WHERE id=v_id) IS NULL THEN
 
@@ -124,8 +155,10 @@ BEGIN
 				  compass=(((p_data ->>'data')::json->>'deviceTrace')::json->>'compass')::float
 				  WHERE visit_id=v_id;
 
+    raise exception 'v_id %', v_id;
+
 	-- getting geometry
-	EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=' || quote_literal(v_id)|| ')a')
+	EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=' || v_id || ')a')
             INTO v_geometry;
 
             raise notice 'v_geometry %', v_geometry;

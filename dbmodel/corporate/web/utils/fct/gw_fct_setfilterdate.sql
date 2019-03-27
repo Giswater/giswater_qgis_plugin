@@ -1,30 +1,34 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
--- Function: SCHEMA_NAME.gw_fct_setfilterdate(json)
+-- Function: arbrat_viari_upgrade.gw_fct_setfilterdate(json)
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_setfilterdate(json);
+-- DROP FUNCTION arbrat_viari_upgrade.gw_fct_setfilterdate(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setfilterdate(json_dates json)
+CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_fct_setfilterdate(json_dates json)
   RETURNS json AS
 $BODY$
+/*
+SELECT arbrat_viari_upgrade.gw_fct_setfilterdate('{"date_to":"14-03-2019 23:07","date_from":"14-03-2019 23:07", "lang":"es","device":3}') AS result
+*/
+
 DECLARE
 
 --    Variables
     event_id integer;
     existing_record integer;
     api_version text;
-    from_date_value date;
-    to_date_value date;
+    from_date_value timestamp;
+    to_date_value timestamp;
 
 BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "arbrat_viari_upgrade", public;
 
     --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -32,8 +36,8 @@ BEGIN
 
 
 --  Get values from json
-    from_date_value:= json_dates->>'from_date';
-    to_date_value:= json_dates->>'to_date';
+    from_date_value:= (json_dates->>'date_from')::timestamp;
+    to_date_value:= (json_dates->>'date_to')::timestamp;
 
 --      Check exists and set
     EXECUTE format('SELECT COUNT(*) FROM selector_date WHERE cur_user = current_user')

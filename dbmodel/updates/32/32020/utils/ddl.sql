@@ -11,8 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE om_visit ADD column lot_id integer;
 ALTER TABLE om_visit ADD COLUMN class_id integer;
 ALTER TABLE om_visit ADD COLUMN status integer;
-ALTER TABLE om_visit ADD COLUMN feature_type text;
-ALTER TABLE om_visit ADD COLUMN vtype integer;
+
 
 ALTER TABLE om_visit ALTER COLUMN visitcat_id DROP NOT NULL;
 
@@ -28,6 +27,25 @@ ALTER TABLE om_visit_event_photo ADD COLUMN fextension varchar(16);
 
 
 ALTER TABLE om_visit_parameter ADD COLUMN short_descript varchar(30);
+
+
+DROP TABLE selector_date;
+
+CREATE TABLE selector_date (
+  id serial NOT NULL,
+  from_date timestamp,
+  to_date timestamp,
+  context character varying(30),
+  cur_user text,
+  CONSTRAINT selector_date_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE om_visit_type(
+  id serial PRIMARY KEY,
+  idval character varying(30),
+  descript text
+);
 
 
 CREATE TABLE sys_combo_cat (
@@ -61,6 +79,7 @@ CREATE TABLE om_visit_class
   ismultievent boolean,
   feature_type text,
   sys_role_id character varying(30),
+  visit_type integer,
   CONSTRAINT om_visit_class_pkey PRIMARY KEY (id)
 );
 

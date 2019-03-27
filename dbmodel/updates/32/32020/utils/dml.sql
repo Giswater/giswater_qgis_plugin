@@ -25,5 +25,10 @@ INSERT INTO sys_combo_cat VALUES (4, 'incidency');
 INSERT INTO sys_combo_cat VALUES (5, 'om_lot_status');
 
 
+INSERT INTO om_visit_type VALUES (1, 'planned');
+INSERT INTO om_visit_type VALUES (2, 'unspected');
+
+
+
 
 -- add function gw_api_get_filtervalues_vdef

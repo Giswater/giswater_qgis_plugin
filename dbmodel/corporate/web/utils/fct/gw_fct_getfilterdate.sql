@@ -1,16 +1,21 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
--- Function: SCHEMA_NAME.gw_fct_getfilterdate(json)
+-- Function: arbrat_viari_upgrade.gw_fct_getfilterdate(json)
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_getfilterdate(json);
+-- DROP FUNCTION arbrat_viari_upgrade.gw_fct_getfilterdate(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfilterdate(info_json json)
+CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_fct_getfilterdate(info_json json)
   RETURNS json AS
 $BODY$
+/*
+SELECT arbrat_viari_upgrade.gw_fct_getfilterdate('{"istilemap":"False","device":3,"lang":"es"}') AS result
+*/
+
+
 DECLARE
 
 --	Variables
@@ -25,8 +30,7 @@ DECLARE
 	v_active boolean=true;
 	v_firsttab boolean=false;
 	v_istiled_filterstate varchar;
-	json_date_value character varying;
-	date_value date;
+	json_date_value timestamp;
 	fields json;
 	v_istilemap boolean;
 	device integer;
@@ -38,7 +42,7 @@ BEGIN
 
 
 -- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "arbrat_viari_upgrade", public;
 
 --  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -65,7 +69,7 @@ BEGIN
 		EXECUTE 'SELECT '|| (aux_json->>'dv_name_column') ||' FROM selector_date WHERE cur_user = current_user'
 		INTO json_date_value;
 				
-		filter_dates[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(filter_dates[(aux_json->>'orderby')::INT], 'value', json_date_value);
+		filter_dates[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(filter_dates[(aux_json->>'orderby')::INT], 'value', left (date_trunc('minute', json_date_value)::text, 16));
 		
 	END LOOP;
 
@@ -80,6 +84,8 @@ BEGIN
 
 --    Adding to the tabs structure
 	formTabs := formTabs || v_formTabs_inittab::text;
+
+	raise notice 'v_formTabs_inittab %', v_formTabs_inittab;
 
 /*	-- Add tab to json
 	fields := ('{"fields":' || array_to_json(filter_dates) || '}')::json;

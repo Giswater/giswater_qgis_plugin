@@ -6,27 +6,27 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2616
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setinsert(p_data json)
+CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_api_setinsert(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
 -- Indirects
 visit: (query used on setvisit function, not direct from client)
-SELECT SCHEMA_NAME.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT arbrat_viari_upgrade.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
 	"feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName": "visit_id"}, 
 	"data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":10, "desperfectes_arc":1, "neteja_arc":3},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 
 file: (query used on setfileinsert function, not direct from client)
-SELECT SCHEMA_NAME.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
+SELECT arbrat_viari_upgrade.gw_api_setinsert($${"client":{"device":3, "infoType":100, "lang":"ES"}, 
 	"feature":{"featureType":"file","tableName":"om_visit_file", "id":null, "idName": "id"}, 
 	"data":{"fields":{"visit_id":1, "hash":"testhash", "url":"urltest", "filetype":"png"},
 		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 
 -- directs
 feature:
-SELECT SCHEMA_NAME.gw_api_setinsert($${
+SELECT arbrat_viari_upgrade.gw_api_setinsert($${
 "client":{"device":9, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"node", "tableName":"v_edit_node", "id":"1251521", "idName": "node_id"},
@@ -68,8 +68,8 @@ DECLARE
 
 BEGIN
 	--    Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "arbrat_viari_upgrade", public;
+	v_schemaname = 'arbrat_viari_upgrade';
 	
 	-- Get paramters
 	EXECUTE 'SELECT epsg FROM version' INTO v_epsg;
@@ -81,7 +81,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-    p_data = REPLACE (p_data::text, '''''', 'null');
+        p_data = REPLACE (p_data::text, '''''', 'null');
        
 	-- Get input parameters:
 	v_feature  := (p_data ->> 'feature');
@@ -91,11 +91,12 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_idname := (p_data ->> 'feature')::json->> 'idName';
 	v_fields := ((p_data ->> 'data')::json->> 'fields')::json;
-
+	
+	
 	select array_agg(row_to_json(a)) into v_text from json_each(v_fields)a;
 
 	-- query text, step1
-	v_querytext := 'INSERT INTO ' || quote_ident(v_tablename) ||'(';
+	v_querytext := 'INSERT INTO ' || quote_ident(v_tablename) ||' (';
 
 	-- query text, step2
 	i=1;
@@ -160,9 +161,11 @@ BEGIN
 	END LOOP;
 
 	-- query text, final step
-	v_querytext := concat (quote_literal(v_querytext),' ) RETURNING ',quote_ident(v_idname));
+	v_querytext := concat ((v_querytext),' ) RETURNING ',quote_ident(v_idname));
 
 	RAISE NOTICE '--- Insert new file with query:: % ---', v_querytext;
+
+	--v_querytext = 'SELECT 1*1';
 	
 	-- execute query text
 	EXECUTE v_querytext INTO v_newid;

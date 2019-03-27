@@ -6,17 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit(p_visittype text, p_data json)
+
+
+CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_api_get_visit(p_visittype text, p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_api_getvisit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT arbrat_viari_upgrade.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_api_getvisit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT arbrat_viari_upgrade.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
 
 	
@@ -76,7 +78,7 @@ DECLARE
 	v_layermanager json;
 	v_filterfields json;
 	v_data json;
-	isnewvisit boolean;
+	isnewvisit boolean default false;
 	v_feature json;
 	v_addfile json;
 	v_deletefile json;
@@ -99,16 +101,22 @@ DECLARE
 	v_inputformname text;
 	v_isclasschanged boolean = false;  -- to identify if class of visit is changed. Important because in that case new form is reloaded with new widgets but nothing is upserted on database yet
 	v_visitduration text; 	-- to fix the duration of visit. Important because if visit is active on feature, existing visit is showed
-	v_existvisit_id int8;  -- to 
+	arbrat_viari_upgrade int8;  -- to 
 	v_status integer;  -- identifies the status of visit. Important because on status=0 visit is disabled
 	v_class integer;  -- identifies class of visit. Important because each class needs a diferent form
 	v_filterfeaturefield text;
+	v_visitcat integer;
+	v_visitextcode text;
+	v_startdate text;
+	v_enddate text;
+	v_extvisitclass integer;
+	v_existvisit_id integer;
 
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname := 'SCHEMA_NAME';
+	SET search_path = "arbrat_viari_upgrade", public;
+	v_schemaname := 'arbrat_viari_upgrade';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -118,7 +126,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-    p_data = REPLACE (p_data::text, '''''', 'null');
+	p_data = REPLACE (p_data::text, '''''', 'null');
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -142,13 +150,34 @@ BEGIN
 	
 		-- infraestructure visit
 		IF v_featuretype IS NOT NULL THEN
+		
 			--new visit
 			IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
-		
-				v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
-				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
+
+				-- getting dynamic value
+				v_visitclass := (SELECT value FROM config_param_user WHERE parameter = 'visitclass_vdefault' AND cur_user=current_user)::integer;	
+
+				IF p_visittype='planned' THEN
+				
+					IF ((SELECT visit_type FROM om_visit_class WHERE id=v_visitclass) = 1 AND (SELECT feature_type FROM om_visit_class WHERE id=v_visitclass) = upper(v_featuretype)) THEN
+						-- planned visitclass is acording feature type and visit type
+					ELSE
+						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
+					END IF;
+
+					IF v_visitclass IS NULL THEN
+						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
+					END IF;
+					
+				ELSE
+					IF (SELECT visit_type FROM om_visit_class WHERE id=v_visitclass) = 2 AND (SELECT feature_type FROM om_visit_class WHERE id=v_visitclass) = upper(v_featuretype) THEN
+						-- unexpected visitclass is acording feature type and visit type
+					ELSE
+						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type = upper(v_featuretype) AND visit_type=2 LIMIT 1);	
+					END IF;
+
 				END IF;
+							
 			-- existing visit
 			ELSE 
 				v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);
@@ -157,11 +186,11 @@ BEGIN
 				END IF;
 			END IF;
 			
-		-- no infraestructure visit
+		-- no infraestructure visit (only for unspected visits)
 		ELSE 
 			--new visit
 			IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
-				v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type IS NULL LIMIT 1);
+				v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type IS NULL AND visit_type=2 LIMIT 1);
 			
 			-- existing visit
 			ELSE 
@@ -181,9 +210,10 @@ BEGIN
 	-- getting if is new visit
 	IF (SELECT id FROM om_visit WHERE id=v_id::int8) IS NULL OR v_id IS NULL THEN
 		v_id := (SELECT max(id)+1 FROM om_visit);
-		isnewvisit = true;
+		isnewvisit = true;		
 	END IF;
 
+	
 	-- get if visit is related to some ifraestructure element or not
 	IF v_projecttype ='WS' THEN
 		v_queryinfra = (SELECT feature_id FROM (SELECT arc_id as feature_id, visit_id FROM om_visit_x_arc UNION SELECT node_id, visit_id 
@@ -202,38 +232,62 @@ BEGIN
 	
 	-- Check if exists some open visit on related feature with the class configured as vdefault for user
 	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL AND v_visitclass IS NOT NULL THEN
-		EXECUTE ('SELECT v.id FROM om_visit_x_' || quote_literal(v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
-			' WHERE ' || quote_ident(v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0 OR status = 0 AND (now()- enddate) < ''8 hours'') ' ||
-			' AND class_id = ' || quote_literal(v_visitclass) || ''
+		EXECUTE ('SELECT v.id FROM om_visit_x_'|| (v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
+			' WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0 OR status = 0 AND (now()- enddate) < ''8 hours'') ' ||
+			' AND class_id = ' || quote_literal(v_visitclass) || 
 			' ORDER BY startdate DESC LIMIT 1')
 			INTO v_existvisit_id;
-			
-		IF v_existvisit_id IS NOT NULL THEN
-			v_id = v_existvisit_id;
-			v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
-			v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
-			v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
-			v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
-			isnewvisit = false;
-		END IF;
 	END IF;
 
-	-- get change class
-	IF v_inputtablename != v_tablename THEN
-		v_isclasschanged = true;
+	IF v_existvisit_id IS NOT NULL THEN
+		v_id = v_existvisit_id;
+	END IF;
 
-		-- setting new value default for user
-		UPDATE config_param_user SET value=v_visitclass WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user;
+	IF isnewvisit IS FALSE THEN
+		v_extvisitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
+		v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
+		v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
+		v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
+	END IF;
+
+raise notice 'v_extvisitclass %', v_extvisitclass;
+
+	-- get change class
+	IF v_extvisitclass <> v_visitclass THEN
+		v_isclasschanged = true;
+		-- update change of class
+		UPDATE om_visit SET class_id=v_visitclass WHERE id=v_id::int8;
 
 		-- message
 		SELECT gw_api_getmessage(v_feature, 60) INTO v_message;
 	END IF;
 
-	-- set status of visit
+	-- setting values default of new visit
 	IF isnewvisit THEN
-		v_status :=1;
-	ELSE
-		v_status := (SELECT status FROM om_visit WHERE id=v_id::int8);
+	
+		-- dynamics (last user's choice)--
+		-- excode
+		v_visitextcode =  (SELECT value FROM config_param_user WHERE parameter = 'visitextcode_vdefault' AND cur_user=current_user)::text;		
+		--visitcat
+		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user)::integer;		
+	
+
+		-- statics (configured on config_param_user forcing values)--
+		--status
+		v_status = (SELECT value FROM config_param_user WHERE parameter = 'visitstatus_vdefault' AND cur_user=current_user)::integer;
+		IF v_status IS NULL THEN
+			v_status = 1;
+		END IF;
+		-- startdate
+		v_startdate = (SELECT value FROM config_param_user WHERE parameter = 'visitstartdate_vdefault_' AND cur_user=current_user)::integer;
+		IF v_startdate IS NULL THEN
+			v_startdate = left (date_trunc('minute', now())::text, 16);
+		END IF;
+		-- enddate
+		v_enddate = (SELECT value FROM config_param_user WHERE parameter = 'visitenddate_vdefault_' AND cur_user=current_user)::integer;				
+		-- parameter on singlevisit	
+		v_parameter = (SELECT value FROM config_param_user WHERE parameter = concat('visit_parameter_vdefault_', v_featuretype) AND cur_user=current_user)::integer;			
+		
 	END IF;
 
 	-- Get id column
@@ -328,7 +382,7 @@ BEGIN
 		-----------
 		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
 
-			IF isnewvisit OR v_isclasschanged THEN
+			IF isnewvisit THEN
 
 				IF v_formname IS NULL THEN
 					RAISE EXCEPTION 'Api is bad configured. There is no form related to tablename';
@@ -351,29 +405,40 @@ BEGIN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_id);
 						RAISE NOTICE ' --- SETTING visit id VALUE % ---',v_id ;
 					END IF;
-					
+
 					-- setting visitclass value
 					IF (aux_json->>'column_id') = 'class_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitclass::text);
 						RAISE NOTICE ' --- SETTING visitclass VALUE % ---',v_visitclass ;
 					END IF;
 
+					-- setting visitextcode value
+					IF (aux_json->>'column_id') = 'ext_code' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitextcode::text);
+						RAISE NOTICE ' --- SETTING v_visitextcode VALUE % ---',v_visitextcode ;
+					END IF;
+
+					-- setting visitcat
+					IF (aux_json->>'column_id') = 'visitcat_id' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_visitcat::text);
+						RAISE NOTICE ' --- SETTING v_visitcat VALUE % ---',v_visitcat ;
+					END IF;
+									
 					-- setting startdate
-					IF (aux_json->>'column_id') = 'startdate' THEN
-						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', left (date_trunc('second', now())::text, 19));	
+					IF (aux_json->>'column_id') = 'startdate' THEN		
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_startdate);	
 						RAISE NOTICE ' --- SETTING startdate VALUE --- now()';
 					END IF;
 
 					-- setting status
 					IF (aux_json->>'column_id') = 'status' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', '1'::text);	
-						RAISE NOTICE ' --- SETTING visitclass VALUE % ---', 1;
+						RAISE NOTICE ' --- SETTING status VALUE % ---', v_status;
 					END IF;
 
 					-- setting parameter in case of singleparameter visit
 					IF v_ismultievent IS FALSE THEN
 						IF (aux_json->>'column_id') = 'parameter_id' THEN
-							v_parameter := (SELECT parameter_id FROM om_visit_class_x_parameter WHERE class_id=v_visitclass LIMIT 1);
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
 							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_parameter ;
 						END IF;
@@ -386,7 +451,7 @@ BEGIN
 
 				-- getting values from feature
 				EXECUTE ('SELECT (row_to_json(a)) FROM 
-					(SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_idname) || ' = CAST($1 AS ' || quote_literal(v_columntype) || '))a')
+					(SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_idname) || ' = CAST($1 AS ' || (v_columntype) || '))a')
 					INTO v_values
 					USING v_id;
 	
@@ -401,7 +466,7 @@ BEGIN
 					array_index := array_index + 1;
 
 					v_fieldvalue := (v_values->>(aux_json->>'column_id'));	
-									
+		
 					IF (aux_json->>'widgettype')='combo' THEN 
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 
@@ -414,6 +479,11 @@ BEGIN
 					ELSE 
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_fieldvalue, ''));
 					END IF;	
+
+					-- formating dates
+					IF (aux_json->>'widgettype')='datepickertime' THEN 
+						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', left (date_trunc('minute', v_fieldvalue::timestamp)::text, 16));
+					END IF;
 
 					-- dissable widgets if visit is status=0
 					IF v_status = 0 AND (v_fields[(aux_json->>'orderby')::INT]->>'layout_id')::integer < 9 THEN 
@@ -532,7 +602,7 @@ BEGIN
 
         IF isnewvisit IS FALSE THEN        
 		IF v_geometry IS NULL AND v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-			EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM ' || quote_ident(v_featuretype) || ' WHERE ' || quote_ident(v_featuretype) || '_id::text=' || quote_literal(v_featureid) || '::text)a')
+			EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM ' || quote_ident(v_featuretype) || ' WHERE ' || (v_featuretype) || '_id::text=' || quote_literal(v_featureid) || '::text)a')
 				INTO v_geometry;
 		END IF;
 	END IF;
