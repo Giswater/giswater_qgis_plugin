@@ -27,7 +27,7 @@ from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTreeWidgetItem
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsMapLayerRegistry,  QgsProject, QgsDataSourceURI as QgsDataSourceUri
+    from qgis.core import QgsMapLayerRegistry, QgsProject, QgsDataSourceURI as QgsDataSourceUri
 else:
     from qgis.core import QgsProject, QgsDataSourceUri
 
@@ -512,7 +512,6 @@ class GwToolBox(ApiParent):
         if Qgis.QGIS_VERSION_INT < 29900:
             QgsMapLayerRegistry.instance().addMapLayer(virtual_layer, False)
         else:
-            # TODO 3.x
             QgsProject.instance().addMapLayer(virtual_layer, False)
 
         root = QgsProject.instance().layerTreeRoot()
