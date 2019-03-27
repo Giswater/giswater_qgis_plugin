@@ -44,15 +44,6 @@ from giswater.ui_manager import ApiDlgToolbox, ApiFunctionTb
 
 
 
-
-
-
-
-
-
-
-
-
 class GwToolBox(ApiParent):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
@@ -521,37 +512,4 @@ class GwToolBox(ApiParent):
             my_group = root.insertGroup(0, 'GW Functions results')
 
         my_group.insertLayer(0, virtual_layer)
-
-
-
-    def add_table_from_pg(self, schema_name, table_name, field_id, group_to_be_inserted=None):
-        layer = self.controller.get_layer_by_tablename(table_name)
-        if layer is not None:
-            return
-
-        layer = self.controller.get_layer_by_tablename("version")
-        credentials = self.controller.get_layer_source(layer)
-
-        foreign_uri = QgsDataSourceUri()
-        foreign_uri.setConnection(credentials['host'], credentials['port'], credentials['db'], credentials['user'], credentials['password'])
-        foreign_uri.setDataSource(schema_name, table_name, None, "", field_id)
-        new_layer = QgsVectorLayer(foreign_uri.uri(), table_name, "postgres")
-
-        if group_to_be_inserted is None:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                QgsMapLayerRegistry.instance().addMapLayer(new_layer)
-            else:
-                # TODO 3.x
-                QgsProject.instance().addMapLayer(new_layer)
-            return
-
-        root = QgsProject.instance().layerTreeRoot()
-        mygroup = root.findGroup(group_to_be_inserted)
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            QgsMapLayerRegistry.instance().addMapLayer(new_layer, False)
-        else:
-            # TODO 3.x
-            QgsProject.instance().addMapLayer(new_layer, False)
-        mygroup.insertLayer(0, new_layer)
 
