@@ -104,7 +104,7 @@
     </layout>
    </item>
    <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grb_input_layer">
      <property name="title">
       <string>Input layer:</string>
      </property>
@@ -155,9 +155,6 @@
        </widget>
       </item>
      </layout>
-     <zorder>rbt_previous</zorder>
-     <zorder>rbt_previous</zorder>
-     <zorder>rbt_layer</zorder>
     </widget>
    </item>
   </layout>
