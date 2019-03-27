@@ -158,9 +158,8 @@ class DaoController(object):
     
     def get_layer_source_from_credentials(self):
 
-        # Get database parameters from layer 'version'
-        layer = self.get_layer_by_tablename("version")
-
+        # Get database parameters from layer 'v_edit_node'
+        layer = self.get_layer_by_tablename("v_edit_node")
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
 
@@ -204,7 +203,7 @@ class DaoController(object):
 
         else:
             not_version = False
-            self.last_error = self.tr("Layer not found") + ": 'version'"
+            self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
             return None, not_version
 
         return credentials, not_version

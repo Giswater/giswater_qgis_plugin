@@ -424,7 +424,7 @@ class Giswater(QObject):
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
-        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')   
+        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')
 
         self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
