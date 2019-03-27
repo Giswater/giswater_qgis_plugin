@@ -111,6 +111,7 @@ DECLARE
 	v_enddate text;
 	v_extvisitclass integer;
 	v_existvisit_id integer;
+	v_value text;
 
 BEGIN
 
@@ -279,14 +280,21 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 			v_status = 1;
 		END IF;
 		-- startdate
-		v_startdate = (SELECT value FROM config_param_user WHERE parameter = 'visitstartdate_vdefault_' AND cur_user=current_user)::integer;
+		v_startdate = (SELECT value FROM config_param_user WHERE parameter = 'visitstartdate_vdefault' AND cur_user=current_user)::integer;
 		IF v_startdate IS NULL THEN
 			v_startdate = left (date_trunc('minute', now())::text, 16);
 		END IF;
 		-- enddate
-		v_enddate = (SELECT value FROM config_param_user WHERE parameter = 'visitenddate_vdefault_' AND cur_user=current_user)::integer;				
+		v_enddate = (SELECT value FROM config_param_user WHERE parameter = 'visitenddate_vdefault' AND cur_user=current_user)::integer;				
 		-- parameter on singlevisit	
-		v_parameter = (SELECT value FROM config_param_user WHERE parameter = concat('visit_parameter_vdefault_', v_featuretype) AND cur_user=current_user)::integer;			
+		v_parameter = (SELECT value FROM config_param_user WHERE parameter = 'visitparameter_vdefault' AND cur_user=current_user)::text;			
+		-- value for parameter on singlevisit	
+		v_value = (SELECT value FROM config_param_user WHERE parameter = 'visitparametervalue_vdefault' AND cur_user=current_user)::text;
+
+		-- if visitparametervalue_vdefault is used as date
+		IF  (SELECT value FROM config_param_system WHERE parameter = 'om_visit_parameter_value_datatype') = 'timestamp' AND v_value IS NULL THEN 
+			v_value = left (date_trunc('minute', now())::text, 16);
+		END IF;
 		
 	END IF;
 
@@ -442,6 +450,13 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
 							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_parameter ;
 						END IF;
+
+						IF (aux_json->>'column_id') = 'value' THEN
+							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'value', v_value);
+							RAISE NOTICE ' --- SETTING v_parameter VALUE % ---',v_value ;
+						END IF;
+
+						
 					END IF;
 				END LOOP;
 			ELSE 
