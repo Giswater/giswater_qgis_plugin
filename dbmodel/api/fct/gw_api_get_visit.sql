@@ -167,7 +167,7 @@ BEGIN
 					END IF;
 
 					IF v_visitclass IS NULL THEN
-						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
+						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
 					END IF;
 					
 				ELSE
