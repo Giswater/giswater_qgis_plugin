@@ -15,7 +15,7 @@ except ImportError:
 
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
-from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton
+from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtSql import QSqlQueryModel
 
@@ -128,10 +128,32 @@ class Giswater(QObject):
         self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
         action.triggered.connect(partial(self.update_sql.init_sql, connection_status))
 
+    
+    def show_python_console(self):
+        """ Show Python console and Log Messages panel if parameter 'devoloper_mode' = True """
+        
+        # Get parameter 'devoloper_mode'
+        devoloper_mode = self.settings.value('system_variables/devoloper_mode').upper()
+        if devoloper_mode != 'TRUE':
+            return
+            
+        # Manage Python console
+        python_console = self.iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
+        if python_console:
+            python_console.setVisible(True)
+        else:
+            import console
+            console.show_console()
+            
+        # Manage Log Messages panel
+        message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+        if message_log:
+            message_log.setVisible(True)
+        
 
     def tr(self, message):
         if self.controller:
-            return self.controller.tr(message)      
+            return self.controller.tr(message)
         
     
     def manage_action(self, index_action, function_name):  
@@ -534,7 +556,7 @@ class Giswater(QObject):
                           
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
-
+        
         self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
@@ -547,6 +569,10 @@ class Giswater(QObject):
                 self.controller.show_warning(message, 15)
                 self.controller.log_warning(str(self.controller.layer_source))
             return
+            
+        # Show Python console and Log Messages panel if parameter 'devoloper_mode' = True
+        self.show_python_console()
+        
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)
 
