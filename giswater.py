@@ -425,7 +425,6 @@ class Giswater(QObject):
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
         self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')   
-        self.table_version = self.settings.value('db/table_version', 'version') 
 
         self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
@@ -576,8 +575,8 @@ class Giswater(QObject):
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
 
-        # Get schema name from table 'version' and set it in controller and in config file
-        layer_version = self.controller.get_layer_by_tablename("version")
+        # Get schema name from table 'v_edit_node' and set it in controller and in config file
+        layer_version = self.controller.get_layer_by_tablename("v_edit_node")
         layer_source = self.controller.get_layer_source(layer_version)
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
@@ -792,8 +791,6 @@ class Giswater(QObject):
                 if self.table_man_pgully == uri_table:
                     self.layer_man_pgully = cur_layer
                 
-                if self.table_version == uri_table:
-                    self.layer_version = cur_layer
 
         # Set arrow cursor
         QApplication.setOverrideCursor(Qt.ArrowCursor)       
