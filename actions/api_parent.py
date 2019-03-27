@@ -1077,7 +1077,13 @@ class ApiParent(ParentAction):
                             if field['reg_exp'] is not None:
                                 reg_exp = QRegExp(str(field['reg_exp']))
                                 widget.setValidator(QRegExpValidator(reg_exp))
-                        widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        if Qgis.QGIS_VERSION_INT < 29900:
+                            widget.lostFocus.connect(
+                                partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        else:
+                            widget.editingFinished.connect(
+                                partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                     elif field['widgettype'] == 'combo':

@@ -145,13 +145,18 @@ class ManNodeDialog(ParentDialog):
         widget_ymax = self.dialog.findChild(QLineEdit, 'ymax')
         if widget_ymax is not None:
             widget_ymax.textChanged.connect(partial(self.compare_depth, widget_ymax, False))
-            widget_ymax.lostFocus.connect(partial(self.compare_depth, widget_ymax, True))
+            if Qgis.QGIS_VERSION_INT < 29900:
+                widget_ymax.lostFocus.connect(partial(self.compare_depth, widget_ymax, True))
+            else:
+                widget_ymax.editingFinished.connect(partial(self.compare_depth, widget_ymax, True))
 
         widget_ymax = self.dialog.findChild(QLineEdit, 'ymax')
         if widget_ymax is not None:
             widget_ymax.textChanged.connect(partial(self.compare_depth, widget_ymax, False))
-            widget_ymax.lostFocus.connect(partial(self.compare_depth, widget_ymax, True))
-
+            if Qgis.QGIS_VERSION_INT < 29900:
+                widget_ymax.lostFocus.connect(partial(self.compare_depth, widget_ymax, True))
+            else:
+                widget_ymax.editingFinished.connect(partial(self.compare_depth, widget_ymax, True))
 
         # Manage tab 'Scada'
         self.manage_tab_scada()        

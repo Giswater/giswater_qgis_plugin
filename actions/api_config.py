@@ -214,7 +214,10 @@ class ApiConfig(ApiParent):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    if Qgis.QGIS_VERSION_INT < 29900:
+                        widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    else:
+                        widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
@@ -296,7 +299,10 @@ class ApiConfig(ApiParent):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
+                    if Qgis.QGIS_VERSION_INT < 29900:
+                        widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
+                    else:
+                        widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
