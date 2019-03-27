@@ -89,21 +89,21 @@ class Giswater(QObject):
           
         # Set plugin settings
         self.settings = QSettings(setting_file, QSettings.IniFormat)
-        self.settings.setIniCodec(sys.getfilesystemencoding())  
-        
-        # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix) 
+        self.settings.setIniCodec(sys.getfilesystemencoding())
+
+        # Show Python console and Log Messages panel if parameter 'devoloper_mode' = True
+        self.show_python_console()
+
+        # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix)
         self.qgis_settings = QSettings()
         self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
         # Define signals
         self.set_signals()
 
-        if Qgis.QGIS_VERSION_INT < 29900:
+        if sys.version[0] == '2':
             reload(sys)
-            sys.setdefaultencoding('utf-8')  # @UndefinedVariable
-        # TODO: 3.x
-        else:
-            pass
+            sys.setdefaultencoding("utf-8")
 
         
     def set_signals(self): 
@@ -569,10 +569,7 @@ class Giswater(QObject):
                 self.controller.show_warning(message, 15)
                 self.controller.log_warning(str(self.controller.layer_source))
             return
-            
-        # Show Python console and Log Messages panel if parameter 'devoloper_mode' = True
-        self.show_python_console()
-        
+
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)
 
