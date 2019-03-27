@@ -181,24 +181,24 @@ BEGIN
 		
 			-- Update elements from old arc to new arcs
 			FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=arc_id_aux  LOOP
+				DELETE FROM element_x_arc WHERE arc_id=arc_id_aux;
 				INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux1.arc_id);
 				INSERT INTO element_x_arc (id, element_id, arc_id) VALUES (nextval('element_x_arc_id_seq'),rec_aux.element_id, rec_aux2.arc_id);
-				DELETE FROM element_x_arc WHERE arc_id=arc_id_aux;
 			END LOOP;
 		
 			-- Update documents from old arc to the new arcs
 			FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=arc_id_aux  LOOP
+				DELETE FROM doc_x_arc WHERE arc_id=arc_id_aux;
 				INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
 				INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
-				DELETE FROM doc_x_arc WHERE arc_id=arc_id_aux;
 
 			END LOOP;
 		
 			-- Update visits from old arc to the new arcs
 			FOR rec_aux IN SELECT * FROM om_visit_x_arc WHERE arc_id=arc_id_aux  LOOP
+				DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
 				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux1.arc_id);
 				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux2.arc_id);
-				DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
 
 			END LOOP;
 
