@@ -1762,10 +1762,13 @@ class UpdateSQL(ParentAction):
 
     def get_user_connection(self, connection_name):
 
+        connection_username = None
         settings = QSettings()
-        settings.beginGroup("PostgreSQL/connections/" + connection_name)
-        connection_username = settings.value('username')
-        settings.endGroup()
+        if connection_name:
+            settings.beginGroup("PostgreSQL/connections/" + connection_name)
+            connection_username = settings.value('username')
+            settings.endGroup()
+
         return connection_username
 
 
