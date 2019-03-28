@@ -505,14 +505,15 @@ def get_col_index_by_col_name(qtable, column_name):
     return column_index
 
 
-def set_regexp_date_validator(widget, button=None, type=1):
+def set_regexp_date_validator(widget, button=None, regex_type=1):
     """ Set QRegExpression in order to validate QLineEdit(widget) field type date.
     Also allow to enable or disable a QPushButton(button), like typical accept button
     @Type=1 (yyy-mm-dd), @Type=2 (dd-mm-yyyy)
     """
-
-    if type == 1:
+    placeholder = "yyyy-mm-dd"
+    if regex_type == 1:
         widget.setPlaceholderText("yyyy-mm-dd")
+        placeholder = "yyyy-mm-dd"
         reg_exp = QRegExp("(((\d{4})([-])(0[13578]|10|12)([-])(0[1-9]|[12][0-9]|3[01]))|"
                           "((\d{4})([-])(0[469]|11)([-])([0][1-9]|[12][0-9]|30))|"
                           "((\d{4})([-])(02)([-])(0[1-9]|1[0-9]|2[0-8]))|"
@@ -521,8 +522,9 @@ def set_regexp_date_validator(widget, button=None, type=1):
                           "(([0-9][0-9][0][48])([-])(02)([-])(29))|"
                           "(([0-9][0-9][2468][048])([-])(02)([-])(29))|"
                           "(([0-9][0-9][13579][26])([-])(02)([-])(29)))")
-    elif type == 2:
+    elif regex_type == 2:
         widget.setPlaceholderText("dd-mm-yyyy")
+        placeholder = "dd-mm-yyyy"
         reg_exp = QRegExp("(((0[1-9]|[12][0-9]|3[01])([-])(0[13578]|10|12)([-])(\d{4}))|"
                           "(([0][1-9]|[12][0-9]|30)([-])(0[469]|11)([-])(\d{4}))|"
                           "((0[1-9]|1[0-9]|2[0-8])([-])(02)([-])(\d{4}))|"
@@ -533,24 +535,24 @@ def set_regexp_date_validator(widget, button=None, type=1):
                           "((29)([-])(02)([-])([0-9][0-9][13579][26])))")
 
     widget.setValidator(QRegExpValidator(reg_exp))
-    widget.textChanged.connect(partial(eval_regex, widget, reg_exp, button))
+    widget.textChanged.connect(partial(eval_regex, widget, reg_exp, button, placeholder))
 
 
-def eval_regex(widget, reg_exp, button, text):
-    isValid = False
+def eval_regex(widget, reg_exp, button, placeholder, text):
+    is_valid = False
     if reg_exp.exactMatch(text) is True:
         widget.setStyleSheet("border: 1px solid gray")
-        isValid = True
+        is_valid = True
     elif str(text) == '':
         widget.setStyleSheet("border: 1px solid gray")
-        widget.setPlaceholderText("yyyy-mm-dd")
-        isValid = True
+        widget.setPlaceholderText(placeholder)
+        is_valid = True
     elif reg_exp.exactMatch(text) is False:
         widget.setStyleSheet("border: 1px solid red")
-        isValid = False
+        is_valid = False
 
-    if type(button) == QPushButton:
-        if isValid is False:
+    if button is not None and type(button) == QPushButton:
+        if is_valid is False:
             button.setEnabled(False)
         else:
             button.setEnabled(True)
