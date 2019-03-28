@@ -507,7 +507,6 @@ class Giswater(QObject):
 
         except AttributeError:
             self.controller.log_info("unload - AttributeError")
-            pass
         except:
             pass
     
@@ -538,8 +537,6 @@ class Giswater(QObject):
             for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:                
                     plugin_toolbar.toolbar.setVisible(visible)
-        except AttributeError:
-            pass
         except:
             pass                      
                                   
@@ -790,7 +787,6 @@ class Giswater(QObject):
                     
                 if self.table_man_pgully == uri_table:
                     self.layer_man_pgully = cur_layer
-                
 
         # Set arrow cursor
         QApplication.setOverrideCursor(Qt.ArrowCursor)       
@@ -1048,11 +1044,10 @@ class Giswater(QObject):
         """ Fill table 'audit_check_project' with layers data """
 
         self.dlg_audit_project = AuditCheckProjectResult()
-
         self.dlg_audit_project.tbl_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.dlg_audit_project.btn_close.clicked.connect(self.dlg_audit_project.close)
 
-        sql = ("DELETE FROM" + self.schema_name + ".audit_check_project"
+        sql = ("DELETE FROM " + self.schema_name + ".audit_check_project"
                " WHERE user_name = current_user AND fprocesscat_id = 1")
         self.controller.execute_sql(sql)
         sql = ""
