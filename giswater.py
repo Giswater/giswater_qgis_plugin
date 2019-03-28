@@ -444,7 +444,7 @@ class Giswater(QObject):
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
         self.feature_cat = {}             
-        sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
+        sql = "SELECT * FROM sys_feature_cat"
         rows = self.controller.dao.get_rows(sql)
         if not rows:
             return False
@@ -552,7 +552,7 @@ class Giswater(QObject):
                           
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
-        
+
         self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
@@ -1052,8 +1052,8 @@ class Giswater(QObject):
             return
                     
         # Update table 'selector_expl' of current user (delete and insert)
-        sql = ("DELETE FROM " + self.schema_name + ".selector_expl WHERE current_user = cur_user;"
-               "\nINSERT INTO " + self.schema_name + ".selector_expl (expl_id, cur_user)"
+        sql = ("DELETE FROM selector_expl WHERE current_user = cur_user;"
+               "\nINSERT INTO selector_expl (expl_id, cur_user)"
                " VALUES(" + expl_id + ", current_user);")
         self.controller.execute_sql(sql)        
         
@@ -1077,7 +1077,7 @@ class Giswater(QObject):
                 table_name = layer_source['table']
                 db_name = layer_source['db']
                 host_name = layer_source['host']
-                sql += ("\nINSERT INTO " + self.schema_name + ".audit_check_project"
+                sql += ("\nINSERT INTO audit_check_project"
                         " (table_schema, table_id, table_dbname, table_host, fprocesscat_id)"
                         " VALUES ('" + str(schema_name) + "', '" + str(table_name) + "', '" + str(db_name) + "', '" + str(host_name) + "', 1);")
                 
@@ -1085,7 +1085,7 @@ class Giswater(QObject):
         if not status:
             return False
                 
-        sql = ("SELECT " + self.schema_name + ".gw_fct_audit_check_project(1);")
+        sql = ("SELECT gw_fct_audit_check_project(1);")
         row = self.controller.get_row(sql, commit=True)
         if not row:
             return False
@@ -1094,7 +1094,7 @@ class Giswater(QObject):
             message = "This is not a valid Giswater project. Do you want to view problem details?"
             answer = self.controller.ask_question(message, "Warning!")
             if answer:
-                sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                sql = ("SELECT * FROM audit_check_project"
                        " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user AND criticity = 3")
                 rows = self.controller.get_rows(sql)
                 if rows:
@@ -1116,7 +1116,7 @@ class Giswater(QObject):
                 message = "Some layers of your role not found. Do you want to view them?"
                 answer = self.controller.ask_question(message, "Warning")
                 if answer:
-                    sql = ("SELECT * FROM " + self.schema_name + ".audit_check_project"
+                    sql = ("SELECT * FROM audit_check_project"
                            " WHERE fprocesscat_id = 1 AND enabled = false AND user_name = current_user")
                     rows = self.controller.get_rows(sql, log_sql=True)
                     if rows:

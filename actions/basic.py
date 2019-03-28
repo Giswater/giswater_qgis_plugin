@@ -18,10 +18,10 @@ class Basic(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
+
         self.minor_version = "3.0"
         self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.logged = False
         self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')        
         
 
@@ -80,6 +80,7 @@ class Basic(ParentAction):
 
     def basic_hydrometer_state_selector(self):
         """ Button 51: Hydrometer selector """
+
         # Create the dialog and signals
         self.dlg_hydro_state = Multirow_selector()
         self.load_settings(self.dlg_hydro_state)
@@ -117,8 +118,10 @@ class Basic(ParentAction):
      
      
     def close_dialog(self, dlg):
+
         ParentAction.close_dialog(self, dlg)
         try:
             self.search_plus.refresh_data()
         except:
             pass
+

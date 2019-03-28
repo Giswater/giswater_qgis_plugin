@@ -416,9 +416,9 @@ class ParentAction(object):
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE " + name + " NOT IN "
-        query_left += "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft
-        query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+        query_left = "SELECT * FROM " + tableleft + " WHERE " + name + " NOT IN "
+        query_left += "(SELECT " + tableleft + "." + name + " FROM " + tableleft
+        query_left += " RIGHT JOIN " + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
 
         self.fill_table_by_query(tbl_all_rows, query_left)
@@ -428,8 +428,8 @@ class ParentAction(object):
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        query_right = "SELECT " + tableleft + "."  + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.schema_name + "." + tableleft
-        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
+        query_right = "SELECT " + tableleft + "."  + name + ", cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + tableleft
+        query_right += " JOIN " + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_right += " WHERE cur_user = current_user"
 
         self.fill_table_by_query(tbl_selected_rows, query_right)
@@ -439,7 +439,7 @@ class ParentAction(object):
         dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
 
         # Button unselect
-        query_delete = "DELETE FROM " + self.schema_name + "." + tableright
+        query_delete = "DELETE FROM " + tableright
         query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
         dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
@@ -502,7 +502,7 @@ class ParentAction(object):
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(" + id_des + ", cur_user)"
-                   " FROM " + self.schema_name + "." + tablename_des + ""
+                   " FROM " + tablename_des + ""
                    " WHERE " + id_des + " = '" + str(expl_id[i]) + "' AND cur_user = current_user")
             row = self.controller.get_row(sql)
 
@@ -511,7 +511,7 @@ class ParentAction(object):
                 message = "Id already selected"
                 self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
-                sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + " (" + field_id + ", cur_user) "
+                sql = ("INSERT INTO " + tablename_des + " (" + field_id + ", cur_user) "
                        " VALUES (" + str(expl_id[i]) + ", current_user)")
                 self.controller.execute_sql(sql)
 
@@ -523,8 +523,10 @@ class ParentAction(object):
 
     def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected @table_name. Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(table_name)
@@ -543,8 +545,10 @@ class ParentAction(object):
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(table_name)
@@ -555,6 +559,7 @@ class ParentAction(object):
         # Check for errors
         if self.model.lastError().isValid():
             self.controller.show_warning(self.model.lastError().text())
+
         # Attach model to table view
         widget.setModel(self.model)
 
@@ -578,9 +583,9 @@ class ParentAction(object):
         """ Fill the QTableView by filtering through the QLineEdit"""
         
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
-        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE " + name + " NOT IN "
-               "(SELECT " + tableleft + "." + name + " FROM " + self.schema_name + "." + tableleft + ""
-               " RIGHT JOIN " + self.schema_name + "." + tableright + ""
+        sql = ("SELECT * FROM " + tableleft + " WHERE " + name + " NOT IN "
+               "(SELECT " + tableleft + "." + name + " FROM " + tableleft + ""
+               " RIGHT JOIN " + tableright + ""
                " ON " + tableleft + "." + field_id_l + " = " + tableright + "." + field_id_r + ""
                " WHERE cur_user = current_user) AND LOWER(" + name + "::text) LIKE '%" + query + "%'")
         self.fill_table_by_query(qtable, sql)
@@ -655,7 +660,7 @@ class ParentAction(object):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
+               " FROM config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
         rows = self.controller.get_rows(sql, log_info=False)
@@ -704,8 +709,8 @@ class ParentAction(object):
 
     def set_label_current_psector(self, dialog):
 
-        sql = ("SELECT t1.name FROM " + self.schema_name + ".plan_psector AS t1 "
-               " INNER JOIN " + self.schema_name + ".config_param_user AS t2 ON t1.psector_id::text = t2.value "
+        sql = ("SELECT t1.name FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='psector_vdefault' AND cur_user = current_user")
         row = self.controller.get_row(sql)
         if not row:
@@ -742,7 +747,7 @@ class ParentAction(object):
         title = "Delete records"
         answer = self.controller.ask_question(message, title, inf_text)
         if answer:
-            sql = "DELETE FROM " + self.schema_name + "." + table_name
+            sql = "DELETE FROM " + table_name
             sql += " WHERE " + column_id + " IN (" + list_id + ")"
             self.controller.execute_sql(sql)
             widget.model().select()
@@ -800,7 +805,7 @@ class ParentAction(object):
 
         # Set SQL
         sql = ("SELECT DISTINCT(" + field_search + ")"
-               " FROM " + self.schema_name + "." + tablename + ""
+               " FROM " + tablename + ""
                " ORDER BY " + field_search + "")
         row = self.controller.get_rows(sql)
 
