@@ -266,8 +266,8 @@ SELECT element_x_gully.id,
 JOIN element ON element.element_id = element_x_gully.element_id
 JOIN value_state ON element.state = value_state.id
 LEFT JOIN value_state_type ON element.state_type = value_state_type.id
-LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text
+LEFT JOIN man_type_location ON man_type_location.location_type = element.location_type AND man_type_location.feature_type='ELEMENT'
 LEFT JOIN cat_element ON cat_element.id=element.elementcat_id
-WHERE element.state = 1 and man_type_location.feature_type='ELEMENT';
+WHERE element.state = 1;
 
 

@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1314
 
-CREATE OR REPLACE FUNCTION "ws".gw_trg_edit_man_arc()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_arc()
   RETURNS trigger AS
 $BODY$
 DECLARE 
