@@ -14,7 +14,8 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 
-changelog=Version 3.1.110 (21/03/2019)
+changelog=Version 3.1.110 (28/03/2019)
+    - Change widget builtdate from element dialog [68566aa]
     - Remove current date as default builtdate into custom forms[6d9a825]
     - Bug fix on mincut sequence
     - Improve cadtools [f440038]
