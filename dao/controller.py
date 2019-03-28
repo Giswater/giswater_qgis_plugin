@@ -40,8 +40,7 @@ class DaoController(object):
         self.iface = iface               
         self.translator = None           
         self.plugin_dir = None           
-        self.giswater = None                
-        self.logged = False 
+        self.giswater = None
         self.postgresql_version = None
         self.logger = None
         self.schema_name = None
@@ -138,7 +137,6 @@ class DaoController(object):
         self.dao = None 
         self.last_error = None      
         self.log_codes = {}
-        self.logged = False
         
         self.layer_source, not_version = self.get_layer_source_from_credentials()
         if self.layer_source:
@@ -147,13 +145,8 @@ class DaoController(object):
                 return False, not_version
         else:
             return False, not_version
-            
-        # Connect to database
-        self.logged = self.connect_to_database(self.layer_source['host'], self.layer_source['port'], 
-                                               self.layer_source['db'], self.layer_source['user'],
-                                               self.layer_source['password'])
 
-        return self.logged, not_version
+        return True, not_version
     
     
     def get_layer_source_from_credentials(self):
@@ -758,7 +751,10 @@ class DaoController(object):
         # Initialize variables
         layer_source = {'db': None, 'schema': None, 'table': None, 
                         'host': None, 'port': None, 'user': None, 'password': None}
-        
+
+        if layer is None:
+            return layer_source
+
         # Get dbname, host, port, user and password
         uri = layer.dataProvider().dataSourceUri()
         pos_db = uri.find('dbname=')
