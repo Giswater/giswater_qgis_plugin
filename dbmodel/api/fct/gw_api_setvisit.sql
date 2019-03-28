@@ -6,21 +6,21 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2622
 
-CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_api_setvisit(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_setvisit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 
 -- INSERT WITH GEOMETRY (visit notinfra)
-  SELECT arbrat_viari_upgrade.gw_api_setvisit($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+  SELECT ws_sample.gw_api_setvisit($${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
   "feature":{"featureType":"visit", "tableName":"ve_visit_noinfra_typea", "id":10373, "idName":"visit_id"},
    "data":{"fields":{"class_id":"8","visit_id":"10373","visitcat_id":"1","startdate":null,"enddate":null},
 	   "canvas":{"xcoord":343434, "ycoord":234235235}}}$$) AS result
 
 
 --INSERT
-SELECT arbrat_viari_upgrade.gw_api_setvisit($${
+SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":null, "idName":"visit_id"},
@@ -29,7 +29,7 @@ SELECT arbrat_viari_upgrade.gw_api_setvisit($${
 	}$$)
 
 --UPDATE
-SELECT arbrat_viari_upgrade.gw_api_setvisit($${
+SELECT ws_sample.gw_api_setvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"visit", "tableName":"ve_visit_arc_insp", "id":1159,"idName":"visit_id"},
@@ -60,7 +60,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "arbrat_viari_upgrade", public;
+    SET search_path = "ws_sample", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -155,7 +155,6 @@ BEGIN
 				  compass=(((p_data ->>'data')::json->>'deviceTrace')::json->>'compass')::float
 				  WHERE visit_id=v_id;
 
-    raise exception 'v_id %', v_id;
 
 	-- getting geometry
 	EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=' || v_id || ')a')

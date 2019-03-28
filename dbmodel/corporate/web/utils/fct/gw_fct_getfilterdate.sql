@@ -4,15 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- Function: arbrat_viari_upgrade.gw_fct_getfilterdate(json)
+-- Function: ws_sample.gw_fct_getfilterdate(json)
 
--- DROP FUNCTION arbrat_viari_upgrade.gw_fct_getfilterdate(json);
+-- DROP FUNCTION ws_sample.gw_fct_getfilterdate(json);
 
-CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_fct_getfilterdate(info_json json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getfilterdate(info_json json)
   RETURNS json AS
 $BODY$
 /*
-SELECT arbrat_viari_upgrade.gw_fct_getfilterdate('{"istilemap":"False","device":3,"lang":"es"}') AS result
+SELECT ws_sample.gw_fct_getfilterdate('{"istilemap":"False","device":3,"lang":"es"}') AS result
 */
 
 
@@ -42,7 +42,7 @@ BEGIN
 
 
 -- Set search path to local schema
-	SET search_path = "arbrat_viari_upgrade", public;
+	SET search_path = "ws_sample", public;
 
 --  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -69,7 +69,7 @@ BEGIN
 		EXECUTE 'SELECT '|| (aux_json->>'dv_name_column') ||' FROM selector_date WHERE cur_user = current_user'
 		INTO json_date_value;
 				
-		filter_dates[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(filter_dates[(aux_json->>'orderby')::INT], 'value', left (date_trunc('minute', json_date_value)::text, 16));
+		filter_dates[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(filter_dates[(aux_json->>'orderby')::INT], 'value', to_char(json_date_value, 'DD-MM-YYYY HH:MM'));
 		
 	END LOOP;
 
