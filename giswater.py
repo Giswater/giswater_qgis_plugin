@@ -584,6 +584,19 @@ class Giswater(QObject):
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
 
+        # Set PostgreSQL parameter 'search_path'
+        self.controller.set_search_path(layer_source['db'], layer_source['schema'])
+        self.controller.log_info("Set search_path")
+        connection_status, not_version = self.controller.set_database_connection()
+        self.set_info_button(connection_status)
+        if not connection_status or not_version:
+            message = self.controller.last_error
+            if show_warning:
+                if message:
+                    self.controller.show_warning(message, 15)
+                self.controller.log_warning(str(self.controller.layer_source))
+            return
+
         # Check if schema exists
         self.schema_exists = self.controller.dao.check_schema(self.schema_name)
         if not self.schema_exists:
