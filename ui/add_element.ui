@@ -609,11 +609,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QDateEdit" name="builtdate">
-              <property name="calendarPopup">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <widget class="QLineEdit" name="builtdate"/>
             </item>
            </layout>
           </item>

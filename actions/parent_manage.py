@@ -151,7 +151,7 @@ class ParentManage(ParentAction, object):
             state = ""
             if row['state']:
                 sql = ("SELECT name FROM " + self.schema_name + ".value_state"
-                                                                " WHERE id = '" + str(row['state']) + "'")
+                       " WHERE id = '" + str(row['state']) + "'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     state = row_aux[0]
@@ -159,14 +159,14 @@ class ParentManage(ParentAction, object):
             expl_id = ""
             if row['expl_id']:
                 sql = ("SELECT name FROM " + self.schema_name + ".exploitation"
-                                                                " WHERE expl_id = '" + str(row['expl_id']) + "'")
+                       " WHERE expl_id = '" + str(row['expl_id']) + "'")
                 row_aux = self.controller.get_row(sql, commit=self.autocommit)
                 if row_aux:
                     expl_id = row_aux[0]
 
             utils_giswater.setWidgetText(dialog, "code", row['code'])
             sql = ("SELECT elementtype_id FROM " + self.schema_name + ".cat_element"
-                                                                      " WHERE id = '" + str(row['elementcat_id']) + "'")
+                   " WHERE id = '" + str(row['elementcat_id']) + "'")
             row_type = self.controller.get_row(sql)
             if row_type:
                 utils_giswater.setWidgetText(dialog, "element_type", row_type[0])
@@ -178,8 +178,7 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
             utils_giswater.setWidgetText(dialog, "location_type", row['location_type'])
             utils_giswater.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
-            builtdate = QDate.fromString(str(row['builtdate']), 'yyyy-MM-dd')
-            dialog.builtdate.setDate(builtdate)
+            utils_giswater.setWidgetText(dialog, "builtdate", row['builtdate'])
             utils_giswater.setWidgetText(dialog, "workcat_id", row['workcat_id'])
             utils_giswater.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
             utils_giswater.setWidgetText(dialog, "comment", row['comment'])

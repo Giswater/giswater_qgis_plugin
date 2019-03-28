@@ -67,6 +67,8 @@ class ManageElement(ParentManage):
         # Manage i18n of the form
         # self.controller.translate_form(self.dlg, 'element')
 
+        utils_giswater.set_regexp_date_validator(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept)
+
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.update_location_cmb))
@@ -140,7 +142,6 @@ class ManageElement(ParentManage):
         # If is a new element dont need set enddate
         if self.new_element_id is True:
             # Set calendars date from config_param_user
-            self.set_calendars(self.dlg_add_element, 'builtdate', 'config_param_user', 'value', 'builtdate_vdefault')
             utils_giswater.setWidgetText(self.dlg_add_element, 'num_elements', '1')
 
         self.update_location_cmb()
@@ -190,6 +191,7 @@ class ManageElement(ParentManage):
         ownercat_id = utils_giswater.getWidgetText(self.dlg_add_element, "ownercat_id", return_string_null=False)
         location_type = utils_giswater.getWidgetText(self.dlg_add_element, "location_type", return_string_null=False)
         buildercat_id = utils_giswater.getWidgetText(self.dlg_add_element, "buildercat_id", return_string_null=False)
+        builtdate = utils_giswater.getWidgetText(self.dlg_add_element, "builtdate", return_string_null=False)
         workcat_id = utils_giswater.getWidgetText(self.dlg_add_element, "workcat_id", return_string_null=False)
         workcat_id_end = utils_giswater.getWidgetText(self.dlg_add_element, "workcat_id_end", return_string_null=False)
         comment = utils_giswater.getWidgetText(self.dlg_add_element, "comment", return_string_null=False)
@@ -199,7 +201,6 @@ class ManageElement(ParentManage):
         rotation = utils_giswater.getWidgetText(self.dlg_add_element, "rotation")
         if rotation == 0 or rotation is None or rotation == 'null':
             rotation = '0'
-        builtdate = self.dlg_add_element.builtdate.dateTime().toString('yyyy-MM-dd')
         undelete = self.dlg_add_element.undelete.isChecked()
 
         # Check mandatory fields
@@ -251,7 +252,7 @@ class ManageElement(ParentManage):
                        ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (" VALUES ('" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
-                              + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
+                              + str(link) + "', '" + str(undelete) + "'")
 
             else:
                 sql = ("INSERT INTO " + self.schema_name + ".v_edit_element (element_id, , elementcat_id, num_elements, state"
@@ -260,8 +261,12 @@ class ManageElement(ParentManage):
 
                 sql_values = (" VALUES ('" + str(element_id) + "', '" + str(num_elements) + "', '" + str(elementcat_id) + "', '" + str(num_elements) + "', '" + str(state) + "', '"
                               + str(expl_id) + "', '" + str(rotation) + "', '" + str(comment) + "', '" + str(observ) + "', '"
-                              + str(link) + "', '" + str(undelete) + "', '" + str(builtdate) + "'")
+                              + str(link) + "', '" + str(undelete) + "'")
 
+            if builtdate:
+                sql_values += ", '" + str(builtdate) + "'"
+            else:
+                sql_values += ", null"
             if ownercat_id:
                 sql_values += ", '" + str(ownercat_id) + "'"
             else:
@@ -286,6 +291,7 @@ class ManageElement(ParentManage):
                 sql_values += ", '" + str(verified) + "'"
             else:
                 sql_values += ", null"
+
             if str(self.x) != "":
                 sql_values += ", ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
                 self.x = ""
@@ -315,8 +321,11 @@ class ManageElement(ParentManage):
                    " SET elementcat_id = '" + str(elementcat_id) + "', num_elements = '" + str(num_elements) + "', state = '" + str(state) + "'"
                    ", expl_id = '" + str(expl_id) + "', rotation = '" + str(rotation) + "'"
                    ", comment = '" + str(comment) + "', observ = '" + str(observ) + "'"
-                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'"
-                   ", builtdate = '" + str(builtdate) + "'")
+                   ", link = '" + str(link) + "', undelete = '" + str(undelete) + "'")
+            if builtdate:
+                sql += ", builtdate = '" + str(builtdate) + "'"
+            else:
+                sql += ", builtdate = null"
             if ownercat_id:
                 sql += ", ownercat_id = '" + str(ownercat_id) + "'"
             else:
