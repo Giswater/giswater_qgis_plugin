@@ -562,7 +562,8 @@ class Giswater(QObject):
         if not connection_status or not_version:
             message = self.controller.last_error
             if show_warning:
-                self.controller.show_warning(message, 15)
+                if message:
+                    self.controller.show_warning(message, 15)
                 self.controller.log_warning(str(self.controller.layer_source))
             return
 
@@ -573,8 +574,12 @@ class Giswater(QObject):
         self.controller.manage_translation(self.plugin_name)
 
         # Get schema name from table 'v_edit_node' and set it in controller and in config file
-        layer_version = self.controller.get_layer_by_tablename("v_edit_node")
-        layer_source = self.controller.get_layer_source(layer_version)
+        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        if not layer:
+            self.controller.show_warning("Layer not found", parameter="v_edit_node")
+            return
+
+        layer_source = self.controller.get_layer_source(layer)
         self.schema_name = layer_source['schema']
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)
         self.controller.set_schema_name(self.schema_name)
