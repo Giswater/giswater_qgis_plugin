@@ -543,7 +543,7 @@ def eval_regex(widget, reg_exp, button, text):
         isValid = True
     elif str(text) == '':
         widget.setStyleSheet("border: 1px solid gray")
-        widget.setPlaceholderText("yyyy-mm-dddd")
+        widget.setPlaceholderText("yyyy-mm-dd")
         isValid = True
     elif reg_exp.exactMatch(text) is False:
         widget.setStyleSheet("border: 1px solid red")
