@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1314
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_arc()
+CREATE OR REPLACE FUNCTION "ws".gw_trg_edit_man_arc()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -208,6 +208,22 @@ BEGIN
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
+
+		-- epa type
+		IF (NEW.epa_type != OLD.epa_type) THEN    
+			IF (OLD.epa_type = 'PIPE') THEN
+				inp_table:= 'inp_pipe';            
+				v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+				EXECUTE v_sql;
+			END IF;
+			inp_table := NULL;
+
+			IF (NEW.epa_type = 'PIPE') THEN
+				inp_table:= 'inp_pipe';   
+				v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
+				EXECUTE v_sql;
+			END IF;
+		END IF;
 	
 		-- State
 		IF (NEW.state != OLD.state) THEN
