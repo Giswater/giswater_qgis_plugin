@@ -151,8 +151,8 @@ class ManArcDialog(ParentDialog):
         widget_y.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, widget_node)
         text = utils_giswater.getWidgetText(self.dialog, widget_y)
-
-        if text is None:
+        self.controller.log_info(str(text))
+        if text is None or str(text) == 'null':
             return
         if widget_node is None:
             return
@@ -161,7 +161,7 @@ class ManArcDialog(ParentDialog):
         row = self.controller.get_row(sql, log_sql=True)
         if row:
             if row['ymax'] is not None:
-                if float(row['ymax']) < float(text) :
+                if float(row['ymax']) < float(text):
                     widget_y.setStyleSheet("border: 1px solid red")
                     if show_message:
                         msg = "The depth of {} is less than the y{}".format(widget_node.objectName(), widget_node.objectName()[5:6])
