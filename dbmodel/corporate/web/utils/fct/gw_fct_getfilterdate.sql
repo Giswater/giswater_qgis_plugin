@@ -70,6 +70,12 @@ BEGIN
 		INTO json_date_value;
 				
 		filter_dates[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(filter_dates[(aux_json->>'orderby')::INT], 'value', to_char(json_date_value, 'DD-MM-YYYY HH:MM'));
+
+
+		IF (aux_json->>'name') = 'date_to' THEN
+		filter_dates[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(filter_dates[(aux_json->>'orderby')::INT], 'value', to_char(json_date_value, 'DD-MM-YYYY'));
+		END IF;
+		
 		
 	END LOOP;
 

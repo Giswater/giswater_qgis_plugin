@@ -30,6 +30,11 @@ BEGIN
 	END LOOP;
 	*/
 	
+	-- set result on result selector
+	-- NOTE: In spite of there are two selectors tables (rpt_selector_result, rpt_selector_compare) only it's setted one
+	DELETE FROM rpt_selector_result WHERE result_id=result_id_var AND cur_user=current_user;
+	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+	
 
 RETURN 0;
 

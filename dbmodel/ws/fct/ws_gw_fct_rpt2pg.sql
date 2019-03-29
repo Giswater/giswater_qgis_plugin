@@ -27,6 +27,11 @@ BEGIN
 	UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=result_id_var;
 	UPDATE rpt_arc SET flow=(-1)*flow WHERE flow<0 and result_id=result_id_var;
 	
+	-- set result on result selector
+	-- NOTE: In spite of there are four selectors tables (rpt_selector_result, rpt_selector_compare, rpt_selector_hourly, rpt_selector_hourly_compare) only it's setted one
+	DELETE FROM rpt_selector_result WHERE result_id=result_id_var AND cur_user=current_user;
+	INSERT INTO rpt_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
+	
 	
 RETURN 0;
 		
