@@ -39,6 +39,9 @@ BEGIN
 				UPDATE rpt_inp_arc SET status='CLOSED' WHERE concat(v_valverec.node_id,'_n2a')=arc_id AND result_id=result_id_var;
 			END LOOP;
 
+			-- set demands affected into the mincut area
+			UPDATE rpt_inp_node SET demand=0 WHERE rpt_inp_node.node_id IN (SELECT node_id FROM anl_mincut_result_node WHERE result_id=v_mincutresult) AND result_id=result_id_var;
+
 		ELSIF v_valvemode = 'INVENTORY VALUES' THEN
 			FOR v_valverec IN SELECT node_id FROM v_edit_man_valve WHERE closed IS TRUE
 			LOOP
