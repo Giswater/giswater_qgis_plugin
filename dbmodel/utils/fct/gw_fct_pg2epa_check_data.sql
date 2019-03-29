@@ -393,7 +393,8 @@ BEGIN
 --  Return
     RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{"result":' || v_result ||
+		     ',"data":{"geometryType":"",
+				       "result":' || v_result ||
 			     '}'||
 		       '}'||
 	    '}')::json;
