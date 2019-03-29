@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>624</width>
-    <height>327</height>
+    <width>446</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,15 +15,15 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="topMargin">
-      <number>15</number>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="bottomMargin">
-      <number>7</number>
-     </property>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+     <widget class="QWidget" name="tab_result">
+      <attribute name="title">
+       <string>Result</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QLabel" name="label_result_name_to_show">
          <property name="minimumSize">
@@ -64,64 +64,6 @@
          </property>
         </widget>
        </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QLabel" name="label_result_name_to_show_2">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>120</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <property name="text">
-          <string>Time (to show):</string>
-         </property>
-         <property name="margin">
-          <number>3</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="cmb_time_to_show">
-         <property name="frame">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <property name="topMargin">
-      <number>7</number>
-     </property>
-     <property name="bottomMargin">
-      <number>15</number>
-     </property>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
         <widget class="QLabel" name="label_result_name_to_compare">
          <property name="minimumSize">
@@ -162,10 +104,66 @@
          </property>
         </widget>
        </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+     </widget>
+     <widget class="QWidget" name="tab_time">
+      <attribute name="title">
+       <string>Time</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QLabel" name="label_result_name_to_show_2">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>120</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <property name="text">
+          <string>Time (to show):</string>
+         </property>
+         <property name="margin">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="cmb_time_to_show">
+         <property name="frame">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QLabel" name="label_result_name_to_compare_2">
          <property name="minimumSize">
@@ -206,22 +204,22 @@
          </property>
         </widget>
        </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+     </widget>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">

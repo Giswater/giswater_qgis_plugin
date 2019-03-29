@@ -97,15 +97,16 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
 
-        # TODO es realmente result_id de la vista v_ui_rpt_cat_result lo que debemos comparar?
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
         # Open dialog
         self.dlg_go2epa.show()
 
+
     def cancel_imports(self):
         self.counter = self.iterations
         self.imports_canceled = True
+
 
     def active_recurrent(self, state):
         if state == 2:  # Checked
@@ -114,6 +115,7 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_recurrent.setEnabled(False)
             utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, False)
             self.recurrent(0)
+
 
     def recurrent(self, state):
         if state == 0:
@@ -143,52 +145,61 @@ class Go2Epa(ApiParent):
             else:
                 utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, False)
 
+
+    def check_inp_chk(self, file_inp):
+        if file_inp is None:
+            msg = "Select valid INP file"
+            self.controller.show_warning(msg, parameter=str(file_inp))
+            return False
+
+
+    def check_rpt(self):
+        file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+        # Control execute epa software
+        if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
+            if self.check_inp_chk(file_inp) is False:
+                return False
+
+            if file_rpt is None:
+                msg = "Select valid RPT file"
+                self.controller.show_warning(msg, parameter=str(file_rpt))
+                return False
+
+            if not utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
+                if not os.path.exists(file_inp):
+                    msg = "File INP not found"
+                    self.controller.show_warning(msg, parameter=str(file_rpt))
+                    return False
+
+
     def check_fields(self):
         file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
-        self.controller.log_info(str(file_inp))
-        self.controller.log_info(str(file_rpt))
-        self.controller.log_info(str(result_name))
         # Control export INP
         if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
-            if file_inp is None:
-                self.controller.log_info(str("TEST 10"))
-                msg = "Select valid INP file"
-                self.controller.show_warning(msg, parameter=str(file_inp))
+            if self.check_inp_chk(file_inp) is False:
                 return False
 
         # Control execute epa software
-        if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
-
-            if file_inp is None:
-                self.controller.log_info(str("TEST 20"))
-                msg = "Select valid INP file"
-                self.controller.show_warning(msg, parameter=str(file_inp))
-                return False
-            elif not os.path.exists(file_inp):
-                self.controller.log_info(str("TEST 30"))
-                f = open(file_inp, "w+")
-                f.close()
-
-            if file_rpt is None:
-                msg = "Select valid RPT file"
-                self.controller.show_warning(msg, parameter=str(file_rpt))
-                return False
-            elif not os.path.exists(file_rpt):
-                f = open(file_rpt, "w+")
-                f.close()
+        if self.check_rpt() is False:
+            return False
 
         # Control import result
         if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
             if file_rpt is None:
-                msg = "Select valid RPT file"
-                self.controller.show_warning(msg, parameter=str(file_rpt))
-                return False
-            elif not os.path.exists(file_rpt):
-                f = open(file_rpt, "w+")
-                f.close()
-
+                    msg = "Select valid RPT file"
+                    self.controller.show_warning(msg, parameter=str(file_rpt))
+                    return False
+            if not utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
+                if not os.path.exists(file_rpt):
+                    msg = "File RPT not found"
+                    self.controller.show_warning(msg, parameter=str(file_rpt))
+                    return False
+            else:
+                if self.check_rpt() is False:
+                    return False
 
         # Control result name
         if result_name == '':
@@ -207,6 +218,7 @@ class Go2Epa(ApiParent):
                     return False
         return True
 
+
     def go2epa_sector_selector(self):
         tableleft = "sector"
         tableright = "inp_selector_sector"
@@ -214,12 +226,14 @@ class Go2Epa(ApiParent):
         field_id_right = "sector_id"
         self.sector_selection(tableleft, tableright, field_id_left, field_id_right)
 
+
     def load_user_values(self):
         """ Load QGIS settings related with csv options """
         cur_user = self.controller.get_current_user()
         self.result_name = self.controller.plugin_settings_value('RESULT_NAME' + cur_user)
         self.file_inp = self.controller.plugin_settings_value('FILE_INP' + cur_user)
         self.file_rpt = self.controller.plugin_settings_value('FILE_RPT' + cur_user)
+
 
     def save_user_values(self):
         """ Save QGIS settings related with csv options """
@@ -230,6 +244,7 @@ class Go2Epa(ApiParent):
                                                   utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp'))
         self.controller.plugin_settings_set_value("FILE_RPT" + cur_user,
                                                   utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt'))
+
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
         """ Load the tables in the selection form """
@@ -257,10 +272,12 @@ class Go2Epa(ApiParent):
         dlg_psector_sel.setWindowFlags(Qt.WindowStaysOnTopHint)
         dlg_psector_sel.exec_()
 
+
     def epa_options(self):
         """ Open dialog api_epa_options.ui.ui """
         status = self.g2epa_opt.go2epa_options()
         return
+
 
     def ud_hydrology_selector(self):
         """ Dialog hydrology_selector.ui """
@@ -476,7 +493,7 @@ class Go2Epa(ApiParent):
 
         self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid gray")
         status = self.check_fields()
-        if not status:
+        if status is False:
             return
 
         # Get widgets values
@@ -735,7 +752,8 @@ class Go2Epa(ApiParent):
         # Create the dialog and signals
         self.dlg_go2epa_result = EpaResultCompareSelector()
         self.load_settings(self.dlg_go2epa_result)
-
+        if self.project_type == 'ud':
+            utils_giswater.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_times")
         self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
         self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa_result))
         self.dlg_go2epa_result.rejected.connect(partial(self.close_dialog, self.dlg_go2epa_result))
@@ -748,21 +766,18 @@ class Go2Epa(ApiParent):
         rows = [('', '')]
         rows.extend(self.controller.get_rows(sql))
         utils_giswater.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
+        if self.project_type == 'ws':
+            sql = ("SELECT DISTINCT time, time FROM " + self.schema_name + ".rpt_arc "
+                   " WHERE result_id ILIKE '%%' ORDER BY time")
+            rows = [('', '')]
+            rows.extend(self.controller.get_rows(sql))
+            utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
+            utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
 
-        sql = ("SELECT DISTINCT time, time FROM " + self.schema_name + ".rpt_arc "
-               " WHERE result_id ILIKE '%%' ORDER BY time")
-        rows = [('', '')]
-        rows.extend(self.controller.get_rows(sql))
-        utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
-        utils_giswater.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
-
-        # self.populate_time(self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show)
-        # self.populate_time(self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_time_to_compare)
-
-        self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
-            self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show))
-        self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
-            self.populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_time_to_compare))
+            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
+                self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show))
+            self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
+                self.populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_time_to_compare))
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_result"
@@ -796,16 +811,19 @@ class Go2Epa(ApiParent):
         user = self.controller.get_project_user()
         # Delete previous values
         sql = ("DELETE FROM " + self.schema_name + ".rpt_selector_result WHERE cur_user = '" + user + "';\n"
-               "DELETE FROM " + self.schema_name + ".rpt_selector_compare WHERE cur_user = '" + user + "';\n"
-               "DELETE FROM " + self.schema_name + ".rpt_selector_hourly WHERE cur_user = '" + user + "';\n"
-               "DELETE FROM " + self.schema_name + ".rpt_selector_hourly_compare WHERE cur_user = '" + user + "';\n")
+               "DELETE FROM " + self.schema_name + ".rpt_selector_compare WHERE cur_user = '" + user + "';\n")
+        if self.project_type == 'ws':
+            sql += ("DELETE FROM " + self.schema_name + ".rpt_selector_hourly WHERE cur_user = '" + user + "';\n"
+                    "DELETE FROM " + self.schema_name + ".rpt_selector_hourly_compare "
+                    " WHERE cur_user = '" + user + "';\n")
         self.controller.execute_sql(sql, log_sql=False)
 
         # Get new values from widgets of type QComboBox
         rpt_selector_result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
         rpt_selector_compare_id = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
-        time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
-        time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
+        if self.project_type == 'ws':
+            time_to_show = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
+            time_to_compare = utils_giswater.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
 
 
         if rpt_selector_result_id not in (None, -1, ''):
@@ -816,14 +834,15 @@ class Go2Epa(ApiParent):
             sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_compare (result_id, cur_user)"
                    " VALUES ('" + str(rpt_selector_compare_id) + "', '" + user + "');\n")
             self.controller.execute_sql(sql, log_sql=False)
-        if time_to_show not in (None, -1, ''):
-            sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly(time, cur_user)"
-                   " VALUES ('" + str(time_to_show) + "', '" + user + "');\n")
-            self.controller.execute_sql(sql, log_sql=False)
-        if time_to_compare not in (None, -1, ''):
-            sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly_compare(time, cur_user)"
-                   " VALUES ('" + str(time_to_compare) + "', '" + user + "');\n")
-            self.controller.execute_sql(sql, log_sql=False)
+        if self.project_type == 'ws':
+            if time_to_show not in (None, -1, ''):
+                sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly(time, cur_user)"
+                       " VALUES ('" + str(time_to_show) + "', '" + user + "');\n")
+                self.controller.execute_sql(sql, log_sql=False)
+            if time_to_compare not in (None, -1, ''):
+                sql = ("INSERT INTO " + self.schema_name + ".rpt_selector_hourly_compare(time, cur_user)"
+                       " VALUES ('" + str(time_to_compare) + "', '" + user + "');\n")
+                self.controller.execute_sql(sql, log_sql=False)
 
         # Show message to user
         message = "Values has been updated"
