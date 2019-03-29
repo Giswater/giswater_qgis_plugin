@@ -52,6 +52,10 @@ BEGIN
 	ELSIF v_coefficient = 'REAL' THEN
 		UPDATE rpt_inp_node SET demand=lps_avg::numeric(12,6)*v_epaunitsfactor FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 	END IF;
+
+	-- update patterns
+	UPDATE rpt_inp_node SET pattern=pattern_id FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+
 	
 RETURN 1;
 END;
