@@ -397,8 +397,8 @@ class GwToolBox(ApiParent):
         trv_widget.setUniformRowHeights(False)
         main_parent = QStandardItem('{}'.format('Giswater'))
         self.icon_folder = self.plugin_dir + os.sep + 'icons'
-        path_icon_blue = self.icon_folder + + os.sep + '36.png'
-        path_icon_red = self.icon_folder + + os.sep + '100.png'
+        path_icon_blue = self.icon_folder + os.sep + '36.png'
+        path_icon_red = self.icon_folder + os.sep + '100.png'
         if os.path.exists(path_icon_blue):
             icon = QIcon(path_icon_blue)
             main_parent.setIcon(icon)
