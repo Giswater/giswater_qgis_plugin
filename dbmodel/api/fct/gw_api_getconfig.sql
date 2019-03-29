@@ -6,18 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2570
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getconfig(p_data json)
+CREATE OR REPLACE FUNCTION "SCHAME_NAME".gw_api_getconfig(p_data json)
   RETURNS json AS
 $BODY$
 DECLARE
 
 /*EXAMPLE:
-SELECT SCHEMA_NAME.gw_api_getconfig($${
+SELECT "SCHAME_NAME".gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"epaoptions"},
 "feature":{},"data":{}}$$)
 
-SELECT SCHEMA_NAME.gw_api_getconfig($${
+SELECT "SCHAME_NAME".gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"config"},
 "feature":{},"data":{}}$$)
@@ -55,7 +55,7 @@ SELECT SCHEMA_NAME.gw_api_getconfig($${
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = ""SCHAME_NAME"", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -121,7 +121,7 @@ BEGIN
 	LOOP	
 		IF (aux_json->>'dv_parent_id') IS null THEN
 			-- Get combo id's
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((aux_json->>'dv_querytext'))||' ORDER BY idval)a'
+			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
 				INTO combo_json;
 
 			raise notice 'aux_json %', aux_json;
@@ -130,7 +130,7 @@ BEGIN
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
 
 			-- Get combo values
-			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||quote_literal((aux_json->>'dv_querytext'))||' ORDER BY idval)a'
+			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
 				INTO combo_json; 
 				combo_json := COALESCE(combo_json, '[]');
 
@@ -154,10 +154,10 @@ BEGIN
 					raise notice 'v_selected_id %',v_selected_id;
 					-- Get combo id's
 					IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN	
-						query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||quote_literal((aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
+						query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
 						execute query_text INTO combo_json_child;
 					ELSE 	
-						EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||' ORDER BY idval)a' INTO combo_json_child;
+						EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY idval)a' INTO combo_json_child;
 					END IF;
 					raise notice 'combo_json_child %',combo_json_child;
 					-- Update array
@@ -165,10 +165,10 @@ BEGIN
 					fields_array[(aux_json->>'orderby')::INT+1] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT+1], 'selectedId', aux_json->>'value');      
 					-- Get combo values
 					IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN
-						query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||quote_literal((aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(quote_literal(v_selected_id))||' ORDER BY idval) a';
+						query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(quote_literal(v_selected_id))||' ORDER BY idval) a';
 						execute query_text INTO combo_json_child;
 					ELSE 	
-						EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(quote_literal(aux_json_child->>'dv_querytext'))||' ORDER BY idval)a'
+						EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY idval)a'
 							INTO combo_json_child;
 					END IF;
 					raise notice 'combo_json_child %',combo_json_child;
@@ -275,5 +275,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_getconfig(json)
+ALTER FUNCTION "SCHAME_NAME".gw_api_getconfig(json)
   OWNER TO postgres;
