@@ -133,58 +133,57 @@ BEGIN
             NEW.presszonecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='presszone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
         END IF;
 		
-	--Inventory	
-	NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
+		--Inventory	
+		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
-	--Publish
-	NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		--Publish
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
 		
-	-- Exploitation
-	IF (NEW.expl_id IS NULL) THEN
-		NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
-			NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='exploitation_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.expl_id IS NULL) THEN
-				PERFORM audit_function(2012,1302,NEW.arc_id);
-			END IF;		
+				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				IF (NEW.expl_id IS NULL) THEN
+					PERFORM audit_function(2012,1302,NEW.arc_id);
+				END IF;		
+			END IF;
 		END IF;
-	END IF;
 
-	-- Municipality 
-	IF (NEW.muni_id IS NULL) THEN
-		NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		-- Municipality 
 		IF (NEW.muni_id IS NULL) THEN
-			NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.muni_id IS NULL) THEN
-				PERFORM audit_function(2024,1302,NEW.arc_id);
-			END IF;	
+				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+				IF (NEW.muni_id IS NULL) THEN
+					PERFORM audit_function(2024,1302,NEW.arc_id);
+				END IF;	
+			END IF;
 		END IF;
-	END IF;
-	
-	-- Builtdate
-	IF (NEW.builtdate IS NULL) THEN
-		NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-	END IF;  
-	
-	-- Set EPA type
-	IF (NEW.epa_type IS NULL) THEN
-		NEW.epa_type = 'PIPE';   
-	END IF; 
-	   
-	-- LINK
-	IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
-		NEW.link=NEW.arc_id;
-	END IF;
 		
+		-- Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;  
+		
+        -- Set EPA type
+       NEW.epa_type = 'PIPE';   
+	   
+	   -- LINK
+	   IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+	      NEW.link=NEW.arc_id;
+	   END IF;
+		
+    
         -- FEATURE INSERT
-	INSERT INTO arc (arc_id, code, node_1, node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
-		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
-		descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation, publish, inventory, expl_id,num_value)
-		VALUES (NEW.arc_id,NEW.code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW."comment", NEW.custom_length,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, 
-		NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
-		NEW.muni_id, NEW.postcode, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2,
-		NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation, 
-		NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
+    		INSERT INTO arc (arc_id, code, node_1, node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
+					workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
+					descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation, publish, inventory, expl_id,num_value)
+					VALUES (NEW.arc_id,NEW.code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW."comment", NEW.custom_length,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, 
+					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
+					NEW.muni_id, NEW.postcode, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2,
+					NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation, 
+					NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
 
 
 		IF edit_enable_arc_nodes_update_aux IS TRUE THEN
