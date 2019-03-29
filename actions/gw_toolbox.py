@@ -197,6 +197,8 @@ class GwToolBox(ApiParent):
 
         dialog.progressBar.setValue(0)
         dialog.progressBar.setVisible(True)
+        extras = ''
+        feature_field = ''
         # Check if time functions is short or long, activate and set undetermined  if not short
         for group, function in list(result['fields'].items()):
             if len(function) != 0:
@@ -215,31 +217,32 @@ class GwToolBox(ApiParent):
         if self.is_paramtetric is False:
             self.execute_no_parametric(dialog, function_name)
             return
+        if str(function[0]['input_params']['featureType']) != "":
+            layer_name = utils_giswater.get_item_data(dialog, combo, 1)
+            if layer_name != -1:
+                layer = self.set_selected_layer(dialog, combo)
 
-        layer_name = utils_giswater.get_item_data(dialog, combo, 1)
-        if layer_name != -1:
-            layer = self.set_selected_layer(dialog, combo)
-
-        selection_mode = self.rbt_checked['widget']
-        extras = '"selectionMode":"'+selection_mode+'",'
-        # Check selection mode and get (or not get) all feature id
-        feature_id_list = '"id":['
-        if (selection_mode == 'wholeSelection') or(selection_mode == 'previousSelection' and layer is None):
-            feature_id_list += ']'
-        elif selection_mode == 'previousSelection' and layer is not None:
-            features = layer.selectedFeatures()
-            for feature in features:
-                feature_id = feature.attribute(feature_type+"_id")
-                feature_id_list += '"'+feature_id+'", '
-            if len(features) > 0:
-                feature_id_list = feature_id_list[:-2] + ']'
-            else:
+            selection_mode = self.rbt_checked['widget']
+            extras += '"selectionMode":"'+selection_mode+'",'
+            # Check selection mode and get (or not get) all feature id
+            feature_id_list = '"id":['
+            if (selection_mode == 'wholeSelection') or(selection_mode == 'previousSelection' and layer is None):
                 feature_id_list += ']'
+            elif selection_mode == 'previousSelection' and layer is not None:
+                features = layer.selectedFeatures()
+                for feature in features:
+                    feature_id = feature.attribute(feature_type+"_id")
+                    feature_id_list += '"'+feature_id+'", '
+                if len(features) > 0:
+                    feature_id_list = feature_id_list[:-2] + ']'
+                else:
+                    feature_id_list += ']'
 
-        feature_field = ''
-        if layer_name != -1:
-            feature_field = '"tableName":"' + layer_name + '", '
-        feature_field += feature_id_list
+
+            if layer_name != -1:
+                feature_field = '"tableName":"' + layer_name + '", '
+            feature_field += feature_id_list
+
         widget_list = dialog.grb_parameters.findChildren(QWidget)
         widget_is_void = False
         extras += '"parameters":{'
@@ -339,8 +342,12 @@ class GwToolBox(ApiParent):
                         layout.addWidget(label, 0, 0)
                     status = True
                     break
-
-                self.populate_layer_combo(function[0]['input_params']['featureType'])
+                self.controller.log_info("TEAT"+str(function[0]['input_params']['featureType']))
+                if str(function[0]['input_params']['featureType']) == "":
+                    dialog.grb_input_layer.setVisible(False)
+                    dialog.grb_selection_type.setVisible(False)
+                else:
+                    self.populate_layer_combo(function[0]['input_params']['featureType'])
                 self.construct_form_param_user(dialog, function, 0, self.function_list, False)
                 self.load_settings_values(dialog, function)
                 status = True
@@ -464,6 +471,9 @@ class GwToolBox(ApiParent):
                     virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', function_name, "memory")
                 elif 'ST_Point' in str(geom_type):
                     virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', function_name, "memory")
+                #TODO capas poligon
+                #TODO cargar las no geometricas
+
 
         prov = virtual_layer.dataProvider()
 
