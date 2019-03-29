@@ -163,7 +163,7 @@ class ManArcDialog(ParentDialog):
         node_id = utils_giswater.getWidgetText(self.dialog, widget_node)
         text = utils_giswater.getWidgetText(self.dialog, widget_y)
 
-        if text is None:
+        if text is None or str(text) == 'null':
             return
         if widget_node is None:
             return

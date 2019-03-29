@@ -245,7 +245,8 @@ class ManNodeDialog(ParentDialog):
                         widget_ymax.setStyleSheet("border: 1px solid red")
                         arcs_list += str((row['feature_id'] + ", "))
                         bad_alert = True
-        if len(arcs_list)>2:
+                        
+        if len(arcs_list) > 2:
             arcs_list = arcs_list[:-2]
 
         if show_message and bad_alert:
