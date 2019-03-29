@@ -4,15 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- Function: arbrat_viari_upgrade.gw_fct_setfilterdate(json)
+-- Function: "SCHEMA_NAME".gw_fct_setfilterdate(json)
 
--- DROP FUNCTION arbrat_viari_upgrade.gw_fct_setfilterdate(json);
+-- DROP FUNCTION "SCHEMA_NAME".gw_fct_setfilterdate(json);
 
-CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_fct_setfilterdate(json_dates json)
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_setfilterdate(json_dates json)
   RETURNS json AS
 $BODY$
 /*
-SELECT arbrat_viari_upgrade.gw_fct_setfilterdate('{"date_to":"14-03-2019 23:07","date_from":"14-03-2019 23:07", "lang":"es","device":3}') AS result
+SELECT "SCHEMA_NAME".gw_fct_setfilterdate('{"date_to":"14-03-2019 23:07","date_from":"14-03-2019 23:07", "lang":"es","device":3}') AS result
 */
 
 DECLARE
@@ -28,7 +28,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari_upgrade", public;
+    SET search_path = ""SCHEMA_NAME"", public;
 
     --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'

@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(
     table_id character varying,
     lang character varying,
     id character varying)
@@ -35,7 +35,7 @@ BEGIN
 
 
 --    Set search path to local schema
-    SET search_path = "arbrat_viari_upgrade", public;
+    SET search_path = ""SCHEMA_NAME"", public;
 
 --    Get schema name
     schemas_array := current_schemas(FALSE);
@@ -204,10 +204,10 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying)
+ALTER FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(character varying, character varying, character varying)
   OWNER TO postgres;
-GRANT EXECUTE ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) TO postgres;
-GRANT EXECUTE ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) TO role_basic;
-GRANT EXECUTE ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) TO qgisserver;
-GRANT EXECUTE ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) TO xtorret;
-REVOKE ALL ON FUNCTION arbrat_viari_upgrade.gw_fct_getinsertform(character varying, character varying, character varying) FROM public;
+GRANT EXECUTE ON FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(character varying, character varying, character varying) TO postgres;
+GRANT EXECUTE ON FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(character varying, character varying, character varying) TO role_basic;
+GRANT EXECUTE ON FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(character varying, character varying, character varying) TO qgisserver;
+GRANT EXECUTE ON FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(character varying, character varying, character varying) TO xtorret;
+REVOKE ALL ON FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(character varying, character varying, character varying) FROM public;
