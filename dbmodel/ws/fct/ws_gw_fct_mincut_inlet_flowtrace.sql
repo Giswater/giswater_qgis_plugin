@@ -45,7 +45,7 @@ BEGIN
 	inner join v_edit_node AS node2 on node_1 = node2.node_id);
 	
 	-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
-	DELETE FROM anl_mincut_arc_x_node WHERE arc_id IN 
+	DELETE FROM anl_mincut_arc_x_node WHERE user_name=current_user AND arc_id IN 
 	(SELECT a.arc_id FROM 
 	(SELECT count(*) AS count, arc_id FROM anl_mincut_arc_x_node GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
 		
