@@ -100,11 +100,6 @@ class ParentMapTool(QgsMapTool):
         
         self.force_active_layer = True
         
-        # Set default encoding
-        if Qgis.QGIS_VERSION_INT < 29900:
-            reload(sys)
-            sys.setdefaultencoding('utf-8')   #@UndefinedVariable
-        
         
     def get_cursor_multiple_selection(self):
         """ Set cursor for multiple selection """
