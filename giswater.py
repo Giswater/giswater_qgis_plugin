@@ -92,7 +92,7 @@ class Giswater(QObject):
         self.settings.setIniCodec(sys.getfilesystemencoding())
 
         # Show Python console and Log Messages panel if parameter 'devoloper_mode' = True
-        self.show_python_console()
+        #self.show_python_console()
 
         # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix)
         self.qgis_settings = QSettings()
