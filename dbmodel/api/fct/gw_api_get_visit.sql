@@ -8,17 +8,17 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_get_visit(p_visittype text, p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit(p_visittype text, p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- unexpected first call
-SELECT ws_sample.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "tableName":"v_edit_node", "id":"1074"},"fields":{},"pageInfo":null}}$$)
+SELECT SCHEMA_NAME.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "tableName":"v_edit_node", "id":"1074"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT ws_sample.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"139"},"fields":{},"pageInfo":null}}$$)
+SELECT SCHEMA_NAME.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"139"},"fields":{},"pageInfo":null}}$$)
 
 
 
@@ -102,7 +102,7 @@ DECLARE
 	v_inputformname text;
 	v_isclasschanged boolean = false;  -- to identify if class of visit is changed. Important because in that case new form is reloaded with new widgets but nothing is upserted on database yet
 	v_visitduration text; 	-- to fix the duration of visit. Important because if visit is active on feature, existing visit is showed
-	ws_sample int8;  -- to 
+	SCHEMA_NAME int8;  -- to 
 	v_status integer;  -- identifies the status of visit. Important because on status=0 visit is disabled
 	v_class integer;  -- identifies class of visit. Important because each class needs a diferent form
 	v_filterfeaturefield text;
@@ -117,8 +117,8 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
-	v_schemaname := 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'

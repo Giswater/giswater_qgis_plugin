@@ -4,15 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- Function: ws_sample.gw_fct_getfilterdate(json)
+-- Function: SCHEMA_NAME.gw_fct_getfilterdate(json)
 
--- DROP FUNCTION ws_sample.gw_fct_getfilterdate(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_getfilterdate(json);
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_getfilterdate(info_json json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfilterdate(info_json json)
   RETURNS json AS
 $BODY$
 /*
-SELECT ws_sample.gw_fct_getfilterdate('{"istilemap":"False","device":3,"lang":"es"}') AS result
+SELECT SCHEMA_NAME.gw_fct_getfilterdate('{"istilemap":"False","device":3,"lang":"es"}') AS result
 */
 
 
@@ -42,7 +42,7 @@ BEGIN
 
 
 -- Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 --  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
