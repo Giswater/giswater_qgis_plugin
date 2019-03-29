@@ -6,18 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2570
 
-CREATE OR REPLACE FUNCTION "SCHAME_NAME".gw_api_getconfig(p_data json)
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_api_getconfig(p_data json)
   RETURNS json AS
 $BODY$
 DECLARE
 
 /*EXAMPLE:
-SELECT "SCHAME_NAME".gw_api_getconfig($${
+SELECT "SCHEMA_NAME".gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"epaoptions"},
 "feature":{},"data":{}}$$)
 
-SELECT "SCHAME_NAME".gw_api_getconfig($${
+SELECT "SCHEMA_NAME".gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"config"},
 "feature":{},"data":{}}$$)
@@ -55,7 +55,7 @@ SELECT "SCHAME_NAME".gw_api_getconfig($${
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = ""SCHAME_NAME"", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -144,7 +144,7 @@ BEGIN
 					(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 					project_type, dv_querytext,dv_querytext_filterc,dv_parent_id, isparent, sys_role_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby,
 					placeholder
-					FROM audit_cat_param_user WHERE dv_parent_id='||quote_literal(aux_json->>'widgetname')||') a WHERE widgettype = ''combo'''
+					FROM audit_cat_param_user WHERE dv_parent_id='||aux_json->>'widgetname'||') a WHERE widgettype = ''combo'''
 					INTO combo_rows_child;
 					combo_rows_child := COALESCE(combo_rows_child, '{}');
 				
@@ -275,5 +275,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION "SCHAME_NAME".gw_api_getconfig(json)
+ALTER FUNCTION "SCHEMA_NAME".gw_api_getconfig(json)
   OWNER TO postgres;
