@@ -34,16 +34,24 @@ DECLARE
 	v_query_text text;
 	v_arcsearchnodes float;
 	v_status text;
+	v_nodarc_min float;
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	--  Looking for parameters
+	--  Looking for nodarc values
+	SELECT min(st_length(the_geom)) FROM rpt_inp_arc JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_arc.sector_id WHERE result_id=result_id_var
+		INTO v_nodarc_min;
+
 	v_nod2arc := (SELECT value::float FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' and cur_user=current_user limit 1)::float;
 	IF v_nod2arc is null then 
 		v_nod2arc = 0.3;
+	END IF;
+	
+	IF v_nod2arc > v_nodarc_min-0.01 THEN
+		v_nod2arc = v_nodarc_min-0.01;
 	END IF;
 
 	v_arcsearchnodes := 0.1;
@@ -74,8 +82,6 @@ BEGIN
     FOR node_id_aux IN EXECUTE v_query_text
     LOOP
 	
---        RAISE NOTICE 'Process valve: %', node_id_aux;
-
         -- Get node data
 		SELECT * INTO record_node FROM rpt_inp_node WHERE node_id = node_id_aux AND result_id=result_id_var;
 
