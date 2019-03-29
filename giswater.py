@@ -101,10 +101,6 @@ class Giswater(QObject):
         # Define signals
         self.set_signals()
 
-        if sys.version[0] == '2':
-            reload(sys)
-            sys.setdefaultencoding("utf-8")
-
         
     def set_signals(self): 
         """ Define widget and event signals """
@@ -482,7 +478,8 @@ class Giswater(QObject):
 
     def unload(self):
         """ Removes the plugin menu item and icon from QGIS GUI """
-        
+
+
         try:
 
             # Remove icon of action 'Info'
@@ -491,7 +488,7 @@ class Giswater(QObject):
             for action in list(self.actions.values()):
                 self.iface.removePluginMenu(self.plugin_name, action)
                 self.iface.removeToolBarIcon(action)
-                
+
             for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:
                     plugin_toolbar.toolbar.setVisible(False)                
@@ -499,7 +496,7 @@ class Giswater(QObject):
 
             if self.search_plus:
                 self.search_plus.unload()
-            
+
             # unload all loaded giswater related modules
             for modName, mod in list(sys.modules.items()):
                 if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
@@ -509,7 +506,7 @@ class Giswater(QObject):
             self.controller.log_info("unload - AttributeError")
         except:
             pass
-    
+
     
     """ Slots """             
 
