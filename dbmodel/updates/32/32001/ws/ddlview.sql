@@ -16,7 +16,7 @@ CREATE OR REPLACE VIEW vi_status AS SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc
      JOIN inp_valve ON rpt_inp_arc.arc_id::text = concat(inp_valve.node_id, '_n2a')
      JOIN inp_typevalue ON inp_typevalue.id=rpt_inp_arc.status
-  WHERE rpt_inp_arc.status::text = 'ACTIVE'::text OR rpt_inp_arc.status::text = 'CLOSED_VALVE'::text OR rpt_inp_arc.status::text = 'OPEN_VALVE'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+  WHERE rpt_inp_arc.status::text = 'CLOSED_VALVE'::text OR rpt_inp_arc.status::text = 'OPEN_VALVE'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
    idval
@@ -24,7 +24,7 @@ UNION
     rpt_inp_arc
      JOIN inp_pump ON rpt_inp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a')
      JOIN inp_typevalue ON inp_typevalue.id=rpt_inp_arc.status
- WHERE inp_pump.status::text = 'OPEN'::text OR inp_pump.status::text = 'CLOSED_PUMP'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+ WHERE inp_pump.status::text = 'CLOSED_PUMP'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
    idval
@@ -32,5 +32,5 @@ UNION
     rpt_inp_arc
      JOIN inp_pump_additional ON rpt_inp_arc.arc_id::text = concat(inp_pump_additional.node_id, '_n2a', inp_pump_additional.order_id)
     LEFT JOIN inp_typevalue ON inp_typevalue.id=rpt_inp_arc.status
-  WHERE inp_pump_additional.status::text = 'OPEN_PUMP'::text OR inp_pump_additional.status::text = 'CLOSED_PUMP'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
+  WHERE inp_pump_additional.status::text = 'CLOSED_PUMP'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
 
