@@ -21,6 +21,11 @@ ALTER TABLE anl_arc_x_node ADD COLUMN result_id character varying(16);
 ALTER TABLE sys_feature_type ADD COLUMN parentlayer varchar(30);
 
 
+ALTER TABLE dma RENAME COLUMN pattern_id to _pattern_id;
+ALTER TABLE dma ADD COLUMN pattern_id character varying(16);
+ALTER TABLE dma ADD COLUMN link text;
+
+
 CREATE TABLE anl_polygon (
   id serial PRIMARY KEY,
   pol_id character varying(16) NOT NULL,
