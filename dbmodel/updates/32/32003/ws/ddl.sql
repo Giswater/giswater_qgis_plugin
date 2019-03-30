@@ -10,6 +10,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2019/03/29
-ALTER TABLE dma RENAME COLUMN pattern_id to _pattern_id_;
-ALTER TABLE dma ADD COLUMN pattern_id character varying(16);
-ALTER TABLE rpt_inp_node ADD COLUMN pattern_id character varying(16);
+ALTER TABLE rpt_inp_node ADD column pattern_id varchar(16);
