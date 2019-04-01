@@ -448,7 +448,7 @@ class Go2Epa(ApiParent):
                         line += "\t\t\t"
                     elif len(row[x]) < 16:
                         line += "\t\t"
-                    else:
+                    elif len(row[x]) < 20:
                         line += "\t"
             line += "\n"
             file1.write(line)
