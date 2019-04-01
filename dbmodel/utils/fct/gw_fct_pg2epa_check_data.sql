@@ -394,7 +394,6 @@ BEGIN
 	FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=14 AND result_id=v_result_id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
 	
 	--points
 	v_result = null;
@@ -402,8 +401,6 @@ BEGIN
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=14 AND result_id=v_result_id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
-
-			raise notice 'v_result %', v_result;
 
 	--lines
 	--frpocesscat_id=39 gets arcs without source of water
@@ -413,7 +410,6 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
-		raise notice 'v_result %', v_result;
 
 	--polygons
 	v_result = null;
@@ -422,7 +418,6 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_polygon = concat ('{"geometryType":"Polygon", "values":',v_result, '}');
 
-	raise notice 'v_result %', v_result;
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results

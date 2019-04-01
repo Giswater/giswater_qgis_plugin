@@ -24,13 +24,15 @@ DECLARE
 	node_id_var    text;
 	point_aux      public.geometry;
 	srid_schema    text;
-    v_version text;
+	v_version text;
 	v_saveondatabase boolean;
 	v_result json;
+	v_result_info json;
+	v_result_point json;
 	v_id json;
-    v_selectionmode text;
-    v_worklayer text;
-    v_array text;
+	v_selectionmode text;
+	v_worklayer text;
+	v_array text;
 
 BEGIN
 	SET search_path = "SCHEMA_NAME", public;
@@ -51,25 +53,36 @@ BEGIN
 	-- Computing process
 	IF v_array != '()' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, num_arcs, the_geom,nodecat_id, state)
-				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom,nodecat_id,state
+				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom,nodecat_id,'||v_worklayer||'.state
 				FROM arc JOIN '||v_worklayer||' ON node_id=node_1 AND node_id IN '||v_array||'
 				WHERE arc.state=1 and '||v_worklayer||'.state=1
-				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id
+				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.state
 				HAVING count(node_1)> 1 
 				ORDER BY 2 desc;';	
 	ELSE
 		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fprocesscat_id, num_arcs, the_geom,nodecat_id,state)
-				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom, nodecat_id,state
+				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 12, count(node_1) as num_arcs, '||v_worklayer||'.the_geom, nodecat_id,'||v_worklayer||'.state
 				FROM arc JOIN '||v_worklayer||' ON node_id=node_1
 				WHERE arc.state=1 and '||v_worklayer||'.state=1
-				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id
+				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.state
 				HAVING count(node_1)> 1 
 				ORDER BY 2 desc;';
 	END IF;
 
 
 	-- get results
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=12) row; 
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=12) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=12) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
@@ -81,18 +94,17 @@ BEGIN
 	END IF;
 		
 	--    Control nulls
-	v_result := COALESCE(v_result, '[]'); 
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
 
 	--  Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
-	     ',"body":{"form":{}'||
-		     ',"data":{"result":' || v_result ||
-			     '}'||
-		       '}'||
-	    '}')::json;
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||
+			'}}'||
+	    '}')::json; 
 
-  
-        
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

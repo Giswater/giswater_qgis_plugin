@@ -18,6 +18,10 @@ ALTER TABLE anl_arc ADD COLUMN result_id character varying(16);
 ALTER TABLE anl_arc_x_node ADD COLUMN descript text;
 ALTER TABLE anl_arc_x_node ADD COLUMN result_id character varying(16);
 
+ALTER TABLE anl_connec ADD COLUMN descript text;
+ALTER TABLE anl_connec ADD COLUMN result_id character varying(16);
+
+
 ALTER TABLE sys_feature_type ADD COLUMN parentlayer varchar(30);
 
 

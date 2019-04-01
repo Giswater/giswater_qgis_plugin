@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -19,14 +19,16 @@ SELECT SCHEMA_NAME.gw_fct_anl_arc_same_startend($${
 */
 
 DECLARE
-    v_id json;
-    v_selectionmode text;
-    v_connectolerance float;
-    v_saveondatabase boolean;
-    v_worklayer text;
-    v_result json;
-    v_array text;
-	v_version text;
+v_id json;
+v_selectionmode 	text;
+v_connectolerance 	float;
+v_saveondatabase 	boolean;
+v_worklayer 		text;
+v_result 		json;
+v_result_info		json;
+v_result_line 		json;
+v_array 		text;
+v_version 		text;
 
 BEGIN
 
@@ -58,8 +60,18 @@ BEGIN
 				FROM '||v_worklayer||' WHERE node_1::text=node_2::text;';
 	END IF;
 
-	-- get results
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4) row; 
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=4) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	--lines
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND fprocesscat_id=4) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
@@ -71,14 +83,15 @@ BEGIN
 	END IF;
 		
 	--    Control nulls
-	v_result := COALESCE(v_result, '[]'); 
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 
 
-	--  Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
-	     ',"body":{"form":{}'||
-		     ',"data":{"result":' || v_result ||
-			     '}'||
-		       '}'||
+--  Return
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"line":'||v_result_line||
+		       '}}'||
 	    '}')::json; 
 
 END;

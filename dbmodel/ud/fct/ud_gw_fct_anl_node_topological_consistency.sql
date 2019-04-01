@@ -25,10 +25,12 @@ DECLARE
 	v_version text;
 	v_saveondatabase boolean;
 	v_result json;
+	v_result_info json;
+	v_result_point json;
 	v_id json;
-    v_selectionmode text;
-    v_worklayer text;
-    v_array text;
+	v_selectionmode text;
+	v_worklayer text;
+	v_array text;
 
 BEGIN
 
@@ -67,8 +69,18 @@ BEGIN
 	END IF;
 
 	-- get results
+	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=8) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=8) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
@@ -80,14 +92,15 @@ BEGIN
 	END IF;
 		
 	--    Control nulls
-	v_result := COALESCE(v_result, '[]'); 
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
 
 	--  Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
-	     ',"body":{"form":{}'||
-		     ',"data":{"result":' || v_result ||
-			     '}'||
-		       '}'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||
+			'}}'||
 	    '}')::json;
 
 END;
