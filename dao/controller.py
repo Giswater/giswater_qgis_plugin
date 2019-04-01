@@ -153,33 +153,36 @@ class DaoController(object):
     
     
     def get_layer_source_from_credentials(self):
+        """ Get database parameters from layer 'v_edit_node' or  database connection settings """
 
-        # Get database parameters from layer 'v_edit_node'
+        # Get layer 'v_edit_node'
         layer = self.get_layer_by_tablename("v_edit_node")
+
+        # Get database connection settings
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
 
-        if layer is not None:
+        if layer is None and settings is None:
+            not_version = False
+            self.log_warning("Layer 'v_edit_node' is None and settings is None")
+            self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
+            return None, not_version
+
+        if layer:
             not_version = False
             credentials = self.get_layer_source(layer)
             self.schema_name = credentials['schema']
             conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
-            attempts = 1
-            logged = self.connect_to_database(credentials['host'], credentials['port'],
-                                              credentials['db'], credentials['user'], credentials['password'])
-            while not logged:
-                attempts += 1
-                if attempts <= 2:
-                    (success, credentials['user'], credentials['password']) = QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
-                    logged = self.connect_to_database(credentials['host'], credentials['port'],
-                                                      credentials['db'], credentials['user'], credentials['password'])
-                else:
-                    return None, not_version
+            status, credentials = self.connect_to_database_credentials(credentials, conn_info)
+            if not status:
+                self.log_warning("Error connecting to database (layer)")
+                self.last_error = self.tr("Error connecting to database")
+                return None, not_version
 
             # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
             QgsCredentials.instance().put(conn_info, credentials['user'], credentials['password'])
 
-        elif settings is not None:
+        elif settings:
             not_version = True
             default_connection = settings.value('selected')
             settings.endGroup()
@@ -193,16 +196,33 @@ class DaoController(object):
                 credentials['user'] = settings.value('username')
                 credentials['password'] = settings.value('password')
                 settings.endGroup()
+                status, credentials = self.connect_to_database_credentials(credentials)
+                if not status:
+                    self.log_warning("Error connecting to database (settings)")
+                    self.last_error = self.tr("Error connecting to database")
+                    return None, not_version
             else:
+                self.log_warning("Error getting default connection (settings)")
                 self.last_error = self.tr("Error getting default connection")
                 return None, not_version
 
-        else:
-            not_version = False
-            self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
-            return None, not_version
-
         return credentials, not_version
+
+
+    def connect_to_database_credentials(self, credentials, conn_info=None, max_attempts=2):
+        """ Connect to database with selected database @credentials """
+
+        attempt = 0
+        logged = False
+        while not logged and attempt <= max_attempts:
+            attempt += 1
+            if conn_info and attempt > 1:
+                (success, credentials['user'], credentials['password']) = QgsCredentials.instance().get(conn_info,
+                    credentials['user'], credentials['password'])
+            logged = self.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
+                credentials['user'], credentials['password'])
+
+        return logged, credentials
 
     
     def connect_to_database(self, host, port, db, user, pwd):
