@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1232
    
-CREATE OR REPLACE FUNCTION ud.gw_trg_edit_subcatchment()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_subcatchment()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -35,7 +35,7 @@ BEGIN
 	
 		-- Subc ID
         IF (NEW.subc_id IS NULL) THEN
-            NEW.subc_id := concat((SELECT value FROM config_param_system WHERE parameter='inp_subc_seq_id_prefix'),(SELECT nextval('ud.subcatchment_subc_id_seq'::regclass)));
+            NEW.subc_id := concat((SELECT value FROM config_param_system WHERE parameter='inp_subc_seq_id_prefix'),(SELECT nextval('SCHEMA_NAME.subcatchment_subc_id_seq'::regclass)));
         END IF;
 
        		
