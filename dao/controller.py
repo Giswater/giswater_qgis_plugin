@@ -41,6 +41,7 @@ class DaoController(object):
         self.translator = None           
         self.plugin_dir = None           
         self.giswater = None
+        self.logged = False
         self.postgresql_version = None
         self.logger = None
         self.schema_name = None
@@ -137,6 +138,7 @@ class DaoController(object):
         self.dao = None 
         self.last_error = None      
         self.log_codes = {}
+        self.logged = False
         
         self.layer_source, not_version = self.get_layer_source_from_credentials()
         if self.layer_source:
@@ -146,6 +148,7 @@ class DaoController(object):
         else:
             return False, not_version
 
+        self.logged = True
         return True, not_version
     
     
