@@ -14,7 +14,7 @@ api_version json;
 
 BEGIN 
     -- set search_path
-    SET search_path= 'SCHEMA_NAME','public';
+    SET search_path= "SCHEMA_NAME", public;
 
     --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'

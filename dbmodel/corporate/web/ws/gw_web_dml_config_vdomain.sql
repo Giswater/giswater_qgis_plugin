@@ -15,5 +15,5 @@ INSERT INTO config_web_fields VALUES (282, 'v_anl_mincut_result_valve', 'work_or
 INSERT INTO config_web_fields VALUES (283, 'v_anl_mincut_result_valve', 'node_id', false, 'string', NULL, NULL, NULL, 'Node_id:', 'text', NULL, NULL, NULL, NULL, false, 4);
 INSERT INTO config_web_fields VALUES (284, 'v_anl_mincut_result_valve', 'closed', false, 'boolean', NULL, NULL, NULL, 'Closed:', 'text', NULL, NULL, NULL, NULL, false, 5);
 INSERT INTO config_web_fields VALUES (285, 'v_anl_mincut_result_valve', 'broken', false, 'boolean', NULL, NULL, NULL, 'Broken:', 'text', NULL, NULL, NULL, NULL, false, 6);
-INSERT INTO config_web_fields VALUES (286, 'v_anl_mincut_result_valve', 'unaccess', false, 'boolean', NULL, NULL, NULL, 'Unaccess:', 'check', NULL, NULL, NULL, NULL, true, 8);
+INSERT INTO config_web_fields VALUES (286, 'v_anl_mincut_result_valve', 'unaccess', false, 'boolean', NULL, NULL, NULL, 'Unaccess:', 'checkbox', NULL, NULL, NULL, NULL, true, 8);
 INSERT INTO config_web_fields VALUES (287, 'v_anl_mincut_result_valve', 'proposed', false, 'boolean', NULL, NULL, NULL, 'Proposed:', 'text', NULL, NULL, NULL, NULL, false, 7);

@@ -137,7 +137,7 @@ INSERT INTO config_web_fields VALUES (297, 'F32', 'composer', true, 'string', NU
 INSERT INTO config_web_fields VALUES (295, 'F32', 'descript', true, 'string', NULL, NULL, 'descript', 'Descripcio:', 'textarea', NULL, NULL, NULL, NULL, true, 5);
 INSERT INTO config_web_fields VALUES (300, 'F32', 'scale', true, 'string', NULL, NULL, NULL, 'Escala:', 'combo', 'config_web_composer_scale', 'id', 'idval', NULL, true, 2);
 INSERT INTO config_web_fields VALUES (294, 'F32', 'title', true, 'string', NULL, NULL, 'title', 'Titol:', 'text', NULL, NULL, NULL, NULL, true, 4);
-INSERT INTO config_web_fields VALUES (296, 'F32_', 'date', true, 'date', NULL, NULL, NULL, 'Data:', 'datepikertime', NULL, NULL, NULL, NULL, true, 6);
+INSERT INTO config_web_fields VALUES (296, 'F32_', 'date', true, 'date', NULL, NULL, NULL, 'Data:', 'datepickertime', NULL, NULL, NULL, NULL, true, 6);
 INSERT INTO config_web_fields VALUES (304, 'F32', 'divider', false, 'string', NULL, NULL, NULL, NULL, 'formDivider', NULL, NULL, NULL, NULL, true, 3);
 
 
