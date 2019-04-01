@@ -61,17 +61,10 @@ class Go2Epa(ApiParent):
             self.dlg_go2epa.chk_recurrent.setVisible(False)
             self.dlg_go2epa.chk_recurrent.setChecked(False)
 
+
         self.dlg_go2epa.progressBar.setMaximum(0)
         self.dlg_go2epa.progressBar.setMinimum(0)
         self.show_widgets(False)
-
-        # Set widgets
-        self.dlg_go2epa.chk_recurrent.setEnabled(False)
-        self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
-        self.dlg_go2epa.txt_result_name.setText(self.result_name)
-        self.dlg_go2epa.chk_only_check.setChecked(False)
-        self.dlg_go2epa.chk_only_check.setEnabled(False)
 
         # Set signals
         self.dlg_go2epa.chk_only_check.stateChanged.connect(partial(self.active_recurrent))
@@ -228,23 +221,61 @@ class Go2Epa(ApiParent):
 
 
     def load_user_values(self):
-        """ Load QGIS settings related with csv options """
+        """ Load QGIS settings related with file_manager """
         cur_user = self.controller.get_current_user()
-        self.result_name = self.controller.plugin_settings_value('RESULT_NAME' + cur_user)
-        self.file_inp = self.controller.plugin_settings_value('FILE_INP' + cur_user)
-        self.file_rpt = self.controller.plugin_settings_value('FILE_RPT' + cur_user)
+
+        self.result_name = self.controller.plugin_settings_value('go2epa_RESULT_NAME' + cur_user)
+        self.dlg_go2epa.txt_result_name.setText(self.result_name)
+        self.file_inp = self.controller.plugin_settings_value('go2epa_FILE_INP' + cur_user)
+        self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
+        self.file_rpt = self.controller.plugin_settings_value('go2epa_FILE_RPT' + cur_user)
+        self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
+
+        value = self.controller.plugin_settings_value('go2epa_chk_NETWORK_GEOM' + cur_user)
+        if str(value) == 'true':
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, True)
+        value = self.controller.plugin_settings_value('go2epa_chk_RECURSIVE' + cur_user)
+        if str(value) == 'true':
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent, True)
+
+        value = self.controller.plugin_settings_value('go2epa_chk_INP' + cur_user)
+        if str(value) == 'true':
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
+        value = self.controller.plugin_settings_value('go2epa_chk_UD' + cur_user)
+        if str(value) == 'true':
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
+        value = self.controller.plugin_settings_value('go2epa_chk_EPA' + cur_user)
+        if str(value) == 'true':
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
+        value = self.controller.plugin_settings_value('go2epa_chk_RPT' + cur_user)
+        if str(value) == 'true':
+            utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, True)
 
 
     def save_user_values(self):
-        """ Save QGIS settings related with csv options """
+        """ Save QGIS settings related with file_manager """
         cur_user = self.controller.get_current_user()
-        self.controller.plugin_settings_set_value("RESULT_NAME" + cur_user,
+        self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
                                                   utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name'))
-        self.controller.plugin_settings_set_value("FILE_INP" + cur_user,
+        self.controller.plugin_settings_set_value('go2epa_FILE_INP' + cur_user,
                                                   utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_inp'))
-        self.controller.plugin_settings_set_value("FILE_RPT" + cur_user,
+        self.controller.plugin_settings_set_value('go2epa_FILE_RPT' + cur_user,
                                                   utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_file_rpt'))
 
+        self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
+
+        self.controller.plugin_settings_set_value('go2epa_chk_RECURSIVE' + cur_user,
+                                          utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_recurrent))
+        self.controller.plugin_settings_set_value('go2epa_chk_INP' + cur_user,
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
+        self.controller.plugin_settings_set_value('go2epa_chk_UD' + cur_user,
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
+        self.controller.plugin_settings_set_value('go2epa_chk_EPA' + cur_user,
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
+        self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
+                                                  utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
+        
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
         """ Load the tables in the selection form """
@@ -395,7 +426,7 @@ class Go2Epa(ApiParent):
     def insert_into_inp(self, folder_path=None, all_rows=None):
         progress = 0
         # sys.stdout.flush()
-        self.dlg_go2epa.progressBar.setFormat("The INP file is begin imported...")
+        self.dlg_go2epa.progressBar.setFormat("The INP file is begin exported...")
         self.dlg_go2epa.progressBar.setAlignment(Qt.AlignCenter)
         self.dlg_go2epa.progressBar.setValue(progress)
         # self.show_widgets(True)
