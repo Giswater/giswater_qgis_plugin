@@ -985,12 +985,15 @@ class DaoController(object):
         return self.dao.check_column(self.schema_name, tablename, columname)
     
 
-    def get_group_layers(self, geom_type):
+    def get_group_layers(self, geom_type, union=False):
         """ Get layers of the group @geom_type """
         
         list_items = []        
         sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
                " WHERE type = '" + geom_type.upper() + "'")
+        if union:
+            sql += (" UNION SELECT parentlayer FROM " + self.schema_name + ".sys_feature_type"
+                    " WHERE id='" + geom_type.upper() + "'")
         rows = self.get_rows(sql)
         if rows:
             for row in rows:
@@ -1000,7 +1003,7 @@ class DaoController(object):
         
         return list_items
          
-    
+
     def check_role(self, role_name):
         """ Check if @role_name exists """
         
