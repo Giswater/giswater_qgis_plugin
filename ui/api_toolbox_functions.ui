@@ -15,11 +15,11 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QTabWidget" name="tab_infolog">
+    <widget class="QTabWidget" name="mainTab">
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_config">
       <attribute name="title">
        <string>Config</string>
       </attribute>
@@ -147,7 +147,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tab_loginfo">
       <attribute name="title">
        <string>Info Log</string>
       </attribute>

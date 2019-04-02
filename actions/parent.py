@@ -862,7 +862,7 @@ class ParentAction(object):
                 break
         if layer is not None:
             QgsProject.instance().removeMapLayer(layer)
-
+            self.delete_layer_from_toc(layer_name)
 
     def get_snapper(self):
         """ Return snapper """

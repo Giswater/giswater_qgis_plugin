@@ -113,9 +113,7 @@ class GwToolBox(ApiParent):
 
         self.dlg_functions = ApiFunctionTb()
         self.load_settings(self.dlg_functions)
-        self.dlg_functions.progressBar.setVisible(True)
-        self.dlg_functions.progressBar.setValue(0)
-        self.dlg_functions.progressBar.setMaximum(100)
+        self.dlg_functions.progressBar.setVisible(False)
 
         self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
                                                                           self.dlg_functions.cmb_layers))
@@ -195,7 +193,8 @@ class GwToolBox(ApiParent):
 
     def execute_function(self, dialog, combo, result):
 
-        dialog.progressBar.setValue(0)
+        dialog.progressBar.setMaximum(0)
+        dialog.progressBar.setMinimum(0)
         dialog.progressBar.setVisible(True)
         extras = ''
         feature_field = ''
@@ -207,15 +206,15 @@ class GwToolBox(ApiParent):
                 if 'input_params' in function[0]:
                     if 'featureType' in function[0]['input_params']:
                         feature_type = function[0]['input_params']['featureType']
-                    if 'durationType' in function[0]['input_params']:
-                        if function[0]['input_params']['durationType'] != 'short':
-                            dialog.progressBar.setMaximum(0)
-                            dialog.progressBar.setMinimum(0)
                 break
 
         # If function is not parametrized, call function(old) without json
         if self.is_paramtetric is False:
             self.execute_no_parametric(dialog, function_name)
+            dialog.progressBar.setVisible(False)
+            dialog.progressBar.setMinimum(0)
+            dialog.progressBar.setMaximum(1)
+            dialog.progressBar.setValue(1)
             return
         if str(function[0]['input_params']['featureType']) != "":
             layer_name = utils_giswater.get_item_data(dialog, combo, 1)
@@ -271,6 +270,10 @@ class GwToolBox(ApiParent):
         if widget_is_void:
             message = "This paramater is mandatory. Please, set a value"
             self.controller.show_warning(message, parameter='')
+            dialog.progressBar.setVisible(False)
+            dialog.progressBar.setMinimum(0)
+            dialog.progressBar.setMaximum(1)
+            dialog.progressBar.setValue(1)
             return
 
         dialog.progressBar.setFormat("Running function: " + str(function_name))
@@ -286,6 +289,10 @@ class GwToolBox(ApiParent):
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
             self.controller.show_message("Function : " + str(function_name)+" executed with no result ", 3)
+            dialog.progressBar.setVisible(False)
+            dialog.progressBar.setMinimum(0)
+            dialog.progressBar.setMaximum(1)
+            dialog.progressBar.setValue(1)
             return True
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -294,6 +301,9 @@ class GwToolBox(ApiParent):
 
         dialog.progressBar.setFormat("Function " + str(function_name) + " has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
+        dialog.progressBar.setMinimum(0)
+        dialog.progressBar.setMaximum(1)
+        dialog.progressBar.setValue(1)
 
 
     def execute_no_parametric(self, dialog, function_name):
@@ -301,8 +311,6 @@ class GwToolBox(ApiParent):
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setFormat("Running function: " + str(function_name))
         dialog.progressBar.setAlignment(Qt.AlignCenter)
-        dialog.progressBar.setMaximum(100)
-        dialog.progressBar.setValue(0)
         dialog.progressBar.setFormat("")
 
         sql = ("SELECT " + self.schema_name + "." + str(function_name) + "()::text")
@@ -342,7 +350,7 @@ class GwToolBox(ApiParent):
                         layout.addWidget(label, 0, 0)
                     status = True
                     break
-                self.controller.log_info("TEAT"+str(function[0]['input_params']['featureType']))
+                self.controller.log_info("TEST"+str(function[0]['input_params']['featureType']))
                 if str(function[0]['input_params']['featureType']) == "":
                     dialog.grb_input_layer.setVisible(False)
                     dialog.grb_selection_type.setVisible(False)
@@ -384,7 +392,7 @@ class GwToolBox(ApiParent):
     def populate_layer_combo(self, geom_type):
 
         self.layers = []
-        self.layers = self.controller.get_group_layers(geom_type)
+        self.layers = self.controller.get_group_layers(geom_type, union=True)
         layers = []
         legend_layers = self.controller.get_layers()
         for layer in self.layers:
@@ -449,60 +457,60 @@ class GwToolBox(ApiParent):
             return 0
 
 
-    def add_temp_layer(self, dialog, result, function_name):
+    def add_temp_layer(self, dialog, data, function_name):
 
         self.delete_layer_from_toc(function_name)
-
-        counter = len(result['result'])
-        dialog.progressBar.setMaximum(counter+1)
-        dialog.progressBar.setValue(0)
         srid = self.controller.plugin_settings_value('srid')
-        virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', function_name, "memory")
+        cahange_tab = False
+        for k, v in list(data.items()):
+            if str(k) == "info":
+                text = ""
+                for x in data['info']['values']:
+                    if x['error_message'] is not None:
+                        text += str(x['error_message']) + "\n"
+                        cahange_tab = True
+                    else:
+                        text += "\n"
+                dialog.txt_infolog.setText(text + "\n")
+            else:
+                counter = len(data[k]['values'])
+                if counter > 0:
+                    counter = len(data[k]['values'])
+                    geometry_type = data[k]['geometryType']
+                    v_layer = QgsVectorLayer(str(geometry_type) + "?crs=epsg:" + str(srid), function_name, 'memory')
 
-        if counter > 0:
-            if 'the_geom' in result['result'][0]:
-                the_geom = result['result'][0]['the_geom']
-                sql = ("SELECT St_AsText('" + str(the_geom) + "')")
-                row = self.controller.get_row(sql, log_sql=False)
-                sql = ("SELECT ST_GeometryType(ST_GeomFromText('"+str(row[0])+"'))")
-                geom_type = self.controller.get_row(sql, log_sql=False)
-                # create layer
-                if 'ST_LineString' in str(geom_type):
-                    virtual_layer = QgsVectorLayer('LineString?crs=epsg:' + str(srid) + '', function_name, "memory")
-                elif 'ST_Point' in str(geom_type):
-                    virtual_layer = QgsVectorLayer('Point?crs=epsg:' + str(srid) + '', function_name, "memory")
-                #TODO capas poligon
-                #TODO cargar las no geometricas
+                    self.populate_vlayer(dialog, v_layer, data, k, counter)
+
+        if cahange_tab:
+            dialog.mainTab.setCurrentIndex(1)
 
 
+    def populate_vlayer(self, dialog, virtual_layer, data, layer_type, counter):
         prov = virtual_layer.dataProvider()
 
         # Enter editing mode
         virtual_layer.startEditing()
         if counter > 0:
-            for key, value in list(result['result'][0].items()):
+            for key, value in list(data[layer_type]['values'][0].items()):
                 # add columns
                 if str(key) != 'the_geom':
                     prov.addAttributes([QgsField(str(key), QVariant.String)])
 
-        x = 1
         # Add features
-        for item in result['result']:
-            x += 1
-            dialog.progressBar.setValue(x)
+        for item in data[layer_type]['values']:
             attributes = []
             fet = QgsFeature()
+
             for k, v in list(item.items()):
                 if str(k) != 'the_geom':
                     attributes.append(v)
                 if str(k) in ('the_geom'):
                     sql = ("SELECT St_AsText('"+str(v)+"')")
-                    row = self.controller.get_row(sql, log_sql=False)
+                    row = self.controller.get_row(sql, log_sql=True)
                     geometry = QgsGeometry.fromWkt(str(row[0]))
                     fet.setGeometry(geometry)
             fet.setAttributes(attributes)
             prov.addFeatures([fet])
-        dialog.progressBar.setValue(x)
 
         # Commit changes
         virtual_layer.commitChanges()
@@ -517,4 +525,5 @@ class GwToolBox(ApiParent):
             my_group = root.insertGroup(0, 'GW Functions results')
 
         my_group.insertLayer(0, virtual_layer)
+
 
