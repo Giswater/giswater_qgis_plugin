@@ -104,7 +104,9 @@ class Giswater(QObject):
         
     def set_signals(self): 
         """ Define widget and event signals """
-        self.iface.projectRead.connect(self.project_read)                
+
+        self.iface.projectRead.connect(self.project_read)
+        self.iface.newProjectCreated.connect(self.project_new)
 
 
     def set_info_button(self, connection_status):
@@ -476,7 +478,7 @@ class Giswater(QObject):
                     elem.layername = cur_layer.name()
 
 
-    def unload(self):
+    def unload(self, remove_modules=True):
         """ Removes the plugin menu item and icon from QGIS GUI """
 
 
@@ -497,10 +499,11 @@ class Giswater(QObject):
             if self.search_plus:
                 self.search_plus.unload()
 
-            # unload all loaded giswater related modules
-            for modName, mod in list(sys.modules.items()):
-                if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
-                    del sys.modules[modName]
+            if remove_modules:
+                # unload all loaded giswater related modules
+                for modName, mod in list(sys.modules.items()):
+                    if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
+                        del sys.modules[modName]
 
         except AttributeError:
             self.controller.log_info("unload - AttributeError")
@@ -545,7 +548,14 @@ class Giswater(QObject):
         plugin_toolbar.toolbar.setVisible(enable)            
         for index_action in plugin_toolbar.list_actions:
             self.enable_action(enable, index_action)                 
-      
+
+
+    def project_new(self, show_warning=True):
+        """ Function executed when a user creates a new QGIS project """
+
+        self.unload(False)
+        self.set_info_button(True)
+
                           
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
@@ -562,6 +572,7 @@ class Giswater(QObject):
                 if message:
                     self.controller.show_warning(message, 15)
                 self.controller.log_warning(str(self.controller.layer_source))
+            self.project_new()
             return
 
         # Cache error message with log_code = -1 (uncatched error)

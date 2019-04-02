@@ -222,7 +222,7 @@ class CadAddCircle(ParentMapTool):
 
         # Check for default base layer
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             self.snap_to_selected_layer = True
