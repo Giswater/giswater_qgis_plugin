@@ -103,7 +103,7 @@ class Giswater(QObject):
         # Define signals
         self.set_signals()
 
-        if sys.version[0] == '2' and enable_python_console != 'TRUE':
+        if sys.version[0] == '2':
             reload(sys)
             sys.setdefaultencoding("utf-8")
 
