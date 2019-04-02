@@ -1987,7 +1987,7 @@ class UpdateSQL(ParentAction):
 
             if len(sp_n) > 0:
                 sql += "INSERT INTO " + self.schema + ".temp_csv2pg (csv2pgcat_id, "
-                values = "VALUES(11, "
+                values = "VALUES(12, "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += "csv" + str(x + 1) + ", "
