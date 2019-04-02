@@ -1084,8 +1084,8 @@ class UpdateSQL(ParentAction):
     def execute_import_data(self):
         self.insert_inp_into_db(self.file_inp)
         # Execute import data
-        sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
-        self.controller.execute_sql(sql, commit=False)
+        # sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
+        # self.controller.execute_sql(sql, commit=False)
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
@@ -1198,9 +1198,9 @@ class UpdateSQL(ParentAction):
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
             self.update_31to39(new_project=True, project_type=project_type)
-            self.execute_import_data()
             self.api(project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+            self.execute_import_data()
 
         elif self.rdb_sample.isChecked():
             if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
@@ -1972,7 +1972,13 @@ class UpdateSQL(ParentAction):
 
         for row in full_file:
             progress += 1
-            dirty_list = row.split(' ')
+            list_aux = row.split("\t")
+            dirty_list = []
+            for x in range(0, len(list_aux)):
+                aux = list_aux[x].split(" ")
+                for i in range(len(aux)):
+                    dirty_list.append(aux[i])
+
             for x in range(len(dirty_list) - 1, -1, -1):
                 if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
                     dirty_list.pop(x)
