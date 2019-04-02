@@ -450,7 +450,13 @@ class Go2Epa(ApiParent):
                         line += "\t\t"
                     elif len(row[x]) < 20:
                         line += "\t"
-            line += "\n"
+
+            for x in range(len(line) - 1, -1, -2):
+                if str(line[x:len(line)]) == "\t":
+                    line = line[:-2]
+                else:
+                    break
+            line = line.rstrip() + "\n"
             file1.write(line)
         file1.close()
         del file1
