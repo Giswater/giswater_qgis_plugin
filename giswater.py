@@ -91,8 +91,10 @@ class Giswater(QObject):
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())
 
-        # Show Python console and Log Messages panel if parameter 'devoloper_mode' = True
-        #self.show_python_console()
+        # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
+        enable_python_console = self.settings.value('system_variables/enable_python_console', 'FALSE').upper()
+        if enable_python_console == 'TRUE':
+            self.enable_python_console()
 
         # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix)
         self.qgis_settings = QSettings()
@@ -101,7 +103,11 @@ class Giswater(QObject):
         # Define signals
         self.set_signals()
 
-        
+        if sys.version[0] == '2' and enable_python_console != 'TRUE':
+            reload(sys)
+            sys.setdefaultencoding("utf-8")
+
+
     def set_signals(self): 
         """ Define widget and event signals """
 
@@ -127,14 +133,9 @@ class Giswater(QObject):
         action.triggered.connect(partial(self.update_sql.init_sql, connection_status))
 
     
-    def show_python_console(self):
-        """ Show Python console and Log Messages panel if parameter 'devoloper_mode' = True """
-        
-        # Get parameter 'devoloper_mode'
-        devoloper_mode = self.settings.value('system_variables/devoloper_mode').upper()
-        if devoloper_mode != 'TRUE':
-            return
-            
+    def enable_python_console(self):
+        """ Enable Python console and Log Messages panel if parameter 'enable_python_console' = True """
+
         # Manage Python console
         python_console = self.iface.mainWindow().findChild(QDockWidget, 'PythonConsole')
         if python_console:
@@ -249,14 +250,14 @@ class Giswater(QObject):
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
         menu.addSeparator()
         for feature_cat in list(self.feature_cat.values()):
-            if (index_action == '01' and feature_cat.type == 'CONNEC'):
+            if index_action == '01' and feature_cat.type == 'CONNEC':
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
         menu.addSeparator()
         for feature_cat in list(self.feature_cat.values()):
-            if (index_action == '01' and feature_cat.type == 'GULLY' and self.wsoftware == 'ud'):
+            if index_action == '01' and feature_cat.type == 'GULLY' and self.wsoftware == 'ud':
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
                 menu.addSeparator()
@@ -274,7 +275,6 @@ class Giswater(QObject):
             Associate it to corresponding @action_group
         """
         
-        action = None
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
         if not function_name:
@@ -370,7 +370,6 @@ class Giswater(QObject):
         list_actions = ['206', '19', '99', '83']
         self.manage_toolbar(toolbar_id, list_actions)                                      
             
-
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()           
         for plugin_toolbar in list(self.plugin_toolbars.values()):
@@ -423,7 +422,6 @@ class Giswater(QObject):
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
         self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_gully_pol')
-
         self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
         self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_gully_pol') 
@@ -480,7 +478,6 @@ class Giswater(QObject):
 
     def unload(self, remove_modules=True):
         """ Removes the plugin menu item and icon from QGIS GUI """
-
 
         try:
 
