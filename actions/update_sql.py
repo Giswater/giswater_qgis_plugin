@@ -1649,9 +1649,6 @@ class UpdateSQL(ParentAction):
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
 
-            if schema_name is None:
-                schema_name = ''
-
         else:
             sql = "SELECT value FROM " + schema_name + ".config_param_system WHERE parameter = 'schema_manager'"
             row = self.controller.get_row(sql)

@@ -506,7 +506,7 @@ class GwToolBox(ApiParent):
                     attributes.append(v)
                 if str(k) in ('the_geom'):
                     sql = ("SELECT St_AsText('"+str(v)+"')")
-                    row = self.controller.get_row(sql, log_sql=True)
+                    row = self.controller.get_row(sql, log_sql=False)
                     geometry = QgsGeometry.fromWkt(str(row[0]))
                     fet.setGeometry(geometry)
             fet.setAttributes(attributes)

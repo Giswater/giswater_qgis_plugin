@@ -7,7 +7,6 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-# -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
 except ImportError:
