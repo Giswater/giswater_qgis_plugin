@@ -32,3 +32,19 @@ INSERT INTO om_visit_type VALUES (2, 'unspected');
 
 
 -- add function gw_api_get_filtervalues_vdef
+
+
+--03/04/2019 - activate audit_cat_param_user for new visit
+UPDATE audit_cat_param_user SET isdeprecated=true, isenabled=false where id='om_param_type_vdefault';
+UPDATE audit_cat_param_user SET isdeprecated=true, isenabled=false where id='parameter_vdefault';
+
+
+UPDATE audit_cat_param_user SET isenabled=true where id='visitclass_vdefault';
+UPDATE audit_cat_param_user SET isenabled=true where id='visitclass_vdefault_arc';
+UPDATE audit_cat_param_user SET isenabled=true where id='visitclass_vdefault_node';
+UPDATE audit_cat_param_user SET isenabled=true where id='visitclass_vdefault_connec';
+UPDATE audit_cat_param_user SET isenabled=true where id='visitenddate_vdefault';
+UPDATE audit_cat_param_user SET isenabled=true where id='visitstartdate_vdefault';
+UPDATE audit_cat_param_user SET isenabled=true where id='visit_duration_vdef';
+UPDATE audit_cat_param_user SET isenabled=true where id='visitstatus_vdefault';
+UPDATE audit_cat_param_user SET isenabled=true where id='visitextcode_vdefault';
