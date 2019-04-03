@@ -21,6 +21,8 @@ SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
 
 */
 
+
+
 DECLARE
 	v_schemaname text;
 	v_tablerecord record;
@@ -166,7 +168,6 @@ BEGIN
 		LOOP
 			v_query_text:= 'ALTER TABLE '||((v_tablerecord.text_column)::json->>'tablename')||
 				       ' DROP CONSTRAINT IF EXISTS '||((v_tablerecord.text_column)::json->>'constraintname')||';';
-			raise notice 'fk  %',v_query_text;
 			EXECUTE v_query_text;
 			v_36=v_36+1;
 		END LOOP;
@@ -175,16 +176,23 @@ BEGIN
 		LOOP
 			v_query_text:= 'ALTER TABLE '||((v_tablerecord.text_column)::json->>'tablename')||
 				       ' ALTER COLUMN '||((v_tablerecord.text_column)::json->>'attributename')||' DROP NOT NULL;';
-			raise notice 'NOTNULL %',v_query_text;
 			EXECUTE v_query_text;
 			v_37=v_37+1;
 		END LOOP;
 
-		v_return = concat('{"constraints dropped":"',v_36,'","notnull dropped":"',v_37,'"}');
+		-- Disable topocontrol triggers
+		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
+		ALTER TABLE node DISABLE TRIGGER gw_trg_node_update;
+		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
+		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
+			
+		
+		v_return = concat('{"constraints dropped":"',v_36,'","notnull dropped":"',v_37,'"}');	
 
 
 	ELSIF v_action = 'ADD' THEN
-		
+
+		-- Enable constraints 
 		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=36 order by 1 desc
 		LOOP
 			v_query_text:=  'ALTER TABLE '||((v_tablerecord.text_column::json)->>'tablename')|| 
@@ -199,13 +207,21 @@ BEGIN
 		LOOP
 			v_query_text:=  'ALTER TABLE '||((v_tablerecord.text_column::json)->>'tablename')|| 
 							' ALTER COLUMN '||((v_tablerecord.text_column::json)->>'attributename')||' SET NOT NULL;' ;
-		raise notice 'SET NOTNULL %',v_query_text;
 			EXECUTE v_query_text;
 			v_37=v_37+1;	
 		END LOOP;
 
+		-- Enable topocontrol triggers
+		ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
+		ALTER TABLE node ENABLE TRIGGER gw_trg_node_update;
+		ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
+		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
+
+
 		v_return = concat('{"constraints reloaded":"',v_36,'","notnull reloaded":"',v_37,'"}');
+		
 	END IF;
+
 
 
 RETURN v_return;

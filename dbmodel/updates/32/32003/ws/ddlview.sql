@@ -20,7 +20,63 @@ FROM inp_selector_result, rpt_inp_node
    WHERE epa_type IN ('JUNCTION', 'SHORTPIPE') AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
    ORDER BY rpt_inp_node.node_id;
   
- 
+
+DROP VIEW vi_patterns;
+CREATE OR REPLACE VIEW vi_patterns AS 
+ SELECT inp_pattern_value.pattern_id,
+    inp_pattern_value.factor_1,
+    inp_pattern_value.factor_2,
+    inp_pattern_value.factor_3,
+    inp_pattern_value.factor_4,
+    inp_pattern_value.factor_5,
+    inp_pattern_value.factor_6,
+    inp_pattern_value.factor_7,
+    inp_pattern_value.factor_8,
+    inp_pattern_value.factor_9,
+    inp_pattern_value.factor_10,
+    inp_pattern_value.factor_11,
+    inp_pattern_value.factor_12,
+    inp_pattern_value.factor_13,
+    inp_pattern_value.factor_14,
+    inp_pattern_value.factor_15,
+    inp_pattern_value.factor_16,
+    inp_pattern_value.factor_17,
+    inp_pattern_value.factor_18
+   FROM inp_pattern_value
+  ORDER BY inp_pattern_value.pattern_id;
+
+
+    
+CREATE OR REPLACE VIEW vi_pipes AS 
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.length,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.roughness,
+    CASE WHEN inp_pipe.minorloss IS NULL THEN 0::numeric(12,6) ELSE inp_pipe.minorloss END AS minorloss,
+    inp_typevalue.idval AS status
+   FROM inp_selector_result,
+    rpt_inp_arc
+     JOIN inp_pipe ON rpt_inp_arc.arc_id::text = inp_pipe.arc_id::text
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_pipe.status::text
+  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.length,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.roughness,
+    CASE WHEN inp_shortpipe.minorloss IS NULL THEN 0::numeric(12,6) ELSE inp_shortpipe.minorloss END AS minorloss,
+    inp_typevalue.idval AS status
+   FROM inp_selector_result,
+    rpt_inp_arc
+     JOIN inp_shortpipe ON rpt_inp_arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_shortpipe.status::text
+  WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
+
+
 -- 2919/03/29
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
