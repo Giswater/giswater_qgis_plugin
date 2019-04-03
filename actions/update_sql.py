@@ -1644,15 +1644,14 @@ class UpdateSQL(ParentAction):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
-        # Set label schema name
-        if schema_name is None:
-            schema_name = ''
-        self.lbl_schema_name.setText(str(schema_name))
-
         if schema_name is None:
 
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
+
+            if schema_name is None:
+                schema_name = ''
+
         else:
             sql = "SELECT value FROM " + schema_name + ".config_param_system WHERE parameter = 'schema_manager'"
             row = self.controller.get_row(sql)
@@ -1665,6 +1664,9 @@ class UpdateSQL(ParentAction):
             row = self.controller.get_row(sql)
             if row is not None:
                 self.project_data_schema_version = str(row[0])
+
+        # Set label schema name
+        self.lbl_schema_name.setText(str(schema_name))
 
         # Get parameters
         sql = "SELECT version();"
