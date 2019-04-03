@@ -6,11 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2522
   
-CREATE OR REPLACE FUNCTION load3.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
   RETURNS integer AS
 
 /*EXAMPLE
-SELECT load3.gw_fct_utils_csv2pg_import_epanet_inp(null)
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(null)
 */
 
 $BODY$
@@ -50,7 +50,7 @@ $BODY$
 BEGIN
 
 	-- Search path
-	SET search_path = "load3", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- GET'S
     	-- Get schema name
@@ -177,7 +177,7 @@ BEGIN
 
 	--inp_cat_mat_roughness
 	INSERT INTO inp_cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)
-	SELECT DISTINCT ON (temp_csv2pg.csv6)  csv6, 'GLOBAL PERIOD', 0, 999, csv6::numeric FROM load3.temp_csv2pg WHERE source='[PIPES]' AND csv1 not like ';%' and csv6 IS NOT NULL;
+	SELECT DISTINCT ON (temp_csv2pg.csv6)  csv6, 'GLOBAL PERIOD', 0, 999, csv6::numeric FROM SCHEMA_NAME.temp_csv2pg WHERE source='[PIPES]' AND csv1 not like ';%' and csv6 IS NOT NULL;
 	
 	--cat_arc
 	--pipe w
@@ -196,7 +196,7 @@ BEGIN
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id
 	LOOP
 		--identifing the humber of fields of the editable view
-		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='load3'
+		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 		LOOP	
 			IF v_rec_view.rid=1 and v_rec_table.fields not LIKE 'concat%'THEN
 				v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);
