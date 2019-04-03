@@ -6,11 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2522
   
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
+CREATE OR REPLACE FUNCTION load3.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
   RETURNS integer AS
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp('D:\dades\test.inp')
+SELECT load3.gw_fct_utils_csv2pg_import_epanet_inp(null)
 */
 
 $BODY$
@@ -50,7 +50,7 @@ $BODY$
 BEGIN
 
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "load3", public;
 
 	-- GET'S
     	-- Get schema name
@@ -66,7 +66,7 @@ BEGIN
 	IF p_path IS NOT NULL THEN
 		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' )';
 	END IF;
-
+/*
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
 	INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1);
@@ -79,11 +79,12 @@ BEGIN
 	INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user);
 	INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
 
-	
+	*/
 	
 	-- HARMONIZE THE SOURCE TABLE
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
+		raise notice 'rpt_rec %', rpt_rec;
 		-- massive refactor of source field (getting target)
 		IF rpt_rec.csv1 LIKE '[%' THEN
 			v_target=rpt_rec.csv1;
@@ -91,6 +92,7 @@ BEGIN
 		UPDATE temp_csv2pg SET source=v_target WHERE rpt_rec.id=temp_csv2pg.id;
 	END LOOP;
 
+/*
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 		raise notice 'v_target,%,%', rpt_rec.source,rpt_rec.id;
@@ -175,7 +177,7 @@ BEGIN
 
 	--inp_cat_mat_roughness
 	INSERT INTO inp_cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)
-	SELECT DISTINCT ON (temp_csv2pg.csv6)  csv6, 'GLOBAL PERIOD', 0, 999, csv6::numeric FROM SCHEMA_NAME.temp_csv2pg WHERE source='[PIPES]' AND csv1 not like ';%' and csv6 IS NOT NULL;
+	SELECT DISTINCT ON (temp_csv2pg.csv6)  csv6, 'GLOBAL PERIOD', 0, 999, csv6::numeric FROM load3.temp_csv2pg WHERE source='[PIPES]' AND csv1 not like ';%' and csv6 IS NOT NULL;
 	
 	--cat_arc
 	--pipe w
@@ -189,12 +191,12 @@ BEGIN
 	INSERT INTO cat_node VALUES ('EPAJUNCTION-DEF', 'EPAJUNCTION', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPATANK-DEF', 'EPATANK', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPARESERVOIR-DEF', 'EPARESERVOIR', 'EPAMAT');
-
+*/
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id
 	LOOP
 		--identifing the humber of fields of the editable view
-		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
+		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='load3'
 		LOOP	
 			IF v_rec_view.rid=1 and v_rec_table.fields not LIKE 'concat%'THEN
 				v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);
