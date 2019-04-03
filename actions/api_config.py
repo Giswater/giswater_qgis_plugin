@@ -160,24 +160,23 @@ class ApiConfig(ApiParent):
         admin_layout1.addItem(verticalSpacer5)
         admin_layout2.addItem(verticalSpacer6)
 
-        #TODO:
-        # self.remove_empty_groupBox(page1_layout1)
-        # self.remove_empty_groupBox(page1_layout2)
-        # self.remove_empty_groupBox(page2_layout1)
-        # self.remove_empty_groupBox(page2_layout2)
-        # self.remove_empty_groupBox(admin_layout1)
-        # self.remove_empty_groupBox(admin_layout2)
 
         # Event on change from combo parent
         self.get_event_combo_parent('fields', complet_list[0]['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
-        # TODO:: Descomentar cuando la tabla config param user este populada
-        # self.chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
-        # self.chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
-        #
-        # self.chk_dma.stateChanged.connect(partial(self.check_child_to_parent, self.chk_dma,self.chk_expl))
-        # self.chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  self.chk_expl,self.chk_dma))
+        self.chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
+        self.chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
+
+        self.chk_dma.stateChanged.connect(partial(self.check_child_to_parent, self.chk_dma,self.chk_expl))
+        self.chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  self.chk_expl,self.chk_dma))
+
+        # Remove empty grupbox
+        grbox_list = self.dlg_config.findChildren(QGroupBox)
+        for grbox in grbox_list:
+            widget_list = grbox.findChildren(QWidget)
+            if len(widget_list) == 0:
+                grbox.setVisible(False)
 
         # Open form
         self.dlg_config.show()
