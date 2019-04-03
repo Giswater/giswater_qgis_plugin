@@ -7,20 +7,16 @@ qgisMinimumVersion=2.18
 description=Plugin to enable additional features and capabilities of Giswater working together with QGIS and PostgreSQL
 about=Giswater is a open source tool with the goal to move from acquired knowledge to shared knowledge in the areas of water management, such as supply, sewerage, urban drainage or flood risk assessment with to communicate any water simulation software through any Spatial database with any Geographic Information System (GIS) in order to give everybody a real way of open solution of water management.
 
-version=3.1.110
+version=3.1.111
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Xavier Torret
 
 # End of mandatory metadata
 
 # Uncomment the following line and add your changelog:
 
-changelog=Version 3.1.110 (28/03/2019)
-    - Change widget builtdate from element dialog [68566aa]
-    - Remove current date as default builtdate into custom forms[6d9a825]
-    - Bug fix on mincut sequence
-    - Improve cadtools [f440038]
-    - Bug fix when manage 2on, 3th... exploitation [5b3bedf]
-    - Improve depth control [184bc6f]
+changelog=Version 3.1.111 (03/04/2019)
+    - Minor improvements
+
 
 
 
