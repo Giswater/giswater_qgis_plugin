@@ -438,7 +438,10 @@ class ApiConfig(ApiParent):
     def order_widgets_system(self, field, form, lbl,  widget):
 
 
-        if field['widgettype'] != 'check':
+        if field['widgettype'] != 'checkbox':
+            form.addWidget(lbl, field['layout_order'], 0)
+            form.addWidget(widget, field['layout_order'], 3)
+        elif field['widgettype'] == 'checkbox':
             form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(widget, field['layout_order'], 2)
         else:
