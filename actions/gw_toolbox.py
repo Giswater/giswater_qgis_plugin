@@ -204,8 +204,9 @@ class GwToolBox(ApiParent):
                 self.save_settings_values(dialog, function)
                 function_name = function[0]['functionname']
                 if 'input_params' in function[0]:
-                    if 'featureType' in function[0]['input_params']:
-                        feature_type = function[0]['input_params']['featureType']
+                    if function[0]['input_params'] is not None:
+                        if 'featureType' in function[0]['input_params']:
+                            feature_type = function[0]['input_params']['featureType']
                 break
 
         # If function is not parametrized, call function(old) without json
@@ -350,7 +351,6 @@ class GwToolBox(ApiParent):
                         layout.addWidget(label, 0, 0)
                     status = True
                     break
-                self.controller.log_info("TEST"+str(function[0]['input_params']['featureType']))
                 if str(function[0]['input_params']['featureType']) == "":
                     dialog.grb_input_layer.setVisible(False)
                     dialog.grb_selection_type.setVisible(False)
