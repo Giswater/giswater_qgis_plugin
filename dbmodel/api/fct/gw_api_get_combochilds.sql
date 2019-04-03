@@ -162,7 +162,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_get_combochilds(character varying, character varying, character varying, character varying, character varying, character varying)
-  OWNER TO geoadmin;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_api_get_combochilds(character varying, character varying, character varying, character varying, character varying, character varying) TO public;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_api_get_combochilds(character varying, character varying, character varying, character varying, character varying, character varying) TO geoadmin;

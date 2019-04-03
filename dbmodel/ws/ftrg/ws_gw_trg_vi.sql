@@ -30,26 +30,26 @@ BEGIN
    IF TG_OP = 'INSERT' THEN
 	  IF v_view='vi_junctions' THEN
 	    INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.node_id, NEW.elevation,'EPAJUN-CAT','JUNCTION',1,1,1,1,2) ;
+	    VALUES (NEW.node_id, NEW.elevation,'EPAJUN-CAT','JUNCTION',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1)) ;
 	    INSERT INTO inp_junction (node_id, demand, pattern_id) VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);
 	    INSERT INTO man_junction (node_id) VALUES (NEW.node_id); 
 	    
 	  ELSIF v_view='vi_reservoirs' THEN
 	    INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.node_id, NEW.head,'EPARES-CAT','RESERVOIR',1,1,1,1,2) ;
+	    VALUES (NEW.node_id, NEW.head,'EPARES-CAT','RESERVOIR',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1)) ;
 	    INSERT INTO inp_reservoir (node_id, pattern_id) VALUES (NEW.node_id, NEW.pattern_id);
 	    INSERT INTO man_source(node_id) VALUES (NEW.node_id); 
 	    
 	  ELSIF v_view='vi_tanks' THEN
 	    INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.node_id, NEW.elevation,'EPATAN-CAT','TANK',1,1,1,1,2);
+	    VALUES (NEW.node_id, NEW.elevation,'EPATAN-CAT','TANK',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    INSERT INTO inp_tank (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id) 
 	    VALUES (NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id);
 	    INSERT INTO man_tank (node_id) VALUES (NEW.node_id); 
 	    
 	  ELSIF v_view='vi_pipes' THEN
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id,epa_type,custom_length,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.arc_id,NEW.node_1, NEW.node_2,concat(NEW.roughness::numeric(10,3),'-',NEW.diameter::numeric(10,3))::text,'PIPE',NEW.length,1,1,1,1,2);
+	    VALUES (NEW.arc_id,NEW.node_1, NEW.node_2,concat(NEW.roughness::numeric(10,3),'-',NEW.diameter::numeric(10,3))::text,'PIPE',NEW.length,1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    INSERT INTO inp_pipe (arc_id, minorloss) VALUES (NEW.arc_id, NEW.minorloss);
 	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
 	    UPDATE inp_pipe SET status=id FROM inp_typevalue WHERE arc_id=NEW.arc_id AND NEW.status=inp_typevalue.idval AND typevalue='inp_value_status_pipe';
@@ -57,14 +57,20 @@ BEGIN
 	    
 	  ELSIF v_view='vi_pumps' THEN 
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAPUMP-CAT','PUMP',1,1,1,1,2);
-	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern) 
-	    VALUES (NEW.arc_id,NEW.power,NEW.head, NEW.speed::numeric, NEW.pattern);
+	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAPUMP-CAT','PUMP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
+	    IF NEW.power ='POWER' THEN
+		NEW.power=NEW.head;
+	    ELSIF NEW.power ='HEAD' THEN
+		NEW.power=NULL;	   
+	    END IF;
+	    
+	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern)
+	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern);
 	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
 	    
 	  ELSIF v_view='vi_valves' THEN
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2,concat('EPA',NEW.valv_type,'-CAT')::text,'VALVE',1,1,1,1,2);
+	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2,concat('EPA',NEW.valv_type,'-CAT')::text,'VALVE',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    INSERT INTO inp_valve_importinp (arc_id, diameter, valv_type, minorloss) VALUES (NEW.arc_id,NEW.diameter, NEW.valv_type, NEW.minorloss);
 	      IF NEW.valv_type='PRV' THEN
 		UPDATE inp_valve_importinp SET pressure=NEW.setting::numeric WHERE arc_id=NEW.arc_id;

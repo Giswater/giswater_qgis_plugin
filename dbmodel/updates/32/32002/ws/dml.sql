@@ -36,3 +36,7 @@ INSERT INTO audit_cat_table VALUES ('vi_junctions', 'Hydraulic input data', 'Use
 INSERT INTO audit_cat_table VALUES ('vi_energy', 'Hydraulic input data', 'Used to export to EPANET the information about global energy elements', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, false);
 INSERT INTO audit_cat_table VALUES ('vi_emitters', 'Hydraulic input data', 'Used to export to EPANET the information about transmitters', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, false);
 INSERT INTO audit_cat_table VALUES ('vi_vertices', 'Hydraulic input data', 'Used to export to EPANET the information about the pipelines'' vertexes geometry', NULL, 0, NULL, NULL, 0, NULL, NULL, NULL, false);
+
+
+INSERT INTO inp_arc_type VALUES ('VALVE');
+INSERT INTO inp_arc_type VALUES ('PUMP');

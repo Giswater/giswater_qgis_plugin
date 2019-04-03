@@ -19,6 +19,15 @@ SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
 "client":{"lang":"ES"}, 
 "data":{"action":"ADD"}}$$)
 
+
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
+"client":{"lang":"ES"}, 
+"data":{"action":"DISABLE TOPO-TRIGGERS"}}$$)
+
+
+SELECT SCHEMA_NAME.gw_fct_admin_schema_manage_ct($${
+"client":{"lang":"ES"}, 
+"data":{"action":"ENABLE TOPO-TRIGGERS"}}$$)
 */
 
 
@@ -167,7 +176,7 @@ BEGIN
 		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=36
 		LOOP
 			v_query_text:= 'ALTER TABLE '||((v_tablerecord.text_column)::json->>'tablename')||
-				       ' DROP CONSTRAINT IF EXISTS '||((v_tablerecord.text_column)::json->>'constraintname')||';';
+				       ' DROP CONSTRAINT IF EXISTS '||((v_tablerecord.text_column)::json->>'constraintname')||' CASCADE;';
 			EXECUTE v_query_text;
 			v_36=v_36+1;
 		END LOOP;
@@ -186,9 +195,23 @@ BEGIN
 		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
 		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 			
-		
 		v_return = concat('{"constraints dropped":"',v_36,'","notnull dropped":"',v_37,'"}');	
+		
+	ELSIF v_action = 'DISABLE TOPO-TRIGGERS' THEN
+		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
+		ALTER TABLE node DISABLE TRIGGER gw_trg_node_update;
+		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
+		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 
+		v_return = '{"Triggers disabled":"4"}';	
+
+	ELSIF v_action = 'ENABLE TOPO-TRIGGERS' THEN
+		ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
+		ALTER TABLE node ENABLE TRIGGER gw_trg_node_update;
+		ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
+		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
+
+		v_return = '{"Triggers enabled":"4"}';	
 
 	ELSIF v_action = 'ADD' THEN
 

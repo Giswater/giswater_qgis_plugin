@@ -54,9 +54,11 @@ $BODY$
 	v_node2 text;
 	v_elevation float;
 	v_arc2node_reverse boolean = true; -- MOST IMPORTANT variable of this function. When true importation will be used making and arc2node reverse transformation for pumps and valves. Only works using Giswater sintaxis of additional pumps
+	v_delete_prev boolean = false; -- used on dev mode to
 	v_querytext text;
 	v_nodecat text;
 	i integer=1;
+	v_arc_id text;
 	
 BEGIN
 
@@ -72,74 +74,77 @@ BEGIN
 	-- Get SRID
 	SELECT epsg INTO epsg_val FROM version LIMIT 1;
 
-	-- Delete system and user catalogs
-	DELETE FROM macroexploitation;
-	DELETE FROM exploitation;
-	DELETE FROM sector;
-	DELETE FROM dma;
-	DELETE FROM ext_municipality;
-	DELETE FROM selector_expl;
-	DELETE FROM selector_state;
-	DELETE FROM cat_feature;
-	DELETE FROM arc_type ;
-	DELETE FROM node_type ;
-	DELETE FROM cat_mat_arc;
-	DELETE FROM cat_mat_node;
-	DELETE FROM inp_cat_mat_roughness;
-	DELETE FROM cat_arc;
-	DELETE FROM cat_node;
-	 
-	-- Delete data
-	DELETE FROM node;
-	DELETE FROM arc;
-
-	DELETE FROM man_tank;
-	DELETE FROM man_source;
-	DELETE FROM man_junction;
-	DELETE FROM man_pipe;
-	DELETE FROM man_pump;
-	DELETE FROM man_valve ;
-	
-	DELETE FROM inp_reservoir;
-	DELETE FROM inp_junction;
-	DELETE FROM inp_pipe;
-    	DELETE FROM inp_shortpipe;
-	DELETE FROM inp_pump;
-	DELETE FROM inp_tank;
-	DELETE FROM inp_valve;
-	DELETE FROM inp_pump_importinp;
-	DELETE FROM inp_pump_additional;
-	DELETE FROM inp_valve_importinp ;
-	
-	DELETE FROM inp_tags;
-	DELETE FROM inp_demand;
-        DELETE FROM inp_pattern;
-	DELETE FROM inp_pattern_value;
-	DELETE FROM inp_curve_id;
-	DELETE FROM inp_curve;
-	DELETE FROM inp_controls_x_arc;
-	DELETE FROM inp_controls_x_node;
-	DELETE FROM inp_rules_x_arc;
-	DELETE FROM inp_rules_x_node;
-	DELETE FROM inp_emitter;
-	DELETE FROM inp_quality;
-        DELETE FROM inp_source;
-	DELETE FROM inp_reactions_el;
-	DELETE FROM inp_reactions_gl;
-	DELETE FROM inp_energy_gl;
-	DELETE FROM inp_energy_el;
-	DELETE FROM inp_mixing;
-	DELETE FROM config_param_user;
-	DELETE FROM inp_label;
-        DELETE FROM inp_backdrop;
-        DELETE FROM rpt_inp_arc;
-	DELETE FROM rpt_inp_node;
-	DELETE FROM rpt_cat_result;
-
 	-- Disable constraints
-	PERFORM gw_fct_admin_schema_manage_ct($${
-	"client":{"lang":"ES"}, 
-	"data":{"action":"DROP"}}$$);
+	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+
+	
+	IF v_delete_prev THEN
+		-- Delete system and user catalogs
+		DELETE FROM macroexploitation;
+		DELETE FROM exploitation;
+		DELETE FROM sector;
+		DELETE FROM dma;
+		DELETE FROM ext_municipality;
+		DELETE FROM selector_expl;
+		DELETE FROM selector_state;
+		
+		DELETE FROM arc_type ;
+		DELETE FROM node_type ;
+		DELETE FROM connec_type ;
+		DELETE FROM cat_feature;
+		DELETE FROM cat_mat_arc;
+		DELETE FROM cat_mat_node;
+		DELETE FROM inp_cat_mat_roughness;
+		DELETE FROM cat_arc;
+		DELETE FROM cat_node;
+		 
+		-- Delete data
+		DELETE FROM node;
+		DELETE FROM arc;
+
+		DELETE FROM man_tank;
+		DELETE FROM man_source;
+		DELETE FROM man_junction;
+		DELETE FROM man_pipe;
+		DELETE FROM man_pump;
+		DELETE FROM man_valve ;
+		
+		DELETE FROM inp_reservoir;
+		DELETE FROM inp_junction;
+		DELETE FROM inp_pipe;
+		DELETE FROM inp_shortpipe;
+		DELETE FROM inp_pump;
+		DELETE FROM inp_tank;
+		DELETE FROM inp_valve;
+		DELETE FROM inp_pump_importinp;
+		DELETE FROM inp_pump_additional;
+		DELETE FROM inp_valve_importinp ;
+		
+		DELETE FROM inp_tags;
+		DELETE FROM inp_demand;
+		DELETE FROM inp_pattern;
+		DELETE FROM inp_pattern_value;
+		DELETE FROM inp_curve_id;
+		DELETE FROM inp_curve;
+		DELETE FROM inp_controls_x_arc;
+		DELETE FROM inp_controls_x_node;
+		DELETE FROM inp_rules_x_arc;
+		DELETE FROM inp_rules_x_node;
+		DELETE FROM inp_emitter;
+		DELETE FROM inp_quality;
+		DELETE FROM inp_source;
+		DELETE FROM inp_reactions_el;
+		DELETE FROM inp_reactions_gl;
+		DELETE FROM inp_energy_gl;
+		DELETE FROM inp_energy_el;
+		DELETE FROM inp_mixing;
+		DELETE FROM config_param_user;
+		DELETE FROM inp_label;
+		DELETE FROM inp_backdrop;
+		DELETE FROM rpt_inp_arc;
+		DELETE FROM rpt_inp_node;
+		DELETE FROM rpt_cat_result;
+	END IF;
 
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
@@ -221,8 +226,8 @@ BEGIN
 	INSERT INTO cat_feature VALUES ('EPAPBV','VARC','ARC');
 	INSERT INTO cat_feature VALUES ('EPAPSV','VARC','ARC');
 	INSERT INTO cat_feature VALUES ('EPAPRV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPATLV','VARC','ARC');
-	INSERT INTO cat_feature VALUES ('EPAPUM','VARC','ARC');
+	INSERT INTO cat_feature VALUES ('EPATCV','VARC','ARC');
+	INSERT INTO cat_feature VALUES ('EPAPUMP','VARC','ARC');
 	
 	--nodarc (AS node)
 	INSERT INTO cat_feature VALUES ('EPACHVA2N','VALVE','NODE');
@@ -231,32 +236,32 @@ BEGIN
 	INSERT INTO cat_feature VALUES ('EPAPBVA2N','VALVE','NODE');
 	INSERT INTO cat_feature VALUES ('EPAPSVA2N','VALVE','NODE');
 	INSERT INTO cat_feature VALUES ('EPAPRVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPATLVA2N','VALVE','NODE');
-	INSERT INTO cat_feature VALUES ('EPAPUMA2N','PUMP','NODE');
+	INSERT INTO cat_feature VALUES ('EPATCVA2N','VALVE','NODE');
+	INSERT INTO cat_feature VALUES ('EPAPUMPA2N','PUMP','NODE');
 	
 	--arc_type
 	--arc
 	INSERT INTO arc_type VALUES ('EPAPIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe',TRUE);
 	--nodarc
-	INSERT INTO arc_type VALUES ('EPACHV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
+	INSERT INTO arc_type VALUES ('EPACHV', 'VARC', 'PIPE', 'man_varc', 'inp_valve_importinp',TRUE);
 	INSERT INTO arc_type VALUES ('EPAFCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
 	INSERT INTO arc_type VALUES ('EPAGPV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
 	INSERT INTO arc_type VALUES ('EPAPBV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
 	INSERT INTO arc_type VALUES ('EPAPSV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
 	INSERT INTO arc_type VALUES ('EPAPRV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
-	INSERT INTO arc_type VALUES ('EPATLV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
+	INSERT INTO arc_type VALUES ('EPATCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp',TRUE);
 	INSERT INTO arc_type VALUES ('EPAPUMP', 'VARC', 'PIPE', 'man_varc', 'inp_pump_importinp',TRUE);
 	--node_type
 	--node
 	INSERT INTO node_type VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction',TRUE);
 	INSERT INTO node_type VALUES ('EPATAN', 'TANK', 'TANK', 'man_tank', 'inp_tank',TRUE);
 	INSERT INTO node_type VALUES ('EPARES', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_reservoir',TRUE);
-	INSERT INTO node_type VALUES ('EPACHVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
+	INSERT INTO node_type VALUES ('EPACHVA2N', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe',TRUE);
 	INSERT INTO node_type VALUES ('EPAFCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
 	INSERT INTO node_type VALUES ('EPAGPVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
 	INSERT INTO node_type VALUES ('EPAPBVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
 	INSERT INTO node_type VALUES ('EPAPSVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
-	INSERT INTO node_type VALUES ('EPATLVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
+	INSERT INTO node_type VALUES ('EPATCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
 	INSERT INTO node_type VALUES ('EPAPRVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve',TRUE);
 	INSERT INTO node_type VALUES ('EPAPUMPA2N', 'PUMP', 'PUMP', 'man_pump', 'inp_pump',TRUE);
 
@@ -265,18 +270,25 @@ BEGIN
 	SELECT DISTINCT csv6 FROM temp_csv2pg WHERE source='[PIPES]' AND csv6 IS NOT NULL;
 	DELETE FROM inp_cat_mat_roughness; -- forcing delete because when new material is inserted on cat_mat_arc automaticly this table is filled
 	INSERT INTO cat_mat_node VALUES ('EPAMAT');
+	INSERT INTO cat_mat_arc VALUES ('EPAMAT');
 	
 	--Roughness
 	INSERT INTO inp_cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)
-	SELECT id, 'default period',  0, 999, id::float FROM SCHEMA_NAME.cat_mat_arc;
+	SELECT id, 'default period',  0, 999, id::float FROM cat_mat_arc WHERE id !='EPAMAT';
 	
 	--cat_arc
 	--pipe w
 	INSERT INTO cat_arc( id, arctype_id, matcat_id,  dint)
 	SELECT DISTINCT ON (csv6, csv5) concat(csv6::numeric(10,3),'-',csv5::numeric(10,3))::text, 'EPAPIPE', csv6, csv5::float FROM temp_csv2pg WHERE source='[PIPES]' AND csv1 not like ';%' AND csv5 IS NOT NULL;
-	--nodarc
-	INSERT INTO cat_arc ( id, arctype_id, matcat_id,dnom) SELECT DISTINCT ON (csv5,csv4) concat(csv5,'-',csv4::numeric(10,3))::text, 'EPAVALVE', 'EPAMAT', csv4 from temp_csv2pg WHERE source='[VALVES]' AND csv1 not like ';%' AND csv5 IS NOT NULL ;
-	INSERT INTO cat_arc VALUES  ('EPAPUMP-CAT', 'EPAPUMP', 'EPAMAT');
+	
+	INSERT INTO cat_arc VALUES ('EPAPUMP-CAT', 'EPAPUMP', 'EPAMAT');
+	INSERT INTO cat_arc VALUES ('EPACHV-CAT', 'EPACHV', 'EPAMAT');
+	INSERT INTO cat_arc VALUES ('EPAFCV-CAT', 'EPAFCV', 'EPAMAT');
+	INSERT INTO cat_arc VALUES ('EPAGPV-CAT', 'EPAGPV', 'EPAMAT');
+	INSERT INTO cat_arc VALUES ('EPAPBV-CAT', 'EPAPBV', 'EPAMAT');
+	INSERT INTO cat_arc VALUES ('EPAPSV-CAT', 'EPAPSV', 'EPAMAT');
+	INSERT INTO cat_arc VALUES ('EPATCV-CAT', 'EPATCV', 'EPAMAT');
+	INSERT INTO cat_arc VALUES ('EPAPRV-CAT', 'EPAPRV', 'EPAMAT');
 
 	--cat_node
 	INSERT INTO cat_node VALUES ('EPAJUN-CAT', 'EPAJUN', 'EPAMAT');
@@ -287,7 +299,7 @@ BEGIN
 	INSERT INTO cat_node VALUES ('EPAGPV-CATA2N', 'EPAGPVA2N', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPAPBV-CATA2N', 'EPAPBVA2N', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPAPSV-CATA2N', 'EPAPSVA2N', 'EPAMAT');
-	INSERT INTO cat_node VALUES ('EPATLV-CATA2N', 'EPATLVA2N', 'EPAMAT');
+	INSERT INTO cat_node VALUES ('EPATCV-CATA2N', 'EPATCVA2N', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPAPRV-CATA2N', 'EPAPRVA2N', 'EPAMAT');
 	INSERT INTO cat_node VALUES ('EPAPUMP-CATA2N', 'EPAPUMPA2N', 'EPAMAT');
 
@@ -326,7 +338,8 @@ BEGIN
 
 	IF v_arc2node_reverse THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
 	
-		FOR v_data IN SELECT * FROM arc WHERE epa_type='VALVE' or epa_type='PUMP'  
+		FOR v_data IN SELECT * FROM arc WHERE epa_type IN ('VALVE','PUMP')
+		 
 		LOOP
 			-- getting man_table to work with
 			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM node_type WHERE epa_default=v_data.epa_type;
@@ -354,22 +367,20 @@ BEGIN
 			v_thegeom=ST_LineInterpolatePoint(v_thegeom, 0.5);
 
 			-- Introducing new node transforming line into point
-			INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type,the_geom) VALUES (v_node_id, v_nodecat, v_data.epa_type,1,1,1,1,2, v_thegeom) ;
+			INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type,the_geom) VALUES (v_node_id, v_nodecat, v_data.epa_type,1,1,1,1,
+			(SELECT id FROM value_state_type WHERE state=1 LIMIT 1), v_thegeom) ;
 			EXECUTE 'INSERT INTO '||v_mantablename||' VALUES ('||quote_literal(v_node_id)||')';
-
-			raise notice 'v_data %', v_data;
-			raise notice 'v_node_id %', v_node_id;
 
 			IF v_epatablename = 'inp_pump' THEN
 				INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status)
 				SELECT v_node_id, power, curve_id, speed, pattern, status FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
+				DELETE FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 
 			ELSIF v_epatablename = 'inp_valve' THEN
 				INSERT INTO inp_valve (node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status)
 				SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status FROM inp_valve_importinp WHERE arc_id=v_data.arc_id;
-				
 			END IF;
-						
+				
 			-- get old nodes
 			SELECT node_1, node_2 INTO v_node1, v_node2 FROM arc WHERE arc_id=v_data.arc_id;
 
@@ -377,22 +388,25 @@ BEGIN
 			v_elevation = ((SELECT elevation FROM node WHERE node_id=v_node1) + (SELECT elevation FROM node WHERE node_id=v_node2))/2;
 
 			-- downgrade to obsolete arcs and nodes
-			UPDATE arc SET state=0,state_type=0 WHERE arc_id=v_data.arc_id;
-			UPDATE node SET state=0,state_type=0 WHERE node_id IN (v_node1, v_node2);
+			UPDATE arc SET state=0,state_type=(SELECT id FROM value_state_type WHERE state=1 LIMIT 1) WHERE arc_id=v_data.arc_id;
+			UPDATE node SET state=0,state_type=(SELECT id FROM value_state_type WHERE state=1 LIMIT 1) WHERE node_id IN (v_node1, v_node2);
 					
 			-- update elevation of new node
 			UPDATE node SET elevation = v_elevation WHERE node_id=v_node_id;
 		END LOOP;	
 		
 		-- transform pump additional from node to inp_pump_additional table		
-		FOR v_data IN SELECT reverse(substring(reverse(node_1),7,99)) as nodarc_id, count from (select node_1, count(node_1) FROM ( SELECT node_1 FROM arc where state=0)a group by node_1 order by 2 desc)b where count>1
+		FOR v_data IN SELECT reverse(substring(reverse(node_1),7,99)) as nodarc_id, count 
+		from (select node_1, count(node_1) FROM ( SELECT node_1 FROM arc where state=0 AND epa_type='PUMP')a group by node_1 order by 2 desc)b where count>1
 		LOOP
 			-- migrate additional from inp_pump to inp_pump_additional
 			LOOP
 				-- nodarc_id: 
 				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern, status)
 				SELECT reverse(substring(reverse(node_id),2,99)), 1, power, curve_id, speed, pattern, status FROM SCHEMA_NAME.inp_pump WHERE node_id=concat(v_data.nodarc_id,i);
-				DELETE FROM node WHERE node_id=v_data.nodarc_id;
+				DELETE FROM node WHERE node_id=concat(v_data.nodarc_id,i);
+				DELETE FROM man_pump WHERE node_id=concat(v_data.nodarc_id,i);
+				DELETE FROM inp_pump WHERE node_id=concat(v_data.nodarc_id,i);
 				i=i+1;
 				EXIT WHEN i = v_data.count;
 			END LOOP;
@@ -422,6 +436,18 @@ BEGIN
 
 	END LOOP;
 
+	--update toarc field
+	IF v_arc2node_reverse THEN
+		FOR v_data IN SELECT * FROM arc WHERE state=0
+		LOOP
+			v_node_id = replace(v_data.arc_id,'_n2a','');
+			v_arc_id = (SELECT arc_id FROM arc WHERE state=1 AND ST_DWithin (the_geom, st_endpoint(v_data.the_geom), 0.01));
+			UPDATE inp_pump SET to_arc=v_arc_id WHERE node_id=v_node_id;
+			UPDATE inp_shortpipe SET to_arc=v_arc_id WHERE node_id=v_node_id;
+			UPDATE inp_valve SET to_arc=v_arc_id WHERE node_id=v_node_id;
+		END LOOP;
+	END IF;
+
 	--mapzones
 	EXECUTE 'SELECT ST_Multi(ST_ConvexHull(ST_Collect(the_geom))) FROM arc;'
 	into v_extend_val;
@@ -435,21 +461,25 @@ BEGIN
 	-- Enable constraints
 	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
-	-- reconnect arcs to arc2nodes
-	DELETE FROM node WHERE state=0;
 
 	IF v_arc2node_reverse THEN -- Reconnect those arcs connected to dissapeared nodarcs to the new node
 	
 		-- set nodearc variable as a max length/2+0.01 of arcs with state=0 (only are nod2arcs)
 		UPDATE config_param_system SET value = ((SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01) WHERE parameter='arc_searchnodes';
 		UPDATE config SET arc_searchnodes = (SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01;
-	
+
+		-- delete old nodes
+		UPDATE arc SET node_1=null where node_1 IN (SELECT node_id FROM node WHERE state=0);
+		UPDATE arc SET node_2=null where node_2 IN (SELECT node_id FROM node WHERE state=0);
+		DELETE FROM node WHERE state=0;
+			
 		-- repair arcs
 		PERFORM gw_fct_repair_arc (arc_id, null, null) FROM arc;
 
 		-- restore default default values
 		UPDATE config_param_system SET value=0.1 where parameter = 'arc_searchnodes';
-		UPDATE config SET arc_searchnodes = 0.1;
+		UPDATE config SET arc_searchnodes = 0.1;	
+		
 	END IF;
 
 RETURN v_count;
