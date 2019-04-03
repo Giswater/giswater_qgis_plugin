@@ -6,6 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 -- 2019/04/01
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
-INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, dv_querytext, dv_filterbyfield, isenabled, layout_id, layout_order, project_type, dv_isparent, isautoupdate, datatype, widgettype, tooltip) 
-VALUES ('inp_subc_seq_id_prefix', 'C', 'text', 'epa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
+VALUES ('inp_subc_seq_id_prefix', 'C', 'text', 'epa', NULL);
 
