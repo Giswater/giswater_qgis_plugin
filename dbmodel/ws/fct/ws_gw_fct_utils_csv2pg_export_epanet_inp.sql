@@ -49,19 +49,24 @@ BEGIN
 	--node
 	FOR rec_table IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=v_pg2csvcat_id order by id
 	LOOP
-
 		-- insert header
 		INSERT INTO temp_csv2pg (csv1,csv2pgcat_id) VALUES (NULL,v_pg2csvcat_id); 
 		EXECUTE 'INSERT INTO temp_csv2pg(csv2pgcat_id,csv1) VALUES ('||v_pg2csvcat_id||','''|| rec_table.target||''');';
-	
-		INSERT INTO temp_csv2pg (csv2pgcat_id,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12) 
-		SELECT v_pg2csvcat_id,rpad(concat(';',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
-		FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
-		AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text);
+
+		-- insert fieldnames
+		IF rec_table.tablename = 'vi_patterns' THEN
+			INSERT INTO temp_csv2pg (csv2pgcat_id,csv1,csv2) VALUES (10, ';ID', 'Multipliers');
+			num_column = 2;
+		ELSE 
+			INSERT INTO temp_csv2pg (csv2pgcat_id,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13) 
+			SELECT v_pg2csvcat_id,rpad(concat(';',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20),rpad(c13,20)
+			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
+			AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text);
+
+			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
+		END IF;
 	
 		INSERT INTO temp_csv2pg (csv2pgcat_id) VALUES (10) RETURNING id INTO id_last;
-
-		SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
   
 		--add underlines    
 		FOR num_col_rec IN 1..num_column
@@ -93,7 +98,7 @@ BEGIN
 
 	-- use the copy function of postgres to export to file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12 FROM temp_csv2pg WHERE csv2pgcat_id=10 and user_name=current_user order by id) 
+		EXECUTE 'COPY (SELECT csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18 ,csv19 FROM temp_csv2pg WHERE csv2pgcat_id=10 and user_name=current_user order by id) 
 		TO '''||p_path||''' WITH (DELIMITER E''\t'', FORMAT CSV);';
 	END IF;
 
