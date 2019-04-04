@@ -16,7 +16,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import  QgsPointXY
 
-from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
+from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel, QgsPointLocator
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QDoubleValidator
@@ -144,8 +144,11 @@ class CadAddCircle(ParentMapTool):
                 self.vertex_marker.setCenter(point)
                 self.vertex_marker.show()
         else:
-            # TODO 3.x if self.snap_to_selected_layer:
-            result = self.snapper.snapToMap(event_point)  # @UnusedVariable
+            if self.snap_to_selected_layer:
+                result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
+            else:
+                result = self.snapper.snapToMap(event_point)  # @UnusedVariable
+
             # That's the snapped features
             if result:
                 # Get the point and add marker on it

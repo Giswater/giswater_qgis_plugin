@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapToPixel
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint
+else:
+    from qgis.core import  QgsPointXY
+from qgis.core import QgsPoint, QgsMapToPixel, QgsPointLocator
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QDoubleValidator
@@ -24,6 +33,7 @@ class CadAddPoint(ParentMapTool):
         self.point_1 = None
         self.point_2 = None
         self.snap_to_selected_layer = False
+
 
 
     def init_create_point_form(self, point_1=None, point_2=None):
@@ -128,18 +138,30 @@ class CadAddPoint(ParentMapTool):
             return
 
         # Snapping
-        if self.snap_to_selected_layer:
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            if self.snap_to_selected_layer:
+                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+            else:
+                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
+
+            # That's the snapped features
+            if result:
+                # Get the point and add marker on it
+                point = QgsPoint(result[0].snappedVertex)
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
         else:
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
+            if self.snap_to_selected_layer:
+                result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
+            else:
+                result = self.snapper.snapToMap(event_point)  # @UnusedVariable
 
-        # That's the snapped features
-        if result:
-            # Get the point and add marker on it
-            point = QgsPoint(result[0].snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-
+            # That's the snapped features
+            if result:
+                # Get the point and add marker on it
+                point = QgsPointXY(result.point())
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
 
     def canvasReleaseEvent(self, event):
 
