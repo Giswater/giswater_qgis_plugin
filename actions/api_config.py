@@ -308,7 +308,7 @@ class ApiConfig(ApiParent):
                     self.populate_combo(widget, field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'checkbox':
+                elif field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
                     widget = QCheckBox()
                     if field['value'].lower() == 'true':
                         widget.setChecked(True)
@@ -333,7 +333,10 @@ class ApiConfig(ApiParent):
                 else:
                     pass
 
-                widget.setObjectName(field['widgetname'])
+                if widget:
+                    widget.setObjectName(field['widgetname'])
+                else:
+                    pass
 
 
                 # Order Widgets
@@ -425,26 +428,22 @@ class ApiConfig(ApiParent):
 
     def order_widgets(self, field, form, lbl, chk, widget):
 
+        form.addWidget(lbl, field['layout_order'], 0)
         if field['widgettype'] != 'check':
-            form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(chk, field['layout_order'], 1)
             form.addWidget(widget, field['layout_order'], 2)
         else:
-            form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(chk, field['layout_order'], 1)
 
 
     def order_widgets_system(self, field, form, lbl,  widget):
 
-
-        if field['widgettype'] != 'checkbox':
-            form.addWidget(lbl, field['layout_order'], 0)
-            form.addWidget(widget, field['layout_order'], 3)
-        elif field['widgettype'] == 'checkbox':
-            form.addWidget(lbl, field['layout_order'], 0)
+        form.addWidget(lbl, field['layout_order'], 0)
+        if field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
             form.addWidget(widget, field['layout_order'], 2)
+        elif field['widgettype'] != 'checkbox' and field['widgettype'] != 'check':
+            form.addWidget(widget, field['layout_order'], 3)
         else:
-            form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(widget, field['layout_order'], 1)
 
     def get_values_checked_param_user(self, chk, widget, field, value=None):
