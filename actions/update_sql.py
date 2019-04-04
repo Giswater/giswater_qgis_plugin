@@ -1084,8 +1084,8 @@ class UpdateSQL(ParentAction):
     def execute_import_data(self):
         self.insert_inp_into_db(self.file_inp)
         # Execute import data
-        # sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
-        # self.controller.execute_sql(sql, commit=False)
+        sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
+        self.controller.execute_sql(sql, commit=False)
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
@@ -1193,7 +1193,7 @@ class UpdateSQL(ParentAction):
                 msg = "The 'Path' field is required for Import INP data."
                 result = self.controller.show_info_box(msg, "Info")
                 return
-            self.load_base_no_ct(project_type=project_type)
+            self.load_base(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
