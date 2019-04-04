@@ -253,8 +253,8 @@ descript = 'Tolerance of difference allowed for connec geom1 in case of revision
 	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
 	WHERE parameter = 'rev_connec_geom1_tol';
-UPDATE config_param_system SET data_type = NULL, context = 'searchplus', descript = 'Deprecated', label = 'Portal field postal:', 
-	dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = 1, 
+UPDATE config_param_system SET data_type = NULL, context = 'searchplus', descript = 'Column used as id to fill postal field', 
+	label = 'Portal field postal:', dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = 1, 
 	layout_order = 0, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
 	datatype = 'string', widgettype = 'linetext', tooltip = NULL, ismandatory = false,iseditable = true, 
 	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
@@ -499,7 +499,7 @@ descript = 'Tolerance of difference allowed for connec y2 in case of revision (o
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
 	WHERE parameter = 'rev_connec_y2_tol';
 UPDATE config_param_system SET data_type = NULL, context = 'edit', 
-descript = 'Deprecated', label = 'Link search button:', 
+descript = 'Value that defines the distance buffer in which link is looking for his end features', label = 'Link search button:', 
 	dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = NULL, 
 	layout_order = NULL, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
 	datatype = 'double', widgettype = 'spinbox', tooltip = NULL, ismandatory = false,iseditable = true, 
@@ -618,22 +618,25 @@ descript = 'Default value used if Arc system elevation 2 is NULL when drawing pr
 	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
 	WHERE parameter = 'sys_elev2_vd';
-UPDATE config_param_system SET data_type = NULL, context = 'path', descript = 'Deprecated', label = 'Doc absolute path:', 
-	dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = NULL, 
+UPDATE config_param_system SET data_type = NULL, context = 'path', descript = 'The hyperlink of document info to an url or a file is made up of two parts. 
+	A common part to all documents, and a specific part for each document. The common part to all is the value of this variable', 
+label = 'Doc absolute path:', dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = NULL, 
 	layout_order = NULL, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
 	datatype = 'string', widgettype = 'linetext', tooltip = NULL, ismandatory = false,iseditable = true, 
 	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= true
 	WHERE parameter = 'doc_absolute_path';
-UPDATE config_param_system SET data_type = NULL, context = 'path', descript = 'Deprecated', label = 'Om visit absolute path:', 
+UPDATE config_param_system SET data_type = NULL, context = 'path', 
+	descript = 'The hyperlink of visit info to an url or a file is made up of two parts. A common part to all visits, 
+	and a specific part for each visit. The common part to all is the value of this variable', label = 'Om visit absolute path:', 
 	dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = NULL, 
 	layout_order = NULL, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
 	datatype = 'string', widgettype = 'linetext', tooltip = NULL, ismandatory = false,iseditable = true, 
 	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= true
 	WHERE parameter = 'om_visit_absolute_path';
-UPDATE config_param_system SET data_type = NULL, context = 'om', descript = 'Deprecated', label = 'Module om rehabit:', 
-	dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = NULL, 
+UPDATE config_param_system SET data_type = NULL, context = 'om', descript = 'Enable/disable using rehabit module of visit', 
+	label = 'Module om rehabit:', dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = NULL, 
 	layout_order = NULL, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
 	datatype = 'boolean', widgettype = 'check', tooltip = NULL, ismandatory = false,iseditable = true, 
 	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
@@ -902,7 +905,7 @@ descript = 'Buffer to find neighbour elements', label = 'Neighbourhood proximity
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
 	WHERE parameter = 'proximity_buffer';
 UPDATE config_param_system SET data_type = NULL, context = 'edit', 
-descript = 'Deprecated', label = 'Edit arc divide automatic control:', 
+descript = 'Enable/disable automatic arc division when the node is inserted over an arc', label = 'Edit arc divide automatic control:', 
 	dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = true, layout_id = 13, 
 	layout_order = 6, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
 	datatype = 'boolean', widgettype = 'check', tooltip = NULL, ismandatory = false,iseditable = true, 
@@ -1163,7 +1166,7 @@ descript = 'Automatic insert of a node at the end of an arc', label = 'Automatic
 	datatype = 'boolean', widgettype = 'check', tooltip = NULL, ismandatory = false,iseditable = true, 
 	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
-	WHERE parameter = 'nodeisert_arcendpoint';
+	WHERE parameter = 'nodeinsert_arcendpoint';
 UPDATE config_param_system SET data_type = NULL, context = 'system', descript = 'Basic information about schema', label = 'Schema manager:', 
 	dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = NULL, layout_id = NULL, 
 	layout_order = NULL, project_type = 'utils', dv_isparent = NULL, isautoupdate = NULL, 
@@ -1173,13 +1176,15 @@ UPDATE config_param_system SET data_type = NULL, context = 'system', descript = 
 	WHERE parameter = 'schema_manager';
 
 update config_param_system set data_type = datatype, ismandatory=TRUE;
+update config_param_system set ismandatory=FALSE WHERE parameter='custom_giswater_folder' OR parameter='ext_utils_schema' or 
+	parameter='hydrometer_link_absolute_path';
 update config_param_system set isenabled=false where isenabled is null;
 update config_param_system 	set layout_id=null,layout_order=null, ismandatory=null, widgettype=null, datatype=null, iseditable=null, 
 	dv_isparent=null, dv_querytext=null, dv_filterbyfield=null, isautoupdate=null where isenabled is false;
-update config_param_system set isdeprecated=false where isdeprecated is null
+update config_param_system set isdeprecated=false where isdeprecated is null;
 update config_param_system set iseditable=TRUE where isenabled = true and iseditable is null;
 update config_param_system set dv_isparent=FALSE where isenabled = true and dv_isparent is null;
-update config_param_system set isautoupdate=FALSE where isenabled = true and isautoupdate is null;*
+update config_param_system set isautoupdate=FALSE where isenabled = true and isautoupdate is null;
 
 update config_param_system a set id = b.a FROM 
 	(SELECT row_number() over (order by id)+1000 AS a, id FROM config_param_system) b where b.id = a.id;
