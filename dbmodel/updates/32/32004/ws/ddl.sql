@@ -42,4 +42,9 @@ ALTER TABLE inp_reactions_gl ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.in
 ALTER TABLE inp_reactions_el ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_reactions_el_id_seq'::regclass);
 
 
-ALTER TABLE 
+ALTER TABLE inp_pattern_value ALTER COLUMN _factor_19 DROP DEFAULT;
+ALTER TABLE inp_pattern_value ALTER COLUMN _factor_20 DROP DEFAULT;
+ALTER TABLE inp_pattern_value ALTER COLUMN _factor_21 DROP DEFAULT;
+ALTER TABLE inp_pattern_value ALTER COLUMN _factor_22 DROP DEFAULT;
+ALTER TABLE inp_pattern_value ALTER COLUMN _factor_23 DROP DEFAULT;
+ALTER TABLE inp_pattern_value ALTER COLUMN _factor_24 DROP DEFAULT;
