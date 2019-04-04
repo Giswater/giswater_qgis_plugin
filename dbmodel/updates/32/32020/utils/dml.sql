@@ -1172,7 +1172,14 @@ UPDATE config_param_system SET data_type = NULL, context = 'system', descript = 
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
 	WHERE parameter = 'schema_manager';
 
-
+update config_param_system set data_type = datatype, ismandatory=TRUE;
+update config_param_system set isenabled=false where isenabled is null;
+update config_param_system 	set layout_id=null,layout_order=null, ismandatory=null, widgettype=null, datatype=null, iseditable=null, 
+	dv_isparent=null, dv_querytext=null, dv_filterbyfield=null, isautoupdate=null where isenabled is false;
+update config_param_system set isdeprecated=false where isdeprecated is null
+update config_param_system set iseditable=TRUE where isenabled = true and iseditable is null;
+update config_param_system set dv_isparent=FALSE where isenabled = true and dv_isparent is null;
+update config_param_system set isautoupdate=FALSE where isenabled = true and isautoupdate is null;*
 
 update config_param_system a set id = b.a FROM 
 	(SELECT row_number() over (order by id)+1000 AS a, id FROM config_param_system) b where b.id = a.id;
