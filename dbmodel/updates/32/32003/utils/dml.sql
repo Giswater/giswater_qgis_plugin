@@ -25,8 +25,13 @@ INSERT INTO audit_cat_table VALUES ('anl_polygon', 'Analysis', 'Table with the r
 
 
 -- 2019/04/03
-insert into config_param_system (parameter, value) values ('ApiVersion','0.9.101' ) on conflict (parameter) do nothing;
-
+UPDATE config_param_system SET data_type = NULL, context = 'Api', descript = 'Version of API', 
+label = 'Api version:', dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = null, 
+	layout_order = 0, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
+	datatype = NULL, widgettype = NULL, tooltip = NULL, ismandatory = NULL,iseditable = NULL, 
+	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
+	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
+	WHERE parameter = 'ApiVersion';
 UPDATE config_param_system SET data_type = NULL, context = 'searchplus', descript = 'Layer used by search tool to fill Municipality field', 
 label = 'Expl layer:', dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = false, layout_id = 1, 
 	layout_order = 0, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
