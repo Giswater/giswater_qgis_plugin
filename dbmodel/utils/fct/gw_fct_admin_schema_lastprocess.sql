@@ -57,11 +57,9 @@ BEGIN
 	-- last proccess
 	IF v_isnew IS TRUE THEN
 	
-		-- clean schema of all tables/views/triggers not used in this version
-		-- to do: stabilize before activate this
-		--IF v_gwversion > '3.2.009' AND v_gwversion < '3.2.011 THEN
-			--PERFORM gw_fct_admin_schema_dropdeprecated_rel();	
-		--END IF;	
+		--untill 3.2.004 is not possible
+		--PERFORM gw_fct_admin_schema_dropdeprecated_rel();	
+		
 
 		-- inserting version table
 		INSERT INTO version (giswater, wsoftware, postgres, postgis, language, epsg) VALUES (v_gwversion, upper(v_projecttype), (select version()),(select postgis_version()), v_language, v_epsg);	
@@ -81,6 +79,12 @@ BEGIN
 		PERFORM gw_fct_admin_schema_utils_fk();  -- this is the posiition to use it because of we need values on version table to workwith
 		
 	ELSIF v_isnew IS FALSE THEN
+		
+		-- clean schema of all tables/views/triggers not used in this version
+		-- to do: stabilize before activate this
+		--IF v_gwversion > '3.2.002' AND v_gwversion < '3.2.004 AND upper(v_projecttype) = 'WS' THEN
+		--END IF;
+	
 		-- check project consistency
 		IF v_projecttype = 'WS' THEN
 	

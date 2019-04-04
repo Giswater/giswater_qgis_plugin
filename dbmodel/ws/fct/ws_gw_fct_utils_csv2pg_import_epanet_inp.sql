@@ -54,7 +54,7 @@ $BODY$
 	v_node2 text;
 	v_elevation float;
 	v_arc2node_reverse boolean = true; -- MOST IMPORTANT variable of this function. When true importation will be used making and arc2node reverse transformation for pumps and valves. Only works using Giswater sintaxis of additional pumps
-	v_delete_prev boolean = false; -- used on dev mode to
+	v_delete_prev boolean = true; -- used on dev mode to
 	v_querytext text;
 	v_nodecat text;
 	i integer=1;
@@ -74,11 +74,14 @@ BEGIN
 	-- Get SRID
 	SELECT epsg INTO epsg_val FROM version LIMIT 1;
 
-	-- Disable constraints
-	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
-
-	
 	IF v_delete_prev THEN
+		
+		DELETE FROM rpt_cat_result;
+		DELETE FROM anl_mincut_selector_valve;
+
+		-- Disable constraints
+		PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
+
 		-- Delete system and user catalogs
 		DELETE FROM macroexploitation;
 		DELETE FROM exploitation;
@@ -97,7 +100,7 @@ BEGIN
 		DELETE FROM inp_cat_mat_roughness;
 		DELETE FROM cat_arc;
 		DELETE FROM cat_node;
-		 
+ 
 		-- Delete data
 		DELETE FROM node;
 		DELETE FROM arc;
@@ -144,7 +147,11 @@ BEGIN
 		DELETE FROM rpt_inp_arc;
 		DELETE FROM rpt_inp_node;
 		DELETE FROM rpt_cat_result;
+	ELSE 
+		-- Disable constraints
+		PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);		
 	END IF;
+	
 
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
@@ -171,43 +178,48 @@ BEGIN
 		IF rpt_rec.csv1 LIKE '[%' THEN
 			v_target=rpt_rec.csv1;
 		END IF;
+		
 		UPDATE temp_csv2pg SET source=v_target WHERE rpt_rec.id=temp_csv2pg.id;
 	END LOOP;
 
 	DELETE FROM temp_csv2pg WHERE left(csv1,1)=';' AND source!='[TITLE]';
-
-	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id
+	
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
-		raise notice 'v_target,%,%', rpt_rec.source,rpt_rec.id;
 		-- refactor of [OPTIONS] target
-		IF rpt_rec.source ='[OPTIONS]' AND rpt_rec.csv1 ILIKE 'Specific' THEN UPDATE temp_csv2pg SET csv1='specific_gravity', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[OPTIONS]' AND rpt_rec.csv1 ILIKE 'Demand' THEN UPDATE temp_csv2pg SET csv1='demand_multiplier', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[OPTIONS]' AND rpt_rec.csv1 ILIKE 'Emitter' THEN UPDATE temp_csv2pg SET csv1='emitter_exponent', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[OPTIONS]' AND rpt_rec.csv1 ILIKE 'Unbalanced' THEN UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3), csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[TIMES]' AND rpt_rec.csv2 ILIKE 'Clocktime'  THEN 
-			UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=concat(csv3,' ',csv4), csv3=null,csv4=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[TIMES]' AND (rpt_rec.csv2 ILIKE 'Timestep' OR rpt_rec.csv2 ILIKE 'Start' )THEN 
-			UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=csv3, csv3=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'specific' THEN 
+			UPDATE temp_csv2pg SET csv1='SPECIFIC GRAVITY', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'demand' 
+			THEN UPDATE temp_csv2pg SET csv1='DEMAND MULTIPLIER', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'emitter' 
+			THEN UPDATE temp_csv2pg SET csv1='EMITTER EXPONENT', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'unbalanced' 
+			THEN UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3), csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
 
-		IF rpt_rec.source ilike '[ENERGY]%' AND rpt_rec.csv1 ILIKE 'PUMP' THEN 
+		-- refactor of [REPORT] target
+		IF rpt_rec.source ='[REPORT]' AND lower(rpt_rec.csv1) = 'f-factor' 
+			THEN UPDATE temp_csv2pg SET csv1='f_factor', csv2=concat(csv2,' ',csv3), csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+			
+		-- refactor of [TIMES] target
+		IF rpt_rec.source ='[TIMES]' AND lower(rpt_rec.csv2) ='clocktime'  THEN 
+			UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=concat(csv3,' ',csv4), csv3=null,csv4=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+		IF rpt_rec.source ='[TIMES]' AND (lower(rpt_rec.csv2) ILIKE 'timestep' OR lower(rpt_rec.csv2) ILIKE 'start' ) 
+			THEN UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=csv3, csv3=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+
+		-- refactor of [ENERGY] target
+		IF rpt_rec.source ilike '[ENERGY]%' AND lower(rpt_rec.csv1) ILIKE 'pump' THEN 
 			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3), csv2=csv4, csv3=null,  csv4=null WHERE temp_csv2pg.id=rpt_rec.id;
-		ELSIF rpt_rec.source ilike '[ENERGY]%' AND (rpt_rec.csv1 ILIKE 'GLOBAL' OR  rpt_rec.csv1 ILIKE 'DEMAND') THEN
-			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2), csv2=csv3, csv3=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[PUMPS]' and rpt_rec.csv4 ILIKE 'Power' THEN 
-			UPDATE temp_csv2pg SET csv4=concat(csv5,' ',csv7,' ',csv9,' ',csv11), csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+		ELSIF rpt_rec.source ilike '[ENERGY]%' AND (lower(rpt_rec.csv1) ILIKE 'global' OR  lower(rpt_rec.csv1) ILIKE 'demand') THEN UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2), csv2=csv3, csv3=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+
+		-- refactor of [RULES] target
 		IF rpt_rec.source ='[RULES]' and rpt_rec.csv2 IS NOT NULL THEN 
 			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ), 
 			csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+
+		-- refactor of [CONTROLS] target
 		IF rpt_rec.source ='[CONTROLS]'and rpt_rec.csv2 IS NOT NULL THEN 
 			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ), 
 			csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[PATTERNS]' and rpt_rec.csv3 IS NOT NULL THEN 
-			UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,
-			csv14,' ',csv15,' ',csv16,' ',csv17,' ',csv18,' ',csv19,' ',csv20,' ',csv21,' ',csv22,' ',csv23,' ',csv24,' ',csv25), 
-			csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null,csv12=null, csv13=null,
-			csv14=null,csv15=NULL, csv16=null, csv17=null,csv18=null,csv19=null,csv20=null,csv21=null,csv22=null, csv23=null,csv24=null, csv25=null
-			WHERE temp_csv2pg.id=rpt_rec.id;
-		END IF;
 	END LOOP;
 
 	-- CATALOGS
