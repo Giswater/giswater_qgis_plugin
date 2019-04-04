@@ -1983,7 +1983,7 @@ class UpdateSQL(ParentAction):
                 aux = row
                 dirty_list.append(aux)
             for x in range(len(dirty_list) - 1, -1, -1):
-                if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
+                if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x] or dirty_list[x] == '; ' or dirty_list[x] == ';' or dirty_list[x] == ';\n':
                     dirty_list.pop(x)
 
             sp_n = dirty_list
