@@ -175,14 +175,21 @@ class CadAddPoint(ParentMapTool):
             except(TypeError, KeyError):
                 self.iface.actionPan().trigger()
                 return
-
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-            # Create point with snap reference
-            if result:
-                point = QgsPoint(result[0].snappedVertex)
-            # Create point with mouse cursor reference
+            if Qgis.QGIS_VERSION_INT < 29900:
+                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+                # Create point with snap reference
+                if result:
+                    point = QgsPoint(result[0].snappedVertex)
+                # Create point with mouse cursor reference
+                else:
+                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
             else:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+                result = self.snapper.snapToMap(event_point)
+                if result:
+                    point = QgsPointXY(result.point())
+                    if point.x() == 0 and point.y() == 0:
+                        point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+                
             if self.point_1 is None:
                 self.point_1 = point
             else:
@@ -240,7 +247,7 @@ class CadAddPoint(ParentMapTool):
             self.vdefault_layer = self.iface.activeLayer()
 
         # Set snapping
-        self.snapper_manager.snap_to_layer(self.vdefault_layer)
+        #self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
     def deactivate(self):

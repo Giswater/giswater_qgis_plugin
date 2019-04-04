@@ -180,7 +180,8 @@ class CadAddCircle(ParentMapTool):
                 else:
                     point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
             else:
-                result = self.snapper.snapToMap(event_point)  # @UnusedVariable
+
+                result = self.snapper.snapToMap(event_point)
                 # Create point with snap reference
                 point = QgsPointXY(result.point())
                 if point.x() == 0 and point.y() == 0:
