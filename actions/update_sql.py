@@ -1083,8 +1083,9 @@ class UpdateSQL(ParentAction):
 
     def execute_import_data(self):
         self.insert_inp_into_db(self.file_inp)
-        sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
-        self.controller.execute_sql(sql, commit=False)
+        # Execute import data
+        # sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
+        # self.controller.execute_sql(sql, commit=False)
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
@@ -1192,7 +1193,7 @@ class UpdateSQL(ParentAction):
                 msg = "The 'Path' field is required for Import INP data."
                 result = self.controller.show_info_box(msg, "Info")
                 return
-            self.load_base(project_type=project_type)
+            self.load_base_no_ct(project_type=project_type)
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
@@ -1972,11 +1973,15 @@ class UpdateSQL(ParentAction):
             progress += 1
             list_aux = row.split("\t")
             dirty_list = []
-            for x in range(0, len(list_aux)):
-                aux = list_aux[x].split(" ")
-                for i in range(len(aux)):
-                    dirty_list.append(aux[i])
-
+            if str(row[0]) != ';':
+                for x in range(0, len(list_aux)):
+                    aux = list_aux[x].split(" ")
+                    for i in range(len(aux)):
+                        dirty_list.append(aux[i])
+            else:
+                for x in range(0, len(list_aux)):
+                    aux = list_aux[x]
+                    dirty_list.append(aux)
             for x in range(len(dirty_list) - 1, -1, -1):
                 if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
                     dirty_list.pop(x)
