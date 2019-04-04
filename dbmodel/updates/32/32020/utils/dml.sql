@@ -31,13 +31,17 @@ INSERT INTO om_visit_type VALUES (2, 'unspected');
 UPDATE audit_cat_param_user SET isdeprecated=true, isenabled=false where id='om_param_type_vdefault';
 UPDATE audit_cat_param_user SET isdeprecated=true, isenabled=false where id='parameter_vdefault';
 
+--2019/04/04
 
-UPDATE audit_cat_param_user SET isenabled=true where id='visitclass_vdefault';
-UPDATE audit_cat_param_user SET isenabled=true where id='visitclass_vdefault_arc';
-UPDATE audit_cat_param_user SET isenabled=true where id='visitclass_vdefault_node';
-UPDATE audit_cat_param_user SET isenabled=true where id='visitclass_vdefault_connec';
-UPDATE audit_cat_param_user SET isenabled=true where id='visitenddate_vdefault';
-UPDATE audit_cat_param_user SET isenabled=true where id='visitstartdate_vdefault';
-UPDATE audit_cat_param_user SET isenabled=true where id='visit_duration_vdef';
-UPDATE audit_cat_param_user SET isenabled=true where id='visitstatus_vdefault';
-UPDATE audit_cat_param_user SET isenabled=true where id='visitextcode_vdefault';
+INSERT INTO audit_cat_param_user VALUES ('visitextcode_vdefault', 'config', 'Default value of external code of a visit', 'role_om', NULL, NULL, 'Visit external code:', NULL, NULL, true, 2, 10, 'utils', false, NULL, NULL, NULL, false, 'string', 'linetext', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitstatus_vdefault', 'config', 'Default value of visit status', 'role_om', NULL, NULL, 'Visit status:', 'SELECT id, idval FROM om_visit_cat_status WHERE idval IS NOT NULL', NULL, true, 2, 9, 'utils', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitenddate_vdefault', 'config', 'Default value of visit end date', 'role_om', NULL, NULL, 'Visit end date:', NULL, NULL, true, 2, 6, 'utils', false, NULL, NULL, NULL, false, 'date', 'datepickertime', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitstartdate_vdefault', 'config', 'Default value of visit start date', 'role_om', NULL, NULL, 'Visit start date:', NULL, NULL, true, 2, 7, 'utils', false, NULL, NULL, NULL, false, 'date', 'datepickertime', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitparameter_vdefault', 'dynamic_param', 'Default value of parameter of an event', 'role_om', NULL, NULL, 'Visit parameter:', NULL, NULL, false, NULL, NULL, 'utils', false, NULL, NULL, NULL, false, 'string', NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitclass_vdefault', 'config', 'Default value of visit class', 'role_om', NULL, NULL, 'Visit class:', 'SELECT id, idval FROM om_visit_class WHERE feature_type IS NULL AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, true, 2, 1, 'utils', false, NULL, NULL, NULL, false, 'integer', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitclass_vdefault_connec', 'config', 'Default value of visit class for connec', 'role_om', NULL, NULL, 'Visit class of connec:', 'SELECT id, idval FROM om_visit_class WHERE feature_type=''CONNEC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, true, 2, 4, 'utils', false, NULL, NULL, NULL, false, 'integer', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visit_duration_vdef', 'config', 'Default duration of a visit', 'role_om', NULL, NULL, 'Visit duration', NULL, NULL, true, 2, 8, 'utils', false, NULL, NULL, NULL, false, 'integer', 'linetext', false, NULL, '24 hours', 'grl_om', NULL, true, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitclass_vdefault_node', 'config', 'Default value of visit class for node', 'role_om', NULL, NULL, 'Visit class of node:', 'SELECT id, idval FROM om_visit_class WHERE feature_type=''NODE'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, true, 2, 3, 'utils', false, NULL, NULL, NULL, false, 'integer', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitclass_vdefault_arc', 'config', 'Default value of visit class for arc', 'role_om', NULL, NULL, 'Visit class of arc:', 'SELECT id, idval FROM om_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, true, 2, 2, 'utils', false, NULL, NULL, NULL, false, 'integer', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('visitcat_vdefault', 'dynamic_param', 'Default value of visit catalog', 'role_om', NULL, NULL, 'Visit catalog:', 'SELECT id AS id, name as idval  FROM om_visit_cat WHERE id IS NOT NULL', NULL, true, NULL, NULL, 'utils', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+	
