@@ -7,6 +7,12 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+UPDATE sys_csv2pg_config SET reverse_pg2csvcat_id=null WHERE tablename='vi_energy';
+UPDATE sys_csv2pg_config SET reverse_pg2csvcat_id=null WHERE tablename='vi_quality';
+UPDATE sys_csv2pg_config SET reverse_pg2csvcat_id=null WHERE tablename='vi_reactions';
+UPDATE sys_csv2pg_config SET reverse_pg2csvcat_id=null WHERE tablename='vi_mixing';
+
 --2019/04/04
 DELETE FROM audit_cat_param_user;
 

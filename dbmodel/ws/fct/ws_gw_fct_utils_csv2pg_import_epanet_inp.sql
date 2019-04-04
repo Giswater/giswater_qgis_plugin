@@ -182,7 +182,6 @@ BEGIN
 		UPDATE temp_csv2pg SET source=v_target WHERE rpt_rec.id=temp_csv2pg.id;
 	END LOOP;
 
-	DELETE FROM temp_csv2pg WHERE left(csv1,1)=';' AND source!='[TITLE]';
 	
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
