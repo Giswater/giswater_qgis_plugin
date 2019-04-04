@@ -37,6 +37,9 @@ CREATE SEQUENCE inp_reactions_el_id_seq
    CACHE 1;
 
 ALTER TABLE inp_energy_gl ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_energy_gl_id_seq'::regclass);
-ALTER TABLE abc.inp_energy_el ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_energy_el_id_seq'::regclass);
-ALTER TABLE abc.inp_reactions_gl ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_reactions_gl_id_seq'::regclass);
-ALTER TABLE abc.inp_reactions_el ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_reactions_el_id_seq'::regclass);
+ALTER TABLE inp_energy_el ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_energy_el_id_seq'::regclass);
+ALTER TABLE inp_reactions_gl ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_reactions_gl_id_seq'::regclass);
+ALTER TABLE inp_reactions_el ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_reactions_el_id_seq'::regclass);
+
+
+ALTER TABLE 
