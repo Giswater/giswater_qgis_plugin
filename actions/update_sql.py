@@ -1970,17 +1970,18 @@ class UpdateSQL(ParentAction):
 
         for row in full_file:
             progress += 1
-            list_aux = row.split("\t")
-            dirty_list = []
+
             if str(row[0]) != ';':
+                list_aux = row.split("\t")
+                dirty_list = []
                 for x in range(0, len(list_aux)):
                     aux = list_aux[x].split(" ")
                     for i in range(len(aux)):
                         dirty_list.append(aux[i])
             else:
-                for x in range(0, len(list_aux)):
-                    aux = list_aux[x]
-                    dirty_list.append(aux)
+                dirty_list = []
+                aux = row
+                dirty_list.append(aux)
             for x in range(len(dirty_list) - 1, -1, -1):
                 if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
                     dirty_list.pop(x)
