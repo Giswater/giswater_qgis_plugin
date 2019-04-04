@@ -73,7 +73,7 @@ BEGIN
 		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, data_type, context, descript, project_type, label, isdeprecated) 
-		VALUES ('schema_manager', v_schema_info,'json','system', 'Basic information about schema','utils' 'Schema manager:', false);
+		VALUES ('schema_manager', v_schema_info,'json','system', 'Basic information about schema','utils', 'Schema manager:', false);
 
 		-- fk from utils schema
 		PERFORM gw_fct_admin_schema_utils_fk();  -- this is the posiition to use it because of we need values on version table to workwith

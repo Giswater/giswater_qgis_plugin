@@ -63,12 +63,10 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND result_id=v_result_id AND user_name=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id=14 AND result_id=v_result_id AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id=14 AND result_id=v_result_id AND cur_user=current_user;
-
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('NETWORK DATA ANALYSIS ACORDING EPA RULES'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('----------------------------------------'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, null);
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('-------------------------------------------------------'));
 	
 	-- UTILS
 	-- Check orphan nodes
@@ -81,7 +79,10 @@ BEGIN
 	END LOOP;
 
 	IF count_aux > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('There are ',count_aux,' node(s) orphan. Take a look on temporal table to know details'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' node(s) orphan. Take a look on temporal table to know details'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+		VALUES (14, v_result_id, 'INFO: There are no nodes orphan');
 	END IF;
 
 	-- Check arcs without start/end node
@@ -98,7 +99,10 @@ BEGIN
 	EXECUTE 'INSERT INTO anl_arc (fprocesscat_id, arc_id, arccat_id, state, expl_id, the_geom, result_id, descript)'||v_querytext;
 
 	IF count_aux > 0 THEN
-		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('There are ',count_aux,' arc(s) without start/end nodes. Take a look on temporal table to know details'));
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' arc(s) without start/end nodes. Take a look on temporal table to know details'));
+	ELSE
+		INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+		VALUES (14, v_result_id, 'INFO: There are no arcs without start/end nodes');
 	END IF;
 		
 	-- only UD projects
@@ -110,7 +114,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment WHERE node_id is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column node_id column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column node_id column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -118,7 +122,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where rg_id is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column rg_id column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column rg_id column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -126,7 +130,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where area is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column area column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column area column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -134,7 +138,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where width is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column width column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column width column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -142,7 +146,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where slope is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column slope column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column slope column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -150,7 +154,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where clength is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column clength column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column clength column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -158,7 +162,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where nimp is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column nimp column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column nimp column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -166,7 +170,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where nperv is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column nperv column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column nperv column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -174,7 +178,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where simp is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column simp column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column simp column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -182,7 +186,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where sperv is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column sperv column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column sperv column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -190,7 +194,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where zero is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column zero column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column zero column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -198,7 +202,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where routeto is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column routeto column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column routeto column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -207,7 +211,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_subcatchment where rted is null;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory column rted column'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory column rted column'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
 		END IF;
@@ -222,7 +226,7 @@ BEGIN
 			
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;
@@ -234,7 +238,7 @@ BEGIN
 			
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory columns of Green-Apt infiltartion method (suction....)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory columns of Green-Apt infiltartion method (suction....)'));
 				count_global_aux=count_global_aux+count_aux;
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
@@ -248,7 +252,7 @@ BEGIN
 			
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' subcatchment(s) with null values on mandatory columns of Horton/Horton modified infiltartion method (maxrate, minrate, decay, drytime, maxinfil)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' subcatchment(s) with null values on mandatory columns of Horton/Horton modified infiltartion method (maxrate, minrate, decay, drytime, maxinfil)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;
@@ -260,7 +264,7 @@ BEGIN
 		where (form_type is null) OR (intvl is null) OR (rgage_type is null);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' raingage(s) with null values at least on mandatory columns for rain type (form_type, intvl, rgage_type)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' raingage(s) with null values at least on mandatory columns for rain type (form_type, intvl, rgage_type)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;		
@@ -268,7 +272,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_raingage where rgage_type='TIMESERIES' AND timser_id IS NULL;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' raingage(s) with null values on the mandatory column for timeseries raingage type'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' raingage(s) with null values on the mandatory column for timeseries raingage type'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;		
@@ -276,7 +280,7 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM v_edit_raingage where rgage_type='FILE' AND (fname IS NULL) or (sta IS NULL) or (units IS NULL);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' raingage(s) with null values at least on mandatory columns for file raingage type (fname, sta, units)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' raingage(s) with null values at least on mandatory columns for file raingage type (fname, sta, units)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
 			END IF;				
@@ -291,7 +295,10 @@ BEGIN
 		
 		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message)
-			VALUES (14, v_result_id, concat('The node2arc parameter have been modified from ', v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts'));
+			VALUES (14, v_result_id, concat('WARNING: The node2arc parameter have been modified from ', v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts'));
+		ELSE 
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message)
+			VALUES (14, v_result_id, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value:', v_nodearc_user::numeric(12,3)));
 		END IF;
 		
 		--WS check and set value default
@@ -300,9 +307,12 @@ BEGIN
 		SELECT count(*) INTO count_aux FROM inp_cat_mat_roughness WHERE init_age IS NULL or end_age IS NULL or roughness IS NULL;
 		IF count_aux > 0 THEN
 			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-			VALUES (14, v_result_id, concat('There are ',count_aux,' material(s) with null values at least on mandatory columns for Roughness catalog (init_age,end_age,roughness)'));
+			VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' material(s) with null values at least on mandatory columns for Roughness catalog (init_age,end_age,roughness)'));
 			count_global_aux=count_global_aux+count_aux; 
 			count_aux=0;
+		ELSE
+			INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+			VALUES (14, v_result_id, 'INFO: Materials checked. No mandadoty values missed');
 		END IF;	
 		
 		-- Check conected nodes but with closed valves -->force to put values of demand on '0'	
@@ -313,9 +323,12 @@ BEGIN
 		WHERE (((initlevel IS NULL) OR (minlevel IS NULL) OR (maxlevel IS NULL) OR (diameter IS NULL) OR (minvol IS NULL)) AND result_id=v_result_id);
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' tank(s) with null values at least on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' tank(s) with null values at least on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol)'));
 				count_global_aux=count_global_aux+count_aux;
 				count_aux=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, 'INFO: Tanks checked. No mandadoty values missed');
 			END IF;	
 		
 		
@@ -325,9 +338,12 @@ BEGIN
 
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' valve(s) with null values at least on mandatory columns for valve (valv_type, status, to_arc)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' valve(s) with null values at least on mandatory columns for valve (valv_type, status, to_arc)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, 'INFO: Valve status checked. No mandadoty values missed');
 			END IF;
 		
 
@@ -335,36 +351,48 @@ BEGIN
 		WHERE ((valv_type='PBV' OR valv_type='PRV' OR valv_type='PSV') AND (pressure IS NULL)) AND result_id=v_result_id;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' PBV-PRV-PSV valve(s) with null values at least on mandatory on the mandatory column for Pressure valves'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' PBV-PRV-PSV valve(s) with null values at least on mandatory on the mandatory column for Pressure valves'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, 'INFO: PBC-PRV-PSV valves checked. No mandadoty values missed');
 			END IF;				
 	
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE ((valv_type='GPV') AND (curve_id IS NULL)) AND result_id=v_result_id;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' GPV valve(s) with null values at least on mandatory on the mandatory column for General purpose valves'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' GPV valve(s) with null values at least on mandatory on the mandatory column for General purpose valves'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, 'INFO: GPV valves checked. No mandadoty values missed');
 			END IF;	
 
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE ((valv_type='TCV')) AND result_id=v_result_id;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' TCV valve(s) with null values at least on mandatory column for Losses Valves'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' TCV valve(s) with null values at least on mandatory column for Losses Valves'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, 'INFO: TCV valves checked. No mandadoty values missed');
 			END IF;				
 
 		SELECT count(*) INTO count_aux FROM inp_valve JOIN rpt_inp_arc ON concat(node_id, '_n2a')=arc_id 
 		WHERE ((valv_type='FCV') AND (flow IS NULL)) AND result_id=v_result_id;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' FCV valve(s) with null values at least on mandatory column for Flow Control Valves'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' FCV valve(s) with null values at least on mandatory column for Flow Control Valves'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, 'INFO: FCV valves checked. No mandadoty values missed');
 			END IF;				
 					
 		-- pumps
@@ -372,18 +400,24 @@ BEGIN
 		WHERE ((curve_id IS NULL) OR (inp_pump.status IS NULL) OR (to_arc IS NULL)) AND result_id=v_result_id;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' pump(s) with null values at least on mandatory columns for pump (curve_id, status, to_arc)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' pump(s) with null values at least on mandatory columns for pump (curve_id, status, to_arc)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, 'INFO: Pumps checked. No mandadoty values missed');
 			END IF;	
 		
 		SELECT count(*) INTO count_aux FROM inp_pump_additional JOIN rpt_inp_arc ON concat(node_id, '_n2a') = arc_id 
 		WHERE ((curve_id IS NULL) OR (inp_pump_additional.status IS NULL)) AND result_id=v_result_id;
 			IF count_aux > 0 THEN
 				INSERT INTO audit_check_data (fprocesscat_id, result_id, table_id, column_id, error_message) 
-				VALUES (14, v_result_id, concat('There are ',count_aux,' additional pump(s) with null values at least on mandatory columns for additional pump (curve_id, status)'));
+				VALUES (14, v_result_id, concat('WARNING: There are ',count_aux,' additional pump(s) with null values at least on mandatory columns for additional pump (curve_id, status)'));
 				count_global_aux=count_global_aux+count_aux; 
 				count_aux=0;
+			ELSE
+				INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) 
+				VALUES (14, v_result_id, 'INFO: Additional pumps checked. No mandadoty values missed');
 			END IF;	
 	END IF;
 	
