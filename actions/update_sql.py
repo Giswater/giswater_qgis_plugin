@@ -1783,7 +1783,6 @@ class UpdateSQL(ParentAction):
 
         if self.dev_user != 'TRUE':
             self.rdb_sample_dev.setEnabled(False)
-            self.rdb_import_data.setEnabled(False)
 
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
