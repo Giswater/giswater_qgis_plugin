@@ -477,7 +477,6 @@ BEGIN
 	
 		-- set nodearc variable as a max length/2+0.01 of arcs with state=0 (only are nod2arcs)
 		UPDATE config_param_system SET value = ((SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01) WHERE parameter='arc_searchnodes';
-		UPDATE config SET arc_searchnodes = (SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01;
 
 		-- delete old nodes
 		UPDATE arc SET node_1=null where node_1 IN (SELECT node_id FROM node WHERE state=0);
@@ -489,7 +488,6 @@ BEGIN
 
 		-- restore default default values
 		UPDATE config_param_system SET value=0.1 where parameter = 'arc_searchnodes';
-		UPDATE config SET arc_searchnodes = 0.1;	
 		
 	END IF;
 
