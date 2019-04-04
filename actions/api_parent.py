@@ -1071,7 +1071,7 @@ class ApiParent(ParentAction):
                             chk.setChecked(False)
                         chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-                    if field['widgettype'] == 'text':
+                    if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                         widget = QLineEdit()
                         widget.setText(field['value'])
                         if 'reg_exp' in field:
@@ -1120,8 +1120,9 @@ class ApiParent(ParentAction):
                             if str(field['iseditable']) == "False":
                                 widget.setReadOnly(True)
                                 widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-                            if 'placeholder' in field:
-                                widget.setPlaceholderText(field['placeholder'])
+                            if type(widget) == QLineEdit:
+                                if 'placeholder' in field:
+                                    widget.setPlaceholderText(field['placeholder'])
                         elif type(widget) in (QComboBox, QCheckBox):
                             if str(field['iseditable']) == "False":
                                 widget.setEnabled(False)
