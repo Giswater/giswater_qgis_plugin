@@ -1156,6 +1156,7 @@ class DaoController(object):
         return self.logger.log_folder
 
 
+    """  Functions related with Qgis versions """
     def is_layer_visible(self, layer):
         """ Is layer visible """
 
@@ -1188,5 +1189,14 @@ class DaoController(object):
             layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
 
         return layers
+
+
+    def set_path_from_qfiledialog(self, qtextedit, path):
+        if Qgis.QGIS_VERSION_INT < 29900:
+            if path:
+                qtextedit.setText(path)
+        else:
+            if path[0]:
+                qtextedit.setText(path[0])
 
 
