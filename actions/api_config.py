@@ -42,7 +42,7 @@ class ApiConfig(ApiParent):
 
 
     def api_config(self):
-        """ Button 36: Info show info, open giswater and visit web page """
+        """ Button 99: Dynamic config form """
 
         self.list_update = []
 
@@ -160,16 +160,15 @@ class ApiConfig(ApiParent):
         admin_layout1.addItem(verticalSpacer5)
         admin_layout2.addItem(verticalSpacer6)
 
-
         # Event on change from combo parent
         self.get_event_combo_parent('fields', complet_list[0]['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
-        self.chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
-        self.chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
-
-        self.chk_dma.stateChanged.connect(partial(self.check_child_to_parent, self.chk_dma,self.chk_expl))
-        self.chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  self.chk_expl,self.chk_dma))
+        chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
+        chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
+        if chk_dma and chk_expl:
+            chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
+            chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
 
         # Remove empty grupbox
         grbox_list = self.dlg_config.findChildren(QGroupBox)
@@ -180,15 +179,6 @@ class ApiConfig(ApiParent):
 
         # Open form
         self.dlg_config.show()
-
-
-    def open_giswater(self):
-        """ Open giswater.jar with last opened .gsw file """
-
-        if 'nt' in sys.builtin_module_names:
-            self.execute_giswater("ed_giswater_jar")
-        else:
-            self.controller.show_info("Function not supported in this Operating System")
 
 
     def construct_form_param_user(self, row, pos):
@@ -284,6 +274,7 @@ class ApiConfig(ApiParent):
                 elif field['layout_id'] == 17:
                     self.order_widgets(field, self.system_form, lbl, chk, widget)
 
+
     def construct_form_param_system(self, row, pos):
 
         widget = None
@@ -338,7 +329,6 @@ class ApiConfig(ApiParent):
                 else:
                     pass
 
-
                 # Order Widgets
                 if field['layout_id'] == 1:
                     self.order_widgets_system(field, self.basic_form, lbl,  widget)
@@ -374,6 +364,7 @@ class ApiConfig(ApiParent):
                     self.order_widgets_system(field, self.analysis_form, lbl,  widget)
                 elif field['layout_id'] == 17:
                     self.order_widgets_system(field, self.system_form, lbl,  widget)
+
 
     def get_event_combo_parent(self, fields, row):
 
@@ -446,6 +437,7 @@ class ApiConfig(ApiParent):
         else:
             form.addWidget(widget, field['layout_order'], 1)
 
+
     def get_values_checked_param_user(self, chk, widget, field, value=None):
 
         elem = {}
@@ -470,6 +462,7 @@ class ApiConfig(ApiParent):
             elem['sys_role_id'] = 'role_admin'
 
         self.list_update.append(elem)
+
 
     def get_values_changed_param_user(self, chk, widget, field, value=None):
 
@@ -504,7 +497,6 @@ class ApiConfig(ApiParent):
             value = utils_giswater.isChecked(self.dlg_config, widget)
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
-
 
         elem['widget'] = str(widget.objectName())
         elem['chk'] = str('')
