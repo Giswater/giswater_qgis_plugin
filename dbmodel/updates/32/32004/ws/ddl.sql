@@ -40,3 +40,6 @@ ALTER TABLE inp_energy_gl ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_e
 ALTER TABLE inp_energy_el ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_energy_el_id_seq'::regclass);
 ALTER TABLE inp_reactions_gl ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_reactions_gl_id_seq'::regclass);
 ALTER TABLE inp_reactions_el ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.inp_reactions_el_id_seq'::regclass);
+
+ALTER TABLE inp_reactions_gl ALTER COLUMN parameter DROP DEFAULT;
+
