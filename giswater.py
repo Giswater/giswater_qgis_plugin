@@ -198,7 +198,13 @@ class Giswater(QObject):
             else:        
                 callback_function = getattr(self, 'action_triggered')  
                 action.triggered.connect(partial(callback_function, function_name))
-                
+
+            # Hide actions according parameter action_to_hide from config file
+            if self.list_to_hide is not None:
+                if len(self.list_to_hide) > 0:
+                    if str(action.property('index_action')) in self.list_to_hide:
+                        action.setVisible(False)
+
         except AttributeError:
             action.setEnabled(False)                
 
@@ -622,6 +628,9 @@ class Giswater(QObject):
         self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
+        # Get list of actions to hide
+        self.list_to_hide = self.settings.value('system_variables/action_to_hide')
+
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()   
         
@@ -648,9 +657,6 @@ class Giswater(QObject):
         
         # Manage project variable 'expl_id'
         self.manage_expl_id()
-
-        # Hide actions according parameter action_to_hide from config file
-        self.hide_actions()
 
         # Log it
         message = "Project read successfully"
@@ -1142,16 +1148,3 @@ class Giswater(QObject):
             self.controller.show_warning(model.lastError().text())
 
 
-    def hide_actions(self):
-        """ This function was created added in order to hide actions """
-
-        # Configure list_to_hide into file giswater.config -> [system_variables]-> action_to_hide in format n,n,n
-        # Example action_to_hide=19,74,75
-        list_to_hide = self.settings.value('system_variables/action_to_hide')
-        if len(list_to_hide) > 0:
-            action_list = self.iface.mainWindow().findChildren(QAction)
-            for action in action_list:
-                _property = action.property('index_action')
-                if _property is not None:
-                    if str(action.property('index_action')) in list_to_hide:
-                        action.setVisible(False)
