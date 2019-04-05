@@ -412,8 +412,7 @@ class SearchPlus(QObject):
 
         msg = "Save as"
         folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
-        if folder_path:
-            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+        self.controller.set_path_from_qfiledialog(widget, folder_path)
 
 
     def workcat_zoom(self, qtable):

@@ -401,8 +401,7 @@ class Go2Epa(ApiParent):
         os.chdir(folder_path)
         message = self.controller.tr("Select INP file")
         self.file_inp = QFileDialog.getSaveFileName(None, message, "", '*.inp')
-        if self.file_inp:
-            self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
+        self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_inp, self.file_inp)
 
 
     def go2epa_select_file_rpt(self):
@@ -419,8 +418,7 @@ class Go2Epa(ApiParent):
         os.chdir(folder_path)
         message = self.controller.tr("Select RPT file")
         self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
-        if self.file_rpt:
-            self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
+        self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
 
     def insert_into_inp(self, folder_path=None, all_rows=None):
