@@ -971,7 +971,7 @@ class DaoController(object):
         sql = ("SELECT routine_name FROM information_schema.routines"
                " WHERE lower(routine_schema) = '" + schema_name + "'"
                " AND lower(routine_name) = '" + function_name + "'")
-        row = self.get_row(sql, log_info=False)
+        row = self.get_row(sql, log_info=False, commit=True)
         return row
     
     
@@ -1022,7 +1022,7 @@ class DaoController(object):
             username = self.user
 
         sql = ("SELECT pg_has_role('" + username + "', '" + role_name + "', 'MEMBER');")
-        row = self.get_row(sql)
+        row = self.get_row(sql, commit=True)
         return row[0]
          
          
