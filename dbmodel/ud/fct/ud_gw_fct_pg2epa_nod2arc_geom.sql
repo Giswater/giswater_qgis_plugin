@@ -6,16 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2240
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(character varying);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(result_id_var character varying)
+DROP FUNCTION IF EXISTS "ud_sample".gw_fct_pg2epa_nod2arc_geom(character varying);
+CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_pg2epa_nod2arc_geom(result_id_var character varying)
   RETURNS integer AS
 $BODY$
 DECLARE
 	
-record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
-record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
-record_arc2 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
-record_new_arc SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+record_node ud_sample.rpt_inp_node%ROWTYPE;
+record_arc1 ud_sample.rpt_inp_arc%ROWTYPE;
+record_arc2 ud_sample.rpt_inp_arc%ROWTYPE;
+record_new_arc ud_sample.rpt_inp_arc%ROWTYPE;
 node_diameter double precision;
 nodarc_geometry geometry;
 nodarc_node_1_geom geometry;
@@ -39,7 +39,7 @@ v_node_yinit double precision;
 BEGIN
 
 --  Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ud_sample", public;
 
 --  Looking for parameters
     SELECT * INTO rec_options FROM inp_options;
@@ -49,13 +49,17 @@ BEGIN
 
     FOR rec_flowreg IN 
 	SELECT DISTINCT ON (node_id, to_arc) node_id,  to_arc, max(flwreg_length) AS flwreg_length, flw_type FROM 
-	(SELECT rpt_inp_node.node_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_orifice.node_id JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
+	(SELECT rpt_inp_node.node_id, to_arc, flwreg_length, 'ori'::text as flw_type FROM inp_flwreg_orifice JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_orifice.node_id 
+	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var
 		UNION 
-	SELECT DISTINCT rpt_inp_node.node_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_outlet.node_id JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var			
+	SELECT DISTINCT rpt_inp_node.node_id,  to_arc, flwreg_length, 'out'::text as flw_type FROM inp_flwreg_outlet JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_outlet.node_id 
+	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var			
 		UNION 
-	SELECT DISTINCT rpt_inp_node.node_id,  to_arc, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_pump.node_id JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var			
+	SELECT DISTINCT rpt_inp_node.node_id,  to_arc, flwreg_length, 'pump'::text as flw_type FROM inp_flwreg_pump JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_pump.node_id 
+	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var			
 		UNION 
-	SELECT DISTINCT rpt_inp_node.node_id,  to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_weir.node_id JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var)a
+	SELECT DISTINCT rpt_inp_node.node_id,  to_arc, flwreg_length, 'weir'::text as flw_type FROM inp_flwreg_weir JOIN rpt_inp_node ON rpt_inp_node.node_id=inp_flwreg_weir.node_id 
+	JOIN inp_selector_sector ON inp_selector_sector.sector_id=rpt_inp_node.sector_id WHERE result_id=result_id_var)a
 	GROUP BY node_id, to_arc, flw_type
 	ORDER BY node_id, to_arc
 				
@@ -116,7 +120,8 @@ BEGIN
 				record_node.epa_type := 'JUNCTION';
 				record_node.the_geom := nodarc_node_1_geom;
 				record_node.node_id := concat(node_1_aux,'_',rec_flowreg.to_arc);
-				v_node_yinit =(SELECT value::float FROM config_param_user WHERE parameter='epa_junction_y0_vdefault');
+				v_node_yinit =(SELECT value::float FROM config_param_user WHERE parameter='epa_junction_y0_vdefault' AND cur_user=current_user);
+				IF v_node_yinit IS NULL THEN v_node_yinit = 0; END IF;
 
 	
 				INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, expl_id, the_geom) 
@@ -133,8 +138,6 @@ BEGIN
 
 
     RETURN 1;
-
-
 		
 END;
 $BODY$

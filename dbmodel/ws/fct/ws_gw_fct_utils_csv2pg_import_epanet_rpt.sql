@@ -40,7 +40,7 @@ BEGIN
 	UPDATE temp_csv2pg SET csv2pgcat_id=v_csv2pgcat_id WHERE csv2pgcat_id IS NULL AND user_name=current_user;
 	
 	--remove data from with the same result_id
-	FOR rpt_rec IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT * FROM sys_csv2pg_config WHERE tablename='rpt_cat_result' LOOP
+	FOR rpt_rec IN SELECT tablename FROM sys_csv2pg_config WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT tablename FROM sys_csv2pg_config WHERE tablename='rpt_cat_result' LOOP
 		EXECUTE 'DELETE FROM '||rpt_rec.tablename||' WHERE result_id='''||p_result_id||''';';
 	END LOOP;
 	

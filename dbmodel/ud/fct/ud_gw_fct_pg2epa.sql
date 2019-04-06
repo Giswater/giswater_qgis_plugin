@@ -7,10 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2222
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_dumpsubcatchment boolean, p_isrecursive boolean)  
+CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_dumpsubcatchment boolean, p_isrecursive boolean)  
 RETURNS integer AS 
 $BODY$
 
+/*example
+SELECT "ud_sample".gw_fct_pg2epa('r1', false, false, false)  
+*/
 
 DECLARE
 	check_count_aux integer; 
@@ -18,10 +21,9 @@ DECLARE
 BEGIN
 
 --  Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ud_sample", public;
 
 	RAISE NOTICE 'Starting pg2epa process.';
-	
 	
 	--Set value default
 	UPDATE inp_outfall SET outfall_type=(SELECT value FROM config_param_user WHERE parameter='epa_outfall_type_vdefault' AND cur_user=current_user) WHERE outfall_type IS NULL;

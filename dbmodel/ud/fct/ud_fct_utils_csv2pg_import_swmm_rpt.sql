@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2528
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(p_result_id text, p_path text)
+CREATE OR REPLACE FUNCTION ud_sample.gw_fct_utils_csv2pg_import_swmm_rpt(p_result_id text, p_path text)
   RETURNS integer AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt('result1', 'D:\dades\test.inp')
+SELECT ud_sample.gw_fct_utils_csv2pg_import_swmm_rpt('t3', null)
 */
 
 DECLARE
@@ -28,7 +28,7 @@ DECLARE
 BEGIN
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ud_sample", public;
 
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
@@ -38,7 +38,7 @@ BEGIN
 	END IF;
 	
 	--remove data from with the same result_id
-	FOR rpt_rec IN SELECT * FROM sys_csv2pg_config WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT * FROM sys_csv2pg_config WHERE tablename='rpt_cat_result' 
+	FOR rpt_rec IN SELECT tablename FROM sys_csv2pg_config WHERE pg2csvcat_id=v_csv2pgcat_id EXCEPT SELECT tablename FROM sys_csv2pg_config WHERE tablename='rpt_cat_result' 
 	LOOP
 		EXECUTE 'DELETE FROM '||rpt_rec.tablename||' WHERE result_id='''||p_result_id||''';';
 	END LOOP;
@@ -180,12 +180,12 @@ BEGIN
 			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric);
 
 		ELSIF rpt_rec.csv1='WARNING' THEN
-			INSERT INTO SCHEMA_NAME.rpt_warning_summary(result_id,warning_number, text)
+			INSERT INTO rpt_warning_summary(result_id,warning_number, text)
 			VALUES (p_result_id,concat(rpt_rec.csv1,' ',rpt_rec.csv2), concat(rpt_rec.csv3,' ',rpt_rec.csv4,'',rpt_rec.csv5,' ' ,rpt_rec.csv6,' ',rpt_rec.csv7,' ',
 			rpt_rec.csv8,' ',rpt_rec.csv9,' ',rpt_rec.csv10,' ',rpt_rec.csv11,' ',rpt_rec.csv12,' ',rpt_rec.csv13,' ',rpt_rec.csv14,' ',rpt_rec.csv15));
    				
 		ELSIF type_aux='rpt_instability_index' THEN
-			INSERT INTO SCHEMA_NAME.rpt_instability_index(result_id, text)
+			INSERT INTO rpt_instability_index(result_id, text)
    			VALUES (p_result_id,  concat(rpt_rec.csv1,' ',rpt_rec.csv2,'',rpt_rec.csv3));
    		
 		ELSIF rpt_rec.csv1 IN (SELECT poll_id FROM inp_pollutant) AND type_aux='rpt_outfallload_sum' THEN

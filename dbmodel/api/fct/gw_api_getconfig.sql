@@ -6,22 +6,22 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2570
 
--- Function: SCHEMA_NAME.gw_api_getconfig(json)
+-- Function: ud_sample.gw_api_getconfig(json)
 
--- DROP FUNCTION SCHEMA_NAME.gw_api_getconfig(json);
+-- DROP FUNCTION ud_sample.gw_api_getconfig(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getconfig(p_data json)
+CREATE OR REPLACE FUNCTION ud_sample.gw_api_getconfig(p_data json)
   RETURNS json AS
 $BODY$
 DECLARE
 
 /*EXAMPLE:
-SELECT "SCHEMA_NAME".gw_api_getconfig($${
+SELECT "ud_sample".gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"epaoptions"},
 "feature":{},"data":{}}$$)
 
-SELECT "SCHEMA_NAME".gw_api_getconfig($${
+SELECT "ud_sample".gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"config"},
 "feature":{},"data":{}}$$)
@@ -54,12 +54,13 @@ SELECT "SCHEMA_NAME".gw_api_getconfig($${
     v_formgroupbox json[];
     v_formgroupbox_json json;
     v_querytext json;
+    v_epaversion text;
 
    
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ud_sample", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -71,6 +72,14 @@ BEGIN
 --  Get project type
     SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 
+--  Set epaversion
+    IF v_project_type='WS' then
+	v_epaversion='2.0.12';
+    ELSE
+	v_epaversion='5.0.022';
+    END IF;
+
+
 -- Create tabs array
     v_formtabs := '[';
 
@@ -79,14 +88,6 @@ BEGIN
     SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='config' AND tabname='tabUser';
     IF rec_tab.tabname IS NOT NULL THEN
 
-	-- ismandatory true are user values we need on config_param_user. If  not exists (one of then inp_options_units) values are forced
-	IF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter = 'inp_options_units') IS NULL THEN 
-
-		-- set current user values
-		v_querytext = '{"user":"'||current_user||'", "values":{}}';
-		PERFORM gw_fct_admin_role_resetuserprofile(v_querytext);		
-	END IF;
-	
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
 		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_id, layout_order,layout_name, 
@@ -99,12 +100,11 @@ BEGIN
 		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 		AND formname ='||quote_literal(lower(v_formname))||'
+		AND epaversion::json->>''from''= '||quote_literal(v_epaversion)||'
 		AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||')
 		AND isenabled IS TRUE
 		ORDER by orderby)a'
 			INTO fields_array ;
-
-			
 
 	--  Combo rows
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
@@ -115,6 +115,7 @@ BEGIN
 		 FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		 WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
   		 AND formname ='||quote_literal(lower(v_formname))||'
+ 		 AND epaversion::json->>''from''= '||quote_literal(v_epaversion)||'
 		 AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||')
 		 AND isenabled IS TRUE
 		 ORDER BY orderby) a WHERE widgettype = ''combo'''
@@ -128,15 +129,16 @@ BEGIN
 			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
 				INTO combo_json;
 
-			raise notice 'aux_json %', aux_json;
 			-- Update array
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
-			raise notice '1 %',aux_json;
+
 			-- Get combo values
 			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
 				INTO combo_json; 
 				combo_json := COALESCE(combo_json, '[]');
+
+			RAISE NOTICE 'aux_json %', aux_json;
 
 			-- Update array
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
@@ -269,6 +271,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_getconfig(json)
+ALTER FUNCTION ud_sample.gw_api_getconfig(json)
   OWNER TO postgres;
 

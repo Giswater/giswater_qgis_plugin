@@ -6,20 +6,20 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2606
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setconfig(p_data json)
+CREATE OR REPLACE FUNCTION ud_sample.gw_api_setconfig(p_data json)
   RETURNS json AS
 $BODY$
 
 /*
 --example for config button
-SELECT SCHEMA_NAME.gw_api_setconfig($${
+SELECT ud_sample.gw_api_setconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"config"},
 "feature":{},
 "data":{"fields":[{"widget":"", "value":"", "chk":"", "isChecked":"", "sysRoleId":""},{"widget":"", "value":"", "chk":"", "isChecked":"", "sysRoleId":""}]}}$$)
 
 --example for epaoptions button
-SELECT SCHEMA_NAME.gw_api_setconfig($${
+SELECT ud_sample.gw_api_setconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"epaoptions"},
 "feature":{},
@@ -47,7 +47,7 @@ DECLARE
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ud_sample", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -127,12 +127,11 @@ BEGIN
 			END IF;
 		ELSIF v_formname = 'epaoptions' THEN
 			EXECUTE 'UPDATE '|| quote_ident(v_table) ||' SET value = $1 WHERE parameter = $2 AND cur_user=current_user'
-			USING  v_value, v_widget;
-			
-
+			USING  v_value, v_widget;			
 		END IF;
 	END IF;
-	
+
+	RAISE NOTICE 'v_value  % v_widget % ',v_value, v_widget;
 	RAISE NOTICE 'v_table: %',v_table;
 
    END LOOP;

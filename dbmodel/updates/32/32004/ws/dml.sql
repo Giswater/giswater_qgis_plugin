@@ -10,11 +10,22 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+INSERT INTO audit_cat_param_user VALUES ('epaversion', null, 'Version of EPANET. Hard coded variable. Only enabled version is EPANET-EN 2.0.12', 'role_epa', NULL, NULL, 'EPANET version:', NULL, NULL, false, NULL, NULL, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', true,  null, '2.0.12' NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+
+
+UPDATE audit_cat_param_user SET epaversion='{"from":"2.0.12", "to":null, "language":"english"}' where formname='epaoptions';
+
+
 -- reactived again (disabled on 3.2.003 because code was not solved)
 UPDATE sys_csv2pg_config SET reverse_pg2csvcat_id=12 WHERE tablename='vi_energy';
 UPDATE sys_csv2pg_config SET reverse_pg2csvcat_id=12 WHERE tablename='vi_quality';
 UPDATE sys_csv2pg_config SET reverse_pg2csvcat_id=12 WHERE tablename='vi_reactions';
 UPDATE sys_csv2pg_config SET reverse_pg2csvcat_id=12 WHERE tablename='vi_mixing';
+
+UPDATE sys_csv2pg_config SET fields=null;
+UPDATE sys_csv2pg_config SET csvversion='{"from":"2.0.12", "to":null,"language":"english"}';
+
+
 
 
 -- forgetted on 3.2.0000
