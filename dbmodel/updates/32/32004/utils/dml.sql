@@ -10,3 +10,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO sys_fprocess_cat VALUES (40, 'Epa import rpt results', 'EPA', 'Epa import rpt results', 'utils');
 INSERT INTO sys_fprocess_cat VALUES (41, 'Epa import inp files', 'EPA', 'Epa import inp files', 'utils');
+
+UPDATE audit_cat_function SET return_type= NULL, context = '', isparametric=FALSE where function_name='gw_fct_plan_audit_check_data';
+UPDATE audit_cat_function SET alias ='check data acording EPA rules', return_type = '[{"widgetname":"resultId", "label":"Result Id:","ismandatory":"false","widgettype":"text","datatype":"string","layout_name":"grl_option_parameters","layout_order":1,"value":""}]'';
+
+

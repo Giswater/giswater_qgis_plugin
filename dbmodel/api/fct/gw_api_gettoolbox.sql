@@ -1,17 +1,16 @@
-﻿-- Function: SCHEMA_NAME.gw_api_gettoolbox(json)
+﻿-- Function: ud_sample.gw_api_gettoolbox(json)
 
--- DROP FUNCTION SCHEMA_NAME.gw_api_gettoolbox(json);
+-- DROP FUNCTION ud_sample.gw_api_gettoolbox(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_gettoolbox(p_data json)
+CREATE OR REPLACE FUNCTION ud_sample.gw_api_gettoolbox(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
-SELECT SCHEMA_NAME.gw_api_gettoolbox($${
+SELECT ud_sample.gw_api_gettoolbox($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"filterText":""}}$$)
 */
-
 
 DECLARE
 	v_apiversion text;
@@ -23,12 +22,13 @@ DECLARE
 	v_epa_fields json;
 	v_master_fields json;
 	v_admin_fields json;
+	v_isepa boolean = false;
+	v_epa_user text;
 
-		
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ud_sample", public;
   
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -39,8 +39,17 @@ BEGIN
 	v_filter := COALESCE(v_filter, '');
 -- get project type
         SELECT lower(wsoftware) INTO v_projectype FROM version LIMIT 1;
-		
 
+-- get epa results
+	IF (SELECT id FROM rpt_cat_result LIMIT 1) IS NOT NULL THEN
+		v_isepa = true;
+		v_epa_user = (SELECT result_id FROM rpt_cat_result WHERE user_name=current_user LIMIT 1);
+		IF v_epa_user IS NULL THEN
+			v_epa_user = (SELECT id FROM rpt_cat_result LIMIT 1);
+		END IF;
+	END IF;
+
+		
 -- get om toolbox parameters
 
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
@@ -63,13 +72,17 @@ BEGIN
 
 -- get epa toolbox parameters
 
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
-		 FROM audit_cat_function
-		 WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa''
-		 AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
-		USING v_filter
-		INTO v_epa_fields;
+		IF v_isepa THEN
+			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				SELECT alias, descript, input_params::json,return_type::json,  context as isnotparammsg, sys_role_id, function_name as functionname, isparametric
+				FROM audit_cat_function
+				WHERE istoolbox is TRUE AND alias LIKE ''%'|| v_filter ||'%'' AND sys_role_id =''role_epa''
+				AND ( project_type='||quote_literal(v_projectype)||' or project_type=''utils'')) a'
+				USING v_filter
+				INTO v_epa_fields;
+				
+				v_epa_fields = REPLACE (v_epa_fields::text, '"value":""', concat('"value":"', v_epa_user, '"'));
+		END IF;
 		
 -- get master toolbox parameters
 
@@ -80,6 +93,7 @@ BEGIN
 		 AND (project_type='||quote_literal(v_projectype)||' OR project_type=''utils'')) a'
 		USING v_filter
 		INTO v_master_fields;
+		
         
 -- get admin toolbox parameters
 
@@ -119,5 +133,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_gettoolbox(json)
+ALTER FUNCTION ud_sample.gw_api_gettoolbox(json)
   OWNER TO postgres;
