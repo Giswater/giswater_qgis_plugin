@@ -24,6 +24,8 @@ DECLARE
 	rpt_rec record;
 	project_type_aux varchar;
 	v_csv2pgcat_id integer =11;
+	v_target text;
+	v_id text;
 
 BEGIN
 
@@ -43,10 +45,10 @@ BEGIN
 		EXECUTE 'DELETE FROM '||rpt_rec.tablename||' WHERE result_id='''||p_result_id||''';';
 	END LOOP;
 
-  	hour_aux=null;
-	
+
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
+
 		IF (SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id) IS NOT NULL THEN
 			type_aux=(SELECT tablename FROM sys_csv2pg_config WHERE target=concat(rpt_rec.csv1,' ',rpt_rec.csv2) AND pg2csvcat_id=v_csv2pgcat_id);
 		END IF;	
@@ -68,6 +70,37 @@ BEGIN
 			UPDATE rpt_cat_result set wet_tstep=rpt_rec.csv5 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Wet Time%' and result_id=p_result_id;
 			UPDATE rpt_cat_result set dry_tstep=rpt_rec.csv5 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Dry Time%' and result_id=p_result_id;
 			UPDATE rpt_cat_result set rout_tstep=concat(rpt_rec.csv5,rpt_rec.csv6) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Routing Time%' and result_id=p_result_id;
+
+		ELSIF type_aux='rpt_timestep_subcatchment' THEN
+
+			IF rpt_rec.csv1 ='<<<' THEN 
+				v_id= rpt_rec.csv3;
+			END IF;
+
+			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='mm/hr' THEN 
+			ELSE
+				INSERT INTO rpt_subcatchment (result_id, subc_id, resultdate, resulttime, precip, losses, runoff) VALUES (p_result_id, v_id, rpt_rec.csv1, rpt_rec.csv4, rpt_rec.csv5::float, rpt_rec.csv6::float, rpt_rec.csv7::float);
+			END IF;
+
+		ELSIF type_aux='rpt_node' THEN
+
+			IF rpt_rec.csv1 ='<<<' THEN 
+				v_id= rpt_rec.csv3;
+			END IF;
+			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Inflow' THEN 
+			ELSE
+				INSERT INTO rpt_node (result_id, node_id, resultdate, resulttime, flooding, depth, head) VALUES (p_result_id, v_id, rpt_rec.csv1, rpt_rec.csv4, rpt_rec.csv5::float, rpt_rec.csv6::float, rpt_rec.csv7::float);
+			END IF;
+
+		ELSIF type_aux='rpt_arc' THEN
+
+			IF rpt_rec.csv1 ='<<<' THEN 
+				v_id= rpt_rec.csv3;
+			END IF;
+			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Flow' or rpt_rec.csv1='Analysis' or rpt_rec.csv1='Total' THEN
+			ELSE
+				INSERT INTO rpt_arc (result_id, arc_id, resultdate, resulttime, flow, velocity, fullpercent) VALUES (p_result_id, v_id, rpt_rec.csv1, rpt_rec.csv4, rpt_rec.csv5::float, rpt_rec.csv6::float, rpt_rec.csv7::float);
+			END IF;
 			
 		--there are still 3 empty fields on rpt_cat_results, where does the data come from? -- ok
 		ELSIF type_aux='rpt_runoff_quant' then 					
