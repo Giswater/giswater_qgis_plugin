@@ -175,16 +175,16 @@ BEGIN
 		-- Drop fk
 		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=36
 		LOOP
-			v_query_text:= 'ALTER TABLE '||((v_tablerecord.text_column)::json->>'tablename')||
-				       ' DROP CONSTRAINT IF EXISTS '||((v_tablerecord.text_column)::json->>'constraintname')||' CASCADE;';
+			v_query_text:= 'ALTER TABLE '||quote_ident((v_tablerecord.text_column)::json->>'tablename')||
+				       ' DROP CONSTRAINT IF EXISTS '||quote_ident((v_tablerecord.text_column)::json->>'constraintname')||' CASCADE;';
 			EXECUTE v_query_text;
 			v_36=v_36+1;
 		END LOOP;
 
 		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=37
 		LOOP
-			v_query_text:= 'ALTER TABLE '||((v_tablerecord.text_column)::json->>'tablename')||
-				       ' ALTER COLUMN '||((v_tablerecord.text_column)::json->>'attributename')||' DROP NOT NULL;';
+			v_query_text:= 'ALTER TABLE '||quote_ident((v_tablerecord.text_column)::json->>'tablename')||
+				       ' ALTER COLUMN '||quote_ident((v_tablerecord.text_column)::json->>'attributename')||' DROP NOT NULL;';
 			EXECUTE v_query_text;
 			v_37=v_37+1;
 		END LOOP;
@@ -218,8 +218,8 @@ BEGIN
 		-- Enable constraints 
 		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=36 order by 1 desc
 		LOOP
-			v_query_text:=  'ALTER TABLE '||((v_tablerecord.text_column::json)->>'tablename')|| 
-							' ADD CONSTRAINT '||((v_tablerecord.text_column::json)->>'constraintname')||
+			v_query_text:=  'ALTER TABLE '||quote_ident((v_tablerecord.text_column::json)->>'tablename')|| 
+							' ADD CONSTRAINT '||quote_ident((v_tablerecord.text_column::json)->>'constraintname')||
 							' '||((v_tablerecord.text_column::json)->>'definition');
 			EXECUTE v_query_text;
 			v_36=v_36+1;
@@ -228,8 +228,8 @@ BEGIN
 		
 		FOR v_tablerecord IN SELECT * FROM temp_table WHERE fprocesscat_id=37 order by 1 desc
 		LOOP
-			v_query_text:=  'ALTER TABLE '||((v_tablerecord.text_column::json)->>'tablename')|| 
-							' ALTER COLUMN '||((v_tablerecord.text_column::json)->>'attributename')||' SET NOT NULL;' ;
+			v_query_text:=  'ALTER TABLE '||quote_ident((v_tablerecord.text_column::json)->>'tablename')|| 
+							' ALTER COLUMN '||quote_ident((v_tablerecord.text_column::json)->>'attributename')||' SET NOT NULL;' ;
 			EXECUTE v_query_text;
 			v_37=v_37+1;	
 		END LOOP;
