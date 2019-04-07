@@ -45,7 +45,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=40 AND result_id=p_resultname) row; 
+	FROM (SELECT error_message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=40 AND result_id=p_resultname order by id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
@@ -64,7 +64,7 @@ BEGIN
 	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
 
-	--    Control nulls
+	--Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	

@@ -6,8 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2532
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_inp(text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_inp(p_path text)
-RETURNS integer AS
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -17,6 +18,10 @@ SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_inp()
 DECLARE
 	project_type_aux text;
 	schemas_array name[];
+	v_result json;
+	v_result_info 	json;
+	v_result_point	json;
+	v_result_line 	json;
 	
 BEGIN
 
@@ -37,7 +42,41 @@ BEGIN
 	
 	END IF;
 		
-RETURN 0;
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT error_message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=41 AND result_id=p_resultname order by id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=41 AND result_id=p_resultname) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+
+	--lines
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id=41) AND result_id=p_resultname) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+
+
+	--Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 	
+
+--  Return
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+		       '}'||
+	    '}')::json;
 	
 END;
 $BODY$
