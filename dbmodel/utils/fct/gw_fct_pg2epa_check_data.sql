@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"resultId":"test1"},	"saveOnDatabase":true}}$$)
+"feature":{},"data":{"parameters":{"resultId":"test1"},"saveOnDatabase":true}}$$)
 */
 
 DECLARE
@@ -22,7 +22,7 @@ valve_rec		record;
 count_global_aux	integer;
 rec_var			record;
 setvalue_int		int8;
-project_type_aux 	text;
+v_project_type 		text;
 count_aux		integer;
 infiltration_aux	text;
 rgage_rec		record;
@@ -51,8 +51,17 @@ BEGIN
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 
 	-- select config values
-	SELECT wsoftware, giswater  INTO project_type_aux, v_version FROM version order by 1 desc limit 1;
-	
+	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
+
+	-- call go2epa function in case of new result
+	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN	
+		IF v_project_type = 'WS' THEN
+			PERFORM gw_fct_pg2epa(  v_result_id, false, false);
+		ELSE
+			PERFORM gw_fct_pg2epa(  v_result_id, false, false, false);
+		END IF;
+	END IF;
+		
 	SELECT st_length(a.the_geom), a.arc_id INTO v_min_node2arc, v_arc FROM v_edit_arc a JOIN rpt_inp_arc b ON a.arc_id=b.arc_id WHERE result_id=v_result_id ORDER BY 1 asc LIMIT 1;
 
 	-- init variables
@@ -106,7 +115,7 @@ BEGIN
 	END IF;
 		
 	-- only UD projects
-	IF 	project_type_aux='UD' THEN
+	IF 	v_project_type='UD' THEN
 
 		SELECT hydrology_id INTO scenario_aux FROM inp_selector_hydrology WHERE cur_user=current_user;
 	
@@ -285,7 +294,7 @@ BEGIN
 				count_aux=0;
 			END IF;				
 
-	ELSIF project_type_aux='WS' THEN
+	ELSIF v_project_type='WS' THEN
 
 		SELECT dscenario_id INTO scenario_aux FROM inp_selector_dscenario WHERE cur_user=current_user;
 		
