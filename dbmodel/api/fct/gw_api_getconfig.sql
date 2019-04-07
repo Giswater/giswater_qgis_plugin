@@ -6,22 +6,22 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2570
 
--- Function: ud_sample.gw_api_getconfig(json)
+-- Function: SCHEMA_NAME.gw_api_getconfig(json)
 
--- DROP FUNCTION ud_sample.gw_api_getconfig(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_api_getconfig(json);
 
-CREATE OR REPLACE FUNCTION ud_sample.gw_api_getconfig(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getconfig(p_data json)
   RETURNS json AS
 $BODY$
 DECLARE
 
 /*EXAMPLE:
-SELECT "ud_sample".gw_api_getconfig($${
+SELECT "SCHEMA_NAME".gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"epaoptions"},
 "feature":{},"data":{}}$$)
 
-SELECT "ud_sample".gw_api_getconfig($${
+SELECT "SCHEMA_NAME".gw_api_getconfig($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"config"},
 "feature":{},"data":{}}$$)
@@ -60,7 +60,7 @@ SELECT "ud_sample".gw_api_getconfig($${
 BEGIN
 
 -- Set search path to local schema
-    SET search_path = "ud_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -271,6 +271,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ud_sample.gw_api_getconfig(json)
+ALTER FUNCTION SCHEMA_NAME.gw_api_getconfig(json)
   OWNER TO postgres;
 
