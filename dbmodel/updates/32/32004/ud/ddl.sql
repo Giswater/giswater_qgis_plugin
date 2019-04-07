@@ -5,7 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ud_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
+ALTER TABLE cat_arc ADD COLUMN tsect_id character varying(16);
+ALTER TABLE cat_arc ADD COLUMN curve_id character varying(16);
+
+ALTER TABLE cat_arc_shape RENAME COLUMN tsect_id to _tsect_id;
+ALTER TABLE cat_arc_shape RENAME COLUMN curve_id to _curve_id;
 
 
 CREATE TABLE rpt_node (

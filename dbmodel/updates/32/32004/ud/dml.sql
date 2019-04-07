@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = ud_sample, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE audit_cat_param_user SET layout_id=3, layout_name='grl_hyd_3' WHERE layout_id=11;
 UPDATE audit_cat_param_user SET layout_id=4, layout_name='grl_hyd_4' WHERE layout_id=12;
@@ -44,7 +44,7 @@ INSERT INTO audit_cat_param_user VALUES ('epaversion', null, 'Version of SWMM. H
 UPDATE audit_cat_param_user SET epaversion='{"from":"5.0.022", "to":null,"language":"english"}' where formname='epaoptions';
 
 
-UPDATE audit_cat_param_user SET isenabled=FALSE ismandatory=FALSE WHERE id='inp_options_rtc_period_id';
+UPDATE audit_cat_param_user SET isenabled=FALSE, ismandatory=FALSE WHERE id='inp_options_rtc_period_id';
 UPDATE audit_cat_param_user SET epaversion='{"from":"5.1.000", "to":null,"language":"english"}' where id ='inp_options_max_trials';
 UPDATE audit_cat_param_user SET epaversion='{"from":"5.1.000", "to":null,"language":"english"}' where id ='inp_options_lat_flow_tol';
 UPDATE audit_cat_param_user SET epaversion='{"from":"5.1.000", "to":null,"language":"english"}' where id ='inp_options_head_tolerance';

@@ -96,7 +96,6 @@ CREATE TABLE temp_csv2pg(
   csv18 text,
   csv19 text,
   csv20 text,
-  tstamp timestamp without time zone DEFAULT now(),
   csv21 text,
   csv22 text,
   csv23 text,
@@ -107,6 +106,18 @@ CREATE TABLE temp_csv2pg(
   csv28 text,
   csv29 text,
   csv30 text,
+  csv31 text,
+  csv32 text,
+  csv33 text,
+  csv34 text,
+  csv35 text,
+  csv36 text,
+  csv37 text,
+  csv38 text,
+  csv39 text,
+  csv40 text,
+  tstamp timestamp without time zone DEFAULT now(),
+
   CONSTRAINT temp_csv2pg_csv2pgcat_id_fkey2 FOREIGN KEY (csv2pgcat_id)
       REFERENCES sys_csv2pg_cat (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE RESTRICT);

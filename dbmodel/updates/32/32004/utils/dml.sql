@@ -12,6 +12,11 @@ INSERT INTO sys_fprocess_cat VALUES (40, 'Epa import rpt results', 'EPA', 'Epa i
 INSERT INTO sys_fprocess_cat VALUES (41, 'Epa import inp files', 'EPA', 'Epa import inp files', 'utils');
 
 UPDATE audit_cat_function SET return_type= NULL, context = '', isparametric=FALSE where function_name='gw_fct_plan_audit_check_data';
-UPDATE audit_cat_function SET alias ='check data acording EPA rules', return_type = '[{"widgetname":"resultId", "label":"Result Id:","ismandatory":"false","widgettype":"text","datatype":"string","layout_name":"grl_option_parameters","layout_order":1,"value":""}]'';
+UPDATE audit_cat_function SET alias ='check data acording EPA rules', return_type = '[{"widgetname":"resultId", "label":"Result Id:","placeholder":"Write here the name (result_id) of the 1st temptative of EPA simulation. Data will be checked","widgettype":"text","datatype":"string","layout_name":"grl_option_parameters","layout_order":1,"value":""}]', 
+descript = 'The function allows the possibility to find errors and data inconsistency before first exportation to EPA models. 
+It checks on EPA feature tables hydraulic mandatory data to enable the simulation. 
+It works not only with one layers but also with all layers need on the go2epa process.
+When there is no EPA result_id into database you can create it for first time using this function.  You will delete it using EPA manager toolbar button' WHERE function_name='gw_fct_pg2epa_check_data';
+
 
 
