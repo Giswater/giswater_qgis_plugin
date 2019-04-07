@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2536
 
-DROP FUNCTION IF EXISTS ud_sample.gw_fct_utils_csv2pg_import_epa_rpt(text);
-CREATE OR REPLACE FUNCTION ud_sample.gw_fct_utils_csv2pg_import_epa_rpt(p_resultname text)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_rpt(text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_rpt(p_resultname text)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ud_sample.gw_fct_utils_csv2pg_import_epa_rpt('demo1')
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epa_rpt('demo1')
 */
 
 DECLARE
@@ -26,7 +26,7 @@ DECLARE
 BEGIN
 
 	-- Search path
-	SET search_path = "ud_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
    	-- Get schema name
 	schemas_array := current_schemas(FALSE);

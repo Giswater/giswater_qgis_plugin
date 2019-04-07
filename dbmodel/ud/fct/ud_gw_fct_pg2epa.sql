@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2222
 
 
-CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_dumpsubcatchment boolean, p_isrecursive boolean)  
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_dumpsubcatchment boolean, p_isrecursive boolean)  
 RETURNS integer AS 
 $BODY$
 
 /*example
-SELECT "ud_sample".gw_fct_pg2epa('r1', false, false, false)  
+SELECT "SCHEMA_NAME".gw_fct_pg2epa('r1', false, false, false)  
 */
 
 DECLARE
@@ -21,7 +21,7 @@ DECLARE
 BEGIN
 
 --  Search path
-    SET search_path = "ud_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting pg2epa process.';
 	

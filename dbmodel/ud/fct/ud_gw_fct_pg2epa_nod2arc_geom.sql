@@ -6,16 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2240
 
-DROP FUNCTION IF EXISTS "ud_sample".gw_fct_pg2epa_nod2arc_geom(character varying);
-CREATE OR REPLACE FUNCTION "ud_sample".gw_fct_pg2epa_nod2arc_geom(result_id_var character varying)
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(character varying);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_nod2arc_geom(result_id_var character varying)
   RETURNS integer AS
 $BODY$
 DECLARE
 	
-record_node ud_sample.rpt_inp_node%ROWTYPE;
-record_arc1 ud_sample.rpt_inp_arc%ROWTYPE;
-record_arc2 ud_sample.rpt_inp_arc%ROWTYPE;
-record_new_arc ud_sample.rpt_inp_arc%ROWTYPE;
+record_node SCHEMA_NAME.rpt_inp_node%ROWTYPE;
+record_arc1 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+record_arc2 SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
+record_new_arc SCHEMA_NAME.rpt_inp_arc%ROWTYPE;
 node_diameter double precision;
 nodarc_geometry geometry;
 nodarc_node_1_geom geometry;
@@ -39,7 +39,7 @@ v_node_yinit double precision;
 BEGIN
 
 --  Search path
-    SET search_path = "ud_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 --  Looking for parameters
     SELECT * INTO rec_options FROM inp_options;
