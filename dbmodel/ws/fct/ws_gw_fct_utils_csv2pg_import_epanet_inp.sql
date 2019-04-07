@@ -158,20 +158,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' )';
 	END IF;
 
-	-- MAPZONES
-	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
-	INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1);
-	INSERT INTO sector(sector_id,name) VALUES(1,'sector1');
-	INSERT INTO dma(dma_id,name) VALUES(1,'dma1');
-	INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1');
-
-	-- SELECTORS
-	--insert values into selector
-	INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user);
-	INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
-	
-	
-	-- HARMONIZE THE SOURCE TABLE
+	-- Harmonize the source table
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 		-- massive refactor of source field (getting target)
@@ -182,7 +169,6 @@ BEGIN
 		UPDATE temp_csv2pg SET source=v_target WHERE rpt_rec.id=temp_csv2pg.id;
 	END LOOP;
 
-	
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 		-- refactor of [OPTIONS] target
@@ -221,6 +207,19 @@ BEGIN
 			csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
 	END LOOP;
 
+	-- MAPZONES
+	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
+	INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1);
+	INSERT INTO sector(sector_id,name) VALUES(1,'sector1');
+	INSERT INTO dma(dma_id,name) VALUES(1,'dma1');
+	INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1');
+
+	-- SELECTORS
+	--insert values into selector
+	INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user);
+	INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
+	
+	
 	-- CATALOGS
 	--cat_feature
 	--node
