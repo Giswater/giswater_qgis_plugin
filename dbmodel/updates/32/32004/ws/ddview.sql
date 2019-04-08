@@ -31,13 +31,6 @@ UNION
  SELECT descript, null as value,  null as value2  FROM inp_energy;
 
 
-CREATE TRIGGER gw_trg_vi_energy
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON vi_energy
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_vi('vi_energy');
-
-
 DROP VIEW vi_reactions;
 CREATE OR REPLACE VIEW vi_reactions AS 
  SELECT inp_pipe.reactiontype,
@@ -50,10 +43,3 @@ CREATE OR REPLACE VIEW vi_reactions AS
 UNION
  SELECT descript, null as value, null as value2
    FROM inp_reactions;
-
-
-CREATE TRIGGER gw_trg_vi_reactions
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON vi_reactions
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_vi('vi_reactions');

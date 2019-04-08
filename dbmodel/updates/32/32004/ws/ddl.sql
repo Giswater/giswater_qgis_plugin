@@ -14,7 +14,7 @@ ALTER TABLE inp_pump ADD COLUMN energyparam varchar (30);
 ALTER TABLE inp_pump ADD COLUMN energyvalue varchar (30);
 
 ALTER TABLE inp_pump_importinp ADD COLUMN energyparam varchar (30);
-ALTER TABLE inp_pump_importinp ADD COLUMN energyparam varchar (30);
+ALTER TABLE inp_pump_importinp ADD COLUMN energyvalue varchar (30);
 
 ALTER TABLE inp_pump_additional ADD COLUMN energyparam varchar (30);
 ALTER TABLE inp_pump_additional ADD COLUMN energyvalue varchar (30);

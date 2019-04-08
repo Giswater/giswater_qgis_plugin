@@ -10,7 +10,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO audit_cat_param_user VALUES ('epaversion', null, 'Version of EPANET. Hard coded variable. Only enabled version is EPANET-EN 2.0.12', 'role_epa', NULL, NULL, 'EPANET version:', NULL, NULL, false, NULL, NULL, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', true,  null, '2.0.12' NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('epaversion', null, 'Version of EPANET. Hard coded variable. Only enabled version is EPANET-EN 2.0.12', 'role_epa', NULL, NULL, 'EPANET version:', NULL, NULL, false, NULL, NULL, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', true, null, '2.0.12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
 
 
 UPDATE audit_cat_param_user SET epaversion='{"from":"2.0.12", "to":null, "language":"english"}' where formname='epaoptions';
