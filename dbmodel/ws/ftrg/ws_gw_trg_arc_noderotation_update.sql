@@ -26,7 +26,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dissbl' AND cur_user=current_user) IS NOT TRUE THEN 
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS NOT TRUE THEN 
     
 		IF TG_OP='INSERT' THEN
 	

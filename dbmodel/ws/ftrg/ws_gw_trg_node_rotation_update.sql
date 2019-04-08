@@ -23,7 +23,7 @@ DECLARE
 BEGIN 
 
 -- The goal of this function are two goals:
---1) to update automatic rotation node values using the hemisphere values when the variable edit_noderotation_update_dissbl is TRUE
+--1) to update automatic rotation node values using the hemisphere values when the variable edit_noderotation_update_dsbl is TRUE
 --2) when node is disconnected from arcs update rotation taking values from nearest arc if exists
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -33,7 +33,7 @@ BEGIN
 	SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM node_type JOIN cat_node ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
 	SELECT hemisphere INTO hemisphere_rotation_aux FROM node WHERE node_id=NEW.node_id;
 	
-	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dissbl' AND cur_user=current_user) IS TRUE THEN 
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS TRUE THEN 
 
     		UPDATE node SET rotation=NEW.hemisphere WHERE node_id=NEW.node_id;
 					
