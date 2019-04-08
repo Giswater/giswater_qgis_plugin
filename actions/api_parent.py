@@ -1115,15 +1115,16 @@ class ApiParent(ParentAction):
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                     # Set editable/readonly
-                    if 'iseditable' in field:
-                        if type(widget) in (QLineEdit, QDoubleSpinBox):
+
+                    if type(widget) in (QLineEdit, QDoubleSpinBox):
+                        if 'iseditable' in field:
                             if str(field['iseditable']) == "False":
                                 widget.setReadOnly(True)
                                 widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-                            if type(widget) == QLineEdit:
-                                if 'placeholder' in field:
-                                    widget.setPlaceholderText(field['placeholder'])
-                        elif type(widget) in (QComboBox, QCheckBox):
+                        if type(widget) == QLineEdit:
+                            if 'placeholder' in field:
+                                widget.setPlaceholderText(field['placeholder'])
+                    elif type(widget) in (QComboBox, QCheckBox):
                             if str(field['iseditable']) == "False":
                                 widget.setEnabled(False)
                     widget.setObjectName(field['widgetname'])
