@@ -447,37 +447,35 @@ UNION
   ORDER BY 2;
   
   
-  DROP VIEW SCHEMA_NAME.vi_timeseries;
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.vi_timeseries AS 
- SELECT inp_timeseries.timser_id,
-    inp_timeseries.date AS other1,
-    inp_timeseries.hour AS other2,
-    inp_timeseries.value AS other3
-   FROM SCHEMA_NAME.inp_timeseries
-     JOIN SCHEMA_NAME.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
-  WHERE inp_timser_id.times_type::text = 'ABSOLUTE'::text
-UNION
- SELECT inp_timeseries.timser_id,
-    concat('FILE', ' ', inp_timeseries.fname) AS other1,
-    NULL AS other2,
-    NULL AS other3
-    FROM SCHEMA_NAME.inp_timeseries
+DROP VIEW SCHEMA_NAME.vi_timeseries;
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_timeseries AS
+SELECT inp_timeseries.timser_id,
+   inp_timeseries.date AS other1,
+   inp_timeseries.hour AS other2,
+   inp_timeseries.value AS other3
+  FROM SCHEMA_NAME.inp_timeseries
     JOIN SCHEMA_NAME.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
-  WHERE inp_timser_id.times_type::text = 'FILE_TIME'::text
+ WHERE inp_timser_id.times_type::text = 'ABSOLUTE'::text
 UNION
- SELECT inp_timeseries.timser_id,
-    inp_timeseries."time"
-	inp_timeseries.value
-    NULL AS other3
+SELECT inp_timeseries.timser_id,
+   concat('FILE', ' ', inp_timeseries.fname) AS other1,
+   NULL::text AS other2,
+   NULL AS other3
    FROM SCHEMA_NAME.inp_timeseries
-     JOIN SCHEMA_NAME.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
-  WHERE inp_timser_id.times_type::text = 'RELATIVE'::text
-  ORDER BY 1, 2;
+   JOIN SCHEMA_NAME.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
+ WHERE inp_timser_id.times_type::text = 'FILE_TIME'::text
+UNION
+SELECT inp_timeseries.timser_id,
+   inp_timeseries."time"::text,
+    inp_timeseries.value::text,
+   NULL AS other3
+  FROM SCHEMA_NAME.inp_timeseries
+    JOIN SCHEMA_NAME.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
+ WHERE inp_timser_id.times_type::text = 'RELATIVE'::text
+ ORDER BY 1, 2;
   
   
-  DROP VIEW SCHEMA_NAME.vi_raingages;
-
+DROP VIEW SCHEMA_NAME.vi_raingages;
 CREATE OR REPLACE VIEW SCHEMA_NAME.vi_raingages AS 
  SELECT v_edit_raingage.rg_id,
     v_edit_raingage.form_type,
