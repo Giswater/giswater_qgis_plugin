@@ -63,8 +63,11 @@ class Go2EpaOptions(ApiParent):
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
                 grbox.setVisible(False)
-
-
+            else:
+                gridlist = grbox.findChildren(QGridLayout)
+                for grl in gridlist:
+                    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+                    grl.addItem(spacer)
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
         self.dlg_options.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_options))
         self.dlg_options.show()
