@@ -15,6 +15,7 @@ UPDATE audit_cat_param_user SET layout_id=3, layout_order=5,layout_name='grl_hyd
 UPDATE audit_cat_param_user SET layout_id=4, layout_order=5,layout_name='grl_hyd_4' WHERE id='inp_options_dry_step';
 UPDATE audit_cat_param_user SET layout_id=3, layout_order=6,layout_name='grl_hyd_3' WHERE id='inp_options_sweep_start';
 UPDATE audit_cat_param_user SET layout_id=4, layout_order=6,layout_name='grl_hyd_4' WHERE id='inp_options_sweep_end';
+UPDATE audit_cat_param_user SET vdefault='CURVE_NUMBER' WHERE id='inp_options_infiltration';
 
 
 UPDATE audit_cat_param_user SET layout_id=13,layout_name='grl_date_13', widgettype='linetext', vdefault='00:00:00', placeholder='00:00:00'  WHERE id='inp_options_start_time';
