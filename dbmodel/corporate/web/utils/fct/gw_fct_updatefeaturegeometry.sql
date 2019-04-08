@@ -65,7 +65,7 @@ BEGIN
         INTO column_type;
 
 --    Value update
-    EXECUTE FORMAT ('UPDATE ' || quote_ident(table_id) || ' SET the_geom = $1 WHERE ' || quote_ident(table_pkey) || ' = CAST( $2 AS ' || quote_literal(column_type) || ' )')
+    EXECUTE FORMAT ('UPDATE ' || quote_ident(table_id) || ' SET the_geom = $1 WHERE ' || quote_ident(table_pkey) || ' = CAST( $2 AS ' || column_type || ' )')
     USING insert_geom, id;
 
 --    Return

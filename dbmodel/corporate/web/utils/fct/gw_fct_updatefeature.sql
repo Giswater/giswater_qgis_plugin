@@ -61,7 +61,7 @@ BEGIN
         USING schemas_array[1], table_pkey
         INTO column_type_id;
 
-         EXECUTE FORMAT ('UPDATE ' || quote_ident(p_table_id) || ' SET ' || quote_ident(p_column_name) || ' = CAST( $1 AS ' || quote_literal(column_type) || ') 
+         EXECUTE FORMAT ('UPDATE ' || quote_ident(p_table_id) || ' SET ' || quote_ident(p_column_name) || ' = CAST( $1 AS ' || column_type || ') 
 			  WHERE ' || quote_ident(table_pkey) || ' = CAST( ' || quote_ident(p_id) || ' AS ' || quote_literal(column_type_id) || ')')
 		USING p_value_new;
 		
