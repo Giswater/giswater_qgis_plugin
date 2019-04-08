@@ -18,7 +18,8 @@ DECLARE
     connec_id_aux varchar;
     array_agg varchar [];
 	v_dsbl_error boolean;
-
+	v_samenode_init_end_control boolean;
+	v_nodeinsert_arcendpoint boolean;
 	
 BEGIN 
 
@@ -28,6 +29,8 @@ BEGIN
     SELECT * INTO rec FROM config;  
     SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol';
    	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
+   	SELECT value::boolean INTO v_samenode_init_end_control FROM config_param_system WHERE parameter='samenode_init_end_control' ;
+	SELECT value::boolean INTO v_nodeinsert_arcendpoint  FROM config_param_system WHERE parameter='nodeinsert_arcendpoint';
 
 
     IF state_topocontrol_bool IS FALSE OR state_topocontrol_bool IS NULL THEN
@@ -140,7 +143,7 @@ BEGIN
 		IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
     
         -- Control of same node initial and final
-			IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
+			IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
 				IF v_dsbl_error IS NOT TRUE THEN
 					PERFORM audit_function (1040,1344, nodeRecord1.node_id);	
 				ELSE
@@ -159,7 +162,7 @@ BEGIN
 			END IF;
 
 -- Check auto insert end nodes
-		ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND (SELECT nodeinsert_arcendpoint FROM config) THEN
+		ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
 			IF TG_OP = 'INSERT' THEN
 
 			INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 

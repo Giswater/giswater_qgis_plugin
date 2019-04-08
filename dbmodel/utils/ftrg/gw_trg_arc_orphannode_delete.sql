@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_orphannode_delete() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
-    rec record;
+    v_orphannode_delete boolean;
     numArcs integer;
     
 BEGIN 
@@ -17,10 +17,10 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     -- Get snapping_tolerance from config table
-    SELECT orphannode_delete INTO rec FROM config; 
+    SELECT value::boolean INTO v_orphannode_delete FROM config_param_system WHERE parameter='orphannode_delete';
 
     -- Delete orphan nodes
-    IF rec.orphannode_delete THEN
+    IF v_orphannode_delete THEN
     
         SELECT count(*) INTO numArcs FROM arc WHERE node_1 = OLD.node_1 OR node_2 = OLD.node_1;
         IF numArcs = 0 THEN
