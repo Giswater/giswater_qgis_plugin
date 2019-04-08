@@ -22,6 +22,7 @@ DECLARE
 	v_result_info 	json;
 	v_result_point	json;
 	v_result_line 	json;
+	v_version	json;
 	
 BEGIN
 
