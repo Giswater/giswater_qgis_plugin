@@ -16,6 +16,7 @@ DECLARE
     formToDisplayName character varying;
     table_pkey varchar;
     schemas_array name[];
+    schemas_array name[];
     array_index integer DEFAULT 0;
     field_value character varying;
     class_id_var text;
@@ -94,7 +95,7 @@ ORDER BY a.attnum'
         
 --getting values
 EXECUTE 'SELECT (row_to_json(a)) FROM 
-    (SELECT * FROM '||table_id||' WHERE '||quote_ident(table_pkey)||' = CAST($1 AS '||quote_literal(column_type)||'))a'
+    (SELECT * FROM '||table_id||' WHERE '||quote_ident(table_pkey)||' = CAST($1 AS '||(column_type)||'))a'
         INTO values_array
         USING p_id;
 

@@ -128,7 +128,7 @@ BEGIN
 --     Get geometry (to feature response)
 ------------------------------------------
     IF v_the_geom IS NOT NULL THEN
-        EXECUTE ('SELECT row_to_json(row) FROM (SELECT St_AsText(St_simplify('||quote_ident(v_the_geom)||',0)) FROM ' || quote_ident(table_id_arg) || ' WHERE '||quote_ident(v_idname)||' = CAST( ' || quote_literal(id) || ' AS '||quote_literal(column_type)||'))row')
+        EXECUTE ('SELECT row_to_json(row) FROM (SELECT St_AsText(St_simplify('||quote_ident(v_the_geom)||',0)) FROM ' || quote_ident(table_id_arg) || ' WHERE '||quote_ident(v_idname)||' = CAST( ' || quote_literal(id) || ' AS '||(column_type)||'))row')
             INTO v_geometry;
     END IF;
 
@@ -140,7 +140,7 @@ BEGIN
 
     IF  link_id_aux IS NOT NULL THEN      
         -- Get link field value
-        EXECUTE ('SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' AS link FROM ' || quote_ident(table_id_arg) || ' WHERE ' || quote_literal(id) || ' = CAST( '||quote_ident(v_idname)||' AS '||quote_literal(column_type)||'))row')
+        EXECUTE ('SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' AS link FROM ' || quote_ident(table_id_arg) || ' WHERE ' || quote_literal(id) || ' = CAST( '||quote_ident(v_idname)||' AS '||column_type||'))row')
         INTO link_path;
 	raise notice 'Layer link path: % ', link_path;
    END IF;
