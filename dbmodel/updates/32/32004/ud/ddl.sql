@@ -75,6 +75,7 @@ CREATE TABLE rpt_selector_timestep(
 
 CREATE TABLE rpt_selector_timestep_compare(
   id serial PRIMARY KEY,
+  resultdate varchar(16),
   resulttime varchar(12),
   cur_user text NOT NULL
 );
