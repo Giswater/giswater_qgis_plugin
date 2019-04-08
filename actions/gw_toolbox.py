@@ -392,9 +392,10 @@ class GwToolBox(ApiParent):
     def populate_layer_combo(self, geom_type):
 
         self.layers = []
-        self.layers = self.controller.get_group_layers(geom_type, union=True)
+        self.layers = self.controller.get_all_group_layers(geom_type)
         layers = []
         legend_layers = self.controller.get_layers()
+
         for layer in self.layers:
             if layer in legend_layers:
                 elem = []
@@ -402,7 +403,7 @@ class GwToolBox(ApiParent):
                 elem.append(layer.name())
                 elem.append(layer_name)
                 layers.append(elem)
-        utils_giswater.set_item_data(self.dlg_functions.cmb_layers, layers)
+        utils_giswater.set_item_data(self.dlg_functions.cmb_layers, layers, sort_combo=False)
 
 
     def populate_trv(self, trv_widget, result, expand=False):
