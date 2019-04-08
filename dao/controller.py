@@ -1002,7 +1002,24 @@ class DaoController(object):
                     list_items.append(layer)
         
         return list_items
-         
+
+    def get_all_group_layers(self, geom_type):
+        list_items = []
+        sql = ("SELECT tablename FROM "
+               "(SELECT tablename, 1 as c FROM " + self.schema_name + ".sys_feature_cat"
+               " WHERE type = '" + geom_type.upper() + "'"
+               " UNION SELECT parentlayer, 0 FROM " + self.schema_name + ".sys_feature_type"
+               " WHERE id='" + geom_type.upper() + "') as t "
+               " ORDER BY c")
+        rows = self.get_rows(sql, log_sql=True)
+        if rows:
+            for row in rows:
+                layer = self.get_layer_by_tablename(row[0])
+                if layer:
+                    list_items.append(layer)
+
+        return list_items
+
 
     def check_role(self, role_name):
         """ Check if @role_name exists """
