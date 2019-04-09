@@ -506,7 +506,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_patterns AS
     inp_pattern_value.factor_23,
     inp_pattern_value.factor_24
    FROM SCHEMA_NAME.inp_pattern_value JOIN SCHEMA_NAME.inp_pattern ON inp_pattern_value.pattern_id::text = inp_pattern.pattern_id::text
-  ORDER BY inp_pattern_value.pattern_id;
+  ORDER BY inp_pattern_value.id;
   
   
 DROP VIEW SCHEMA_NAME.vi_infiltration;

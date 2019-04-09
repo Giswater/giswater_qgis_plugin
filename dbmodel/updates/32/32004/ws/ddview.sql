@@ -35,8 +35,8 @@ UNION
 
 DROP VIEW vi_reactions;
 CREATE OR REPLACE VIEW vi_reactions AS 
- SELECT inp_pipe.reactiontype,
-	inp_typevalue.idval,
+ SELECT inp_typevalue.idval,
+	inp_pipe.arc_id,
 	inp_pipe.reactionvalue
 	FROM inp_selector_result, inp_pipe
 	JOIN rpt_inp_arc ON inp_pipe.arc_id::text = rpt_inp_arc.arc_id::text
@@ -45,3 +45,28 @@ CREATE OR REPLACE VIEW vi_reactions AS
 UNION
  SELECT descript, null as value, null as value2
    FROM inp_reactions;
+   
+   
+   DROP VIEW vi_patterns;
+CREATE OR REPLACE VIEW vi_patterns AS 
+ SELECT inp_pattern_value.pattern_id,
+    inp_pattern_value.factor_1,
+    inp_pattern_value.factor_2,
+    inp_pattern_value.factor_3,
+    inp_pattern_value.factor_4,
+    inp_pattern_value.factor_5,
+    inp_pattern_value.factor_6,
+    inp_pattern_value.factor_7,
+    inp_pattern_value.factor_8,
+    inp_pattern_value.factor_9,
+    inp_pattern_value.factor_10,
+    inp_pattern_value.factor_11,
+    inp_pattern_value.factor_12,
+    inp_pattern_value.factor_13,
+    inp_pattern_value.factor_14,
+    inp_pattern_value.factor_15,
+    inp_pattern_value.factor_16,
+    inp_pattern_value.factor_17,
+    inp_pattern_value.factor_18
+   FROM inp_pattern_value
+  ORDER BY inp_pattern_value.id;

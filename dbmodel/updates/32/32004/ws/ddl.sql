@@ -19,7 +19,6 @@ ALTER TABLE inp_pump_importinp ADD COLUMN energyvalue varchar (30);
 ALTER TABLE inp_pump_additional ADD COLUMN energyparam varchar (30);
 ALTER TABLE inp_pump_additional ADD COLUMN energyvalue varchar (30);
 
-ALTER TABLE inp_pipe ADD COLUMN reactiontype varchar (30);
 ALTER TABLE inp_pipe ADD COLUMN reactionparam varchar (30);
 ALTER TABLE inp_pipe ADD COLUMN reactionvalue varchar (30);
 
