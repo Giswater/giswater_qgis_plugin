@@ -7,6 +7,22 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+UPDATE audit_cat_table SET isdeprecated = true WHERE id='vi_title';
+
+
+
+INSERT INTO audit_cat_table ('inp_hydrograph_id');---------------------------TODO
+
+
+
+INSERT INTO inp_typevalue ('inp_typevalue_evap', 'DRY_ONLY','DRY_ONLY');
+UPDATE inp_typevalue SET id='TIMESERIES_OUTF' WHERE id='TIMESERIES_OUTFALL';
+UPDATE inp_typevalue SET id='FILE_WINDSP' WHERE id='WINDSPEED FILE';
+UPDATE inp_typevalue SET id='MONTHLY_WINDSP' WHERE id='WINDSPEED MONTHLY';
+UPDATE inp_typevalue SET id='ADC IMPERVIOUS' WHERE id='ADC IMPERVIOUS';
+
+
 UPDATE audit_cat_param_user SET layout_id=3, layout_name='grl_hyd_3' WHERE layout_id=11;
 UPDATE audit_cat_param_user SET layout_id=4, layout_name='grl_hyd_4' WHERE layout_id=12;
 UPDATE audit_cat_param_user SET layout_id=4, layout_order=4,layout_name='grl_hyd_4' WHERE id='inp_options_dry_days';
@@ -82,7 +98,6 @@ INSERT INTO sys_csv2pg_config VALUES (37, 10, 'vi_loadings', '[LOADINGS]', NULL,
 INSERT INTO sys_csv2pg_config VALUES (41, 10, 'vi_timeseries', '[TIMESERIES]', NULL, 12, '{"from":"5.0.022", "to":null,"language":"english"}');
 INSERT INTO sys_csv2pg_config VALUES (42, 10, 'vi_lid_controls', '[LID_CONTROLS]', NULL, 12, '{"from":"5.0.022", "to":null,"language":"english"}');
 INSERT INTO sys_csv2pg_config VALUES (43, 10, 'vi_lid_usage', '[LID_USAGE]', NULL, 12, '{"from":"5.0.022", "to":null,"language":"english"}');
-INSERT INTO sys_csv2pg_config VALUES (1, 10, 'vi_title', '[TITLE]', NULL, 12, '{"from":"5.0.022", "to":null,"language":"english"}');
 INSERT INTO sys_csv2pg_config VALUES (51, 10, 'vi_polygons', '[Polygons]', NULL, 12, '{"from":"5.0.022", "to":null,"language":"english"}');
 INSERT INTO sys_csv2pg_config VALUES (52, 11, 'rpt_pumping_sum', 'Pumping Summary', NULL, NULL, '{"from":"5.0.022", "to":null,"language":"english"}');
 INSERT INTO sys_csv2pg_config VALUES (53, 11, 'rpt_arcflow_sum', 'Link Flow', NULL, NULL, '{"from":"5.0.022", "to":null,"language":"english"}');

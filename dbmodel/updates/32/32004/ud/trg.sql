@@ -9,13 +9,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 CREATE TRIGGER gw_trg_vi_xsections INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_xsections  
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_xsections');
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_xsections');
 
 CREATE TRIGGER gw_trg_vi_xsections INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_report  
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_report');
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_report');
 
 CREATE TRIGGER gw_trg_vi_xsections INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_options  
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_vi('vi_options');
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_options');
 
 CREATE TRIGGER gw_trg_vi_dividers INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_dividers
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_dividers');
@@ -43,3 +43,15 @@ FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_raingages');
 
 CREATE TRIGGER gw_trg_vi_lid_controls INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.vi_lid_controls
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_lid_controls');
+
+CREATE TRIGGER gw_trg_vi_snowpacks INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_snowpacks
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_snowpacks');
+
+CREATE TRIGGER gw_trg_vi_hydrographs INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_hydrographs
+FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_hydrographs');
+
+CREATE TRIGGER gw_trg_vi_hydrographs INSTEAD OF INSERT OR UPDATE OR DELETE ON vi_outfalls
+FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_outfalls');
+
+CREATE TRIGGER gw_trg_vi_inflows INSTEAD OF INSERT OR UPDATE OR DELETE ON ud_sample.vi_inflows
+FOR EACH ROW EXECUTE PROCEDURE ud_sample.gw_trg_vi('vi_inflows');

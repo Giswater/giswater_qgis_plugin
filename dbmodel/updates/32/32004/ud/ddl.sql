@@ -8,6 +8,59 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+CREATE TABLE ud_sample.inp_hdyrograph_id(
+  id character varying(16) PRIMARY KEY
+);
+
+ALTER TABLE inp_orifice RENAME node_id TO _node_id;
+ALTER TABLE inp_orifice RENAME arc_id TO _arc_id;
+ALTER TABLE inp_weir RENAME nod_id TO _node_id;
+ALTER TABLE inp_weir RENAME arc_id TO _arc_id;
+ALTER TABLE inp_pump RENAME nod_id TO _node_id;
+ALTER TABLE inp_pump RENAME arc_id TO _arc_id;
+ALTER TABLE inp_outlet RENAME node_id TO _node_id;
+
+ALTER TABLE inp_hydrograph RENAME hydro_id TO id;
+
+ALTER TABLE inp_pollutant ADD COLUMN cinit numeric(12,4);
+
+
+
+
+
+
+ALTER TABLE ud_sample.inp_inflows  RENAME TO _inp_inflows;
+
+CREATE TABLE inp_inflows
+(
+  id integer NOT NULL DEFAULT nextval('ud_sample.inp_inflows_seq'::regclass),
+  node_id character varying(50),
+  timser_id character varying(16),
+  format_type text,
+  mfactor numeric (12,4),
+  sfactor numeric(12,4),
+  base numeric(12,4),
+  pattern_id character varying(16),
+  CONSTRAINT inp_inflows_pkey PRIMARY KEY (id)
+);
+
+
+RENAME TABLE inp_snowpack TO _inp_snowpack;
+
+CREATE TABLE inp_snowpack
+( id serial PRIMARY KEY,
+  snow_id character varying(16) NOT NULL,
+  snow_type character varying(16),
+  value_1 numeric(12,3),
+  value_2 numeric(12,3),
+  value_3 numeric(12,3),
+  value_4 numeric(12,3),
+  value_5 numeric(12,3),
+  value_6 numeric(12,3),
+  value_7 numeric(12,3)
+);
+
+
 ALTER TABLE cat_arc ADD COLUMN tsect_id character varying(16);
 ALTER TABLE cat_arc ADD COLUMN curve_id character varying(16);
 
