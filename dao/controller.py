@@ -77,7 +77,7 @@ class DaoController(object):
 
         if self.logger is None:
             if logger_name is None:
-                logger_name = self.plugin_name
+                logger_name = 'plugin'
             log_level = int(self.settings.value('status/log_level'))
             log_suffix = self.settings.value('status/log_suffix')
             self.logger = Logger(self, logger_name, log_level, log_suffix)
@@ -880,26 +880,31 @@ class DaoController(object):
         """ Write message into QGIS Log Messages Panel with selected message level
             @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} 
         """
+
         msg = None
         if text:
             msg = self.tr(text, context_name)
             if parameter:
                 msg += ": " + str(parameter)            
         QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
+
+        return msg
         
 
     def log_info(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
         """ Write information message into QGIS Log Messages Panel """
-        self.log_message(text, 0, context_name, parameter=parameter)      
+
+        msg = self.log_message(text, 0, context_name, parameter=parameter)
         if self.logger and logger_file:        
-            self.logger.info(text, stack_level_increase=stack_level_increase)                             
+            self.logger.info(msg, stack_level_increase=stack_level_increase)
 
 
     def log_warning(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
         """ Write warning message into QGIS Log Messages Panel """
-        self.log_message(text, 1, context_name, parameter=parameter)   
+
+        msg = self.log_message(text, 1, context_name, parameter=parameter)
         if self.logger and logger_file:
-            self.logger.warning(text, stack_level_increase=stack_level_increase)            
+            self.logger.warning(msg, stack_level_increase=stack_level_increase)
         
      
     def add_translator(self, locale_path, log_info=False):
