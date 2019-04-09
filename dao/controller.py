@@ -983,6 +983,7 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
 
+        schemaname = schemaname.replace('"', '')
         sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
         params = [schemaname]
         row = self.get_row(sql, commit=True, params=params)
@@ -995,6 +996,7 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
 
+        schemaname = schemaname.replace('"', '')
         sql = ("SELECT routine_name FROM information_schema.routines "
                "WHERE lower(routine_schema) = %s "
                "AND lower(routine_name) = %s ")
@@ -1009,6 +1011,7 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
 
+        schemaname = schemaname.replace('"', '')
         sql = ("SELECT * FROM pg_tables "
                "WHERE schemaname = %s AND tablename = %s ")
         params = [schemaname, tablename]
@@ -1022,6 +1025,7 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
 
+        schemaname = schemaname.replace('"', '')
         sql = ("SELECT * FROM pg_views "
                "WHERE schemaname = %s AND viewname = %s ")
         params = [schemaname, viewname]
@@ -1035,6 +1039,7 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
 
+        schemaname = schemaname.replace('"', '')
         sql = ("SELECT * FROM information_schema.columns"
                " WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
         params = [schemaname, tablename, columname]
@@ -1222,6 +1227,7 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
 
+        schemaname = schemaname.replace('"', '')
         sql = ("SELECT column_name FROM information_schema.columns "
                "WHERE table_schema = %s AND table_name = %s "
                "ORDER BY ordinal_position")
@@ -1236,6 +1242,7 @@ class DaoController(object):
         if schemaname is None:
             schemaname = self.schema_name
 
+        schemaname = schemaname.replace('"', '')
         srid = None
         sql = "SELECT Find_SRID(%s, %s, 'the_geom');"
         params = [schemaname, tablename]

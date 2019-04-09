@@ -625,7 +625,7 @@ class Giswater(QObject):
         self.manage_snapping_layers()    
         
         # Get SRID from table node
-        self.srid = self.controller.get_srid(self.schema_name, self.table_node)
+        self.srid = self.controller.get_srid(self.table_node, self.schema_name)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
         # Get list of actions to hide
