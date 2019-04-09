@@ -1084,8 +1084,8 @@ class UpdateSQL(ParentAction):
     def execute_import_data(self):
         self.insert_inp_into_db(self.file_inp)
         # Execute import data
-        sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
-        self.controller.execute_sql(sql, commit=False)
+        # sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
+        # self.controller.execute_sql(sql, commit=False)
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
@@ -1967,30 +1967,38 @@ class UpdateSQL(ParentAction):
         full_file = _file.readlines()
         sql = ""
         progress = 0
-
+        target = ""
         for row in full_file:
             progress += 1
-
-            if str(row[0]) != ';':
-                list_aux = row.split("\t")
-                dirty_list = []
-                for x in range(0, len(list_aux)):
-                    aux = list_aux[x].split(" ")
-                    for i in range(len(aux)):
-                        dirty_list.append(aux[i])
+            row = row.rstrip()
+            if len(row) == 0:
+                continue
+            if str(row[0]) == "[":
+                target = str(row)
+            if target in ('[TRANSECTS]', '[CONTROLS]', '[RULES]'):
+                sp_n = [row]
+            elif target in ('[EVAPORATION]', '[TEMPERATURE]'):
+                sp_n = re.split(' |\t', row, 1)
             else:
-                dirty_list = []
-                aux = row
-                dirty_list.append(aux)
-            for x in range(len(dirty_list) - 1, -1, -1):
-                if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x] or dirty_list[x] == '; ' or dirty_list[x] == ';' or dirty_list[x] == ';\n':
-                    dirty_list.pop(x)
+                if str(row[0]) != ';':
+                    list_aux = row.split("\t")
+                    dirty_list = []
+                    for x in range(0, len(list_aux)):
+                        aux = list_aux[x].split(" ")
+                        for i in range(len(aux)):
+                            dirty_list.append(aux[i])
+                else:
+                    dirty_list = [row]
 
-            sp_n = dirty_list
+                for x in range(len(dirty_list) - 1, -1, -1):
+                    if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x] or dirty_list[x] == '; '\
+                            or dirty_list[x] == ';' or dirty_list[x] == ';\n':
+                        dirty_list.pop(x)
+                sp_n = dirty_list
 
             if len(sp_n) > 0:
-                sql += "INSERT INTO " + self.schema + ".temp_csv2pg (csv2pgcat_id, "
-                values = "VALUES(12, "
+                sql += "INSERT INTO " + self.schema + ".temp_csv2pg (csv2pgcat_id, source, "
+                values = "VALUES(12, '" + target + "', "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += "csv" + str(x + 1) + ", "
