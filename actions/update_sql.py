@@ -1084,8 +1084,8 @@ class UpdateSQL(ParentAction):
     def execute_import_data(self):
         self.insert_inp_into_db(self.file_inp)
         # Execute import data
-        # sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
-        # self.controller.execute_sql(sql, commit=False)
+        sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
+        self.controller.execute_sql(sql, commit=False)
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
