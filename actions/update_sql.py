@@ -1187,7 +1187,7 @@ class UpdateSQL(ParentAction):
 
         self.set_wait_cursor()
         if self.rdb_import_data.isChecked():
-            self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project,self.dlg_readsql_create_project.data_file)
+            self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.data_file)
             if self.file_inp is 'null':
                 self.set_arrow_cursor()
                 msg = "The 'Path' field is required for Import INP data."

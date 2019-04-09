@@ -1115,7 +1115,6 @@ class ApiParent(ParentAction):
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                     # Set editable/readonly
-
                     if type(widget) in (QLineEdit, QDoubleSpinBox):
                         if 'iseditable' in field:
                             if str(field['iseditable']) == "False":

@@ -205,7 +205,7 @@ class Go2Epa(ApiParent):
                    " WHERE result_id='" + str(result_name) + "' LIMIT 1")
             row = self.controller.get_row(sql, log_sql=False, commit=True)
             if row:
-                msg = "Result name already exists, do you want override?"
+                msg = "Result name already exists, do you want overwrite?"
                 answer = self.controller.ask_question(msg, title="Alert")
                 if not answer:
                     return False
