@@ -333,7 +333,7 @@ UNION
    FROM SCHEMA_NAME.inp_selector_result, SCHEMA_NAME.rpt_inp_node
      JOIN SCHEMA_NAME.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
      LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_outfall.outfall_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_outfall'::text AND inp_outfall.outfall_type::text = 'TIMESERIES_OUTFALL'::text 
+  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_outfall'::text AND inp_outfall.outfall_type::text = 'TIMESERIES_OUTF'::text 
   AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
    
   

@@ -17,11 +17,12 @@ INSERT INTO audit_cat_table VALUES ('inp_hydrograph_id');-----------------------
 DELETE FROM inp_typevalue WHERE id='TIMESERIES_OUTFALL';
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_outfall', 'TIMESERIES_OUTF', 'TIMESERIES');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_evap', 'DRY_ONLY', 'DRY_ONLY');
-UPDATE inp_typevalue SET id='FILE_WINDSP' WHERE id='WINDSPEED FILE';
-UPDATE inp_typevalue SET id='MONTHLY_WINDSP' WHERE id='WINDSPEED MONTHLY';
+
+
+UPDATE inp_typevalue SET id='WINDSPEED', idval='WINDSPEED' WHERE id='WINDSPEED MONTHLY';
 UPDATE inp_typevalue SET id='ADC', idval='ADC' WHERE id='ADC IMPERVIOUS';
 DELETE FROM inp_typevalue WHERE id='ADC PERVIOUS';
-
+DELETE FROM inp_typevalue wHERE id='WINDSPEED FILE';
 
 UPDATE audit_cat_param_user SET layout_id=3, layout_name='grl_hyd_3' WHERE layout_id=11;
 UPDATE audit_cat_param_user SET layout_id=4, layout_name='grl_hyd_4' WHERE layout_id=12;

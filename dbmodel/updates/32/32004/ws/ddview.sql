@@ -13,6 +13,39 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- not used view
 DROP VIEW  vi_title;
 
+CREATE OR REPLACE VIEW vi_rules AS 
+ SELECT c.text
+   FROM ( SELECT a.id,
+            a.text
+           FROM ( SELECT inp_rules_x_arc.id,
+                    inp_rules_x_arc.text
+                   FROM inp_selector_result,
+                    inp_rules_x_arc
+                     JOIN rpt_inp_arc ON inp_rules_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+                  WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+                  ORDER BY inp_rules_x_arc.id) a
+        UNION
+         SELECT b.id,
+            b.text
+           FROM ( SELECT inp_rules_x_node.id + 1000000 AS id,
+                    inp_rules_x_node.text
+                   FROM inp_selector_result,
+                    inp_rules_x_node
+                     JOIN rpt_inp_node ON inp_rules_x_node.node_id::text = rpt_inp_node.node_id::text
+                  WHERE inp_selector_result.result_id::text = rpt_inp_node.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+                  ORDER BY inp_rules_x_node.id) b
+         UNION
+         SELECT d.id,
+            d.text
+           FROM ( SELECT inp_rules_x_sector.id + 2000000 AS id,
+                    inp_rules_x_sector.text
+                   FROM inp_selector_sector,
+                    inp_rules_x_sector
+                    WHERE inp_selector_sector.sector_id = inp_rules_x_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text
+                  ORDER BY inp_rules_x_sector.id) d) c
+  ORDER BY c.id;
+
+
 DROP VIEW vi_energy;
 CREATE OR REPLACE VIEW vi_energy AS 
  SELECT concat ('PUMP ',arc_id) as pump_id,

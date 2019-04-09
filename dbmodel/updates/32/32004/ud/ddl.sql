@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE TABLE inp_hdyrograph_id(
+CREATE TABLE inp_hydrograph_id(
   id character varying(16) PRIMARY KEY
 );
 
