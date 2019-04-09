@@ -474,11 +474,10 @@ class Go2Epa(ApiParent):
             for x in range(len(dirty_list) - 1, -1, -1):
                 if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
                     dirty_list.pop(x)
-
             sp_n = []
             if len(dirty_list) > 0:
                 for x in range(0, len(dirty_list)):
-                    if bool(re.search('[[0-9][-][0-9]]*', str(dirty_list[x]))):
+                    if bool(re.search('[[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
                         # 0.00-2.56e+007-2.56e+007
                         last_index = 0
                         for i, c in enumerate(dirty_list[x]):
@@ -627,7 +626,7 @@ class Go2Epa(ApiParent):
 
                     # delete previous values of user on temp table
                     sql = ("DELETE FROM " + self.schema_name + ".temp_csv2pg "
-                                                               " WHERE user_name=current_user AND csv2pgcat_id=11")
+                           " WHERE user_name=current_user AND csv2pgcat_id=11")
                     self.controller.execute_sql(sql, log_sql=False)
 
                     # Importing file to temporal table
