@@ -22,7 +22,11 @@ BEGIN
 --  Get variables
     v_usedmapattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_use_dma_pattern' AND cur_user=current_user);
 
--- Upsert on node rpt_inp table
+-- Delete previous results on rpt_inp_node & arc tables
+   DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
+   DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
+
+-- Insert on node rpt_inp table
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
 	SELECT 
 	result_id_var,
@@ -39,7 +43,7 @@ BEGIN
 	END IF;
 
 
--- Upsert on arc rpt_inp table
+-- Insert on arc rpt_inp table
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, the_geom)
 	SELECT
 	result_id_var,
