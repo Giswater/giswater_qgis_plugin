@@ -72,6 +72,19 @@ class PgDao(object):
             self.conn_string += " password="+self.password
         
         
+    def mogrify(self, sql, params):
+        """ Return a query string after arguments binding """
+
+        query = sql
+        try:
+            query = self.cursor.mogrify(sql, params)
+        except Exception as e:
+            self.last_error = e
+            print(str(e))
+        finally:
+            return query
+
+        
     def get_rows(self, sql, commit=False):
         """ Get multiple rows from selected query """
 
