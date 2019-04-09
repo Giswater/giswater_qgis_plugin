@@ -10,6 +10,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+-- not used view
+DROP VIEW  vi_title;
 
 DROP VIEW vi_energy;
 CREATE OR REPLACE VIEW vi_energy AS 

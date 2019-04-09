@@ -31,6 +31,7 @@ UPDATE sys_csv2pg_config SET csvversion='{"from":"2.0.12", "to":null,"language":
 -- forgetted on 3.2.0000
 UPDATE audit_cat_table SET isdeprecated = true WHERE id='inp_report';
 UPDATE audit_cat_table SET isdeprecated = true WHERE id='inp_times';
+UPDATE audit_cat_table SET isdeprecated = true WHERE id='vi_title';
 
 -- new udpates
 UPDATE audit_cat_table SET isdeprecated = true WHERE id='inp_energy_gl';
