@@ -447,7 +447,7 @@ class Giswater(QObject):
         # Value: Object of the class SysFeatureCat
         self.feature_cat = {}             
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
-        rows = self.controller.dao.get_rows(sql)
+        rows = self.controller.get_rows(sql)
         if not rows:
             return False
 
@@ -596,7 +596,7 @@ class Giswater(QObject):
         self.controller.set_schema_name(self.schema_name)
 
         # Check if schema exists
-        self.schema_exists = self.controller.dao.check_schema(self.schema_name)
+        self.schema_exists = self.controller.check_schema(self.schema_name)
         if not self.schema_exists:
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
 
@@ -625,7 +625,7 @@ class Giswater(QObject):
         self.manage_snapping_layers()    
         
         # Get SRID from table node
-        self.srid = self.controller.dao.get_srid(self.schema_name, self.table_node)
+        self.srid = self.controller.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
 
         # Get list of actions to hide

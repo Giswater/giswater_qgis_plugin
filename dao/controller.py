@@ -407,11 +407,21 @@ class DaoController(object):
         return self.dao.get_conn_encoding()
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False):
+    def get_sql(self, sql, log_sql=False, params=None):
+        """ Generate SQL with params. Useful for debugging """
+
+        if params:
+            sql = self.dao.mogrify(sql, params)
+        if log_sql:
+            self.log_info(sql, stack_level_increase=2)
+
+        return sql
+
+        
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
-        if log_sql:
-            self.log_info(sql, stack_level_increase=1)
+        sql = self.get_sql(sql, log_sql, params)
         row = self.dao.get_row(sql, commit)   
         self.last_error = self.dao.last_error      
         if not row:
@@ -964,25 +974,69 @@ class DaoController(object):
         return project_version    
     
     
-    def check_function(self, function_name):
-        """ Check if @function_name exists """
-        
-        schema_name = self.schema_name.replace('"', '')
-        sql = ("SELECT routine_name FROM information_schema.routines"
-               " WHERE lower(routine_schema) = '" + schema_name + "'"
-               " AND lower(routine_name) = '" + function_name + "'")
-        row = self.get_row(sql, log_info=False, commit=True)
+    def check_schema(self, schemaname=None):
+        """ Check if selected schema exists """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
+        params = [schemaname]
+        row = self.get_row(sql, commit=True, params=params)
         return row
     
     
-    def check_table(self, tablename):
+    def check_function(self, functionname, schemaname=None):
+        """ Check if @function_name exists in selected schema """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        sql = ("SELECT routine_name FROM information_schema.routines "
+               "WHERE lower(routine_schema) = %s "
+               "AND lower(routine_name) = %s ")
+        params = [schemaname, functionname]
+        row = self.get_row(sql, commit=True, params=params)
+        return row
+    
+    
+    def check_table(self, tablename, schemaname=None):
         """ Check if selected table exists in selected schema """
-        return self.dao.check_table(self.schema_name, tablename)
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        sql = ("SELECT * FROM pg_tables "
+               "WHERE schemaname = %s AND tablename = %s ")
+        params = [schemaname, tablename]
+        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        return row
+
+
+    def check_view(self, viewname, schemaname=None):
+        """ Check if selected view exists in selected schema """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        sql = ("SELECT * FROM pg_views "
+               "WHERE schemaname = %s AND viewname = %s ")
+        params = [schemaname, viewname]
+        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        return row
     
     
-    def check_column(self, tablename, columname):
+    def check_column(self, tablename, columname, schemaname=None):
         """ Check if @columname exists table @schemaname.@tablename """
-        return self.dao.check_column(self.schema_name, tablename, columname)
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        sql = ("SELECT * FROM information_schema.columns"
+               " WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
+        params = [schemaname, tablename, columname]
+        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        return row
     
 
     def get_group_layers(self, geom_type, union=False):
@@ -1003,7 +1057,9 @@ class DaoController(object):
         
         return list_items
 
+
     def get_all_group_layers(self, geom_type):
+
         list_items = []
         sql = ("SELECT tablename FROM "
                "(SELECT tablename, 1 as c FROM " + self.schema_name + ".sys_feature_cat"
@@ -1157,16 +1213,35 @@ class DaoController(object):
         return value
 
 
-    def get_columns_list(self, tablename):
+    def get_columns_list(self, tablename, schemaname=None):
         """  Return list of all columns in @tablename """
         
-        sql = ("SELECT column_name FROM information_schema.columns"
-               " WHERE table_name = '" + tablename + "'"
-               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
-               " ORDER BY ordinal_position")
-        column_names = self.get_rows(sql)
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        sql = ("SELECT column_name FROM information_schema.columns "
+               "WHERE table_schema = %s AND table_name = %s "
+               "ORDER BY ordinal_position")
+        params = [schemaname, tablename]
+        column_names = self.get_rows(sql, params=params)
         return column_names
     
+    
+    def get_srid(self, tablename, schemaname=None):
+        """ Find SRID of selected schema """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        srid = None
+        sql = "SELECT Find_SRID(%s, %s, 'the_geom');"
+        params = [schemaname, tablename]
+        row = self.get_row(sql, params=params)
+        if row:
+            srid = row[0]
+
+        return srid
+
     
     def get_log_folder(self):
         """ Return log folder """
