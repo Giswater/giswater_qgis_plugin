@@ -11,16 +11,16 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE audit_cat_table SET isdeprecated = true WHERE id='vi_title';
 
 
-
-INSERT INTO audit_cat_table ('inp_hydrograph_id');---------------------------TODO
-
+INSERT INTO audit_cat_table VALUES ('inp_hydrograph_id');---------------------------TODO
 
 
-INSERT INTO inp_typevalue ('inp_typevalue_evap', 'DRY_ONLY','DRY_ONLY');
-UPDATE inp_typevalue SET id='TIMESERIES_OUTF' WHERE id='TIMESERIES_OUTFALL';
+DELETE FROM inp_typevalue WHERE id='TIMESERIES_OUTFALL';
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_outfall', 'TIMESERIES_OUTF', 'TIMESERIES');
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_evap', 'DRY_ONLY', 'DRY_ONLY');
 UPDATE inp_typevalue SET id='FILE_WINDSP' WHERE id='WINDSPEED FILE';
 UPDATE inp_typevalue SET id='MONTHLY_WINDSP' WHERE id='WINDSPEED MONTHLY';
-UPDATE inp_typevalue SET id='ADC IMPERVIOUS' WHERE id='ADC IMPERVIOUS';
+UPDATE inp_typevalue SET id='ADC', idval='ADC' WHERE id='ADC IMPERVIOUS';
+DELETE FROM inp_typevalue WHERE id='ADC PERVIOUS';
 
 
 UPDATE audit_cat_param_user SET layout_id=3, layout_name='grl_hyd_3' WHERE layout_id=11;

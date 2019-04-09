@@ -8,32 +8,26 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE TABLE ud_sample.inp_hdyrograph_id(
+CREATE TABLE inp_hdyrograph_id(
   id character varying(16) PRIMARY KEY
 );
 
+
 ALTER TABLE inp_orifice RENAME node_id TO _node_id;
-ALTER TABLE inp_orifice RENAME arc_id TO _arc_id;
-ALTER TABLE inp_weir RENAME nod_id TO _node_id;
-ALTER TABLE inp_weir RENAME arc_id TO _arc_id;
-ALTER TABLE inp_pump RENAME nod_id TO _node_id;
-ALTER TABLE inp_pump RENAME arc_id TO _arc_id;
+ALTER TABLE inp_orifice RENAME to_arc TO _to_arc;
+ALTER TABLE inp_weir RENAME node_id TO _node_id;
+ALTER TABLE inp_weir RENAME to_arc TO _to_arc;
+ALTER TABLE inp_pump RENAME node_id TO _node_id;
+ALTER TABLE inp_pump RENAME to_arc TO _to_arc;
 ALTER TABLE inp_outlet RENAME node_id TO _node_id;
-
 ALTER TABLE inp_hydrograph RENAME hydro_id TO id;
-
 ALTER TABLE inp_pollutant ADD COLUMN cinit numeric(12,4);
+ALTER TABLE inp_inflows  RENAME TO _inp_inflows;
 
-
-
-
-
-
-ALTER TABLE ud_sample.inp_inflows  RENAME TO _inp_inflows;
 
 CREATE TABLE inp_inflows
 (
-  id integer NOT NULL DEFAULT nextval('ud_sample.inp_inflows_seq'::regclass),
+  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.inp_inflows_seq'::regclass),
   node_id character varying(50),
   timser_id character varying(16),
   format_type text,
@@ -41,11 +35,11 @@ CREATE TABLE inp_inflows
   sfactor numeric(12,4),
   base numeric(12,4),
   pattern_id character varying(16),
-  CONSTRAINT inp_inflows_pkey PRIMARY KEY (id)
+  CONSTRAINT inp_inflows_pkey2 PRIMARY KEY (id)
 );
 
 
-RENAME TABLE inp_snowpack TO _inp_snowpack;
+ALTER TABLE inp_snowpack RENAME TO _inp_snowpack;
 
 CREATE TABLE inp_snowpack
 ( id serial PRIMARY KEY,

@@ -26,10 +26,10 @@ UPDATE inp_conduit SET flap='NO';
 
 UPDATE subcatchment SET snow_id='Spack_01';
 
-INSERT INTO ud_sample.inp_inflows (node_id, timser_id, sfactor, base, pattern_id) 
-SELECT node_id, 'T5-5m', 1, 0.2, 'pattern_01' FROM ud_sample.node;
-INSERT INTO ud_sample.inp_inflows_pol_x_node (poll_id, node_id, timser_id, form_type, mfactor, sfactor, base, pattern_id) 
-SELECT 'SS',node_id, 'T5-5m', 'CONCEN_INFLOWS',1, 1, 0.2, 'pattern_01' FROM ud_sample.node;
+INSERT INTO SCHEMA_NAME.inp_inflows (node_id, timser_id, sfactor, base, pattern_id) 
+SELECT node_id, 'T5-5m', 1, 0.2, 'pattern_01' FROM SCHEMA_NAME.node;
+INSERT INTO SCHEMA_NAME.inp_inflows_pol_x_node (poll_id, node_id, timser_id, form_type, mfactor, sfactor, base, pattern_id) 
+SELECT 'SS',node_id, 'T5-5m', 'CONCEN_INFLOWS',1, 1, 0.2, 'pattern_01' FROM SCHEMA_NAME.node;
 
 ---------
 
@@ -40,7 +40,7 @@ SELECT 'SS',node_id, 'T5-5m', 'CONCEN_INFLOWS',1, 1, 0.2, 'pattern_01' FROM ud_s
 
 ---------
 
-INSERT INTO ud_sample.inp_coverage_land_x_subc SELECT subc_id, landus_id, 0.5 FROM ud_sample.subcatchment, ud_sample.inp_landuses
+INSERT INTO SCHEMA_NAME.inp_coverage_land_x_subc SELECT subc_id, landus_id, 0.5 FROM SCHEMA_NAME.subcatchment, SCHEMA_NAME.inp_landuses
 
 UPDATE inp_junction SET y0=random(), ysur=random(), apond=random()*100  ;
 UPDATE inp_divider SET y0=random(), ysur=random(), apond= random()*100 ;

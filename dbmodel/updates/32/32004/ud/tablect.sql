@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE ud_sample.inp_flwreg_weir DROP CONSTRAINT inp_flwreg_weir_check_type;
+ALTER TABLE SCHEMA_NAME.inp_flwreg_weir DROP CONSTRAINT inp_flwreg_weir_check_type;
 
-ALTER TABLE ud_sample.inp_flwreg_weir
+ALTER TABLE SCHEMA_NAME.inp_flwreg_weir
 ADD CONSTRAINT inp_flwreg_weir_check_type CHECK (weir_type::text = ANY (ARRAY['SIDEFLOW','TRANSVERSE','V-NOTCH','TRAPEZOIDAL_WEIR']::text[]));
 
 ALTER TABLE inp_timser_id DROP CONSTRAINT inp_timser_id_check;

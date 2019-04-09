@@ -8,11 +8,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-drop view  ud_sample.vi_title;
+drop view  SCHEMA_NAME.vi_title;
 
 
-DROP VIEW ud_sample.vi_inflows;
-CREATE OR REPLACE VIEW ud_sample.vi_inflows AS 
+DROP VIEW SCHEMA_NAME.vi_inflows;
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_inflows AS 
  SELECT rpt_inp_node.node_id,
     'FLOW'::text AS type_flow,
     inp_inflows.timser_id,
@@ -21,9 +21,9 @@ CREATE OR REPLACE VIEW ud_sample.vi_inflows AS
     inp_inflows.sfactor,
     inp_inflows.base,
     inp_inflows.pattern_id
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_inflows ON inp_inflows.node_id::text = rpt_inp_node.node_id::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_node
+     JOIN SCHEMA_NAME.inp_inflows ON inp_inflows.node_id::text = rpt_inp_node.node_id::text
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_node.node_id,
@@ -34,167 +34,71 @@ UNION
     inp_inflows_pol_x_node.sfactor,
     inp_inflows_pol_x_node.base, 
     inp_inflows_pol_x_node.pattern_id
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_inflows_pol_x_node ON inp_inflows_pol_x_node.node_id::text = rpt_inp_node.node_id::text
-     LEFT JOIN ud_sample.inp_typevalue ON inp_typevalue.id::text = inp_inflows_pol_x_node.form_type::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_node
+     JOIN SCHEMA_NAME.inp_inflows_pol_x_node ON inp_inflows_pol_x_node.node_id::text = rpt_inp_node.node_id::text
+     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_inflows_pol_x_node.form_type::text
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
 
-
   
-drop view  ud_sample.vi_outfalls;
-CREATE OR REPLACE VIEW ud_sample.vi_outfalls AS 
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_outfall.outfall_type,
-    inp_outfall.stage::text,
-    inp_outfall.gate
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON inp_outfall.node_id::text = rpt_inp_node.node_id::text
-  WHERE inp_outfall.outfall_type::text = 'FIXED'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-UNION
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_outfall.outfall_type,
-    null as other1,
-    inp_outfall.gate
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
-  WHERE inp_outfall.outfall_type::text = 'FREE'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-UNION
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_outfall.outfall_type,
-    null as other1,
-    inp_outfall.gate
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
-  WHERE inp_outfall.outfall_type::text = 'NORMAL'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-UNION
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_typevalue.idval AS outfall_type,
-    inp_outfall.curve_id, 
-    inp_outfall.gate
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
-     LEFT JOIN ud_sample.inp_typevalue ON inp_typevalue.id::text = inp_outfall.outfall_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_outfall'::text AND inp_outfall.outfall_type::text = 'TIDAL_OUTFALL'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-UNION
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_typevalue.idval AS outfall_type,
-    inp_outfall.timser_id, 
-    inp_outfall.gate
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     LEFT JOIN ud_sample.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
-     LEFT JOIN ud_sample.inp_typevalue ON inp_typevalue.id::text = inp_outfall.outfall_type::text
-  WHERE inp_outfall.outfall_type::text = 'TIMESERIES_OUTF'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW ud_sample.vi_controls AS 
+DROP VIEW SCHEMA_NAME.vi_controls;
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_controls AS 
 SELECT text FROM (SELECT inp_controls_x_arc.id, inp_controls_x_arc.text
-   FROM ud_sample.inp_selector_sector,
-    ud_sample.inp_controls_x_arc
-     JOIN ud_sample.rpt_inp_arc ON inp_controls_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+   FROM SCHEMA_NAME.inp_selector_sector,
+    SCHEMA_NAME.inp_controls_x_arc
+     JOIN SCHEMA_NAME.rpt_inp_arc ON inp_controls_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
   WHERE rpt_inp_arc.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text
 UNION
  SELECT inp_controls_x_node.id+1000000,inp_controls_x_node.text
-   FROM ud_sample.inp_selector_sector,
-    ud_sample.inp_controls_x_node
-     JOIN ud_sample.rpt_inp_node ON inp_controls_x_node.node_id::text = rpt_inp_node.node_id::text
+   FROM SCHEMA_NAME.inp_selector_sector,
+    SCHEMA_NAME.inp_controls_x_node
+     JOIN SCHEMA_NAME.rpt_inp_node ON inp_controls_x_node.node_id::text = rpt_inp_node.node_id::text
   WHERE rpt_inp_node.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text
   ORDER BY id) a;
 
-CREATE OR REPLACE VIEW ud_sample.vi_outfalls AS 
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_outfall.outfall_type,
-    concat(inp_outfall.stage, ' ', inp_outfall.gate) AS other_val
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON inp_outfall.node_id::text = rpt_inp_node.node_id::text
-  WHERE inp_outfall.outfall_type::text = 'FIXED'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-UNION
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_outfall.outfall_type,
-    inp_outfall.gate AS other_val
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
-  WHERE inp_outfall.outfall_type::text = 'FREE'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-UNION
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_outfall.outfall_type,
-    inp_outfall.gate AS other_val
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
-  WHERE inp_outfall.outfall_type::text = 'NORMAL'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-UNION
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_typevalue.idval AS outfall_type,
-    concat(inp_outfall.curve_id, ' ', inp_outfall.gate) AS other_val
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
-     LEFT JOIN ud_sample.inp_typevalue ON inp_typevalue.id::text = inp_outfall.outfall_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_outfall'::text AND inp_outfall.outfall_type::text = 'TIDAL_OUTFALL'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
-UNION
- SELECT rpt_inp_node.node_id,
-    rpt_inp_node.elev,
-    inp_typevalue.idval AS outfall_type,
-    concat(inp_outfall.timser_id, ' ', inp_outfall.gate) AS other_val
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_outfall ON rpt_inp_node.node_id::text = inp_outfall.node_id::text
-     LEFT JOIN ud_sample.inp_typevalue ON inp_typevalue.id::text = inp_outfall.outfall_type::text
-  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_outfall'::text AND inp_outfall.outfall_type::text = 'TIMESERIES_OUTF'::text AND rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW ud_sample.vi_treatment AS 
+  
+DROP VIEW SCHEMA_NAME.vi_treatment;
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_treatment AS 
 SELECT 
    rpt_inp_node.node_id,
    inp_treatment_node_x_pol.poll_id,
   function::varchar(30)
-   FROM ud_sample.inp_selector_result, 
-   ud_sample.rpt_inp_node
-     JOIN ud_sample.inp_treatment_node_x_pol ON inp_treatment_node_x_pol.node_id::text = rpt_inp_node.node_id::text
-     LEFT JOIN ud_sample.inp_typevalue ON inp_typevalue.id::text = inp_treatment_node_x_pol.function::text
+   FROM SCHEMA_NAME.inp_selector_result, 
+   SCHEMA_NAME.rpt_inp_node
+     JOIN SCHEMA_NAME.inp_treatment_node_x_pol ON inp_treatment_node_x_pol.node_id::text = rpt_inp_node.node_id::text
+     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_treatment_node_x_pol.function::text
   WHERE rpt_inp_node.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW ud_sample.vi_transects AS 
+DROP VIEW vi_transects;
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_transects AS 
  SELECT inp_transects.text
-   FROM ud_sample.inp_transects
+   FROM SCHEMA_NAME.inp_transects
   ORDER BY inp_transects.id;
-
-CREATE OR REPLACE VIEW ud_sample.vi_temperature AS 
+ 
+ 
+DROP VIEW vi_temperature;
+CREATE OR REPLACE VIEW vi_temperature AS 
  SELECT idval AS temp_type,
     inp_temperature.value
-   FROM ud_sample.inp_temperature
-    JOIN ud_sample.inp_typevalue ON temp_type=inp_typevalue.id;
-	
+   FROM SCHEMA_NAME.inp_temperature
+    JOIN SCHEMA_NAME.inp_typevalue ON temp_type=inp_typevalue.id;
 
-CREATE OR REPLACE VIEW ud_sample.vi_evaporation AS 
+	
+DROP VIEW vi_evaporation;
+CREATE OR REPLACE VIEW vi_evaporation AS 
  SELECT idval::varchar(16) AS evap_type,
     inp_evaporation.value
-   FROM ud_sample.inp_evaporation
-   JOIN ud_sample.inp_typevalue ON evap_type=inp_typevalue.id;
+   FROM SCHEMA_NAME.inp_evaporation
+   JOIN SCHEMA_NAME.inp_typevalue ON evap_type=inp_typevalue.id;
 
+   
 DROP VIEW vi_hydrographs;
 CREATE OR REPLACE VIEW vi_hydrographs AS 
 SELECT inp_hydrograph.text
    FROM inp_hydrograph;
 
+   
 DROP VIEW vi_snowpacks;
 CREATE OR REPLACE VIEW vi_snowpacks AS 
  SELECT inp_snowpack.snow_id,
@@ -209,20 +113,19 @@ CREATE OR REPLACE VIEW vi_snowpacks AS
    FROM inp_snowpack
   ORDER BY id;
 
-
 DROP VIEW IF EXISTS vi_xsections;
-CREATE OR REPLACE VIEW ud_sample.vi_xsections AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_xsections AS 
  SELECT rpt_inp_arc.arc_id,
     cat_arc_shape.epa AS shape,
     cat_arc.geom1::text AS other1,
     cat_arc.curve_id AS other2,
     NULL::text AS other3,
     NULL::text AS other4
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_arc
-     JOIN ud_sample.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
-     JOIN ud_sample.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN ud_sample.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_arc
+     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text = 'CUSTOM'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -231,11 +134,11 @@ UNION
     cat_arc.geom2::text AS other2,
     cat_arc.geom3::text AS other3,
     cat_arc.geom4::text AS other4
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_arc
-     JOIN ud_sample.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
-     JOIN ud_sample.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN ud_sample.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_arc
+     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text <> 'CUSTOM'::text AND cat_arc_shape.epa::text <> 'IRREGULAR'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -244,11 +147,11 @@ UNION
     NULL::character varying AS other2,
     NULL::text AS other3,
     NULL::text AS other4
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_arc
-     JOIN ud_sample.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
-     JOIN ud_sample.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
-     JOIN ud_sample.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_arc
+     JOIN SCHEMA_NAME.inp_conduit ON rpt_inp_arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN SCHEMA_NAME.cat_arc ON rpt_inp_arc.arccat_id::text = cat_arc.id::text
+     JOIN SCHEMA_NAME.cat_arc_shape ON cat_arc_shape.id::text = cat_arc.shape::text
   WHERE cat_arc_shape.epa::text = 'IRREGULAR'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT inp_orifice.arc_id,
@@ -257,10 +160,10 @@ UNION
     inp_orifice.geom2::text AS other2,
     inp_orifice.geom3::text AS other3,
     inp_orifice.geom4::text AS other4
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_arc
-     JOIN ud_sample.inp_orifice ON inp_orifice.arc_id::text = rpt_inp_arc.arc_id::text
-     LEFT JOIN ud_sample.inp_typevalue ON inp_typevalue.id::text = inp_orifice.shape::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_arc
+     JOIN SCHEMA_NAME.inp_orifice ON inp_orifice.arc_id::text = rpt_inp_arc.arc_id::text
+     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_orifice.shape::text
   WHERE inp_typevalue.typevalue::text = 'inp_value_orifice'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -269,10 +172,10 @@ UNION
     inp_flwreg_orifice.geom2::text AS other2,
     inp_flwreg_orifice.geom3::text AS other3,
     inp_flwreg_orifice.geom4::text AS other4
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_arc
-     JOIN ud_sample.inp_flwreg_orifice ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_orifice.node_id, '_', inp_flwreg_orifice.to_arc, '_ori_', inp_flwreg_orifice.flwreg_id)
-     LEFT JOIN ud_sample.inp_typevalue ON inp_typevalue.id::text = inp_flwreg_orifice.shape::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_arc
+     JOIN SCHEMA_NAME.inp_flwreg_orifice ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_orifice.node_id, '_', inp_flwreg_orifice.to_arc, '_ori_', inp_flwreg_orifice.flwreg_id)
+     LEFT JOIN SCHEMA_NAME.inp_typevalue ON inp_typevalue.id::text = inp_flwreg_orifice.shape::text
   WHERE inp_typevalue.typevalue::text = 'inp_value_orifice'::text AND rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -281,10 +184,10 @@ UNION
     inp_weir.geom2::text AS other2,
     inp_weir.geom3::text AS other3,
     inp_weir.geom4::text AS other4
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_arc
-     JOIN ud_sample.inp_weir ON inp_weir.arc_id::text = rpt_inp_arc.arc_id::text
-     JOIN ud_sample.inp_typevalue ON inp_weir.weir_type::text = inp_typevalue.idval::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_arc
+     JOIN SCHEMA_NAME.inp_weir ON inp_weir.arc_id::text = rpt_inp_arc.arc_id::text
+     JOIN SCHEMA_NAME.inp_typevalue ON inp_weir.weir_type::text = inp_typevalue.idval::text
   WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT rpt_inp_arc.arc_id,
@@ -293,12 +196,11 @@ UNION
     inp_flwreg_weir.geom2::text AS other2,
     inp_flwreg_weir.geom3::text AS other3,
     inp_flwreg_weir.geom4::text AS other4
-   FROM ud_sample.inp_selector_result,
-    ud_sample.rpt_inp_arc
-     JOIN ud_sample.inp_flwreg_weir ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_weir.node_id, '_', inp_flwreg_weir.to_arc, '_weir_', inp_flwreg_weir.flwreg_id)
-     JOIN ud_sample.inp_typevalue ON inp_flwreg_weir.weir_type::text = inp_typevalue.idval::text
+   FROM SCHEMA_NAME.inp_selector_result,
+    SCHEMA_NAME.rpt_inp_arc
+     JOIN SCHEMA_NAME.inp_flwreg_weir ON rpt_inp_arc.flw_code::text = concat(inp_flwreg_weir.node_id, '_', inp_flwreg_weir.to_arc, '_weir_', inp_flwreg_weir.flwreg_id)
+     JOIN SCHEMA_NAME.inp_typevalue ON inp_flwreg_weir.weir_type::text = inp_typevalue.idval::text
   WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text;
-
   
   
 DROP VIEW IF EXISTS vi_report;
@@ -642,29 +544,29 @@ UNION
   
   
 DROP VIEW vi_timeseries;
-CREATE OR REPLACE VIEW ud_sample.vi_timeseries AS 
+CREATE OR REPLACE VIEW SCHEMA_NAME.vi_timeseries AS 
  SELECT inp_timeseries.timser_id,
     inp_timeseries.date AS other1,
     inp_timeseries.hour AS other2,
     inp_timeseries.value AS other3
-   FROM ud_sample.inp_timeseries
-     JOIN ud_sample.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
+   FROM SCHEMA_NAME.inp_timeseries
+     JOIN SCHEMA_NAME.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
   WHERE inp_timser_id.times_type::text = 'ABSOLUTE'::text
 UNION
  SELECT inp_timeseries.timser_id,
     concat('FILE', ' ', inp_timeseries.fname) AS other1,
     NULL::character varying AS other2,
     NULL::numeric AS other3
-   FROM ud_sample.inp_timeseries
-     JOIN ud_sample.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
+   FROM SCHEMA_NAME.inp_timeseries
+     JOIN SCHEMA_NAME.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
   WHERE inp_timser_id.times_type::text = 'FILE_TIME'::text
 UNION
  SELECT inp_timeseries.timser_id,
     inp_timeseries."time",
     inp_timeseries.value::text,
     NULL::numeric AS other3
-   FROM ud_sample.inp_timeseries
-     JOIN ud_sample.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
+   FROM SCHEMA_NAME.inp_timeseries
+     JOIN SCHEMA_NAME.inp_timser_id ON inp_timeseries.timser_id::text = inp_timser_id.id::text
   WHERE inp_timser_id.times_type::text = 'RELATIVE'::text
   ORDER BY 1, 2;
   
@@ -696,7 +598,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.vi_raingages AS
   WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND rgage_type='FILE_RAIN';
 
   
-  DROP VIEW SCHEMA_NAME.vi_lid_controls;
+DROP VIEW SCHEMA_NAME.vi_lid_controls;
 CREATE OR REPLACE VIEW SCHEMA_NAME.vi_lid_controls AS 
  SELECT inp_lid_control.lidco_id,
     inp_typevalue.idval AS lidco_type,
