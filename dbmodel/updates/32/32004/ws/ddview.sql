@@ -10,8 +10,19 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
--- not used view
-DROP VIEW  vi_title;
+CREATE OR REPLACE VIEW vi_controls AS 
+ SELECT c.text
+   FROM ( SELECT a.id,
+            a.text
+           FROM ( SELECT inp_controls_x_arc.id,
+                    inp_controls_x_arc.text
+                   FROM inp_selector_result,
+                    inp_controls_x_arc
+                     JOIN rpt_inp_arc ON inp_controls_x_arc.arc_id::text = rpt_inp_arc.arc_id::text
+                  WHERE inp_selector_result.result_id::text = rpt_inp_arc.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
+                  ORDER BY inp_controls_x_arc.id) a) c
+  ORDER BY c.id;
+
 
 CREATE OR REPLACE VIEW vi_rules AS 
  SELECT c.text

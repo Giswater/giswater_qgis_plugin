@@ -6,8 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-SET search_path = "ud_sample", public, pg_catalog;
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO inp_evaporation VALUES ('DRY_ONLY','NO');
 

@@ -10,12 +10,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- controls
-INSERT INTO inp_controls_x_node (id, node_id, text) VALUES (1, '113766', 'RULE 1');
-INSERT INTO inp_controls_x_node (id, node_id, text) VALUES (3, '113766', 'THEN PUMP 1105_n2a STATUS IS CLOSED');
-INSERT INTO inp_controls_x_node (id, node_id, text) VALUES (4, '113766', 'RULE 2');
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (6, '113921', 'THEN PUMP 1105_n2a STATUS IS OPEN');
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (2, '113921', 'IF TANK 113766 LEVEL ABOVE 3');
-INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (5, '113921', 'IF TANK 113766 LEVEL BELOW 0.75');
+INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (6, '2005', 'LINK 2005 CLOSED IF 1001 BELOW 4');
+INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (2, '2002', 'LINK 2002 CLOSED IF 1001 ABOVE 3');
 
 
 -- emiteers
@@ -53,7 +49,7 @@ INSERT INTO inp_reactions (descript) VALUES ('GLOBAL WALL -1.0');
 INSERT INTO inp_reactions (descript) VALUES ('LIMITING POTENTIAL 1');
 INSERT INTO inp_reactions (descript) VALUES ('ROUGHNESS CORRELATION 1.8');
 
-UPDATE inp_pipe SET reactiontype='', reactionparam='', reactionvalue='';
+UPDATE inp_pipe SET reactionparam='WALL', reactionvalue='0.3';
 
 
 

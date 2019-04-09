@@ -14,4 +14,4 @@ ADD CONSTRAINT inp_flwreg_weir_check_type CHECK (weir_type::text = ANY (ARRAY['S
 
 ALTER TABLE inp_timser_id DROP CONSTRAINT inp_timser_id_check;
 
-ALTER TABLE inp_rdii ADD CONSTRAINT inp_rdii_hydro_id_fkey FOREIGN KEY (hydro_id) REFERENCES inp_hdyrograph_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE inp_rdii ADD CONSTRAINT inp_rdii_hydro_id_fkey FOREIGN KEY (hydro_id) REFERENCES inp_hydrograph_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

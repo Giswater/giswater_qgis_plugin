@@ -32,6 +32,8 @@ ALTER TABLE inp_pipe ADD COLUMN reactionparam varchar (30);
 ALTER TABLE inp_pipe ADD COLUMN reactionvalue varchar (30);
 
 
+
+
 CREATE TABLE inp_reactions
 ( id serial PRIMARY KEY,
   descript text);
