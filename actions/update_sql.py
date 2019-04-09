@@ -40,6 +40,9 @@ class UpdateSQL(ParentAction):
     def init_sql(self, connection_status=False):
         """ Button 100: Execute SQL. Info show info """
 
+        # Set logger file
+        self.controller.set_logger()
+
         # Check if we have any layer loaded
         layers = self.controller.get_layers()
 
@@ -1080,7 +1083,6 @@ class UpdateSQL(ParentAction):
 
     """ Functions execute process """
 
-
     def execute_import_data(self):
         self.insert_inp_into_db(self.file_inp)
         # Execute import data
@@ -1127,7 +1129,6 @@ class UpdateSQL(ParentAction):
 
 
     """ Buttons calling functions """
-
 
     def create_project_data_schema(self):
 
@@ -1366,7 +1367,7 @@ class UpdateSQL(ParentAction):
         self.error_count = 0
 
 
-    #TODO:Rename this function => Update all versions from changelog file.
+    # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type):
 
         msg = "Are you sure to update the project schema to lastest version?"
@@ -1441,7 +1442,6 @@ class UpdateSQL(ParentAction):
 
     """ Create new connection when change combo connections """
 
-
     def event_change_connection(self):
 
         connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
@@ -1464,11 +1464,11 @@ class UpdateSQL(ParentAction):
                                                credentials['password'])
 
         if not self.logged:
-            self.controller.show_message("Connection Failed. Please, check connection parameters.", 1)
+            msg = "Connection Failed. Please, check connection parameters"
+            self.controller.show_message(msg, 1)
             utils_giswater.dis_enable_dialog(self.dlg_readsql, False, ignore_widgets='cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         'Connection Failed. Please, check connection parameters')
+            utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
         else:
             utils_giswater.dis_enable_dialog(self.dlg_readsql, True)
@@ -1521,7 +1521,6 @@ class UpdateSQL(ParentAction):
 
     """ Other functions """
 
-
     def show_info(self):
 
         # Create dialog
@@ -1538,7 +1537,7 @@ class UpdateSQL(ParentAction):
         if str(self.message_update) == '':
             self.dlg_readsql_show_info.btn_update.setEnabled(False)
 
-        #Set listeners
+        # Set listeners
         self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_show_info))
         self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
 
@@ -1722,7 +1721,6 @@ class UpdateSQL(ParentAction):
             self.reload_fct_ftrg(self.project_type_selected)
             self.set_arrow_cursor()
 
-
         # Show message if precess execute correctly
         if self.error_count == 0:
             self.controller.dao.commit()
@@ -1778,7 +1776,8 @@ class UpdateSQL(ParentAction):
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
 
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
-        #TODO:: do and call listener for buton + table -> temp_csv2pg
+
+        # TODO: do and call listener for buton + table -> temp_csv2pg
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
         if self.dev_user != 'TRUE':
@@ -1820,7 +1819,6 @@ class UpdateSQL(ParentAction):
             self.cmb_locale.addItem(locale)
             if locale == 'EN':
                 utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
-
 
         # Get connection ddb name
         connection_name = str(utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_connection))
@@ -1913,11 +1911,13 @@ class UpdateSQL(ParentAction):
 
         except Exception as e:
             self.error_count = self.error_count + 1
-            self.controller.log_info(str("Error to execute"))
+            self.controller.log_info(str("Error to execute: " + str(e)))
             self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
             if self.dev_commit == 'TRUE':
                 self.controller.dao.rollback()
-            return False
+            status = False
+        finally:
+            return status
 
 
     def readFiles(self, filelist, filedir):
@@ -1932,7 +1932,9 @@ class UpdateSQL(ParentAction):
                 else:
                     return False
             except Exception as e:
+                self.controller.log_warning("Error readFiles: " + str(e))
                 return False
+
         return True
 
 
@@ -1963,6 +1965,7 @@ class UpdateSQL(ParentAction):
 
 
     def insert_inp_into_db(self, folder_path=None):
+        
         _file = open(folder_path, "r+")
         full_file = _file.readlines()
         sql = ""
@@ -2035,6 +2038,7 @@ class UpdateSQL(ParentAction):
         message = self.controller.tr("Select INP file")
         file_inp = QFileDialog.getOpenFileName(None, message, "", '*.inp')
         self.dlg_readsql_create_project.data_file.setText(file_inp)
+
 
     """ Info basic """
     def info_show_info(self):

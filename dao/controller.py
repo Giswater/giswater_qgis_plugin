@@ -72,13 +72,16 @@ class DaoController(object):
         self.plugin_dir = plugin_dir
         
         
-    def set_logger(self, logger_name):
+    def set_logger(self, logger_name=None):
         """ Set logger class """
-        
-        log_level = int(self.settings.value('status/log_level')) 
-        log_suffix = self.settings.value('status/log_suffix') 
-        self.logger = Logger(self, logger_name, log_level, log_suffix)   
-        self.log_info("Logger initialized")   
+
+        if self.logger is None:
+            if logger_name is None:
+                logger_name = self.plugin_name
+            log_level = int(self.settings.value('status/log_level'))
+            log_suffix = self.settings.value('status/log_suffix')
+            self.logger = Logger(self, logger_name, log_level, log_suffix)
+            self.log_info("Logger initialized")
         
                 
     def close_logger(self):
