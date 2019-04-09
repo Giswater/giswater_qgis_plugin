@@ -78,7 +78,7 @@ BEGIN
 
 -- Map zones
 	-- Make geometry column
-	v_the_geom:= ST_SetSRID(ST_MakePoint(p_x, p_y),(SELECT ST_srid (the_geom) FROM sector limit 1));
+	v_the_geom:= ST_SetSRID(ST_MakePoint(p_x, p_y),(SELECT epsg FROM version limit 1));
 
 	-- Sector ID
 	v_sector_id := (SELECT "value"::integer FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
