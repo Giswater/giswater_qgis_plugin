@@ -469,6 +469,7 @@ class Go2Epa(ApiParent):
         for row in full_file:
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
+            row = row.rstrip()
             dirty_list = row.split(' ')
             for x in range(len(dirty_list) - 1, -1, -1):
                 if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
