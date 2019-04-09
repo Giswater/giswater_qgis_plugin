@@ -17,15 +17,11 @@ BEGIN
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
--- Upsert on rpt_cat_table
-    DELETE FROM rpt_cat_result WHERE result_id=result_id_var;
-    INSERT INTO rpt_cat_result (result_id) VALUES (result_id_var);
+-- Delete previous results on rpt_inp_node & arc tables
+   DELETE FROM rpt_inp_node WHERE result_id=result_id_var;
+   DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
 	
--- Upsert on node rpt_inp result manager table
-     DELETE FROM inp_selector_result WHERE cur_user=current_user;
-     INSERT INTO inp_selector_result (result_id, cur_user) VALUES (result_id_var, current_user);
-	
--- Upsert on node rpt_inp table
+-- Insert on node rpt_inp table
 	INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, expl_id, y0, ysur, apond, the_geom)
 	SELECT 
 	result_id_var,
@@ -65,7 +61,7 @@ BEGIN
 
 
 
--- Upsert on arc rpt_inp table
+-- Insert on arc rpt_inp table
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, expl_id, the_geom)
 	SELECT
 	result_id_var,
