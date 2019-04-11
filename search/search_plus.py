@@ -618,7 +618,11 @@ class SearchPlus(QObject):
             self.dlg_search.tab_main.removeTab(2)
         else:
             # Get project variable 'expl_id'
-            expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl))
+            if Qgis.QGIS_VERSION_INT < 29900:
+                expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl))
+            else:
+                project = QgsProject.instance()
+                expl_id = QgsExpressionContextUtils.projectScope(project).variable(str(self.street_field_expl))
             if expl_id:
                 # Set SQL to get 'expl_name'
                 sql = ("SELECT " + self.params['expl_field_name'] + ""
@@ -925,7 +929,7 @@ class SearchPlus(QObject):
         if 'network_layer_node' in self.layers:
             self.dlg_search.network_geom_type.addItem(self.controller.tr('Node'))
 
-        return self.dlg_search.network_geom_type > 0
+        return self.dlg_search.network_geom_type.count() > 0
 
 
     def expl_name_changed(self):
@@ -987,7 +991,8 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        for value in self.feature_cat.itervalues():
+        #for value in self.feature_cat.itervalues():
+        for key, value in self.feature_cat.items():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
@@ -1015,8 +1020,12 @@ class SearchPlus(QObject):
         # Get features
         layer = self.layers[layername]
         records = [(-1, '', '')]
-        idx_field_code = layer.fieldNameIndex(self.params[field_code])
-        idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        if Qgis.QGIS_VERSION_INT < 29900:
+            idx_field_code = layer.fieldNameIndex(self.params[field_code])
+            idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        else:
+            idx_field_code = layer.fields().indexFromName(self.params[field_code])
+            idx_field_name = layer.fields().indexFromName(self.params[field_name])
 
         it = layer.getFeatures()
 
@@ -1043,7 +1052,10 @@ class SearchPlus(QObject):
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
             if value_code is not None and geom is not None:
-                elem = [value_code, value_name, geom.exportToWkt()]
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    elem = [value_code, value_name, geom.exportToWkt()]
+                else:
+                    elem = [value_code, value_name, geom.asWkt()]
             else:
                 elem = [value_code, value_name, None]
             records.append(elem)
@@ -1090,8 +1102,12 @@ class SearchPlus(QObject):
 
             # Set filter expression
         layer = self.layers['portal_layer']
-        idx_field_code = layer.fieldNameIndex(field_code)
-        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        if Qgis.QGIS_VERSION_INT < 29900:
+            idx_field_code = layer.fieldNameIndex(field_code)
+            idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        else:
+            idx_field_code = layer.fields().indexFromName(field_code)
+            idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
         expr_filter = field_code + "  = '" + str(code) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
@@ -1206,7 +1222,10 @@ class SearchPlus(QObject):
         # Fields management
         layer = self.layers[parameter]
         records = []
-        idx_field = layer.fieldNameIndex(fieldname)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            idx_field = layer.fieldNameIndex(fieldname)
+        else:
+            idx_field = layer.fields().indexFromName(fieldname)
         if idx_field == -1:
             message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)
             self.controller.show_warning(message)
