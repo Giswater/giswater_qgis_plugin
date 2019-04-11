@@ -284,7 +284,7 @@ class Utils(ParentAction):
             self.controller.plugin_settings_value('Csv2Pg_txt_file_csv_' + cur_user))
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list,
             self.controller.plugin_settings_value('Csv2Pg_cmb_unicode_list_' + cur_user))
-        if self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user).title() == 'True':
+        if str(self.controller.plugin_settings_value('Csv2Pg_rb_comma_' + cur_user)).upper() == 'TRUE':
             self.dlg_csv.rb_comma.setChecked(True)
         else:
             self.dlg_csv.rb_semicolon.setChecked(True)
@@ -362,14 +362,26 @@ class Utils(ParentAction):
         dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
 
         try:
-            with open(path, "rb") as file_input:
-                rows = csv.reader(file_input, delimiter=delimiter)
-                for row in rows:
-                    unicode_row = [x.decode(str(_unicode)) for x in row]
-                    items = [QStandardItem(field)for field in unicode_row]
-                    model.appendRow(items)
+            if Qgis.QGIS_VERSION_INT < 29900:
+                with open(path, "r") as file_input:
+                    self.read_csv_file(model, file_input, delimiter, _unicode)
+            else:
+                with open(path, "r", encoding=_unicode) as file_input:
+                    self.read_csv_file(model, file_input, delimiter, _unicode)
+
         except Exception as e:
             self.controller.show_warning(str(e))
+
+
+    def read_csv_file(self, model, file_input, delimiter, _unicode):
+        rows = csv.reader(file_input, delimiter=delimiter)
+        for row in rows:
+            if Qgis.QGIS_VERSION_INT < 29900:
+                unicode_row = [x.decode(str(_unicode)) for x in row]
+            else:
+                unicode_row = [x for x in row]
+            items = [QStandardItem(field) for field in unicode_row]
+            model.appendRow(items)
 
 
     def delete_table_csv(self, temp_tablename, csv2pgcat_id_aux):
@@ -391,54 +403,18 @@ class Utils(ParentAction):
         label_aux = utils_giswater.getWidgetText(dialog, dialog.txt_import)
         delimiter = self.get_delimiter(dialog)
         _unicode = utils_giswater.getWidgetText(dialog, dialog.cmb_unicode_list)
-        cabecera = True
-        fields = "csv2pgcat_id, "
-        progress = 0
-        dialog.progressBar.setVisible(True)
-        dialog.progressBar.setValue(progress)
-
         try:
-            with open(path, 'rb') as csvfile:
-                # counts rows in csvfile, using var "row_count" to do progresbar
-                row_count = sum(1 for rows in csvfile)  #@UnusedVariable
-                if row_count > 20:
-                    row_count -= 20
-                dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress
-                csvfile.seek(0)  # Position the cursor at position 0 of the file
-                reader = csv.reader(csvfile, delimiter=delimiter)
-                for row in reader:
-                    values = "'" + str(csv2pgcat_id_aux)+"', '"
-                    progress += 1
-
-                    for x in range(0, len(row)):
-                        row[x] = row[x].replace("'", "''")
-                    if cabecera:
-                        for x in range(1, len(row)+1):
-                            fields += 'csv' + str(x)+", "
-                        cabecera = False
-                        fields = fields[:-2]
-                    else:
-                        for value in row:
-                            if len(value) != 0:
-                                values += str(value.decode(str(_unicode))) + "', '"
-                            else:
-                                values = values[:-1]
-                                values += "null, '"
-                        values = values[:-3]
-                        sql = ("INSERT INTO " + self.controller.schema_name + "." + temp_tablename + " ("
-                               + str(fields) + ") VALUES (" + str(values) + ")")
-
-                        status = self.controller.execute_sql(sql)
-                        if not status:
-                            return
-                        dialog.progressBar.setValue(progress)
-
+            if Qgis.QGIS_VERSION_INT < 29900:
+                with open(path, 'r') as csvfile:
+                    self.insert_into_db(dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename)
+            else:
+                with open(path, 'r', encoding=_unicode) as csvfile:
+                    self.insert_into_db(dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename)
         except Exception as e:
             self.controller.show_warning(str(e))
             return
 
-        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg("
-               + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
+        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg(" + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
         status = self.controller.execute_sql(sql, log_sql=False)
         self.save_settings_values()
         if status:
@@ -448,6 +424,50 @@ class Utils(ParentAction):
         else:
             message = "Import failed"
             self.controller.show_info_box(message)
+
+
+    def insert_into_db(self, dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename):
+        cabecera = True
+        fields = "csv2pgcat_id, "
+        progress = 0
+        dialog.progressBar.setVisible(True)
+        dialog.progressBar.setValue(progress)
+        # counts rows in csvfile, using var "row_count" to do progresbar
+        row_count = sum(1 for rows in csvfile)  # @UnusedVariable
+        if row_count > 20:
+            row_count -= 20
+        dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress
+        csvfile.seek(0)  # Position the cursor at position 0 of the file
+        reader = csv.reader(csvfile, delimiter=delimiter)
+        for row in reader:
+            values = "'" + str(csv2pgcat_id_aux) + "', '"
+            progress += 1
+
+            for x in range(0, len(row)):
+                row[x] = row[x].replace("'", "''")
+            if cabecera:
+                for x in range(1, len(row) + 1):
+                    fields += 'csv' + str(x) + ", "
+                cabecera = False
+                fields = fields[:-2]
+            else:
+                for value in row:
+                    if len(value) != 0:
+                        if Qgis.QGIS_VERSION_INT < 29900:
+                            values += str(value.decode(str(_unicode))) + "', '"
+                        else:
+                            values += str(value) + "', '"
+                    else:
+                        values = values[:-1]
+                        values += "null, '"
+                values = values[:-3]
+                sql = ("INSERT INTO " + self.controller.schema_name + "." + temp_tablename + " ("
+                       + str(fields) + ") VALUES (" + str(values) + ")")
+
+                status = self.controller.execute_sql(sql)
+                if not status:
+                    return
+                dialog.progressBar.setValue(progress)
 
 
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
