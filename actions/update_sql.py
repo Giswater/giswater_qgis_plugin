@@ -1087,7 +1087,9 @@ class UpdateSQL(ParentAction):
         self.insert_inp_into_db(self.file_inp)
         # Execute import data
         sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
-        self.controller.execute_sql(sql, commit=False)
+        status = self.controller.execute_sql(sql, commit=False)
+        if status is False:
+            self.error_count = self.error_count + 1
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
@@ -1259,6 +1261,7 @@ class UpdateSQL(ParentAction):
             msg = "The project has been created correctly."
             self.controller.show_info_box(msg, "Info")
             self.close_dialog(self.dlg_readsql_create_project)
+
         else:
             self.controller.dao.rollback()
             msg = "Some errors has occurred. Process has not been executed."
