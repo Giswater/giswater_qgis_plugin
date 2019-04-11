@@ -43,3 +43,9 @@ UPDATE audit_cat_table SET isdeprecated = true WHERE id='inp_reactions_el';
 
 INSERT INTO audit_cat_table VALUES ('inp_energy') ;
 INSERT INTO audit_cat_table VALUES ('inp_reactions') ;
+
+
+--modify inp_typevalue for inp_reactions
+INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_value_reactions', 'BULK', 'BULK');
+INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_value_reactions', 'WALL', 'WALL');
+INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_value_reactions', 'TANK', 'TANK');

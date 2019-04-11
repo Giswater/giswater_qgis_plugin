@@ -84,7 +84,7 @@ CREATE OR REPLACE VIEW vi_reactions AS
 	inp_pipe.reactionvalue
 	FROM inp_selector_result, inp_pipe
 	JOIN rpt_inp_arc ON inp_pipe.arc_id::text = rpt_inp_arc.arc_id::text
-	LEFT JOIN inp_typevalue ON inp_pipe.reactionparam::text = inp_typevalue.id::text AND inp_typevalue.typevalue::text = 'inp_value_reactions_el'::text
+	LEFT JOIN inp_typevalue ON inp_pipe.reactionparam::text = inp_typevalue.id::text AND inp_typevalue.typevalue::text = 'inp_value_reactions'::text
 	WHERE rpt_inp_arc.result_id::text = inp_selector_result.result_id::text AND inp_selector_result.cur_user = "current_user"()::text
 UNION
  SELECT descript, null as value, null as value2
