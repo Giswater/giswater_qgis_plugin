@@ -1,19 +1,17 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:2522
-  
+--FUNCTION CODE:XXXX
+
+-- Function: SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(text)
+
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(text);
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
   RETURNS integer AS
-
-/*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp('D:\dades\test.inp')
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(NULL)
-*/
-
 $BODY$
 	DECLARE
 	rpt_rec record;
@@ -53,12 +51,14 @@ $BODY$
 	v_node1 text;
 	v_node2 text;
 	v_elevation float;
-	v_arc2node_reverse boolean = true; -- MOST IMPORTANT variable of this function. When true importation will be used making and arc2node reverse transformation for pumps and valves. Only works using Giswater sintaxis of additional pumps
+	v_arc2node_reverse boolean = TRUE; -- MOST IMPORTANT variable of this function. When true importation will be used making and arc2node reverse transformation for pumps and valves. Only works using Giswater sintaxis of additional pumps
 	v_delete_prev boolean = true; -- used on dev mode to
 	v_querytext text;
 	v_nodecat text;
 	i integer=1;
 	v_arc_id text;
+	v_rules_aux text;
+	
 	
 BEGIN
 
@@ -161,16 +161,6 @@ BEGIN
 	-- Harmonize the source table
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
-		-- massive refactor of source field (getting target)
-		IF rpt_rec.csv1 LIKE '[%' THEN
-			v_target=rpt_rec.csv1;
-		END IF;
-		
-		UPDATE temp_csv2pg SET source=v_target WHERE rpt_rec.id=temp_csv2pg.id;
-	END LOOP;
-
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
-	LOOP
 		-- refactor of [OPTIONS] target
 		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'specific' THEN 
 			UPDATE temp_csv2pg SET csv1='SPECIFIC GRAVITY', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
@@ -196,11 +186,7 @@ BEGIN
 			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3), csv2=csv4, csv3=null,  csv4=null WHERE temp_csv2pg.id=rpt_rec.id;
 		ELSIF rpt_rec.source ilike '[ENERGY]%' AND (lower(rpt_rec.csv1) ILIKE 'global' OR  lower(rpt_rec.csv1) ILIKE 'demand') THEN UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2), csv2=csv3, csv3=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
 
-		-- refactor of [RULES] target
-		IF rpt_rec.source ='[RULES]' and rpt_rec.csv2 IS NOT NULL THEN 
-			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ), 
-			csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-
+	
 		-- refactor of [CONTROLS] target
 		IF rpt_rec.source ='[CONTROLS]'and rpt_rec.csv2 IS NOT NULL THEN 
 			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ), 
@@ -319,16 +305,11 @@ BEGIN
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 		LOOP	
-			IF v_rec_view.rid=1 and v_rec_table.fields not LIKE 'concat%'THEN
+
+			IF v_rec_view.rid=1 THEN
+				--insert of fields which are concatenation 
 				v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);
 				
-			ELSIF v_rec_view.rid=1 and v_rec_table.fields LIKE 'concat%'  then
-				--insert of fields which are concatenation in first field
-				v_query_fields = concat (split_part(v_rec_table.fields,';'::text,v_rec_view.rid::integer),'::',v_rec_view.data_type);
-				
-			ELSIF v_rec_table.fields LIKE '%concat%' THEN
-				--insert of fields which are concatenation 
-				v_query_fields = concat (v_query_fields,', ',split_part(v_rec_table.fields,';'::text,v_rec_view.rid::integer),'::',v_rec_view.data_type);
 			ELSE
 				v_query_fields = concat (v_query_fields,' , csv',v_rec_view.rid,'::',v_rec_view.data_type);
 				
@@ -382,8 +363,8 @@ BEGIN
 			EXECUTE 'INSERT INTO '||v_mantablename||' VALUES ('||quote_literal(v_node_id)||')';
 
 			IF v_epatablename = 'inp_pump' THEN
-				INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status)
-				SELECT v_node_id, power, curve_id, speed, pattern, status FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
+				INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern, status,energyparam, energyvalue)
+				SELECT v_node_id, power, curve_id, speed, pattern, status, energyparam, energyvalue FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 				DELETE FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 
 			ELSIF v_epatablename = 'inp_valve' THEN
@@ -496,4 +477,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

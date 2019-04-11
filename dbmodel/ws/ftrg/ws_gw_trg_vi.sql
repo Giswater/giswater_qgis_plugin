@@ -11,6 +11,8 @@ DECLARE
   geom_array public.geometry array;
   v_point_geom public.geometry;
   rec_arc record;
+
+  
 BEGIN
 
     --Get schema name
@@ -59,9 +61,9 @@ BEGIN
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
 	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAPUMP-CAT','PUMP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    IF NEW.power ='POWER' THEN
-		NEW.power=NEW.head;
+			NEW.power=NEW.head;
 	    ELSIF NEW.power ='HEAD' THEN
-		NEW.power=NULL;	   
+			NEW.power=NULL;	   
 	    END IF;
 	    
 	    INSERT INTO inp_pump_importinp (arc_id,power,curve_id,speed,pattern)
@@ -86,8 +88,8 @@ BEGIN
 	  ELSIF v_view='vi_tags' THEN 
 	    INSERT INTO inp_tags(object, node_id, tag) VALUES (NEW.object, NEW.node_id, NEW.tag);
 	    
-	  ELSIF v_view='vi_demand' THEN 
-	    INSERT INTO inp_demand(node_id, demand, pattern_id, deman_type) VALUES (NEW.node_id, NEW.demand, NEW.pattern_id, NEW.deman_type);
+	  ELSIF v_view='vi_demands' THEN 
+	    INSERT INTO inp_demand (node_id, demand, pattern_id, deman_type) VALUES (NEW.node_id, NEW.demand, NEW.pattern_id, NEW.deman_type);
 	      
 	  ELSIF v_view='vi_status' THEN
 	    IF NEW.arc_id IN (SELECT arc_id FROM inp_pump_importinp) THEN
@@ -109,19 +111,15 @@ BEGIN
 	    INSERT INTO inp_curve(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
 	    
 	  ELSIF v_view='vi_controls' THEN 
-	    IF split_part(NEW.text,' ',2) in (select arc_id from arc) then
+	    IF split_part(NEW.text,' ',2) in (select arc_id from inp_pipe) then
 	      INSERT INTO inp_controls_x_arc (arc_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
-	    ELSIF split_part(NEW.text,' ',2) in (select node_id from node) then
-	      INSERT INTO inp_controls_x_node (node_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
+	    ELSE
+	      INSERT INTO inp_rules_controls_importinp (feature_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
 	    END IF;
 	    
 	  ELSIF v_view='vi_rules' THEN  
-	    IF split_part(NEW.text,' ',2) in (select arc_id from arc) then
-	      INSERT INTO inp_rules_x_arc (arc_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
-	    ELSIF split_part(NEW.text,' ',2) in (select node_id from node) then
-	      INSERT INTO inp_rules_x_node (node_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
-	    END IF;
-	    
+		INSERT INTO inp_rules_controls_importinp (text) VALUES (NEW.text);
+
 	  ELSIF v_view='vi_emitters' THEN
 	    INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);
 	    
@@ -132,32 +130,21 @@ BEGIN
 	    INSERT INTO inp_source(node_id, sourc_type, quality, pattern_id) VALUES (NEW.node_id, NEW.sourc_type, NEW.quality, NEW.pattern_id);
 	    
 	  ELSIF v_view='vi_reactions' THEN
-	    IF NEW.parameter IS NOT NULL THEN
-	      IF NEW.parameter IN (SELECT arc_id FROM arc) THEN
-		INSERT INTO inp_reactions_el (parameter, arc_id,value) SELECT inp_typevalue.id,NEW.parameter,NEW.value
-		FROM inp_typevalue WHERE upper(NEW.react_type)=idval AND typevalue='inp_value_reactions_el';
-	      ELSE 
-		IF NEW.react_type='LIMITING' OR NEW.react_type='ROUGHNESS' THEN
-		  INSERT INTO inp_reactions_gl (react_type,value) VALUES (concat(NEW.react_type,' ',NEW.parameter),NEW.value);
-		ELSE
-		  INSERT INTO inp_reactions_gl (react_type,parameter,value) VALUES (
-		  (SELECT inp_typevalue.id FROM inp_typevalue WHERE upper(NEW.react_type)=idval AND typevalue='inp_typevalue_reactions_gl'),
-		  (select inp_typevalue.id FROM inp_typevalue WHERE upper(NEW.parameter)=idval AND typevalue='inp_value_reactions_gl'), NEW.value);
-		END IF;
-	      END IF;
-	    END IF;
-	    
+
+	  	IF NEW.arc_id IN (SELECT arc_id FROM inp_pipe) THEN
+	  		UPDATE inp_pipe SET reactionparam = NEW.idval, reactionvalue = NEW.reactionvalue WHERE arc_id=NEW.arc_id;
+	  	ELSE 
+	  		INSERT INTO inp_reactions (descript) VALUES (concat(NEW.idval,' ', NEW.arc_id,' ',NEW.reactionvalue));
+	  	END IF;
+
 	  ELSIF v_view='vi_energy' THEN
-	      IF NEW.parameter ilike 'GLOBAL%' THEN
-		INSERT INTO inp_energy_gl(energ_type,parameter, value)
-		select split_part(NEW.parameter,' ',1),inp_typevalue.id,NEW.value 
-		FROM inp_typevalue WHERE upper(split_part(NEW.parameter,' ',2))=idval AND typevalue='inp_value_param_energy';
-	      ELSIF NEW.parameter ilike 'DEMAND CHARGE' THEN
-		INSERT INTO inp_energy_gl(energ_type, value) VALUES ('DEMAND CHARGE',NEW.value);
-	      ELSIF NEW.parameter ilike '%PUMP%' THEN
-		INSERT INTO inp_energy_el(pump_id,parameter, value) VALUES (split_part(NEW.parameter,' ',2),split_part(NEW.parameter,' ',3),NEW.value);
-	      END IF;
-	      
+	  	IF NEW.pump_id ilike 'PUMP%' THEN
+	  		UPDATE inp_pump_importinp SET energyparam = NEW.idval , energyvalue = NEW.energyvalue 
+	  		WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
+	  	ELSE
+	  		INSERT INTO inp_energy(descript) select concat(NEW.pump_id, ' ',NEW.idval); 
+	  	END IF;
+
 	  ELSIF v_view='vi_mixing' THEN
 	    INSERT INTO inp_mixing(node_id, mix_type, value) VALUES (NEW.node_id, NEW.mix_type, NEW.value);
 	    
@@ -186,14 +173,8 @@ BEGIN
 	  RETURN NEW; 	
     END IF;
 
-    
-
  
-
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-
