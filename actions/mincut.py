@@ -115,18 +115,18 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_mincut.btn_end.clicked.connect(self.real_end)
 
         # Fill ComboBox type
-        sql = ("SELECT id"
+        sql = ("SELECT id, descript"
                " FROM " + self.schema_name + ".anl_mincut_cat_type"
                " ORDER BY id;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_mincut, "type", rows, False)
+        utils_giswater.set_item_data(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
-        sql = ("SELECT id"
+        sql = ("SELECT id, descript"
                " FROM " + self.schema_name + ".anl_mincut_cat_cause"
                " ORDER BY id;")
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_mincut, "cause", rows, False)
+        utils_giswater.set_item_data(self.dlg_mincut.cause, rows, 1)
 
         # Fill ComboBox assigned_to and exec_user
         sql = ("SELECT id, name"
@@ -360,8 +360,8 @@ class MincutParent(ParentAction, MultipleSelection):
         address_street = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_street)
         address_number = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_number)
 
-        mincut_result_type = self.dlg_mincut.type.currentText()
-        anl_cause = self.dlg_mincut.cause.currentText()
+        mincut_result_type = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.type, 0)
+        anl_cause = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.cause, 0)
         work_order = self.work_order.text()
 
         anl_descript = utils_giswater.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
@@ -1681,8 +1681,8 @@ class MincutParent(ParentAction, MultipleSelection):
             return
               
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.type, row['mincut_type'])
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.cause, row['anl_cause'])
+        utils_giswater.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
+        utils_giswater.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, row['state_name'])
         
         # Manage location
