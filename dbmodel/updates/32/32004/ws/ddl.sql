@@ -41,3 +41,9 @@ CREATE TABLE inp_reactions
 CREATE TABLE inp_energy 
 (id serial PRIMARY KEY,
   descript text);
+
+CREATE TABLE inp_rules_controls_importinp
+( id serial NOT NULL PRIMARY KEY,
+feature_id varchar(16),
+text text);
+  

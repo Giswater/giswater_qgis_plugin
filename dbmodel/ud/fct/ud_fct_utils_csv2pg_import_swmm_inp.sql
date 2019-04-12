@@ -103,7 +103,7 @@ BEGIN
 	
 		DELETE FROM config_param_user ;
 
-		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id='role_epa' AND id NOT LIKE 'v%') or id like 'inp_%'
+		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id='role_epa' AND id NOT LIKE 'v%') and  id not like 'inp_%'
 		LOOP 
 			RAISE NOTICE 'v_id %', v_id;
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);
@@ -239,6 +239,7 @@ BEGIN
 
 	--cat_mat_node 
 	INSERT INTO cat_mat_node VALUES ('EPAMAT');
+	INSERT INTO cat_mat_arc VALUES ('EPAMAT');
 	
 	--cat_node
 	INSERT INTO cat_node VALUES ('EPAMANH-CAT', 'EPAMAT');
