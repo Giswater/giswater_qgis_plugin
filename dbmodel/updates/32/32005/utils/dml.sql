@@ -8,6 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2018/04/13
-INSERT INTO audit_cat_function VALUES (2619, 'gw_fct_api_getprint', 'utils', 'api function', NULL, NULL, NULL, 'Get print form', 'role_basic', false, false, NULL, false);
-INSERT INTO audit_cat_function VALUES (2621, 'gw_fct_api_setprint', 'utils', 'api function', NULL, NULL, NULL, 'Set print form', 'role_basic', false, false, NULL, false);
+-- 3.1.112
+INSERT INTO audit_cat_function VALUES (2619, 'gw_fct_api_getprint', 'utils', 'api function', NULL, NULL, NULL, 'Get print form', 'role_basic', false, false, NULL, false) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_function VALUES (2621, 'gw_fct_api_setprint', 'utils', 'api function', NULL, NULL, NULL, 'Set print form', 'role_basic', false, false, NULL, false) ON CONFLICT (id) DO NOTHING;

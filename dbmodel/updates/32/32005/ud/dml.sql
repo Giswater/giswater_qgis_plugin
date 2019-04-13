@@ -4,7 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- 2019/04/01
+-- 3.1.111
+
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript) 
 VALUES ('inp_subc_seq_id_prefix', 'C', 'text', 'epa', NULL);

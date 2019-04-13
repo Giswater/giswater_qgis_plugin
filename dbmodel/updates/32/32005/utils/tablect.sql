@@ -7,6 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+-- 3.1.111 & 3.1.112
+
 --DROP
 ALTER TABLE cat_feature DROP CONSTRAINT IF EXISTS cat_feature_feature_type_fkey;
 ALTER TABLE cat_feature DROP CONSTRAINT IF EXISTS cat_feature_system_id_fkey;

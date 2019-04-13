@@ -6,5 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- 3.1.112
 UPDATE anl_mincut_cat_cause SET descript=id WHERE descript IS NULL;
 UPDATE anl_mincut_cat_type SET descript=id WHERE descript IS NULL;

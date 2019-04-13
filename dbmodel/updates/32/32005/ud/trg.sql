@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+-- 3.1.112
 DROP TRIGGER IF EXISTS gw_trg_ui_element ON SCHEMA_NAME.v_ui_element_x_gully;
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.v_ui_element_x_gully
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_ui_element('element_x_gully');
