@@ -66,6 +66,8 @@ DECLARE
 	end_aux text;
 	distance_init_aux double precision;
 	distance_end_aux double precision;
+
+	v_count integer;
 	
 	
 BEGIN
@@ -306,9 +308,12 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
 	
 		IF OLD.exit_type='VNODE' THEN
-			SELECT count (*) INTO count_int FROM vnode WHERE vnode_id::text=OLD.exit_id;
-			IF count_int = 1 THEN	
-				DELETE FROM vnode WHERE vnode_id::text=OLD.exit_id;
+
+			-- delete vnode if no more links are related to vnode
+			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=OLD.exit_id;
+						
+			IF v_count < 2 THEN -- only 1 link or cero exists
+				DELETE FROM vnode WHERE  vnode_id::text=OLD.exit_id;
 			END IF;
 		END IF;
 		

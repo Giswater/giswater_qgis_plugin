@@ -317,15 +317,18 @@ BEGIN
 	
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
-       	-- delete links & vnode's
+	-- delete links & vnode's
 	FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
 	LOOP
+		-- delete link
 		DELETE FROM link WHERE link_id=v_record_link.link_id;
-		
-		FOR v_record_vnode IN SELECT * FROM vnode WHERE vnode_id=v_record_link.exit_id::integer
-		LOOP
-			DELETE FROM vnode WHERE vnode_id=v_record_vnode.vnode_id;
-		END LOOP;
+
+		-- delete vnode if no more links are related to vnode
+		SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
+						
+		IF v_count =0 THEN 
+			DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
+		END IF;
 	END LOOP;
 
         RETURN NULL;
