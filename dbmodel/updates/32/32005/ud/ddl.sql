@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 3.1.111
 
-CREATE SEQUENCE subcatchment_subc_id_seq
+CREATE SEQUENCE IF NOT EXISTS subcatchment_subc_id_seq
   INCREMENT 1
   no MINVALUE 
   no MAXVALUE
