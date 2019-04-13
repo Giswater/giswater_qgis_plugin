@@ -8,4 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 3.1.112
+ALTER TABLE anl_mincut_cat_state DROP CONSTRAINT IF EXISTS anl_mincut_cat_state_check CASCADE;
 ALTER TABLE anl_mincut_cat_state ADD CONSTRAINT anl_mincut_cat_state_check CHECK (id = ANY (ARRAY[0, 1, 2, 3]));

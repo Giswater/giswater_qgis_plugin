@@ -13,7 +13,7 @@ DROP TRIGGER IF EXISTS gw_trg_ui_element ON SCHEMA_NAME.v_ui_element_x_arc;
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.v_ui_element_x_arc
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_ui_element('element_x_arc');
   
-DROP TRIGGER IF EXISTS gw_trg_ui_element ON SCHEMA_NAME.v_ui_element_x_node;
+DROP TRIGGER EXISTS gw_trg_ui_element ON SCHEMA_NAME.v_ui_element_x_node;
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.v_ui_element_x_node
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_ui_element('element_x_node');
 
