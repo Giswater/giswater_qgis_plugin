@@ -88,17 +88,17 @@ BEGIN
 
 		IF arc_id_aux IS NOT NULL THEN
 			-- arc founded using 5 meter tolerance
-			new_arc_id_aux = (SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(vnode_geom, the_geom, 5)
+			new_arc_id_aux = (SELECT arc_id FROM v_edit_arc WHERE v_edit_arc.state=1 AND ST_DWithin(vnode_geom, the_geom, 5)
 			   	     ORDER BY ST_Distance(vnode_geom, the_geom) LIMIT 1);
 			   	     
 			IF new_arc_id_aux IS NOT NULL THEN
 
 				-- update vnode_geom using 5 meter tolerance
-				aux_geom := ST_ShortestLine(connect_geom, (SELECT the_geom FROM v_edit_arc WHERE arc_id=new_arc_id_aux));
+				aux_geom := ST_ShortestLine(connect_geom, (SELECT the_geom FROM v_edit_arc WHERE v_edit_arc.state=1 AND arc_id=new_arc_id_aux));
 				vnode_geom := ST_EndPoint(aux_geom);
 			ELSE 
 				-- update vnode_geom using userdefined arc_id
-				aux_geom := ST_ShortestLine(connect_geom, (SELECT the_geom FROM v_edit_arc WHERE arc_id=arc_id_aux));
+				aux_geom := ST_ShortestLine(connect_geom, (SELECT the_geom FROM v_edit_arc WHERE v_edit_arc.state=1 AND arc_id=arc_id_aux));
 				vnode_geom := ST_EndPoint(aux_geom);			
 			END IF;
 
@@ -107,11 +107,11 @@ BEGIN
 		ELSE 
 			-- arc founded as inifity buffer from vnode 
 			WITH index_query AS(
-			SELECT ST_Distance(the_geom, vnode_geom) as d, arc_id FROM v_edit_arc ORDER BY the_geom <-> connect_geom LIMIT 10)
+			SELECT ST_Distance(the_geom, vnode_geom) as d, arc_id FROM v_edit_arc WHERE v_edit_arc.state=1 ORDER BY the_geom <-> connect_geom LIMIT 10)
 			SELECT arc_id INTO arc_id_aux FROM index_query ORDER BY d limit 1;
 			
 			-- update vnode_geom using inifity buffer from vnode
-			aux_geom := ST_ShortestLine(vnode_geom, (SELECT the_geom FROM v_edit_arc WHERE arc_id=arc_id_aux));
+			aux_geom := ST_ShortestLine(vnode_geom, (SELECT the_geom FROM v_edit_arc WHERE v_edit_arc.state=1 AND arc_id=arc_id_aux));
 			vnode_geom := ST_EndPoint(aux_geom);
 			
 		END IF;
@@ -125,7 +125,7 @@ BEGIN
 		-- Improved version for curved lines (not perfect!)
 		WITH index_query AS
 		(
-			SELECT ST_Distance(the_geom, connect_geom) as d, arc_id FROM v_edit_arc ORDER BY the_geom <-> connect_geom LIMIT 10
+			SELECT ST_Distance(the_geom, connect_geom) as d, arc_id FROM v_edit_arc WHERE v_edit_arc.state=1 ORDER BY the_geom <-> connect_geom LIMIT 10
 		)
 		SELECT arc_id INTO arc_id_aux FROM index_query ORDER BY d limit 1;
 	ELSE
@@ -135,7 +135,7 @@ BEGIN
 	END IF;
 
 	-- Get v_edit_arc geometry
-	SELECT * INTO arcrec FROM v_edit_arc WHERE arc_id = arc_id_aux;
+	SELECT * INTO arcrec FROM v_edit_arc WHERE v_edit_arc.state=1  AND arc_id = arc_id_aux;
 
 	-- Compute link
 	IF arcrec.the_geom IS NOT NULL THEN
