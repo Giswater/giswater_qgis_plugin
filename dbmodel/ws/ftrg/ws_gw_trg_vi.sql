@@ -114,11 +114,11 @@ BEGIN
 	    IF split_part(NEW.text,' ',2) in (select arc_id from inp_pipe) then
 	      INSERT INTO inp_controls_x_arc (arc_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
 	    ELSE
-	      INSERT INTO inp_rules_controls_importinp (feature_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
+	      INSERT INTO inp_rules_controls_importinp (feature_id, importype, text) VALUES (split_part(NEW.text,' ',2), 'controls', NEW.text);
 	    END IF;
 	    
 	  ELSIF v_view='vi_rules' THEN  
-		INSERT INTO inp_rules_controls_importinp (text) VALUES (NEW.text);
+		INSERT INTO inp_rules_controls_importinp (importtype, text) VALUES ('rules', NEW.text);
 
 	  ELSIF v_view='vi_emitters' THEN
 	    INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);

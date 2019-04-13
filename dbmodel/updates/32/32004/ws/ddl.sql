@@ -32,8 +32,6 @@ ALTER TABLE inp_pipe ADD COLUMN reactionparam varchar (30);
 ALTER TABLE inp_pipe ADD COLUMN reactionvalue varchar (30);
 
 
-
-
 CREATE TABLE inp_reactions
 ( id serial PRIMARY KEY,
   descript text);
@@ -43,7 +41,9 @@ CREATE TABLE inp_energy
   descript text);
 
 CREATE TABLE inp_rules_controls_importinp
-( id serial NOT NULL PRIMARY KEY,
+(id serial NOT NULL PRIMARY KEY,
+importtype varchar (16), 
 feature_id varchar(16),
-text text);
-  
+text text,
+CONSTRAINT UNIQUE inp_rules_controls_importinp_check CHECK (importtype::text =  ANY (ARRAY['controls'::character varying, 'rules'::character varying]::text[])));
+
