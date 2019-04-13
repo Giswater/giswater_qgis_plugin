@@ -20,3 +20,6 @@ FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_ui_element('element_x_node');
 DROP TRIGGER IF EXISTS gw_trg_ui_element ON SCHEMA_NAME.v_ui_element_x_connec;
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.v_ui_element_x_connec
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_ui_element('element_x_connec');
+
+DROP TRIGGER IF EXISTS gw_trg_doc ON SCHEMA_NAME.doc;
+CREATE TRIGGER gw_trg_doc BEFORE INSERT ON SCHEMA_NAME.doc FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_doc();
