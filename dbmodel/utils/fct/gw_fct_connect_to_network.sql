@@ -161,6 +161,7 @@ BEGIN
 				link_geom = ST_SetPoint(v_link_geom, (ST_NumPoints(v_link_geom) - 1),point_aux); 
 			END IF;
 
+			vnode_geom := ST_EndPoint(link_geom);
 
 		ELSE	
 			IF (v_vnode_type = 'CUSTOM') THEN  
