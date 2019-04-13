@@ -162,7 +162,7 @@ BEGIN
 			IF (aux_json->>'widgettype') = 'combo' THEN
 			
 				-- Get combo id's
-				EXECUTE 'SELECT (array_agg(id)) FROM ('||quote_ident(v_dv_querytext)||' ORDER BY '||quote_ident(v_orderby)||')a'
+				EXECUTE 'SELECT (array_agg(id)) FROM ('||(v_dv_querytext)||' ORDER BY '||quote_ident(v_orderby)||')a'
 					INTO v_array;
 				
 				-- Enable null values
@@ -174,7 +174,7 @@ BEGIN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));		
 
 				-- Get combo values
-				EXECUTE 'SELECT (array_agg(idval)) FROM ('||quote_literal(v_dv_querytext)||' ORDER BY '||quote_ident(v_orderby)||')a'
+				EXECUTE 'SELECT (array_agg(idval)) FROM ('||(v_dv_querytext)||' ORDER BY '||quote_ident(v_orderby)||')a'
 					INTO v_array;
 
 				-- Enable null values
@@ -184,15 +184,17 @@ BEGIN
 				combo_json = array_to_json(v_array);
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 	
+				
 				-- Get selected value
 				IF p_tgop ='INSERT' THEN
 					v_vdefault:=quote_ident(aux_json->>'column_id');
 					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
 						INTO field_value_parent;
-				ELSE 
+				ELSIF  p_tgop ='UPDATE' THEN
 					EXECUTE 'SELECT ' || quote_ident(quote_ident(aux_json->>'column_id')) || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' || quote_literal(p_id) || ' AS ' || quote_literal(p_columntype) || ')' 
-						INTO field_value_parent; 
+						INTO field_value_parent; 				
 				END IF;
+				
 
 				IF v_vdefault IS NULL THEN
 					IF p_filterfield is not null THEN
@@ -239,7 +241,7 @@ BEGIN
 						
 						-- Get combo id's
 						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN		
-							query_text= 'SELECT (array_agg(id)) FROM ('|| quote_ident(v_dv_querytext_child) || quote_literal((aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
+							query_text= 'SELECT (array_agg(id)) FROM ('|| quote_ident(v_dv_querytext_child) || ((aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
 							execute query_text INTO v_array_child;									
 						ELSE 	
 							EXECUTE 'SELECT (array_agg(id)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||' ORDER BY '||quote_ident(v_orderby_child)||')a' INTO v_array_child;
