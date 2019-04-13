@@ -5,14 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getprint(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getprint(p_data json)
   RETURNS json AS
 $BODY$
 DECLARE
 
 /*
  
-SELECT "ws_sample".gw_api_getprint($${
+SELECT "SCHEMA_NAME".gw_api_getprint($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{},
 "feature":{},
@@ -47,7 +47,7 @@ SELECT "ws_sample".gw_api_getprint($${
 BEGIN
 
     -- Set search path to local schema
-    SET search_path = "ws_sample", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- Get schema name
     schemas_array := current_schemas(FALSE);
