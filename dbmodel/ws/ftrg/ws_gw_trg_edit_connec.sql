@@ -17,6 +17,8 @@ DECLARE
 	old_connec_type_aux text;
 	query_text text;
 	link_path_aux varchar;
+	v_record_link record;
+	v_record_vnode record;
 
 BEGIN
 
@@ -264,9 +266,20 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 	
-		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
+	PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
 
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
+
+        -- delete links & vnode's
+	FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
+	LOOP
+		DELETE FROM link WHERE link_id=v_record_link.link_id;
+		
+		FOR v_record_vnode IN SELECT * FROM vnode WHERE vnode_id=v_record_link.exit_id::integer
+		LOOP
+			DELETE FROM vnode WHERE vnode_id=v_record_vnode.vnode_id;
+		END LOOP;
+	END LOOP;
 
         RETURN NULL;
    

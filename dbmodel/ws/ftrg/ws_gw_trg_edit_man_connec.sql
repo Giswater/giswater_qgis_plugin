@@ -23,6 +23,8 @@ DECLARE
 	count_aux integer;
 	promixity_buffer_aux double precision;
 	link_path_aux varchar;
+	v_record_link record;
+	v_record_vnode record;
 
 BEGIN
 
@@ -210,7 +212,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 		
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value))) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value))) from connec where connec_id=NEW.connec_id));
 					
 				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name,  chlorinator, arq_patrimony, pol_id) 
 				VALUES (NEW.connec_id, NEW.linked_connec, NEW.vmax, NEW.vtotal,NEW.container_number, NEW.pump_number, NEW.power, NEW.regulation_tank, NEW.name, 
@@ -349,6 +351,17 @@ BEGIN
 		ELSE
 			DELETE FROM connec WHERE connec_id = OLD.connec_id;
 		END IF;		
+
+		-- delete links & vnode's
+		FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
+		LOOP
+			DELETE FROM link WHERE link_id=v_record_link.link_id;
+			
+			FOR v_record_vnode IN SELECT * FROM vnode WHERE vnode_id=v_record_link.exit_id::integer
+			LOOP
+				DELETE FROM vnode WHERE vnode_id=v_record_vnode.vnode_id;
+			END LOOP;
+		END LOOP;
 
 		RETURN NULL;
 

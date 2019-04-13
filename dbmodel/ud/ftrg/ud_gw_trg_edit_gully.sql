@@ -10,12 +10,14 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_gully()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    v_sql varchar;
+	v_sql varchar;
 	gully_geometry varchar;
-    gully_id_seq int8;
+	gully_id_seq int8;
 	count_aux integer;
 	promixity_buffer_aux double precision;
 	link_path_aux varchar;
+	v_record_link record;
+	v_record_vnode record;
 
 BEGIN
 
@@ -272,9 +274,20 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 	
-		PERFORM gw_fct_check_delete(OLD.gully_id, 'GULLY');
+	PERFORM gw_fct_check_delete(OLD.gully_id, 'GULLY');
 		
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
+
+ 	-- delete links & vnode's
+	FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
+	LOOP
+		DELETE FROM link WHERE link_id=v_record_link.link_id;
+		
+		FOR v_record_vnode IN SELECT * FROM vnode WHERE vnode_id=v_record_link.exit_id::integer
+		LOOP
+			DELETE FROM vnode WHERE vnode_id=v_record_vnode.vnode_id;
+		END LOOP;
+	END LOOP;
 
         RETURN NULL;
    
