@@ -71,6 +71,14 @@ BEGIN
 
     --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+	
+
+	-- fix client null mistakes
+	p_data = REPLACE (p_data::text, '"NULL"', 'null');
+	p_data = REPLACE (p_data::text, '"null"', 'null');
+	p_data = REPLACE (p_data::text, '""', 'null');
+    p_data = REPLACE (p_data::text, '''''', 'null');
+	
 
     --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -85,10 +93,18 @@ BEGIN
     v_y1 := ((((p_data ->> 'data')::json->>'extent')::json->>'p1')::json->>'ycoord')::float;
     v_x2 := ((((p_data ->> 'data')::json->>'extent')::json->>'p2')::json->>'xcoord')::float;
     v_y2 := ((((p_data ->> 'data')::json->>'extent')::json->>'p2')::json->>'ycoord')::float;
-    
-
+	
+	IF v_scale IS NULL THEN
+		v_scale = 1000;
+		-- to do: get valuedefault of widget or user or system
+	END IF;
+	
+	IF v_rotation IS NULL THEN
+		v_rotation = 0;
+		-- to do: get valuedefault of widget or user or system
+	END IF;
+	
     SELECT * INTO v_json2 FROM json_array_elements(v_json1) AS a WHERE a->>'ComposerTemplate' = v_composer;
-
 
     -- Get maps from composer
     v_json3 := v_json2->'ComposerMap';
