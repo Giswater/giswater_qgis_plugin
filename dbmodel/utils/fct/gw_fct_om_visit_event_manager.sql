@@ -58,8 +58,8 @@ BEGIN
 		-- inserting (or update) visits
 		IF (rec_node.startdate < now()-interval'1 day') OR (rec_node.startdate IS NULL) THEN
 	
-			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done)
-			SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done
+			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done,status)
+			SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, 4
 			FROM om_visit WHERE id=visit_id_aux RETURNING id into id_last;
     
 		    INSERT INTO om_visit_x_node (node_id, visit_id) VALUES (rec_node.node_id, id_last);
