@@ -55,34 +55,67 @@ BEGIN
 
 		-- Get exploitations, selected and unselected
 		IF p_istilemap THEN	
-			
+
 			-- setting whole exploitations for user when is tilemap acoording sys_exploitation_x_user variable			
 			IF (SELECT value FROM config_param_system WHERE parameter ='sys_exploitation_x_user')::boolean THEN
 				DELETE FROM selector_expl WHERE cur_user = current_user;
 				INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id,current_user FROM exploitation_x_user WHERE user_id=current_user;
-			ELSIF (SELECT value FROM config_param_system WHERE parameter ='sys_exploitation_x_user')::boolean IS false THEN
-				DELETE FROM selector_expl WHERE cur_user = current_user;
-				INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id,current_user FROM exploitation;
-			END IF;
 
-			-- getting json
-			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , true AS disabled
-			FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ')
-			UNION
-			SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , true AS disabled
-			FROM exploitation WHERE expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ') ORDER BY label) a'
-			INTO formTabs_explotations;
+				-- getting json
+				EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				SELECT name as label, exploitation.expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , true AS disabled
+				FROM exploitation JOIN exploitation_x_user ON exploitation_x_user.expl_id=exploitation.expl_id
+				WHERE exploitation.expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ')
+				AND username=current_user
+				UNION
+				SELECT name as label, exploitation.expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , true AS disabled
+				FROM exploitation JOIN exploitation_x_user ON exploitation_x_user.expl_id=exploitation.expl_id
+				WHERE exploitation.expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || '
+				AND username=current_user) 
+				ORDER BY label) a'
+					INTO formTabs_explotations;
+			ELSE
+				DELETE FROM selector_expl WHERE cur_user = current_user;
+				INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id,current_user FROM exploitation;		
+				
+				-- getting json
+				EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , true AS disabled
+				FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ')
+				UNION
+				SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , true AS disabled
+				FROM exploitation WHERE expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ') ORDER BY label) a'
+				INTO formTabs_explotations;
+				
+			END IF;
+			
 
 		ELSE
-			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , false AS disabled
-			FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ')
-			UNION
-			SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , false AS disabled
-			FROM exploitation WHERE expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label) a'
-			INTO formTabs_explotations;
-
+			-- setting whole exploitations for user acoording sys_exploitation_x_user variable			
+			IF (SELECT value FROM config_param_system WHERE parameter ='sys_exploitation_x_user')::boolean THEN
+			
+				-- getting json
+				EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				SELECT name as label, exploitation.expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , true AS disabled
+				FROM exploitation JOIN exploitation_x_user ON exploitation_x_user.expl_id=exploitation.expl_id
+				WHERE exploitation.expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ')
+				AND username=current_user
+				UNION
+				SELECT name as label, exploitation.expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , true AS disabled
+				FROM exploitation JOIN exploitation_x_user ON exploitation_x_user.expl_id=exploitation.expl_id
+				WHERE exploitation.expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || '
+				AND username=current_user) 
+				ORDER BY label) a'
+					INTO formTabs_explotations;
+			ELSE 		
+				EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+				SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , false AS disabled
+				FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ')
+				UNION
+				SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , false AS disabled
+				FROM exploitation WHERE expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label) a'
+					INTO formTabs_explotations;
+			END IF;
 		END IF;	
 		-- Add tab name to json
 		formTabs_explotations := ('{"fields":' || formTabs_explotations || '}')::json;
@@ -285,3 +318,10 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+
+  GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO postgres;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO role_basic;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO qgisserver;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO xtorret;
+GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO jlsala;
