@@ -14,6 +14,7 @@ DECLARE
     v_sourcetext json;
     v_targettext text;
     v_record record;
+    v_enabled boolean;
     
 BEGIN
 
@@ -21,13 +22,16 @@ BEGIN
    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
    -- getting config data
-   v_sourcetext = (SELECT value FROM config_param_system WHERE parameter='edit_replace_doc_folderpath')::text;
+   v_enabled = (SELECT value::json->>'enabled' FROM config_param_system WHERE parameter='edit_replace_doc_folderpath')::boolean;
+   v_sourcetext = (SELECT value::json->>'values' FROM config_param_system WHERE parameter='edit_replace_doc_folderpath')::text;
 
-   -- looping data
-   FOR v_record IN SELECT (a)->>'source' as source,(a)->>'target' as target  FROM json_array_elements(v_sourcetext) a
-   LOOP
-	NEW.path=REPLACE (NEW.path, v_record.source, v_record.target);
-   END LOOP;
+   IF v_enabled THEN 
+	-- looping data
+	FOR v_record IN SELECT (a)->>'source' as source,(a)->>'target' as target  FROM json_array_elements(v_sourcetext) a
+	LOOP
+		NEW.path=REPLACE (NEW.path, v_record.source, v_record.target);
+	END LOOP;
+  END IF;
  
    RETURN NEW;    
     

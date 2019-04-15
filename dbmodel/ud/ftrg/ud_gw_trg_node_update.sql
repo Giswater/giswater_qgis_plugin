@@ -126,23 +126,7 @@ BEGIN
 			END IF;
 			
 			
-		ELSIF TG_OP ='UPDATE' THEN
-		
-		-- Checking number of nodes 
-			numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id AND node.state!=0);
-			
-			IF (numNodes >1) AND (rec.node_proximity_control IS TRUE) THEN
-				PERFORM audit_function(1096,1234);
-				
-			ELSIF (numNodes =1) AND (rec.node_proximity_control IS TRUE) THEN
-				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
-				IF (NEW.state=1 AND node_rec.state=1) OR (NEW.state=2 AND node_rec.state=1) THEN
-					PERFORM audit_function(1098,1234);
-				ELSIF (NEW.state=2 AND node_rec.state=2) THEN
-					PERFORM audit_function(1100,1234);
-				END IF;
-			END IF;
-			
+		ELSIF TG_OP ='UPDATE' THEN			
 			
 		-- Updating expl / dma
 			IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
