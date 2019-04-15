@@ -8,18 +8,19 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit(p_visittype text, p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_visit(
+    p_visittype text,
+    p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "tableName":"v_edit_node", "id":"1074"},"fields":{},"pageInfo":null}}$$)
+SELECT SCHEMA_NAME.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"arc", "id":"139"},"fields":{},"pageInfo":null}}$$)
-
+SELECT SCHEMA_NAME.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
 
 	
@@ -100,7 +101,7 @@ DECLARE
 	v_ismultievent boolean;
 	v_inputtablename text;
 	v_inputformname text;
-	v_isclasschanged boolean = false;  -- to identify if class of visit is changed. Important because in that case new form is reloaded with new widgets but nothing is upserted on database yet
+	v_isclasschanged boolean = true;  -- to identify if class of visit is changed. Important because in that case new form is reloaded with new widgets but nothing is upserted on database yet
 	v_visitduration text; 	-- to fix the duration of visit. Important because if visit is active on feature, existing visit is showed
 	SCHEMA_NAME int8;  -- to 
 	v_status integer;  -- identifies the status of visit. Important because on status=0 visit is disabled
@@ -168,7 +169,7 @@ BEGIN
 					END IF;
 
 					IF v_visitclass IS NULL THEN
-						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
+						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
 					END IF;
 					
 				ELSE
@@ -220,6 +221,8 @@ BEGIN
 	IF v_projecttype ='WS' THEN
 		v_queryinfra = (SELECT feature_id FROM (SELECT arc_id as feature_id, visit_id FROM om_visit_x_arc UNION SELECT node_id, visit_id 
 				FROM om_visit_x_node UNION SELECT connec_id, visit_id FROM om_visit_x_connec LIMIT 1) a WHERE visit_id=v_id::int8);
+	ELSIF v_projecttype ='TM' THEN
+		v_queryinfra = (SELECT feature_id FROM (SELECT node_id AS feature_id, visit_id FROM om_visit_x_node LIMIT 1) a WHERE visit_id=v_id::int8);
 	ELSE
 		v_queryinfra = (SELECT feature_id FROM (SELECT arc_id as feature_id, visit_id FROM om_visit_x_arc UNION SELECT node_id, visit_id FROM om_visit_x_node 
 				UNION SELECT connec_id, visit_id FROM om_visit_x_connec UNION SELECT gully, visit_id FROM om_visit_x_gully LIMIT 1) a WHERE visit_id=v_id::int8);
@@ -231,12 +234,11 @@ BEGIN
 		v_noinfra = TRUE;
 	END IF;
 	
-	
 	-- Check if exists some open visit on related feature with the class configured as vdefault for user
 	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL AND v_visitclass IS NOT NULL THEN
 		EXECUTE ('SELECT v.id FROM om_visit_x_'|| (v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
 			' WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0 OR status = 0 AND (now()- enddate) < ''8 hours'') ' ||
-			' AND class_id = ' || quote_literal(v_visitclass) || 
+			' AND status != 4 AND class_id = ' || quote_literal(v_visitclass) || 
 			' ORDER BY startdate DESC LIMIT 1')
 			INTO v_existvisit_id;
 	END IF;
@@ -278,7 +280,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 		--status
 		v_status = (SELECT value FROM config_param_user WHERE parameter = 'visitstatus_vdefault' AND cur_user=current_user)::integer;
 		IF v_status IS NULL THEN
-			v_status = 1;
+			v_status = 4;
 		END IF;
 		-- startdate
 		v_startdate = (SELECT value FROM config_param_user WHERE parameter = 'visitstartdate_vdefault' AND cur_user=current_user)::integer;
@@ -333,7 +335,6 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 
 	-- upserting data when change from tabData to tabFile
 	IF v_currentactivetab = 'tabData' AND v_isclasschanged IS FALSE AND v_status > 0 THEN
---	IF v_currentactivetab = 'tabData' AND isnewvisit THEN
 
 		RAISE NOTICE '--- gw_api_getvisit: Upsert visit calling ''gw_api_setvisit'' with : % ---', p_data;
 		
@@ -441,7 +442,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 
 					-- setting status
 					IF (aux_json->>'column_id') = 'status' THEN
-						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', '1'::text);	
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', '4'::text);	
 						RAISE NOTICE ' --- SETTING status VALUE % ---', v_status;
 					END IF;
 
