@@ -16,6 +16,7 @@ from functools import partial
 from encodings.aliases import aliases
 
 import utils_giswater
+from giswater.actions.api_manage_composer import ApiManageComposer
 from giswater.actions.parent import ParentAction
 from giswater.actions.manage_visit import ManageVisit
 from giswater.ui_manager import ConfigUtils
@@ -1276,3 +1277,8 @@ class Utils(ParentAction):
             records.append(elem)
             index = index +1
         utils_giswater.set_item_data(combo, records, 1)
+
+
+    def utils_print_composer(self):
+        self.api_composer = ApiManageComposer(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_composer.composer()
