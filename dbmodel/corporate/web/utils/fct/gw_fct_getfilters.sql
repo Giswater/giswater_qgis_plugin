@@ -96,24 +96,22 @@ BEGIN
 			
 				-- getting json
 				EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-				SELECT name as label, exploitation.expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , true AS disabled
+				SELECT name as label, exploitation.expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , false AS disabled
 				FROM exploitation JOIN exploitation_x_user ON exploitation_x_user.expl_id=exploitation.expl_id
-				WHERE exploitation.expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || ')
-				AND username=current_user
+				WHERE exploitation.expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) AND username=current_user
 				UNION
-				SELECT name as label, exploitation.expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , true AS disabled
+				SELECT name as label, exploitation.expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , false AS disabled
 				FROM exploitation JOIN exploitation_x_user ON exploitation_x_user.expl_id=exploitation.expl_id
-				WHERE exploitation.expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal('qgisserver') || '
-				AND username=current_user) 
+				WHERE exploitation.expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) AND username=current_user
 				ORDER BY label) a'
 					INTO formTabs_explotations;
 			ELSE 		
 				EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 				SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", true as "value" , false AS disabled
-				FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ')
+				FROM exploitation WHERE exploitation.expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user)
 				UNION
 				SELECT name as label, expl_id as name, ''check'' as type, ''boolean'' as "dataType", false as "value" , false AS disabled
-				FROM exploitation WHERE expl_id NOT IN (SELECT expl_id FROM selector_expl WHERE cur_user=' || quote_literal(current_user) || ') ORDER BY label) a'
+				FROM exploitation WHERE exploitation.expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ORDER BY label) a'
 					INTO formTabs_explotations;
 			END IF;
 		END IF;	
