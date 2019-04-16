@@ -58,8 +58,8 @@ BEGIN
 		-- inserting (or update) visits
 		IF (rec_node.startdate < now()-interval'1 day') OR (rec_node.startdate IS NULL) THEN
 	
-			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done)
-			SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done
+			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done,status)
+			SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, 4
 			FROM om_visit WHERE id=visit_id_aux RETURNING id into id_last;
     
 		    INSERT INTO om_visit_x_node (node_id, visit_id) VALUES (rec_node.node_id, id_last);
@@ -217,7 +217,7 @@ BEGIN
 		    IF rec_parameter.visit_id != visit_id_aux THEN
 			-- incompatible events (action_type=2)
 			-- rec_parameter.action_value is integer (0 = False / 1 = True)
-		        UPDATE om_visit_event SET value2 = rec_parameter.action_value WHERE visit_id = rec_parameter.visit_id AND parameter_id = rec_parameter.parameter_id2;
+		        UPDATE om_visit_event SET value2 = rec_parameter.action_value::integer WHERE visit_id = rec_parameter.visit_id AND parameter_id = rec_parameter.parameter_id2;
 		    END IF;
 		END LOOP;
 		
