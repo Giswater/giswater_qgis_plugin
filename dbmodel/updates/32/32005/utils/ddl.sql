@@ -6,7 +6,3 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
-
-
-ALTER TABLE config_api_form_fields ADD COLUMN vdefault text;
-ALTER TABLE config_api_form_fields ADD COLUMN layoutname text;
