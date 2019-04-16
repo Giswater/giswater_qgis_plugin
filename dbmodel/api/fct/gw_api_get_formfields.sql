@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2562
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_api_get_formfields(
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_formfields(
     p_formname character varying,
     p_formtype character varying,
     p_tabname character varying,
@@ -100,7 +100,7 @@ BEGIN
 			(SELECT ''individual'' as widtget_context, concat(unit, ''. '', descript) AS label, identif AS column_id, ''label'' AS widgettype, concat ('||quote_literal(p_tabname)||',''_'',identif) AS widgetname, ''string'' AS datatype, 
 			NULL AS tooltip, NULL AS placeholder, FALSE AS iseditable, orderby as ordby, 1 AS layout_id,  NULL AS dv_parent_id, NULL AS isparent, NULL AS button_function, NULL AS dv_querytext, 
 			NULL AS dv_querytext_filterc, NULL AS action_function, NULL AS isautoupdate, concat (measurement,'' '',unit,'' x '', cost , '' €/'',unit,'' = '', total_cost::numeric(12,2), '' €'') as value, stylesheet
-			FROM ' ||quote_ident(p_tablename)|| ' WHERE ' ||quote_ident(p_idname)|| ' = $2
+			FROM ' ||p_tablename|| ' WHERE ' ||p_idname|| ' = $2
 			UNION
 			SELECT ''resumen'' as widtget_context, label AS form_label, column_id, widgettype, concat ('||quote_literal(p_tabname)||',''_'',column_id) AS widgetname, datatype, 
 			tooltip, placeholder, iseditable, layout_order AS ordby, layout_id,  NULL AS dv_parent_id, NULL AS isparent, NULL AS widgetfunction, NULL AS dv_querytext, 
@@ -130,7 +130,7 @@ BEGIN
 
 		-- Refactor widget
 		IF (aux_json->>'widgettype')='image' THEN
-		      	EXECUTE quote_literal((aux_json->>'dv_querytext')) INTO v_image; 
+		      	EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 		END IF;
 
@@ -143,7 +143,7 @@ BEGIN
 		
 		-- for image widgets
 		IF (aux_json->>'widgettype')='image' THEN
-		      	EXECUTE quote_literal((aux_json->>'dv_querytext')) INTO v_image; 
+		      	EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 		END IF;
 	
@@ -162,7 +162,7 @@ BEGIN
 			IF (aux_json->>'widgettype') = 'combo' THEN
 			
 				-- Get combo id's
-				EXECUTE 'SELECT (array_agg(id)) FROM ('||(v_dv_querytext)||' ORDER BY '||quote_ident(v_orderby)||')a'
+				EXECUTE 'SELECT (array_agg(id)) FROM ('||v_dv_querytext||' ORDER BY '||v_orderby||')a'
 					INTO v_array;
 				
 				-- Enable null values
@@ -174,7 +174,7 @@ BEGIN
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));		
 
 				-- Get combo values
-				EXECUTE 'SELECT (array_agg(idval)) FROM ('||(v_dv_querytext)||' ORDER BY '||quote_ident(v_orderby)||')a'
+				EXECUTE 'SELECT (array_agg(idval)) FROM ('||v_dv_querytext||' ORDER BY '||v_orderby||')a'
 					INTO v_array;
 
 				-- Enable null values
@@ -184,17 +184,15 @@ BEGIN
 				combo_json = array_to_json(v_array);
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 	
-				
 				-- Get selected value
 				IF p_tgop ='INSERT' THEN
 					v_vdefault:=quote_ident(aux_json->>'column_id');
 					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
 						INTO field_value_parent;
-				ELSIF  p_tgop ='UPDATE' THEN
-					EXECUTE 'SELECT ' || quote_ident(quote_ident(aux_json->>'column_id')) || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' || quote_literal(p_id) || ' AS ' || quote_literal(p_columntype) || ')' 
-						INTO field_value_parent; 				
+				ELSE 
+					EXECUTE 'SELECT ' || quote_ident(aux_json->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' || quote_literal(p_id) || ' AS ' || p_columntype || ')' 
+						INTO field_value_parent; 
 				END IF;
-				
 
 				IF v_vdefault IS NULL THEN
 					IF p_filterfield is not null THEN
@@ -241,10 +239,10 @@ BEGIN
 						
 						-- Get combo id's
 						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN		
-							query_text= 'SELECT (array_agg(id)) FROM ('|| quote_ident(v_dv_querytext_child) || ((aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
+							query_text= 'SELECT (array_agg(id)) FROM ('|| v_dv_querytext_child || (aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
 							execute query_text INTO v_array_child;									
 						ELSE 	
-							EXECUTE 'SELECT (array_agg(id)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||' ORDER BY '||quote_ident(v_orderby_child)||')a' INTO v_array_child;
+							EXECUTE 'SELECT (array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY '||v_orderby_child||')a' INTO v_array_child;
 							
 						END IF;
 						
@@ -258,10 +256,10 @@ BEGIN
 						
 						-- Get combo values
 						IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL THEN
-							query_text= 'SELECT (array_agg(idval)) FROM ('|| quote_literal(v_dv_querytext_child) ||quote_literal((aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(quote_literal(v_selected_id))||' ORDER BY idval) a';
+							query_text= 'SELECT (array_agg(idval)) FROM ('|| v_dv_querytext_child ||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY idval) a';
 							execute query_text INTO v_array_child;
 						ELSE 	
-							EXECUTE 'SELECT (array_agg(idval)) FROM ('||quote_literal((aux_json_child->>'dv_querytext'))||' ORDER BY '||quote_ident(v_orderby_child)||')a'
+							EXECUTE 'SELECT (array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY '||v_orderby_child||')a'
 								INTO v_array_child;
 						END IF;
 						
