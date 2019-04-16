@@ -45,5 +45,5 @@ CREATE TABLE inp_rules_controls_importinp
 importtype varchar (16), 
 feature_id varchar(16),
 text text,
-CONSTRAINT UNIQUE inp_rules_controls_importinp_check CHECK (importtype::text =  ANY (ARRAY['controls'::character varying, 'rules'::character varying]::text[])));
+CONSTRAINT inp_rules_controls_importinp_check CHECK (importtype::text =  ANY (ARRAY['controls'::character varying, 'rules'::character varying]::text[])));
 
