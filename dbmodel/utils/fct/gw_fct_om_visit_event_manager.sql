@@ -217,7 +217,7 @@ BEGIN
 		    IF rec_parameter.visit_id != visit_id_aux THEN
 			-- incompatible events (action_type=2)
 			-- rec_parameter.action_value is integer (0 = False / 1 = True)
-		        UPDATE om_visit_event SET value2 = rec_parameter.action_value WHERE visit_id = rec_parameter.visit_id AND parameter_id = rec_parameter.parameter_id2;
+		        UPDATE om_visit_event SET value2 = rec_parameter.action_value::integer WHERE visit_id = rec_parameter.visit_id AND parameter_id = rec_parameter.parameter_id2;
 		    END IF;
 		END LOOP;
 		

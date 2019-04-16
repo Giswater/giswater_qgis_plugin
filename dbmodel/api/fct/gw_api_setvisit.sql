@@ -55,7 +55,7 @@ DECLARE
 	v_visitextcode text;
 	v_visitcat int2;
 	v_status int2;
-	return_event_manager_aux text;
+	return_event_manager_aux json;
 	v_event_manager json;
 	v_node_id integer;
 	
@@ -175,21 +175,18 @@ BEGIN
 	-- only applied for arbrat viari (nodes).
 	IF v_status='4' THEN
 	    UPDATE om_visit SET enddate = current_timestamp::timestamp WHERE id = v_id;
-	    --SELECT row_to_json(a) FROM (SELECT gw_fct_om_visit_event_manager(v_id::integer) AS st_astext)a INTO return_event_manager_aux;
-	    SELECT gw_fct_om_visit_event_manager(v_id::integer) INTO return_event_manager_aux;
+	    SELECT row_to_json(a) FROM (SELECT gw_fct_om_visit_event_manager(v_id::integer) as "st_astext")a INTO return_event_manager_aux ;
         END IF;
 
 	--  Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
 	v_message := COALESCE(v_message, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
-	return_event_manager_aux := COALESCE(return_event_manager_aux, '');
-
+	return_event_manager_aux := COALESCE(return_event_manager_aux, '{}');
 				  
 --    Return
-    RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||', 
-	      "body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":"'|| return_event_manager_aux ||'"}},
-	      "geometry":"'||return_event_manager_aux||'"}')::json; 
+      RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||', 
+	      "body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":'|| return_event_manager_aux ||'}}}')::json; 
 
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 
