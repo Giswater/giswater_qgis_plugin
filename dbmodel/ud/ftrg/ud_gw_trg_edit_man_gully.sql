@@ -18,6 +18,7 @@ DECLARE
 	link_path_aux varchar;
 	v_record_link record;
 	v_record_vnode record;
+	v_count integer;
 
 BEGIN
 
