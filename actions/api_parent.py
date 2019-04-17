@@ -117,7 +117,7 @@ class ApiParent(ParentAction):
                 widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
-            #widget = self.set_fucntion_associated(dialog, widget, field)
+            widget = self.set_fucntion_associated(dialog, widget, field)
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
@@ -145,10 +145,11 @@ class ApiParent(ParentAction):
         if type(widget) == QLineEdit:
             if Qgis.QGIS_VERSION_INT < 29900:
                 widget.lostFocus.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                #widget.textChanged.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
             else:
                 widget.editingFinished.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
         #elif type(widget) == QComboBox:
-
+        return widget
     def add_lineedit(self, field):
         """ Add widgets QLineEdit type """
 
@@ -170,19 +171,19 @@ class ApiParent(ParentAction):
 
 
     def set_data_type(self, field, widget):
-        if 'datatype' in field:
-            if field['datatype'] == 'integer':  # Integer
+        if 'dataType' in field:
+            if field['dataType'] == 'integer':  # Integer
                 widget.setValidator(QIntValidator())
-            elif field['datatype'] == 'string':  # String
+            elif field['dataType'] == 'string':  # String
                 function_name = "test"
                 widget.returnPressed.connect(partial(getattr(self, function_name)))
-            elif field['datatype'] == 'date':  # Date
+            elif field['dataType'] == 'date':  # Date
                 pass
-            elif field['datatype'] == 'datetime':  # DateTime
+            elif field['dataType'] == 'datetime':  # DateTime
                 pass
-            elif field['datatype'] == 'boolean':  # Boolean
+            elif field['dataType'] == 'boolean':  # Boolean
                 pass
-            elif field['datatype'] == 'double':  # Double
+            elif field['dataType'] == 'double':  # Double
                 validator = QDoubleValidator()
                 validator.setRange(-9999999.0, 9999999.0, 3)
                 validator.setNotation(QDoubleValidator().StandardNotation)

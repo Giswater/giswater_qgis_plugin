@@ -21,9 +21,9 @@ from qgis.core import QgsComposerMap, QgsPoint, QgsGeometry, QgsRectangle
 from qgis.gui import QgsVertexMarker, QgsRubberBand
 
 
-from qgis.PyQt.QtCore import Qt, QRectF, QPointF
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.QtCore import Qt, QRectF, QPointF, QRegExp
+from qgis.PyQt.QtGui import QColor, QIntValidator, QRegExpValidator
+from qgis.PyQt.QtWidgets import QMessageBox, QLineEdit
 
 
 import json
@@ -62,19 +62,28 @@ class ApiManageComposer(ApiParent):
             fields = complet_result[0]['formTabs'][0]
             self.create_dialog(self.dlg_composer, fields)
 
+        # Set current values from canvas
+        w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
+        w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
+        reg_exp = QRegExp("\d{8}")
+        w_scale.setValidator(QRegExpValidator(reg_exp))
+        rotation = self.iface.mapCanvas().rotation()
+        scale = int(self.iface.mapCanvas().scale())
+        utils_giswater.setWidgetText(self.dlg_composer, w_rotation, rotation)
+        utils_giswater.setWidgetText(self.dlg_composer, w_scale, scale)
+        self.my_json['rotation'] = rotation
+        self.my_json['scale'] = scale
 
-
-        #self.dlg_composer.cmb_composers.currentIndexChanged.connect(self.selectComposer)
-        
+        # Signals
         self.dlg_composer.btn_export.clicked.connect(partial(self.accept, self.dlg_composer, self.my_json))
         self.dlg_composer.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(self.destructor)
         self.dlg_composer.rejected.connect(self.destructor)
         self.dlg_composer.show()
-        # self.iface.composerAdded.connect(lambda view: self.populate_cmb_composer())
-        # self.iface.composerWillBeRemoved.connect(self.populate_cmb_composer)
+
         self.iface.mapCanvas().extentsChanged.connect(partial(self.accept, self.dlg_composer, self.my_json))
 
+        #self.accept(self.dlg_composer, self.my_json)
 
 
     def destructor(self):
@@ -110,14 +119,18 @@ class ApiManageComposer(ApiParent):
         pass
 
     def gw_api_setprint(self, dialog, widget, my_json):
+        self.controller.log_info(str(widget.objectName()))
+        self.controller.log_info(str(widget.validator()))
         self.accept(dialog, my_json)
 
     def accept(self, dialog, my_json):
+        scale = None
+        rotation = None
         if self.destroyed:
             return
         if my_json == '' or str(my_json) == '{}':
             self.close_dialog(dialog)
-            return
+            return False
         composer_templates = []
         for composer in self.iface.activeComposers():
             composer_map = []
@@ -155,6 +168,9 @@ class ApiManageComposer(ApiParent):
         body = "" + client + form + feature + data
         sql = ("SELECT " + self.schema_name + ".gw_api_setprint($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
+        if not row:
+            self.controller.show_warning("NOT ROW FOR: " + sql)
+            return False
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_result[0]['data']
         self.draw_rectangle(result)
@@ -169,9 +185,15 @@ class ApiManageComposer(ApiParent):
                         maps.append(item)
                 break
         if len(maps) > 0:
+            if rotation is None or rotation == 0:
+                rotation = self.iface.mapCanvas().rotation()
+            if scale is None or scale == 0:
+                scale = self.iface.mapCanvas().scale()
+            self.controller.log_info()
             self.iface.mapCanvas().setRotation(float(rotation))
             maps[map_index].zoomToExtent(self.iface.mapCanvas().extent())
             maps[map_index].setNewScale(float(scale))
             maps[map_index].setMapRotation(float(rotation))
 
 
+        return True
