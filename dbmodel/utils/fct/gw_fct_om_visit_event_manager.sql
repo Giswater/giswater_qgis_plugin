@@ -40,7 +40,7 @@ BEGIN
     WHERE visit_id=visit_id_aux;
     
     --  Delete previous parameters with cost (if exists on the referenced node due with this update will insert again the same values
-    DELETE FROM om_visit_work_x_node WHERE node_id=node_id_aux AND work_date=startdate_aux;
+   -- DELETE FROM om_visit_work_x_node WHERE node_id=node_id_aux AND work_date=startdate_aux;
 
     -- check if exits multiplier parameter (action type=1)
     IF (SELECT count(*) FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
@@ -117,12 +117,12 @@ BEGIN
 				    work_aux := (select action_value::text from om_visit_parameter_x_parameter WHERE parameter_id1=rec_parameter.parameter_id2 AND action_type=5);
 				    builder_aux:= (select om_visit_cat.id from om_visit_cat JOIN om_visit ON om_visit_cat.id=om_visit.visitcat_id WHERE om_visit.id=visit_id_aux);
 				    size_id_aux= (select size_id FROM node WHERE node_id=rec_node.node_id);
-				    event_date_aux=(SELECT date(tstamp) FROM om_visit_event WHERE id=rec_parameter.id);
+				    event_date_aux=(SELECT date(value) FROM om_visit_event WHERE id=rec_parameter.id);
 				    campaign_aux=(select id FROM cat_campaign WHERE start_date<=event_date_aux and end_date>=event_date_aux AND active = TRUE);
 				    price_aux = (select price FROM cat_price WHERE size_id=size_id_aux AND work_id=work_aux AND campaign_id=campaign_aux);
 				
 				    INSERT INTO om_visit_work_x_node (node_id, work_id, work_date, builder_id, size_id, price, units, work_cost, event_id) values 
-				    (rec_node.node_id, work_aux, startdate_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, id_event);
+				    (rec_node.node_id, work_aux, event_date_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, id_event);
 				  
 				END IF;
 			END IF;
@@ -171,12 +171,12 @@ BEGIN
             work_aux := (select action_value::text from om_visit_parameter_x_parameter WHERE parameter_id1=rec_parameter.parameter_id1 AND action_type=5);
             builder_aux:= (select om_visit_cat.id from om_visit_cat JOIN om_visit ON om_visit_cat.id=om_visit.visitcat_id WHERE om_visit.id=visit_id_aux);
             size_id_aux= (select size_id FROM node WHERE node_id=node_id_aux);
-            event_date_aux=(SELECT date(tstamp) FROM om_visit_event WHERE id=rec_parameter.id);
+            event_date_aux=(SELECT date(value) FROM om_visit_event WHERE id=rec_parameter.id);
             campaign_aux=(select id FROM cat_campaign WHERE start_date<=event_date_aux and end_date>=event_date_aux AND active = TRUE);
             price_aux = (select price FROM cat_price WHERE size_id=size_id_aux AND work_id=work_aux AND campaign_id=campaign_aux);
                
             INSERT INTO om_visit_work_x_node (node_id, work_id, work_date, builder_id, size_id, price, units, work_cost, event_id) values 
-            (node_id_aux, work_aux, startdate_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, rec_parameter.id);
+            (node_id_aux, work_aux, event_date_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, rec_parameter.id);
             
         END LOOP;
         

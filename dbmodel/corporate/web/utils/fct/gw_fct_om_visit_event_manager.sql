@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 -- Function: SCHEMA_NAME.gw_fct_om_visit_event_manager(integer)
 
 -- DROP FUNCTION SCHEMA_NAME.gw_fct_om_visit_event_manager(integer);
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_event_manager(visit_id_aux integer)
   RETURNS text AS
 $BODY$
@@ -35,8 +34,6 @@ v_id_list bigint[];
 v_visit_id bigint[];
 v_node_id bigint;
 v_parameter text;
-event_id_aux integer;
-
 
 BEGIN
 
@@ -48,14 +45,11 @@ BEGIN
     count=0;
     -- select main values (stardate, node_id, mu_id)
     SELECT startdate INTO startdate_aux FROM om_visit WHERE id=visit_id_aux; 
-
-    SELECT id INTO event_id_aux FROM om_visit_event WHERE visit_id=visit_id_aux; 
-    
     SELECT mu_id, node.node_id INTO mu_id_aux, node_id_aux FROM node JOIN om_visit_x_node ON om_visit_x_node.node_id=node.node_id 
     WHERE visit_id=visit_id_aux;
     
     --  Delete previous parameters with cost (if exists on the referenced node due with this update will insert again the same values
-   -- DELETE FROM om_visit_work_x_node WHERE node_id=node_id_aux AND event_id=event_id_aux;
+   -- DELETE FROM om_visit_work_x_node WHERE node_id=node_id_aux AND work_date=startdate_aux;
 
     -- check if exits multiplier parameter (action type=1)
     IF (SELECT count(*) FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
@@ -251,3 +245,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
