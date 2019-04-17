@@ -97,21 +97,21 @@ BEGIN
 	IF (SELECT id FROM config_param_user WHERE parameter = 'visitclass_vdefault' AND cur_user=current_user) IS NOT NULL THEN
 		UPDATE config_param_user SET value = v_class WHERE parameter = 'visitclass_vdefault' AND cur_user=current_user;
 	ELSE
-		INSERT INTO config_param_user (parameter, value) VALUES ('visitclass_vdefault', v_class);
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitclass_vdefault', v_class, current_user);
 	END IF;
 
 	-- visitextcode_vdefault
 	IF (SELECT id FROM config_param_user WHERE parameter = 'visitextcode_vdefault' AND cur_user=current_user) IS NOT NULL THEN
 		UPDATE config_param_user SET value = v_visitextcode WHERE parameter = 'visitextcode_vdefault' AND cur_user=current_user;
 	ELSE
-		INSERT INTO config_param_user (parameter, value) VALUES ('visitextcode_vdefault', v_visitextcode);
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitextcode_vdefault', v_visitextcode, current_user);
 	END IF;
 
 	-- visitcat_vdefault
 	IF (SELECT id FROM config_param_user WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user) IS NOT NULL THEN
 		UPDATE config_param_user SET value = v_visitcat WHERE parameter = 'visitcat_vdefault' AND cur_user=current_user;
 	ELSE
-		INSERT INTO config_param_user (parameter, value) VALUES ('visitcat_vdefault', v_visitcat);
+		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('visitcat_vdefault', v_visitcat, current_user);
 	END IF;
 
 	--upsert visit
