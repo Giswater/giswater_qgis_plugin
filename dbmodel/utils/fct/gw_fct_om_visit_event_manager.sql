@@ -207,7 +207,7 @@ BEGIN
 		JOIN SCHEMA_NAME.om_visit_parameter_x_parameter ON parameter_id=om_visit_parameter_x_parameter.parameter_id2 
 		WHERE visit_id = ANY(v_visit_id)
 		AND action_type = 2
-		AND rec_parameter.parameter_id1 = v_parameter
+		AND parameter_id1 = v_parameter
 		AND parameter_id = om_visit_parameter_x_parameter.parameter_id2
 		ORDER BY startdate desc LIMIT 1
 		
