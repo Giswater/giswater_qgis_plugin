@@ -17,12 +17,12 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from builtins import range
 
-from qgis.core import QgsComposerMap, QgsPoint, QgsGeometry, QgsRectangle
+from qgis.core import QgsComposerMap, QgsPoint, QgsGeometry, QgsRectangle, QgsComposerLabel
 from qgis.gui import QgsVertexMarker, QgsRubberBand
 
 
 from qgis.PyQt.QtCore import Qt, QRectF, QPointF, QRegExp
-from qgis.PyQt.QtGui import QColor, QIntValidator, QRegExpValidator
+from qgis.PyQt.QtGui import QColor, QIntValidator, QRegExpValidator, QPrintDialog, QPrinter, QDialog
 from qgis.PyQt.QtWidgets import QMessageBox, QLineEdit
 
 
@@ -42,6 +42,7 @@ class ApiManageComposer(ApiParent):
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
 
         self.destroyed = False
+        self.printer = None
 
     def composer(self):
         self.my_json = {}
@@ -75,15 +76,33 @@ class ApiManageComposer(ApiParent):
         self.my_json['scale'] = scale
 
         # Signals
-        self.dlg_composer.btn_export.clicked.connect(partial(self.accept, self.dlg_composer, self.my_json))
+        self.dlg_composer.btn_print.clicked.connect(self.__print)
+        self.dlg_composer.btn_export.clicked.connect(partial(self.export, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_composer))
+        self.dlg_composer.btn_close.clicked.connect(partial(self.save_settings, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(self.destructor)
+        self.dlg_composer.rejected.connect(partial(self.save_settings, self.dlg_composer))
         self.dlg_composer.rejected.connect(self.destructor)
         self.dlg_composer.show()
 
         self.iface.mapCanvas().extentsChanged.connect(partial(self.accept, self.dlg_composer, self.my_json))
 
-        #self.accept(self.dlg_composer, self.my_json)
+
+    def export(self, dialog):
+        """ Export values from widgets(only QLineEdit) into dialog, to selected composer
+            if composer.widget.id == dialog.widget.property('column_id')
+        """
+        selected_com = self.get_current_composer()
+        composition = selected_com.composition()
+
+        widget_list = dialog.findChildren(QLineEdit)
+        for widget in widget_list:
+            item = composition.getComposerItemById(widget.property('column_id'))
+            if type(item) == QgsComposerLabel:
+                item.setText(str(widget.text()))
+
+        composition.refreshItems()
+        composition.update()
 
 
     def destructor(self):
@@ -115,12 +134,36 @@ class ApiManageComposer(ApiParent):
             self.get_values(dialog, widget, self.my_json)
 
 
+    def get_current_composer(self):
+        """ Get composer selected in QComboBox """
+        selected_com = None
+        for composer in self.iface.activeComposers():
+            if composer.composerWindow().windowTitle() == self.my_json['composer']:
+                selected_com = composer
+                break
+        return selected_com
+
+
+    def __print(self):
+        if not self.printer:
+            self.printer = QPrinter()
+
+        printdialog = QPrintDialog(self.printer)
+        if printdialog.exec_() != QDialog.Accepted:
+            return
+
+        selected_com = self.get_current_composer()
+        if selected_com is None:
+            return
+        print_ = getattr(selected_com.composition(), 'print')
+        success = print_(self.printer)
+        if not success:
+            QMessageBox.warning(self.iface.mainWindow(), self.tr("Print Failed"), self.tr("Failed to print the composition."))
+
     def update_rectangle(self, dialog, my_json):
         pass
 
     def gw_api_setprint(self, dialog, widget, my_json):
-        self.controller.log_info(str(widget.objectName()))
-        self.controller.log_info(str(widget.validator()))
         self.accept(dialog, my_json)
 
     def accept(self, dialog, my_json):
@@ -189,7 +232,6 @@ class ApiManageComposer(ApiParent):
                 rotation = self.iface.mapCanvas().rotation()
             if scale is None or scale == 0:
                 scale = self.iface.mapCanvas().scale()
-            self.controller.log_info()
             self.iface.mapCanvas().setRotation(float(rotation))
             maps[map_index].zoomToExtent(self.iface.mapCanvas().extent())
             maps[map_index].setNewScale(float(scale))
