@@ -154,7 +154,7 @@ BEGIN
         JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=4 AND feature_type='NODE'
         LOOP 
             query:=((SELECT action_value FROM om_visit_parameter_x_parameter JOIN om_visit_parameter ON om_visit_parameter.id=parameter_id1 
-            JOIN om_visit_event ON parameter_id=parameter_id1 WHERE om_visit_event.id=event_aux )||' WHERE node_id='||quote_literal(node_id_aux)||';' );
+            JOIN om_visit_event ON parameter_id=parameter_id1 WHERE om_visit_event.id=event_aux AND action_type=4)||' WHERE node_id='||quote_literal(node_id_aux)||';' );
             EXECUTE query;    
         END LOOP;
 

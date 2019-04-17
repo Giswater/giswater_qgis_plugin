@@ -114,6 +114,7 @@ DECLARE
 	v_extvisitclass integer;
 	v_existvisit_id integer;
 	v_value text;
+	v_tab_data boolean;
 
 BEGIN
 
@@ -147,6 +148,7 @@ BEGIN
 	v_currentactivetab = (((p_data ->>'form')::json->>'navigation')::json->>'currentActiveTab')::text;
 	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
 	v_inputtablename = ((p_data ->>'feature')::json->>'tableName');
+	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
 
 	--  get visitclass
 	IF v_visitclass IS NULL THEN
@@ -334,7 +336,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 							     v_noinfra, isnewvisit, v_featuretype, v_featureid, v_isclasschanged, v_visitclass, v_id, v_status, v_formname, v_tablename, v_idname, v_columntype, v_device;
 
 	-- upserting data when change from tabData to tabFile
-	IF v_currentactivetab = 'tabData' AND v_isclasschanged IS FALSE AND v_status > 0 THEN
+	IF v_currentactivetab = 'tabData' AND (v_isclasschanged IS FALSE OR v_tab_data IS FALSE) AND v_status > 0 THEN
 
 		RAISE NOTICE '--- gw_api_getvisit: Upsert visit calling ''gw_api_setvisit'' with : % ---', p_data;
 		
@@ -488,10 +490,10 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 
 						-- setting parameter in case of singleevent visit
-						IF v_ismultievent IS FALSE AND (aux_json->>'column_id') = 'parameter_id' THEN
-							v_parameter := (SELECT parameter_id FROM om_visit_class_x_parameter WHERE class_id=v_visitclass LIMIT 1);
-							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
-						END IF;
+						--IF v_ismultievent IS FALSE AND (aux_json->>'column_id') = 'parameter_id' THEN
+							--v_parameter := (SELECT parameter_id FROM om_visit_class_x_parameter WHERE class_id=v_visitclass LIMIT 1);
+							--v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
+						--END IF;
 					
 					ELSE 
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_fieldvalue, ''));
