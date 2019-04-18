@@ -12,36 +12,25 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtCore import Qt, QSettings, QPoint, QTimer, QDate, SIGNAL
-    from PyQt4.QtGui import QAction, QLineEdit, QSizePolicy, QColor, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
-    from PyQt4.QtGui import QCompleter, QStringListModel, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
+    from PyQt4.QtCore import Qt
+    from PyQt4.QtGui import QLineEdit, QColor,  QComboBox, QGridLayout, QLabel, QSpinBox, QDoubleSpinBox
     from PyQt4.QtGui import QIntValidator, QDoubleValidator
-    from PyQt4.QtSql import QSqlTableModel
-    from qgis.gui import QgsMapCanvasSnapper    
-else:
-    from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QStringListModel
-    from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator
-    from qgis.PyQt.QtWidgets import QAction, QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel
-    from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QPushButton, QFrame, QSpinBox, QDoubleSpinBox
-    from qgis.PyQt.QtSql import QSqlTableModel
-    from qgis.PyQt.QtWidgets import QAction
-    from qgis.core import QgsWkbTypes    
 
-from qgis.core import QgsExpression,QgsFeatureRequest, QgsExpressionContextUtils
+else:
+    from qgis.PyQt.QtCore import Qt
+    from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator
+    from qgis.PyQt.QtWidgets import  QLineEdit,  QComboBox, QGridLayout,  QLabel, QSpinBox, QDoubleSpinBox
+    from qgis.core import QgsWkbTypes
+
+
 from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 
 
-import json
-import os
 import re
-from collections import OrderedDict
 from functools import partial
-
 import utils_giswater
-from map_tools.snapping_utils import SnappingConfigManager
 from giswater.actions.parent import ParentAction
-from giswater.actions.HyperLinkLabel import HyperLinkLabel
 
 
 class ApiParent(ParentAction):
