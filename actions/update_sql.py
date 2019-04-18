@@ -19,6 +19,7 @@ from functools import partial
 import utils_giswater
 from giswater.actions.parent import ParentAction
 from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo
+from giswater.actions.create_gis_project import CreateGisProject
 
 
 class UpdateSQL(ParentAction):
@@ -172,7 +173,6 @@ class UpdateSQL(ParentAction):
         # Set Listeners
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_api_create.clicked.connect(partial(self.implement_api))
-
         self.dlg_readsql.btn_custom_load_file.clicked.connect(partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
         self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, self.project_type_selected))
         self.dlg_readsql.btn_update_api.clicked.connect(partial(self.update_api))
@@ -189,6 +189,9 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
         self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
+
+        self.dlg_readsql.btn_gis_folder.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "txt_gis_folder"))
+        self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.gis_create_project))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -220,6 +223,27 @@ class UpdateSQL(ParentAction):
 
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
+
+
+    def gis_create_project(self):
+
+        # Get gis folder, gis file, project type and schema
+        gis_folder = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.txt_gis_folder)
+        if gis_folder is None or gis_folder == 'null':
+            self.controller.show_warning("GIS folder not set")
+            return
+
+        gis_file = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.txt_gis_file)
+        if gis_file is None or gis_file == 'null':
+            self.controller.show_warning("GIS file name not set")
+            return
+
+        project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
+        # Generate QGIS project
+        gis = CreateGisProject(self.controller, self.plugin_dir)
+        gis.gis_project_database(gis_folder, gis_file, project_type, schema_name)
 
 
     def btn_constrains_changed(self, button, call_function=False):
