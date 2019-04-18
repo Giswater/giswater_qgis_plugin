@@ -32,9 +32,7 @@ from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
-
 import sys
-
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
@@ -523,8 +521,10 @@ class ParentAction(object):
 
     def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected @table_name. Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(table_name)
@@ -543,8 +543,10 @@ class ParentAction(object):
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(table_name)
@@ -564,6 +566,7 @@ class ParentAction(object):
         :param qtable: QTableView to show
         :param query: query to set model
         """
+
         model = QSqlQueryModel()
         model.setQuery(query)
         qtable.setModel(model)
@@ -607,8 +610,9 @@ class ParentAction(object):
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)      
-            return (False, expr)
-        return (True, expr)               
+            return False, expr
+
+        return True, expr
         
 
     def refresh_map_canvas(self, restore_cursor=False):
@@ -713,8 +717,6 @@ class ParentAction(object):
         utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
 
 
-
-
     def multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
         :param QTableView widget: origin
@@ -746,6 +748,7 @@ class ParentAction(object):
             sql += " WHERE " + column_id + " IN (" + list_id + ")"
             self.controller.execute_sql(sql)
             widget.model().select()
+
 
     def select_features_by_expr(self, layer, expr):
         """ Select features of @layer applying @expr """
@@ -821,7 +824,7 @@ class ParentAction(object):
 
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
-        # rect = QgsRectangle(float(x1)+10, float(y1)+10, float(x2)-10, float(y2)-10)
+
         rect = QgsRectangle(float(x1)-margin, float(y1)-margin, float(x2)+margin, float(y2)+margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
@@ -855,6 +858,7 @@ class ParentAction(object):
 
     def delete_layer_from_toc(self, layer_name):
         """ Delete layer from toc if exist """
+
         layer = None
         for lyr in list(QgsProject.instance().mapLayers().values()):
             if lyr.name() == layer_name:
@@ -863,6 +867,7 @@ class ParentAction(object):
         if layer is not None:
             QgsProject.instance().removeMapLayer(layer)
             self.delete_layer_from_toc(layer_name)
+
 
     def get_snapper(self):
         """ Return snapper """

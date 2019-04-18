@@ -4,20 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QDate, QRegExp
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit
-from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy
+from qgis.PyQt.QtWidgets import QGridLayout, QWidget
 
-import csv
 import json
-import os
-
 from collections import OrderedDict
 from functools import partial
-
-import utils_giswater
 
 from giswater.actions.api_parent import ApiParent
 from giswater.ui_manager import ApiEpaOptions
@@ -27,9 +20,11 @@ class Go2EpaOptions(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'go2epa' """
+
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.epa_options_json = {}
         self.epa_options_list = []
+
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -41,10 +36,6 @@ class Go2EpaOptions(ApiParent):
         # Create dialog
         self.dlg_options = ApiEpaOptions()
         self.load_settings(self.dlg_options)
-
-        # reg_exp = QRegExp("[ \\d]{3}:[0-2][0-3]:[0-5][0-9]:[0-5][0-9]")  # to days:hours:minutes:seconds (dd:23:59:%9)
-        # reg_exp = QRegExp("[\\d]+:[0-5][0-9]:[0-5][0-9]")  # to hours:minutes:seconds (999:59:59)
-        # self.dlg_options.line_1.setValidator(QRegExpValidator(reg_exp))
 
         form = '"formName":"epaoptions"'
         body = self.create_body(form=form)
@@ -68,6 +59,7 @@ class Go2EpaOptions(ApiParent):
                 for grl in gridlist:
                     spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
                     grl.addItem(spacer)
+
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
         self.dlg_options.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_options))
         self.dlg_options.show()

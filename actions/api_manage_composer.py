@@ -33,12 +33,14 @@ class ApiManageComposer(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control Composer button """
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
 
+        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.destroyed = False
         self.printer = None
 
+
     def composer(self):
+
         self.my_json = {}
         self.dlg_composer = ApiComposerUi()
         self.load_settings(self.dlg_composer)
@@ -52,11 +54,13 @@ class ApiManageComposer(ApiParent):
         if not row:
             self.controller.show_warning("NOT ROW FOR: " + sql)
             return False
+
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if complet_result[0]['formTabs']:
             fields = complet_result[0]['formTabs'][0]
             self.create_dialog(self.dlg_composer, fields)
         self.hide_void_groupbox(self.dlg_composer)
+
         # Set current values from canvas
         w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
         w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
@@ -103,6 +107,7 @@ class ApiManageComposer(ApiParent):
 
 
     def destructor(self):
+
         self.destroyed = True
         if self.rubber_polygon:
             self.iface.mapCanvas().scene().removeItem(self.rubber_polygon)
@@ -111,8 +116,8 @@ class ApiManageComposer(ApiParent):
 
     def get_composer(self, removed=None):
         """ Get all composers from current QGis project """
-        composers = '"{'
 
+        composers = '"{'
         for composer in self.iface.activeComposers():
             if composer != removed and composer.composerWindow():
                 cur = composer.composerWindow().windowTitle()
@@ -125,6 +130,7 @@ class ApiManageComposer(ApiParent):
 
 
     def create_dialog(self, dialog, fields):
+
         for field in fields['fields']:
             label, widget = self.set_widgets(dialog, field)
             self.put_widgets(dialog, field, label, None, widget)
@@ -133,6 +139,7 @@ class ApiManageComposer(ApiParent):
 
     def get_current_composer(self):
         """ Get composer selected in QComboBox """
+
         selected_com = None
         for composer in self.iface.activeComposers():
             if composer.composerWindow().windowTitle() == self.my_json['composer']:
@@ -142,6 +149,7 @@ class ApiManageComposer(ApiParent):
 
 
     def __print(self, dialog):
+
         if not self.printer:
             self.printer = QPrinter()
 
@@ -158,20 +166,24 @@ class ApiManageComposer(ApiParent):
         # if not success:
         #     QMessageBox.warning(self.iface.mainWindow(), self.controller.tr("Print Failed"), self.controller.tr("Failed to print the composition."))
 
+
     def update_rectangle(self, dialog, my_json):
         pass
+
 
     def gw_api_setprint(self, dialog, widget, my_json):
         self.accept(dialog, my_json)
 
+
     def accept(self, dialog, my_json):
-        scale = None
-        rotation = None
+
         if self.destroyed:
             return
+
         if my_json == '' or str(my_json) == '{}':
             self.close_dialog(dialog)
             return False
+
         composer_templates = []
         for composer in self.iface.activeComposers():
             composer_map = []
@@ -212,6 +224,7 @@ class ApiManageComposer(ApiParent):
         if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)
             return False
+
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_result[0]['data']
         self.draw_rectangle(result)
@@ -225,6 +238,7 @@ class ApiManageComposer(ApiParent):
                     if isinstance(item, QgsComposerMap):
                         maps.append(item)
                 break
+
         if len(maps) > 0:
             if rotation is None or rotation == 0:
                 rotation = self.iface.mapCanvas().rotation()

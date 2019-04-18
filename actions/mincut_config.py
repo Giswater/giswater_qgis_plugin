@@ -27,7 +27,6 @@ import utils_giswater
 from giswater.ui_manager import Multirow_selector
 from giswater.ui_manager import Multi_selector
 from giswater.ui_manager import Mincut_edit
-
 from giswater.actions.parent import ParentAction
 
 
@@ -35,6 +34,7 @@ class MincutConfig(ParentAction):
     
     def __init__(self, mincut):
         """ Class constructor """
+
         self.mincut = mincut
         self.canvas = mincut.canvas
         self.plugin_dir = mincut.plugin_dir
@@ -59,7 +59,6 @@ class MincutConfig(ParentAction):
         self.dlg_multi.btn_insert.clicked.connect(partial(self.fill_insert_menu, table))
         btn_close = self.dlg_multi.findChild(QPushButton, "btn_close")
         btn_close.clicked.connect(partial(self.close_dialog, self.dlg_multi))
-
 
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
         self.dlg_multi.btn_delete.clicked.connect(partial(self.delete_records_config, self.tbl_config, table))
@@ -93,7 +92,6 @@ class MincutConfig(ParentAction):
                 self.menu_valve.addAction(elem, partial(self.insert, elem, table))
 
 
-
     def insert(self, id_action, table):
         """ On action(select value from menu) execute SQL """
 
@@ -103,6 +101,7 @@ class MincutConfig(ParentAction):
         self.fill_table_config(self.tbl_config, self.schema_name+"."+table)
         self.fill_insert_menu(table)
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
+
 
     def fill_table_config(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
@@ -150,6 +149,7 @@ class MincutConfig(ParentAction):
             self.controller.execute_sql(sql)
             widget.model().select()
         self.fill_insert_menu('anl_mincut_selector_valve')
+
 
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
@@ -209,6 +209,7 @@ class MincutConfig(ParentAction):
 
 
     def set_state_cancel_mincut(self):
+
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -233,8 +234,8 @@ class MincutConfig(ParentAction):
             self.tbl_mincut_edit.model().select()
 
 
-
     def show_selection(self):
+
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -255,6 +256,7 @@ class MincutConfig(ParentAction):
 
 
     def populate_combos(self):
+
         # Fill ComboBox state
         sql = ("SELECT name"
                " FROM " + self.schema_name + ".anl_mincut_cat_state"
@@ -269,6 +271,7 @@ class MincutConfig(ParentAction):
 
 
     def mincut_selector(self):
+
         self.dlg_mincut_sel = Multirow_selector()
         self.load_settings(self.dlg_mincut_sel)
 
@@ -286,6 +289,7 @@ class MincutConfig(ParentAction):
         index = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
         self.multi_row_selector(self.dlg_mincut_sel, tableleft, tableright, field_id_left, field_id_right, index=index)
         self.dlg_mincut_sel.btn_select.clicked.connect(partial(self.mincut.set_visible_mincut_layers))
+
         # Open dialog
         self.open_dialog(self.dlg_mincut_sel, maximize_button=False)
 
@@ -311,6 +315,7 @@ class MincutConfig(ParentAction):
 
 
     def filter_by_id(self, qtable):
+
         expr = ""
         id_ = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
         state = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.state_edit, False, False)
@@ -359,7 +364,6 @@ class MincutConfig(ParentAction):
         # Refresh model with selected filter
         qtable.model().setFilter(expr)
         qtable.model().select()
-
 
 
     def fill_table_mincut_management(self, widget, table_name):
@@ -425,6 +429,7 @@ class MincutConfig(ParentAction):
             layer = self.controller.get_layer_by_tablename('v_anl_mincut_result_hydrometer')
             if layer is not None:
                 layer.triggerRepaint()
+
 
     def set_dates(self):
 

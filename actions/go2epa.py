@@ -36,13 +36,17 @@ from giswater.ui_manager import EpaResultCompareSelector, EpaResultManager
 
 
 class Go2Epa(ApiParent):
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'go2epa' """
+
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.g2epa_opt = Go2EpaOptions(iface, settings, controller, plugin_dir)
 
+
     def set_project_type(self, project_type):
         self.project_type = project_type
+
 
     def go2epa(self):
         """ Button 23: Open form to set INP, RPT and project """
@@ -97,11 +101,13 @@ class Go2Epa(ApiParent):
 
 
     def cancel_imports(self):
+
         self.counter = self.iterations
         self.imports_canceled = True
 
 
     def active_recurrent(self, state):
+
         if state == 2:  # Checked
             self.dlg_go2epa.chk_recurrent.setEnabled(True)
         elif state == 0:  # UnChecked
@@ -111,6 +117,7 @@ class Go2Epa(ApiParent):
 
 
     def recurrent(self, state):
+
         if state == 0:
             utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, False)
             utils_giswater.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, False)
@@ -140,6 +147,7 @@ class Go2Epa(ApiParent):
 
 
     def check_inp_chk(self, file_inp):
+
         if file_inp is None:
             msg = "Select valid INP file"
             self.controller.show_warning(msg, parameter=str(file_inp))
@@ -147,6 +155,7 @@ class Go2Epa(ApiParent):
 
 
     def check_rpt(self):
+
         file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         # Control execute epa software
@@ -167,6 +176,7 @@ class Go2Epa(ApiParent):
 
 
     def check_fields(self):
+
         file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
@@ -213,6 +223,7 @@ class Go2Epa(ApiParent):
 
 
     def go2epa_sector_selector(self):
+
         tableleft = "sector"
         tableright = "inp_selector_sector"
         field_id_left = "sector_id"
@@ -222,6 +233,7 @@ class Go2Epa(ApiParent):
 
     def load_user_values(self):
         """ Load QGIS settings related with file_manager """
+
         cur_user = self.controller.get_current_user()
 
         self.result_name = self.controller.plugin_settings_value('go2epa_RESULT_NAME' + cur_user)
@@ -254,6 +266,7 @@ class Go2Epa(ApiParent):
 
     def save_user_values(self):
         """ Save QGIS settings related with file_manager """
+
         cur_user = self.controller.get_current_user()
         self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
                                                   utils_giswater.getWidgetText(self.dlg_go2epa, 'txt_result_name'))
@@ -306,7 +319,8 @@ class Go2Epa(ApiParent):
 
     def epa_options(self):
         """ Open dialog api_epa_options.ui.ui """
-        status = self.g2epa_opt.go2epa_options()
+
+        self.g2epa_opt.go2epa_options()
         return
 
 
@@ -346,6 +360,7 @@ class Go2Epa(ApiParent):
 
 
     def save_hydrology(self):
+
         sql = ("SELECT cur_user FROM " + self.schema_name + ".inp_selector_hydrology "
                " WHERE cur_user = current_user")
         row = self.controller.get_row(sql, commit=True)
@@ -389,6 +404,7 @@ class Go2Epa(ApiParent):
 
     def go2epa_select_file_inp(self):
         """ Select INP file """
+
         self.file_inp = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         # Set default value if necessary
         if self.file_inp is None or self.file_inp == '':
@@ -422,6 +438,7 @@ class Go2Epa(ApiParent):
 
 
     def insert_into_inp(self, folder_path=None, all_rows=None):
+
         progress = 0
         # sys.stdout.flush()
         self.dlg_go2epa.progressBar.setFormat("The INP file is begin exported...")
@@ -456,6 +473,7 @@ class Go2Epa(ApiParent):
 
 
     def insert_rpt_into_db(self, folder_path=None):
+
         _file = open(folder_path, "r+")
         full_file = _file.readlines()
         sql = ""
@@ -672,6 +690,7 @@ class Go2Epa(ApiParent):
         """ Set autocomplete of widget 'feature_id'
             getting id's from selected @viewname
         """
+
         result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
 
         # Adding auto-completion to a QLineEdit
@@ -696,6 +715,7 @@ class Go2Epa(ApiParent):
 
     def check_result_id(self):
         """ Check if selected @result_id already exists """
+
         result_id = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         sql = ("SELECT result_id FROM " + self.schema_name + ".v_ui_rpt_cat_result"
                " WHERE result_id = '" + str(result_id) + "'")
@@ -866,7 +886,6 @@ class Go2Epa(ApiParent):
                 partial(self.populate_date_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_com_date,
                         self.dlg_go2epa_result.cmb_com_time))
 
-
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM " + self.schema_name + ".rpt_selector_result"
         row = self.controller.get_row(sql)
@@ -881,7 +900,9 @@ class Go2Epa(ApiParent):
         self.dlg_go2epa_result.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_go2epa_result.exec_()
 
+
     def populate_date_time(self, combo_result, combo_date, combo_time):
+
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
         date = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_date)
         sql = ("SELECT DISTINCT(resulttime), resulttime  FROM " + self.schema_name + ".rpt_arc "
@@ -897,6 +918,7 @@ class Go2Epa(ApiParent):
 
     def populate_time(self, combo_result, combo_time):
         """ Populate combo times """
+
         result_id = utils_giswater.get_item_data(self.dlg_go2epa_result, combo_result)
         sql = ("SELECT DISTINCT time, time FROM " + self.schema_name + ".rpt_arc "
                " WHERE result_id ILIKE '"+str(result_id)+"' ORDER BY time")
@@ -1063,3 +1085,4 @@ class Go2Epa(ApiParent):
     def update_sql(self):
         usql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
         usql.init_sql()
+

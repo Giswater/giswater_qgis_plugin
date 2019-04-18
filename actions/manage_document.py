@@ -4,8 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
-# -*- coding: utf-8 -*-    
+# -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 
 from functools import partial
@@ -101,7 +100,6 @@ class ManageDocument(ParentManage):
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type+"_id"]))
 
-
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
@@ -113,6 +111,7 @@ class ManageDocument(ParentManage):
 
 
     def fill_table_doc(self, dialog, geom_type, feature_id):
+
         widget = "tbl_doc_x_" + geom_type
         widget = dialog.findChild(QTableView, widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)

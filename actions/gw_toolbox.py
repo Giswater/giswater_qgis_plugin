@@ -14,28 +14,23 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-import os
-import json
-
-from qgis.PyQt.QtCore import Qt, QDate, QPoint, QUrl, QThread, pyqtSignal, QVariant
+from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt.QtGui import QColor, QIcon
-from qgis.PyQt.QtWidgets import QMenu, QApplication, QSpinBox, QDoubleSpinBox, QTextEdit
-from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
-from qgis.PyQt.QtWidgets import QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QListWidget
-from qgis.PyQt.QtWidgets import QTableView, QListWidgetItem, QTabWidget, QRadioButton
+from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
+from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTreeWidgetItem
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsMapLayerRegistry, QgsProject, QgsDataSourceURI as QgsDataSourceUri
+    from qgis.core import QgsMapLayerRegistry, QgsProject
 else:
-    from qgis.core import QgsProject, QgsDataSourceUri
+    from qgis.core import QgsProject
 
-from qgis.core import QgsPoint, QgsFeature, QgsGeometry
-from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField
+from qgis.core import QgsFeature, QgsGeometry
+from qgis.core import QgsVectorLayer, QgsField
 
+import os
+import json
 from collections import OrderedDict
-from datetime import datetime
 from functools import partial
 
 import utils_giswater
@@ -526,5 +521,4 @@ class GwToolBox(ApiParent):
             my_group = root.insertGroup(0, 'GW Functions results')
 
         my_group.insertLayer(0, virtual_layer)
-
 

@@ -21,7 +21,6 @@ from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
 
 from collections import OrderedDict
 import json
-import sys
 import operator
 from functools import partial
 
@@ -170,7 +169,6 @@ class ApiConfig(ApiParent):
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
         self.hide_void_groupbox(self.dlg_config)
-
 
         # Open form
         self.dlg_config.show()
@@ -405,7 +403,7 @@ class ApiConfig(ApiParent):
                 self.populate_child(combo_child, row)
 
 
-    def populate_child(self, combo_child, result):
+    def populate_child(self, combo_child):
 
         child = self.dlg_config.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
@@ -526,7 +524,7 @@ class ApiConfig(ApiParent):
 
 
     def check_parent_to_child(self, widget_parent, widget_child):
-        if widget_parent.isChecked() == False:
+        if not widget_parent.isChecked():
             widget_child.setChecked(False)
 
 
