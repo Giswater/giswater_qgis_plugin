@@ -539,7 +539,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 
 		RAISE NOTICE ' --- BUILDING tabData with v_tabaux % ---', v_tabaux;
 
-	
+		/*
 		-- Files tab
 		------------
 		--show tab only if it is not new visit
@@ -604,7 +604,7 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'pageInfo', v_pageinfo);
 			v_formtabs := v_formtabs  || ',' || v_tabaux::text;
 		--END IF; 		
-
+		*/
 	--closing tabs array
 	v_formtabs := (v_formtabs ||']');
 
