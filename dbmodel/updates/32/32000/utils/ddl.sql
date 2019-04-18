@@ -66,6 +66,7 @@ ALTER TABLE config_param_system ADD COLUMN dv_isnullvalue boolean;
 ALTER TABLE config_param_system ADD COLUMN stylesheet json;
 ALTER TABLE config_param_system ADD COLUMN widgetcontrols json;
 ALTER TABLE config_param_system ADD COLUMN placeholder text;
+ALTER TABLE config_param_system ADD COLUMN isdeprecated text;
 
 
 ALTER TABLE temp_csv2pg RENAME TO old_temp_csv2pg;
