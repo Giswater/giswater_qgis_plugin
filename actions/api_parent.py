@@ -14,12 +14,13 @@ except:
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from PyQt4.QtCore import Qt
     from PyQt4.QtGui import QLineEdit, QColor,  QComboBox, QGridLayout, QLabel, QSpinBox, QDoubleSpinBox
-    from PyQt4.QtGui import QIntValidator, QDoubleValidator
+    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QGroupBox, QWidget
 
 else:
     from qgis.PyQt.QtCore import Qt
     from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator
-    from qgis.PyQt.QtWidgets import  QLineEdit,  QComboBox, QGridLayout,  QLabel, QSpinBox, QDoubleSpinBox
+    from qgis.PyQt.QtWidgets import QLineEdit,  QComboBox, QGridLayout,  QLabel, QSpinBox, QDoubleSpinBox, QGroupBox
+    from qgis.PyQt.QtWidgets import QWidget
     from qgis.core import QgsWkbTypes
 
 
@@ -273,7 +274,13 @@ class ApiParent(ParentAction):
         # # wait to simulate a flashing effect
         # if duration_time is not None:
         #     QTimer.singleShot(duration_time, self.resetRubberbands)
-
+    def hide_void_groupbox(self, dialog):
+        # Hide empty grupbox
+        grbox_list = dialog.findChildren(QGroupBox)
+        for grbox in grbox_list:
+            widget_list = grbox.findChildren(QWidget)
+            if len(widget_list) == 0:
+                grbox.setVisible(False)
     # def resetRubberbands(self):
     #
     #     canvas = self.canvas
