@@ -28,6 +28,7 @@ from encodings.aliases import aliases
 
 import utils_giswater
 from giswater.actions.api_config import ApiConfig
+from giswater.actions.api_manage_composer import ApiManageComposer
 from giswater.actions.gw_toolbox import GwToolBox
 from giswater.actions.parent import ParentAction
 from giswater.actions.manage_visit import ManageVisit
@@ -532,3 +533,8 @@ class Utils(ParentAction):
 
     def utils_toolbox(self):
         self.toolbox.open_toolbox()
+
+
+    def utils_print_composer(self):
+        self.api_composer = ApiManageComposer(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_composer.composer()

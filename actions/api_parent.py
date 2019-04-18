@@ -816,18 +816,35 @@ class ApiParent(ParentAction):
             QTimer.singleShot(duration_time, self.resetRubberbands)
 
 
+    # def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+    #     """ Draw 'line' over canvas following list of points """
+    #
+    #     rb = self.rubber_polygon
+    #     rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+    #     rb.setColor(color)
+    #     rb.setWidth(width)
+    #     rb.show()
+    #
+    #     # wait to simulate a flashing effect
+    #     if duration_time is not None:
+    #         QTimer.singleShot(duration_time, self.resetRubberbands)
+
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
 
-        rb = self.rubber_polygon
-        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
-        rb.setColor(color)
-        rb.setWidth(width)
-        rb.show()
-
-        # wait to simulate a flashing effect
-        if duration_time is not None:
-            QTimer.singleShot(duration_time, self.resetRubberbands)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            rb = self.rubber_polygon
+            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+            rb.setColor(color)
+            rb.setWidth(width)
+            rb.show()
+            return rb
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(width)
+            self.vMarker.setCenter(points)
+            self.vMarker.show()
+            return self.vMarker
 
 
     def resetRubberbands(self):
@@ -1132,12 +1149,12 @@ class ApiParent(ParentAction):
                     # Set signals
                     if put_chk is True:
                         chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
-                    self.put_widgets(dialog, field, field['layout_name'], lbl, chk, widget)
+                    self.put_widgets(dialog, field, lbl, chk, widget)
 
 
-    def put_widgets(self, dialog, field, layout_name, lbl, chk, widget):
+    def put_widgets(self, dialog, field,  lbl, chk, widget):
         """ Insert widget into layout """
-        layout = dialog.findChild(QGridLayout, layout_name)
+        layout = dialog.findChild(QGridLayout, field['layoutname'])
         if layout is None:
             return
         layout.addWidget(lbl, int(field['layout_order']), 0)
@@ -1232,6 +1249,78 @@ class ApiParent(ParentAction):
         return 0
 
 
+    def set_widgets(self, dialog, field):
+        widget = None
+        label = None
+        if field['label']:
+            label = QLabel()
+            label.setObjectName('lbl_' + field['widgetname'])
+            label.setText(field['label'].capitalize())
+            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+                label = self.set_setStyleSheet(field, label)
+            if 'tooltip' in field:
+                label.setToolTip(field['tooltip'])
+            else:
+                label.setToolTip(field['label'].capitalize())
+        if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+            widget = self.add_lineedit(field)
+            widget = self.set_widget_size(widget, field)
+            widget = self.set_data_type(field, widget)
+            if Qgis.QGIS_VERSION_INT < 29900:
+                widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
+            else:
+                widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+            widget = self.set_fucntion_associated(dialog, widget, field)
+        elif field['widgettype'] == 'combo':
+            widget = self.add_combobox(field)
+            widget = self.set_widget_size(widget, field)
+            widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return label, widget
+
+
+    def get_values(self, dialog, widget, _json=None):
+        value = None
+        if type(widget) in(QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
+            value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+        elif type(widget) is QComboBox and widget.isEnabled():
+            value = utils_giswater.get_item_data(dialog, widget, 0)
+
+        if str(value) == '' or value is None:
+            _json[str(widget.property('column_id'))] = None
+        else:
+            _json[str(widget.property('column_id'))] = str(value)
+
+
+    def set_fucntion_associated(self, dialog, widget, field):
+        function_name = 'no_function_associated'
+        if 'widgetfunction' in field:
+            if field['widgetfunction'] is not None:
+                function_name = field['widgetfunction']
+            else:
+                msg = ("parameter button_function is null for button " + widget.objectName())
+                self.controller.show_message(msg, 2)
+        else:
+            msg = "parameter button_function not found"
+            self.controller.show_message(msg, 2)
+        if type(widget) == QLineEdit:
+            if Qgis.QGIS_VERSION_INT < 29900:
+                widget.lostFocus.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                #widget.textChanged.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+            else:
+                widget.editingFinished.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+        #elif type(widget) == QComboBox:
+        return widget
+
+
+    def draw_rectangle(self, result, reset_rb=True):
+        """ Draw lines based on geometry """
+        if result['geometry'] is None:
+            return
+        list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
+        # if reset_rb is True:
+        #     self.resetRubberbands()
+        points = self.get_points(list_coord)
+        self.draw_polygon(points)
 
 
 

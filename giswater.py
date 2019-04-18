@@ -191,7 +191,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.master, function_name)
                 action.triggered.connect(callback_function)
             # Utils toolbar actions
-            elif int(index_action) in (206, 19, 83, 99):
+            elif int(index_action) in (206, 19, 58, 83, 99):
                 callback_function = getattr(self.utils, function_name)
                 action.triggered.connect(callback_function)                
             # Generic function
@@ -288,7 +288,7 @@ class Giswater(QObject):
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 86, 64, 65, 66, 67, 68, 74, 75, 81, 82, 83, 84, 98, 99, 196, 206):
+                                 50, 58, 86, 64, 65, 66, 67, 68, 74, 75, 81, 82, 83, 84, 98, 99, 196, 206):
 
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
         # Buttons checkable (normally related with 'map_tools')                
@@ -373,7 +373,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)  
             
         toolbar_id = "utils"
-        list_actions = ['206', '19', '99', '83']
+        list_actions = ['206', '19', '99', '83', '58']
         self.manage_toolbar(toolbar_id, list_actions)                                      
             
         # Manage action group of every toolbar
