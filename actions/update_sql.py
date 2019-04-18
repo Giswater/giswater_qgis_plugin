@@ -1373,7 +1373,7 @@ class UpdateSQL(ParentAction):
     # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type):
 
-        msg = "Are you sure to update the project schema to lastest version?"
+        msg = "Are you sure to update the project schema to last version?"
         result = self.controller.ask_question(msg, "Info")
         if result:
             self.set_wait_cursor()
@@ -1563,9 +1563,9 @@ class UpdateSQL(ParentAction):
                         status = self.readFiles(
                             os.listdir(self.folderUpdates + folder + os.sep + sub_folder + ''), self.folderUpdates + folder + os.sep + sub_folder + '')
                         if status is False:
-                            return False
+                            continue
                 else:
-                    return False
+                    continue
 
         return True
 
@@ -1968,7 +1968,7 @@ class UpdateSQL(ParentAction):
 
 
     def insert_inp_into_db(self, folder_path=None):
-        
+
         _file = open(folder_path, "r+")
         full_file = _file.readlines()
         sql = ""
@@ -2018,10 +2018,18 @@ class UpdateSQL(ParentAction):
                 sql += values
 
         if progress % 500 == 0:
-            self.controller.execute_sql(sql, log_sql=False, commit=False)
+            # TODO:: Use dev_commit or dev_user?
+            if self.dev_user:
+                self.controller.execute_sql(sql, log_sql=False, commit=True)
+            else:
+                self.controller.execute_sql(sql, log_sql=False, commit=False)
             sql = ""
         if sql != "":
-            self.controller.execute_sql(sql, log_sql=False, commit=False)
+            # TODO:: Use dev_commit or dev_user?
+            if self.dev_user:
+                self.controller.execute_sql(sql, log_sql=False, commit=True)
+            else:
+                self.controller.execute_sql(sql, log_sql=False, commit=False)
         _file.close()
         del _file
 
