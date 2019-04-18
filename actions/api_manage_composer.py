@@ -157,8 +157,9 @@ class ApiManageComposer(ApiParent):
             return
         print_ = getattr(selected_com.composition(), 'print')
         success = print_(self.printer)
-        if not success:
-            QMessageBox.warning(self.iface.mainWindow(), self.tr("Print Failed"), self.tr("Failed to print the composition."))
+        # self.controller.log_info(str(success))
+        # if not success:
+        #     QMessageBox.warning(self.iface.mainWindow(), self.controller.tr("Print Failed"), self.controller.tr("Failed to print the composition."))
 
     def update_rectangle(self, dialog, my_json):
         pass
@@ -211,7 +212,7 @@ class ApiManageComposer(ApiParent):
         body = "" + client + form + feature + data
         sql = ("SELECT " + self.schema_name + ".gw_api_setprint($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
-        if not row:
+        if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)
             return False
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]

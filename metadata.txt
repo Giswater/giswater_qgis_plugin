@@ -15,6 +15,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 # Uncomment the following line and add your changelog:
 
 changelog=Version 3.1.113 (30/04/2019)
+    - New button added Print Composer
     - Minor improvements
 
 
