@@ -169,13 +169,8 @@ class ApiConfig(ApiParent):
         if chk_dma and chk_expl:
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
+        self.hide_void_groupbox(self.dlg_config)
 
-        # Remove empty grupbox
-        grbox_list = self.dlg_config.findChildren(QGroupBox)
-        for grbox in grbox_list:
-            widget_list = grbox.findChildren(QWidget)
-            if len(widget_list) == 0:
-                grbox.setVisible(False)
 
         # Open form
         self.dlg_config.show()

@@ -62,7 +62,7 @@ class ApiManageComposer(ApiParent):
         if complet_result[0]['formTabs']:
             fields = complet_result[0]['formTabs'][0]
             self.create_dialog(self.dlg_composer, fields)
-
+        self.hide_void_groupbox(self.dlg_composer)
         # Set current values from canvas
         w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
         w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
@@ -76,8 +76,8 @@ class ApiManageComposer(ApiParent):
         self.my_json['scale'] = scale
 
         # Signals
-        self.dlg_composer.btn_print.clicked.connect(self.__print)
-        self.dlg_composer.btn_export.clicked.connect(partial(self.export, self.dlg_composer))
+        self.dlg_composer.btn_print.clicked.connect(partial(self.__print, self.dlg_composer))
+        self.dlg_composer.btn_preview.clicked.connect(partial(self.preview, self.dlg_composer, True))
         self.dlg_composer.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(partial(self.save_settings, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(self.destructor)
@@ -88,11 +88,14 @@ class ApiManageComposer(ApiParent):
         self.iface.mapCanvas().extentsChanged.connect(partial(self.accept, self.dlg_composer, self.my_json))
 
 
-    def export(self, dialog):
+    def preview(self, dialog, show):
         """ Export values from widgets(only QLineEdit) into dialog, to selected composer
             if composer.widget.id == dialog.widget.property('column_id')
         """
+
         selected_com = self.get_current_composer()
+        if show:
+            selected_com.composerWindow().show()
         composition = selected_com.composition()
 
         widget_list = dialog.findChildren(QLineEdit)
@@ -144,14 +147,14 @@ class ApiManageComposer(ApiParent):
         return selected_com
 
 
-    def __print(self):
+    def __print(self, dialog):
         if not self.printer:
             self.printer = QPrinter()
 
         printdialog = QPrintDialog(self.printer)
         if printdialog.exec_() != QDialog.Accepted:
             return
-
+        self.preview(dialog, False)
         selected_com = self.get_current_composer()
         if selected_com is None:
             return

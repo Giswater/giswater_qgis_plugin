@@ -32,9 +32,10 @@ from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDat
 from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
-from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit
-from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox
 from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtSql import QSqlTableModel
+
 
 import json
 import os
@@ -1322,5 +1323,10 @@ class ApiParent(ParentAction):
         points = self.get_points(list_coord)
         self.draw_polygon(points)
 
-
-
+    def hide_void_groupbox(self, dialog):
+        # Hide empty grupbox
+        grbox_list = dialog.findChildren(QGroupBox)
+        for grbox in grbox_list:
+            widget_list = grbox.findChildren(QWidget)
+            if len(widget_list) == 0:
+                grbox.setVisible(False)
