@@ -5,38 +5,32 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-import re
-
 try:
     from qgis.core import Qgis
 except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    pass
+    from qgis.core import QgsComposerMap, QgsComposerLabel
+    from qgis.PyQt.QtGui import QPrintDialog, QPrinter, QDialog
 else:
-    from builtins import range
+    pass
 
-from qgis.core import QgsComposerMap, QgsPoint, QgsGeometry, QgsRectangle, QgsComposerLabel
-from qgis.gui import QgsVertexMarker, QgsRubberBand
-
-
-from qgis.PyQt.QtCore import Qt, QRectF, QPointF, QRegExp
-from qgis.PyQt.QtGui import QColor, QIntValidator, QRegExpValidator, QPrintDialog, QPrinter, QDialog
-from qgis.PyQt.QtWidgets import QMessageBox, QLineEdit
-
+from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtCore import QRegExp
+from qgis.PyQt.QtWidgets import QLineEdit
 
 import json
-import utils_giswater
-
 from collections import OrderedDict
 from functools import partial
 
+import utils_giswater
 from giswater.actions.api_parent import ApiParent
 from giswater.ui_manager import ApiComposerUi
 
 
 class ApiManageComposer(ApiParent):
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control Composer button """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
@@ -241,5 +235,5 @@ class ApiManageComposer(ApiParent):
             maps[map_index].setNewScale(float(scale))
             maps[map_index].setMapRotation(float(rotation))
 
-
         return True
+
