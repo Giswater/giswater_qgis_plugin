@@ -86,7 +86,7 @@ BEGIN
     -- select map with maximum width
     SELECT array_agg(a->>'width') INTO v_array_width FROM json_array_elements(v_json3) AS a;
     SELECT max (a) INTO v_width FROM unnest(v_array_width) AS a;
-    SELECT a->>'name' INTO v_mapcomposer_name FROM json_array_elements(v_json3) AS a WHERE a->>'width' = v_width::text;
+    SELECT a->>'name' INTO v_mapcomposer_name FROM json_array_elements(v_json3) AS a WHERE (a->>'width')::float = v_width::float;
     SELECT a->>'height' INTO v_height FROM json_array_elements(v_json3) AS a WHERE a->>'name' = v_mapcomposer_name;  
 
     -- loop for fields
