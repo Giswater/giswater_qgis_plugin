@@ -7,6 +7,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+INSERT INTO cat_dwf_scenario VALUES (1, 'scenario1', '2017-01-01', '2017-12-31');
+
+UPDATE inp_dwf SET dwfscenario_id=1;
+
 
 INSERT INTO cat_users VALUES (1,'user1');
 INSERT INTO cat_users VALUES (2,'user2');
