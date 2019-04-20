@@ -1,0 +1,4 @@
+3.2.001
+*******
+Add column (node_id) on ext_rtc_scada
+Full refactor of go2epa

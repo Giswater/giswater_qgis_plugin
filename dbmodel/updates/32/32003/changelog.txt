@@ -1,0 +1,11 @@
+3.2.003
+*******
+New table anl_polygon
+New index anl_polygon_index
+New columns (descpript, result_id) on anl_node table
+New columns (descpript, result_id) on anl_arc table
+New columns (descpript, result_id) on anl_arc_x_node table
+New columns (descpript, result_id) on anl_connec table
+New column (parentlayer) on sys_feature_type table
+New column (link) on dma table
+New columns (isdeprecated) on audit_cat_param_user table

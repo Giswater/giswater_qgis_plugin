@@ -1,0 +1,7 @@
+3.2.004
+*******
+New column (csvversion) on sys_csv2pg_config table.
+New column (epaversion) on audit_cat_param_user table.
+Update values on sys_fprocess_cat table
+Update values on audit_cat_function table
+Some additional constraint on man_addfields_value, cat_feature, sys_feature_cat tables
