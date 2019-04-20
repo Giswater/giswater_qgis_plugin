@@ -48,5 +48,4 @@ CREATE INDEX anl_polygon_index
   (the_geom);
 
 -- 2019/04/03
-ALTER TABLE config_param_system ADD COLUMN isdeprecated boolean;
 ALTER TABLE audit_cat_param_user ADD COLUMN isdeprecated boolean;
