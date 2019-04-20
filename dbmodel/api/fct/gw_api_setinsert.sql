@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2616
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_api_setinsert(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setinsert(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -68,8 +68,8 @@ DECLARE
 
 BEGIN
 	--    Set search path to local schema
-	SET search_path = ""SCHEMA_NAME"", public;
-	v_schemaname = '"SCHEMA_NAME"';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 	
 	-- Get paramters
 	EXECUTE 'SELECT epsg FROM version' INTO v_epsg;
