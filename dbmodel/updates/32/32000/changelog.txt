@@ -1,19 +1,14 @@
-****************************
-******    3.2.000   ********
-****************************
-
-
-*******    UTILS    ********
-
-
-***********  WS  ************
-Full refactor of go2epa
-
-
-***********  UD  ************
-Full refactor of go2epa
-
-
-**********  I18N  ***********
-
-
+3.2.000
+*******
+Full refactor epa tables changing the epa strategy with:
+-New fields on audit_cat_param_user
+-New fields on audit_cat_function
+-New fields on config_param_system
+-Replaced existing table of temp_csv2pg
+-New table sys_csv2pg_config
+-New table inp_typevalue
+-New table inp_valve_importinp (ws)
+-New table inp_pump_importinp (ws)
+-New constraint epa on arc_type table
+-New constraint epa on node_type table
+New triggers for man_addfields_control
