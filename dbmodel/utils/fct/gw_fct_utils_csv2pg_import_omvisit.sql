@@ -7,18 +7,25 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2512
 
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(p_isvisitexists boolean, p_isparametervalue boolean, p_visit_descript text)
-  RETURNS integer AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(boolean, boolean, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(p_data json)
+RETURNS json AS
 $BODY$
 
+/*
+EXAMPLE
+-------
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{},
+"data":{"visitDescript":"Test"}}$$)
 
-/*INSTRUCTIONS
 
-Three parameters:
-1: p_isvisitexists: 	- If true, no visit is added because events are related to existing visits
-2: p_isparametervalue:	- On the column of om_visit_event.parameter_id in spite of insert parameter_id, parameter value is inserted. The field of parameter value keeps with nulls
-3: p_visit_descript:	- om_visit.descript value
+INSTRUCTIONS
+------------
+Two parameters:
+1: v_isvisitexists: 	- If true, no visit is added because events are related to existing visits
+2: v_visit_descript:	- om_visit.descript value
 
 Three steps:
 1) PREVIOUS
@@ -47,48 +54,65 @@ select distinct "ESTAT_GENERAL" from public.traspas_events
 */
 
 DECLARE
-	v_parameters text[];
+	v_parameters record;
 	v_visit record;
 	v_parameter_id text;
 	v_csv integer = 0;
 	v_csv_id text;
 	v_parameter_value text;
+	v_isvisitexists boolean;
+	v_visit_descript text;
+	v_result_id text= 'import visit file';
+	v_result json;
+	v_result_info json;
+	v_project_type text;
+	v_version text;
+	v_featuretable text;
 BEGIN
 
---  Search path
-    SET search_path = "SCHEMA_NAME", public;
+	--  Search path
+	SET search_path = "SCHEMA_NAME", public;
 
-    -- Get parameters
-    SELECT value INTO v_parameters FROM config_param_system WHERE parameter = 'utils_csv2pg_om_visit_parameters';
+	-- get system parameters
+	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
-	-- Check data
-	-- visitcat_id
-	-- visit_id
+	-- get config parameteres
+	v_isvisitexists = (SELECT value::json->>'isVisitExists' FROM config_param_system WHERE parameter = 'utils_csv2pg_om_visit_parameters');
 
+	-- get input parameter
+	v_visit_descript =  (p_data::json->>'data')::json->>'visitDescript';
+
+	-- manage log (fprocesscat 42)
+	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND user_name=current_user;
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT VISIT FILE'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('----------------------'));
+   
+ 	-- starting process
 	-- Insert into audit table
 	INSERT INTO audit_log_csv2pg 
 	(csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20)
 	SELECT csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
-	FROM temp_csv2pg;
+	FROM temp_csv2pg WHERE csv2pgcat_id=9 AND user_name=current_user;
 
-	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=2 AND user_name=current_user
+	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=9 AND user_name=current_user
 	LOOP
 	
-		IF p_isvisitexists IS FALSE THEN
+		IF v_isvisitexists IS FALSE OR v_isvisitexists IS NULL THEN
 		
 			-- Insert into visit table
 			INSERT INTO om_visit (id, visitcat_id, startdate, enddate, ext_code, user_name, descript) 
-			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv7::date, v_visit.csv7::date, v_visit.csv8, v_visit.csv9, p_visit_descript);
+			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv7::date, v_visit.csv7::date, v_visit.csv8, v_visit.csv9, v_visit_descript);
 	
 			-- Insert into feature table
-			EXECUTE 'UPDATE om_visit_x_'||v_visit.csv5||' SET is_last=FALSE where '||v_visit.csv5||'_id::text='||v_visit.csv6||'::text';
-			EXECUTE 'INSERT INTO om_visit_x_'||v_visit.csv5||' (visit_id, '||v_visit.csv5||'_id) VALUES ( '||v_visit.csv1||','||v_visit.csv6||')';
+			v_featuretable = concat ('om_visit_x_', v_visit.csv5);
+			EXECUTE 'UPDATE '||v_featuretable||' SET is_last=FALSE where '||v_visit.csv5||'_id::text='||v_visit.csv6||'::text';
+			EXECUTE 'INSERT '||v_featuretable||' (visit_id, '||v_visit.csv5||'_id) VALUES ( '||v_visit.csv1||','||v_visit.csv6||')';
 		
 		END IF;
 	
 		v_csv=10;
 			
-		FOREACH v_parameter_id IN ARRAY v_parameters
+		FOR v_parameters IN SELECT json_array_elements((value::json->>'parameters')::json) FROM config_param_system WHERE parameter = 'utils_csv2pg_om_visit_parameters'
 		LOOP			
 			-- parameters are defined from row csv10 to row csv20
 			IF v_csv = 10 THEN
@@ -117,24 +141,46 @@ BEGIN
 			v_csv=v_csv+1;
 				raise notice 'v_parameter_id: %, v_parameter_value: %', v_parameter_id, v_parameter_value;
 	
-			IF p_isparametervalue IS FALSE THEN
-				-- set previous to is_last=false
-				EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_id)||' AND visit_id IN (SELECT visit_id FROM om_visit_x_'||v_visit.csv5||'
-					WHERE '||v_visit.csv5||'_id = '||v_visit.csv6||'::text)';
-				-- insert event
-				INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (v_visit.csv1::bigint, v_parameter_id, v_parameter_value , v_visit.csv7::timestamp);
-			
-			ELSIF p_isparametervalue IS TRUE AND v_parameter_value IS NOT NULL THEN 
-				-- set previous to is_last=false
-				EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_value)||' AND visit_id IN (SELECT visit_id FROM om_visit_x_'||v_visit.csv5||'
-					WHERE '||v_visit.csv5||'_id = '||v_visit.csv6||'::text)';
-				-- insert event
-				INSERT INTO om_visit_event (visit_id, parameter_id, tstamp) VALUES (v_visit.csv1::bigint, v_parameter_value, v_visit.csv7::timestamp);
-			END IF;
+			-- set previous to is_last=false
+			EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_id)||' AND visit_id IN (SELECT visit_id FROM om_visit_x_'||v_visit.csv5||'
+				WHERE '||v_visit.csv5||'_id = '||v_visit.csv6||'::text)';
+
+			-- insert event
+			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (v_visit.csv1::bigint, v_parameter_id, v_parameter_value , v_visit.csv7::timestamp);			
 		END LOOP;				
 	END LOOP;
+
+	-- Delete values on temporal table
+	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=9;
+
+	-- manage log (fprocesscat 42)
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit table -> Done'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit_event table -> Done'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
 	
-RETURN 0;
+	-- get log (fprocesscat 42)
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=42) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+			
+	-- Control nulls
+	v_version := COALESCE(v_version, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}'); 
+ 
+	-- Return
+	RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"Process executed"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||'}}'||
+	    '}')::json;
+	    
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","message":{"priority":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	
 	
 END;
 $BODY$
