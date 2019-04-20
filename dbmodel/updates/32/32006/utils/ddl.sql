@@ -7,4 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
 ALTER TABLE audit_cat_table ADD COLUMN sys_roleselect_id varchar (16);
+
+-- 2019/04/19
+ALTER TABLE sys_csv2pg_cat ADD COLUMN formname varchar (50);
+ALTER TABLE sys_csv2pg_cat ADD COLUMN functionname varchar (50);
+ALTER TABLE sys_csv2pg_cat ADD COLUMN isdeprecated boolean;
+
