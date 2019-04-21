@@ -10,7 +10,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO audit_cat_param_user VALUES ('epaversion', null, 'Version of EPANET. Hard coded variable. Only enabled version is EPANET-EN 2.0.12', 'role_epa', NULL, NULL, 'EPANET version:', NULL, NULL, false, NULL, NULL, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', true, null, '2.0.12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('epaversion', 'epaoptions', 'Version of EPANET. Hard coded variable. Only enabled version is EPANET-EN 2.0.12', 'role_epa', NULL, NULL, 'EPANET version:', NULL, NULL, false, NULL, NULL, 'ws', false, NULL, NULL, NULL, false, 'string', 'combo', true, null, '2.0.12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
 
 
 UPDATE audit_cat_param_user SET epaversion='{"from":"2.0.12", "to":null, "language":"english"}' where formname='epaoptions';
@@ -50,6 +50,7 @@ INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_value_reactions', '
 INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_value_reactions', 'TANK', 'TANK');
 
 
+--To delete
 DELETE FROM inp_typevalue WHERE typevalue='inp_typevalue_pump';
 DELETE FROM inp_typevalue WHERE typevalue='inp_typevalue_reactions_gl';
 DELETE FROM inp_typevalue WHERE typevalue='inp_value_reactions_el';
