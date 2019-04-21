@@ -90,7 +90,7 @@ BEGIN
 
 	-- Get all parameters from audit_cat param_user
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_id, layout_order,layout_name, 
+		SELECT label, audit_cat_param_user.id as widgetname, value , datatype, widgettype, layout_id, layout_order, layoutname, 
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 		row_number()over(ORDER BY layout_id, layout_order) AS orderby, isparent, sys_role_id,project_type, ismandatory, reg_exp,
 		(CASE WHEN value is not null THEN ''True'' ELSE ''False'' END) AS checked,
@@ -100,7 +100,7 @@ BEGIN
 		FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))	
 		AND formname ='||quote_literal(lower(v_formname))||'
-		AND epaversion::json->>''from''= '||quote_literal(v_epaversion)||'
+		AND (epaversion::json->>''from''= '||quote_literal(v_epaversion)||' or formname !=''epaoptions'')
 		AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||')
 		AND isenabled IS TRUE
 		ORDER by orderby)a'
@@ -108,14 +108,14 @@ BEGIN
 
 	--  Combo rows
 	EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		 SELECT label, audit_cat_param_user.id as widgetname, datatype, widgettype, layout_id, layout_order,layout_name,
+		 SELECT label, audit_cat_param_user.id as widgetname, datatype, widgettype, layout_id, layout_order,layoutname,
 		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
 		 row_number()over(ORDER BY layout_id, layout_order) AS orderby, value, project_type, dv_querytext,dv_parent_id, isparent, sys_role_id,
 		 placeholder
 		 FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
 		 WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
   		 AND formname ='||quote_literal(lower(v_formname))||'
- 		 AND epaversion::json->>''from''= '||quote_literal(v_epaversion)||'
+		 AND (epaversion::json->>''from''= '||quote_literal(v_epaversion)||' or formname !=''epaoptions'')
 		 AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||')
 		 AND isenabled IS TRUE
 		 ORDER BY orderby) a WHERE widgettype = ''combo'''
@@ -137,8 +137,6 @@ BEGIN
 			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||(aux_json->>'dv_querytext')||' ORDER BY idval)a'
 				INTO combo_json; 
 				combo_json := COALESCE(combo_json, '[]');
-
-			RAISE NOTICE 'aux_json %', aux_json;
 
 			-- Update array
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
@@ -248,6 +246,7 @@ BEGIN
 	v_formgroupbox_json := array_to_json(v_formgroupbox);
 
 --    Check null
+    api_version := COALESCE(api_version, '[]'); 
     v_formtabs := COALESCE(v_formtabs, '[]'); 
     v_formgroupbox_json := COALESCE(v_formgroupbox_json, '[]'); 
 
