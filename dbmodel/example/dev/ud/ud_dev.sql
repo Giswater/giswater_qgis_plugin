@@ -23,17 +23,19 @@ UPDATE arc set epa_type='WEIR' WHERE arc_id IN ('154','155','156','157');
 
 UPDATE inp_conduit SET flap='NO';
 
+INSERT INTO inp_snowpack_id VALUES ('Spack_01', 'Demo snow pack');
+
 UPDATE subcatchment SET snow_id='Spack_01';
 
-INSERT INTO inp_inflows (node_id, timser_id, sfactor, base, pattern_id) 
-SELECT node_id, 'T5-5m', 1, 0.2, 'pattern_01' FROM node;
+
+INSERT INTO inp_inflows (node_id, timser_id, sfactor, base, pattern_id) SELECT node_id, 'T5-5m', 1, 0.2, NULL FROM node;
 
 
-INSERT INTO inp_adjustments VALUES ('2', 'EVAPORATION_ADEJ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO inp_adjustments VALUES ('2', 'EVAPORATION', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO inp_adjustments VALUES ('1', 'TEMPERATURE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
-INSERT INTO inp_aquifer VALUES ('aquifer01', 0.5000, 0.1500, 0.3000, 5.0000, 10.0000, 15.0000, 0.3500, 14.0000, 0.0020, 0.0000, 10.0000, 0.3000, 'patter01');
+INSERT INTO inp_aquifer VALUES ('aquifer01', 0.5000, 0.1500, 0.3000, 5.0000, 10.0000, 15.0000, 0.3500, 14.0000, 0.0020, 0.0000, 10.0000, 0.3000, NULL);
 
 
 INSERT INTO inp_controls_x_arc (id, arc_id, text) VALUES (2, '201', 'IF TIME SIMULATION IS >3');
@@ -81,7 +83,7 @@ INSERT INTO inp_curve VALUES (36, 'C7_TIDAL', 3.000000, 3.000000);
 
 
 
-INSERT INTO inp_divider VALUES ('129', 'TABULAR_DIVIDER', '201', 'C2_DIVERSION', NULL, NULL, NULL, 0.8982, 0.6767, 63.5941);
+INSERT INTO inp_divider VALUES ('129', 'TABULAR', '201', 'C2_DIVERSION', NULL, NULL, NULL, 0.8982, 0.6767, 63.5941);
 INSERT INTO inp_divider VALUES ('130', 'CUTOFF', '202', NULL, 1.000000, NULL, NULL, 0.1588, 0.7805, 79.9171);
 INSERT INTO inp_divider VALUES ('131', 'WEIR', '203', NULL, 1.000000, 1.0000, 1.0000, 0.5573, 0.1130, 75.8022);
 INSERT INTO inp_divider VALUES ('132', 'OVERFLOW', '204', NULL, NULL, NULL, NULL, 0.0345, 0.3384, 35.7010);
@@ -89,10 +91,10 @@ INSERT INTO inp_divider VALUES ('132', 'OVERFLOW', '204', NULL, NULL, NULL, NULL
 
 
 INSERT INTO inp_evaporation (evap_type, value) VALUES ('CONSTANT', '1');
-INSERT INTO inp_evaporation (evap_type, value) VALUES ('TEMPERATURE_EVAP', NULL);
-INSERT INTO inp_evaporation (evap_type, value) VALUES ('MONTHLY_EVAP', '1 0.5 2 4 2 5 4.3 2 2.3 2 1.2 3.4');
-INSERT INTO inp_evaporation (evap_type, value) VALUES ('TIMESERIES_EVAP', 'T100-5m');
-INSERT INTO inp_evaporation (evap_type, value) VALUES ('FILE_EVAP', 'fname');
+INSERT INTO inp_evaporation (evap_type, value) VALUES ('TEMPERATURE', NULL);
+INSERT INTO inp_evaporation (evap_type, value) VALUES ('MONTHLY', '1 0.5 2 4 2 5 4.3 2 2.3 2 1.2 3.4');
+INSERT INTO inp_evaporation (evap_type, value) VALUES ('TIMESERIES', 'T100-5m');
+INSERT INTO inp_evaporation (evap_type, value) VALUES ('FILE', 'fname');
 INSERT INTO inp_evaporation (evap_type, value) VALUES ('RECOVERY', 'patten_01');
 
 
@@ -134,8 +136,8 @@ INSERT INTO inp_landuses VALUES ('urban', 0.0000, 0.0000, 0.0000);
 
 INSERT INTO inp_lid_control VALUES (1, 'lid01', 'IT', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO inp_lid_control VALUES (4, 'lid01', 'DRAIN', 0.0000, 0.5000, 0.0000, 6.0000, NULL, NULL, NULL);
-INSERT INTO inp_lid_control VALUES (2, 'lid01', 'SURFACE_LID', 0.0000, 0.0000, 0.1000, 1.0000, 5.0000, 3.0000, NULL);
-INSERT INTO inp_lid_control VALUES (3, 'lid01', 'SURFACE_LID', 12.0000, 0.7500, 0.0000, 6.0000, 5.0000, 3.0000, NULL);
+INSERT INTO inp_lid_control VALUES (2, 'lid01', 'SURFACE', 0.0000, 0.0000, 0.1000, 1.0000, 5.0000, 3.0000, NULL);
+INSERT INTO inp_lid_control VALUES (3, 'lid01', 'SURFACE', 12.0000, 0.7500, 0.0000, 6.0000, 5.0000, 3.0000, NULL);
 
 
 INSERT INTO inp_lidusage_subc_x_lidco VALUES ('S104', 'lid01', 1, 0.010000, 10.0000, 0.0000, 0.0000, 0, '0');
@@ -151,10 +153,10 @@ INSERT INTO inp_orifice VALUES ('158', NULL, 'SIDE', 2.0000, 1.0000, 1.0000, 'YE
 INSERT INTO inp_orifice VALUES ('159', NULL, 'BOTTOM', 2.0000, 1.0000, 1.0000, 'NO', 'RECT_CLOSED', NULL, 1.0000, 2.0000, 0.0000, 0.0000);
 
 
-INSERT INTO inp_outfall VALUES ('127', 'TIDAL_OUTFALL', NULL, 'C7_TIDAL', NULL, 'YES');
+INSERT INTO inp_outfall VALUES ('127', 'TIDAL', NULL, 'C7_TIDAL', NULL, 'YES');
 INSERT INTO inp_outfall VALUES ('128', 'FIXED', 225.0000, NULL, NULL, 'YES');
 INSERT INTO inp_outfall VALUES ('126', 'NORMAL', NULL, NULL, NULL, 'YES');
-UPDATE inp_outfall SET outfall_type='TIMESERIES_OUTF', timser_id='T10-5m', gate='YES'  WHERE node_id='236';
+UPDATE inp_outfall SET outfall_type='TIMESERIES', timser_id='T10-5m', gate='YES'  WHERE node_id='236';
 UPDATE inp_outfall SET outfall_type='FREE', gate='YES'  WHERE node_id='240';
 
 
@@ -166,7 +168,7 @@ INSERT INTO inp_outlet VALUES ('153', NULL, 'TABULAR/HEAD', 1.0000, 'C1_CONTROL'
 DELETE FROM inp_pattern;
 INSERT INTO inp_pattern (pattern_id, pattern_type, observ) VALUES ('pattern_02', 'DAILY', NULL);
 INSERT INTO inp_pattern (pattern_id, pattern_type, observ) VALUES ('pattern_01', 'HOURLY', NULL);
-INSERT INTO inp_pattern (pattern_id, pattern_type, observ) VALUES ('pattern_03', 'MONTHLY_PATTERN', NULL);
+INSERT INTO inp_pattern (pattern_id, pattern_type, observ) VALUES ('pattern_03', 'MONTHLY', NULL);
 INSERT INTO inp_pattern (pattern_id, pattern_type, observ) VALUES ('pattern_04', 'WEEKEND', NULL);
 
 DELETE FROM inp_pattern_value;
@@ -194,29 +196,28 @@ INSERT INTO inp_pollutant VALUES ('SS', 'MG/L', 10.0000, 5.0000, 0.0000, 5.0000,
 INSERT INTO inp_rdii VALUES ('101', 'UH1', 0.251000);
 INSERT INTO inp_rdii VALUES ('102', 'UH1', 0.325100);
 
-
 INSERT INTO inp_snowpack VALUES (1, 'Spack_01', 'PLOWABLE', 0.001, 0.001, 32.000, 0.001, 0.000, 0.000, 0.000);
 INSERT INTO inp_snowpack VALUES (2, 'Spack_01', 'IMPERVIOUS', 0.001, 0.001, 32.000, 0.001, 0.000, 0.000, 0.000);
 INSERT INTO inp_snowpack VALUES (3, 'Spack_01', 'PERVIOUS', 0.001, 0.001, 0.000, 0.001, 0.000, 0.000, 0.000);
 INSERT INTO inp_snowpack VALUES (4, 'Spack_01', 'REMOVAL', 1.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000);
 
 DELETE FROM inp_storage;
-INSERT INTO inp_storage VALUES ('18828', 'TABULAR_STORAGE', 'EBAR-02', NULL, NULL, NULL, 1.0000, 1.0000, 1.0000, 1.0000, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_storage VALUES ('18828', 'TABULAR', 'EBAR-02', NULL, NULL, NULL, 1.0000, 1.0000, 1.0000, 1.0000, 0.0000, 0.0000, 0.0000);
 INSERT INTO inp_storage VALUES ('238', 'FUNCTIONAL', NULL, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 0.0000, 0.0000, 0.0000);
-INSERT INTO inp_storage VALUES ('125', 'TABULAR_STORAGE', 'EBAR-02', NULL, NULL, NULL, 1.0000, 1.0000, 1.0000, 1.0000, 0.0000, 0.0000, 0.0000);
+INSERT INTO inp_storage VALUES ('125', 'TABULAR', 'EBAR-02', NULL, NULL, NULL, 1.0000, 1.0000, 1.0000, 1.0000, 0.0000, 0.0000, 0.0000);
 
 
 INSERT INTO inp_temperature VALUES (6, 'SNOWMELT', '1 2 3 4 5 6 7 8 9 10 11 12');
 INSERT INTO inp_temperature VALUES (1, 'ADC', 'IMPERVIOUS 1 2 3 4 5 6 7 8 9 10 11 12');
 INSERT INTO inp_temperature VALUES (2, 'ADC', 'PERVIOUS 1 2 3 4 5 6 7 8 9 10 11 12');
-INSERT INTO inp_temperature VALUES (7, 'TIMESERIES_TEMP', 'T10-5m');
-INSERT INTO inp_temperature VALUES (3, 'TIMESERIES_TEMP', 'FILE "c:/data/temperature.txt"');
+INSERT INTO inp_temperature VALUES (7, 'TIMESERIES', 'T10-5m');
+INSERT INTO inp_temperature VALUES (3, 'TIMESERIES', 'FILE "c:/data/temperature.txt"');
 INSERT INTO inp_temperature VALUES (4, 'WINDSPEED', 'FILE "c:/data/windspeed.txt"');
-INSERT INTO inp_temperature VALUES (5, 'WINDSPEED', 'MONTLY 1 2 3 4 5 6 7 8 9 10 11 12');
+INSERT INTO inp_temperature VALUES (5, 'WINDSPEED', 'MONTHLY 1 2 3 4 5 6 7 8 9 10 11 12');
 
 
 INSERT INTO inp_timser_id VALUES ('T100-5m', 'Rainfall', 'ABSOLUTE');
-INSERT INTO inp_timser_id VALUES ('T2-5m', 'Rainfall', 'FILE_TIME');
+INSERT INTO inp_timser_id VALUES ('T2-5m', 'Rainfall', 'FILE');
 
 INSERT INTO inp_timeseries VALUES (25, 'T2-5m', NULL, NULL, NULL, NULL, '"C:\Users\usuario\Desktop\masterplan_test.txt"');
 INSERT INTO inp_timeseries VALUES (26, 'T100-5m', '05/12/1995', '0:00', NULL, 0.5000, NULL);
@@ -233,7 +234,7 @@ INSERT INTO inp_timeseries VALUES (37, 'T100-5m', '05/12/1995', '0:55', NULL, 0.
 INSERT INTO inp_timeseries VALUES (32, 'T100-5m', '05/12/1995', '0:30', NULL, 22.1250, NULL);
 
 INSERT INTO inp_inflows_pol_x_node (poll_id, node_id, timser_id, form_type, mfactor, sfactor, base, pattern_id) 
-SELECT 'SS',node_id, 'T5-5m', 'CONCEN_INFLOWS',1, 1, 0.2, 'pattern_01' FROM node;
+SELECT 'SS',node_id, 'T5-5m', 'CONCEN',1, 1, 0.2, 'pattern_01' FROM node;
 
 
 INSERT INTO inp_buildup_land_x_pol (landus_id, poll_id, funcb_type, c1, c2, c3, perunit) VALUES ('rural', 'SS', 'SAT', 0.0500, 1.0000, 5.0000, 'AREA');
@@ -257,7 +258,7 @@ INSERT INTO inp_washoff_land_x_pol VALUES ('rural', 'SS', 'RC', 1.0000, 1.2500, 
 INSERT INTO inp_washoff_land_x_pol VALUES ('urban', 'SS', 'RC', 0.8500, 1.8000, 0.6400, 26.6000);
 
 
-INSERT INTO inp_weir VALUES ('155', NULL, 'TRAPEZOIDAL_WEIR', 1.0000, 0.5000, 1.0000, 1.0000, 'NO', NULL, 1.0000, 1.0000, 1.0000, 1.0000, '2.1');
+INSERT INTO inp_weir VALUES ('155', NULL, 'TRAPEZOIDAL', 1.0000, 0.5000, 1.0000, 1.0000, 'NO', NULL, 1.0000, 1.0000, 1.0000, 1.0000, '2.1');
 INSERT INTO inp_weir VALUES ('156', NULL, 'SIDEFLOW', 1.0000, 0.5000, 1.0000, 1.0000, 'YES', NULL, 1.0000, 1.0000, 0.0000, 0.0000, '2.1');
 INSERT INTO inp_weir VALUES ('157', NULL, 'V-NOTCH', 1.0000, 0.5000, 1.0000, 1.0000, 'NO', NULL, 1.0000, 1.0000, 0.0000, 0.0000, '1.0');
 INSERT INTO inp_weir VALUES ('154', NULL, 'TRANSVERSE', 1.0000, 0.5000, 1.0000, 1.0000, 'YES', NULL, 1.0000, 1.0000, 0.0000, 0.0000, '0.0');
