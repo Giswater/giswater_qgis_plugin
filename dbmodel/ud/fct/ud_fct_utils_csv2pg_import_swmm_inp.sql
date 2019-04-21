@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(p_pat
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp('D:\dades\test.inp');
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(NULL);
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(null);
 
 */
 
@@ -38,7 +38,7 @@ $BODY$
 	v_node1 text;
 	v_node2 text;
 	v_elevation float;
-	v_arc2node_reverse boolean = true; -- MOST IMPORTANT variable of this function. When true importation will be used making and arc2node reverse transformation for pumps and valves. Only works using Giswater sintaxis of additional pumps
+	v_arc2node_reverse boolean = true; -- not used on ud
 	v_delete_prev boolean = true; -- used on dev mode to
 	v_querytext text;
 	v_nodecat text;
@@ -61,6 +61,8 @@ BEGIN
 	
 	-- Get SRID
 	SELECT epsg INTO epsg_val FROM version LIMIT 1;
+
+	RAISE NOTICE 'step 1/6';
 
 	IF v_delete_prev THEN
 
@@ -103,9 +105,16 @@ BEGIN
 	
 		DELETE FROM config_param_user ;
 
-		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id='role_epa' AND id NOT LIKE 'v%') and  id not like 'inp_%'
+		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_edit' AND id NOT LIKE 'v%') 
 		LOOP 
-			RAISE NOTICE 'v_id %', v_id;
+			--RAISE NOTICE 'v_id %', v_id;
+			EXECUTE 'DELETE FROM '||quote_ident(v_id);
+		END LOOP;
+
+		
+		FOR v_id IN SELECT id FROM audit_cat_table WHERE (sys_role_id ='role_epa' AND id NOT LIKE 'v%') 
+		LOOP 
+			--RAISE NOTICE 'v_id %', v_id;
 			EXECUTE 'DELETE FROM '||quote_ident(v_id);
 		END LOOP;
 			
@@ -116,30 +125,20 @@ BEGIN
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
-		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' )';
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' ) ';
 	END IF;
 
-	-- Harmonize the source table
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
-	LOOP
-		-- massive refactor of source field (getting target)
-		--Fill in the fields source with the name of the target in order to refactor and read data correctly
-		IF rpt_rec.csv1 LIKE '[%' THEN
-			v_target=rpt_rec.csv1;
-		END IF;
-		UPDATE temp_csv2pg SET source=v_target WHERE rpt_rec.id=temp_csv2pg.id;
-
-		raise notice '1st loop %', rpt_rec;
-	END LOOP;
-		-- refactor of [OPTIONS] target
+			-- refactor of [OPTIONS] target
 		--Target in order to insert them to the tables using editable views, which have different values concatenated into one field. 
 		--Those values are later separated using the trigger in order to put it in corresponding fields if necessary.
 		--Concatenation is made using ';' when the values need the separation in the next step (trigger) and by ' ' when they are inserted into the same field.
 
+	RAISE NOTICE 'step 2/6';
+	
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 
-		raise notice 'Second loop %', rpt_rec;
+		--raise notice 'Second loop %', rpt_rec;
 
 		IF rpt_rec.source ='[TEMPERATURE]' AND rpt_rec.csv3 is not null THEN 
 			IF rpt_rec.csv1 LIKE 'TIMESERIES' OR rpt_rec.csv1 LIKE 'FILE' OR rpt_rec.csv1 LIKE 'SNOWMELT' THEN
@@ -151,52 +150,46 @@ BEGIN
 			END IF;
 		END IF;
 
-		/*					
-		IF rpt_rec.source LIKE '%TRANSECTS%'  AND rpt_rec.csv2 is not null THEN 
-			UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
-			csv2=null,csv3=null, csv4=null, csv5=null, csv6=null, csv7=null,csv8=null, csv9=null,csv10=null, csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;	
-			
-		IF rpt_rec.source LIKE '[CONTROLS%'  AND rpt_rec.csv2 is not null THEN 
+		IF rpt_rec.source = '[CONTROLS]' AND rpt_rec.csv2 is not null THEN 
 			UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
 			csv2=null, csv3=null, csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
 		END IF;	
-		*/
 			
-		IF rpt_rec.source LIKE '%TREATMENT%'  AND rpt_rec.csv2 is not null THEN 
+		IF rpt_rec.source = '[TREATMENT]'  AND rpt_rec.csv2 is not null THEN 
 			UPDATE temp_csv2pg SET csv3=(concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
 			csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
 		END IF;	
 			
-		IF rpt_rec.source LIKE '%HYDROGRAPH%'  AND rpt_rec.csv2 is not null THEN 
+		IF rpt_rec.source = '[HYDROGRAPHS]'  AND rpt_rec.csv2 is not null THEN 
 			UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
 			csv2=null, csv3=null,csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
 		END IF;	
+
+		IF rpt_rec.source = '[DWF]'  AND rpt_rec.csv2 is not null THEN 
+			UPDATE temp_csv2pg SET csv4 = replace(csv4,'"',''), csv5 = replace(csv5,'"',''), csv6 = replace(csv6,'"',''), csv7 = replace(csv7,'"','') ;
+		END IF;	
 		
-		IF rpt_rec.source LIKE '%ADJUSTMENT%'  AND rpt_rec.csv3 is not null THEN 
-			UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5,';',csv6,';',csv7,';',csv8,';',csv9,';',csv10,';',csv11,';',csv12,';',csv13),
-			csv3=null,csv4=null,csv5=null,csv6=null,csv7=null,csv8=null,csv9=null,csv10=null,csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;
-		
-		IF rpt_rec.source LIKE '%MAP%'  AND rpt_rec.csv3 is not null THEN 
+		IF rpt_rec.source = '[MAP]'  AND rpt_rec.csv3 is not null THEN 
 			UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5),csv3=null,csv4=null,csv5=null WHERE temp_csv2pg.id=rpt_rec.id; 
 		END IF;	
 					
-		IF rpt_rec.source LIKE '%GWF%' AND rpt_rec.csv4 is not null THEN 
+		IF rpt_rec.source = '[GWF]' AND rpt_rec.csv4 is not null THEN 
 			UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3),csv3=concat(csv4,';',csv5),csv4=null,csv5=null WHERE temp_csv2pg.id=rpt_rec.id; 
 		END IF;	
 			
-		IF rpt_rec.source LIKE '%BACKDROP%' AND rpt_rec.csv2 is not null THEN 
+		IF rpt_rec.source = '[BACKDROP]' AND rpt_rec.csv2 is not null THEN 
 			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6),
 			csv2=null, csv3=null,csv4=null, csv5=null,csv6=null WHERE temp_csv2pg.id=rpt_rec.id; 
 		END IF;	
 	
-		IF rpt_rec.source LIKE '%EVAPORATION%' AND rpt_rec.csv3 is not null THEN 
+		IF rpt_rec.source LIKE '[EVAPORATION]' AND rpt_rec.csv3 is not null THEN 
 			UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5,';',csv6,csv7,';',csv8,';',csv9,';',csv10,';',csv11,';',csv12,';',csv13),
 			csv3=null,csv4=null, csv5=null,csv6=null,csv7=null,csv8=null,csv9=null,csv10=null,csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
 		END IF;	
 	END LOOP;
-	
+
+	RAISE NOTICE 'step 3/6';
+
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
 	INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1);
@@ -205,9 +198,13 @@ BEGIN
 	INSERT INTO ext_municipality(muni_id,name) VALUES(1,'municipality1');
 
 	-- SELECTORS
-	--insert values into selector
+	--insert values into selectors
 	INSERT INTO selector_expl(expl_id,cur_user) VALUES (1,current_user);
 	INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
+	INSERT INTO inp_selector_sector(sector_id,cur_user) VALUES (1,current_user);
+	INSERT INTO inp_selector_hydrology(hydrology_id,cur_user) VALUES (1,current_user);
+	INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user) ;--ON CONFLICT (parameter, cur_user) DO NOTHING;
+
 
 	-- CATALOGS
 	--cat_feature
@@ -223,6 +220,8 @@ BEGIN
 	INSERT INTO cat_feature VALUES ('EPAPUMP','VARC','ARC');
 	INSERT INTO cat_feature VALUES ('EPAORIF','VARC','ARC');
 	INSERT INTO cat_feature VALUES ('EPAOUTL','VARC','ARC');
+
+	INSERT INTO cat_dwf_scenario VALUES (1, 'test');
 	
 	--arc_type
 	--arc
@@ -253,11 +252,12 @@ BEGIN
 	INSERT INTO cat_arc VALUES ('EPAOUTL-CAT', 'EPAMAT');
 
 
+
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id order by id
 	LOOP
 
-		raise notice 'Third loop %', v_rec_table;
+		--raise notice 'Third loop %', v_rec_table;
 
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -271,19 +271,20 @@ BEGIN
 		
 		--inserting values on editable view
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv2pg where source like '||quote_literal(concat('%',v_rec_table.target,'%'))||' 
-		AND csv2pgcat_id='||v_csv2pgcat_id||' AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
+		AND csv2pgcat_id='||v_csv2pgcat_id||' AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user)||' ORDER BY id';
 
-		raise notice 'v_sql %', v_sql;
+		--raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;
 	END LOOP;
-		
+
+	
 	-- Create arc geom
 	v_querytext = 'SELECT * FROM arc ';
 		
 	FOR v_data IN EXECUTE v_querytext
 	LOOP
 
-		raise notice 'Fifth loop %', v_data;
+		--raise notice '4th loop %', v_data;
 
 		--Insert start point, add vertices if exist, add end point
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
@@ -298,16 +299,18 @@ BEGIN
 		UPDATE arc SET the_geom=ST_MakeLine(geom_array) where arc_id=v_data.arc_id;
 
 	END LOOP;
+
+	RAISE NOTICE 'step 4/6';
 	
 	-- Subcatchments geometry
 	--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
 	FOR v_data IN SELECT * FROM subcatchment LOOP
 
-		raise notice 'Six loop %', v_data;
+		--raise notice '5th loop %', v_data;
 	
 		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
 		LOOP	
-			raise notice 'Six-inter loop %', v_data;
+			--raise notice 'Six-inter loop %', v_data;
 
 			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
 			INSERT INTO temp_table (text_column,geom_point) VALUES (v_data.subc_id,v_point_geom);
@@ -338,6 +341,8 @@ BEGIN
 			END IF;
 		
 	END LOOP;
+
+	RAISE NOTICE 'step-5/6';
 		
 	-- Mapzones geometry
 	--Create the same geometry of all mapzones by making the Convex Hull over all the existing arcs
@@ -350,7 +355,9 @@ BEGIN
 
 	-- Enable constraints
 	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
-	
+
+	RAISE NOTICE 'step-6/6';
+
 RETURN v_count;
 	
 END;

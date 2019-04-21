@@ -1,16 +1,23 @@
-﻿
-/* This function load inp file to giswater 3
-The mail characterisitics mapping from SWMM to GW are:
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+-- FUNCTION NUMBER : XXXX
+
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_vi()  RETURNS trigger AS
+$BODY$
+
+/* 
+This function load inp file to giswater 3
+The main characterisitics mapping from SWMM to GW are:
 	- Material Catalog is created on fly using manning as is. Material is desvinculated from arc catalog and related directly to table arc
 	- Flow regulators are mapped as arcs not using the issue of giswater to define it without geometry on inp_flw_regulator tables
 */
--- Function: SCHEMA_NAME.gw_trg_vi()
 
--- DROP FUNCTION SCHEMA_NAME.gw_trg_vi();
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_vi()
-  RETURNS trigger AS
-$BODY$
 
 
 DECLARE 
@@ -18,6 +25,9 @@ DECLARE
 	v_epsg integer;
 	v_epatype text;
 	v_catalog text;
+	v_linkoffsets text;
+	v_y1 float;
+	v_y2 float;
 BEGIN
 
     --Get schema name
@@ -44,27 +54,25 @@ BEGIN
 			INSERT INTO inp_files (actio_type, file_type, fname) VALUES (NEW.actio_type, NEW.file_type, NEW.fname);
 			
 		ELSIF v_view='vi_evaporation' THEN 
-			INSERT INTO inp_evaporation (evap_type, value) SELECT inp_typevalue.id, NEW.value
-			FROM inp_typevalue WHERE upper(split_part(NEW.value,';',1))=idval AND typevalue='inp_typevalue_evap';
-			
+			INSERT INTO inp_evaporation (evap_type, value) VALUES (NEW.evap_type, NEW.value);
+
+		ELSIF v_view='vi_temperature' THEN
+			INSERT INTO inp_temperature (temp_type, value) VALUES (NEW.temp_type, NEW.value);
+	
 		ELSIF v_view='vi_raingages' THEN
 			IF NEW.raingage_type ILIKE 'TIMESERIES' THEN
 				INSERT INTO raingage (rg_id, form_type, intvl, scf, rgage_type, timser_id, expl_id) 
-				VALUES (NEW.rg_id, NEW.form_type, NEW.intvl, NEW.scf, 'TIMESERIES_RAIN', NEW.other1, 1);
+				VALUES (NEW.rg_id, NEW.form_type, NEW.intvl, NEW.scf, 'TIMESERIES', NEW.other1, 1);
 			ELSE
 				INSERT INTO raingage (rg_id, form_type, intvl, scf, rgage_type, fname, sta, units, expl_id) 
-				VALUES (NEW.rg_id,NEW.form_type,NEW.intvl,NEW.scf, 'FILE_RAIN', NEW.other1, NEW.other2, NEW.other3, 1);
+				VALUES (NEW.rg_id,NEW.form_type,NEW.intvl,NEW.scf, 'FILE', NEW.other1, NEW.other2, NEW.other3, 1);
 			END IF;
-			
-		ELSIF v_view='vi_temperature' THEN 
-			INSERT INTO inp_temperature (temp_type, value) SELECT inp_typevalue.id, NEW.value
-				FROM inp_typevalue WHERE upper(NEW.temp_type)=idval AND typevalue='inp_typevalue_pattern';
 				
 		ELSIF v_view='vi_subcatchments' THEN 
-			INSERT INTO subcatchment (subc_id, rg_id, node_id, area, imperv, width, slope, clength, snow_id) 
-			VALUES (NEW.subc_id, NEW.rg_id, NEW.node_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength,NEW.snow_id);
+			INSERT INTO subcatchment (subc_id, rg_id, node_id, area, imperv, width, slope, clength, snow_id, sector_id) 
+			VALUES (NEW.subc_id, NEW.rg_id, NEW.node_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, 1);
 			
-			INSERT INTO cat_hydrology (hydrology_id,infiltration) SELECT DISTINCT hydrology_id, 'CURVE_NUMBER' FROM subcatchment 
+			INSERT INTO cat_hydrology (hydrology_id,name, infiltration) SELECT DISTINCT hydrology_id, 'Default scenario','CURVE_NUMBER' FROM subcatchment 
 			WHERE hydrology_id NOT IN (SELECT hydrology_id FROM cat_hydrology);
 
 		ELSIF v_view='vi_subareas' THEN
@@ -124,8 +132,8 @@ BEGIN
 			END IF;
 			
 		ELSIF v_view='vi_dividers' THEN
-			INSERT INTO node (node_id,node_type,nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.node_id, 'EPAMANH','EPAMANH-CAT','DIVIDER',1,1,1,1,1);
+			INSERT INTO node (node_id, elev, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
+			VALUES (NEW.node_id, NEW.elev, 'EPAMANH', 'EPAMANH-CAT', 'DIVIDER', 1, 1, 1, 1, 2);
 
 			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
 
@@ -136,7 +144,7 @@ BEGIN
 				INSERT INTO inp_divider (node_id, arc_id, divider_type, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'OVERFLOW', NEW.other1::numeric, NEW.other2, NEW.other3);
 				
 			ELSIF NEW.divider_type LIKE 'TABULAR' THEN
-				INSERT INTO inp_divider (node_id, arc_id, divider_type, curve_id, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'TABULAR_DIVIDER', NEW.other1, NEW.other2, NEW.other3, NEW.other4);
+				INSERT INTO inp_divider (node_id, arc_id, divider_type, curve_id, y0,ysur,apond) VALUES (NEW.node_id, NEW.arc_id,'TABULAR', NEW.other1, NEW.other2, NEW.other3, NEW.other4);
 				
 			ELSIF NEW.divider_type LIKE 'WEIR' THEN
 				INSERT INTO inp_divider (node_id, arc_id, divider_type, qmin, ht, cd, y0, ysur, apond) VALUES (NEW.node_id, NEW.arc_id,'WEIR', NEW.other1::numeric, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6);
@@ -144,7 +152,7 @@ BEGIN
 			
 		ELSIF v_view='vi_storage' THEN
 			INSERT INTO node (node_id, elev, ymax,node_type,nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.node_id, NEW.elev, NEW.ymax,'EPASTOR','EPASTOR-CAT','STORAGE',1,1,1,1,2);
+			VALUES (NEW.node_id, NEW.elev, NEW.ymax, 'EPASTOR', 'EPASTOR-CAT', 'STORAGE', 1, 1, 1, 1, 2);
 			INSERT INTO man_storage (node_id) VALUES (NEW.node_id);
 			
 			IF NEW.storage_type = 'FUNCTIONAL' THEN 
@@ -153,14 +161,26 @@ BEGIN
 				
 			ELSIF NEW.storage_type like 'TABULAR' THEN
 				INSERT INTO inp_storage(node_id,y0,storage_type,curve_id,apond,fevap, sh, hc, imd) 
-				VALUES (NEW.node_id,NEW.y0,'TABULAR_STORAGE',NEW.other1, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6);
+				VALUES (NEW.node_id,NEW.y0,'TABULAR',NEW.other1, NEW.other2, NEW.other3, NEW.other4, NEW.other5, NEW.other6);
 			END IF;
 			
 		ELSIF v_view='vi_conduits' THEN 
-			INSERT INTO arc (arc_id, node_1,node_2,y1,y2, sys_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, NEW.z1, NEW.z2, NEW.length, 'EPACOND', 'CONDUIT', NEW.n, 1, 1, 1, 1, 2);
+
+			v_linkoffsets = (SELECT value FROM config_param_user WHERE parameter='inp_options_link_offsets' AND cur_user=current_user);
+
+			IF v_linkoffsets ='ELEVATION' THEN
+				INSERT INTO arc (arc_id, node_1,node_2, sys_elev1, sys_elev2, sys_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
+				VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, NEW.z1, NEW.z2, NEW.length, 'EPACOND', 'CONDUIT', NEW.n, 1, 1, 1, 1, 2);
+			ELSE
+				v_y1 = (SELECT ymax FROM node WHERE node_id=NEW.node_1 LIMIT 1)-NEW.z1;
+				v_y2 = (SELECT ymax FROM node WHERE node_id=NEW.node_1 LIMIT 1)-NEW.z1;
+				INSERT INTO arc (arc_id, node_1,node_2, sys_elev1, sys_elev2, sys_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
+				VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, v_y1, v_y2, NEW.length, 'EPACOND', 'CONDUIT', NEW.n, 1, 1, 1, 1, 2);
+			END IF;
+
 			INSERT INTO man_conduit(arc_id) VALUES (NEW.arc_id);
 			INSERT INTO inp_conduit (arc_id,custom_n, q0, qmax) VALUES (NEW.arc_id,NEW.n, NEW.q0, NEW.qmax); 
+			
 			
 		ELSIF v_view='vi_pumps' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
@@ -170,19 +190,19 @@ BEGIN
 			
 		ELSIF v_view='vi_orifices' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAORIF','EPAORIF-CAT','ORIFICE',1,1,1,1,2);
+			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAORIF','EPAORIF-CAT','ORIFICE', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			INSERT INTO inp_orifice (arc_id, ori_type, "offset", cd, flap, orate) VALUES (NEW.arc_id, NEW.ori_type, NEW."offset", NEW.cd, NEW.flap, NEW.orate);
 			
 		ELSIF v_view='vi_weirs' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAWEIR','EPAWEIR-CAT','WEIR',1,1,1,1,2);
+			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAWEIR','EPAWEIR-CAT','WEIR', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			INSERT INTO inp_weir (arc_id, weir_type, "offset", cd, flap, ec, cd2, surcharge) VALUES (NEW.arc_id, NEW.weir_type, NEW."offset", NEW.cd, NEW.flap, NEW.ec, NEW.cd2, NEW.surcharge);
 			
 		ELSIF v_view='vi_outlets' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAOUTL','EPAOUTL-CAT','OUTLET',1,1,1,1,2);
+			VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAOUTL','EPAOUTL-CAT','OUTLET', 1, 1, 1, 1, 2);
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 			
 			IF NEW.outlet_type LIKE 'FUNCTIONAL%' THEN
@@ -205,14 +225,14 @@ BEGIN
 			ELSIF NEW.shape='CUSTOM' THEN
 				v_catalog = concat(NEW.shape::varchar(9),'-',NEW.other1::varchar(5),'-', NEW.other2::varchar(12));
 				UPDATE arc SET arccat_id=v_catalog WHERE arc_id=NEW.arc_id;
-				--UPDATE inp_conduit SET barrels=NEW.other5::smallint WHERE arc_id=NEW.arc_id;
+				UPDATE inp_conduit SET barrels=NEW.other5::smallint WHERE arc_id=NEW.arc_id;
 				INSERT INTO cat_arc (id, shape, geom1, curve_id) VALUES (v_catalog, NEW.shape::varchar(16), NEW.other1::float, NEW.other1::varchar(16)) ON CONFLICT (id) DO nothing;				
 			ELSE
 				v_epatype= (SELECT epa_type FROM arc WHERE arc_id=NEW.arc_id);
 				IF v_epatype='CONDUIT' THEN
 					v_catalog = concat(NEW.shape::varchar(9),'-',NEW.other1::varchar(4),'-', NEW.other2::varchar(4),'-', NEW.other3::varchar(4),'-', NEW.other4::varchar(4));
 					UPDATE arc SET arccat_id=v_catalog WHERE arc_id=NEW.arc_id;
-					--UPDATE inp_conduit SET barrels=NEW.other5::smallint, culvert=NEW.other6 WHERE arc_id=NEW.arc_id;
+					UPDATE inp_conduit SET barrels=NEW.other5::smallint, culvert=NEW.other6 WHERE arc_id=NEW.arc_id;
 					INSERT INTO cat_arc (id, shape, geom1, geom2, geom3, geom4) VALUES (v_catalog, NEW.shape::varchar(16), NEW.other1::float, NEW.other2::float, NEW.other3::float, NEW.other4::float) ON CONFLICT (id) DO nothing;
 				ELSIF v_epatype='WEIR' THEN
 					UPDATE inp_weir SET geom1=NEW.other1::numeric, geom2=NEW.other2::numeric, geom3=NEW.other3::numeric, geom4=NEW.other4::numeric WHERE arc_id=NEW.arc_id;
@@ -229,11 +249,7 @@ BEGIN
 			INSERT INTO inp_transects (tsect_id,text) VALUES (split_part(NEW.text,' ',1),NEW.text);
 			
 		ELSIF v_view='vi_controls' THEN
-			IF split_part(NEW.text,' ',2) IN (SELECT node_id FROM node) THEN
-				INSERT INTO inp_controls_x_node (node_id,text) VALUES (split_part(NEW.text,' ',2), NEW.text);
-			ELSIF split_part(NEW.text,' ',2) IN (SELECT arc_id FROM arc) THEN 
-				INSERT INTO inp_controls_x_arc (arc_id,text) VALUES (split_part(NEW.text,' ',2), NEW.text);
-			END IF;
+			INSERT INTO inp_controls_importinp (text) VALUES (NEW.text);
 			
 		ELSIF v_view='vi_pollutants' THEN 
 			INSERT INTO inp_pollutants (poll_id, units_type, crain, cgw, cii, kd, sflag, copoll_id, cofract, cdwf) 
@@ -257,8 +273,8 @@ BEGIN
 			INSERT INTO inp_treatment_node_x_pol (node_id, poll_id, function) VALUES (NEW.node_id, NEW.poll_id, NEW.function);
 			
 		ELSIF v_view='vi_dwf' THEN
-			INSERT INTO inp_dwf(node_id,  value, pat1, pat2, pat3, pat4)
-			VALUES (NEW.node_id, NEW.value, NEW.pat1, NEW.pat2, NEW.pat3, NEW.pat4);
+			INSERT INTO inp_dwf(node_id, value, pat1, pat2, pat3, pat4, dwfscenario_id)
+			VALUES (NEW.node_id, NEW.value, NEW.pat1, NEW.pat2, NEW.pat3, NEW.pat4,1);
 			
 		ELSIF v_view='vi_patterns' THEN
 	
@@ -306,7 +322,7 @@ BEGIN
 		ELSIF v_view='vi_timeseries' THEN 
 			IF NEW.other1 ilike 'FILE' THEN
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timser_id) THEN
-					INSERT INTO inp_timser_id(id,times_type) VALUES (NEW.timser_id,'FILE_TIME') ;
+					INSERT INTO inp_timser_id(id,times_type) VALUES (NEW.timser_id,'FILE') ;
 				END IF;
 				INSERT INTO inp_timeseries (timser_id,fname) VALUES (NEW.timser_id, NEW.other2);
 				
@@ -349,6 +365,9 @@ BEGIN
 			ELSIF NEW.type_dim ILIKE 'UNITS' THEN
 				INSERT INTO inp_mapunits (type_units, map_type) VALUES (NEW.type_dim, split_part(NEW.other_val,';',1));
 			END IF;
+
+		ELSIF v_view='vi_symbols' THEN
+			UPDATE	raingage SET the_geom=st_setsrid(st_makepoint(NEW.xcoord, NEW.ycoord), v_epsg) WHERE rg_id=NEW.rg_id;	
 			
 		ELSIF v_view='vi_backdrop' THEN 
 			INSERT INTO inp_backdrop (text) VALUES (NEW.text);
