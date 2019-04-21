@@ -67,6 +67,7 @@ CREATE TABLE inp_hydrograph(
   hydro_id integer PRIMARY KEY NOT NULL DEFAULT nextval('inp_hydrograph_seq'::regclass),
   text character varying(254));
 
+  /*
 
 ALTER TABLE IF EXISTS inp_lid_control RENAME TO _inp_lid_control;
 CREATE TABLE inp_lid_control(
@@ -81,7 +82,7 @@ CREATE TABLE inp_lid_control(
   value_7 numeric(12,4),
   value_8 numeric(12,4));
 
-
+*/
 
 ALTER TABLE inp_inflows  RENAME TO _inp_inflows;
 
@@ -112,4 +113,9 @@ CREATE TABLE inp_snowpack
   value_5 numeric(12,3),
   value_6 numeric(12,3),
   value_7 numeric(12,3)
+);
+
+CREATE TABLE inp_snowpack_id(
+  snow_id character varying(16) NOT NULL PRIMARY KEY,
+  observ text
 );
