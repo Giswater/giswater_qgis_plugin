@@ -19,7 +19,6 @@ DELETE FROM inp_typevalue WHERE id='CONCEN_TREAT';
 
 
 DELETE FROM inp_typevalue WHERE id='TIMESERIES_OUTFALL';
-INSERT INTO inp_typevalue VALUES ('inp_typevalue_outfall', 'TIMESERIES_OUTF', 'TIMESERIES');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_evap', 'DRY_ONLY', 'DRY_ONLY');
 DELETE FROM inp_typevalue WHERE id='FILE_WINDSP';
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_temp', 'WINDSPEED', 'WINDSPEED');
@@ -38,19 +37,19 @@ UPDATE audit_cat_param_user SET layout_id=3, layout_order=6,layout_name='grl_hyd
 UPDATE audit_cat_param_user SET layout_id=4, layout_order=6,layout_name='grl_hyd_4' WHERE id='inp_options_sweep_end';
 UPDATE audit_cat_param_user SET vdefault='CURVE_NUMBER' WHERE id='inp_options_infiltration';
 
-UPDATE audit_cat_param_user SET layout_id=13,layout_name='grl_date_13', widgettype='linetext', vdefault='00:00:00', placeholder='00:00:00'  WHERE id='inp_options_start_time';
+UPDATE audit_cat_param_user SET layout_id=13,layout_name='grl_date_13', widgettype='linetext', vdefault='00:00:00', placeholder='HH:MM:SS'  WHERE id='inp_options_start_time';
 
 UPDATE audit_cat_param_user SET layout_id=13,layout_order=1,layout_name='grl_date_13' WHERE id='inp_options_routing_step';
 UPDATE audit_cat_param_user SET layout_id=14,layout_order=1,layout_name='grl_date_14' WHERE id='inp_options_report_step';
 
-UPDATE audit_cat_param_user SET layout_id=13,layout_order = 2, layout_name='grl_date_13', widgettype='linetext', vdefault='01/01/2017', placeholder='01/01/2017'  WHERE id='inp_options_start_date';
-UPDATE audit_cat_param_user SET layout_id=14,layout_order = 2, layout_name='grl_date_14', widgettype='linetext', vdefault='00:00:00', placeholder='00:00:00'  WHERE id='inp_options_start_time';
+UPDATE audit_cat_param_user SET layout_id=13,layout_order = 2, layout_name='grl_date_13', widgettype='linetext', vdefault='01/01/2017', placeholder='DD/MM/AAAA'  WHERE id='inp_options_start_date';
+UPDATE audit_cat_param_user SET layout_id=14,layout_order = 2, layout_name='grl_date_14', widgettype='linetext', vdefault='00:00:00', placeholder='HH:MM:SS'  WHERE id='inp_options_start_time';
 
-UPDATE audit_cat_param_user SET layout_id=13,layout_order = 3, layout_name='grl_date_13', widgettype='linetext', vdefault='01/01/2017', placeholder='01/01/2017' WHERE id='inp_options_end_date';
-UPDATE audit_cat_param_user SET layout_id=14,layout_order = 3, layout_name='grl_date_14', widgettype='linetext', vdefault='00:03:00', placeholder='00:03:00'  WHERE id='inp_options_end_time';
+UPDATE audit_cat_param_user SET layout_id=13,layout_order = 3, layout_name='grl_date_13', widgettype='linetext', vdefault='01/01/2017', placeholder='DD/MM/AAAA' WHERE id='inp_options_end_date';
+UPDATE audit_cat_param_user SET layout_id=14,layout_order = 3, layout_name='grl_date_14', widgettype='linetext', vdefault='03:00:00', placeholder='HH:MM:SS'  WHERE id='inp_options_end_time';
 
-UPDATE audit_cat_param_user SET layout_id=13,layout_order = 4, layout_name='grl_date_13', widgettype='linetext', vdefault='01/01/2017', placeholder='01/01/2017' WHERE id='inp_options_report_start_date';
-UPDATE audit_cat_param_user SET layout_id=14,layout_order = 4, layout_name='grl_date_14', widgettype='linetext', vdefault='00:00:00', placeholder='00:00:00' WHERE id='inp_options_report_start_time';
+UPDATE audit_cat_param_user SET layout_id=13,layout_order = 4, layout_name='grl_date_13', widgettype='linetext', vdefault='01/01/2017', placeholder='DD/MM/AAAA' WHERE id='inp_options_report_start_date';
+UPDATE audit_cat_param_user SET layout_id=14,layout_order = 4, layout_name='grl_date_14', widgettype='linetext', vdefault='00:00:00', placeholder='HH:MM:SS' WHERE id='inp_options_report_start_time';
 
 
 UPDATE audit_cat_param_user SET layout_id=2,layout_order=90, layout_name='grl_general_2', isenabled=true, ismandatory=true WHERE id='inp_options_tempdir';
@@ -60,7 +59,7 @@ UPDATE audit_cat_param_user SET label = 'Timestep detailed links:', placeholder=
 UPDATE audit_cat_param_user SET label = 'Timestep detailed subcatchments:',placeholder='ALL / subc1 subc2 subc3 subc4' WHERE id='inp_report_subcatchments';
 
 
-INSERT INTO audit_cat_param_user VALUES ('epaversion', null, 'Version of SWMM. Hard coded variable. Only enabled version is SWMM-EN 5.0.022', 'role_epa', NULL, NULL, 'SWMM version:', NULL, NULL, false, NULL, NULL, 'ud', false, NULL, NULL, NULL, false, 'string', 'combo', true, null, '5.0.022', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
+INSERT INTO audit_cat_param_user VALUES ('epaversion', 'epaoptions', 'Version of SWMM. Hard coded variable. Only enabled version is SWMM-EN 5.0.022', 'role_epa', NULL, NULL, 'SWMM version:', NULL, NULL, false, NULL, NULL, 'ud', false, NULL, NULL, NULL, false, 'string', 'combo', true, null, '5.0.022', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
 
 UPDATE audit_cat_param_user SET epaversion='{"from":"5.0.022", "to":null,"language":"english"}' where formname='epaoptions';
 

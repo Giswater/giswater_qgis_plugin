@@ -33,3 +33,4 @@ UPDATE config_param_system SET value='{"isVisitExists":true, "parameters": ["p1"
 
 INSERT INTO sys_fprocess_cat VALUES (42, 'import generic csv file', 'Utils','import generic csv file', 'utils');
 
+-- TO DO: INSERT INTO audit_cat_function gw_trg_vi
