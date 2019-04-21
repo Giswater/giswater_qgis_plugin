@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -12,6 +12,11 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
   RETURNS integer AS
+
+/*
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(null);
+*/
+ 
 $BODY$
 	DECLARE
 	rpt_rec record;
@@ -58,6 +63,7 @@ $BODY$
 	i integer=1;
 	v_arc_id text;
 	v_rules_aux text;
+	v_curvetype text;
 	
 	
 BEGIN
@@ -174,6 +180,15 @@ BEGIN
 		-- refactor of [REPORT] target
 		IF rpt_rec.source ='[REPORT]' AND lower(rpt_rec.csv1) = 'f-factor' 
 			THEN UPDATE temp_csv2pg SET csv1='f_factor', csv2=concat(csv2,' ',csv3), csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
+
+		-- refactor of [CURVES] target
+		IF rpt_rec.source ='[CURVES]' THEN
+			IF rpt_rec.csv2 is null THEN
+				v_curvetype=replace(replace(rpt_rec.csv1,';',''),':','');
+			ELSE
+				UPDATE temp_csv2pg SET csv4=v_curvetype WHERE temp_csv2pg.id=rpt_rec.id; 
+			END IF;	
+		END IF;
 			
 		-- refactor of [TIMES] target
 		IF rpt_rec.source ='[TIMES]' AND lower(rpt_rec.csv2) ='clocktime'  THEN 
@@ -321,7 +336,7 @@ BEGIN
 		raise notice 'v_query_fields %,%', v_query_fields,v_rec_table.fields;
 		
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv2pg where source='||quote_literal(v_rec_table.target)||' 
-		AND csv2pgcat_id='||v_csv2pgcat_id||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user);
+		AND csv2pgcat_id='||v_csv2pgcat_id||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user)||' ORDER BY id';;
 
 		raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;		
@@ -381,20 +396,25 @@ BEGIN
 			-- downgrade to obsolete arcs and nodes
 			UPDATE arc SET state=0,state_type=(SELECT id FROM value_state_type WHERE state=1 LIMIT 1) WHERE arc_id=v_data.arc_id;
 			UPDATE node SET state=0,state_type=(SELECT id FROM value_state_type WHERE state=1 LIMIT 1) WHERE node_id IN (v_node1, v_node2);
+
+			-- reconnect topology
+			UPDATE arc SET node_1=v_node_id WHERE node_1=v_node1 OR node_1=v_node2;
+			UPDATE arc SET node_2=v_node_id WHERE node_2=v_node1 OR node_2=v_node2;
 					
 			-- update elevation of new node
 			UPDATE node SET elevation = v_elevation WHERE node_id=v_node_id;
+
 		END LOOP;	
 		
 		-- transform pump additional from node to inp_pump_additional table		
-		FOR v_data IN SELECT reverse(substring(reverse(node_1),7,99)) as nodarc_id, count 
+		FOR v_data IN SELECT node_1 as nodarc_id, count 
 		from (select node_1, count(node_1) FROM ( SELECT node_1 FROM arc where state=0 AND epa_type='PUMP')a group by node_1 order by 2 desc)b where count>1
 		LOOP
 			-- migrate additional from inp_pump to inp_pump_additional
 			LOOP
 				-- nodarc_id: 
 				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern, status)
-				SELECT reverse(substring(reverse(node_id),2,99)), 1, power, curve_id, speed, pattern, status FROM SCHEMA_NAME.inp_pump WHERE node_id=concat(v_data.nodarc_id,i);
+				SELECT v_data.nodarc_id, i, power, curve_id, speed, pattern, status FROM inp_pump WHERE node_id=concat(v_data.nodarc_id,i);
 				DELETE FROM node WHERE node_id=concat(v_data.nodarc_id,i);
 				DELETE FROM man_pump WHERE node_id=concat(v_data.nodarc_id,i);
 				DELETE FROM inp_pump WHERE node_id=concat(v_data.nodarc_id,i);
@@ -402,6 +422,11 @@ BEGIN
 				EXIT WHEN i = v_data.count;
 			END LOOP;
 		END LOOP;
+
+		DELETE FROM inp_valve_importinp;
+		DELETE FROM inp_pump_importinp;
+		
+	
 	END IF;
 	
 	-- Create arc geom

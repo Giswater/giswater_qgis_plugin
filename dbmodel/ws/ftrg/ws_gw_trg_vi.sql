@@ -93,9 +93,9 @@ BEGIN
 	      
 	  ELSIF v_view='vi_status' THEN
 	    IF NEW.arc_id IN (SELECT arc_id FROM inp_pump_importinp) THEN
-	      UPDATE inp_pump_importinp SET status=id FROM inp_typevalue WHERE arc_id=NEW.arc_id AND NEW.idval=inp_typevalue.idval AND typevalue='inp_value_status_pump';
+	      UPDATE inp_pump_importinp SET status=upper(NEW.idval);
 	    ELSIF NEW.arc_id IN (SELECT arc_id FROM inp_valve_importinp) THEN
-      	      UPDATE inp_valve_importinp SET status=id FROM inp_typevalue WHERE arc_id=NEW.arc_id AND NEW.idval=inp_typevalue.idval AND typevalue='inp_value_status_valve';
+      	      UPDATE inp_valve_importinp SET status=upper(NEW.idval);
 	    END IF;
 	    
 	  ELSIF v_view='vi_patterns' THEN 
@@ -105,20 +105,17 @@ BEGIN
 					   NEW.factor_10,NEW.factor_11,NEW.factor_12,NEW.factor_13,NEW.factor_14, NEW.factor_15, NEW.factor_16,NEW.factor_17, NEW.factor_18);
 	  
 	  ELSIF v_view='vi_curves' THEN
+
 	    IF NEW.curve_id NOT IN (SELECT id FROM inp_curve_id) then
-	      INSERT INTO inp_curve_id (id,curve_type)  VALUES (NEW.curve_id,'EFFICIENCY'); --curve type by default???
+	      INSERT INTO inp_curve_id (id,curve_type,descript)  VALUES (NEW.curve_id, split_part(NEW.other,' ',1), split_part(NEW.other,' ',2));
 	    END IF;
 	    INSERT INTO inp_curve(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
 	    
 	  ELSIF v_view='vi_controls' THEN 
-	    IF split_part(NEW.text,' ',2) in (select arc_id from inp_pipe) then
-	      INSERT INTO inp_controls_x_arc (arc_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
-	    ELSE
-	      INSERT INTO inp_rules_controls_importinp (feature_id, importype, text) VALUES (split_part(NEW.text,' ',2), 'controls', NEW.text);
-	    END IF;
-	    
+	    INSERT INTO inp_controls_x_arc (arc_id, text) VALUES (split_part(NEW.text,' ',2),NEW.text);
+	    	    
 	  ELSIF v_view='vi_rules' THEN  
-		INSERT INTO inp_rules_controls_importinp (importtype, text) VALUES ('rules', NEW.text);
+		INSERT INTO inp_rules_importinp (text) VALUES (NEW.text);
 
 	  ELSIF v_view='vi_emitters' THEN
 	    INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);
@@ -155,7 +152,7 @@ BEGIN
 	      INSERT INTO config_param_user (parameter, value, cur_user) VALUES (concat('inp_times_',(lower(NEW.parameter))), NEW.value, current_user) ;
 	    END IF;
 	  ELSIF v_view='vi_report' THEN
-	    INSERT INTO config_param_user (parameter, value, cur_user) VALUES (concat('inp_report_',(lower(NEW.parameter))), NEW.value, current_user) ; 
+	    INSERT INTO config_param_user (parameter, value, cur_user) SELECT id, vdefault, current_user FROM audit_cat_param_user WHERE layoutname IN ('grl_reports_17', 'grl_reports_18') AND ismandatory=true AND vdefault IS NOT NULL;
 	    
 	  ELSIF v_view='vi_coordinates' THEN
 	    UPDATE node SET the_geom=ST_SetSrid(ST_MakePoint(NEW.xcoord,NEW.ycoord),v_epsg) WHERE node_id=NEW.node_id;
