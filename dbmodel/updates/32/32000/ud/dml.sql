@@ -312,7 +312,7 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_ye
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_weirs', 'V-NOTCH', 'V-NOTCH', NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_weirs', 'SIDEFLOW', 'SIDEFLOW', 'RECT_OPEN');
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_weirs', 'TRANSVERSE', 'TRANSVERSE', 'RECT_OPEN');
-INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_orifice', 'RECT-CLOSED_ORIFICE', 'RECT-CLOSED', NULL);
+INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_orifice', 'RECTCLOSED_ORIFICE', 'RECT-CLOSED', NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_orifice', 'CIRCULAR_ORIFICE', 'CIRCULAR', NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_treatment', 'CONCEN_TREAT', 'CONCEN', NULL);
 INSERT INTO inp_typevalue (typevalue, id, idval, descript) VALUES ('inp_value_mapunits', 'NONE_MAP', 'NONE', NULL);
