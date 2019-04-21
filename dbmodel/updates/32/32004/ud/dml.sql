@@ -14,6 +14,10 @@ UPDATE audit_cat_table SET isdeprecated = true WHERE id='vi_title';
 INSERT INTO audit_cat_table VALUES ('inp_hydrograph_id');---------------------------TODO
 
 
+DELETE FROM inp_typevalue WHERE id='EXT_BUILDUP';
+DELETE FROM inp_typevalue WHERE id='CONCEN_TREAT';
+
+
 DELETE FROM inp_typevalue WHERE id='TIMESERIES_OUTFALL';
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_outfall', 'TIMESERIES_OUTF', 'TIMESERIES');
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_evap', 'DRY_ONLY', 'DRY_ONLY');

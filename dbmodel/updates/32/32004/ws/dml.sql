@@ -27,7 +27,6 @@ UPDATE sys_csv2pg_config SET csvversion='{"from":"2.0.12", "to":null,"language":
 
 
 
-
 -- forgetted on 3.2.0000
 UPDATE audit_cat_table SET isdeprecated = true WHERE id='inp_report';
 UPDATE audit_cat_table SET isdeprecated = true WHERE id='inp_times';
@@ -49,3 +48,10 @@ INSERT INTO audit_cat_table VALUES ('inp_reactions') ;
 INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_value_reactions', 'BULK', 'BULK');
 INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_value_reactions', 'WALL', 'WALL');
 INSERT INTO inp_typevalue(typevalue, id, idval) VALUES ('inp_value_reactions', 'TANK', 'TANK');
+
+
+DELETE FROM inp_typevalue WHERE typevalue='inp_typevalue_pump';
+DELETE FROM inp_typevalue WHERE typevalue='inp_typevalue_reactions_gl';
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_reactions_el';
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_reactions_gl';
+
