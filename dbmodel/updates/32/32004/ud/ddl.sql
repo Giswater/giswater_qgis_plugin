@@ -20,39 +20,11 @@ ALTER TABLE inp_weir RENAME to_arc TO _to_arc;
 ALTER TABLE inp_pump RENAME node_id TO _node_id;
 ALTER TABLE inp_pump RENAME to_arc TO _to_arc;
 ALTER TABLE inp_outlet RENAME node_id TO _node_id;
+
 ALTER TABLE inp_hydrograph RENAME hydro_id TO id;
+
 ALTER TABLE inp_pollutant ADD COLUMN cinit numeric(12,4);
-ALTER TABLE inp_inflows  RENAME TO _inp_inflows;
 
-
-CREATE TABLE inp_inflows
-(
-  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.inp_inflows_seq'::regclass),
-  node_id character varying(50),
-  timser_id character varying(16),
-  format_type text,
-  mfactor numeric (12,4),
-  sfactor numeric(12,4),
-  base numeric(12,4),
-  pattern_id character varying(16),
-  CONSTRAINT inp_inflows_pkey2 PRIMARY KEY (id)
-);
-
-
-ALTER TABLE inp_snowpack RENAME TO _inp_snowpack;
-
-CREATE TABLE inp_snowpack
-( id serial PRIMARY KEY,
-  snow_id character varying(16) NOT NULL,
-  snow_type character varying(16),
-  value_1 numeric(12,3),
-  value_2 numeric(12,3),
-  value_3 numeric(12,3),
-  value_4 numeric(12,3),
-  value_5 numeric(12,3),
-  value_6 numeric(12,3),
-  value_7 numeric(12,3)
-);
 
 
 ALTER TABLE cat_arc ADD COLUMN tsect_id character varying(16);
@@ -107,7 +79,6 @@ runoff float,
 CONSTRAINT rpt_subcatchment_fkey FOREIGN KEY (result_id)
       REFERENCES rpt_cat_result (result_id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE
-
 );
 
 
@@ -188,4 +159,11 @@ CREATE TABLE rpt_summary_crossection (
   fullflow float
 );
 
+  
+CREATE TABLE rpt_warning_summary(
+id serial NOT NULL PRIMARY KEY,
+result_id varchar(30),
+warning_number varchar(30),
+text text
+);
 

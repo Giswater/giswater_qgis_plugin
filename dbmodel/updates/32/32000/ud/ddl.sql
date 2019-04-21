@@ -9,45 +9,30 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
-DROP TABLE IF EXISTS inp_evaporation CASCADE;
-CREATE TABLE inp_evaporation
-(
+ALTER TABLE IF EXISTS inp_evaporation RENAME TO _inp_evaporation;
+CREATE TABLE inp_evaporation(
   evap_type character varying(16) NOT NULL PRIMARY KEY,
   value text);
 
 
-DROP TABLE IF EXISTS inp_temperature CASCADE;
-  CREATE TABLE inp_temperature
-(
+ALTER TABLE IF EXISTS inp_temperature RENAME TO _inp_temperature;
+  CREATE TABLE inp_temperature(
   id serial NOT NULL PRIMARY KEY,
   temp_type character varying(30),
   value text
 );
 
-DROP TABLE IF EXISTS inp_snowpack CASCADE;
-CREATE TABLE inp_snowpack
-(
-  snow_id character varying(16) NOT NULL PRIMARY KEY,
-  snow_type character varying(16),
-  value_1 numeric(12,3),
-  value_2 numeric(12,3),
-  value_3 numeric(12,3),
-  value_4 numeric(12,3),
-  value_5 numeric(12,3),
-  value_6 numeric(12,3),
-  value_7 numeric(12,3)
-);
 
-DROP TABLE IF EXISTS inp_pattern CASCADE;
-CREATE TABLE inp_pattern
-(
+ALTER TABLE IF EXISTS inp_pattern RENAME TO _inp_pattern;
+CREATE TABLE inp_pattern(
   pattern_id character varying(16) NOT NULL PRIMARY KEY,
   pattern_type character varying(30),
   observ text
 );
-DROP TABLE IF EXISTS inp_pattern_value CASCADE;
-CREATE TABLE inp_pattern_value
-(
+
+
+ALTER TABLE IF EXISTS inp_pattern_value RENAME TO _inp_pattern_value;
+CREATE TABLE inp_pattern_value(
   id serial NOT NULL PRIMARY KEY,
   pattern_id character varying(16),
   factor_1 numeric(12,4),
@@ -76,15 +61,14 @@ CREATE TABLE inp_pattern_value
   factor_24 numeric(12,4)
 );
 
-DROP TABLE IF EXISTS inp_hydrograph CASCADE;
-CREATE TABLE inp_hydrograph
-(
+
+ALTER TABLE IF EXISTS inp_hydrograph RENAME TO _inp_hydrograph;
+CREATE TABLE inp_hydrograph(
   hydro_id integer PRIMARY KEY NOT NULL DEFAULT nextval('inp_hydrograph_seq'::regclass),
-  text character varying(254)
-);
+  text character varying(254));
 
 
-DROP TABLE IF EXISTS inp_lid_control CASCADE;
+ALTER TABLE IF EXISTS inp_lid_control RENAME TO _inp_lid_control;
 CREATE TABLE inp_lid_control(
   id integer PRIMARY KEY NOT NULL DEFAULT nextval('SCHEMA_NAME.inp_lid_control_seq'::regclass),
   lidco_id character varying(16),
@@ -97,9 +81,35 @@ CREATE TABLE inp_lid_control(
   value_7 numeric(12,4),
   value_8 numeric(12,4));
 
-CREATE TABLE rpt_warning_summary(
-id serial NOT NULL PRIMARY KEY,
-result_id varchar(30),
-warning_number varchar(30),
-text text
+
+
+ALTER TABLE inp_inflows  RENAME TO _inp_inflows;
+
+CREATE TABLE inp_inflows
+(
+  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.inp_inflows_seq'::regclass),
+  node_id character varying(50),
+  timser_id character varying(16),
+  format_type text,
+  mfactor numeric (12,4),
+  sfactor numeric(12,4),
+  base numeric(12,4),
+  pattern_id character varying(16),
+  CONSTRAINT inp_inflows_pkey2 PRIMARY KEY (id)
+);
+
+
+ALTER TABLE inp_snowpack RENAME TO _inp_snowpack;
+
+CREATE TABLE inp_snowpack
+( id serial PRIMARY KEY,
+  snow_id character varying(16) NOT NULL,
+  snow_type character varying(16),
+  value_1 numeric(12,3),
+  value_2 numeric(12,3),
+  value_3 numeric(12,3),
+  value_4 numeric(12,3),
+  value_5 numeric(12,3),
+  value_6 numeric(12,3),
+  value_7 numeric(12,3)
 );
