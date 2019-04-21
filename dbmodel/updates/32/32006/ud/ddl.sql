@@ -19,3 +19,9 @@ CREATE TABLE cat_dwf_scenario (
 ALTER TABLE inp_dwf ADD COLUMN dwfscenario_id integer;
 
 ALTER TABLE inp_dwf_pol_x_node ADD COLUMN dwfscenario_id integer;
+
+
+CREATE TABLE inp_controls_importinp(
+  id serial NOT NULL,
+  text text);
+
