@@ -26,10 +26,9 @@ INSERT INTO inp_energy (descript) VALUES ('GLOBAL PRICE 0.5');
 INSERT INTO inp_energy (descript) VALUES ('GLOBAL PATTERN pattern_01');
 INSERT INTO inp_energy (descript) VALUES ('GLOBAL EFFIC 0.8');
 
-UPDATE inp_pump SET energyparam = '', energyvalue='';
+UPDATE inp_pump SET energyparam = 'PRICE', energyvalue='0.5';
 
-UPDATE inp_pump_additional SET energyparam = '', energyvalue='' WHERE node_id='';
-
+UPDATE inp_pump_additional SET energyparam = 'PRICE', energyvalue='0.5';
 
 
 --quality
@@ -51,9 +50,7 @@ INSERT INTO inp_reactions (descript) VALUES ('ROUGHNESS CORRELATION 1.8');
 
 UPDATE inp_pipe SET reactionparam='WALL', reactionvalue='0.3';
 
-
-
-
+UPDATE inp_curve_id SET descript ='curve demo for pumps';
 
 
 
