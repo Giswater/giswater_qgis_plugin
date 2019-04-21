@@ -1,4 +1,3 @@
 3.2.002
 *******
-Set defaults =0 minorloss for inp_pipe and inp_shortpipe (ws)
-Bug fix on vi_status view (ws)
+Enhance and update data on system tables: audit_cat_table, sys_csv2pg_cat, audit_cat_function
