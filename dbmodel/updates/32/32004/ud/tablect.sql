@@ -15,3 +15,15 @@ ADD CONSTRAINT inp_flwreg_weir_check_type CHECK (weir_type::text = ANY (ARRAY['S
 ALTER TABLE inp_timser_id DROP CONSTRAINT inp_timser_id_check;
 
 ALTER TABLE inp_rdii ADD CONSTRAINT inp_rdii_hydro_id_fkey FOREIGN KEY (hydro_id) REFERENCES inp_hydrograph_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE rpt_arc ADD CONSTRAINT rpt_arc_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rpt_node ADD CONSTRAINT rpt_node_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rpt_subcatchment ADD CONSTRAINT rpt_subcatchment_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rpt_summary_subcatchment ADD CONSTRAINT rpt_summary_subcatchment_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rpt_summary_node ADD CONSTRAINT rpt_summary_node_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rpt_summary_arc ADD CONSTRAINT rpt_summary_arc_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE rpt_summary_crossection ADD CONSTRAINT rpt_summary_crossection_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result (result_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE inp_inflows ADD CONSTRAINT inp_inflows_node_id_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE cat_arc ADD CONSTRAINT cat_arc_tsect_id_fkey FOREIGN KEY (tsect_id) REFERENCES inp_transects_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE cat_arc ADD CONSTRAINT cat_arc_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve_id (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE inp_washoff_land_x_pol ADD CONSTRAINT inp_whasoff_land_x_pol_funcw_type_fkey FOREIGN KEY (funcw_type) REFERENCES inp_typevalue (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
