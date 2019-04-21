@@ -9,6 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- update data
+/*
 UPDATE raingage SET rgage_type='TIMESERIES_RAIN' WHERE rgage_type='TIMESERIES';
 UPDATE raingage SET rgage_type='FILE_RAIN' WHERE rgage_type='FILE';
 UPDATE inp_timser_id SET times_type='FILE_TIMES' WHERE times_type='FILE';
@@ -27,7 +28,7 @@ UPDATE inp_flwreg_weir SET weir_type='TRAPEZOIDAL_WEIR' WHERE weir_type='TRAPEZO
 UPDATE inp_weir SET weir_type='TRAPEZOIDAL_WEIR' WHERE weir_type='TRAPEZOIDAL';
 UPDATE inp_buildup_land_x_pol SET funcb_type='EXP_BUILDUP' WHERE funcb_type='EXP';
 UPDATE inp_washoff_land_x_pol SET funcw_type='EXP_WHASOFF' WHERE funcw_type='EXP';
-
+*/
 
 -- refactor patterns
 INSERT INTO inp_pattern
@@ -39,10 +40,11 @@ SELECT pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, f
 factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24 FROM _inp_pattern;
 
 
+/*
 -- Refactor lidcontrols
 INSERT INTO inp_lid_control 
 SELECT id, lidco_id, (CASE WHEN lidco_type='STORAGE' THEN 'STORAGE_LID' WHEN lidco_type='SURFACE' THEN 'SURFACE_LID' ELSE lidco_type END)
 value_2, value_3,  value_4, value_5, value_6, value_7, value_8 FROM _inp_lid_control;
-  
+*/
   
 -- TODO: Refactor snowpack, hydrograph, inflows, temperature, evaporation

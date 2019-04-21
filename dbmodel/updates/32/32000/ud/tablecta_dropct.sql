@@ -23,15 +23,14 @@ ALTER TABLE gully_type DROP CONSTRAINT IF EXISTS gully_type_man_table_check;
 
 --INP
 ALTER TABLE "raingage" DROP CONSTRAINT IF EXISTS "raingage_form_type_fkey";
-ALTER TABLE "raingage" DROP CONSTRAINT IF EXISTS "raingage_rgage_type_fkey" ;
 
+ALTER TABLE subcatchment DROP CONSTRAINT subcatchment_snow_id_fkey;
 ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_routeto_fkey";
 
 ALTER TABLE "cat_hydrology" DROP CONSTRAINT IF EXISTS "cat_hydrology_infiltration_id_fkey";
 
 ALTER TABLE "inp_files" DROP CONSTRAINT  IF EXISTS "inp_files_actio_type_fkey";
 ALTER TABLE "inp_files" DROP CONSTRAINT IF EXISTS  "inp_files_file_type_fkey";
-
 
 
 ALTER TABLE "inp_pollutant" DROP CONSTRAINT IF EXISTS"inp_pollutant_units_type_fkey";
@@ -48,6 +47,23 @@ ALTER TABLE "inp_inflows_pol_x_node" DROP CONSTRAINT IF EXISTS "inp_inflows_pol_
 
 
 ALTER TABLE "inp_lid_control" DROP CONSTRAINT IF EXISTS "inp_lid_control_lidco_type_fkey";
+
+
+ALTER TABLE inp_dwf DROP CONSTRAINT IF EXISTS inp_dwf_pat1_fkey;
+ALTER TABLE inp_dwf DROP CONSTRAINT IF EXISTS inp_dwf_pat2_fkey;
+ALTER TABLE inp_dwf DROP CONSTRAINT IF EXISTS inp_dwf_pat3_fkey;
+ALTER TABLE inp_dwf DROP CONSTRAINT IF EXISTS inp_dwf_pat4_fkey;
+
+ALTER TABLE inp_dwf_pol_x_node DROP CONSTRAINT IF EXISTS inp_dwf_pol_x_node_pat1_fkey;
+ALTER TABLE inp_dwf_pol_x_node DROP CONSTRAINT IF EXISTS inp_dwf_pol_x_node_pat2_fkey;
+ALTER TABLE inp_dwf_pol_x_node DROP CONSTRAINT IF EXISTS inp_dwf_pol_x_node_pat3_fkey;
+ALTER TABLE inp_dwf_pol_x_node DROP CONSTRAINT IF EXISTS inp_dwf_pol_x_node_pat4_fkey;
+
+ALTER TABLE inp_inflows DROP CONSTRAINT IF EXISTS inp_inflows_pattern_id_fkey;
+ALTER TABLE inp_inflows_pol_x_node DROP CONSTRAINT IF EXISTS inp_inflows_pol_x_node_pattern_id_fkey;
+
+
+ALTER TABLE inp_aquifer DROP CONSTRAINT IF EXISTS inp_aquifer_pattern_id_fkey;
 
 
 ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_allow_ponding_fkey";

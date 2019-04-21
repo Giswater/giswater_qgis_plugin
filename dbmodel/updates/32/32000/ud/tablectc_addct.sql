@@ -14,16 +14,41 @@ ALTER TABLE arc_type ADD CONSTRAINT arc_type_man_table_check CHECK (man_table IN
 
 ALTER TABLE node_type ADD CONSTRAINT node_type_epa_table_check CHECK (epa_table IN ('inp_junction', 'inp_divider', 'inp_storage', 'inp_outfall'));
 
-ALTER TABLE node_type ADD CONSTRAINT node_type_man_table_check CHECK (man_table IN ('man_chamber', 'man_junction', 'man_manhole', 'man_netelement', 'man_netgully',
-'man_netinit', 'man_outfall', 'man_storage', 'man_valve', 'man_wjump', 'man_wwtp'));
+ALTER TABLE node_type ADD CONSTRAINT node_type_man_table_check CHECK (man_table IN ('man_chamber', 'man_junction', 'man_manhole', 'man_netelement', 'man_netgully','man_netinit', 'man_outfall', 'man_storage', 'man_valve', 'man_wjump', 'man_wwtp'));
 
 ALTER TABLE connec_type ADD CONSTRAINT connec_type_man_table_check CHECK (man_table IN ('man_connec'));
 
 ALTER TABLE gully_type ADD CONSTRAINT gully_type_man_table_check CHECK (man_table IN ('man_gully'));
 
 
+ALTER TABLE subcatchment ADD CONSTRAINT subcatchment_snow_id_fkey FOREIGN KEY (snow_id) REFERENCES inp_snowpack_id (snow_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE inp_snowpack ADD CONSTRAINT inp_snowpack_snow_id_fkey FOREIGN KEY (snow_id) REFERENCES inp_snowpack_id (snow_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+ALTER TABLE inp_aquifer ADD CONSTRAINT inp_aquifer_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE inp_dwf ADD CONSTRAINT inp_dwf_pat1_fkey FOREIGN KEY (pat1) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE inp_dwf ADD CONSTRAINT inp_dwf_pat2_fkey FOREIGN KEY (pat2) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;  
+ALTER TABLE inp_dwf ADD CONSTRAINT inp_dwf_pat3_fkey FOREIGN KEY (pat3) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;	  
+ALTER TABLE inp_dwf ADD CONSTRAINT inp_dwf_pat4_fkey FOREIGN KEY (pat4) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;  
+
+ALTER TABLE inp_dwf_pol_x_node ADD CONSTRAINT inp_dwf_pol_x_node_pat1_fkey FOREIGN KEY (pat1) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE inp_dwf_pol_x_node ADD CONSTRAINT inp_dwf_pol_x_node_pat2_fkey FOREIGN KEY (pat2) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;  
+ALTER TABLE inp_dwf_pol_x_node ADD CONSTRAINT inp_dwf_pol_x_node_pat3_fkey FOREIGN KEY (pat3) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;	  
+ALTER TABLE inp_dwf_pol_x_node ADD CONSTRAINT inp_dwf_pol_x_node_pat4_fkey FOREIGN KEY (pat4) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;  
+
+ALTER TABLE inp_inflows ADD CONSTRAINT inp_inflows_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;  
+ALTER TABLE inp_inflows_pol_x_node ADD CONSTRAINT inp_inflows_pol_x_node_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;  
+
+ALTER TABLE inp_pattern_value ADD CONSTRAINT inp_pattern_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+
+
 --ADD
 --INP
+/*
 ALTER TABLE "inp_typevalue" ADD CONSTRAINT "inp_typevalue_id_unique" UNIQUE(id);
 
 ALTER TABLE "raingage" ADD CONSTRAINT "raingage_form_type_fkey" FOREIGN KEY ("form_type") REFERENCES "inp_typevalue" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -95,7 +120,7 @@ ALTER TABLE "inp_washoff_land_x_pol" ADD CONSTRAINT "inp_washoff_land_x_pol_func
 ALTER TABLE "inp_weir" ADD CONSTRAINT "inp_weir_weir_type_fkey" FOREIGN KEY ("weir_type") REFERENCES "inp_typevalue" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_weir" ADD CONSTRAINT "inp_weir_flap_fkey" FOREIGN KEY ("flap") REFERENCES "inp_typevalue" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-
+*/
 
 -- ADD CHECK
 
