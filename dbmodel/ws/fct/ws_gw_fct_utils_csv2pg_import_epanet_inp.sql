@@ -6,15 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:XXXX
 
--- Function: SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(text)
-
--- DROP FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(text);
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
   RETURNS integer AS
 
 /*
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(null);
+SELECT ws_sample.gw_fct_utils_csv2pg_import_epanet_inp(null);
 */
  
 $BODY$
@@ -69,7 +65,7 @@ $BODY$
 BEGIN
 
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 
     	-- Get schema name
 	schemas_array := current_schemas(FALSE);
@@ -164,6 +160,12 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' )';
 	END IF;
 
+	RAISE NOTICE 'step 1/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Constraints of schema temporary disabled -> Done');
+
+	RAISE NOTICE 'step 2/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data from inp file to temp_csv2pg table -> Done');
+
 	-- Harmonize the source table
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
@@ -208,6 +210,9 @@ BEGIN
 			csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
 	END LOOP;
 
+	RAISE NOTICE 'step 3/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating map zones and catalogs -> Done');
+	
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
 	INSERT INTO exploitation(expl_id,name,macroexpl_id) VALUES(1,'exploitation1',1);
@@ -318,7 +323,7 @@ BEGIN
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id order by id
 	LOOP
 		--identifing the humber of fields of the editable view
-		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
+		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='ws_sample'
 		LOOP	
 
 			IF v_rec_view.rid=1 THEN
@@ -336,11 +341,16 @@ BEGIN
 		raise notice 'v_query_fields %,%', v_query_fields,v_rec_table.fields;
 		
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv2pg where source='||quote_literal(v_rec_table.target)||' 
-		AND csv2pgcat_id='||v_csv2pgcat_id||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user)||' ORDER BY id';;
+		AND csv2pgcat_id='||v_csv2pgcat_id||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND user_name='||quote_literal(current_user)||' ORDER BY id';
 
 		raise notice 'v_sql %', v_sql;
 		EXECUTE v_sql;		
 	END LOOP;
+
+	RAISE NOTICE 'step 4/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data into tables using vi_* views -> Done');
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Rules will be stored on inp_rules_importinp table. This is a temporary table. Data need to be moved to inp_rules_x_arc, inp_rules_x_node and inp_rules_x_sector tables to be used later');
+	
 
 	IF v_arc2node_reverse THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
 	
@@ -425,9 +435,12 @@ BEGIN
 
 		DELETE FROM inp_valve_importinp;
 		DELETE FROM inp_pump_importinp;
-		
-	
 	END IF;
+
+	RAISE NOTICE 'step 5/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating arc geometry from extremal nodes and intermediate vertex -> Done');
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'NOTICE: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes is saved using state=0');
+	
 	
 	-- Create arc geom
 	IF v_arc2node_reverse THEN
@@ -474,6 +487,10 @@ BEGIN
 
 	INSERT INTO inp_pattern SELECT DISTINCT pattern_id FROM inp_pattern_value;
 
+	RAISE NOTICE 'step-6/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating arc geometries -> Done');
+
+
 	-- Enable constraints
 	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
@@ -493,6 +510,11 @@ BEGIN
 
 		-- restore default default values
 		UPDATE config_param_system SET value=0.1 where parameter = 'arc_searchnodes';
+
+
+	RAISE NOTICE 'step-7/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Enabling constraints -> Done');
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Process finished');
 		
 	END IF;
 

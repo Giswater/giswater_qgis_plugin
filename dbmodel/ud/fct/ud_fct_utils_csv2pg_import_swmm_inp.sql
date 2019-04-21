@@ -62,8 +62,6 @@ BEGIN
 	-- Get SRID
 	SELECT epsg INTO epsg_val FROM version LIMIT 1;
 
-	RAISE NOTICE 'step 1/6';
-
 	IF v_delete_prev THEN
 
 		DELETE FROM rpt_cat_result;
@@ -89,6 +87,7 @@ BEGIN
 		DELETE FROM cat_mat_node;
 		DELETE FROM cat_arc;
 		DELETE FROM cat_node;
+		DELETE FROM cat_dwf_scenario;
 	
  
 		-- Delete data
@@ -122,19 +121,19 @@ BEGIN
 		-- Disable constraints
 		PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);		
 	END IF;
+
+	RAISE NOTICE 'step 1/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Constraints of schema temporary disabled -> Done');
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF p_path IS NOT NULL THEN
 		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' ) ';
 	END IF;
 
-			-- refactor of [OPTIONS] target
-		--Target in order to insert them to the tables using editable views, which have different values concatenated into one field. 
-		--Those values are later separated using the trigger in order to put it in corresponding fields if necessary.
-		--Concatenation is made using ';' when the values need the separation in the next step (trigger) and by ' ' when they are inserted into the same field.
+	RAISE NOTICE 'step 2/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data from inp file to temp_csv2pg table -> Done');
 
-	RAISE NOTICE 'step 2/6';
-	
+	-- Harmonize the source table
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
 
@@ -188,7 +187,8 @@ BEGIN
 		END IF;	
 	END LOOP;
 
-	RAISE NOTICE 'step 3/6';
+	RAISE NOTICE 'step 3/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating map zones and catalogs -> Done');
 
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(1,'macroexploitation1');
@@ -203,7 +203,10 @@ BEGIN
 	INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
 	INSERT INTO inp_selector_sector(sector_id,cur_user) VALUES (1,current_user);
 	INSERT INTO inp_selector_hydrology(hydrology_id,cur_user) VALUES (1,current_user);
-	INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user) ;--ON CONFLICT (parameter, cur_user) DO NOTHING;
+	INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user) ;
+
+
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Setting selectors -> Done');
 
 
 	-- CATALOGS
@@ -277,7 +280,10 @@ BEGIN
 		EXECUTE v_sql;
 	END LOOP;
 
-	
+	RAISE NOTICE 'step 4/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data into tables using vi_* views -> Done');
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Controls rules will be stored on inp_controls_inmortinp table. This is a temporary table. Data need to be moved to inp_controls_x_arc table to be used later');
+
 	-- Create arc geom
 	v_querytext = 'SELECT * FROM arc ';
 		
@@ -300,7 +306,10 @@ BEGIN
 
 	END LOOP;
 
-	RAISE NOTICE 'step 4/6';
+	RAISE NOTICE 'step 5/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating arc geometry from extremal nodes and intermediate vertex -> Done');
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'WARNING: Link geometries as ORIFICE, WEIRS, PUMPS AND OULETS will not transformed using reverse nod2arc strategy as nodes. It will keep as arc');
+
 	
 	-- Subcatchments geometry
 	--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
@@ -342,8 +351,9 @@ BEGIN
 		
 	END LOOP;
 
-	RAISE NOTICE 'step-5/6';
-		
+	RAISE NOTICE 'step-6/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating subcathcment polygons -> Done');
+			
 	-- Mapzones geometry
 	--Create the same geometry of all mapzones by making the Convex Hull over all the existing arcs
 	EXECUTE 'SELECT ST_Multi(ST_ConvexHull(ST_Collect(the_geom))) FROM arc;'
@@ -356,8 +366,10 @@ BEGIN
 	-- Enable constraints
 	PERFORM gw_fct_admin_schema_manage_ct($${"client":{"lang":"ES"},"data":{"action":"ADD"}}$$);
 
-	RAISE NOTICE 'step-6/6';
-
+	RAISE NOTICE 'step-7/7';
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Enabling constraints -> Done');
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Process finished');
+	
 RETURN v_count;
 	
 END;
