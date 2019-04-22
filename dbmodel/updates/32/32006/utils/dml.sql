@@ -33,4 +33,27 @@ UPDATE config_param_system SET value='{"isVisitExists":true, "parameters": ["p1"
 
 INSERT INTO sys_fprocess_cat VALUES (42, 'import generic csv file', 'Utils','import generic csv file', 'utils');
 
--- TO DO: INSERT INTO audit_cat_function gw_trg_vi
+UPDATE audit_cat_function SET isdeprecated=true where function_name = 'gw_fct_utils_csv2pg_import_epa_inp';
+UPDATE audit_cat_function SET isdeprecated=true where function_name = 'gw_fct_utils_csv2pg_import_epa_rpt';
+UPDATE audit_cat_function SET isdeprecated=true where function_name = 'gw_fct_utils_csv2pg_export_epa_inp';
+
+
+UPDATE audit_cat_function SET   
+input_params = '{"featureType":""}',
+return_type='[{"widgetname":"useNod2arc", "label":"Create nod2arc:", "widgettype":"check","datatype":"boolean","layout_name":"grl_option_parameters","layout_order":1,"value":false}]'
+WHERE function_name='gw_fct_utils_csv2pg_import_epanet_inp';
+
+
+UPDATE audit_cat_function SET   
+input_params = '{"featureType":""}',
+return_type='[{"widgetname":"createSubcGeom", "label":"Create subcatchments geometry:", "widgettype":"check","datatype":"boolean","layout_name":"grl_option_parameters","layout_order":1,"value":true}]'
+WHERE function_name='gw_fct_utils_csv2pg_import_swmm_inp';
+
+-- reparir table
+UPDATE audit_cat_function SET function_type='function', input_params='{"featureType":"connec"}'  WHERE function_name='gw_fct_repair_link';
+
+-- TO DO: 
+		-- audit_cat_function : insert gw_trg_vi
+		-- audit_cat_table: all tables form 3.2.0000
+
+
