@@ -5,26 +5,27 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE:2524
-  
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(p_path text)
-  RETURNS integer AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(p_data json)
+  RETURNS json AS
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp('D:\dades\test.inp');
-SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp(null);
-
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_inp($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{},
+"data":{"parameters":{"createSubcGeom":false}}}$$)
 */
 
 $BODY$
 	DECLARE
 	rpt_rec record;
-	epsg_val integer;
+	v_epsg integer;
 	v_point_geom public.geometry;
 	v_line_geom public.geometry;
 	schemas_array name[];
 	v_target text;
 	v_count integer=0;
-	project_type_aux varchar;
+	v_projecttype varchar;
 	geom_array public.geometry array;
 	v_data record;
 	v_extend_val public.geometry;
@@ -38,7 +39,7 @@ $BODY$
 	v_node1 text;
 	v_node2 text;
 	v_elevation float;
-	v_arc2node_reverse boolean = true; -- not used on ud
+	v_createsubcgeom boolean = true; 
 	v_delete_prev boolean = true; -- used on dev mode to
 	v_querytext text;
 	v_nodecat text;
@@ -47,20 +48,26 @@ $BODY$
 	v_id text;
 	v_mantablename text;
 	v_epatablename text;
-	
+	v_result 	json;
+	v_result_info 	json;
+	v_result_point	json;
+	v_result_line 	json;
+	v_version	json;
+	v_path 		text;
+
 BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- GET'S
-    	-- Get schema name
-	schemas_array := current_schemas(FALSE);
+	-- get project type and srid
+	SELECT wsoftware, epsg INTO v_projecttype, v_epsg FROM version LIMIT 1;
 
-	-- Get project type
-	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
-	
-	-- Get SRID
-	SELECT epsg INTO epsg_val FROM version LIMIT 1;
+	-- get input data
+	v_createsubcgeom := (((p_data ->>'data')::json->>'parameters')::json->>'createSubcGeom')::boolean;
+	v_path := ((p_data ->>'data')::json->>'parameters')::json->>'path'::text;
+
+	-- delete previous data on log table
+	DELETE FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=41;
 
 	IF v_delete_prev THEN
 
@@ -89,7 +96,6 @@ BEGIN
 		DELETE FROM cat_node;
 		DELETE FROM cat_dwf_scenario;
 	
- 
 		-- Delete data
 		DELETE FROM node;
 		DELETE FROM arc;
@@ -126,66 +132,39 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Constraints of schema temporary disabled -> Done');
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
-	IF p_path IS NOT NULL THEN
-		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' ) ';
+	IF v_path IS NOT NULL THEN
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(v_path)||' ) ';
 	END IF;
 
 	RAISE NOTICE 'step 2/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data from inp file to temp_csv2pg table -> Done');
 
-	-- Harmonize the source table
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
-	LOOP
+	UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
+	csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE source='[TEMPERATURE]' AND (csv1='TIMESERIES' OR csv1='FILE' OR csv1='SNOWMELT');
 
-		--raise notice 'Second loop %', rpt_rec;
-
-		IF rpt_rec.source ='[TEMPERATURE]' AND rpt_rec.csv3 is not null THEN 
-			IF rpt_rec.csv1 LIKE 'TIMESERIES' OR rpt_rec.csv1 LIKE 'FILE' OR rpt_rec.csv1 LIKE 'SNOWMELT' THEN
-				UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
-				csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE temp_csv2pg.id=rpt_rec.id;
-			ELSE
-				UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2),csv2=concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
-				csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE temp_csv2pg.id=rpt_rec.id;
-			END IF;
-		END IF;
-
-		IF rpt_rec.source = '[CONTROLS]' AND rpt_rec.csv2 is not null THEN 
-			UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
-			csv2=null, csv3=null, csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;	
-			
-		IF rpt_rec.source = '[TREATMENT]'  AND rpt_rec.csv2 is not null THEN 
-			UPDATE temp_csv2pg SET csv3=(concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
-			csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;	
-			
-		IF rpt_rec.source = '[HYDROGRAPHS]'  AND rpt_rec.csv2 is not null THEN 
-			UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
-			csv2=null, csv3=null,csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;	
-
-		IF rpt_rec.source = '[DWF]'  AND rpt_rec.csv2 is not null THEN 
-			UPDATE temp_csv2pg SET csv4 = replace(csv4,'"',''), csv5 = replace(csv5,'"',''), csv6 = replace(csv6,'"',''), csv7 = replace(csv7,'"','') ;
-		END IF;	
-		
-		IF rpt_rec.source = '[MAP]'  AND rpt_rec.csv3 is not null THEN 
-			UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5),csv3=null,csv4=null,csv5=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;	
-					
-		IF rpt_rec.source = '[GWF]' AND rpt_rec.csv4 is not null THEN 
-			UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3),csv3=concat(csv4,';',csv5),csv4=null,csv5=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;	
-			
-		IF rpt_rec.source = '[BACKDROP]' AND rpt_rec.csv2 is not null THEN 
-			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6),
-			csv2=null, csv3=null,csv4=null, csv5=null,csv6=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;	
+	UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2),csv2=concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13,' ',csv14,' ',csv15,' ',csv16 ),
+	csv3=null, csv4=null,csv5=null,csv6=null,csv7=null, csv8=null, csv9=null,csv10=null,csv11=null,csv12=null, csv13=null, csv14=null,csv15=null,csv16=null WHERE source='[TEMPERATURE]' AND csv1!='TIMESERIES' AND csv1!='FILE' AND csv1!='SNOWMELT';
 	
-		IF rpt_rec.source LIKE '[EVAPORATION]' AND rpt_rec.csv3 is not null THEN 
-			UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5,';',csv6,csv7,';',csv8,';',csv9,';',csv10,';',csv11,';',csv12,';',csv13),
-			csv3=null,csv4=null, csv5=null,csv6=null,csv7=null,csv8=null,csv9=null,csv10=null,csv11=null,csv12=null,csv13=null WHERE temp_csv2pg.id=rpt_rec.id; 
-		END IF;	
-	END LOOP;
+	UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
+	csv2=null, csv3=null, csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE source='[CONTROLS]';
+
+	UPDATE temp_csv2pg SET csv3=(concat(csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
+	csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE source='[TREATMENT]'; 
+
+	UPDATE temp_csv2pg SET csv1=(concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10,' ',csv11,' ',csv12,' ',csv13)), 
+	csv2=null, csv3=null,csv4=null, csv5=null, csv6=null, csv7=null, csv8=null, csv9=null, csv10=null, csv11=null,csv12=null,csv13=null WHERE source='[HYDROGRAPHS]'; 
+
+	UPDATE temp_csv2pg SET csv4 = replace(csv4,'"',''), csv5 = replace(csv5,'"',''), csv6 = replace(csv6,'"',''), csv7 = replace(csv7,'"','') WHERE source='[DWF]';
+		
+	UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5),csv3=null,csv4=null,csv5=null WHERE source='[MAP]'; 
+					
+	UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3),csv3=concat(csv4,';',csv5),csv4=null,csv5=null WHERE  source='[GWF]';
+			
+	UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6), csv2=null, csv3=null,csv4=null, csv5=null,csv6=null WHERE  source='[BACKDROP]';
+	
+	UPDATE temp_csv2pg SET csv2=concat(csv2,';',csv3,';',csv4,';',csv5,';',csv6,csv7,';',csv8,';',csv9,';',csv10,';',csv11,';',csv12,';',csv13),
+	csv3=null,csv4=null, csv5=null,csv6=null,csv7=null,csv8=null,csv9=null,csv10=null,csv11=null,csv12=null,csv13=null WHERE source='[EVAPORATION]';
+
 
 	RAISE NOTICE 'step 3/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating map zones and catalogs -> Done');
@@ -296,7 +275,7 @@ BEGIN
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
 		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
 		LOOP	
-			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
+			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),v_epsg);
 			geom_array=array_append(geom_array,v_point_geom);
 		END LOOP;
 
@@ -312,34 +291,35 @@ BEGIN
 
 	
 	-- Subcatchments geometry
-	--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
-	FOR v_data IN SELECT * FROM subcatchment LOOP
+	IF v_createsubcgeom THEN
+		--Create points out of vertices defined in inp file create a line out all points and transform it into a polygon.
+		FOR v_data IN SELECT * FROM subcatchment LOOP
+		
+			FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
+			LOOP	
+			
+				v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),v_epsg);
+				INSERT INTO temp_table (text_column,geom_point) VALUES (v_data.subc_id,v_point_geom);
 
-		--raise notice '5th loop %', v_data;
-	
-		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source ilike '[Polygons]' AND csv1=v_data.subc_id order by id 
-		LOOP	
-			--raise notice 'Six-inter loop %', v_data;
+				--geom_array=array_append(geom_array,v_point_geom);
+			END LOOP;
 
-			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
-			INSERT INTO temp_table (text_column,geom_point) VALUES (v_data.subc_id,v_point_geom);
+			SELECT ARRAY(SELECT geom_point FROM temp_table WHERE text_column=v_data.subc_id) into geom_array;
+			v_line_geom=ST_MakeLine(geom_array);
 
-			--geom_array=array_append(geom_array,v_point_geom);
-		END LOOP;
-		SELECT ARRAY(SELECT geom_point FROM temp_table WHERE text_column=v_data.subc_id) into geom_array;
-		v_line_geom=ST_MakeLine(geom_array);
-		INSERT INTO temp_table (text_column,geom_line) VALUES (v_data.subc_id,v_line_geom);
-		IF array_length(geom_array, 1) > 3 THEN
+			INSERT INTO temp_table (text_column,geom_line) VALUES (v_data.subc_id,v_line_geom);
+
+			IF array_length(geom_array, 1) > 3 THEN
 				v_line_geom=ST_MakeLine(geom_array);
 				INSERT INTO temp_table (text_column,geom_line) VALUES (v_data.subc_id,v_line_geom);
 
 				IF ST_IsClosed(v_line_geom) THEN
-					UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,epsg_val)) where subc_id=v_data.subc_id;
+					UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,v_epsg)) where subc_id=v_data.subc_id;
 					INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
 				ELSE
 					v_line_geom = ST_AddPoint(v_line_geom, ST_StartPoint(v_line_geom));
 					IF ST_IsClosed(v_line_geom) THEN
-						UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,epsg_val)) where subc_id=v_data.subc_id;
+						UPDATE subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,v_epsg)) where subc_id=v_data.subc_id;
 						INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
 					ELSE
 						RAISE NOTICE 'The polygon cant be created because the geometry is not closed. Subc_id: ,%', v_data.subc_id;
@@ -348,8 +328,9 @@ BEGIN
 			ELSE 
 				RAISE NOTICE 'The polygonn cant be created because it has less than 4 vertexes. Subc_id: ,%', v_data.subc_id;
 			END IF;
-		
-	END LOOP;
+		END LOOP;
+	END IF;
+
 
 	RAISE NOTICE 'step-6/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating subcathcment polygons -> Done');
@@ -369,8 +350,50 @@ BEGIN
 	RAISE NOTICE 'step-7/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Enabling constraints -> Done');
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Process finished');
+
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=41  order by id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
-RETURN v_count;
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=41) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+
+	--lines
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id=41)) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+
+
+	--Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 	
+	
+	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+
+
+	--Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 	
+
+-- 	Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+		       '}'||
+	    '}')::json;
 	
 END;
 $BODY$
