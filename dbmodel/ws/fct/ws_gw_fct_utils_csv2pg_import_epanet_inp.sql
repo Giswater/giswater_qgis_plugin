@@ -5,23 +5,25 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE:XXXX
-
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_utils_csv2pg_import_epanet_inp(p_path text)
-  RETURNS integer AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_data json)
+  RETURNS json AS
 
 /*
-SELECT ws_sample.gw_fct_utils_csv2pg_import_epanet_inp(null);
+SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{},
+"data":{"parameters":{"useNod2arc":true}}}$$)
 */
  
 $BODY$
 	DECLARE
 	rpt_rec record;
-	epsg_val integer;
+	v_epsg integer;
 	v_point_geom public.geometry;
 	v_value text;
 	v_config_fields record;
 	v_query_text text;
-	schemas_array name[];
 	v_table_pkey text;
 	v_column_type text;
 	v_pkey_column_type text;
@@ -31,7 +33,7 @@ $BODY$
 	v_fields record;
 	v_target text;
 	v_count integer=0;
-	project_type_aux varchar;
+	v_projecttype varchar;
 	v_xcoord numeric;
 	v_ycoord numeric;
 	geom_array public.geometry array;
@@ -60,21 +62,27 @@ $BODY$
 	v_arc_id text;
 	v_rules_aux text;
 	v_curvetype text;
-	
+	v_result 	json;
+	v_result_info 	json;
+	v_result_point	json;
+	v_result_line 	json;
+	v_version	json;
+	v_path 		text;
 	
 BEGIN
 
 	-- Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 
-    	-- Get schema name
-	schemas_array := current_schemas(FALSE);
+	-- get project type
+	SELECT wsoftware, epsg INTO v_projecttype, v_epsg FROM version LIMIT 1;
 
-	-- Get project type
-	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	-- get input data
+	v_arc2node_reverse := (((p_data ->>'data')::json->>'parameters')::json->>'useNod2arc')::boolean;
+	v_path := ((p_data ->>'data')::json->>'parameters')::json->>'path'::text;
 
-	-- Get SRID
-	SELECT epsg INTO epsg_val FROM version LIMIT 1;
+	-- delete previous data on log table
+	DELETE FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=41;
 
 	IF v_delete_prev THEN
 		
@@ -156,8 +164,8 @@ BEGIN
 	
 
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
-	IF p_path IS NOT NULL THEN
-		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(p_path)||' )';
+	IF v_path IS NOT NULL THEN
+		EXECUTE 'SELECT gw_fct_utils_csv2pg_import_temp_data('||quote_literal(v_csv2pgcat_id)||','||quote_literal(v_path)||' )';
 	END IF;
 
 	RAISE NOTICE 'step 1/7';
@@ -165,7 +173,37 @@ BEGIN
 
 	RAISE NOTICE 'step 2/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Inserting data from inp file to temp_csv2pg table -> Done');
+	
+	--refactor options target
+	UPDATE temp_csv2pg SET csv1='SPECIFIC GRAVITY', csv2=csv3, csv3=NULL WHERE source = '[OPTIONS]' AND lower(csv1)='specific';
+	UPDATE temp_csv2pg SET csv1='DEMAND MULTIPLIER', csv2=csv3, csv3=NULL WHERE source = '[OPTIONS]' and lower(csv1)='demand';
+	UPDATE temp_csv2pg SET csv1='EMITTER EXPONENT', csv2=csv3, csv3=NULL WHERE source = '[OPTIONS]' and lower(csv1)='emitter';
+	UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3), csv3=NULL WHERE source = '[OPTIONS]' and lower(csv1)='unbalanced';
+	UPDATE temp_csv2pg SET csv1='f_factor', csv2=concat(csv2,' ',csv3), csv3=NULL WHERE source = '[OPTIONS]' and lower(csv1)='f-factor';
 
+	--refactor times target
+	UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=concat(csv3,' ',csv4), csv3=null,csv4=null WHERE source = '[TIMES]' and lower(csv2)='clocktime';
+	UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=csv3, csv3=null WHERE source = '[TIMES]' and lower(csv2) ilike ='timestep' OR lower(csv2) ILIKE 'start';
+
+	--refactor energy target
+	UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3), csv2=csv4, csv3=null,  csv4=null WHERE source = '[ENERGY]' and lower(csv1)='pump';
+	UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2), csv2=csv3, csv3=null WHERE source = '[ENERGY]' AND (lower(csv1) ILIKE 'global' OR lower(csv1) ILIKE 'demand'); 
+
+	--refactor controls target
+	UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ), 
+	csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE source = '[CONTROLS]' and csv2 IS NOT NULL;
+	
+	-- refactor curves target
+	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE source ='[CURVES]' 
+	LOOP
+		IF rpt_rec.csv2 is null THEN
+			v_curvetype=replace(replace(rpt_rec.csv1,';',''),':','');
+		ELSE
+			UPDATE temp_csv2pg SET csv4=v_curvetype WHERE temp_csv2pg.id=rpt_rec.id; 
+		END IF;	
+	END LOOP;	
+
+	/*
 	-- Harmonize the source table
 	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
 	LOOP
@@ -209,6 +247,8 @@ BEGIN
 			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ), 
 			csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
 	END LOOP;
+	
+	*/
 
 	RAISE NOTICE 'step 3/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating map zones and catalogs -> Done');
@@ -323,7 +363,7 @@ BEGIN
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id order by id
 	LOOP
 		--identifing the humber of fields of the editable view
-		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='ws_sample'
+		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 		LOOP	
 
 			IF v_rec_view.rid=1 THEN
@@ -368,7 +408,7 @@ BEGIN
 			SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
 			FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
 			LOOP	
-				v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
+				v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),v_epsg);
 				geom_array=array_append(geom_array,v_point_geom);
 			END LOOP;
 	
@@ -435,11 +475,12 @@ BEGIN
 
 		DELETE FROM inp_valve_importinp;
 		DELETE FROM inp_pump_importinp;
+
+		INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'NOTICE: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
 	END IF;
 
 	RAISE NOTICE 'step 5/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating arc geometry from extremal nodes and intermediate vertex -> Done');
-	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'NOTICE: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes is saved using state=0');
 	
 	
 	-- Create arc geom
@@ -455,7 +496,7 @@ BEGIN
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
 		FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id and source='[VERTICES]' AND csv1=v_data.arc_id order by id 
 		LOOP	
-			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),epsg_val);
+			v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),v_epsg);
 			geom_array=array_append(geom_array,v_point_geom);
 		END LOOP;
 
@@ -517,8 +558,42 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Process finished');
 		
 	END IF;
+	
 
-RETURN v_count;
+	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=41  order by id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=41) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}');
+
+	--lines
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom FROM anl_arc WHERE cur_user="current_user"() AND (fprocesscat_id=41)) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
+
+	--Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_line := COALESCE(v_result_line, '{}'); 	
+
+--  	Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+		       '}'||
+	    '}')::json;
 	
 END;
 $BODY$
