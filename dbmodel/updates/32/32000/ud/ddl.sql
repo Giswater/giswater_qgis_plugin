@@ -18,7 +18,7 @@ CREATE TABLE inp_evaporation(
 ALTER TABLE IF EXISTS inp_temperature RENAME TO _inp_temperature;
   CREATE TABLE inp_temperature(
   id serial NOT NULL PRIMARY KEY,
-  temp_type character varying(30),
+  temp_type character varying(60),
   value text
 );
 
