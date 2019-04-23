@@ -1231,7 +1231,7 @@ class ApiParent(ParentAction):
                 widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
-            widget = self.set_fucntion_associated(dialog, widget, field)
+            widget = self.set_function_associated(dialog, widget, field)
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
