@@ -26,6 +26,8 @@ only 32
 SELECT "SCHEMA_NAME".gw_api_get_formfields('go2epa', 'form', 'data', null, null, null, null, null, null,null)
 SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_pipe', 'feature', 'data', NULL, NULL, NULL, NULL, 'INSERT', null, 3)
 SELECT "SCHEMA_NAME".gw_api_get_formfields('ve_arc_pipe', 'list', NULL, NULL, NULL, NULL, NULL, 'INSERT', null, 3)
+SELECT SCHEMA_NAME.gw_api_get_formfields( 'printGeneric', 'utils', 'data', null, null, null, null, 'SELECT', null, 3);
+
 */
 
 
@@ -110,6 +112,8 @@ BEGIN
 				INTO fields_array
 				USING p_formname, p_id ;
 	END IF;
+
+	raise notice'aghsarghrasfgh';
 	
 	fields_array := COALESCE(fields_array, '{}');  
 
@@ -160,11 +164,13 @@ BEGIN
 			v_dv_querytext=(aux_json->>'dv_querytext');
 
 			IF (aux_json->>'widgettype') = 'combo' THEN
-			
+		raise notice'aghsarghrasfgh';
+		
 				-- Get combo id's
 				EXECUTE 'SELECT (array_agg(id)) FROM ('||v_dv_querytext||' ORDER BY '||v_orderby||')a'
 					INTO v_array;
 				
+			raise notice'aghsarghrasfgh';
 				-- Enable null values
 				IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
 					v_array = array_prepend('',v_array);
@@ -183,13 +189,13 @@ BEGIN
 				END IF;
 				combo_json = array_to_json(v_array);
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
-	
+
 				-- Get selected value
 				IF p_tgop ='INSERT' THEN
 					v_vdefault:=quote_ident(aux_json->>'column_id');
 					EXECUTE 'SELECT value::text FROM audit_cat_param_user JOIN config_param_user ON audit_cat_param_user.id=parameter WHERE cur_user=current_user AND feature_field_id='||quote_literal(v_vdefault)
 						INTO field_value_parent;
-				ELSE 
+				ELSIF p_tgop ='UPDATE' THEN
 					EXECUTE 'SELECT ' || quote_ident(aux_json->>'column_id') || ' FROM ' || quote_ident(p_tablename) || ' WHERE ' || quote_ident(p_idname) || ' = CAST(' || quote_literal(p_id) || ' AS ' || p_columntype || ')' 
 						INTO field_value_parent; 
 				END IF;
