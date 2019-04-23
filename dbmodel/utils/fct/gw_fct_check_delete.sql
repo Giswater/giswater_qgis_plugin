@@ -12,7 +12,6 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_check_delete(feature_id_aux text, 
 $BODY$
 DECLARE
     rec_node record;
-    rec record;
     num_feature integer;
     project_type_aux text;
 	error_var text;
@@ -23,9 +22,6 @@ BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
-
-    -- Get data from config table
-    SELECT * INTO rec FROM config; 
 
     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 	

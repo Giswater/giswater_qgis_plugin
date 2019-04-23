@@ -18,13 +18,13 @@ SELECT SCHEMA_NAME.gw_fct_built_nodefromarc()
 DECLARE
 	rec_arc record;
 	rec_table record;
-	rec record;
 	numnodes integer;
 	v_version text;
 	v_saveondatabase boolean = true;
 	v_result json;
 	v_result_info json;
 	v_result_point json;
+	v_node_proximity double precision;
 
 BEGIN
 
@@ -35,8 +35,8 @@ BEGIN
 	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- Get data from config tables
-	SELECT * INTO rec FROM config;
-	
+	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
+
 	--  Reset values
 	DELETE FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16;
 	DELETE FROM anl_node WHERE cur_user=current_user AND fprocesscat_id=16;
@@ -56,7 +56,7 @@ BEGIN
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
-		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, rec.node_proximity));
+		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_node_proximity));
 		IF numNodes = 0 THEN
 			INSERT INTO anl_node (the_geom, state, fprocesscat_id) VALUES (rec_table.geom_point,1,16);
 		ELSE

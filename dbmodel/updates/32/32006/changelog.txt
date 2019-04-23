@@ -8,3 +8,4 @@ New strategy of dwf scenarios adding:
 New columns (formname, functionname, isdeprecated) on sys_csv2pg_cat table. New column (sys_roleselect_id) on audit_cat_table table
 Enhance and update data on system tables: config_param_system table, sys_csv2pg_cat table, audit_cat_function table, sys_fprocess_cat table
 Remove constraint on inp_typevalue table and harmonize id/idval values on that table (ws)
+Move parameters from config to config_param_system. Function refactor.

@@ -13,15 +13,11 @@ $BODY$
 
 DECLARE 
     man_table varchar;
-	rec record;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	man_table:= TG_ARGV[0];
-		
-	--Get data from config table
-	SELECT * INTO rec FROM config;	
 	
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN

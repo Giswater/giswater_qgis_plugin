@@ -102,16 +102,20 @@ BEGIN
     SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
     
      --  get config parameters   
-    SELECT value INTO v_node_proximity FROM config_param_system WHERE parameter = 'node_proximity';
-    SELECT value INTO v_node_proximity_control FROM config_param_system WHERE parameter = 'node_proximity_control';
-    SELECT value INTO v_connec_proximity FROM config_param_system WHERE parameter = 'connec_proximity';
-    SELECT value INTO v_connec_proximity_control FROM config_param_system WHERE parameter = 'connec_proximity_control';
-    SELECT value INTO v_gully_proximity FROM config_param_system WHERE parameter = 'gully_proximity';
-    SELECT value INTO v_gully_proximity_control FROM config_param_system WHERE parameter = 'gully_proximity_control';
-    SELECT value INTO v_arc_searchnodes FROM config_param_system WHERE parameter = 'arc_searchnodes';
+    SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
+	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
+
+    SELECT ((value::json)->>'activated') INTO v_connec_proximity_control FROM config_param_system WHERE parameter='connec_proximity';
+	SELECT ((value::json)->>'value') INTO v_connec_proximity FROM config_param_system WHERE parameter='connec_proximity';
+    
+    SELECT ((value::json)->>'activated') INTO v_gully_proximity_control FROM config_param_system WHERE parameter='gully_proximity';
+	SELECT ((value::json)->>'value') INTO v_gully_proximity FROM config_param_system WHERE parameter='gully_proximity';
+
+    SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='arc_searchnodes';
+	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
+
     SELECT value INTO v_samenode_init_end_control FROM config_param_system WHERE parameter = 'samenode_init_end_control';
-    SELECT value INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter = 'arc_searchnodes_control';
-      
+
     -- get tablename and formname
     -- Common
      v_tablename = p_table_id;

@@ -23,12 +23,12 @@ DECLARE
     old_nodetype varchar;
     new_nodetype varchar;
     node_id_seq int8;
-	rec Record;
 	expl_id_int integer;
 	code_autofill_bool boolean;
-	rec_aux text;
 	node_id_aux text;
 	delete_aux text;
+	v_insert_double_geom boolean;
+	v_double_geom_buffer double precision;
 
 BEGIN
 
@@ -37,8 +37,9 @@ BEGIN
 	man_table_2:=man_table;
 	
 	--Get data from config table
-	SELECT * INTO rec FROM config;	
-	
+	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
+	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
+
 -- INSERT
 
     -- Control insertions ID
@@ -155,13 +156,13 @@ BEGIN
 		NEW.tank_address_02, NEW.tank_address_03, NEW.tank_descript, NEW.tank_rotation, NEW.verified, NEW.undelete,NEW.tank_label_x,NEW.tank_label_y,NEW.tank_label_rotation, 
 		expl_id_int, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.tank_hemisphere,NEW.tank_num_value);
 		
-		IF (rec.insert_double_geometry IS TRUE) THEN
+		IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.tank_pol_id IS NULL) THEN
 					NEW.tank_pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
 				
 					INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.tank_pol_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,(SELECT ST_multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,(SELECT ST_multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			ELSE
 				INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);
 			END IF;
@@ -186,7 +187,7 @@ BEGIN
 				NEW.tank_code=NEW.node_id;
 			END IF;
 			
-		IF (rec.insert_double_geometry IS TRUE) THEN
+		IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.tank_pol_id IS NULL) THEN
 					NEW.tank_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
@@ -532,13 +533,13 @@ BEGIN
 		NEW.register_builtdate, NEW.register_enddate, NEW.register_ownercat_id, NEW.register_address_01, NEW.register_address_02, NEW.register_address_03, NEW.register_descript, NEW.register_rotation, NEW.verified, 
 		NEW.the_geom, NEW.undelete,NEW.register_label_x,NEW.register_label_y,NEW.register_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.register_hemisphere, NEW.register_num_value);
 		
-		IF (rec.insert_double_geometry IS TRUE) THEN
+		IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.register_pol_id IS NULL) THEN
 					NEW.register_pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
 				
 					INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.register_pol_id);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.register_pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.register_pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			ELSE
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 			END IF;	
@@ -564,7 +565,7 @@ BEGIN
 			END IF;
 			
 			
-		IF (rec.insert_double_geometry IS TRUE) THEN
+		IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.register_pol_id IS NULL) THEN
 					NEW.register_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;

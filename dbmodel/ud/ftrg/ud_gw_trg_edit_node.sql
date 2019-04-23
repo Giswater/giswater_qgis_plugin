@@ -18,7 +18,6 @@ DECLARE
     v_sql varchar;
     old_nodetype varchar;
     new_nodetype varchar;
-	rec Record;
     node_id_seq int8;
 	count_aux integer;
 	promixity_buffer_aux double precision;
@@ -29,7 +28,6 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
    
    	--Get data from config table
-	SELECT * INTO rec FROM config;	
 	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
 	
     -- Control insertions ID

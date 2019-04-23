@@ -40,7 +40,7 @@ DECLARE
 	plan_arc_vdivision_dsbl_aux boolean;
 	array_agg_connec varchar [];
 	array_agg_gully varchar [];
-	v_arcsearch_nodes float;
+	v_arc_searchnodes float;
     rec_node record;
     v_newarc varchar;
 
@@ -60,9 +60,9 @@ BEGIN
 	SELECT state INTO state_node_arg FROM node WHERE node_id=node_id_arg;
 
     -- Get parameters from configs table
-	SELECT value::boolean INTO plan_arc_vdivision_dsbl_aux FROM config_param_user WHERE "parameter"='plan_arc_vdivision_dsbl' AND cur_user=current_user;
-	SELECT arc_searchnodes INTO v_arcsearch_nodes FROM config;
-	
+	SELECT value::boolean INTO plan_arc_vdivision_dsbl_aux FROM config_param_user WHERE "parameter"='plan_arc_vdivision_dsbl' AND cur_user=current_user;	  
+	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
+
 	-- State control
 	IF state_aux=0 THEN
 		PERFORM audit_function(1050,2114);
@@ -71,12 +71,12 @@ BEGIN
 	END IF;
 
 	-- Check if it's a end/start point node in case of wrong topology without start or end nodes
-	SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), node_geom, v_arcsearch_nodes) 
-		    OR ST_DWithin(ST_endpoint(the_geom), node_geom, v_arcsearch_nodes) LIMIT 1;
+	SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), node_geom, v_arc_searchnodes) 
+		    OR ST_DWithin(ST_endpoint(the_geom), node_geom, v_arc_searchnodes) LIMIT 1;
 	IF arc_id_aux IS NOT NULL THEN
 		-- force trigger of topology in order to reconnect extremal nodes (in case of null's)
 		UPDATE arc SET the_geom=the_geom WHERE arc_id=arc_id_aux;
-		SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(the_geom, node_geom, v_arcsearch_nodes) AND arc_id != arc_id_aux;
+		SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(the_geom, node_geom, v_arc_searchnodes) AND arc_id != arc_id_aux;
 	END IF;
 
 	-- Find closest arc inside tolerance

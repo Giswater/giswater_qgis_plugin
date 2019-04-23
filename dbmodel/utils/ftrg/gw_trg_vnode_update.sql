@@ -12,17 +12,17 @@ DECLARE
 
 linkrec record;
 arcrec record;
-rec record;
 querystring text;
-
+vnode_update_tolerance double precision;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
         -- Start process
-	SELECT * INTO rec FROM config;
-	SELECT * INTO arcrec FROM v_edit_arc WHERE ST_DWithin((NEW.the_geom), v_edit_arc.the_geom, rec.vnode_update_tolerance) 
+	v_vnode_update_tolerance = (SELECT value FROM config_param_system WHERE "parameter"='vnode_update_tolerance');
+	
+	SELECT * INTO arcrec FROM v_edit_arc WHERE ST_DWithin((NEW.the_geom), v_edit_arc.the_geom, v_vnode_update_tolerance) 
 	ORDER BY ST_Distance(v_edit_arc.the_geom, (NEW.the_geom)) LIMIT 1;
 
         -- Snnaping to arc

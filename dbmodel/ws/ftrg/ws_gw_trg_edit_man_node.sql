@@ -22,7 +22,6 @@ DECLARE
     old_nodetype varchar;
     new_nodetype varchar;
     node_id_seq int8;
-	rec Record;
 	code_autofill_bool boolean;
 	rec_aux text;
 	node_id_aux text;
@@ -34,6 +33,8 @@ DECLARE
 	promixity_buffer_aux double precision;
 	edit_node_reduction_auto_d1d2_aux boolean;
 	link_path_aux varchar;
+	v_insert_double_geom boolean;
+	v_double_geom_buffer double precision;
 
 BEGIN
 
@@ -42,10 +43,11 @@ BEGIN
 	man_table_2:=man_table;
 	
 	--Get data from config table
-	SELECT * INTO rec FROM config;	
 	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
 	edit_node_reduction_auto_d1d2_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_node_reduction_auto_d1d2');
-	
+	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
+	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
+
 -- INSERT
 
     -- Control insertions ID
@@ -260,12 +262,12 @@ BEGIN
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere,NEW.num_value);
 		
 		IF man_table='man_tank' THEN
-			IF (rec.insert_double_geometry IS TRUE) THEN
+			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
 					
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) 
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
 					from node where node_id=NEW.node_id));
 					INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.pol_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name);
 
@@ -317,11 +319,11 @@ BEGIN
 			INSERT INTO man_filter (node_id) VALUES(NEW.node_id);	
 		
 		ELSIF man_table='man_register' THEN
-			IF (rec.insert_double_geometry IS TRUE) THEN
+			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from node where node_id=NEW.node_id));			
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) from node where node_id=NEW.node_id));			
 				INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.pol_id);
 			ELSE
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);

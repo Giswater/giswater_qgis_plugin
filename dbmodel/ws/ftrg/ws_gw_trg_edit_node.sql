@@ -18,8 +18,6 @@ DECLARE
     old_nodetype varchar;
     new_nodetype varchar;
     node_id_seq int8;
-	rec Record;
-	rec_aux text;
 	node_id_aux text;
 	tablename_aux varchar;
 	pol_id_aux varchar;
@@ -36,7 +34,6 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 	--Get data from config table
-	SELECT * INTO rec FROM config;
 	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
     
 	-- Control insertions ID

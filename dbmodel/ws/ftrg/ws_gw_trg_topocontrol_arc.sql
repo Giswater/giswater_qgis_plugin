@@ -9,8 +9,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_topocontrol_arc() RETURNS trigger AS $BODY$
 DECLARE 
     nodeRecord1 record; 
-    nodeRecord2 record; 
-    rec record;  
+    nodeRecord2 record;  
     vnoderec record;
     newPoint public.geometry;    
     connecPoint public.geometry;
@@ -20,25 +19,28 @@ DECLARE
 	v_dsbl_error boolean;
 	v_samenode_init_end_control boolean;
 	v_nodeinsert_arcendpoint boolean;
-	
+	v_arc_searchnodes_control boolean;
+	v_arc_searchnodes double precision;
+
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
- -- Get data from config table
-    SELECT * INTO rec FROM config;  
+ -- Get data from config table 
     SELECT value::boolean INTO state_topocontrol_bool FROM config_param_system WHERE parameter='state_topocontrol';
    	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
    	SELECT value::boolean INTO v_samenode_init_end_control FROM config_param_system WHERE parameter='samenode_init_end_control' ;
 	SELECT value::boolean INTO v_nodeinsert_arcendpoint  FROM config_param_system WHERE parameter='nodeinsert_arcendpoint';
 
-
+    SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='arc_searchnodes';
+	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
+	
     IF state_topocontrol_bool IS FALSE OR state_topocontrol_bool IS NULL THEN
 
-	SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
+	SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 	ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
-	SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
+	SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 	ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
    
     
@@ -55,7 +57,7 @@ BEGIN
 	-- Starting process
 	IF TG_OP='INSERT' THEN  
 
-		SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), v_edit_node.the_geom, rec.arc_searchnodes)
+		SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), v_edit_node.the_geom, v_arc_searchnodes)
 		AND (NEW.state=1 AND v_edit_node.state=1)
 		
 					-- looking for existing nodes that not belongs on the same alternatives that arc
@@ -75,7 +77,7 @@ BEGIN
 		ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
 	
-		SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), v_edit_node.the_geom, rec.arc_searchnodes) 
+		SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), v_edit_node.the_geom, v_arc_searchnodes) 
 		AND (NEW.state=1 AND v_edit_node.state=1)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
@@ -97,7 +99,7 @@ BEGIN
 	ELSIF TG_OP='UPDATE' THEN
 
 
-		SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), v_edit_node.the_geom, rec.arc_searchnodes)
+		SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), v_edit_node.the_geom, v_arc_searchnodes)
 		AND (NEW.state=1 AND v_edit_node.state=1)
 					-- looking for existing nodes that not belongs on the same alternatives that arc
 
@@ -116,7 +118,7 @@ BEGIN
 		ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
 	
-		SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), v_edit_node.the_geom, rec.arc_searchnodes) 
+		SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), v_edit_node.the_geom, v_arc_searchnodes) 
 		AND (NEW.state=1 AND v_edit_node.state=1)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
@@ -186,7 +188,7 @@ BEGIN
 			END IF;
 		
 	--	Error, no existing nodes
-		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
+		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
 			IF v_dsbl_error IS NOT TRUE THEN
 				PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
 			ELSE
@@ -194,7 +196,7 @@ BEGIN
 			END IF;
 		
 	--	Not existing nodes but accepted insertion
-		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
+		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS FALSE) THEN
 			RETURN NEW;
 			
 		ELSE		

@@ -22,12 +22,14 @@ DECLARE
     old_nodetype varchar;
     new_nodetype varchar;
     man_table_2 varchar;
-	rec Record;
     node_id_seq int8;
 	code_autofill_bool boolean;
 	count_aux integer;
 	promixity_buffer_aux double precision;
 	link_path_aux varchar;
+	v_insert_double_geom boolean;
+	v_double_geom_buffer double precision;
+
 
 BEGIN
 
@@ -36,9 +38,10 @@ BEGIN
     man_table_2:=man_table;
 
 
-	--Get data from config table
-	SELECT * INTO rec FROM config;	
+	--Get data from config table	
 	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
+	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -216,12 +219,12 @@ BEGIN
 		
 		ELSIF man_table='man_storage' THEN
 			
-			IF (rec.insert_double_geometry IS TRUE) THEN
+			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from node where node_id=NEW.node_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) from node where node_id=NEW.node_id));
 				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
 				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
 				
@@ -233,12 +236,12 @@ BEGIN
 						
 		ELSIF man_table='man_netgully' THEN
 					
-			IF (rec.insert_double_geometry IS TRUE) THEN
+			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from node where node_id=NEW.node_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) from node where node_id=NEW.node_id));
 				INSERT INTO man_netgully (node_id,pol_id, sander_depth, gratecat_id, units, groove, siphon ) 
 				VALUES(NEW.node_id, NEW.pol_id, NEW.sander_depth, NEW.gratecat_id, NEW.units, 
 				NEW.groove, NEW.siphon );
@@ -250,12 +253,12 @@ BEGIN
 					 			
 		ELSIF man_table='man_chamber' THEN
 
-			IF (rec.insert_double_geometry IS TRUE) THEN
+			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value))) from node where node_id=NEW.node_id));
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) from node where node_id=NEW.node_id));
 				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
 				VALUES (NEW.node_id,NEW.pol_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume, 
 				NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
@@ -283,12 +286,12 @@ BEGIN
 
 		ELSIF man_table='man_wwtp' THEN
 		
-			IF (rec.insert_double_geometry IS TRUE) THEN
+			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 				
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)))
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer)))
 				from node where node_id=NEW.node_id));
 				INSERT INTO man_wwtp (node_id,pol_id, name) VALUES (NEW.node_id,NEW.pol_id,NEW.name);
 			
