@@ -113,6 +113,7 @@ CREATE OR REPLACE VIEW vi_snowpacks AS
 
   
 DROP VIEW IF EXISTS vi_xsections;
+CREATE OR REPLACE VIEW  vi_xsections AS
 SELECT rpt_inp_arc.arc_id,
     cat_arc_shape.epa AS shape,
     cat_arc.geom1::text AS other1,
