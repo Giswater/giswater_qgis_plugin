@@ -7,6 +7,7 @@ or (at your option) any later version.
 
 
 # -*- coding: utf-8 -*-
+
 try:
     from qgis.core import Qgis
 except ImportError:
@@ -20,11 +21,14 @@ else:
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QDateEdit, QFileDialog, QCheckBox, QDoubleSpinBox
 
-import os
 import csv
+import json
 import operator
-from functools import partial
+import os
+
+from collections import OrderedDict
 from encodings.aliases import aliases
+from functools import partial
 
 import utils_giswater
 from giswater.actions.api_config import ApiConfig
@@ -216,14 +220,14 @@ class Utils(ParentAction):
 
     def utils_import_csv(self):
         """ Button 83: Import CSV """
-
+        self.func_name  = None
         self.dlg_csv = Csv2Pg()
         self.load_settings(self.dlg_csv)
         roles = self.controller.get_rolenames()
 
         temp_tablename = 'temp_csv2pg'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure', 'sys_csv2pg_cat', roles, False)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure, functionname', 'sys_csv2pg_cat', roles, False)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -236,6 +240,7 @@ class Utils(ParentAction):
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.disable_import_label, self.dlg_csv))
+        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.get_function_name))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
@@ -251,6 +256,11 @@ class Utils(ParentAction):
         self.open_dialog(self.dlg_csv, maximize_button=False)
 
 
+    def get_function_name(self):
+        self.func_name = utils_giswater.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
+        self.controller.log_info(str(self.func_name))
+
+        
     def disable_import_label(self, dialog):
 
         csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
@@ -414,17 +424,24 @@ class Utils(ParentAction):
         except Exception as e:
             self.controller.show_warning(str(e))
             return
-
-        sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg(" + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
-        status = self.controller.execute_sql(sql, log_sql=False)
         self.save_settings_values()
-        if status:
-            message = "Import has been satisfactory"
-            self.controller.show_info_box(message)
-            self.close_dialog(self.dlg_csv)
-        else:
+
+        extras = '"importparam":"' + label_aux + '"'
+        body = self.create_body(extras=extras)
+        sql = ("SELECT " + self.schema_name + "." + self.func_name + "($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row:
+            self.controller.show_warning("NOT ROW FOR: " + sql)
             message = "Import failed"
             self.controller.show_info_box(message)
+            return
+        else:
+            message = "Import has been satisfactory"
+            self.controller.show_info_box(message)
+            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+            dialog.txt_infolog.setText(complet_result[0]['message']['text'] + "\n")
+
+
 
 
     def insert_into_db(self, dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename):
@@ -478,8 +495,8 @@ class Utils(ParentAction):
 
         sql = ("SELECT DISTINCT(" + field_id + "), " + fields + ""
                " FROM " + self.schema_name + "." + table_name + ""
-               " WHERE sys_role IN " + roles + "")
-        rows = self.controller.get_rows(sql)
+               " WHERE sys_role IN " + roles + " AND formname='importcsv' AND isdeprecated=false")
+        rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             message = "You do not have permission to execute this application"
             self.dlg_csv.lbl_info.setText(self.controller.tr(message))
