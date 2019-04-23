@@ -252,7 +252,6 @@ class UpdateSQL(ParentAction):
 
     def load_base(self, project_type=False):
 
-        status = True
         if str(project_type) in ('ws', 'ud'):
 
             folder = self.folderUtils + self.file_pattern_ddl
@@ -358,7 +357,8 @@ class UpdateSQL(ParentAction):
             if not status and self.dev_commit == 'FALSE':
                 return False
 
-            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + os.sep, '') is False:
+            cmb_locale = utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale)
+            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + self.locale + os.sep, '') is False:
                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep, 'EN') is False:
                     return False
                 else:
@@ -366,7 +366,7 @@ class UpdateSQL(ParentAction):
                     if status is False and self.dev_commit == 'FALSE':
                         return False
             else:
-                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + os.sep, True)
+                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + cmb_locale + os.sep, True)
                 if status is False and self.dev_commit == 'FALSE':
                     return False
 
@@ -375,8 +375,8 @@ class UpdateSQL(ParentAction):
 
     def load_base_no_ct(self, project_type):
 
-        status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
+
             folder = self.folderUtils + self.file_pattern_ddl
             status = self.executeFiles(folder)
             if not status and self.dev_commit == 'FALSE':
@@ -432,14 +432,15 @@ class UpdateSQL(ParentAction):
                     return False
                 else:
                     status = self.executeFiles(self.sql_dir + os.sep + 'i18n' + os.sep + 'EN', True)
-                    if status is False:
+                    if status is False and self.dev_commit == 'FALSE':
                         return False
             else:
                 status = self.executeFiles(self.folderLocale, True)
-                if status is False:
+                if status is False and self.dev_commit == 'FALSE':
                     return False
 
         else:
+
             folder = self.folderSoftware + self.file_pattern_ddl
             status = self.executeFiles(folder)
             if not status and self.dev_commit == 'FALSE':
@@ -465,24 +466,23 @@ class UpdateSQL(ParentAction):
             if not status and self.dev_commit == 'FALSE':
                 return False
 
-            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + os.sep, '') is False:
+            cmb_locale = utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale)
+            if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + cmb_locale + os.sep, '') is False:
                 if self.process_folder(self.sql_dir + os.sep + 'i18n' + os.sep, 'EN') is False:
                     return False
                 else:
                     status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + 'EN', True)
-                    if status is False:
+                    if status is False and self.dev_commit == 'FALSE':
                         return False
             else:
-                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + os.sep, True)
-                if status is False:
+                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n' + os.sep + cmb_locale + os.sep, True)
+                if status is False and self.dev_commit == 'FALSE':
                     return False
 
         return True
 
 
     def update_31to39(self, new_project=False, project_type=False, no_ct=False):
-
-        status = True
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             if not os.path.exists(self.folderUpdates):
@@ -544,6 +544,7 @@ class UpdateSQL(ParentAction):
                                     status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
+                                    
                     else:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100':
@@ -570,6 +571,7 @@ class UpdateSQL(ParentAction):
                                     status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
+                                    
                         else:
                             if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
@@ -595,7 +597,9 @@ class UpdateSQL(ParentAction):
                                     status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
+
         else:
+
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return
             folders = os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + '')
@@ -690,8 +694,6 @@ class UpdateSQL(ParentAction):
 
     def load_views(self, project_type=False):
 
-        status = True
-
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderSoftware + self.file_pattern_ddlview
             status = self.executeFiles(folder)
@@ -714,13 +716,13 @@ class UpdateSQL(ParentAction):
 
     def update_30to31(self, new_project=False, project_type=False):
 
-        status = True
-
         if str(project_type) == 'ws' or str(project_type) == 'ud':
+
             if not os.path.exists(self.folderUpdates):
                 self.controller.show_message("The update folder was not found in sql folder.", 1)
                 self.error_count = self.error_count + 1
-                return
+                return True
+
             folders = os.listdir(self.folderUpdates + '')
             for folder in folders:
                 sub_folders = os.listdir(self.folderUpdates + folder)
@@ -772,9 +774,12 @@ class UpdateSQL(ParentAction):
                                 status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                 if status is False:
                                     return False
+
         else:
+
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
-                return
+                return True
+
             folders = os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + '')
             for folder in folders:
                 sub_folders = os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder)
@@ -816,12 +821,12 @@ class UpdateSQL(ParentAction):
                                 status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
+
         return True
 
 
     def load_sample_data(self, project_type=False):
 
-        status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'user' + os.sep+project_type
             status = self.executeFiles(folder)
@@ -839,7 +844,6 @@ class UpdateSQL(ParentAction):
 
     def load_dev_data(self, project_type=False):
 
-        status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'dev' + os.sep + project_type
             status = self.executeFiles(folder)
@@ -856,7 +860,6 @@ class UpdateSQL(ParentAction):
 
     def load_fct_ftrg(self, project_type=False):
 
-        status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderUtils + self.file_pattern_fct
             status = self.executeFiles(folder)
@@ -894,7 +897,6 @@ class UpdateSQL(ParentAction):
 
     def load_tablect(self, project_type=False):
 
-        status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderSoftware + self.file_pattern_tablect
             status = self.executeFiles(folder)
@@ -917,9 +919,7 @@ class UpdateSQL(ParentAction):
 
     def load_trg(self, project_type=False):
 
-        status = True
         if str(project_type) == 'ws' or str(project_type) == 'ud':
-
             folder = self.folderUtils + self.file_pattern_trg
             status = self.executeFiles(folder)
             if not status and self.dev_commit == 'FALSE':
@@ -943,7 +943,7 @@ class UpdateSQL(ParentAction):
 
         for (path, ficheros, archivos) in os.walk(path_folder):
             status = self.executeFiles(path, no_ct=no_ct)
-            if status is False:
+            if not status:
                 return False
 
         return True
@@ -951,19 +951,21 @@ class UpdateSQL(ParentAction):
 
     def api(self, new_api=False, project_type=False):
 
-        status = True
         folder = self.folderApi + self.file_pattern_ftrg
         status = self.executeFiles(folder)
         if not status and self.dev_commit == 'FALSE':
             return False
+
         folder = self.folderApi + self.file_pattern_fct
         status = self.executeFiles(folder)
         if not status and self.dev_commit == 'FALSE':
             return False
+
         if not os.path.exists(self.folderUpdatesApi):
             self.controller.show_message("The api folder was not found in sql folder.", 1)
             self.error_count = self.error_count + 1
             return
+
         folders = os.listdir(self.folderUpdatesApi + '')
         self.controller.log_info(str(folders))
         for folder in folders:
@@ -975,7 +977,6 @@ class UpdateSQL(ParentAction):
                             status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                             if status is False:
                                 return False
-
                         if self.process_folder(
                                 self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                 '') is True:
@@ -1027,6 +1028,7 @@ class UpdateSQL(ParentAction):
                                 status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
+
                 else:
                     if self.read_all_updates == 'TRUE':
                         if str(sub_folder) > str(self.project_data_schema_version).replace('.', ''):
@@ -1084,12 +1086,14 @@ class UpdateSQL(ParentAction):
                                 status = self.executeFiles(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
+
         return True
 
 
     """ Functions execute process """
 
     def execute_import_data(self):
+
         self.insert_inp_into_db(self.file_inp)
         # Execute import data
         sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
@@ -1175,6 +1179,7 @@ class UpdateSQL(ParentAction):
                 result = self.controller.ask_question(msg, "Info")
                 if result:
                     while available is False:
+                        # TODO: Check this!
                         for row in rows:
                             if str(project_name) + "_bk" == str(row[0]) or \
                                str(project_name) + "_bk_" + str(i) == str(row[0]):
@@ -1190,19 +1195,24 @@ class UpdateSQL(ParentAction):
 
         self.schema = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_name')
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
-
-        # Get value from combo locale
         self.locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale)
 
         self.set_wait_cursor()
+
         if self.rdb_import_data.isChecked():
+
             self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.data_file)
             if self.file_inp is 'null':
                 self.set_arrow_cursor()
                 msg = "The 'Path' field is required for Import INP data."
-                result = self.controller.show_info_box(msg, "Info")
+                self.controller.show_info_box(msg, "Info")
                 return
-            self.load_base(project_type=project_type)
+
+            status = self.load_base(project_type=project_type)
+            if not status and self.dev_commit == 'FALSE':
+                self.manage_process_result()
+                return
+            
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
@@ -1212,7 +1222,8 @@ class UpdateSQL(ParentAction):
             self.execute_import_data()
 
         elif self.rdb_sample.isChecked():
-            if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
+
+            if self.locale != 'EN':
                 msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
@@ -1221,7 +1232,11 @@ class UpdateSQL(ParentAction):
                     self.set_arrow_cursor()
                     return
 
-            self.load_base(project_type=project_type)
+            status = self.load_base(project_type=project_type)
+            if not status and self.dev_commit == 'FALSE':
+                self.manage_process_result()
+                return
+
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
@@ -1231,7 +1246,8 @@ class UpdateSQL(ParentAction):
             self.load_sample_data(project_type=project_type)
 
         elif self.rdb_sample_dev.isChecked():
-            if utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale) != 'EN':
+
+            if self.locale != 'EN':
                 msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
@@ -1240,7 +1256,11 @@ class UpdateSQL(ParentAction):
                     self.set_arrow_cursor()
                     return
 
-            self.load_base(project_type=project_type)
+            status = self.load_base(project_type=project_type)
+            if not status and self.dev_commit == 'FALSE':
+                self.manage_process_result()
+                return
+
             self.update_30to31(new_project=True, project_type=project_type)
             self.load_views(project_type=project_type)
             self.load_trg(project_type=project_type)
@@ -1251,13 +1271,23 @@ class UpdateSQL(ParentAction):
             self.load_dev_data(project_type=project_type)
 
         elif self.rdb_data.isChecked():
-            self.load_base(project_type=project_type)
-            #self.update_30to31(new_project=True, project_type=project_type)
-            #self.load_views(project_type=project_type)
-            #self.load_trg(project_type=project_type)
-            #self.update_31to39(new_project=True, project_type=project_type)
-            #self.api(project_type=project_type)
-            #self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+            
+            status = self.load_base(project_type=project_type)
+            if not status and self.dev_commit == 'FALSE':
+                self.manage_process_result()
+                return
+
+            self.update_30to31(new_project=True, project_type=project_type)
+            self.load_views(project_type=project_type)
+            self.load_trg(project_type=project_type)
+            self.update_31to39(new_project=True, project_type=project_type)
+            self.api(project_type=project_type)
+            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+
+        self.manage_process_result()
+
+
+    def manage_process_result(self):
 
         self.set_arrow_cursor()
 
@@ -1267,19 +1297,16 @@ class UpdateSQL(ParentAction):
             msg = "The project has been created correctly."
             self.controller.show_info_box(msg, "Info")
             self.close_dialog(self.dlg_readsql_create_project)
-
+            # Referesh data main dialog
+            self.event_change_connection()
+            self.set_info_project()
         else:
-            pass
-            #self.controller.dao.rollback()
-            #msg = "Some errors has occurred. Process has not been executed."
-            #self.controller.show_info_box(msg, "Info")
-
-        # Reset count error variable to 0
-        self.error_count = 0
-
-        # Referesh data main dialog
-        self.event_change_connection()
-        self.set_info_project()
+            self.controller.dao.rollback()
+            msg = "Some errors has occurred. Process has not been executed."
+            #self.controller.log_warning(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
+            # Reset count error variable to 0
+            self.error_count = 0
 
 
     def rename_project_data_schema(self, schema, create_project=None):
@@ -1460,13 +1487,11 @@ class UpdateSQL(ParentAction):
 
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections/" + connection_name)
-
         credentials['host'] = settings.value('host')
         credentials['port'] = settings.value('port')
         credentials['db'] = settings.value('database')
         credentials['user'] = settings.value('username')
         credentials['password'] = settings.value('password')
-
         settings.endGroup()
 
         self.logged = self.controller.connect_to_database(credentials['host'], credentials['port'],
@@ -1557,10 +1582,10 @@ class UpdateSQL(ParentAction):
 
     def read_info_version(self):
 
-        status = True
         if not os.path.exists(self.folderUpdates):
             self.controller.show_message("The updates folder was not found in sql folder.", 1)
             return
+
         folders = os.listdir(self.folderUpdates + '')
         for folder in folders:
             sub_folders = os.listdir(self.folderUpdates + folder)
@@ -1598,7 +1623,10 @@ class UpdateSQL(ParentAction):
 
     def update_locale(self):
 
-        self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale) + os.sep
+        # TODO: Check this!
+        cmb_locale = utils_giswater.getWidgetText(self.dlg_readsql, self.cmb_locale)
+        self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + cmb_locale + os.sep
+        print(self.folderLocale)
 
 
     def enable_datafile(self):
@@ -1654,7 +1682,6 @@ class UpdateSQL(ParentAction):
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         if schema_name is None:
-
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
 
@@ -1713,15 +1740,11 @@ class UpdateSQL(ParentAction):
 
     def process_folder(self, folderPath, filePattern):
 
-        status = True
         try:
             self.controller.log_info(str(sorted(os.listdir(folderPath + filePattern))))
-            return status
-        except Exception as e:
+            return True
+        except Exception:
             return False
-            self.controller.log_info(str(e))
-
-        return status
 
 
     def schema_file_to_db(self):
@@ -1803,8 +1826,8 @@ class UpdateSQL(ParentAction):
         self.fill_table_by_query(self.tbl_srid, sql)
 
         self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
-        for type in self.project_types:
-            self.cmb_create_project_type.addItem(str(type))
+        for project_type in self.project_types:
+            self.cmb_create_project_type.addItem(str(project_type))
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type))
         self.change_project_type(self.cmb_create_project_type)
 
@@ -1869,9 +1892,6 @@ class UpdateSQL(ParentAction):
 
         self.controller.log_info("Processing folder", parameter=filedir)
         filelist = sorted(os.listdir(filedir))
-
-        self.controller.log_info("Processing folder", parameter=folder)
-        filelist = sorted(os.listdir(folder))
         status = True
         if self.schema is None:
             if self.schema_name is None:
@@ -1893,7 +1913,6 @@ class UpdateSQL(ParentAction):
                     status = self.read_execute_file(filedir, os.sep + str(self.project_type_selected) + '.sql', schema_name, filter_srid_value)
                 if not status and self.dev_commit == 'FALSE':
                     return False
-
         else:
             for file in filelist:
                 if ".sql" in file:
@@ -1968,6 +1987,7 @@ class UpdateSQL(ParentAction):
             msg = "You cant delete a None project. Please, select correct one."
             self.controller.show_info_box(msg, "Info")
             return
+
         msg = "Are you sure you want delete schema '" + str(project_name) + "' ?"
         result = self.controller.ask_question(msg, "Info")
         if result:
