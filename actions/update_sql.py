@@ -4,11 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
 # -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
 from qgis.PyQt.QtWidgets import QCheckBox, QRadioButton, QComboBox, QLineEdit,QPushButton, QTableView, QLabel, QAbstractItemView, QTextEdit, QFileDialog
 from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtCore import QSettings
 
 import os
 import sys
@@ -1894,16 +1898,18 @@ class UpdateSQL(ParentAction):
     def read_execute_file(self, filedir, file, schema_name, filter_srid_value):
 
         try:
+            status = False
             f = open(filedir + os.sep + file, 'r')
             if f:
-                f_to_read = str(
-                    f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value)).decode(
-                    str('utf-8-sig'))
+                f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value))
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    f_to_read.decode(str('utf-8-sig'))
 
                 if self.dev_commit == 'TRUE':
                     status = self.controller.execute_sql(str(f_to_read))
                 else:
                     status = self.controller.execute_sql(str(f_to_read), commit=False)
+
                 if status is False:
                     self.error_count = self.error_count + 1
                     self.controller.log_info(str("Error to execute"))
@@ -1929,7 +1935,8 @@ class UpdateSQL(ParentAction):
             try:
                 f = open(filedir + os.sep + 'changelog.txt', 'r')
                 if f:
-                    f_to_read = str(f.read()).decode(str('utf-8-sig'))
+                    if Qgis.QGIS_VERSION_INT < 29900:
+                        f_to_read = str(f.read()).decode(str('utf-8-sig'))
                     f_to_read = f_to_read + '\n \n'
                     self.message_update = self.message_update + '\n' + str(f_to_read)
                 else:
