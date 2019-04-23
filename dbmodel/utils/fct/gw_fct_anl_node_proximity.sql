@@ -22,10 +22,12 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_duplicated($${
 DECLARE
     v_id json;
     v_selectionmode text;
-    v_nodeproximity float;
+    v_nodeproximity	float;
     v_saveondatabase boolean;
-    v_worklayer text;
-    v_result json;
+    v_worklayer 	text;
+    v_result 		json;
+	v_result_info	json;
+	v_result_point 	json;
     v_array text;
 
 BEGIN
@@ -60,29 +62,44 @@ BEGIN
         WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
   END IF;
 
-
-    -- get results
-  SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT * FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=32) row; 
-
-  IF v_saveondatabase IS FALSE THEN 
-    -- delete previous results
-    DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=32;
-  ELSE
-    -- set selector
-    DELETE FROM selector_audit WHERE fprocesscat_id=32 AND cur_user=current_user;    
-    INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (32, current_user);
-  END IF;
-
-  -- control null's
-  v_result := COALESCE(v_result, '[]');  
   
---    Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"3.1.105"'||
+  	-- get results
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=32 order by id) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+	--points
+	v_result = null;
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=32) row; 
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}'); 
+
+
+	IF v_saveondatabase IS FALSE THEN 
+		-- delete previous results
+		DELETE FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=32;
+	ELSE
+		-- set selector
+		DELETE FROM selector_audit WHERE fprocesscat_id=32 AND cur_user=current_user;    
+		INSERT INTO selector_audit (fprocesscat_id,cur_user) VALUES (32, current_user);
+	END IF;
+
+ 
+	--    Control nulls
+	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_point := COALESCE(v_result_point, '{}'); 
+
+	--  Return
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-         ',"data":{"result":' || v_result ||
-           '}'||
-           '}'||
-      '}')::json;
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||
+			'}}'||
+	    '}')::json;
+		
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
