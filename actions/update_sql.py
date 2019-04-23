@@ -998,8 +998,8 @@ class UpdateSQL(ParentAction):
                             if status is False:
                                 return False
                     else:
-                        if str(sub_folder) <= str(self.version_metadata).replace('.', ''):
-                            self.controller.log_info("TEST72")
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(
+                                sub_folder) <= str(self.version_metadata).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
@@ -1057,7 +1057,7 @@ class UpdateSQL(ParentAction):
                                 if status is False:
                                     return False
                     else:
-                        if str(sub_folder) <= str(self.version_metadata).replace('.', ''):
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= str(self.version_metadata).replace('.',''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
