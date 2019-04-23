@@ -7,5 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE audit_cat_param_user RENAME layout_name TO layoutname;
-ALTER TABLE config_param_system ADD COLUMN layoutname varchar (50);
+--ALTER TABLE audit_cat_param_user RENAME layout_name TO layoutname;
+--ALTER TABLE config_param_system ADD COLUMN layout_name varchar (50);

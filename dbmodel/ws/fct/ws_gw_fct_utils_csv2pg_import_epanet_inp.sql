@@ -183,7 +183,7 @@ BEGIN
 
 	--refactor times target
 	UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=concat(csv3,' ',csv4), csv3=null,csv4=null WHERE source = '[TIMES]' and lower(csv2)='clocktime';
-	UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=csv3, csv3=null WHERE source = '[TIMES]' and lower(csv2) ilike ='timestep' OR lower(csv2) ILIKE 'start';
+	UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=csv3, csv3=null WHERE source = '[TIMES]' and lower(csv2) ilike 'timestep' OR lower(csv2) ILIKE 'start';
 
 	--refactor energy target
 	UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3), csv2=csv4, csv3=null,  csv4=null WHERE source = '[ENERGY]' and lower(csv1)='pump';
