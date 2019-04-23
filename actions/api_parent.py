@@ -107,7 +107,7 @@ class ApiParent(ParentAction):
                 widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
-            widget = self.set_fucntion_associated(dialog, widget, field)
+            widget = self.set_function_associated(dialog, widget, field)
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
@@ -121,7 +121,7 @@ class ApiParent(ParentAction):
                 widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
         return widget
 
-    def set_fucntion_associated(self, dialog, widget, field):
+    def set_function_associated(self, dialog, widget, field):
         function_name = 'no_function_associated'
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
