@@ -20,13 +20,14 @@ except ImportError:
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
+    from qgis.gui import QgsMapCanvasSnapper
 else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.gui import QgsMapCanvas
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
-from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
+from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
 from qgis.utils import iface
 
 from qgis.PyQt.QtCore import QSettings, Qt, QPoint, QUrl, QDate, QDateTime

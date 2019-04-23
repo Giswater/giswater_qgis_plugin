@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapToPixel
+try:
+    from qgis.core import Qgis
+except ImportError:
+    from qgis.core import QGis as Qgis
+
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint
+else:
+    from qgis.core import  QgsPointXY
+from qgis.core import QgsPoint, QgsMapToPixel, QgsPointLocator
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QDoubleValidator
@@ -24,6 +33,7 @@ class CadAddPoint(ParentMapTool):
         self.point_1 = None
         self.point_2 = None
         self.snap_to_selected_layer = False
+
 
 
     def init_create_point_form(self, point_1=None, point_2=None):
@@ -128,18 +138,30 @@ class CadAddPoint(ParentMapTool):
             return
 
         # Snapping
-        if self.snap_to_selected_layer:
-            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            if self.snap_to_selected_layer:
+                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+            else:
+                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
+
+            # That's the snapped features
+            if result:
+                # Get the point and add marker on it
+                point = QgsPoint(result[0].snappedVertex)
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
         else:
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
+            if self.snap_to_selected_layer:
+                result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
+            else:
+                result = self.snapper.snapToMap(event_point)  # @UnusedVariable
 
-        # That's the snapped features
-        if result:
-            # Get the point and add marker on it
-            point = QgsPoint(result[0].snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-
+            # That's the snapped features
+            if result:
+                # Get the point and add marker on it
+                point = QgsPointXY(result.point())
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
 
     def canvasReleaseEvent(self, event):
 
@@ -153,14 +175,21 @@ class CadAddPoint(ParentMapTool):
             except(TypeError, KeyError):
                 self.iface.actionPan().trigger()
                 return
-
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-            # Create point with snap reference
-            if result:
-                point = QgsPoint(result[0].snappedVertex)
-            # Create point with mouse cursor reference
+            if Qgis.QGIS_VERSION_INT < 29900:
+                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+                # Create point with snap reference
+                if result:
+                    point = QgsPoint(result[0].snappedVertex)
+                # Create point with mouse cursor reference
+                else:
+                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
             else:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+                result = self.snapper.snapToMap(event_point)
+                if result:
+                    point = QgsPointXY(result.point())
+                    if point.x() == 0 and point.y() == 0:
+                        point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+                
             if self.point_1 is None:
                 self.point_1 = point
             else:
@@ -207,7 +236,7 @@ class CadAddPoint(ParentMapTool):
 
         # Check for default base layer
         sql = ("SELECT value FROM " + self.controller.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault_1'")
+               " WHERE cur_user = current_user AND parameter = 'cad_tools_base_layer_vdefault'")
         row = self.controller.get_row(sql)
         if row:
             self.snap_to_selected_layer = True
@@ -218,7 +247,7 @@ class CadAddPoint(ParentMapTool):
             self.vdefault_layer = self.iface.activeLayer()
 
         # Set snapping
-        self.snapper_manager.snap_to_layer(self.vdefault_layer)
+        #self.snapper_manager.snap_to_layer(self.vdefault_layer)
 
 
     def deactivate(self):

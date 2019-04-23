@@ -76,22 +76,9 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="tab1_2">
-          <attribute name="title">
-           <string>Config</string>
-          </attribute>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <item>
-            <layout class="QGridLayout" name="page1_layout1"/>
-           </item>
-           <item>
-            <layout class="QGridLayout" name="page1_layout2"/>
-           </item>
-          </layout>
-         </widget>
          <widget class="QWidget" name="tab_3">
           <attribute name="title">
-           <string>Config 2</string>
+           <string>Featurecat</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
@@ -99,6 +86,19 @@
            </item>
            <item>
             <layout class="QGridLayout" name="page2_layout2"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab1_2">
+          <attribute name="title">
+           <string>Other</string>
+          </attribute>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <layout class="QGridLayout" name="page1_layout1"/>
+           </item>
+           <item>
+            <layout class="QGridLayout" name="page1_layout2"/>
            </item>
           </layout>
          </widget>

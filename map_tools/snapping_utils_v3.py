@@ -51,15 +51,7 @@ class SnappingConfigManager(object):
 
     def get_snapping_options(self):
         """ Function that collects all the snapping options and put it in an array """
-
-        snapping_layers_options = []
-        layers = self.controller.get_layers()
-        for layer in layers:
-            # TODO: 3.x
-            options = None
-
-            globalSnappingConfig = QgsProject.instance().snappingConfig()
-
+        globalSnappingConfig = QgsProject.instance().snappingConfig()
         return globalSnappingConfig
 
 

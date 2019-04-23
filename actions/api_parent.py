@@ -16,7 +16,6 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.gui import QgsMapCanvasSnapper
     from qgis.PyQt.QtGui import QStringListModel
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
@@ -24,17 +23,13 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils
-from qgis.core import QgsRectangle, QgsPoint, QgsGeometry
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
-
 from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
-from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit
+from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAction
 
 import json
 import os
@@ -556,6 +551,7 @@ class ApiParent(ParentAction):
 
 
     def set_data_type(self, field, widget):
+
         if 'datatype' in field:
             if field['datatype'] == 'integer':  # Integer
                 widget.setValidator(QIntValidator())
@@ -573,16 +569,19 @@ class ApiParent(ParentAction):
                 validator.setRange(-9999999.0, 9999999.0, 3)
                 validator.setNotation(QDoubleValidator().StandardNotation)
                 widget.setValidator(validator)
+
         return widget
 
 
     def manage_lineedit(self, field, dialog, widget, completer):
+
         if field['widgettype'] == 'typeahead':
             if 'queryText' not in field or 'fieldToSearch' not in field or 'queryTextFilter' not in field or 'parentId' not in field:
                 return widget
             model = QStringListModel()
             self.populate_lineedit(completer, model, field, dialog, widget)
             widget.textChanged.connect(partial(self.populate_lineedit, completer, model, field, dialog, widget))
+
         return widget
 
 
@@ -591,6 +590,7 @@ class ApiParent(ParentAction):
             getting id's from selected @table_object.
             WARNING: Each QlineEdit needs their own QCompleter and their own QStringListModel!!!
         """
+
         if not widget:
             return
 
@@ -644,7 +644,9 @@ class ApiParent(ParentAction):
         # Populate combo
         for record in combolist:
             widget.addItem(record[1], record)
+
         return widget
+
 
     def add_frame(self, field, x=None):
     
@@ -654,6 +656,7 @@ class ApiParent(ParentAction):
             widget.setProperty('column_id', field['column_id'])
         widget.setFrameShape(QFrame.HLine)
         widget.setFrameShadow(QFrame.Sunken)
+
         return widget
 
 
@@ -667,6 +670,7 @@ class ApiParent(ParentAction):
             widget.setProperty('column_id', field['column_id'])
         if 'value' in field:
             widget.setText(field['value'])
+
         return widget
 
 
@@ -701,18 +705,18 @@ class ApiParent(ParentAction):
         return widget
 
         
-    def add_horizontal_spacer(self, field=None):
+    def add_horizontal_spacer(self):
         widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        #widget.setObjectName(field['widgetname'])
         return widget
 
         
-    def add_verical_spacer(self, field=None):
+    def add_verical_spacer(self):
         widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        #widget.setObjectName(field['widgetname'])
         return widget
 
+
     def add_spinbox(self, field):
+
         widget = None
         if 'value' in field:
             if field['widgettype'] == 'spinbox':
@@ -755,6 +759,7 @@ class ApiParent(ParentAction):
         """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
         :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
         """
+
         coords = list_coord.group(1)
         polygon = coords.split(',')
 
@@ -778,13 +783,14 @@ class ApiParent(ParentAction):
 
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
-        # rect = QgsRectangle(float(x1)+10, float(y1)+10, float(x2)-10, float(y2)-10)
+
         rect = QgsRectangle(float(x1)+margin, float(y1)+margin, float(x2)-margin, float(y2)-margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
 
 
     def draw(self, complet_result, zoom=True):
+
         if complet_result[0]['body']['feature']['geometry'] is None:
             return
         if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
@@ -819,15 +825,19 @@ class ApiParent(ParentAction):
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
 
-        rb = self.rubber_polygon
-        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
-        rb.setColor(color)
-        rb.setWidth(width)
-        rb.show()
-
-        # wait to simulate a flashing effect
-        if duration_time is not None:
-            QTimer.singleShot(duration_time, self.resetRubberbands)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            rb = self.rubber_polygon
+            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+            rb.setColor(color)
+            rb.setWidth(width)
+            rb.show()
+            return rb
+        else:
+            self.vMarker = QgsVertexMarker(self.canvas)
+            self.vMarker.setIconSize(width)
+            self.vMarker.setCenter(points)
+            self.vMarker.show()
+            return self.vMarker
 
 
     def resetRubberbands(self):
@@ -844,6 +854,8 @@ class ApiParent(ParentAction):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -938,6 +950,7 @@ class ApiParent(ParentAction):
         else:
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
         btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
+
         return widget
 
 
@@ -955,11 +968,13 @@ class ApiParent(ParentAction):
         data += '}'
 
         body = "" + client + form + feature + data
+
         return body
 
 
     def activate_snapping(self, emit_point):
         # Set circle vertex marker
+
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
@@ -977,8 +992,10 @@ class ApiParent(ParentAction):
         self.canvas.xyCoordinates.connect(self.mouse_move)
         emit_point.canvasClicked.connect(partial(self.snapping_node))
 
+
     def snapping_node(self, point, button):
         """ Get id of selected nodes (node1 and node2) """
+
         if button == 2:
             self.dlg_destroyed()
             return
@@ -1024,6 +1041,7 @@ class ApiParent(ParentAction):
 
 
     def mouse_move(self, p):
+
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
@@ -1043,7 +1061,9 @@ class ApiParent(ParentAction):
         else:
             self.vertex_marker.hide()
 
+
     def construct_form_param_user(self, dialog, row, pos, _json, put_chk=True):
+
         field_id = ''
         if 'fields' in row[pos]:
             field_id = 'fields'
@@ -1070,14 +1090,20 @@ class ApiParent(ParentAction):
                             chk.setChecked(False)
                         chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-                    if field['widgettype'] == 'text':
+                    if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                         widget = QLineEdit()
                         widget.setText(field['value'])
                         if 'reg_exp' in field:
                             if field['reg_exp'] is not None:
                                 reg_exp = QRegExp(str(field['reg_exp']))
                                 widget.setValidator(QRegExpValidator(reg_exp))
-                        widget.lostFocus.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        if Qgis.QGIS_VERSION_INT < 29900:
+                            widget.lostFocus.connect(
+                                partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                        else:
+                            widget.editingFinished.connect(
+                                partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                     elif field['widgettype'] == 'combo':
@@ -1108,28 +1134,29 @@ class ApiParent(ParentAction):
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
                     # Set editable/readonly
-                    if 'iseditable' in field:
-                        if type(widget) in (QLineEdit, QDoubleSpinBox):
+                    if type(widget) in (QLineEdit, QDoubleSpinBox):
+                        if 'iseditable' in field:
                             if str(field['iseditable']) == "False":
                                 widget.setReadOnly(True)
                                 widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                        if type(widget) == QLineEdit:
                             if 'placeholder' in field:
                                 widget.setPlaceholderText(field['placeholder'])
-                        elif type(widget) in (QComboBox, QCheckBox):
+                    elif type(widget) in (QComboBox, QCheckBox):
                             if str(field['iseditable']) == "False":
                                 widget.setEnabled(False)
                     widget.setObjectName(field['widgetname'])
 
-
                     # Set signals
                     if put_chk is True:
                         chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
-                    self.put_widgets(dialog, field, field['layout_name'], lbl, chk, widget)
+                    self.put_widgets(dialog, field, lbl, chk, widget)
 
 
-    def put_widgets(self, dialog, field, layout_name, lbl, chk, widget):
+    def put_widgets(self, dialog, field,  lbl, chk, widget):
         """ Insert widget into layout """
-        layout = dialog.findChild(QGridLayout, layout_name)
+
+        layout = dialog.findChild(QGridLayout, field['layoutname'])
         if layout is None:
             return
         layout.addWidget(lbl, int(field['layout_order']), 0)
@@ -1139,6 +1166,7 @@ class ApiParent(ParentAction):
 
         layout.addWidget(widget, int(field['layout_order']), 2)
         layout.setColumnStretch(2, 1)
+
 
     def get_values_changed_param_user(self, dialog, chk, widget, field, list, value=None):
 
@@ -1166,31 +1194,7 @@ class ApiParent(ParentAction):
             elem['sys_role_id'] = str(field['sys_role_id'])
         list.append(elem)
         self.controller.log_info(str(list))
-    # def get_values_changed_param_user(self, dialog, chk, widget, field, _json, value=None):
-    #
-    #     if type(widget) is QLineEdit:
-    #         value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
-    #     elif type(widget) is QComboBox:
-    #         value = utils_giswater.get_item_data(dialog, widget, 0)
-    #     elif type(widget) is QCheckBox:
-    #         value = utils_giswater.isChecked(dialog, chk)
-    #     elif type(widget) is QDateEdit:
-    #         value = utils_giswater.getCalendarDate(dialog, widget)
-    #     if chk is None:
-    #         if str(value) == '' or value is None:
-    #             _json[str(widget.objectName())] = None
-    #         else:
-    #             _json['widget'] = str(value)
-    #             _json['value'] = value
-    #             _json['sys_role_id'] = str(field['sys_role_id'])
-    #     elif chk.isChecked():
-    #         _json['widget'] = str(widget.objectName())
-    #         _json['chk'] = str(chk.objectName())
-    #         _json['isChecked'] = str(utils_giswater.isChecked(dialog, chk))
-    #         _json['value'] = value
-    #         _json['sys_role_id'] = str(field['sys_role_id'])
-    #
-    #     self.controller.log_info(str(_json))
+
 
     def get_values_checked_param_user(self, dialog, chk, widget, field, _json, value=None):
 
@@ -1217,13 +1221,93 @@ class ApiParent(ParentAction):
 
         self.list_update.append(elem)
 
-    def test(self, widget=None):
-        # if event.key() == Qt.Key_Escape:
-        #     self.controller.log_info(str("IT WORK S"))
+
+    def test(self):
         self.controller.log_info(str("---------------IT WORK S----------------"))
         return 0
 
 
+    def set_widgets(self, dialog, field):
+
+        widget = None
+        label = None
+        if field['label']:
+            label = QLabel()
+            label.setObjectName('lbl_' + field['widgetname'])
+            label.setText(field['label'].capitalize())
+            if field['stylesheet'] is not None and 'label' in field['stylesheet']:
+                label = self.set_setStyleSheet(field, label)
+            if 'tooltip' in field:
+                label.setToolTip(field['tooltip'])
+            else:
+                label.setToolTip(field['label'].capitalize())
+        if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+            widget = self.add_lineedit(field)
+            widget = self.set_widget_size(widget, field)
+            widget = self.set_data_type(field, widget)
+            if Qgis.QGIS_VERSION_INT < 29900:
+                widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
+            else:
+                widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+            widget = self.set_fucntion_associated(dialog, widget, field)
+        elif field['widgettype'] == 'combo':
+            widget = self.add_combobox(field)
+            widget = self.set_widget_size(widget, field)
+            widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return label, widget
 
 
+    def get_values(self, dialog, widget, _json=None):
 
+        value = None
+        if type(widget) in(QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
+            value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
+        elif type(widget) is QComboBox and widget.isEnabled():
+            value = utils_giswater.get_item_data(dialog, widget, 0)
+
+        if str(value) == '' or value is None:
+            _json[str(widget.property('column_id'))] = None
+        else:
+            _json[str(widget.property('column_id'))] = str(value)
+
+
+    def set_function_associated(self, dialog, widget, field):
+
+        function_name = 'no_function_associated'
+        if 'widgetfunction' in field:
+            if field['widgetfunction'] is not None:
+                function_name = field['widgetfunction']
+            else:
+                msg = ("parameter button_function is null for button " + widget.objectName())
+                self.controller.show_message(msg, 2)
+        else:
+            msg = "parameter button_function not found"
+            self.controller.show_message(msg, 2)
+        if type(widget) == QLineEdit:
+            if Qgis.QGIS_VERSION_INT < 29900:
+                widget.lostFocus.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                #widget.textChanged.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+            else:
+                widget.editingFinished.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+
+        return widget
+
+
+    def draw_rectangle(self, result):
+        """ Draw lines based on geometry """
+
+        if result['geometry'] is None:
+            return
+        list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
+        points = self.get_points(list_coord)
+        self.draw_polygon(points)
+
+
+    def hide_void_groupbox(self, dialog):
+        # Hide empty grupbox
+
+        grbox_list = dialog.findChildren(QGroupBox)
+        for grbox in grbox_list:
+            widget_list = grbox.findChildren(QWidget)
+            if len(widget_list) == 0:
+                grbox.setVisible(False)

@@ -148,7 +148,8 @@ class SearchPlus(QObject):
             if row[0] is None or row[0] == 'null':
                 msg = "Cant zoom to selection because has no geometry: "
                 self.controller.show_warning(msg, parameter=polygon_name)
-                self.iface.legendInterface().setLayerVisible(layer, False)
+                self.controller.set_layer_visible(layer, False)
+
                 return
 
         # Select features of @layer applying @expr
@@ -157,7 +158,7 @@ class SearchPlus(QObject):
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.controller.set_layer_visible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 
@@ -411,8 +412,7 @@ class SearchPlus(QObject):
 
         msg = "Save as"
         folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
-        if folder_path:
-            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+        self.controller.set_path_from_qfiledialog(widget, folder_path)
 
 
     def workcat_zoom(self, qtable):
@@ -451,7 +451,7 @@ class SearchPlus(QObject):
                     # If any feature found, zoom it and exit function
                     if layer.selectedFeatureCount() > 0:
                         self.iface.setActiveLayer(layer)
-                        self.iface.legendInterface().setLayerVisible(layer, True)
+                        self.controller.set_layer_visible(layer, True)
                         self.open_custom_form(layer, expr)
                         self.zoom_to_selected_features(layer, geom_type)
                         return
@@ -569,7 +569,7 @@ class SearchPlus(QObject):
         """ Iterate over all layers to get the ones set in config file """
 
         # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
+        layers = self.controller.get_layers()
         if len(layers) == 0:
             return
 
@@ -618,7 +618,11 @@ class SearchPlus(QObject):
             self.dlg_search.tab_main.removeTab(2)
         else:
             # Get project variable 'expl_id'
-            expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl))
+            if Qgis.QGIS_VERSION_INT < 29900:
+                expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl))
+            else:
+                project = QgsProject.instance()
+                expl_id = QgsExpressionContextUtils.projectScope(project).variable(str(self.street_field_expl))
             if expl_id:
                 # Set SQL to get 'expl_name'
                 sql = ("SELECT " + self.params['expl_field_name'] + ""
@@ -762,7 +766,7 @@ class SearchPlus(QObject):
                 # If any feature found, zoom it and exit function
                 if layer.selectedFeatureCount() > 0:
                     self.iface.setActiveLayer(layer)
-                    self.iface.legendInterface().setLayerVisible(layer, True)
+                    self.controller.set_layer_visible(layer, True)
                     self.open_hydrometer_dialog(element)
                     self.zoom_to_selected_features(layer, expl_name, 250)
                     return
@@ -925,11 +929,10 @@ class SearchPlus(QObject):
         if 'network_layer_node' in self.layers:
             self.dlg_search.network_geom_type.addItem(self.controller.tr('Node'))
 
-        return self.dlg_search.network_geom_type > 0
+        return self.dlg_search.network_geom_type.count() > 0
 
 
     def expl_name_changed(self):
-        self.zoom_to_polygon(self.dlg_search.expl_name, 'exploitation', 'expl_id', 'name')
         self.hydro_create_list()
 
 
@@ -988,7 +991,8 @@ class SearchPlus(QObject):
         if not is_valid:
             return
 
-        for value in self.feature_cat.itervalues():
+        #for value in self.feature_cat.itervalues():
+        for key, value in self.feature_cat.items():
             if value.type.lower() == geom_type:
                 layer = self.controller.get_layer_by_layername(value.layername)
                 if layer:
@@ -998,7 +1002,7 @@ class SearchPlus(QObject):
                     if layer.selectedFeatureCount() > 0:
                         self.zoom_to_selected_features(layer, geom_type)
                         # Set the layer checked (i.e. set it's visibility)
-                        self.iface.legendInterface().setLayerVisible(layer, True)
+                        self.controller.set_layer_visible(layer, True)
                         self.open_custom_form(layer, expr)
                         return
 
@@ -1016,8 +1020,12 @@ class SearchPlus(QObject):
         # Get features
         layer = self.layers[layername]
         records = [(-1, '', '')]
-        idx_field_code = layer.fieldNameIndex(self.params[field_code])
-        idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        if Qgis.QGIS_VERSION_INT < 29900:
+            idx_field_code = layer.fieldNameIndex(self.params[field_code])
+            idx_field_name = layer.fieldNameIndex(self.params[field_name])
+        else:
+            idx_field_code = layer.fields().indexFromName(self.params[field_code])
+            idx_field_name = layer.fields().indexFromName(self.params[field_name])
 
         it = layer.getFeatures()
 
@@ -1044,7 +1052,10 @@ class SearchPlus(QObject):
             value_code = attrs[idx_field_code]
             value_name = attrs[idx_field_name]
             if value_code is not None and geom is not None:
-                elem = [value_code, value_name, geom.exportToWkt()]
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    elem = [value_code, value_name, geom.exportToWkt()]
+                else:
+                    elem = [value_code, value_name, geom.asWkt()]
             else:
                 elem = [value_code, value_name, None]
             records.append(elem)
@@ -1091,8 +1102,12 @@ class SearchPlus(QObject):
 
             # Set filter expression
         layer = self.layers['portal_layer']
-        idx_field_code = layer.fieldNameIndex(field_code)
-        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        if Qgis.QGIS_VERSION_INT < 29900:
+            idx_field_code = layer.fieldNameIndex(field_code)
+            idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
+        else:
+            idx_field_code = layer.fields().indexFromName(field_code)
+            idx_field_number = layer.fields().indexFromName(self.params['portal_field_number'])
         expr_filter = field_code + "  = '" + str(code) + "'"
         (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
@@ -1207,7 +1222,10 @@ class SearchPlus(QObject):
         # Fields management
         layer = self.layers[parameter]
         records = []
-        idx_field = layer.fieldNameIndex(fieldname)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            idx_field = layer.fieldNameIndex(fieldname)
+        else:
+            idx_field = layer.fields().indexFromName(fieldname)
         if idx_field == -1:
             message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)
             self.controller.show_warning(message)
@@ -1352,7 +1370,7 @@ class SearchPlus(QObject):
         # If any feature found, zoom it and exit function
         if layer.selectedFeatureCount() > 0:
             self.iface.setActiveLayer(layer)
-            self.iface.legendInterface().setLayerVisible(layer, True)
+            self.controller.set_layer_visible(layer, True)
             self.iface.actionZoomToSelected().trigger()
             layer.removeSelection()
 

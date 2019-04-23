@@ -7,18 +7,21 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
+
 except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
     from qgis.PyQt.QtGui import QStringListModel
+    from qgis.core import QgsPoint as QgsPointXY
 else:
     from qgis.PyQt.QtCore import QStringListModel
+    from qgis.core import QgsPointXY
     from builtins import str
     from builtins import range
 
-from qgis.core import QgsRectangle, QgsPoint
+from qgis.core import QgsRectangle
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
@@ -243,6 +246,7 @@ class ManageNewPsector(ParentManage):
 
             layer = self.controller.get_layer_by_tablename('v_edit_'+self.plan_om+'_psector')
             expr_filter = "psector_id = '" + str(psector_id) + "'"
+
             (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return
@@ -250,8 +254,8 @@ class ManageNewPsector(ParentManage):
 
             # Get canvas extend in order to create a QgsRectangle
             ext = self.canvas.extent()
-            startPoint = QgsPoint(ext.xMinimum(), ext.yMaximum())
-            endPoint = QgsPoint(ext.xMaximum(), ext.yMinimum())
+            startPoint = QgsPointXY(ext.xMinimum(), ext.yMaximum())
+            endPoint = QgsPointXY(ext.xMaximum(), ext.yMinimum())
             canvas_rec = QgsRectangle(startPoint, endPoint)
             canvas_width = ext.xMaximum() - ext.xMinimum()
             canvas_height = ext.yMaximum() - ext.yMinimum()

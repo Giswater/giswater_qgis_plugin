@@ -72,6 +72,19 @@ class PgDao(object):
             self.conn_string += " password="+self.password
         
         
+    def mogrify(self, sql, params):
+        """ Return a query string after arguments binding """
+
+        query = sql
+        try:
+            query = self.cursor.mogrify(sql, params)
+        except Exception as e:
+            self.last_error = e
+            print(str(e))
+        finally:
+            return query
+
+        
     def get_rows(self, sql, commit=False):
         """ Get multiple rows from selected query """
 
@@ -184,58 +197,6 @@ class PgDao(object):
         self.conn.rollback()
         
         
-    def check_schema(self, schemaname):
-        """ Check if selected schema exists """
-
-        exists = True
-        schemaname = schemaname.replace('"', '')        
-        sql = "SELECT nspname FROM pg_namespace WHERE nspname = '" + schemaname + "'";
-        self.cursor.execute(sql)         
-        if self.cursor.rowcount == 0:      
-            exists = False
-        return exists    
-    
-    
-    def check_table(self, schemaname, tablename):
-        """ Check if selected table exists in selected schema """
-
-        exists = True
-        schemaname = schemaname.replace('"', '')         
-        sql = ("SELECT * FROM pg_tables"
-               " WHERE schemaname = '" + schemaname + "' AND tablename = '" + tablename + "'")
-        self.cursor.execute(sql)         
-        if self.cursor.rowcount == 0:      
-            exists = False
-        return exists         
-    
-    
-    def check_view(self, schemaname, viewname):
-        """ Check if selected view exists in selected schema """
-
-        exists = True
-        schemaname = schemaname.replace('"', '') 
-        sql = ("SELECT * FROM pg_views"
-               " WHERE schemaname = '"+schemaname+"' AND viewname = '" + viewname + "'")
-        self.cursor.execute(sql)         
-        if self.cursor.rowcount == 0:      
-            exists = False
-        return exists                    
-    
-    
-    def check_column(self, schemaname, tablename, columname):
-        """ Check if @columname exists table @schemaname.@tablename """
-
-        exists = True
-        schemaname = schemaname.replace('"', '') 
-        sql = ("SELECT * FROM information_schema.columns"
-               " WHERE table_schema = '" + schemaname + "' AND table_name = '" + tablename + "'"
-               " AND column_name = '" + columname + "'")    
-        self.cursor.execute(sql)         
-        if self.cursor.rowcount == 0:      
-            exists = False
-        return exists                    
-
-
     def copy_expert(self, sql, csv_file):
         """ Dumps contents of the query to selected CSV file """
 
@@ -246,15 +207,3 @@ class PgDao(object):
             return e   
         
         
-    def get_srid(self, schema_name, table_name):
-        """ Find SRID of selected schema """
-        
-        srid = None
-        schema_name = schema_name.replace('"', '')        
-        sql = "SELECT Find_SRID('"+schema_name+"', '"+table_name+"', 'the_geom');"
-        row = self.get_row(sql)
-        if row:
-            srid = row[0]   
-            
-        return srid        
-

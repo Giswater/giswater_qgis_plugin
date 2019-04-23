@@ -21,7 +21,6 @@ from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
 
 from collections import OrderedDict
 import json
-import sys
 import operator
 from functools import partial
 
@@ -42,7 +41,7 @@ class ApiConfig(ApiParent):
 
 
     def api_config(self):
-        """ Button 36: Info show info, open giswater and visit web page """
+        """ Button 99: Dynamic config form """
 
         self.list_update = []
 
@@ -74,14 +73,14 @@ class ApiConfig(ApiParent):
         groupBox_2 = QGroupBox("Om")
         groupBox_3 = QGroupBox("Workcat")
         groupBox_4 = QGroupBox("Mapzones")
-        groupBox_5 = QGroupBox("Cad")
+        groupBox_5 = QGroupBox("Edit")
         groupBox_6 = QGroupBox("Epa")
         groupBox_7 = QGroupBox("MasterPlan")
         groupBox_8 = QGroupBox("Other")
-        groupBox_9 = QGroupBox("Node ws / Type ud")
-        groupBox_10 = QGroupBox("Cat ud")
+        groupBox_9 = QGroupBox("Node")
+        groupBox_10 = QGroupBox("Arc")
         groupBox_11 = QGroupBox("Utils")
-        groupBox_12 = QGroupBox("Connec ws")
+        groupBox_12 = QGroupBox("Connec&Gully")
         groupBox_13 = QGroupBox("Topology")
         groupBox_14 = QGroupBox("Builder")
         groupBox_15 = QGroupBox("Review")
@@ -160,36 +159,19 @@ class ApiConfig(ApiParent):
         admin_layout1.addItem(verticalSpacer5)
         admin_layout2.addItem(verticalSpacer6)
 
-        #TODO:
-        # self.remove_empty_groupBox(page1_layout1)
-        # self.remove_empty_groupBox(page1_layout2)
-        # self.remove_empty_groupBox(page2_layout1)
-        # self.remove_empty_groupBox(page2_layout2)
-        # self.remove_empty_groupBox(admin_layout1)
-        # self.remove_empty_groupBox(admin_layout2)
-
         # Event on change from combo parent
         self.get_event_combo_parent('fields', complet_list[0]['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
-        # TODO:: Descomentar cuando la tabla config param user este populada
-        # self.chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
-        # self.chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
-        #
-        # self.chk_dma.stateChanged.connect(partial(self.check_child_to_parent, self.chk_dma,self.chk_expl))
-        # self.chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  self.chk_expl,self.chk_dma))
+        chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
+        chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
+        if chk_dma and chk_expl:
+            chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
+            chk_expl.stateChanged.connect(partial(self.check_parent_to_child,  chk_expl, chk_dma))
+        self.hide_void_groupbox(self.dlg_config)
 
         # Open form
         self.dlg_config.show()
-
-
-    def open_giswater(self):
-        """ Open giswater.jar with last opened .gsw file """
-
-        if 'nt' in sys.builtin_module_names:
-            self.execute_giswater("ed_giswater_jar")
-        else:
-            self.controller.show_info("Function not supported in this Operating System")
 
 
     def construct_form_param_user(self, row, pos):
@@ -214,7 +196,10 @@ class ApiConfig(ApiParent):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    if Qgis.QGIS_VERSION_INT < 29900:
+                        widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    else:
+                        widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
@@ -282,6 +267,7 @@ class ApiConfig(ApiParent):
                 elif field['layout_id'] == 17:
                     self.order_widgets(field, self.system_form, lbl, chk, widget)
 
+
     def construct_form_param_system(self, row, pos):
 
         widget = None
@@ -296,14 +282,17 @@ class ApiConfig(ApiParent):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
+                    if Qgis.QGIS_VERSION_INT < 29900:
+                        widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
+                    else:
+                        widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
                     self.populate_combo(widget, field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'checkbox':
+                elif field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
                     widget = QCheckBox()
                     if field['value'].lower() == 'true':
                         widget.setChecked(True)
@@ -328,8 +317,10 @@ class ApiConfig(ApiParent):
                 else:
                     pass
 
-                widget.setObjectName(field['widgetname'])
-
+                if widget:
+                    widget.setObjectName(field['widgetname'])
+                else:
+                    pass
 
                 # Order Widgets
                 if field['layout_id'] == 1:
@@ -366,6 +357,7 @@ class ApiConfig(ApiParent):
                     self.order_widgets_system(field, self.analysis_form, lbl,  widget)
                 elif field['layout_id'] == 17:
                     self.order_widgets_system(field, self.system_form, lbl,  widget)
+
 
     def get_event_combo_parent(self, fields, row):
 
@@ -411,7 +403,7 @@ class ApiConfig(ApiParent):
                 self.populate_child(combo_child, row)
 
 
-    def populate_child(self, combo_child, result):
+    def populate_child(self, combo_child):
 
         child = self.dlg_config.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
@@ -420,24 +412,24 @@ class ApiConfig(ApiParent):
 
     def order_widgets(self, field, form, lbl, chk, widget):
 
+        form.addWidget(lbl, field['layout_order'], 0)
         if field['widgettype'] != 'check':
-            form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(chk, field['layout_order'], 1)
             form.addWidget(widget, field['layout_order'], 2)
         else:
-            form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(chk, field['layout_order'], 1)
 
 
     def order_widgets_system(self, field, form, lbl,  widget):
 
-
-        if field['widgettype'] != 'check':
-            form.addWidget(lbl, field['layout_order'], 0)
+        form.addWidget(lbl, field['layout_order'], 0)
+        if field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
             form.addWidget(widget, field['layout_order'], 2)
+        elif field['widgettype'] != 'checkbox' and field['widgettype'] != 'check':
+            form.addWidget(widget, field['layout_order'], 3)
         else:
-            form.addWidget(lbl, field['layout_order'], 0)
             form.addWidget(widget, field['layout_order'], 1)
+
 
     def get_values_checked_param_user(self, chk, widget, field, value=None):
 
@@ -463,6 +455,7 @@ class ApiConfig(ApiParent):
             elem['sys_role_id'] = 'role_admin'
 
         self.list_update.append(elem)
+
 
     def get_values_changed_param_user(self, chk, widget, field, value=None):
 
@@ -498,7 +491,6 @@ class ApiConfig(ApiParent):
         elif type(widget) is QDateEdit:
             value = utils_giswater.getCalendarDate(self.dlg_config, widget)
 
-
         elem['widget'] = str(widget.objectName())
         elem['chk'] = str('')
         elem['isChecked'] = str('')
@@ -532,7 +524,7 @@ class ApiConfig(ApiParent):
 
 
     def check_parent_to_child(self, widget_parent, widget_child):
-        if widget_parent.isChecked() == False:
+        if not widget_parent.isChecked():
             widget_child.setChecked(False)
 
 

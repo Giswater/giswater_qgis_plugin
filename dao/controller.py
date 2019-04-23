@@ -40,8 +40,8 @@ class DaoController(object):
         self.iface = iface               
         self.translator = None           
         self.plugin_dir = None           
-        self.giswater = None                
-        self.logged = False 
+        self.giswater = None
+        self.logged = False
         self.postgresql_version = None
         self.logger = None
         self.schema_name = None
@@ -72,13 +72,16 @@ class DaoController(object):
         self.plugin_dir = plugin_dir
         
         
-    def set_logger(self, logger_name):
+    def set_logger(self, logger_name=None):
         """ Set logger class """
-        
-        log_level = int(self.settings.value('status/log_level')) 
-        log_suffix = self.settings.value('status/log_suffix') 
-        self.logger = Logger(self, logger_name, log_level, log_suffix)   
-        self.log_info("Logger initialized")   
+
+        if self.logger is None:
+            if logger_name is None:
+                logger_name = 'plugin'
+            log_level = int(self.settings.value('status/log_level'))
+            log_suffix = self.settings.value('status/log_suffix')
+            self.logger = Logger(self, logger_name, log_level, log_suffix)
+            self.log_info("Logger initialized")
         
                 
     def close_logger(self):
@@ -138,67 +141,92 @@ class DaoController(object):
         self.dao = None 
         self.last_error = None      
         self.log_codes = {}
+        self.logged = False
         
         self.layer_source, not_version = self.get_layer_source_from_credentials()
-        if self.layer_source['db'] is None or self.layer_source['host'] is None or self.layer_source['user'] is None \
-                or self.layer_source['password'] is None or self.layer_source['port'] is None:
+        if self.layer_source:
+            if self.layer_source['db'] is None or self.layer_source['host'] is None or self.layer_source['user'] is None \
+                    or self.layer_source['password'] is None or self.layer_source['port'] is None:
+                return False, not_version
+        else:
             return False, not_version
-            
-        # Connect to database
-        self.logged = self.connect_to_database(self.layer_source['host'], self.layer_source['port'], 
-                                               self.layer_source['db'], self.layer_source['user'],
-                                               self.layer_source['password'])
-        return self.logged, not_version
+
+        self.logged = True
+        return True, not_version
     
     
     def get_layer_source_from_credentials(self):
+        """ Get database parameters from layer 'v_edit_node' or  database connection settings """
 
-        # Get database parameters from layer 'version'
-        layer = self.get_layer_by_tablename("version")
+        # Get layer 'v_edit_node'
+        layer = self.get_layer_by_tablename("v_edit_node")
 
+        # Get database connection settings
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
 
-        if layer is not None:
+        if layer is None and settings is None:
+            not_version = False
+            self.log_warning("Layer 'v_edit_node' is None and settings is None")
+            self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
+            return None, not_version
+
+        if layer:
             not_version = False
             credentials = self.get_layer_source(layer)
             self.schema_name = credentials['schema']
             conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
-
-            attempts = 1
-            logged = self.connect_to_database(credentials['host'], credentials['port'],
-                                              credentials['db'], credentials['user'], credentials['password'])
-            while not logged:
-                attempts+=1
-                if attempts <= 2:
-                    (success, credentials['user'], credentials['password']) = QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
-                    logged = self.connect_to_database(credentials['host'], credentials['port'],
-                                                      credentials['db'], credentials['user'], credentials['password'])
-                else:
-                    return None, not_version
+            status, credentials = self.connect_to_database_credentials(credentials, conn_info)
+            if not status:
+                self.log_warning("Error connecting to database (layer)")
+                self.last_error = self.tr("Error connecting to database")
+                return None, not_version
 
             # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
             QgsCredentials.instance().put(conn_info, credentials['user'], credentials['password'])
-        elif settings is not None:
+
+        elif settings:
             not_version = True
             default_connection = settings.value('selected')
             settings.endGroup()
             credentials = {'db': None, 'schema': None, 'table': None,
                            'host': None, 'port': None, 'user': None, 'password': None}
+            if default_connection:
+                settings.beginGroup("PostgreSQL/connections/" + default_connection)
+                credentials['host'] = settings.value('host')
+                credentials['port'] = settings.value('port')
+                credentials['db'] = settings.value('database')
+                credentials['user'] = settings.value('username')
+                credentials['password'] = settings.value('password')
+                settings.endGroup()
+                status, credentials = self.connect_to_database_credentials(credentials)
+                if not status:
+                    self.log_warning("Error connecting to database (settings)")
+                    self.last_error = self.tr("Error connecting to database")
+                    return None, not_version
+            else:
+                self.log_warning("Error getting default connection (settings)")
+                self.last_error = self.tr("Error getting default connection")
+                return None, not_version
 
-            settings.beginGroup("PostgreSQL/connections/" + default_connection)
-            credentials['host'] = settings.value('host')
-            credentials['port'] = settings.value('port')
-            credentials['db'] = settings.value('database')
-            credentials['user'] = settings.value('username')
-            credentials['password'] = settings.value('password')
-            settings.endGroup()
-
-        else:
-            not_version = False
-            self.last_error = self.tr("Layer not found") + ": 'version'"
-            return None, not_version
         return credentials, not_version
+
+
+    def connect_to_database_credentials(self, credentials, conn_info=None, max_attempts=2):
+        """ Connect to database with selected database @credentials """
+
+        attempt = 0
+        logged = False
+        while not logged and attempt <= max_attempts:
+            attempt += 1
+            if conn_info and attempt > 1:
+                (success, credentials['user'], credentials['password']) = QgsCredentials.instance().get(conn_info,
+                    credentials['user'], credentials['password'])
+            logged = self.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
+                credentials['user'], credentials['password'])
+
+        return logged, credentials
+
     
     def connect_to_database(self, host, port, db, user, pwd):
         """ Connect to database with selected parameters """
@@ -382,11 +410,21 @@ class DaoController(object):
         return self.dao.get_conn_encoding()
 
         
-    def get_row(self, sql, log_info=True, log_sql=False, commit=False):
+    def get_sql(self, sql, log_sql=False, params=None):
+        """ Generate SQL with params. Useful for debugging """
+
+        if params:
+            sql = self.dao.mogrify(sql, params)
+        if log_sql:
+            self.log_info(sql, stack_level_increase=2)
+
+        return sql
+
+        
+    def get_row(self, sql, log_info=True, log_sql=False, commit=False, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
-        if log_sql:
-            self.log_info(sql, stack_level_increase=1)
+        sql = self.get_sql(sql, log_sql, params)
         row = self.dao.get_row(sql, commit)   
         self.last_error = self.dao.last_error      
         if not row:
@@ -749,7 +787,10 @@ class DaoController(object):
         # Initialize variables
         layer_source = {'db': None, 'schema': None, 'table': None, 
                         'host': None, 'port': None, 'user': None, 'password': None}
-        
+
+        if layer is None:
+            return layer_source
+
         # Get dbname, host, port, user and password
         uri = layer.dataProvider().dataSourceUri()
         pos_db = uri.find('dbname=')
@@ -839,26 +880,31 @@ class DaoController(object):
         """ Write message into QGIS Log Messages Panel with selected message level
             @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} 
         """
+
         msg = None
         if text:
             msg = self.tr(text, context_name)
             if parameter:
                 msg += ": " + str(parameter)            
         QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
+
+        return msg
         
 
     def log_info(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
         """ Write information message into QGIS Log Messages Panel """
-        self.log_message(text, 0, context_name, parameter=parameter)      
+
+        msg = self.log_message(text, 0, context_name, parameter=parameter)
         if self.logger and logger_file:        
-            self.logger.info(text, stack_level_increase=stack_level_increase)                             
+            self.logger.info(msg, stack_level_increase=stack_level_increase)
 
 
     def log_warning(self, text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0):
         """ Write warning message into QGIS Log Messages Panel """
-        self.log_message(text, 1, context_name, parameter=parameter)   
+
+        msg = self.log_message(text, 1, context_name, parameter=parameter)
         if self.logger and logger_file:
-            self.logger.warning(text, stack_level_increase=stack_level_increase)            
+            self.logger.warning(msg, stack_level_increase=stack_level_increase)
         
      
     def add_translator(self, locale_path, log_info=False):
@@ -936,33 +982,85 @@ class DaoController(object):
         return project_version    
     
     
-    def check_function(self, function_name):
-        """ Check if @function_name exists """
-        
-        schema_name = self.schema_name.replace('"', '')
-        sql = ("SELECT routine_name FROM information_schema.routines"
-               " WHERE lower(routine_schema) = '" + schema_name + "'"
-               " AND lower(routine_name) = '" + function_name + "'")
-        row = self.get_row(sql, log_info=False)
+    def check_schema(self, schemaname=None):
+        """ Check if selected schema exists """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        schemaname = schemaname.replace('"', '')
+        sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
+        params = [schemaname]
+        row = self.get_row(sql, commit=True, params=params)
         return row
     
     
-    def check_table(self, tablename):
+    def check_function(self, functionname, schemaname=None):
+        """ Check if @function_name exists in selected schema """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        schemaname = schemaname.replace('"', '')
+        sql = ("SELECT routine_name FROM information_schema.routines "
+               "WHERE lower(routine_schema) = %s "
+               "AND lower(routine_name) = %s ")
+        params = [schemaname, functionname]
+        row = self.get_row(sql, commit=True, params=params)
+        return row
+    
+    
+    def check_table(self, tablename, schemaname=None):
         """ Check if selected table exists in selected schema """
-        return self.dao.check_table(self.schema_name, tablename)
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        schemaname = schemaname.replace('"', '')
+        sql = ("SELECT * FROM pg_tables "
+               "WHERE schemaname = %s AND tablename = %s ")
+        params = [schemaname, tablename]
+        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        return row
+
+
+    def check_view(self, viewname, schemaname=None):
+        """ Check if selected view exists in selected schema """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        schemaname = schemaname.replace('"', '')
+        sql = ("SELECT * FROM pg_views "
+               "WHERE schemaname = %s AND viewname = %s ")
+        params = [schemaname, viewname]
+        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        return row
     
     
-    def check_column(self, tablename, columname):
+    def check_column(self, tablename, columname, schemaname=None):
         """ Check if @columname exists table @schemaname.@tablename """
-        return self.dao.check_column(self.schema_name, tablename, columname)
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        schemaname = schemaname.replace('"', '')
+        sql = ("SELECT * FROM information_schema.columns"
+               " WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
+        params = [schemaname, tablename, columname]
+        row = self.get_row(sql, log_info=False, commit=True, params=params)
+        return row
     
 
-    def get_group_layers(self, geom_type):
+    def get_group_layers(self, geom_type, union=False):
         """ Get layers of the group @geom_type """
         
         list_items = []        
         sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
                " WHERE type = '" + geom_type.upper() + "'")
+        if union:
+            sql += (" UNION SELECT parentlayer FROM " + self.schema_name + ".sys_feature_type"
+                    " WHERE id='" + geom_type.upper() + "'")
         rows = self.get_rows(sql)
         if rows:
             for row in rows:
@@ -971,8 +1069,27 @@ class DaoController(object):
                     list_items.append(layer)
         
         return list_items
-         
-    
+
+
+    def get_all_group_layers(self, geom_type):
+
+        list_items = []
+        sql = ("SELECT tablename FROM "
+               "(SELECT tablename, 1 as c FROM " + self.schema_name + ".sys_feature_cat"
+               " WHERE type = '" + geom_type.upper() + "'"
+               " UNION SELECT parentlayer, 0 FROM " + self.schema_name + ".sys_feature_type"
+               " WHERE id='" + geom_type.upper() + "') as t "
+               " ORDER BY c")
+        rows = self.get_rows(sql, log_sql=True)
+        if rows:
+            for row in rows:
+                layer = self.get_layer_by_tablename(row[0])
+                if layer:
+                    list_items.append(layer)
+
+        return list_items
+
+
     def check_role(self, role_name):
         """ Check if @role_name exists """
         
@@ -991,7 +1108,7 @@ class DaoController(object):
             username = self.user
 
         sql = ("SELECT pg_has_role('" + username + "', '" + role_name + "', 'MEMBER');")
-        row = self.get_row(sql)
+        row = self.get_row(sql, commit=True)
         return row[0]
          
          
@@ -1109,22 +1226,44 @@ class DaoController(object):
         return value
 
 
-    def get_columns_list(self, tablename):
+    def get_columns_list(self, tablename, schemaname=None):
         """  Return list of all columns in @tablename """
         
-        sql = ("SELECT column_name FROM information_schema.columns"
-               " WHERE table_name = '" + tablename + "'"
-               " AND table_schema = '" + self.schema_name.replace('"', '') + "'"
-               " ORDER BY ordinal_position")
-        column_names = self.get_rows(sql)
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        schemaname = schemaname.replace('"', '')
+        sql = ("SELECT column_name FROM information_schema.columns "
+               "WHERE table_schema = %s AND table_name = %s "
+               "ORDER BY ordinal_position")
+        params = [schemaname, tablename]
+        column_names = self.get_rows(sql, params=params)
         return column_names
     
+    
+    def get_srid(self, tablename, schemaname=None):
+        """ Find SRID of selected schema """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        schemaname = schemaname.replace('"', '')
+        srid = None
+        sql = "SELECT Find_SRID(%s, %s, 'the_geom');"
+        params = [schemaname, tablename]
+        row = self.get_row(sql, params=params)
+        if row:
+            srid = row[0]
+
+        return srid
+
     
     def get_log_folder(self):
         """ Return log folder """
         return self.logger.log_folder
 
 
+    """  Functions related with Qgis versions """
     def is_layer_visible(self, layer):
         """ Is layer visible """
 
@@ -1157,5 +1296,14 @@ class DaoController(object):
             layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
 
         return layers
+
+
+    def set_path_from_qfiledialog(self, qtextedit, path):
+        if Qgis.QGIS_VERSION_INT < 29900:
+            if path:
+                qtextedit.setText(path)
+        else:
+            if path[0]:
+                qtextedit.setText(path[0])
 
 
