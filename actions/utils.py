@@ -246,6 +246,7 @@ class Utils(ParentAction):
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self.preview_csv, self.dlg_csv))
         self.disable_import_label(self.dlg_csv)
+        self.get_function_name()
         self.load_settings_values()
 
         if str(utils_giswater.getWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
@@ -428,7 +429,7 @@ class Utils(ParentAction):
 
         extras = '"importparam":"' + label_aux + '"'
         body = self.create_body(extras=extras)
-        sql = ("SELECT " + self.schema_name + "." + self.func_name + "($${" + body + "}$$)::text")
+        sql = ("SELECT " + self.schema_name + "." + str(self.func_name) + "($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_warning("NOT ROW FOR: " + sql)
@@ -436,10 +437,12 @@ class Utils(ParentAction):
             self.controller.show_info_box(message)
             return
         else:
-            message = "Import has been satisfactory"
-            self.controller.show_info_box(message)
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-            dialog.txt_infolog.setText(complet_result[0]['message']['text'] + "\n")
+            if complet_result[0]['status'] == "Accepted":
+                self.populate_info_text(dialog, complet_result[0]['body']['data'])
+            message = complet_result[0]['message']['text']
+            self.controller.show_info_box(message)
+
 
 
 

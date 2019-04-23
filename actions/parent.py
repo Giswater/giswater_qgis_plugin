@@ -893,7 +893,20 @@ class ParentAction(object):
         if extras is not None:
             data += ', ' + extras
         data += '}'
-
         body = "" + client + form + feature + data
-
         return body
+
+
+    def populate_info_text(self, dialog, data):
+        cahange_tab = False
+        text = ""
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    cahange_tab = True
+                else:
+                    text += "\n"
+        dialog.txt_infolog.setText(text + "\n")
+        if cahange_tab:
+            dialog.mainTab.setCurrentIndex(1)
