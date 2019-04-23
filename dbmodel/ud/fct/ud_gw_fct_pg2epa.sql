@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2222
 
-
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean, boolean);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_dumpsubcatchment boolean, p_isrecursive boolean)  
 RETURNS integer AS 
 $BODY$
@@ -17,6 +17,8 @@ SELECT "SCHEMA_NAME".gw_fct_pg2epa('r1', false, false, false)
 
 DECLARE
 	check_count_aux integer; 
+	v_return json;
+	v_input json;
 
 BEGIN
 
@@ -81,7 +83,11 @@ BEGIN
 		END IF;
 	END IF;
 	
-RETURN 0;
+	-- manage return message
+	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',result_id_var,'"},"saveOnDatabase":true}}')::json;
+	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+	
+RETURN v_return;
 
 	
 END;

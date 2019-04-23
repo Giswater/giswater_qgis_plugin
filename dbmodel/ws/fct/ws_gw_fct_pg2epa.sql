@@ -6,8 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2314
 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa(result_id_var character varying, p_use_networkgeom boolean, p_isrecursive boolean)  
-RETURNS integer AS 
+RETURNS json AS 
 $BODY$
 
 /*EXAMPLE
@@ -18,6 +19,8 @@ DECLARE
 	valve_rec	record;
 	check_count_aux integer;
 	v_mandatory_nodarc boolean = false;
+	v_return json;
+	v_input json;
       
 BEGIN
 
@@ -79,8 +82,12 @@ BEGIN
 			RETURN 0;
 		END IF;
 	END IF;
+
+	-- manage return message
+	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',result_id_var,'"},"saveOnDatabase":true}}')::json;
+	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
 	
-RETURN 0;
+RETURN v_return;
 	
 END;
 $BODY$
