@@ -500,7 +500,7 @@ class Utils(ParentAction):
 
         sql = ("SELECT DISTINCT(" + field_id + "), " + fields + ""
                " FROM " + self.schema_name + "." + table_name + ""
-               " WHERE sys_role IN " + roles + " AND formname='importcsv' AND isdeprecated=false")
+               " WHERE sys_role IN " + roles + " AND formname='importcsv' AND isdeprecated is not True")
         rows = self.controller.get_rows(sql, log_sql=True)
         if not rows:
             message = "You do not have permission to execute this application"
