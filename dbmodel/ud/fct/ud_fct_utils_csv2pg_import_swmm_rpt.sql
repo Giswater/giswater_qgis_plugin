@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS  SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(text, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_swmm_rpt(p_data json)
-  RETURNS integer AS
+  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -34,7 +34,7 @@ DECLARE
 	v_result_info 	json;
 	v_result_point	json;
 	v_result_line 	json;
-	v_version	json;
+	v_version	text;
 	v_path 		text;
 	v_result_id	text;
 
@@ -42,6 +42,9 @@ BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
+
+	-- get system parameters
+	SELECT giswater  INTO v_version FROM version order by 1 desc limit 1;
 
 	-- get input data
 	v_result_id := (((p_data ->>'data')::json->>'parameters')::json->>'resultId')::text;
@@ -269,16 +272,8 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
 
-
 	--Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 	
-	
-	v_result_line = concat ('{"geometryType":"LineString", "values":',v_result, '}');
-
-
-	--Control nulls
+	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
@@ -288,8 +283,8 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-		       '}'||
+				'"line":'||v_result_line||
+		       '}}'||
 	    '}')::json;	
 END;
 $BODY$
