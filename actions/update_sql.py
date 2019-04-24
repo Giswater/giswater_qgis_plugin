@@ -19,10 +19,12 @@ import sys
 import re
 import json
 from functools import partial
+from collections import OrderedDict
 
 import utils_giswater
 from giswater.actions.parent import ParentAction
-from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo
+
+from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ApiImportInp
 
 
 class UpdateSQL(ParentAction):
@@ -1081,14 +1083,31 @@ class UpdateSQL(ParentAction):
 
     """ Functions execute process """
 
-    def execute_import_data(self):
+    def execute_import_data(self, schema_type=''):
 
-        self.insert_inp_into_db(self.file_inp)
-        # Execute import data
-        sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epa_inp(null)")
-        status = self.controller.execute_sql(sql, commit=False)
-        if status is False:
-            self.error_count = self.error_count + 1
+        # Create dialog
+        self.dlg_import_inp = ApiImportInp()
+        self.load_settings(self.dlg_import_inp)
+
+        self.dlg_functions.progressBar.setVisible(False)
+        extras = '"filterText":"Import inp epanet file"'
+        extras += ', "isToolbox":false'
+        body = self.create_body(extras=extras)
+        sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        if not row or row[0] is None:
+            self.controller.show_message("No results for: " + sql, 2)
+            return False
+        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        status = self.populate_functions_dlg(self.dlg_functions, complet_result[0]['body']['data'])
+
+
+        # Set listeners
+        self.dlg_import_inp.btn_run.clicked.connect(partial(self.execute_import_inp, accepted=True, schame_type=schema_type))
+        self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
+
+        # Open dialog
+        self.dlg_import_inp.show()
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False):
@@ -1208,7 +1227,12 @@ class UpdateSQL(ParentAction):
             self.update_31to39(new_project=True, project_type=project_type)
             self.api(new_api=True, project_type=project_type)
             self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
-            self.execute_import_data()
+            #TODO::
+            self.set_arrow_cursor()
+            msg = "The sql files have been correctly executed. \n Now, a form will be opened to manage the import inp."
+            self.controller.show_info_box(msg, "Info")
+            self.execute_import_data(schema_type=schema_type)
+            return
 
         elif self.rdb_sample.isChecked():
 
@@ -1987,6 +2011,41 @@ class UpdateSQL(ParentAction):
         self.set_info_project()
 
 
+    def execute_import_inp(self, accepted=False, schame_type=''):
+
+        if accepted:
+            # Insert inp values into database
+            self.insert_inp_into_db(self.file_inp)
+            msg = "Values has been inserted into database correctly."
+            self.controller.show_info_box(msg, "Info")
+
+            # Execute import data
+            extras = '"parameters":{"useNod2arc":true}}'
+            body = self.create_body(extras=extras)
+            if schame_type.lower() == 'ws':
+                sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epanet_inp(" + body + ")")
+            elif schame_type.lower() == 'ud':
+                sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_swmm_inp(" + body + ")")
+            else:
+                self.error_count = self.error_count + 1
+                return
+            status = self.controller.execute_sql(sql, commit=False)
+            if status is False:
+                self.error_count = self.error_count + 1
+
+            # Manage process result
+            self.manage_process_result()
+        else:
+            msg = "A rollback of the schema will be done."
+            self.controller.show_info_box(msg, "Info")
+            self.controller.dao.rollback()
+            self.error_count = 0
+
+        # Close dialog
+        self.close_dialog(self.dlg_import_inp)
+        self.close_dialog(self.dlg_readsql_create_project)
+
+
     """ Take current project type changed """
 
     def change_project_type(self, widget):
@@ -2076,6 +2135,24 @@ class UpdateSQL(ParentAction):
         message = self.controller.tr("Select INP file")
         file_inp = QFileDialog.getOpenFileName(None, message, "", '*.inp')
         self.dlg_readsql_create_project.data_file.setText(file_inp)
+
+
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
+        """ Create and return parameters as body to functions"""
+
+        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        form = '"form":{' + form + '}, '
+        feature = '"feature":{' + feature + '}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{}'
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras is not None:
+            data += ', ' + extras
+        data += '}'
+
+        body = "" + client + form + feature + data
+
+        return body
 
 
     """ Info basic """
