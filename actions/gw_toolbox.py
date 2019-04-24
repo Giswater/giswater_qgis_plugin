@@ -461,14 +461,18 @@ class GwToolBox(ApiParent):
         cahange_tab = False
         for k, v in list(data.items()):
             if str(k) == "info":
-                text = ""
-                for x in data['info']['values']:
-                    if x['error_message'] is not None:
-                        text += str(x['error_message']) + "\n"
-                        cahange_tab = True
-                    else:
-                        text += "\n"
-                dialog.txt_infolog.setText(text + "\n")
+                #TODO sustituir este codigo por la funcion:
+                self.populate_info_text(dialog, data)
+                # text = ""
+                # for x in data['info']['values']:
+                #     if x['message'] is not None:
+                #         text += str(x['message']) + "\n"
+                #         cahange_tab = True
+                #     else:
+                #         text += "\n"
+                # dialog.txt_infolog.setText(text + "\n")
+                # if cahange_tab:
+                #     dialog.mainTab.setCurrentIndex(1)
             else:
                 counter = len(data[k]['values'])
                 if counter > 0:
@@ -478,8 +482,7 @@ class GwToolBox(ApiParent):
 
                     self.populate_vlayer(dialog, v_layer, data, k, counter)
 
-        if cahange_tab:
-            dialog.mainTab.setCurrentIndex(1)
+
 
 
     def populate_vlayer(self, dialog, virtual_layer, data, layer_type, counter):
