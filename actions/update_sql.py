@@ -1101,7 +1101,6 @@ class UpdateSQL(ParentAction):
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         status = self.populate_functions_dlg(self.dlg_functions, complet_result[0]['body']['data'])
 
-
         # Set listeners
         self.dlg_import_inp.btn_run.clicked.connect(partial(self.execute_import_inp, accepted=True, schame_type=schema_type))
         self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
@@ -1207,8 +1206,8 @@ class UpdateSQL(ParentAction):
 
         self.set_wait_cursor()
 
+        # Initial checks
         if self.rdb_import_data.isChecked():
-
             self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.data_file)
             if self.file_inp is 'null':
                 self.set_arrow_cursor()
@@ -1216,86 +1215,70 @@ class UpdateSQL(ParentAction):
                 self.controller.show_info_box(msg, "Info")
                 return
 
-            status = self.load_base(project_type=project_type)
-            if not status and self.dev_commit == 'FALSE':
-                self.manage_process_result()
-                return
-            
-            self.update_30to31(new_project=True, project_type=project_type)
-            self.load_views(project_type=project_type)
-            self.load_trg(project_type=project_type)
-            self.update_31to39(new_project=True, project_type=project_type)
-            self.api(new_api=True, project_type=project_type)
-            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+        elif self.rdb_sample.isChecked() or self.rdb_sample_dev.isChecked():
+            if self.locale != 'EN':
+                msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
+                result = self.controller.ask_question(msg, "Info Message")
+                if result:
+                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
+                else:
+                    self.set_arrow_cursor()
+                    return
+
+        # Common execution
+        status = self.load_base(project_type=project_type)
+        if not status and self.dev_commit == 'FALSE':
+            self.manage_process_result()
+            return
+
+        status = self.update_30to31(new_project=True, project_type=project_type)
+        if not status and self.dev_commit == 'FALSE':
+            self.manage_process_result()
+            return
+
+        status = self.load_views(project_type=project_type)
+        if not status and self.dev_commit == 'FALSE':
+            self.manage_process_result()
+            return
+
+        status = self.load_trg(project_type=project_type)
+        if not status and self.dev_commit == 'FALSE':
+            self.manage_process_result()
+            return
+
+        status = self.update_31to39(new_project=True, project_type=project_type)
+        if not status and self.dev_commit == 'FALSE':
+            self.manage_process_result()
+            return
+
+        status = self.api(new_api=True, project_type=project_type)
+        if not status and self.dev_commit == 'FALSE':
+            self.manage_process_result()
+            return
+
+        status = self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+        if not status and self.dev_commit == 'FALSE':
+            self.manage_process_result()
+            return
+
+        # Custom execution
+        if self.rdb_import_data.isChecked():
             #TODO::
             self.set_arrow_cursor()
-            msg = "The sql files have been correctly executed. \n Now, a form will be opened to manage the import inp."
+            msg = "The sql files have been correctly executed.\nNow, a form will be opened to manage the import inp."
             self.controller.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=schema_type)
             return
-
+        
         elif self.rdb_sample.isChecked():
-
-            if self.locale != 'EN':
-                msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
-                result = self.controller.ask_question(msg, "Info Message")
-                if result:
-                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
-                else:
-                    self.set_arrow_cursor()
-                    return
-
-            status = self.load_base(project_type=project_type)
-            if not status and self.dev_commit == 'FALSE':
-                self.manage_process_result()
-                return
-
-            self.update_30to31(new_project=True, project_type=project_type)
-            self.load_views(project_type=project_type)
-            self.load_trg(project_type=project_type)
-            self.update_31to39(new_project=True, project_type=project_type)
-            self.api(new_api=True, project_type=project_type)
-            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.load_sample_data(project_type=project_type)
 
         elif self.rdb_sample_dev.isChecked():
-
-            if self.locale != 'EN':
-                msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
-                result = self.controller.ask_question(msg, "Info Message")
-                if result:
-                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
-                else:
-                    self.set_arrow_cursor()
-                    return
-
-            status = self.load_base(project_type=project_type)
-            if not status and self.dev_commit == 'FALSE':
-                self.manage_process_result()
-                return
-
-            self.update_30to31(new_project=True, project_type=project_type)
-            self.load_views(project_type=project_type)
-            self.load_trg(project_type=project_type)
-            self.update_31to39(new_project=True, project_type=project_type)
-            self.api(new_api=True, project_type=project_type)
-            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
 
         elif self.rdb_data.isChecked():
-            
-            status = self.load_base(project_type=project_type)
-            if not status and self.dev_commit == 'FALSE':
-                self.manage_process_result()
-                return
-
-            self.update_30to31(new_project=True, project_type=project_type)
-            self.load_views(project_type=project_type)
-            self.load_trg(project_type=project_type)
-            self.update_31to39(new_project=True, project_type=project_type)
-            self.api(new_api=True, project_type=project_type)
-            self.execute_last_process(new_project=True, schema_name=project_name, schema_type=schema_type)
+            pass
 
         self.manage_process_result()
 
