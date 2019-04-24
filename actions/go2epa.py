@@ -602,8 +602,22 @@ class Go2Epa(ApiParent):
             # Export to inp file
             if export_inp is True:
                 # Call function gw_fct_pg2epa
-                sql = ("SELECT " + self.schema_name + "." + epa_function_call)
+                sql = ("SELECT " + self.schema_name + "." + epa_function_call + "::text")
                 row = self.controller.get_row(sql, log_sql=True, commit=True)
+                if not row or row[0] is None:
+                    self.controller.show_warning("NOT ROW FOR: " + sql)
+                    message = "Export failed"
+                    self.controller.show_info_box(message)
+                    return
+                else:
+                    complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+                    if complet_result[0]['status'] == "Accepted":
+                        qtabwidget = self.dlg_go2epa.mainTab
+                        qtextedit = self.dlg_go2epa.txt_infolog
+                        self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+                    message = complet_result[0]['message']['text']
+                    if message is not None:
+                        self.controller.show_info_box(message)
 
                 # Get values from temp_csv2pg and insert into INP file
                 sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13,"
@@ -679,9 +693,9 @@ class Go2Epa(ApiParent):
                             qtabwidget = self.dlg_go2epa.mainTab
                             qtextedit = self.dlg_go2epa.txt_infolog
                             self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit,  complet_result[0]['body']['data'])
-
                         message = complet_result[0]['message']['text']
-                        self.controller.show_info_box(message)
+                        if message is not None:
+                            self.controller.show_info_box(message)
 
                     # final message
                     common_msg += "Import RPT finished."
@@ -710,9 +724,10 @@ class Go2Epa(ApiParent):
                     qtabwidget = self.dlg_go2epa.mainTab
                     qtextedit = self.dlg_go2epa.txt_infolog
                     self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'])
-
                 message = complet_result[0]['message']['text']
-                self.controller.show_info_box(message)
+                if message is not None:
+                    self.controller.show_info_box(message)
+
         if common_msg != "" and self.imports_canceled is False:
             self.controller.show_info(common_msg)
 
