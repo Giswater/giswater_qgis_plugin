@@ -28,4 +28,10 @@ label = 'Doc path replace:', dv_querytext = NULL, dv_filterbyfield = NULL, isena
 	reg_exp = NULL, dv_orderby_id = NULL, dv_isnullvalue = NULL, stylesheet = NULL,
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
 	WHERE parameter = 'edit_replace_doc_folderpath';
+    
+
+--24/04/2019
+UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='v_ui_om_visitman_x_arc';
+UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='v_ui_om_visitman_x_node';
+UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='v_ui_om_visitman_x_connec';
 
