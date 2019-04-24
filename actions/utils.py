@@ -439,7 +439,9 @@ class Utils(ParentAction):
         else:
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             if complet_result[0]['status'] == "Accepted":
-                self.populate_info_text(dialog, complet_result[0]['body']['data'])
+                qtabwidget = dialog.mainTab
+                qtextedit = dialog.txt_infolog
+                self.populate_info_text(dialog, qtabwidget, qtextedit, complet_result[0]['body']['data'])
             message = complet_result[0]['message']['text']
             self.controller.show_info_box(message)
 

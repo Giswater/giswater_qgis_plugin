@@ -897,7 +897,7 @@ class ParentAction(object):
         return body
 
 
-    def populate_info_text(self, dialog, data):
+    def populate_info_text(self, dialog, qtabwidget, qtextedit, data):
         cahange_tab = False
         text = ""
         for item in data['info']['values']:
@@ -907,6 +907,6 @@ class ParentAction(object):
                     cahange_tab = True
                 else:
                     text += "\n"
-        dialog.txt_infolog.setText(text + "\n")
+        utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
         if cahange_tab:
-            dialog.mainTab.setCurrentIndex(1)
+            qtabwidget.setCurrentIndex(1)

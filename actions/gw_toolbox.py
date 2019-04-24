@@ -458,11 +458,12 @@ class GwToolBox(ApiParent):
 
         self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
-        cahange_tab = False
+        qtabwidget = dialog.mainTab
+        qtextedit = dialog.txt_infolog
         for k, v in list(data.items()):
             if str(k) == "info":
                 #TODO sustituir este codigo por la funcion:
-                self.populate_info_text(dialog, data)
+                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
                 # text = ""
                 # for x in data['info']['values']:
                 #     if x['message'] is not None:
