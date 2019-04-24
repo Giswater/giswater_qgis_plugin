@@ -210,7 +210,7 @@ BEGIN
 
 			-- Inserting vnode values
 			INSERT INTO vnode (vnode_id, state, expl_id, sector_id, dma_id, vnode_type, the_geom) 
-			VALUES ((SELECT nextval('vnode_vnode_id_seq')), state_arg, NEW.expl_id, sector_id_arg, dma_id_arg, NEW.feature_type, link_end);			
+			VALUES ((SELECT nextval('vnode_vnode_id_seq')), state_arg, NEW.expl_id, sector_id_arg, dma_id_arg, 'AUTO', link_end);			
 
 			-- Inserting link values
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom)
