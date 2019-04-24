@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updateprint"(p_data json, p_x1 float8, p_y1 float8, p_x2 float8, p_y2 float8, p_istilemap bool, p_device int4) RETURNS pg_catalog.json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updateprint"(p_data json, p_x1 float8, p_y1 float8, p_x2 float8, p_y2 float8, p_istilemap bool, p_device int4) RETURNS pg_catalog.json AS 
 $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_updateprint($${"composer":"mincutA3","scale":"10000","ComposerTemplates":

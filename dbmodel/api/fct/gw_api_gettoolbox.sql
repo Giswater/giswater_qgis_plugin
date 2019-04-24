@@ -1,4 +1,4 @@
-﻿-- Function: SCHEMA_NAME.gw_api_gettoolbox(json)
+-- Function: SCHEMA_NAME.gw_api_gettoolbox(json)
 
 -- DROP FUNCTION SCHEMA_NAME.gw_api_gettoolbox(json);
 

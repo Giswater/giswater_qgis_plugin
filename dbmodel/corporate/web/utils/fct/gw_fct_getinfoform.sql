@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, p_id varchar, formtodisplay text) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoform"(table_id varchar, lang varchar, p_id varchar, formtodisplay text) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables

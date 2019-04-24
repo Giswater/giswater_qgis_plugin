@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -74,7 +74,7 @@ BEGIN
 		UPDATE link SET the_geom = v_link.the_geom WHERE link_id = p_link_id;
 
 		-- insert vnode on the end point geometry
-		INSERT INTO vnode (vnode_type, sector_id, state, expl_id, dma_id, the_geom) VALUES ('AUTO', v_connec.sector_id, v_connec.state, v_connec.expl_id, v_connec.dma_id, v_end_point) RETURNING vnode_id INTO v_id;
+		INSERT INTO vnode (vnode_type, sector_id, state, expl_id, the_geom) VALUES ('CUSTOM', v_connec.sector_id, v_connec.state, v_connec.expl_id, v_end_point) RETURNING vnode_id INTO v_id;
 
 		-- update link values
 		UPDATE link SET exit_id= v_id, exit_type='VNODE' WHERE link_id=p_link_id;

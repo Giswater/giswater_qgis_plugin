@@ -1,4 +1,4 @@
-﻿-- Function: SCHEMA_NAME.gw_trg_edit_man_gully()
+-- Function: SCHEMA_NAME.gw_trg_edit_man_gully()
 
 -- DROP FUNCTION SCHEMA_NAME.gw_trg_edit_man_gully();
 

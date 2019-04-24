@@ -1,4 +1,4 @@
-﻿
+
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getinsertform(
     table_id character varying,
     lang character varying,

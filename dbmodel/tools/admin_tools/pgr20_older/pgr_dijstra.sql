@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION public.pgr_dijkstra(
+CREATE OR REPLACE FUNCTION public.pgr_dijkstra(
     sql text,
     source_id int8,
     target_id int8)

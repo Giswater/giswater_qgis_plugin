@@ -1,4 +1,4 @@
-﻿
+
 CREATE OR REPLACE FUNCTION gw_trg_om_visit()
   RETURNS trigger AS
 $BODY$

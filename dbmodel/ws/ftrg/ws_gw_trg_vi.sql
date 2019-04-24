@@ -1,4 +1,4 @@
-﻿-- Function: SCHEMA_NAME.gw_trg_vi()
+-- Function: SCHEMA_NAME.gw_trg_vi()
 
 -- DROP FUNCTION SCHEMA_NAME.gw_trg_vi();
 
