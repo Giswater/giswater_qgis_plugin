@@ -64,7 +64,7 @@ BEGIN
 		-- reconnect to arc
 		-- getting arc with infinity buffer
 		WITH index_query AS(
-			SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
+			SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc where state=1 ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
 			SELECT * INTO v_arc FROM index_query ORDER BY d limit 1;
 			
 		-- Update the end point link geometry
