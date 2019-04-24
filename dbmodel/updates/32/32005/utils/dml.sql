@@ -35,3 +35,6 @@ UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='v_ui_om_visitman_x_ar
 UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='v_ui_om_visitman_x_node';
 UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='v_ui_om_visitman_x_connec';
 
+
+INSERT INTO audit_cat_error VALUES (2015, 'There is no state-1 feature as endpoint of link. It is impossible to create it', 'Try to connect the link to one arc / node / connec / gully or vnode with state=1', 2, true, NULL)
+ON CONFLICT (id) DO NOTHING;
