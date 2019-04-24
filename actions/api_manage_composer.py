@@ -66,7 +66,7 @@ class ApiManageComposer(ApiParent):
         # Set current values from canvas
         w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
         w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
-        reg_exp = QRegExp("\d{8}")
+        reg_exp = QRegExp("\d{0,8}[\r]?")
         w_scale.setValidator(QRegExpValidator(reg_exp))
         rotation = self.iface.mapCanvas().rotation()
         scale = int(self.iface.mapCanvas().scale())
@@ -84,7 +84,7 @@ class ApiManageComposer(ApiParent):
         self.dlg_composer.rejected.connect(partial(self.save_settings, self.dlg_composer))
         self.dlg_composer.rejected.connect(self.destructor)
         self.dlg_composer.show()
-
+        self.accept(self.dlg_composer, self.my_json)
         self.iface.mapCanvas().extentsChanged.connect(partial(self.accept, self.dlg_composer, self.my_json))
 
 
