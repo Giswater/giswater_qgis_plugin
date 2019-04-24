@@ -20,6 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_repair_link(link_id, (row_number() over (order by link
 DECLARE
 
 v_connec record;
+v_gully record;
 v_link record;
 v_arc record;
 v_node record;
@@ -35,7 +36,7 @@ BEGIN
 	SELECT * INTO v_link FROM link WHERE link_id=p_link_id;
 
 
-	-- reconnect links to nodes
+	-- reconnect links to nodes (any way connec or gully)
 	IF v_link.exit_type='NODE' THEN
 
 		-- getting node with infinity buffer
@@ -56,62 +57,133 @@ BEGIN
 	ELSIF v_link.exit_type='VNODE' THEN
 		DELETE FROM vnode WHERE vnode_id=v_link.exit_id::integer;	
 	END IF;
+
+	IF v_link.feature_type = 'CONNEC' THEN
 	
-	-- reconnect links to only feature (only connec not gully) if it exists
-	SELECT connec.* INTO v_connec FROM connec WHERE ST_DWithin(ST_startpoint(v_link.the_geom), connec.the_geom, 0.5)
-	ORDER BY ST_Distance(connec.the_geom, ST_startpoint(v_link.the_geom)) LIMIT 1;
+		-- reconnect links to only feature (only connec not gully) if it exists
+		SELECT connec.* INTO v_connec FROM connec WHERE ST_DWithin(ST_startpoint(v_link.the_geom), connec.the_geom, 0.5)
+		ORDER BY ST_Distance(connec.the_geom, ST_startpoint(v_link.the_geom)) LIMIT 1;
 
 
-	IF v_connec.connec_id IS NULL THEN 
+		IF v_connec.connec_id IS NULL THEN 
 
-		-- reconnect to connec and reverse geometry (if exists)
-		SELECT connec.* INTO v_connec FROM connec WHERE ST_DWithin(ST_endpoint(v_link.the_geom), connec.the_geom, 0.5)
-		ORDER BY ST_Distance(connec.the_geom, ST_endpoint(v_link.the_geom)) LIMIT 1;
+			-- reconnect to connec and reverse geometry (if exists)
+			SELECT connec.* INTO v_connec FROM connec WHERE ST_DWithin(ST_endpoint(v_link.the_geom), connec.the_geom, 0.5)
+			ORDER BY ST_Distance(connec.the_geom, ST_endpoint(v_link.the_geom)) LIMIT 1;
 
-		IF v_connec.connec_id IS NOT NULL THEN 
-			-- reverse geometry
-			UPDATE link SET the_geom = ST_reverse(the_geom) WHERE link_id=p_link_id;
+
+			IF v_connec.connec_id IS NOT NULL THEN 
+
+				-- reverse geometry
+				UPDATE link SET the_geom = ST_reverse(the_geom) WHERE link_id=p_link_id;
+				-- Update the start point link geometry
+				UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_connec.the_geom) WHERE link_id = p_link_id;
+				-- update link values
+				UPDATE link SET feature_type='CONNEC', feature_id= v_connec.connec_id WHERE link_id=p_link_id;			
+			END IF;
+		END IF;
+
+		-- reconnect links to arcs
+		IF v_connec.connec_id IS NOT NULL THEN
+
+			-- reconnect to arc
+			-- getting arc with infinity buffer
+			WITH index_query AS(
+				SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
+				SELECT * INTO v_arc FROM index_query ORDER BY d limit 1;
+				
+			-- Update the end point link geometry
+			v_end_point = (ST_ClosestPoint(v_arc.the_geom, (ST_endpoint(v_link.the_geom))));
+			v_link.the_geom = (ST_SetPoint(v_link.the_geom, -1, v_end_point));
+	
+			UPDATE link SET the_geom = v_link.the_geom WHERE link_id = p_link_id;
+
+			-- insert vnode on the end point geometry
+			INSERT INTO vnode (vnode_type, sector_id, state, dma_id, expl_id, the_geom) 
+			VALUES ('AUTO', v_connec.sector_id, v_connec.state, v_connec.dma_id, v_connec.expl_id, v_end_point) RETURNING vnode_id INTO v_id;
+	
+			-- update link values
+			UPDATE link SET exit_id= v_id, exit_type='VNODE' WHERE link_id=p_link_id;
+
+			-- update connec values
+			UPDATE connec SET arc_id= v_arc.arc_id WHERE connec_id=v_connec.connec_id; 
+
 			-- Update the start point link geometry
 			UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_connec.the_geom) WHERE link_id = p_link_id;
-			-- update link values
-			UPDATE link SET feature_type='CONNEC', feature_id= v_connec.connec_id WHERE link_id=p_link_id;			
-		END IF;
-	END IF;
-
-	-- reconnect links to arcs
-	IF v_connec.connec_id IS NOT NULL THEN
-
-		-- reconnect to arc
-		-- getting arc with infinity buffer
-		WITH index_query AS(
-			SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
-			SELECT * INTO v_arc FROM index_query ORDER BY d limit 1;
 			
-		-- Update the end point link geometry
-		v_end_point = (ST_ClosestPoint(v_arc.the_geom, (ST_endpoint(v_link.the_geom))));
-		v_link.the_geom = (ST_SetPoint(v_link.the_geom, -1, v_end_point));
+			-- update link values
+			UPDATE link SET feature_type='CONNEC', feature_id= v_connec.connec_id WHERE link_id=p_link_id;
+
+			v_status = 'RECONNECTED';
+
+		ELSE
+			-- INSERT ON LOG TABLE THE LINK NOT FOUNDED WITH CONNEC CLOSE TO IT
+			v_status = 'No connec found. Nothing done';
+
+		END IF;
+
+	ELSIF v_link.feature_type = 'GULLY' THEN
+
+		-- reconnect links to only feature (only connec not gully) if it exists
+		SELECT gully.* INTO v_gully FROM gully WHERE ST_DWithin(ST_startpoint(v_link.the_geom), gully.the_geom, 0.5)
+		ORDER BY ST_Distance(gully.the_geom, ST_startpoint(v_link.the_geom)) LIMIT 1;
+
+
+		IF v_gully.gully_id IS NULL THEN 
+
+			-- reconnect to gully and reverse geometry (if exists)
+			SELECT gully.* INTO v_gully FROM gully WHERE ST_DWithin(ST_endpoint(v_link.the_geom), gully.the_geom, 0.5)
+			ORDER BY ST_Distance(gully.the_geom, ST_endpoint(v_link.the_geom)) LIMIT 1;
+
+
+			IF v_gully.gully_id IS NOT NULL THEN 
+
+				-- reverse geometry
+				UPDATE link SET the_geom = ST_reverse(the_geom) WHERE link_id=p_link_id;
+				-- Update the start point link geometry
+				UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_gully.the_geom) WHERE link_id = p_link_id;
+				-- update link values
+				UPDATE link SET feature_type='CONNEC', feature_id= v_gully.gully_id WHERE link_id=p_link_id;			
+			END IF;
+		END IF;
+
+		-- reconnect links to arcs
+		IF v_gully.gully_id IS NOT NULL THEN
+
+			-- reconnect to arc
+			-- getting arc with infinity buffer
+			WITH index_query AS(
+				SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
+				SELECT * INTO v_arc FROM index_query ORDER BY d limit 1;
+				
+			-- Update the end point link geometry
+			v_end_point = (ST_ClosestPoint(v_arc.the_geom, (ST_endpoint(v_link.the_geom))));
+			v_link.the_geom = (ST_SetPoint(v_link.the_geom, -1, v_end_point));
 	
-		UPDATE link SET the_geom = v_link.the_geom WHERE link_id = p_link_id;
+			UPDATE link SET the_geom = v_link.the_geom WHERE link_id = p_link_id;
 
-		-- insert vnode on the end point geometry
-		INSERT INTO vnode (vnode_type, sector_id, state, dma_id, expl_id, the_geom) VALUES ('AUTO', v_connec.sector_id, v_connec.dma_id, v_connec.state, v_connec.expl_id, v_end_point) RETURNING vnode_id INTO v_id;
+			-- insert vnode on the end point geometry
+			INSERT INTO vnode (vnode_type, sector_id, state, dma_id, expl_id, the_geom) 
+			VALUES ('AUTO', v_gully.sector_id, v_gully.state, v_gully.dma_id, v_gully.expl_id, v_end_point) RETURNING vnode_id INTO v_id;
+	
+			-- update link values
+			UPDATE link SET exit_id= v_id, exit_type='VNODE' WHERE link_id=p_link_id;
 
-		-- update link values
-		UPDATE link SET exit_id= v_id, exit_type='VNODE' WHERE link_id=p_link_id;
+			-- update connec values
+			UPDATE gully SET arc_id= v_arc.arc_id WHERE gully_id=v_gully.gully_id; 
 
-		-- update connec values
-		UPDATE connec SET arc_id= v_arc.arc_id WHERE connec_id=v_connec.connec_id; 
+			-- Update the start point link geometry
+			UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_gully.the_geom) WHERE link_id = p_link_id;
+			
+			-- update link values
+			UPDATE link SET feature_type='CONNEC', feature_id= v_gully.gully_id WHERE link_id=p_link_id;
 
-		-- Update the start point link geometry
-		UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_connec.the_geom) WHERE link_id = p_link_id;
-		-- update link values
-		UPDATE link SET feature_type='CONNEC', feature_id= v_connec.connec_id WHERE link_id=p_link_id;
+			v_status = 'RECONNECTED';
 
-		v_status = 'RECONNECTED';
-
-	ELSE
-		-- INSERT ON LOG TABLE THE LINK NOT FOUNDED WITH CONNEC CLOSE TO IT
-		v_status = 'No connec found. Nothing done';
+		ELSE
+			-- INSERT ON LOG TABLE THE LINK NOT FOUNDED WITH CONNEC CLOSE TO IT
+			v_status = 'No gully found. Nothing done';
+		END IF;
 
 	END IF;
 
