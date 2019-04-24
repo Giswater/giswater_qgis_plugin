@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt(text, text);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_rpt(p_data json)
-  RETURNS integer AS
+  RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -40,6 +40,9 @@ BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
+
+	-- get system parameters
+	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
 
 	-- get input data
 	v_result_id := (((p_data ->>'data')::json->>'parameters')::json->>'resultId')::text;
@@ -146,6 +149,7 @@ BEGIN
 
 
 	--Control nulls
+	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
@@ -155,8 +159,8 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-		       '}'||
+				'"line":'||v_result_line||
+		       '}}'||
 	    '}')::json;		
 END;
 $BODY$
