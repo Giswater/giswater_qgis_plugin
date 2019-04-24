@@ -14,6 +14,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposerMap, QgsComposerLabel
     from qgis.PyQt.QtGui import QPrintDialog, QPrinter, QDialog
 else:
+    from qgis.core import QgsProject
     pass
 
 from qgis.PyQt.QtGui import QRegExpValidator
@@ -118,7 +119,8 @@ class ApiManageComposer(ApiParent):
         """ Get all composers from current QGis project """
 
         composers = '"{'
-        for composer in self.iface.activeComposers():
+        active_composers = self.get_composers_list()
+        for composer in active_composers:
             if composer != removed and composer.composerWindow():
                 cur = composer.composerWindow().windowTitle()
                 composers += cur + ', '
@@ -141,7 +143,8 @@ class ApiManageComposer(ApiParent):
         """ Get composer selected in QComboBox """
 
         selected_com = None
-        for composer in self.iface.activeComposers():
+        active_composers = self.get_composers_list()
+        for composer in active_composers:
             if composer.composerWindow().windowTitle() == self.my_json['composer']:
                 selected_com = composer
                 break
@@ -185,7 +188,8 @@ class ApiManageComposer(ApiParent):
             return False
 
         composer_templates = []
-        for composer in self.iface.activeComposers():
+        active_composers = self.get_composers_list()
+        for composer in active_composers:
             composer_map = []
             composer_template = {'ComposerTemplate': composer.composerWindow().windowTitle()}
             # Get map(item) from each composer template
@@ -231,7 +235,8 @@ class ApiManageComposer(ApiParent):
         map_index = complet_result[0]['data']['mapIndex']
 
         maps = []
-        for composer in self.iface.activeComposers():
+        active_composers = self.get_composers_list()
+        for composer in active_composers:
             maps = []
             if composer.composerWindow().windowTitle() == composer_name:
                 for item in composer.composition().items():

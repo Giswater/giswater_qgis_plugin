@@ -910,3 +910,14 @@ class ParentAction(object):
         utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
         if cahange_tab:
             qtabwidget.setCurrentIndex(1)
+
+
+    def get_composers_list(self):
+        active_composers = []
+        if Qgis.QGIS_VERSION_INT < 29900:
+            active_composers = self.iface.activeComposers()
+        else:
+            # Todo 3.x  "self.iface.activeComposers()" dont work
+            projectInstance = QgsProject.instance()
+            self.controller.log_info(str(type(projectInstance)))
+        return  active_composers
