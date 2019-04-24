@@ -354,7 +354,7 @@ BEGIN
                 inp_table:= 'inp_storage';
             END IF;
             IF inp_table IS NOT NULL THEN
-                v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
+                v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
 				EXECUTE v_sql;
             END IF;
 
