@@ -1229,8 +1229,10 @@ class ApiParent(ParentAction):
             widget = self.set_data_type(field, widget)
             if Qgis.QGIS_VERSION_INT < 29900:
                 widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.returnPressed.connect(partial(self.get_values, dialog, widget, self.my_json))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.returnPressed.connect(partial(self.get_values, dialog, widget, self.my_json))
             widget = self.set_function_associated(dialog, widget, field)
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
@@ -1268,9 +1270,11 @@ class ApiParent(ParentAction):
         if type(widget) == QLineEdit:
             if Qgis.QGIS_VERSION_INT < 29900:
                 widget.lostFocus.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
                 #widget.textChanged.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
             else:
                 widget.editingFinished.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
 
         return widget
 
