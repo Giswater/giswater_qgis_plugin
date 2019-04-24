@@ -29,26 +29,24 @@ v_end_point public.geometry;
 v_status text ;
 
 BEGIN
+
 	-- set set path
 	SET search_path='SCHEMA_NAME', public;
 
 	-- get values
 	SELECT * INTO v_link FROM link WHERE link_id=p_link_id;
 
-
 	-- reconnect links to nodes (any way connec or gully)
 	IF v_link.exit_type='NODE' THEN
 
 		-- getting node with infinity buffer
 		WITH index_query AS(
-			SELECT ST_Distance(the_geom, v_link.the_geom) as d, node.* FROM node ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
+			SELECT ST_Distance(the_geom, v_link.the_geom) as d, node.* FROM node WHERE state=1 ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
 			SELECT * INTO v_node FROM index_query ORDER BY d limit 1;
 			
 		-- Update the end point link geometry
 		v_end_point = (ST_ClosestPoint(v_node.the_geom, (ST_endpoint(v_link.the_geom))));
 		v_link.the_geom = (ST_SetPoint(v_link.the_geom, -1, v_end_point));
-
-		RAISE NOTICE 'v_link.the_geom % v_end_point % ', v_link.the_geom, v_end_point;
 	
 		UPDATE link SET the_geom = v_link.the_geom WHERE link_id = p_link_id;
 
@@ -60,11 +58,11 @@ BEGIN
 
 	IF v_link.feature_type = 'CONNEC' THEN
 	
-		-- reconnect links to only feature (only connec not gully) if it exists
+		-- reconnect links to only feature (only connec) if it exists
 		SELECT connec.* INTO v_connec FROM connec WHERE ST_DWithin(ST_startpoint(v_link.the_geom), connec.the_geom, 0.5)
 		ORDER BY ST_Distance(connec.the_geom, ST_startpoint(v_link.the_geom)) LIMIT 1;
 
-
+		
 		IF v_connec.connec_id IS NULL THEN 
 
 			-- reconnect to connec and reverse geometry (if exists)
@@ -89,7 +87,7 @@ BEGIN
 			-- reconnect to arc
 			-- getting arc with infinity buffer
 			WITH index_query AS(
-				SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
+				SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc WHERE state=1 ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
 				SELECT * INTO v_arc FROM index_query ORDER BY d limit 1;
 				
 			-- Update the end point link geometry
@@ -124,7 +122,7 @@ BEGIN
 
 	ELSIF v_link.feature_type = 'GULLY' THEN
 
-		-- reconnect links to only feature (only connec not gully) if it exists
+		-- reconnect links to only feature (gully) if it exists
 		SELECT gully.* INTO v_gully FROM gully WHERE ST_DWithin(ST_startpoint(v_link.the_geom), gully.the_geom, 0.5)
 		ORDER BY ST_Distance(gully.the_geom, ST_startpoint(v_link.the_geom)) LIMIT 1;
 
@@ -143,7 +141,7 @@ BEGIN
 				-- Update the start point link geometry
 				UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_gully.the_geom) WHERE link_id = p_link_id;
 				-- update link values
-				UPDATE link SET feature_type='CONNEC', feature_id= v_gully.gully_id WHERE link_id=p_link_id;			
+				UPDATE link SET feature_type='GULLY', feature_id= v_gully.gully_id WHERE link_id=p_link_id;			
 			END IF;
 		END IF;
 
@@ -153,7 +151,7 @@ BEGIN
 			-- reconnect to arc
 			-- getting arc with infinity buffer
 			WITH index_query AS(
-				SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
+				SELECT ST_Distance(the_geom, v_link.the_geom) as d, arc.* FROM arc WHERE state=1 ORDER BY the_geom <-> v_link.the_geom LIMIT 5)
 				SELECT * INTO v_arc FROM index_query ORDER BY d limit 1;
 				
 			-- Update the end point link geometry
@@ -176,7 +174,7 @@ BEGIN
 			UPDATE link SET the_geom = ST_SetPoint(v_link.the_geom, 0, v_gully.the_geom) WHERE link_id = p_link_id;
 			
 			-- update link values
-			UPDATE link SET feature_type='CONNEC', feature_id= v_gully.gully_id WHERE link_id=p_link_id;
+			UPDATE link SET feature_type='GULLY', feature_id= v_gully.gully_id WHERE link_id=p_link_id;
 
 			v_status = 'RECONNECTED';
 
