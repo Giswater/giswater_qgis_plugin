@@ -484,67 +484,57 @@ class UpdateSQL(ParentAction):
 
     def update_31to39(self, new_project=False, project_type=False, no_ct=False):
 
-        if str(project_type) == 'ws' or str(project_type) == 'ud':
+        if str(project_type) in ('ws', 'ud'):
+
             if not os.path.exists(self.folderUpdates):
                 self.controller.show_message("The update folder was not found in sql folder.", 1)
                 self.error_count = self.error_count + 1
                 return
-            folders = os.listdir(self.folderUpdates + '')
+            folders = sorted(os.listdir(self.folderUpdates + ''))
             for folder in folders:
-                sub_folders = os.listdir(self.folderUpdates + folder)
+                sub_folders = sorted(os.listdir(self.folderUpdates + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder,
-                                                       os.sep + 'utils' + os.sep) is True:
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
-                                if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
-                                        '') is True:
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, ''):
                                     status = self.load_sql(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), '') is True:
-                                    status = self.executeFiles(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep), True)
+                                    self.locale + os.sep), '') is True:
+                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
+                                elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
                                     status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
+
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder,
-                                                       os.sep + 'utils' + os.sep) is True:
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder,  os.sep + 'utils' + os.sep):
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
-                                if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
-                                        '') is True:
-                                    status = self.load_sql(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, ''):
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
-                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), '') is True:
-                                    status = self.executeFiles(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep), True)
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), ''):
+                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
+                                elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
                                     status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
-                                    
+
                     else:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100':
@@ -602,9 +592,9 @@ class UpdateSQL(ParentAction):
 
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return
-            folders = os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + '')
+            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                sub_folders = os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder)
+                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if self.read_all_updates == 'TRUE':
@@ -723,9 +713,9 @@ class UpdateSQL(ParentAction):
                 self.error_count = self.error_count + 1
                 return True
 
-            folders = os.listdir(self.folderUpdates + '')
+            folders = sorted(os.listdir(self.folderUpdates + ''))
             for folder in folders:
-                sub_folders = os.listdir(self.folderUpdates + folder)
+                sub_folders = sorted(os.listdir(self.folderUpdates + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if str(sub_folder) <= '31100':
@@ -780,9 +770,9 @@ class UpdateSQL(ParentAction):
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return True
 
-            folders = os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + '')
+            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                sub_folders = os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder)
+                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if str(sub_folder) <= '31100':
@@ -966,10 +956,10 @@ class UpdateSQL(ParentAction):
             self.error_count = self.error_count + 1
             return
 
-        folders = os.listdir(self.folderUpdatesApi + '')
+        folders = sorted(os.listdir(self.folderUpdatesApi + ''))
         self.controller.log_info(str(folders))
         for folder in folders:
-            sub_folders = os.listdir(self.folderUpdatesApi + folder)
+            sub_folders = sorted(os.listdir(self.folderUpdatesApi + folder))
             for sub_folder in sub_folders:
                 if new_api:
                     if self.read_all_updates == 'TRUE':
@@ -1136,7 +1126,7 @@ class UpdateSQL(ParentAction):
         if status is False:
             self.error_count = self.error_count + 1
 
-        return
+        return status
 
 
     """ Buttons calling functions """
@@ -1334,7 +1324,7 @@ class UpdateSQL(ParentAction):
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.set_arrow_cursor()
 
-        # Show message if precess execute correctly
+        # Show message if process executed correctly
         if self.error_count == 0:
             self.controller.dao.commit()
             self.event_change_connection()
@@ -1585,14 +1575,14 @@ class UpdateSQL(ParentAction):
             self.controller.show_message("The updates folder was not found in sql folder.", 1)
             return
 
-        folders = os.listdir(self.folderUpdates + '')
+        folders = sorted(os.listdir(self.folderUpdates + ''))
         for folder in folders:
-            sub_folders = os.listdir(self.folderUpdates + folder)
+            sub_folders = sorted(os.listdir(self.folderUpdates + folder))
             for sub_folder in sub_folders:
                 if str(sub_folder) > str(self.project_data_schema_version).replace('.',''):
-                    if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, '') is True:
+                    if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, ''):
                         status = self.readFiles(
-                            os.listdir(self.folderUpdates + folder + os.sep + sub_folder + ''), self.folderUpdates + folder + os.sep + sub_folder + '')
+                            sorted(os.listdir(self.folderUpdates + folder + os.sep + sub_folder + '')), self.folderUpdates + folder + os.sep + sub_folder + '')
                         if status is False:
                             continue
                 else:
@@ -1846,7 +1836,7 @@ class UpdateSQL(ParentAction):
         self.filter_srid.textChanged.connect(partial(self.filter_srid_changed))
 
         # Populate combo with all locales
-        locales = os.listdir(self.sql_dir + os.sep + 'i18n' + os.sep)
+        locales = sorted(os.listdir(self.sql_dir + os.sep + 'i18n' + os.sep))
         for locale in locales:
             self.cmb_locale.addItem(locale)
             if locale == 'EN':
@@ -1926,8 +1916,8 @@ class UpdateSQL(ParentAction):
 
     def read_execute_file(self, filedir, file, schema_name, filter_srid_value):
 
+        status = False
         try:
-            status = False
             f = open(filedir + os.sep + file, 'r')
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", filter_srid_value))
@@ -1941,7 +1931,7 @@ class UpdateSQL(ParentAction):
 
                 if status is False:
                     self.error_count = self.error_count + 1
-                    self.controller.log_info(str("read_execute_file error"), parameter=file)
+                    self.controller.log_info(str("read_execute_file error"), parameter=filedir + os.sep + file)
                     self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
                     if self.dev_commit == 'TRUE':
                         self.controller.dao.rollback()
@@ -1956,8 +1946,6 @@ class UpdateSQL(ParentAction):
             status = False
         finally:
             return status
-
-        return status
 
 
     def readFiles(self, filelist, filedir):
