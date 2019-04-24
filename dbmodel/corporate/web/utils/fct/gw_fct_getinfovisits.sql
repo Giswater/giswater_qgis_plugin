@@ -4,12 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfovisits"(p_element_type varchar, id varchar, device int4, visit_start timestamp, visit_end timestamp, p_parameter_type varchar, p_parameter_id varchar, visit_id int8) RETURNS pg_catalog.json AS 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME"."gw_fct_getinfovisits"(varchar, varchar, int4, timestamp, timestamp, varchar, varchar, int8);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfovisits"(p_element_type varchar, id varchar, device int4, visit_start text, visit_end text, p_parameter_type varchar, p_parameter_id varchar, visit_id int8) RETURNS pg_catalog.json AS 
 $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_getinfovisits('arc', '2078', 3,'2014-03-26T00:00:00.000Z','2019-03-27T00:00:00.000Z','INSPECTION','desperfectes_arc',NULL) AS result
+            SELECT SCHEMA_NAME.gw_fct_getinfovisits('arc', '139', 3,'2014-05-24T00:00:00.000Z','',NULL,'10',NULL) AS result
 */
 
 DECLARE
@@ -31,6 +32,13 @@ BEGIN
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
+
+-- fix diferent ways to say null on client
+	visit_start = REPLACE (visit_start::text, '''''', null);
+	visit_end = REPLACE (visit_end::text, '''''', null);
+
+	IF visit_end IS NULL THEN visit_end=now(); END IF;
+	RAISE NOTICE ' visit_end %', visit_end;
         
 --  Harmonize element_type
     p_element_type := lower (p_element_type);
@@ -61,12 +69,12 @@ raise notice 'p_parameter_type %', p_parameter_type;
 
 --    Add visit_start filter
     IF visit_start IS NOT NULL THEN
-        query_result := query_result || ' AND visit_start > ' || quote_literal(visit_start::TIMESTAMP(6));
+        query_result := query_result || ' AND visit_start > ' || quote_literal(visit_start);
     END IF;
 
 --    Add visit_end filter
    IF visit_end IS NOT NULL THEN
-        query_result := query_result || ' AND visit_end < ' || quote_literal(visit_end::TIMESTAMP(6));
+        query_result := query_result || ' AND visit_end < ' || quote_literal(visit_end);
     END IF;
 
 --    Query with dates filter
@@ -97,12 +105,12 @@ raise notice 'p_parameter_type %', p_parameter_type;
 
 --    Get visits with all the filters
    IF query_result IS NOT NULL THEN
-    EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( ' || quote_literal(query_result) || ' ORDER by sys_date desc) a')
+    EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( ' || (query_result) || ' ORDER by sys_date desc) a')
         INTO query_result_visits
         USING id;
 
 --    Get visits with just date filters
-    EXECUTE fORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( ' || quote_literal(query_result) || ' ORDER by sys_date desc) a')
+    EXECUTE fORMAT ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( ' || (query_result) || ' ORDER by sys_date desc) a')
         INTO query_result_visits_dates
         USING id;
     END IF;
@@ -118,7 +126,7 @@ raise notice 'p_parameter_type %', p_parameter_type;
             USING p_element_type, p_parameter_type;
    ELSE
         EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT sys_parameter_type AS "id", sys_parameter_type AS "name" FROM (
-        SELECT DISTINCT sys_parameter_type FROM ( ' || quote_literal(query_result_dates) || ' ) c) b
+        SELECT DISTINCT sys_parameter_type FROM ( ' || (query_result_dates) || ' ) c) b
         LEFT JOIN (VALUES ($1, 1)) AS x(value, order_number) ON sys_parameter_type = x.value 
         ORDER BY x.order_number) a')
             INTO parameter_type_options
@@ -136,7 +144,7 @@ raise notice 'p_parameter_type %', p_parameter_type;
             USING p_element_type, p_parameter_type;
     ELSE    
         EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT '' '' as id, '' '' as name FROM om_visit_parameter UNION 
-        SELECT DISTINCT sys_parameter_id AS "id", sys_parameter_name AS "name" FROM ( ' || quote_literal(query_result_dates) || ' )b WHERE sys_parameter_type=$1 order by name asc) a')
+        SELECT DISTINCT sys_parameter_id AS "id", sys_parameter_name AS "name" FROM ( ' || (query_result_dates) || ' )b WHERE sys_parameter_type=$1 order by name asc) a')
         INTO parameter_id_options
         USING p_parameter_type;
     END IF;
@@ -156,8 +164,8 @@ raise notice 'p_parameter_type %', p_parameter_type;
 
 
 --    Exception handling
-    EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+   -- EXCEPTION WHEN OTHERS THEN 
+     --   RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
         
 END;
 $BODY$

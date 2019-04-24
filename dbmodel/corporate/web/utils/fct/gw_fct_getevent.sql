@@ -26,7 +26,7 @@ BEGIN
         INTO api_version;
 
 --    Get event data
-    SELECT * INTO event_data FROM om_visit_event WHERE id = event_id;
+    SELECT * INTO event_data FROM om_visit_event JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE om_visit_event.id = event_id;
     event_data_json := row_to_json(event_data);
 
 --    Get form data
