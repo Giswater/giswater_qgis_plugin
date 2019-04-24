@@ -66,8 +66,8 @@ class GwToolBox(ApiParent):
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
-
-        body = self.create_body()
+        extras = '"isToolbox":true'
+        body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
@@ -117,6 +117,7 @@ class GwToolBox(ApiParent):
         self.dlg_functions.rbt_layer.setChecked(True)
 
         extras = '"filterText":"' + self.alias_function + '"'
+        extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
