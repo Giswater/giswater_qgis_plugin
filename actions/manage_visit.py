@@ -903,7 +903,7 @@ class ManageVisit(ParentManage, QObject):
             # set fixed values
             self.dlg_event.value.setText(_value)
             self.dlg_event.position_value.setText(str(position_value))
-            utils_giswater.setWidgetText(self.dlg_event, text, text)
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
@@ -932,10 +932,11 @@ class ManageVisit(ParentManage, QObject):
         elif om_event_parameter.form_type == 'event_standard':
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
+            self.controller.log_info(str(text))
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
             self.dlg_event.value.setText(_value)
-            utils_giswater.setWidgetText(self.dlg_event, text, text)
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
 
         # because of multiple view disable add picture and view gallery
         self.dlg_event.btn_add_picture.setEnabled(False)
