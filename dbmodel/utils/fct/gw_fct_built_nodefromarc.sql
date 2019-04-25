@@ -7,12 +7,14 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2118
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_built_nodefromarc();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc() RETURNS json AS
+DROP FUNCTION IF EXISTS "ws_sample".gw_fct_built_nodefromarc();
+CREATE OR REPLACE FUNCTION ws_sample.gw_fct_built_nodefromarc(p_data json) RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_built_nodefromarc()
+SELECT ws_sample.gw_fct_built_nodefromarc($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{},"data":{"parameters":{"explotation":1, "nodeType":"test", "buffer":0.1, "insertIntoNode":true}}}$$)
 */
 
 DECLARE
@@ -25,17 +27,27 @@ DECLARE
 	v_result_info json;
 	v_result_point json;
 	v_node_proximity double precision;
+	v_buffer double precision;
+	v_nodetype text;
+	v_expl integer;
+	v_insertnode boolean;
+	v_projecttype text;
+	rec record;
 
 BEGIN
 
 	-- Search path
-	SET search_path = SCHEMA_NAME, public;
+	SET search_path = ws_sample, public;
 
 	-- select version
-	SELECT giswater INTO v_version FROM version order by 1 desc limit 1;
+	SELECT giswater, wsoftware INTO v_version, v_projecttype FROM version order by 1 desc limit 1;
 
-	-- Get data from config tables
-	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
+	-- getting input data   
+	v_expl :=  ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
+	v_nodetype := ((p_data ->>'data')::json->>'parameters')::json->>'nodeType';
+	v_buffer := ((p_data ->>'data')::json->>'parameters')::json->>'buffer';
+	v_insertnode := ((p_data ->>'data')::json->>'parameters')::json->>'insertIntoNode';
+
 
 	--  Reset values
 	DELETE FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16;
@@ -51,14 +63,22 @@ BEGIN
 	16,
 	ST_EndPoint(the_geom) AS the_geom FROM arc;
 
-	-- inserting into v_edit_node table
+	-- inserting into node table
 	FOR rec_table IN SELECT * FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
 		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_node_proximity));
 		IF numNodes = 0 THEN
-			INSERT INTO anl_node (the_geom, state, fprocesscat_id) VALUES (rec_table.geom_point,1,16);
+			IF v_insertnode THEN
+				IF v_projecttype='WS' THEN
+					INSERT INTO v_edit_node (the_geom, nodetype_id) VALUES (rec_table.geom_point, v_nodetype);
+				ELSE
+					INSERT INTO v_edit_node (the_geom, node_type) VALUES (rec_table.geom_point, v_nodetype);
+				END IF;
+			ELSE 
+				INSERT INTO anl_node (the_geom, state, fprocesscat_id) VALUES (rec_table.geom_point, 1, 16);
+			END IF;
 		ELSE
 
 		END IF;
