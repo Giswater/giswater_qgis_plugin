@@ -68,6 +68,8 @@ BEGIN
 		SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, 4
 		FROM om_visit WHERE id=visit_id_aux RETURNING id into id_last;
 
+		INSERT INTO om_visit_x_node (visit_id,node_id) VALUES (id_last, rec_node.node_id);
+		
 		RAISE NOTICE 'inserting new visit %', id_last;
     
 		-- insert parameters
