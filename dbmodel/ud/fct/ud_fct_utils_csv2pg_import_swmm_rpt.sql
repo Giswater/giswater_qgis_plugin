@@ -52,6 +52,10 @@ BEGIN
 
 	-- delete previous data on log table
 	DELETE FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=40;
+
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('IMPORT RPT FILE'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('-----------------------------'));
 	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
 	IF v_path IS NOT NULL THEN
@@ -100,7 +104,7 @@ BEGIN
 
 			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='mm/hr' THEN 
 			ELSE
-				INSERT INTO rpt_subcatchment (result_id, subc_id, resultdate, resulttime, precip, losses, runoff) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv4, rpt_rec.csv5::float, rpt_rec.csv6::float, rpt_rec.csv7::float);
+				INSERT INTO rpt_subcatchment (result_id, subc_id, resultdate, resulttime, precip, losses, runoff) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv2, rpt_rec.csv3::float, rpt_rec.csv4::float, rpt_rec.csv5::float);
 			END IF;
 
 		ELSIF type_aux='rpt_node' THEN
@@ -108,9 +112,9 @@ BEGIN
 			IF rpt_rec.csv1 ='<<<' THEN 
 				v_id= rpt_rec.csv3;
 			END IF;
-			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Inflow' THEN 
+			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Inflow' or  rpt_rec.csv2='Node' THEN 
 			ELSE
-				INSERT INTO rpt_node (result_id, node_id, resultdate, resulttime, flooding, depth, head) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv4, rpt_rec.csv5::float, rpt_rec.csv6::float, rpt_rec.csv7::float);
+				INSERT INTO rpt_node (result_id, node_id, resultdate, resulttime, flooding, depth, head) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv2, rpt_rec.csv3::float, rpt_rec.csv4::float, rpt_rec.csv5::float);
 			END IF;
 
 		ELSIF type_aux='rpt_arc' THEN
@@ -118,9 +122,9 @@ BEGIN
 			IF rpt_rec.csv1 ='<<<' THEN 
 				v_id= rpt_rec.csv3;
 			END IF;
-			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Flow' or rpt_rec.csv1='Analysis' or rpt_rec.csv1='Total' THEN
+			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Flow' or rpt_rec.csv1='Analysis' or rpt_rec.csv1='Total' or rpt_rec.csv1='Link'  THEN
 			ELSE
-				INSERT INTO rpt_arc (result_id, arc_id, resultdate, resulttime, flow, velocity, fullpercent) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv4, rpt_rec.csv5::float, rpt_rec.csv6::float, rpt_rec.csv7::float);
+				INSERT INTO rpt_arc (result_id, arc_id, resultdate, resulttime, flow, velocity, fullpercent) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv2, rpt_rec.csv3::float, rpt_rec.csv4::float, rpt_rec.csv5::float);
 			END IF;
 			
 		--there are still 3 empty fields on rpt_cat_results, where does the data come from? -- ok
@@ -251,6 +255,8 @@ BEGIN
 	
 	PERFORM gw_fct_rpt2pg(v_result_id);
 
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (40, 'Rpt file import process -> Finished. Check your data');
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -279,7 +285,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 
 -- 	Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||

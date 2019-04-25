@@ -32,7 +32,7 @@ DECLARE
 	v_result_info 	json;
 	v_result_point	json;
 	v_result_line 	json;
-	v_version	json;
+	v_version	text;
 	v_path 		text;
 	v_result_id	text;
 
@@ -50,7 +50,13 @@ BEGIN
 
 	-- delete previous data on log table
 	DELETE FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=40;
+	
 	-- use the copy function of postgres to import from file in case of file must be provided as a parameter
+
+	-- Starting process
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('IMPORT RPT FILE'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (40, v_result_id, concat('-----------------------------'));
+	
 
 	IF v_path IS NOT NULL THEN
 		DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id;
@@ -118,6 +124,9 @@ BEGIN
 		
 	PERFORM gw_fct_rpt2pg(v_result_id);
 
+	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (40, 'Rpt file import process -> Finished. Check your data');
+
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -155,7 +164,7 @@ BEGIN
 	v_result_line := COALESCE(v_result_line, '{}'); 	
 
 -- 	Return
-	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Import succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
