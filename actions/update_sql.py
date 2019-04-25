@@ -10,9 +10,11 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-from qgis.PyQt.QtWidgets import QCheckBox, QRadioButton, QComboBox, QLineEdit,QPushButton, QTableView, QLabel, QAbstractItemView, QTextEdit, QFileDialog
-from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog
+from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
+from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
+from qgis.PyQt.QtGui import QPixmap, QRegExpValidator
+from qgis.PyQt.QtCore import QSettings, QRegExp, QDate
 
 import os
 import sys
@@ -22,18 +24,20 @@ from functools import partial
 from collections import OrderedDict
 
 import utils_giswater
-from giswater.actions.parent import ParentAction
+# from giswater.actions.parent import ParentAction
+from giswater.actions.api_parent import ApiParent
 
 from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ApiImportInp
 
 
-class UpdateSQL(ParentAction):
+class UpdateSQL(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'om_ws' """
 
         # Initialize instance attributes
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        # ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.giswater_version = "3.1"
         self.iface = iface
         self.settings = settings
@@ -1089,20 +1093,28 @@ class UpdateSQL(ParentAction):
         self.dlg_import_inp = ApiImportInp()
         self.load_settings(self.dlg_import_inp)
 
-        self.dlg_functions.progressBar.setVisible(False)
-        extras = '"filterText":"Import inp epanet file"'
+        self.dlg_import_inp.progressBar.setVisible(False)
+
+        if schema_type.lower() == 'ws':
+            extras = '"filterText":"Import inp epanet file"'
+        elif schema_type.lower() == 'ud':
+            extras = '"filterText":"Import inp swmm file"'
+        else:
+            self.error_count = self.error_count + 1
+            return
+
         extras += ', "isToolbox":false'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True, commit=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=False)
         if not row or row[0] is None:
             self.controller.show_message("No results for: " + sql, 2)
             return False
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        status = self.populate_functions_dlg(self.dlg_functions, complet_result[0]['body']['data'])
+        status = self.populate_functions_dlg(self.dlg_import_inp, complet_result[0]['body']['data'])
 
         # Set listeners
-        self.dlg_import_inp.btn_run.clicked.connect(partial(self.execute_import_inp, accepted=True, schame_type=schema_type))
+        self.dlg_import_inp.btn_run.clicked.connect(partial(self.execute_import_inp, accepted=True, schema_type=schema_type))
         self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
 
         # Open dialog
@@ -1994,7 +2006,7 @@ class UpdateSQL(ParentAction):
         self.set_info_project()
 
 
-    def execute_import_inp(self, accepted=False, schame_type=''):
+    def execute_import_inp(self, accepted=False, schema_type=''):
 
         if accepted:
             # Insert inp values into database
@@ -2003,12 +2015,18 @@ class UpdateSQL(ParentAction):
             self.controller.show_info_box(msg, "Info")
 
             # Execute import data
-            extras = '"parameters":{"useNod2arc":true}}'
-            body = self.create_body(extras=extras)
-            if schame_type.lower() == 'ws':
-                sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epanet_inp(" + body + ")")
-            elif schame_type.lower() == 'ud':
-                sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_swmm_inp(" + body + ")")
+
+            if schema_type.lower() == 'ws':
+                useNode2arc = self.dlg_import_inp.findChild(QWidget, 'useNode2arc')
+                extras = '"parameters":{"useNode2arc":"' + str(useNode2arc.isChecked()) + '"}}'
+                body = self.create_body(extras=extras)
+                sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epanet_inp($${" + body + "$$)")
+                print(str(sql))
+            elif schema_type.lower() == 'ud':
+                createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
+                extras = '"parameters":{"createSubcGeom":' + str(createSubcGeom.isChecked()) + '}}'
+                body = self.create_body(extras=extras)
+                sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_swmm_inp($${" + body + ")$$")
             else:
                 self.error_count = self.error_count + 1
                 return
@@ -2019,7 +2037,7 @@ class UpdateSQL(ParentAction):
             # Manage process result
             self.manage_process_result()
         else:
-            msg = "A rollback of the schema will be done."
+            msg = "A rollback on schema will be done."
             self.controller.show_info_box(msg, "Info")
             self.controller.dao.rollback()
             self.error_count = 0
@@ -2120,22 +2138,19 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql_create_project.data_file.setText(file_inp)
 
 
-    def create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions"""
+    def populate_functions_dlg(self, dialog, result):
+        status = False
+        for group, function in result['fields'].items():
+            if len(function) != 0:
+                dialog.setWindowTitle(function[0]['alias'])
+                dialog.txt_info.setText(str(function[0]['descript']))
+                self.function_list = []
+                self.construct_form_param_user(dialog, function, 0, self.function_list, False)
+                print(str(function))
+                status = True
+                break
 
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
-        form = '"form":{' + form + '}, '
-        feature = '"feature":{' + feature + '}, '
-        filter_fields = '"filterFields":{' + filter_fields + '}'
-        page_info = '"pageInfo":{}'
-        data = '"data":{' + filter_fields + ', ' + page_info
-        if extras is not None:
-            data += ', ' + extras
-        data += '}'
-
-        body = "" + client + form + feature + data
-
-        return body
+        return status
 
 
     """ Info basic """

@@ -1143,6 +1143,7 @@ class ApiParent(ParentAction):
                             if 'placeholder' in field:
                                 widget.setPlaceholderText(field['placeholder'])
                     elif type(widget) in (QComboBox, QCheckBox):
+                        if 'iseditable' in field:
                             if str(field['iseditable']) == "False":
                                 widget.setEnabled(False)
                     widget.setObjectName(field['widgetname'])
