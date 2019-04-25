@@ -69,12 +69,12 @@ BEGIN
 	count_global_aux=0;	
 
 	-- delete old values on result table
-	DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND result_id=v_result_id AND user_name=current_user;
+	DELETE FROM audit_check_data WHERE fprocesscat_id=14 AND user_name=current_user;
 	DELETE FROM anl_arc WHERE fprocesscat_id=14 AND result_id=v_result_id AND cur_user=current_user;
 	DELETE FROM anl_node WHERE fprocesscat_id=14 AND result_id=v_result_id AND cur_user=current_user;
 	
 	-- Starting process
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('NETWORK DATA ANALYSIS ACORDING EPA RULES'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (14, v_result_id, concat('-------------------------------------------------------'));
 	
 	-- UTILS
@@ -433,7 +433,7 @@ BEGIN
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=14 order by id) row; 
+	FROM (SELECT id, error_message as message FROM SCHEMA_NAME.audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=14 order by id) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	
@@ -477,7 +477,7 @@ BEGIN
 	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
 	
 --  Return
-    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+    RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
