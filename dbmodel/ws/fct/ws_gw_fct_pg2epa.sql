@@ -31,6 +31,7 @@ BEGIN
 	v_mandatory_nodarc = (SELECT value FROM config_param_user WHERE parameter='inp_options_nodarc_onlymandatory' AND cur_user=current_user);
 	
 	RAISE NOTICE 'Starting pg2epa process.';
+
 	
 	IF p_isrecursive IS TRUE THEN
 		-- Modify the contourn conditions to dynamic recursive strategy
@@ -86,6 +87,8 @@ BEGIN
 	-- manage return message
 	v_input = concat('{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"resultId":"',result_id_var,'"},"saveOnDatabase":true}}')::json;
 	SELECT gw_fct_pg2epa_check_data(v_input) INTO v_return;
+
+	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Inp export done succesfully"}')::json;
 	
 RETURN v_return;
 	
