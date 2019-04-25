@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 try:
-    from qgis.core import Qgis
+    from qgis.core import Qgis, QgsVectorLayer
 except ImportError:
     from qgis.core import QGis as Qgis
 
@@ -2017,22 +2017,34 @@ class UpdateSQL(ApiParent):
             # Execute import data
 
             if schema_type.lower() == 'ws':
+                function_name = 'gw_fct_utils_csv2pg_import_epanet_inp'
+                alias_function = 'Import inp epanet file'
                 useNode2arc = self.dlg_import_inp.findChild(QWidget, 'useNode2arc')
-                extras = '"parameters":{"useNode2arc":"' + str(useNode2arc.isChecked()) + '"}}'
-                body = self.create_body(extras=extras)
-                sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_epanet_inp($${" + body + "$$)")
-                print(str(sql))
+                extras = '"parameters":{"useNode2arc":"' + str(useNode2arc.isChecked()) + '"}'
             elif schema_type.lower() == 'ud':
+                function_name = 'gw_fct_utils_csv2pg_import_swmm_inp'
+                alias_function = 'Import inp swmm file'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
-                extras = '"parameters":{"createSubcGeom":' + str(createSubcGeom.isChecked()) + '}}'
-                body = self.create_body(extras=extras)
-                sql = ("SELECT " + self.schema + ".gw_fct_utils_csv2pg_import_swmm_inp($${" + body + ")$$")
+                extras = '"parameters":{"createSubcGeom":' + str(createSubcGeom.isChecked()) + '}'
             else:
                 self.error_count = self.error_count + 1
                 return
-            status = self.controller.execute_sql(sql, commit=False)
-            if status is False:
-                self.error_count = self.error_count + 1
+
+            body = self.create_body(extras=extras)
+            sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
+            print(str(sql))
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+            if not row or row[0] is None:
+                self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
+                self.dlg_import_inp.progressBar.setVisible(False)
+                self.dlg_import_inp.progressBar.setMinimum(0)
+                self.dlg_import_inp.progressBar.setMaximum(1)
+                self.dlg_import_inp.progressBar.setValue(1)
+                return True
+
+            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+
+            self.add_temp_layer(self.dlg_import_inp, complet_result[0]['body']['data'], alias_function)
 
             # Manage process result
             self.manage_process_result()
@@ -2151,6 +2163,33 @@ class UpdateSQL(ApiParent):
                 break
 
         return status
+
+    def add_temp_layer(self, dialog, data, function_name):
+
+        self.delete_layer_from_toc(function_name)
+        srid = self.controller.plugin_settings_value('srid')
+        cahange_tab = False
+        for k, v in list(data.items()):
+            if str(k) == "info":
+                text = ""
+                for x in data['info']['values']:
+                    if x['error_message'] is not None:
+                        text += str(x['error_message']) + "\n"
+                        cahange_tab = True
+                    else:
+                        text += "\n"
+                dialog.txt_infolog.setText(text + "\n")
+            else:
+                counter = len(data[k]['values'])
+                if counter > 0:
+                    counter = len(data[k]['values'])
+                    geometry_type = data[k]['geometryType']
+                    v_layer = QgsVectorLayer(str(geometry_type) + "?crs=epsg:" + str(srid), function_name, 'memory')
+
+                    self.populate_vlayer(dialog, v_layer, data, k, counter)
+
+        if cahange_tab:
+            dialog.mainTab.setCurrentIndex(1)
 
 
     """ Info basic """
