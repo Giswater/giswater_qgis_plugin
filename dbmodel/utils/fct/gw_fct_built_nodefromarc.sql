@@ -57,13 +57,14 @@ BEGIN
 	SELECT 	16, ST_StartPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl
 	UNION 
 	SELECT 	16, ST_EndPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl;
-
+	
+	
 	-- inserting into node table
 	FOR rec_table IN SELECT * FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16
 	LOOP
 	        -- Check existing nodes  
 	        numNodes:= 0;
-		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_node_proximity));
+		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_buffer));
 		IF numNodes = 0 THEN
 			IF v_insertnode THEN
 				INSERT INTO v_edit_node (the_geom) VALUES (rec_table.geom_point);
@@ -74,8 +75,30 @@ BEGIN
 
 		END IF;
 	END LOOP;
+		
+	-- repair arcs
+	IF v_insertnode THEN
+	
+		-- set isarcdivide of chosed nodetype on false
+		IF v_projecttype ='WS' THEN
+			v_nodecat =  (SELECT value FROM config_param_user WHERE parameter='nodecat_vdefault' AND cur_user=current_user;
+			SELECT nodetype_id INTO v_nodetype_id FROM cat_node WHERE id=v_nodecat;
+		ELSIF
+			v_nodetype_id =  (SELECT value FROM config_param_user WHERE parameter='nodetype_vdefault' AND cur_user=current_user;		
+		END IF;
+	
+		SELECT isarcdivide INTO v_isarcdivide FROM node_type WHERE id=v_nodetype_id;
+		UPDATE node_type SET isarcdivide=FALSE id=v_nodetype_id;	
+	
+		-- execute function
+		PERFORM gw_fct_repair_arc(arc_id, 0,0) FROM arc WHERE exp_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
+	
+		-- restore isarcdivide to previous value
+		UPDATE node_type SET isarcdivide=v_isarcdivide id=v_nodetype_id;	
+		
+	END IF;	
 
-	-- get results
+	-- get log
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT * FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=16) row; 
