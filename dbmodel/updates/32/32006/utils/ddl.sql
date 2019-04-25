@@ -15,3 +15,7 @@ ALTER TABLE sys_csv2pg_cat ADD COLUMN formname varchar (50);
 ALTER TABLE sys_csv2pg_cat ADD COLUMN functionname varchar (50);
 ALTER TABLE sys_csv2pg_cat ADD COLUMN isdeprecated boolean;
 
+
+ALTER TABLE audit_cat_param_user RENAME COLUMN layout_name to layoutname;
+
+
