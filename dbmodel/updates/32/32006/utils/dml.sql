@@ -88,3 +88,15 @@ UPDATE config_param_system SET parameter='arc_searchnodes', value=(
 SELECT row_to_json(a) FROM (SELECT arc_searchnodes_control as activated, arc_searchnodes as value FROM config) a),
 descript='Enable/disable and set the buffer of the ability to look for arcs final nodes', data_type='json' 
 WHERE parameter='arc_searchnodes_control';
+
+UPDATE audit_cat_function SET   
+input_params = '{"featureType":"arc"}',
+return_type='[{"widgetname":"expoloitation", "label":"Exploitation:", "widgettype":"text", "datatype":"integer","layoutname":"grl_option_parameters","layout_order":1,"value":null},{"widgetname":"inserIntoNode", "label":"Direct insert into node table:", "widgettype":"check", "datatype":"boolean","layoutname":"grl_option_parameters","layout_order":2,"value":"true"},{"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layoutname":"grl_option_parameters","layout_order":3,"value":0.01}]',
+istoolbox=true, isparametric=TRUE, 
+descript='Massive builder assistant. Built as many nodes as network need to achieve the topologic rules. To do this, all nodes are inserted using the default values of user (catalog, workcat_id, state, state_type and node_type(UD)).
+Before execute it, check all new nodes will be inserted into mapzones boudaries. 
+Uncheck direct insert into node table if you are looking to use intermediate table (anl_node)'
+WHERE function_name='gw_fct_built_nodefromarc';
+
+
+
