@@ -40,13 +40,15 @@ UPDATE audit_cat_function SET isdeprecated=true where function_name = 'gw_fct_ut
 
 UPDATE audit_cat_function SET   
 input_params = '{"featureType":""}',
-return_type='[{"widgetname":"useNod2arc", "label":"Create nod2arc:", "widgettype":"check","datatype":"boolean","layout_name":"grl_option_parameters","layout_order":1,"value":false}]'
+return_type='[{"widgetname":"useNode2arc", "label":"Create node2arc:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":1,"value":"false"}]',
+alias='Import inp epanet file'
 WHERE function_name='gw_fct_utils_csv2pg_import_epanet_inp';
 
 
 UPDATE audit_cat_function SET   
 input_params = '{"featureType":""}',
-return_type='[{"widgetname":"createSubcGeom", "label":"Create subcatchments geometry:", "widgettype":"check","datatype":"boolean","layout_name":"grl_option_parameters","layout_order":1,"value":true}]'
+return_type='[{"widgetname":"createSubcGeom", "label":"Create subcatchments geometry:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layout_order":1,"value":"true"}]',
+alias='Import inp swmm file'
 WHERE function_name='gw_fct_utils_csv2pg_import_swmm_inp';
 
 -- reparir table
