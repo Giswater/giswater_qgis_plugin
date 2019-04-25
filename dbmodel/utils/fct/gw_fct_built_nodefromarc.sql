@@ -14,7 +14,7 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_built_nodefromarc($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"explotation":1, "buffer":0.1, "insertIntoNode":true}}}$$)
+"feature":{},"data":{"parameters":{"exploitation":7, "buffer":0.05, "insertIntoNode":true}}}$$)
 */
 
 DECLARE
@@ -40,7 +40,7 @@ BEGIN
 	SET search_path = SCHEMA_NAME, public;
 
 	-- select version
-	SELECT giswater, wsoftware INTO v_version, v_projecttype FROM version order by 1 desc limit 1;
+	SELECT giswater, SCHEMA_NAMEoftware INTO v_version, v_projecttype FROM version order by 1 desc limit 1;
 
 	-- getting input data   
 	v_expl :=  ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
@@ -61,9 +61,10 @@ BEGIN
 	-- inserting into node table
 	FOR rec_table IN SELECT * FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16
 	LOOP
+	RAISE NOTICE 'test';
 	        -- Check existing nodes  
 	        numNodes:= 0;
-		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_node_proximity));
+		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_buffer));
 		IF numNodes = 0 THEN
 			IF v_insertnode THEN
 				INSERT INTO v_edit_node (the_geom) VALUES (rec_table.geom_point);
@@ -74,6 +75,10 @@ BEGIN
 
 		END IF;
 	END LOOP;
+
+	IF v_insertnode THEN
+		PERFORM gw_fct_repair_arc(arc_id, 0, 0) FROM arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
+	END IF;
 
 	-- get results
 	-- info
