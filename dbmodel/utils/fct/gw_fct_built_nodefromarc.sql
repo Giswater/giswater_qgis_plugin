@@ -7,14 +7,14 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2118
 
 
-DROP FUNCTION IF EXISTS "ws_sample".gw_fct_built_nodefromarc();
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_built_nodefromarc(p_data json) RETURNS json AS
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_built_nodefromarc();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc(p_data json) RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws_sample.gw_fct_built_nodefromarc($${
+SELECT SCHEMA_NAME.gw_fct_built_nodefromarc($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"feature":{},"data":{"parameters":{"explotation":1, "nodeType":"test", "buffer":0.1, "insertIntoNode":true}}}$$)
+"feature":{},"data":{"parameters":{"explotation":1, "buffer":0.1, "insertIntoNode":true}}}$$)
 */
 
 DECLARE
@@ -37,14 +37,13 @@ DECLARE
 BEGIN
 
 	-- Search path
-	SET search_path = ws_sample, public;
+	SET search_path = SCHEMA_NAME, public;
 
 	-- select version
 	SELECT giswater, wsoftware INTO v_version, v_projecttype FROM version order by 1 desc limit 1;
 
 	-- getting input data   
 	v_expl :=  ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
-	v_nodetype := ((p_data ->>'data')::json->>'parameters')::json->>'nodeType';
 	v_buffer := ((p_data ->>'data')::json->>'parameters')::json->>'buffer';
 	v_insertnode := ((p_data ->>'data')::json->>'parameters')::json->>'insertIntoNode';
 
@@ -55,13 +54,9 @@ BEGIN
 
 	-- inserting all extrem nodes on temp_node
 	INSERT INTO temp_table (fprocesscat_id, geom_point)
-	SELECT 
-	16,
-	ST_StartPoint(the_geom) AS the_geom FROM arc 
-		UNION 
-	SELECT 
-	16,
-	ST_EndPoint(the_geom) AS the_geom FROM arc;
+	SELECT 	16, ST_StartPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl
+	UNION 
+	SELECT 	16, ST_EndPoint(the_geom) AS the_geom FROM arc WHERE expl_id=v_expl;
 
 	-- inserting into node table
 	FOR rec_table IN SELECT * FROM temp_table WHERE user_name=current_user AND fprocesscat_id=16
@@ -71,11 +66,7 @@ BEGIN
 		numNodes:= (SELECT COUNT(*) FROM node WHERE st_dwithin(node.the_geom, rec_table.geom_point, v_node_proximity));
 		IF numNodes = 0 THEN
 			IF v_insertnode THEN
-				IF v_projecttype='WS' THEN
-					INSERT INTO v_edit_node (the_geom, nodetype_id) VALUES (rec_table.geom_point, v_nodetype);
-				ELSE
-					INSERT INTO v_edit_node (the_geom, node_type) VALUES (rec_table.geom_point, v_nodetype);
-				END IF;
+				INSERT INTO v_edit_node (the_geom) VALUES (rec_table.geom_point);
 			ELSE 
 				INSERT INTO anl_node (the_geom, state, fprocesscat_id) VALUES (rec_table.geom_point, 1, 16);
 			END IF;
@@ -94,7 +85,7 @@ BEGIN
 	--points
 	v_result = null;
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=16) row; 
+	FROM (SELECT id, node_id, nodecat_id, state, expl_id, the_geom FROM anl_node WHERE cur_user="current_user"() AND fprocesscat_id=16) row; 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "values":',v_result, '}'); 
   
