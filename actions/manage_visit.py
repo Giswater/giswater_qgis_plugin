@@ -924,7 +924,7 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event.geom1.setText(str(geom1))
             self.dlg_event.geom2.setText(str(geom2))
             self.dlg_event.geom3.setText(str(geom3))
-            utils_giswater.setWidgetText(self.dlg_event, text, text)
+            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
@@ -932,7 +932,6 @@ class ManageVisit(ParentManage, QObject):
         elif om_event_parameter.form_type == 'event_standard':
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
-            self.controller.log_info(str(text))
             self.dlg_event = EventStandard()
             self.load_settings(self.dlg_event)
             self.dlg_event.value.setText(_value)
