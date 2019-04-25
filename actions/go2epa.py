@@ -545,6 +545,7 @@ class Go2Epa(ApiParent):
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
 
+        self.dlg_go2epa.txt_infolog.clear()
         self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid gray")
         status = self.check_fields()
         if status is False:
