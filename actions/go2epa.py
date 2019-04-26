@@ -600,6 +600,7 @@ class Go2Epa(ApiParent):
         print("{}:{}".format(self.counter, self.iterations))
         while self.counter < self.iterations:
             common_msg = ""
+            message = None
             # Export to inp file
             if export_inp is True:
                 # Call function gw_fct_pg2epa
@@ -617,8 +618,6 @@ class Go2Epa(ApiParent):
                         qtextedit = self.dlg_go2epa.txt_infolog
                         self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'])
                     message = complet_result[0]['message']['text']
-                    if message is not None:
-                        self.controller.show_info_box(message)
 
                 # Get values from temp_csv2pg and insert into INP file
                 sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13,"
@@ -695,8 +694,6 @@ class Go2Epa(ApiParent):
                             qtextedit = self.dlg_go2epa.txt_infolog
                             self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit,  complet_result[0]['body']['data'])
                         message = complet_result[0]['message']['text']
-                        if message is not None:
-                            self.controller.show_info_box(message)
 
                     # final message
                     common_msg += "Import RPT finished."
@@ -731,7 +728,8 @@ class Go2Epa(ApiParent):
 
         if common_msg != "" and self.imports_canceled is False:
             self.controller.show_info(common_msg)
-
+        if message is not None and self.imports_canceled is False:
+            self.controller.show_info_box(message)
         # Save user values
         self.save_user_values()
 
