@@ -417,8 +417,7 @@ class GwToolBox(ApiParent):
 
         for group, functions in result['fields'].items():
             parent1 = QStandardItem('{}   [{} Giswater algorithm]'.format(group, len(functions)))
-
-            self.no_clickable_items.append('{}'.format(group))
+            self.no_clickable_items.append('{}   [{} Giswater algorithm]'.format(group, len(functions)))
             functions.sort(key=self.sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem('{}'.format(function['functionname']))
