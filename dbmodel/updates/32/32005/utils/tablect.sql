@@ -24,3 +24,8 @@ ALTER TABLE sys_feature_cat ADD CONSTRAINT sys_feature_cat_unique UNIQUE(id, typ
 ALTER TABLE cat_feature DROP CONSTRAINT IF EXISTS cat_feature_system_fkey CASCADE;
 ALTER TABLE cat_feature ADD CONSTRAINT cat_feature_system_fkey FOREIGN KEY (system_id, feature_type)
 REFERENCES sys_feature_cat (id, type) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--26/04/2019
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_customer_code_key CASCADE;
+ALTER TABLE connec ADD CONSTRAINT connec_customer_code_key UNIQUE(customer_code);
