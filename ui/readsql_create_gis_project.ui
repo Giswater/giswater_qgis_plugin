@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>readsql_create_project</class>
- <widget class="QMainWindow" name="readsql_create_project">
+ <class>readsql_create_gis_project</class>
+ <widget class="QMainWindow" name="readsql_create_gis_project">
   <property name="geometry">
    <rect>
     <x>0</x>
