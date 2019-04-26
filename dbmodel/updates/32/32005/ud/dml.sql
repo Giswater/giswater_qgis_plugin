@@ -12,3 +12,5 @@ VALUES ('inp_subc_seq_id_prefix', 'C', 'text', 'epa', NULL) ON CONFLICT (paramet
 
 --24/04/2019
 UPDATE audit_cat_table SET sys_role_id='role_om' WHERE id='v_ui_om_visitman_x_gully';
+
+INSERT INTO audit_cat_param_user VALUES ('connecarccat_vdefault', 'config', 'Default value for connec_arccat_id', 'role_edit', NULL, NULL, 'Connec arccat:','SELECT cat_connec.id AS id, cat_connec.id as idval FROM cat_connec WHERE id IS NOT NULL', NULL, true, 12, 1, 'ud', false, NULL, 'connec_arccat_id', NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
