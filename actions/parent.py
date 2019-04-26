@@ -880,3 +880,18 @@ class ParentAction(object):
 
         return snapper
 
+    #TODO::Remove this function when merge into 3.2 because already exist
+    def populate_info_text(self, dialog, qtabwidget, qtextedit, data):
+        cahange_tab = False
+        text = ""
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    cahange_tab = True
+                else:
+                    text += "\n"
+        utils_giswater.setWidgetText(dialog, qtextedit, text + "\n")
+        if cahange_tab:
+            qtabwidget.setCurrentIndex(1)
+

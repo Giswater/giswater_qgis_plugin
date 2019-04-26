@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstract
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
 from qgis.PyQt.QtGui import QPixmap, QRegExpValidator
-from qgis.PyQt.QtCore import QSettings, QRegExp, QDate
+from qgis.PyQt.QtCore import QSettings, QRegExp, QDate, Qt
 
 import os
 import sys
@@ -2009,42 +2009,44 @@ class UpdateSQL(ApiParent):
     def execute_import_inp(self, accepted=False, schema_type=''):
 
         if accepted:
+
+            # Set wait cursor
+            self.set_wait_cursor()
+
             # Insert inp values into database
             self.insert_inp_into_db(self.file_inp)
-            msg = "Values has been inserted into database correctly."
-            self.controller.show_info_box(msg, "Info")
 
             # Execute import data
-
             if schema_type.lower() == 'ws':
                 function_name = 'gw_fct_utils_csv2pg_import_epanet_inp'
-                alias_function = 'Import inp epanet file'
                 useNode2arc = self.dlg_import_inp.findChild(QWidget, 'useNode2arc')
                 extras = '"parameters":{"useNode2arc":"' + str(useNode2arc.isChecked()) + '"}'
             elif schema_type.lower() == 'ud':
                 function_name = 'gw_fct_utils_csv2pg_import_swmm_inp'
-                alias_function = 'Import inp swmm file'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
                 extras = '"parameters":{"createSubcGeom":' + str(createSubcGeom.isChecked()) + '}'
             else:
                 self.error_count = self.error_count + 1
                 return
 
+            # Set progressBar ON
+            self.dlg_import_inp.progressBar.setMaximum(0)
+            self.dlg_import_inp.progressBar.setMinimum(0)
+            self.dlg_import_inp.progressBar.setVisible(True)
+            self.dlg_import_inp.progressBar.setFormat("Running function: " + str(function_name))
+            self.dlg_import_inp.progressBar.setAlignment(Qt.AlignCenter)
+            self.dlg_import_inp.progressBar.setFormat("")
+
             body = self.create_body(extras=extras)
             sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
             print(str(sql))
             row = self.controller.get_row(sql, log_sql=True, commit=True)
-            if not row or row[0] is None:
-                self.controller.show_message("Function : " + str(function_name) + " executed with no result ", 3)
-                self.dlg_import_inp.progressBar.setVisible(False)
-                self.dlg_import_inp.progressBar.setMinimum(0)
-                self.dlg_import_inp.progressBar.setMaximum(1)
-                self.dlg_import_inp.progressBar.setValue(1)
-                return True
 
-            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-
-            self.add_temp_layer(self.dlg_import_inp, complet_result[0]['body']['data'], alias_function)
+            if row:
+                complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+                self.set_log_text(self.dlg_import_inp, complet_result[0]['body']['data'])
+            else:
+                self.error_count = self.error_count + 1
 
             # Manage process result
             self.manage_process_result()
@@ -2164,32 +2166,13 @@ class UpdateSQL(ApiParent):
 
         return status
 
-    def add_temp_layer(self, dialog, data, function_name):
+    def set_log_text(self, dialog, data):
 
-        self.delete_layer_from_toc(function_name)
-        srid = self.controller.plugin_settings_value('srid')
-        cahange_tab = False
+        qtabwidget = dialog.mainTab
+        qtextedit = dialog.txt_infolog
         for k, v in list(data.items()):
             if str(k) == "info":
-                text = ""
-                for x in data['info']['values']:
-                    if x['error_message'] is not None:
-                        text += str(x['error_message']) + "\n"
-                        cahange_tab = True
-                    else:
-                        text += "\n"
-                dialog.txt_infolog.setText(text + "\n")
-            else:
-                counter = len(data[k]['values'])
-                if counter > 0:
-                    counter = len(data[k]['values'])
-                    geometry_type = data[k]['geometryType']
-                    v_layer = QgsVectorLayer(str(geometry_type) + "?crs=epsg:" + str(srid), function_name, 'memory')
-
-                    self.populate_vlayer(dialog, v_layer, data, k, counter)
-
-        if cahange_tab:
-            dialog.mainTab.setCurrentIndex(1)
+                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
 
 
     """ Info basic """

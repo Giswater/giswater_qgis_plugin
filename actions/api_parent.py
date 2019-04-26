@@ -953,7 +953,7 @@ class ApiParent(ParentAction):
 
         return widget
 
-
+    # TODO::Remove this function when merge into 3.2 because already exist
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
         
