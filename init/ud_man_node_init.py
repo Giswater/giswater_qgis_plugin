@@ -135,8 +135,8 @@ class ManNodeDialog(ParentDialog):
         
         widget_ymax = self.dialog.findChild(QLineEdit, 'ymax')
         if widget_ymax is not None:
-            widget_ymax.textChanged.connect(partial(self.compare_depth, widget_ymax, False))
-            widget_ymax.lostFocus.connect(partial(self.compare_depth, widget_ymax, True))
+            self.compare_depth(widget_ymax)
+            widget_ymax.textChanged.connect(partial(self.compare_depth, widget_ymax))
 
         # Manage tab 'Scada'
         self.manage_tab_scada()        
@@ -195,48 +195,30 @@ class ManNodeDialog(ParentDialog):
         self.load_dma(self.dialog, dma_id, self.geom_type)
 
 
-    def compare_depth(self, widget_ymax, show_message):
+    def compare_depth(self, widget_ymax):
         widget_ymax.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, 'node_id')
         ymax = utils_giswater.getWidgetText(self.dialog, widget_ymax)
         if ymax is None:
             return
-        bad_alert = False
+
         sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_upstream "
                " WHERE node_id = '" + str(node_id) + "'")
         rows = self.controller.get_rows(sql, log_sql=False)
-        arcs_list = ""
         if len(rows) > 0:
-            arcs_list += "Upstream: "
             for row in rows:
                 if row['upstream_depth'] is not None:
                     if float(ymax) < float(row['upstream_depth']):
                         widget_ymax.setStyleSheet("border: 1px solid red")
-                        arcs_list += str((row['feature_id'] + ", "))
-                        bad_alert = True
+
         sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_downstream "
                " WHERE node_id = '" + str(node_id) + "'")
         rows = self.controller.get_rows(sql, log_sql=False)
         if len(rows) > 0:
-            arcs_list += "Downstream: "
             for row in rows:
                 if row['downstream_depth'] is not None:
                     if float(ymax) < float(row['downstream_depth']):
                         widget_ymax.setStyleSheet("border: 1px solid red")
-                        arcs_list += str((row['feature_id'] + ", "))
-                        bad_alert = True
-
-        if len(arcs_list) > 2:
-            arcs_list = arcs_list[:-2]
-
-        if show_message and bad_alert:
-            msg = "The depth of this node is less than the arc/'s {}".format(arcs_list)
-            # self.controller.show_info_box(text=msg, title="Info")
-            msg_box = QMessageBox()
-            msg_box.setIcon(3)
-            msg_box.setWindowTitle("Warning")
-            msg_box.setText(msg)
-            msg_box.exec_()
 
 
     def activate_snapping(self, emit_point):
