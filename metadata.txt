@@ -14,7 +14,8 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 
 # Uncomment the following line and add your changelog:
 
-changelog=Version 3.1.113 (30/04/2019)
+changelog=Version 3.1.115 (26/04/2019)
+    - Bug fix in go2epa option(UD) when populate combos
     - New button added Print Composer
     - Minor improvements
 

@@ -301,33 +301,35 @@ class Go2Epa(ParentAction):
         dlg_udoptions.lat_flow_tol.setValidator(QIntValidator())
 
         # Set values from widgets of type QComboBox
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fu ORDER BY id"
+        sql = "SELECT DISTINCT(id), id FROM "+self.schema_name+".inp_value_options_fu ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.flow_units, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fr ORDER BY id"
+        utils_giswater.set_item_data(dlg_udoptions.flow_units, rows, 1)
+        sql = "SELECT DISTINCT(id), id FROM "+self.schema_name+".inp_value_options_fr ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.flow_routing, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_lo ORDER BY id"
+        utils_giswater.set_item_data(dlg_udoptions.flow_routing, rows, 1)
+        sql = "SELECT DISTINCT(id), id FROM "+self.schema_name+".inp_value_options_lo ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.link_offsets, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_fme ORDER BY id"
+        utils_giswater.set_item_data(dlg_udoptions.link_offsets, rows, 1)
+        sql = "SELECT DISTINCT(id), id FROM "+self.schema_name+".inp_value_options_fme ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.force_main_equation, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_nfl ORDER BY id"
+        utils_giswater.set_item_data(dlg_udoptions.force_main_equation, rows, 1)
+        sql = "SELECT DISTINCT(id), id FROM "+self.schema_name+".inp_value_options_nfl ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.normal_flow_limited, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".inp_value_options_id ORDER BY id"
+        utils_giswater.set_item_data(dlg_udoptions.normal_flow_limited, rows, 1)
+        sql = "SELECT DISTINCT(id), id FROM "+self.schema_name+".inp_value_options_id ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.inertial_damping, rows, False)
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_yesno ORDER BY id"
+        utils_giswater.set_item_data(dlg_udoptions.inertial_damping, rows, 1)
+
+        sql = "SELECT DISTINCT(id), id FROM "+self.schema_name+".value_yesno ORDER BY id"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.allow_ponding, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.skip_steady_state, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_rainfall, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_snowmelt, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_groundwater, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_routing, rows, False)
-        utils_giswater.fillComboBox(dlg_udoptions, dlg_udoptions.ignore_quality, rows, False)
+        utils_giswater.set_item_data(dlg_udoptions.allow_ponding, rows, 1)
+        utils_giswater.set_item_data(dlg_udoptions.skip_steady_state, rows, 1)
+        utils_giswater.set_item_data(dlg_udoptions.ignore_rainfall, rows, 1)
+        utils_giswater.set_item_data(dlg_udoptions.ignore_snowmelt, rows, 1)
+        utils_giswater.set_item_data(dlg_udoptions.ignore_groundwater, rows, 1)
+        utils_giswater.set_item_data(dlg_udoptions.ignore_routing, rows, 1)
+        utils_giswater.set_item_data(dlg_udoptions.ignore_quality, rows, 1)
+
         dlg_udoptions.btn_accept.clicked.connect(partial(self.update_table, 'inp_options', dlg_udoptions))
         dlg_udoptions.btn_cancel.clicked.connect(dlg_udoptions.close)
         self.go2epa_options_get_data('inp_options', dlg_udoptions)
