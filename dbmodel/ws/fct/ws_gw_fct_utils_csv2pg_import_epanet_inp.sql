@@ -203,52 +203,6 @@ BEGIN
 		END IF;	
 	END LOOP;	
 
-	/*
-	-- Harmonize the source table
-	FOR rpt_rec IN SELECT * FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id order by id
-	LOOP
-		-- refactor of [OPTIONS] target
-		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'specific' THEN 
-			UPDATE temp_csv2pg SET csv1='SPECIFIC GRAVITY', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'demand' 
-			THEN UPDATE temp_csv2pg SET csv1='DEMAND MULTIPLIER', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'emitter' 
-			THEN UPDATE temp_csv2pg SET csv1='EMITTER EXPONENT', csv2=csv3, csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[OPTIONS]' AND lower(rpt_rec.csv1) = 'unbalanced' 
-			THEN UPDATE temp_csv2pg SET csv2=concat(csv2,' ',csv3), csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-
-		-- refactor of [REPORT] target
-		IF rpt_rec.source ='[REPORT]' AND lower(rpt_rec.csv1) = 'f-factor' 
-			THEN UPDATE temp_csv2pg SET csv1='f_factor', csv2=concat(csv2,' ',csv3), csv3=NULL WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-
-		-- refactor of [CURVES] target
-		IF rpt_rec.source ='[CURVES]' THEN
-			IF rpt_rec.csv2 is null THEN
-				v_curvetype=replace(replace(rpt_rec.csv1,';',''),':','');
-			ELSE
-				UPDATE temp_csv2pg SET csv4=v_curvetype WHERE temp_csv2pg.id=rpt_rec.id; 
-			END IF;	
-		END IF;
-			
-		-- refactor of [TIMES] target
-		IF rpt_rec.source ='[TIMES]' AND lower(rpt_rec.csv2) ='clocktime'  THEN 
-			UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=concat(csv3,' ',csv4), csv3=null,csv4=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-		IF rpt_rec.source ='[TIMES]' AND (lower(rpt_rec.csv2) ILIKE 'timestep' OR lower(rpt_rec.csv2) ILIKE 'start' ) 
-			THEN UPDATE temp_csv2pg SET csv1=concat(csv1,'_',csv2), csv2=csv3, csv3=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-
-		-- refactor of [ENERGY] target
-		IF rpt_rec.source ilike '[ENERGY]%' AND lower(rpt_rec.csv1) ILIKE 'pump' THEN 
-			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3), csv2=csv4, csv3=null,  csv4=null WHERE temp_csv2pg.id=rpt_rec.id;
-		ELSIF rpt_rec.source ilike '[ENERGY]%' AND (lower(rpt_rec.csv1) ILIKE 'global' OR  lower(rpt_rec.csv1) ILIKE 'demand') THEN UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2), csv2=csv3, csv3=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-
-	
-		-- refactor of [CONTROLS] target
-		IF rpt_rec.source ='[CONTROLS]'and rpt_rec.csv2 IS NOT NULL THEN 
-			UPDATE temp_csv2pg SET csv1=concat(csv1,' ',csv2,' ',csv3,' ',csv4,' ',csv5,' ',csv6,' ',csv7,' ',csv8,' ',csv9,' ',csv10 ), 
-			csv2=null, csv3=null, csv4=null,csv5=NULL, csv6=null, csv7=null,csv8=null,csv9=null,csv10=null,csv11=null WHERE temp_csv2pg.id=rpt_rec.id; END IF;
-	END LOOP;
-	
-	*/
 
 	RAISE NOTICE 'step 3/7';
 	INSERT INTO audit_check_data (fprocesscat_id, error_message) VALUES (41, 'Creating map zones and catalogs -> Done');
@@ -362,7 +316,7 @@ BEGIN
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
 	FOR v_rec_table IN SELECT * FROM sys_csv2pg_config WHERE reverse_pg2csvcat_id=v_csv2pgcat_id order by id
 	LOOP
-		--identifing the humber of fields of the editable view
+		--identifing the number of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
 		LOOP	
 

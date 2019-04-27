@@ -9,13 +9,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
-ALTER TABLE IF EXISTS inp_evaporation RENAME TO _inp_evaporation;
+ALTER TABLE IF EXISTS inp_evaporation RENAME TO _inp_evaporation_;
 CREATE TABLE inp_evaporation(
   evap_type character varying(16) NOT NULL PRIMARY KEY,
   value text);
 
 
-ALTER TABLE IF EXISTS inp_temperature RENAME TO _inp_temperature;
+ALTER TABLE IF EXISTS inp_temperature RENAME TO _inp_temperature_;
   CREATE TABLE inp_temperature(
   id serial NOT NULL PRIMARY KEY,
   temp_type character varying(60),
@@ -23,7 +23,7 @@ ALTER TABLE IF EXISTS inp_temperature RENAME TO _inp_temperature;
 );
 
 
-ALTER TABLE IF EXISTS inp_pattern RENAME TO _inp_pattern;
+ALTER TABLE IF EXISTS inp_pattern RENAME TO _inp_pattern_;
 CREATE TABLE inp_pattern(
   pattern_id character varying(16) NOT NULL PRIMARY KEY,
   pattern_type character varying(30),
@@ -31,7 +31,7 @@ CREATE TABLE inp_pattern(
 );
 
 
-ALTER TABLE IF EXISTS inp_pattern_value RENAME TO _inp_pattern_value;
+ALTER TABLE IF EXISTS inp_pattern_value RENAME TO _inp_pattern_value_;
 CREATE TABLE inp_pattern_value(
   id serial NOT NULL PRIMARY KEY,
   pattern_id character varying(16),
@@ -62,7 +62,7 @@ CREATE TABLE inp_pattern_value(
 );
 
 
-ALTER TABLE IF EXISTS inp_hydrograph RENAME TO _inp_hydrograph;
+ALTER TABLE IF EXISTS inp_hydrograph RENAME TO _inp_hydrograph_;
 CREATE TABLE inp_hydrograph(
   hydro_id integer PRIMARY KEY NOT NULL DEFAULT nextval('inp_hydrograph_seq'::regclass),
   text character varying(254));
@@ -84,7 +84,7 @@ CREATE TABLE inp_lid_control(
 
 */
 
-ALTER TABLE inp_inflows  RENAME TO _inp_inflows;
+ALTER TABLE inp_inflows  RENAME TO _inp_inflows_;
 
 CREATE TABLE inp_inflows
 (
@@ -100,7 +100,7 @@ CREATE TABLE inp_inflows
 );
 
 
-ALTER TABLE inp_snowpack RENAME TO _inp_snowpack;
+ALTER TABLE inp_snowpack RENAME TO _inp_snowpack_;
 
 CREATE TABLE inp_snowpack
 ( id serial PRIMARY KEY,

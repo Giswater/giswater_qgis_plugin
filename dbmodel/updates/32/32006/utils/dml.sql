@@ -61,32 +61,43 @@ UPDATE audit_cat_function SET function_type='function', input_params='{"featureT
 --2019/04/23
 UPDATE config_param_system SET value=
 (SELECT row_to_json(a) FROM (SELECT node_proximity_control as activated, node_proximity as value FROM config) a),
-descript='Enable/disable control of inserting duplicated nodes.Minimum accepted distance between two nodes', data_type='json' 
+descript='Enable/disable control of inserting duplicated nodes.Minimum accepted distance between two nodes', 
+data_type='json',
+widgettype='linetext',
+datatype='string'
 WHERE parameter='node_proximity';
 DELETE FROM config_param_system WHERE parameter='node_proximity_control';
 
 UPDATE config_param_system SET value=
 (SELECT row_to_json(a) FROM (SELECT connec_proximity_control as activated, connec_proximity as value FROM config) a),
-descript='Enable/disable control of inserting duplicated connec.Minimum accepted distance between two connecs' , data_type='json'
+descript='Enable/disable control of inserting duplicated connec.Minimum accepted distance between two connecs' , 
+data_type='json'
 WHERE parameter='connec_proximity';
 DELETE FROM config_param_system WHERE parameter='connec_proximity_control';
 
 UPDATE config_param_system SET value=
 (SELECT row_to_json(a) FROM (SELECT insert_double_geometry as activated, buffer_value as value FROM config) a),
 descript='Enable/disable inserting double geometry features (point & polygon). Set the tadius value of a circle on which a square polygon is built', 
-data_type='json'
+data_type='json',
+widgettype='linetext',
+datatype='string'
 WHERE parameter='insert_double_geometry';
 DELETE FROM config_param_system WHERE parameter='buffer_value';
 
 UPDATE config_param_system SET parameter='gully_proximity', value=
 (SELECT row_to_json(a) FROM (SELECT connec_proximity_control as activated, connec_proximity as value FROM config) a),
-descript='Enable/disable control of inserting duplicated gullies.Minimum accepted distance between two gullies', data_type='json'
+descript='Enable/disable control of inserting duplicated gullies.Minimum accepted distance between two gullies', 
+data_type='json',
+widgettype='linetext',
+datatype='string'
 WHERE parameter='gully_proximity_control';
-
 
 UPDATE config_param_system SET parameter='arc_searchnodes', value=(
 SELECT row_to_json(a) FROM (SELECT arc_searchnodes_control as activated, arc_searchnodes as value FROM config) a),
-descript='Enable/disable and set the buffer of the ability to look for arcs final nodes', data_type='json' 
+descript='Enable/disable and set the buffer of the ability to look for arcs final nodes', 
+data_type='json',
+widgettype='linetext',
+datatype='string'
 WHERE parameter='arc_searchnodes_control';
 
 UPDATE audit_cat_function SET   
@@ -97,6 +108,9 @@ descript='Massive builder assistant. Built as many nodes as network need to achi
 Before execute it, check all new nodes will be inserted into mapzones boudaries. 
 Uncheck direct insert into node table if you are looking to use intermediate table (anl_node)'
 WHERE function_name='gw_fct_built_nodefromarc';
+
+
+
 
 
 

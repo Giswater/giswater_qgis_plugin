@@ -32,12 +32,12 @@ UPDATE inp_washoff_land_x_pol SET funcw_type='EXP_WHASOFF' WHERE funcw_type='EXP
 
 -- refactor patterns
 INSERT INTO inp_pattern
-SELECT DISTINCT ON (pattern_id) pattern_id, (case when pattern_type='MONTHLY' THEN 'MONTHLY_PATTERN' ELSE pattern_type END) FROM _inp_pattern;
+SELECT DISTINCT ON (pattern_id) pattern_id, (case when pattern_type='MONTHLY' THEN 'MONTHLY_PATTERN' ELSE pattern_type END) FROM _inp_pattern_;
 
 INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, 
 factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24) 
 SELECT pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, 
-factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24 FROM _inp_pattern;
+factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24 FROM _inp_pattern_;
 
 
 /*

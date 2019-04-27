@@ -24,7 +24,7 @@ ALTER TABLE gully_type DROP CONSTRAINT IF EXISTS gully_type_man_table_check;
 --INP
 ALTER TABLE "raingage" DROP CONSTRAINT IF EXISTS "raingage_form_type_fkey";
 
-ALTER TABLE subcatchment DROP CONSTRAINT subcatchment_snow_id_fkey;
+ALTER TABLE subcatchment DROP CONSTRAINT IF EXISTS subcatchment_snow_id_fkey;
 ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_routeto_fkey";
 
 ALTER TABLE "cat_hydrology" DROP CONSTRAINT IF EXISTS "cat_hydrology_infiltration_id_fkey";
