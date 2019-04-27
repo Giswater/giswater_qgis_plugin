@@ -37,8 +37,8 @@ INSERT INTO cat_feature VALUES ('JUNCTION', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('NETELEMENT', 'NETELEMENT', 'NODE');
 INSERT INTO cat_feature VALUES ('PUMP-STATION', 'CHAMBER', 'NODE');
 INSERT INTO cat_feature VALUES ('NETINIT', 'NETINIT', 'NODE');
-INSERT INTO cat_feature VALUES ('VCONNEC', 'CONNEC', 'CONNEC);
-INSERT INTO cat_feature VALUES ('VGULLY', 'GULLY', 'GULLY);
+
+
 
 -- Records of node type system table
 -- ----------------------------
@@ -74,14 +74,12 @@ INSERT INTO arc_type VALUES ('PUMP-PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', '
 -- Records of connec_type
 -- ----------------------------
 INSERT INTO connec_type VALUES ('CONNEC', 'CONNEC', 'man_connec', TRUE, TRUE);
-INSERT INTO connec_type VALUES ('VCONNEC', 'CONNEC', 'man_connec', TRUE, TRUE);
 
 
 -- Records of gully_type
 -- ----------------------------
 INSERT INTO gully_type VALUES ('GULLY', 'GULLY', 'man_gully', TRUE, TRUE);
 INSERT INTO gully_type VALUES ('PGULLY', 'GULLY', 'man_gully', TRUE, TRUE);
-INSERT INTO gully_type VALUES ('VGULLY', 'GULLY', 'man_gully', TRUE, TRUE);
 
 
 -- Records of element type system table

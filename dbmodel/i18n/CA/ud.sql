@@ -37,8 +37,6 @@ INSERT INTO cat_feature VALUES ('UNIO', 'JUNCTION', 'NODE');
 INSERT INTO cat_feature VALUES ('ELEMENT_TOPO', 'NETELEMENT', 'NODE');
 INSERT INTO cat_feature VALUES ('ESTACIO_BOMBAMENT', 'CHAMBER', 'NODE');
 INSERT INTO cat_feature VALUES ('INICI', 'NETINIT', 'NODE');
-INSERT INTO cat_feature VALUES ('ESCOMESA_FICTICIA', 'CONNEC', 'CONNEC);
-INSERT INTO cat_feature VALUES ('EMBORNAL_FICTICI', 'GULLY', 'GULLY);
 
 
 
@@ -85,7 +83,7 @@ INSERT INTO connec_type VALUES ('ESCOMESA_FICTICIA', 'CONNEC', 'man_connec', TRU
 -- ----------------------------
 INSERT INTO gully_type VALUES ('EMBORNAL', 'GULLY', 'man_gully', TRUE, TRUE);
 INSERT INTO gully_type VALUES ('REIXA', 'GULLY', 'man_gully', TRUE, TRUE);
-INSERT INTO gully_type VALUES ('EMBORNAL_FICTICI', 'GULLY', 'man_gully', TRUE, TRUE);
+
 
 -- Records of element type system table
 -- ----------------------------
