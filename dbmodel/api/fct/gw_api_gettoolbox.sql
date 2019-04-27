@@ -10,6 +10,12 @@ $BODY$
 SELECT SCHEMA_NAME.gw_api_gettoolbox($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "data":{"isToolbox":false, "filterText":"Import inp epanet file"}}$$)
+
+SELECT SCHEMA_NAME.gw_api_gettoolbox($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"data":{"filterText":"Import inp epanet file"}}$$)
+
+
 */
 
 DECLARE
@@ -40,7 +46,10 @@ BEGIN
 	v_filter := COALESCE(v_filter, '');
 	v_istoolbox := ((p_data ->> 'data')::json->> 'isToolbox')::boolean;
 
-	raise notice ' v_istoolbox %', v_istoolbox;
+	IF v_istoolbox IS NULL THEN
+		v_istoolbox = TRUE;
+	END IF;
+
 	
 -- get project type
         SELECT lower(wsoftware) INTO v_projectype FROM version LIMIT 1;
