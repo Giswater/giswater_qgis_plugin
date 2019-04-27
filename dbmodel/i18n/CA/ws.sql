@@ -52,6 +52,8 @@ INSERT INTO cat_feature VALUES ('MEDIDOR_FLUID', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('TANC_EXPANSIO', 'EXPANSIONTANK', 'NODE');
 INSERT INTO cat_feature VALUES ('MEDIDOR_PRESSIO', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('ADAPTACIO', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('ESCOMESA_FICTICIA', 'WJOIN', 'CONNEC);
+
 
 
 -- Records of node type system table
@@ -107,6 +109,8 @@ INSERT INTO connec_type VALUES ('ESCOMESA', 'WJOIN', 'man_wjoin',  TRUE, TRUE, '
 INSERT INTO connec_type VALUES ('BOCA_REG', 'GREENTAP', 'man_greentap',  TRUE, TRUE, 'Boca de reg');
 INSERT INTO connec_type VALUES ('FONT_ORNAMENTAL', 'FOUNTAIN', 'man_fountain',  TRUE, TRUE, 'Font ornamental');
 INSERT INTO connec_type VALUES ('FONT', 'TAP', 'man_tap',  TRUE, TRUE, 'Font pública');
+INSERT INTO connec_type VALUES ('ESCOMESA_FICTICIA', 'WJOIN', 'man_wjoin',  TRUE, TRUE, 'Connec fictici');
+
 
 -- Records of element type system table
 -- ----------------------------
@@ -130,6 +134,8 @@ INSERT INTO anl_mincut_cat_class VALUES (3, 'Tancament d''abonats', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (1, 'En procés', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (2, 'Finalitzat', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (0, 'Planificat', NULL);
+INSERT INTO anl_mincut_cat_state VALUES (3, 'Cancel.lat', NULL);
+
 
 INSERT INTO anl_mincut_cat_type VALUES ('Test', true);
 INSERT INTO anl_mincut_cat_type VALUES ('Demo', true);

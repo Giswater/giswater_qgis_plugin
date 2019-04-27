@@ -52,6 +52,10 @@ INSERT INTO cat_feature VALUES ('MEDIDOR', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('CALDERIN_EXPANSION', 'EXPANSIONTANK', 'NODE');
 INSERT INTO cat_feature VALUES ('MEDIDOR_PRESION', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('ADAPTACION', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('ACOMETIDA_FICTICIA', 'WJOIN', 'CONNEC);
+
+
+
 
 -- Records of node type system table
 -- ----------------------------
@@ -106,6 +110,9 @@ INSERT INTO connec_type VALUES ('ACOMETIDA', 'WJOIN', 'man_wjoin', TRUE, TRUE, '
 INSERT INTO connec_type VALUES ('FUENTE_ORNAMENTAL', 'FOUNTAIN', 'man_fountain', TRUE, TRUE, 'Fuente ornamental' );
 INSERT INTO connec_type VALUES ('FUENTE', 'TAP', 'man_tap', TRUE, TRUE, 'Fuente de agua');
 INSERT INTO connec_type VALUES ('BOCA_RIEGO', 'GREENTAP', 'man_greentap', TRUE, TRUE, 'Boca de riego');
+INSERT INTO connec_type VALUES ('ACOMETIDA_FICTICIA', 'WJOIN', 'man_wjoin', TRUE, TRUE, 'Acometida ficticia');
+
+
 
 -- Records of element type system table
 -- ----------------------------
@@ -129,6 +136,7 @@ INSERT INTO anl_mincut_cat_class VALUES (3, 'Cierre de abonados', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (1, 'En proceso', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (2, 'Finalizado', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (0, 'Planificado', NULL);
+INSERT INTO anl_mincut_cat_state VALUES (0, 'Cancelado', NULL);
 
 INSERT INTO anl_mincut_cat_type VALUES ('Test', true);
 INSERT INTO anl_mincut_cat_type VALUES ('Demo', true);

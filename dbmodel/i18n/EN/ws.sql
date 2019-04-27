@@ -52,6 +52,9 @@ INSERT INTO cat_feature VALUES ('FLOWMETER', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('EXPANTANK', 'EXPANSIONTANK', 'NODE');
 INSERT INTO cat_feature VALUES ('PRESSURE-METER', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('ADAPTATION', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('VCONNEC', 'WJOIN', 'CONNEC);
+
+
 
 -- Records of node type system table
 -- ----------------------------
@@ -105,6 +108,8 @@ INSERT INTO connec_type VALUES ('WJOIN', 'WJOIN', 'man_wjoin', TRUE, TRUE, 'Wjoi
 INSERT INTO connec_type VALUES ('FOUNTAIN', 'FOUNTAIN', 'man_fountain', TRUE, TRUE, 'Ornamental fountain' );
 INSERT INTO connec_type VALUES ('TAP', 'TAP', 'man_tap', TRUE, TRUE, 'Water source');
 INSERT INTO connec_type VALUES ('GREENTAP', 'GREENTAP', 'man_greentap', TRUE, TRUE, 'Greentap');
+INSERT INTO connec_type VALUES ('VCONNEC', 'WJOIN', 'man_wjoin', TRUE, TRUE, 'Virtual connec');
+
 
 -- Records of element type system table
 -- ----------------------------
@@ -128,6 +133,8 @@ INSERT INTO anl_mincut_cat_class VALUES (3, 'Hydrometer mincut', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (1, 'In Progress', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (2, 'Finished', NULL);
 INSERT INTO anl_mincut_cat_state VALUES (0, 'Planified', NULL);
+INSERT INTO anl_mincut_cat_state VALUES (3, 'Canceled', NULL);
+
 
 INSERT INTO anl_mincut_cat_type VALUES ('Test', true);
 INSERT INTO anl_mincut_cat_type VALUES ('Demo', true);
