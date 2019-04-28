@@ -103,20 +103,20 @@ class ParentAction(object):
         if giswater_folder is None:
             message = "Cannot get giswater folder from windows registry"
             self.controller.log_info(message, parameter=reg_path)
-            return (None, None)
+            return None, None
             
         # Check if giswater folder exists
         if not os.path.exists(giswater_folder):
             message = "Giswater folder not found"
             self.controller.log_info(message, parameter=giswater_folder)
-            return (None, None)           
+            return None, None
             
         # Check if giswater executable file file exists
         giswater_file_path = giswater_folder+"\giswater.jar"
         if not os.path.exists(giswater_file_path):
             message = "Giswater executable file not found"
             self.controller.log_info(message, parameter=giswater_file_path)
-            return (None, None) 
+            return None, None
 
         # Get giswater major version
         reg_name = "MajorVersion"
@@ -124,7 +124,7 @@ class ParentAction(object):
         if major_version is None:
             message = "Cannot get giswater major version from windows registry"
             self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)    
+            return giswater_file_path, None
 
         # Get giswater minor version
         reg_name = "MinorVersion"
@@ -132,7 +132,7 @@ class ParentAction(object):
         if minor_version is None:
             message = "Cannot get giswater minor version from windows registry" + reg_path
             self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)  
+            return giswater_file_path, None
                         
         # Get giswater build version
         reg_name = "BuildVersion"
@@ -140,11 +140,11 @@ class ParentAction(object):
         if build_version is None:
             message = "Cannot get giswater build version from windows registry"
             self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)        
+            return giswater_file_path, None
         
         giswater_build_version = major_version + '.' + minor_version + '.' + build_version
         
-        return (giswater_file_path, giswater_build_version)
+        return giswater_file_path, giswater_build_version
     
            
     def get_java_exe(self):
@@ -764,6 +764,7 @@ class ParentAction(object):
             else:
                 layer.removeSelection()
 
+
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
 
@@ -894,10 +895,12 @@ class ParentAction(object):
             data += ', ' + extras
         data += '}'
         body = "" + client + form + feature + data
+
         return body
 
 
     def populate_info_text(self, dialog, qtabwidget, qtextedit, data):
+
         cahange_tab = False
         text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
         for item in data['info']['values']:
@@ -907,12 +910,14 @@ class ParentAction(object):
                     cahange_tab = True
                 else:
                     text += "\n"
+
         utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
         if cahange_tab:
             qtabwidget.setCurrentIndex(1)
 
 
     def get_composers_list(self):
+
         active_composers = []
         if Qgis.QGIS_VERSION_INT < 29900:
             active_composers = self.iface.activeComposers()
@@ -920,4 +925,6 @@ class ParentAction(object):
             # Todo 3.x  "self.iface.activeComposers()" dont work
             projectInstance = QgsProject.instance()
             self.controller.log_info(str(type(projectInstance)))
+
         return  active_composers
+

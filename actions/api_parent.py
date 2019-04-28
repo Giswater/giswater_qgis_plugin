@@ -217,8 +217,6 @@ class ApiParent(ParentAction):
 
 
     def check_actions(self, action, enabled):
-        # print(self.dlg_is_destroyed)
-        # if not self.dlg_is_destroyed:
         action.setChecked(enabled)
 
 
@@ -244,6 +242,7 @@ class ApiParent(ParentAction):
 
     def api_action_help(self, wsoftware, geom_type):
         """ Open PDF file with selected @wsoftware and @geom_type """
+
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
         if locale == 'es_es':
@@ -526,10 +525,12 @@ class ApiParent(ParentAction):
 
 
     def set_widget_size(self, widget, field):
+
         if 'widgetdim' in field:
             if field['widgetdim']:
                 widget.setMaximumWidth(field['widgetdim'])
                 widget.setMinimumWidth(field['widgetdim'])
+
         return widget
 
 
@@ -1205,11 +1206,6 @@ class ApiParent(ParentAction):
         self.list_update.append(elem)
 
 
-    def test(self):
-        self.controller.log_info(str("---------------IT WORK S----------------"))
-        return 0
-
-
     def set_widgets(self, dialog, field):
 
         widget = None
@@ -1298,3 +1294,5 @@ class ApiParent(ParentAction):
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
                 grbox.setVisible(False)
+
+                
