@@ -263,6 +263,8 @@ class UpdateSQL(ParentAction):
         # Set default values
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         utils_giswater.setWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.txt_gis_file, schema_name)
+        users_home = os.path.expanduser("~")
+        utils_giswater.setWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.txt_gis_folder, users_home)
 
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(partial(self.get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
