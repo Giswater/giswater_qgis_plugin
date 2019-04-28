@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QCheckBox, QRadioButton, QComboBox, QLineEdit,QPushButton, QTableView, QLabel, QAbstractItemView, QTextEdit, QFileDialog
 from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtCore import QSettings
 
 import os
 import sys
@@ -18,7 +18,7 @@ from functools import partial
 
 import utils_giswater
 from giswater.actions.parent import ParentAction
-from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo
+from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ReadsqlCreateGisProject
 from giswater.actions.create_gis_project import CreateGisProject
 
 
@@ -243,17 +243,26 @@ class UpdateSQL(ParentAction):
         # Get roletype and export password
         roletype = utils_giswater.getWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype)
         export_passwd = utils_giswater.isChecked(self.dlg_create_gis_project, self.dlg_create_gis_project.chk_export_passwd)
+        if export_passwd:
+            msg = "Credentials will be stored in GIS project file"
+            self.controller.show_info_box(msg, "Warning")
 
         # Generate QGIS project
         gis = CreateGisProject(self.controller, self.plugin_dir)
-        gis.gis_project_database(gis_folder, gis_file, project_type, schema_name)
+        gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd)
+        self.close_dialog(self.dlg_create_gis_project)
         self.close_dialog(self.dlg_readsql)
 
 
     def open_form_create_gis_project(self):
 
+        # Create GIS project dialog
         self.dlg_create_gis_project = ReadsqlCreateGisProject()
         self.load_settings(self.dlg_create_gis_project)
+
+        # Set default values
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        utils_giswater.setWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.txt_gis_file, schema_name)
 
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(partial(self.get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))

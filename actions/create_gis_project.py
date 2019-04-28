@@ -13,7 +13,7 @@ class CreateGisProject():
         self.plugin_dir = plugin_dir
 
 
-    def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample'):
+    def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample', export_passwd=False):
 
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
@@ -90,12 +90,14 @@ class CreateGisProject():
         content = content.replace("SRID_VALUE", str(srid))
 
         # Replace __DBNAME__ for db parameter. __HOST__ for host parameter, __PORT__ for port parameter
-        # Replace __USER__ for user parameter. __PASSWORD__ for password parameter
         content = content.replace("__DBNAME__", db)
         content = content.replace("__HOST__", host)
-        content = content.replace("__PORT__", port)
-        content = content.replace("__USER__", user)
-        content = content.replace("__PASSWORD__", password)
+
+        # Manage username and password
+        credentials = port
+        if export_passwd:
+            credentials = port + " username=" + user + " password=" + password
+        content = content.replace("__PORT__", credentials)
 
         # Write contents and show message
         try:
