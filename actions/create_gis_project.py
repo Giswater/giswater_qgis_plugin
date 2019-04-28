@@ -3,6 +3,7 @@ from qgis.core import QgsProject
 
 import os
 import shutil
+import sqlite3
 
 
 class CreateGisProject():
@@ -75,15 +76,18 @@ class CreateGisProject():
                 return
 
         # Create destination file from template file
-        print("Creating GIS file... " + qgs_path)
+        self.controller.log_info("Creating GIS file... " + qgs_path)
         shutil.copyfile(template_path, qgs_path)
 
         # Read file content
         with open(qgs_path) as f:
             content = f.read()
 
+        # Connect to sqlite database
+        sqlite_conn = self.connect_sqlite()
+
         # Replace spatialrefsys and extent parameters
-        content = self.replace_spatial_parameters(srid, content)
+        content = self.replace_spatial_parameters(srid, content, sqlite_conn)
         content = self.replace_extent_parameters(schema, content)
 
         # Replace SCHEMA_NAME for schemaName parameter. SRID_VALUE for srid parameter
@@ -120,32 +124,52 @@ class CreateGisProject():
         project.read(qgs_path)
 
 
-    def replace_spatial_parameters(self, srid, content):
+    def connect_sqlite(self):
 
-        # TODO: Check query
-        """
-        sql = ("SELECT parameters, srs_id, srid, auth_name || ':' || auth_id as auth_id, description, "
-        	   "projection_acronym, ellipsoid_acronym, is_geo "
-        	   "FROM srs "
-               "WHERE srid = '" + srid + "'")
-        """
+        status = False
+        try:
+            db_path = self.plugin_dir + os.sep + "config" + os.sep + "config.sqlite"
+            self.controller.log_info(db_path)
+            if os.path.exists(db_path):
+                self.conn = sqlite3.connect(db_path)
+                self.cursor = self.conn.cursor()
+                status = True
+            else:
+                self.controller.log_warning("Config database file not found", parameter=db_path)
+        except Exception as e:
+            self.controller.log_warning(str(e))
+
+        return status
+
+
+    def replace_spatial_parameters(self, srid, content, sqlite_conn):
 
         aux = content
-        sql = ("SELECT proj4text as parameters, 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id, "
-               "'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, 'GRS80' as ellipsoid_acronym, 0 as is_geo " 
-        	   "FROM spatial_ref_sys "
-               "WHERE srid = '" + str(srid) + "'")
-        row = self.controller.get_row(sql, log_sql=True)
+        if sqlite_conn:
+            sql = ("SELECT parameters, srs_id, srid, auth_name || ':' || auth_id as auth_id, description, "
+                   "projection_acronym, ellipsoid_acronym, is_geo "
+                   "FROM srs "
+                   "WHERE srid = '" + str(srid) + "'")
+            self.cursor.execute(sql)
+            row = self.cursor.fetchone()
+
+        else:
+            sql = ("SELECT proj4text as parameters, 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id, "
+                   "'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, 'GRS80' as ellipsoid_acronym, 0 as is_geo "
+                   "FROM spatial_ref_sys "
+                   "WHERE srid = '" + str(srid) + "'")
+            row = self.controller.get_row(sql, log_sql=True)
+
         if row:
-            aux = aux.replace("__PROJ4__", row["parameters"])
-            aux = aux.replace("__SRSID__", str(row["srs_id"]))
-            aux = aux.replace("__SRID__", str(row["srid"]))
-            aux = aux.replace("__AUTHID__", row["auth_id"])
-            aux = aux.replace("__DESCRIPTION__", row["description"])
-            aux = aux.replace("__PROJECTIONACRONYM__", row["projection_acronym"])
-            aux = aux.replace("__ELLIPSOIDACRONYM__", row["ellipsoid_acronym"])
+            aux = aux.replace("__PROJ4__", row[0])
+            aux = aux.replace("__SRSID__", str(row[1]))
+            aux = aux.replace("__SRID__", str(row[2]))
+            aux = aux.replace("__AUTHID__", row[3])
+            aux = aux.replace("__DESCRIPTION__", row[4])
+            aux = aux.replace("__PROJECTIONACRONYM__", row[5])
+            aux = aux.replace("__ELLIPSOIDACRONYM__", row[6])
             geo = "false"
-            if row["is_geo"] != 0:
+            if row[7] != 0:
                 geo = "true"
             aux = aux.replace("__GEOGRAPHICFLAG__", geo)
 
