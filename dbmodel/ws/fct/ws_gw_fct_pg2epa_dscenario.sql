@@ -10,24 +10,22 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_dscenario (result_id_var character varying)  RETURNS integer AS $BODY$
 
 DECLARE
-	rec_demand	record;
-	dscenario_aux	integer;      
+     
 
 BEGIN
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT dscenario_id INTO dscenario_aux FROM inp_selector_dscenario WHERE cur_user=current_user;
-
 	RAISE NOTICE 'Starting pg2epa for filling demand scenario';
-	
-	FOR rec_demand IN SELECT * FROM vi_demands
-	LOOP	
-		UPDATE rpt_inp_node SET demand=rec_demand.demand WHERE node_id=rec_demand.node_id;
-	END LOOP;
-	
+
+	-- check if overwrite demands
+	IF (SELECT value FROM config_param_user WHERE parameter='inp_options_overwritedemands' AND cur_user=current_user)::boolean THEN
+		UPDATE rpt_inp_node SET demand=a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
+	ELSE
+		UPDATE rpt_inp_node SET demand=rpt_inp_node.demand+a.demand FROM vi_demands a WHERE a.node_id=rpt_inp_node.node_id AND result_id=result_id_var;
+	END IF;
+
 RETURN 1;
-	
 	
 END;
 $BODY$
