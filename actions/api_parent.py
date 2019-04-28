@@ -217,8 +217,6 @@ class ApiParent(ParentAction):
 
 
     def check_actions(self, action, enabled):
-        # print(self.dlg_is_destroyed)
-        # if not self.dlg_is_destroyed:
         action.setChecked(enabled)
 
 
@@ -244,6 +242,7 @@ class ApiParent(ParentAction):
 
     def api_action_help(self, wsoftware, geom_type):
         """ Open PDF file with selected @wsoftware and @geom_type """
+
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
         if locale == 'es_es':
@@ -526,10 +525,12 @@ class ApiParent(ParentAction):
 
 
     def set_widget_size(self, widget, field):
+
         if 'widgetdim' in field:
             if field['widgetdim']:
                 widget.setMaximumWidth(field['widgetdim'])
                 widget.setMinimumWidth(field['widgetdim'])
+
         return widget
 
 
@@ -953,24 +954,6 @@ class ApiParent(ParentAction):
 
         return widget
 
-    # TODO::Remove this function when merge into 3.2 because already exist
-    def create_body(self, form='', feature='', filter_fields='', extras=None):
-        """ Create and return parameters as body to functions"""
-        
-        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
-        form = '"form":{'+form+'}, '
-        feature = '"feature":{' + feature + '}, '
-        filter_fields = '"filterFields":{' + filter_fields + '}'
-        page_info = '"pageInfo":{}'
-        data = '"data":{' + filter_fields + ', ' + page_info
-        if extras is not None:
-            data += ', ' + extras
-        data += '}'
-
-        body = "" + client + form + feature + data
-
-        return body
-
 
     def activate_snapping(self, emit_point):
         # Set circle vertex marker
@@ -1223,11 +1206,6 @@ class ApiParent(ParentAction):
         self.list_update.append(elem)
 
 
-    def test(self):
-        self.controller.log_info(str("---------------IT WORK S----------------"))
-        return 0
-
-
     def set_widgets(self, dialog, field):
 
         widget = None
@@ -1248,9 +1226,11 @@ class ApiParent(ParentAction):
             widget = self.set_data_type(field, widget)
             if Qgis.QGIS_VERSION_INT < 29900:
                 widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.returnPressed.connect(partial(self.get_values, dialog, widget, self.my_json))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
-            widget = self.set_fucntion_associated(dialog, widget, field)
+                widget.returnPressed.connect(partial(self.get_values, dialog, widget, self.my_json))
+            widget = self.set_function_associated(dialog, widget, field)
         elif field['widgettype'] == 'combo':
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
@@ -1287,9 +1267,11 @@ class ApiParent(ParentAction):
         if type(widget) == QLineEdit:
             if Qgis.QGIS_VERSION_INT < 29900:
                 widget.lostFocus.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
                 #widget.textChanged.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
             else:
                 widget.editingFinished.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
 
         return widget
 
@@ -1312,3 +1294,5 @@ class ApiParent(ParentAction):
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
                 grbox.setVisible(False)
+
+                

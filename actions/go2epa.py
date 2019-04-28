@@ -24,7 +24,8 @@ from qgis.PyQt.QtCore import QTime, QDate, Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox
 from qgis.PyQt.QtWidgets import QCompleter, QFileDialog, QMessageBox
 
-import csv, os, re, subprocess
+import csv, json, os, re, subprocess
+from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
@@ -488,10 +489,12 @@ class Go2Epa(ApiParent):
             progress += 1
             self.dlg_go2epa.progressBar.setValue(progress)
             row = row.rstrip()
-            if row.find("WARNING"):
+
+            if row.find("WARNING") != -1:
                 dirty_list = [row]
             else:
                 dirty_list = row.split(' ')
+
             for x in range(len(dirty_list) - 1, -1, -1):
                 if dirty_list[x] == '' or "**" in dirty_list[x] or "--" in dirty_list[x]:
                     dirty_list.pop(x)
@@ -542,6 +545,7 @@ class Go2Epa(ApiParent):
     def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
 
+        self.dlg_go2epa.txt_infolog.clear()
         self.dlg_go2epa.txt_file_rpt.setStyleSheet("border: 1px solid gray")
         status = self.check_fields()
         if status is False:
@@ -596,11 +600,24 @@ class Go2Epa(ApiParent):
         print("{}:{}".format(self.counter, self.iterations))
         while self.counter < self.iterations:
             common_msg = ""
+            message = None
             # Export to inp file
             if export_inp is True:
                 # Call function gw_fct_pg2epa
-                sql = ("SELECT " + self.schema_name + "." + epa_function_call)
+                sql = ("SELECT " + self.schema_name + "." + epa_function_call + "::text")
                 row = self.controller.get_row(sql, log_sql=True, commit=True)
+                if not row or row[0] is None:
+                    self.controller.show_warning("NOT ROW FOR: " + sql)
+                    message = "Export failed"
+                    self.controller.show_info_box(message)
+                    return
+                else:
+                    complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+                    if complet_result[0]['status'] == "Accepted":
+                        qtabwidget = self.dlg_go2epa.mainTab
+                        qtextedit = self.dlg_go2epa.txt_infolog
+                        self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+                    message = complet_result[0]['message']['text']
 
                 # Get values from temp_csv2pg and insert into INP file
                 sql = ("SELECT csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13,"
@@ -654,9 +671,29 @@ class Go2Epa(ApiParent):
                     self.insert_rpt_into_db(self.file_rpt)
 
                     # Call function gw_fct_utils_csv2pg_export_epa_inp to put in order data from temp table to result tables
-                    sql = ("SELECT " + self.schema_name + "." + "gw_fct_utils_csv2pg_import_epa_rpt('" + str(
-                        self.result_name) + "')")
+                    # sql = ("SELECT " + self.schema_name + "." + "gw_fct_utils_csv2pg_import_epa_rpt('" + str(
+                    #     self.result_name) + "')")
+                   # row = self.controller.get_row(sql, log_sql=True, commit=True)
+                    if self.project_type == 'ws':
+                        function_name = 'gw_fct_utils_csv2pg_import_epanet_rpt'
+                    elif self.project_type == 'ud':
+                        function_name = 'gw_fct_utils_csv2pg_import_swmm_rpt'
+                    extras = '"parameters":{"resultId":"'+str(self.result_name)+'"}'
+                    body = self.create_body(extras=extras)
+                    sql = ("SELECT " + self.schema_name + "." + function_name + "($${" + body + "}$$)::text")
                     row = self.controller.get_row(sql, log_sql=True, commit=True)
+                    if not row or row[0] is None:
+                        self.controller.show_warning("NOT ROW FOR: " + sql)
+                        message = "Import failed"
+                        self.controller.show_info_box(message)
+                        return
+                    else:
+                        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+                        if complet_result[0]['status'] == "Accepted":
+                            qtabwidget = self.dlg_go2epa.mainTab
+                            qtextedit = self.dlg_go2epa.txt_infolog
+                            self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit,  complet_result[0]['body']['data'])
+                        message = complet_result[0]['message']['text']
 
                     # final message
                     common_msg += "Import RPT finished."
@@ -674,16 +711,30 @@ class Go2Epa(ApiParent):
             body = self.create_body(extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_fct_pg2epa_recursive($${" + body + "}$$)::text")
             row = self.controller.get_row(sql, log_sql=True, commit=True)
+            if not row:
+                self.controller.show_warning("NOT ROW FOR: " + sql)
+                message = "Import failed"
+                self.controller.show_info_box(message)
+                return
+            else:
+                complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+                if complet_result[0]['status'] == "Accepted":
+                    qtabwidget = self.dlg_go2epa.mainTab
+                    qtextedit = self.dlg_go2epa.txt_infolog
+                    self.populate_info_text(self.dlg_go2epa, qtabwidget, qtextedit, complet_result[0]['body']['data'])
+                message = complet_result[0]['message']['text']
+                if message is not None:
+                    self.controller.show_info_box(message)
 
         if common_msg != "" and self.imports_canceled is False:
             self.controller.show_info(common_msg)
-
+        if message is not None and self.imports_canceled is False:
+            self.controller.show_info_box(message)
         # Save user values
         self.save_user_values()
 
         self.show_widgets(False)
-        # Close form
-        self.close_dialog(self.dlg_go2epa)
+
 
 
     def set_completer_result(self, widget, viewname, field_name):

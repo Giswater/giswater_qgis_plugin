@@ -392,18 +392,11 @@ class ParentManage(ParentAction, object):
         self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
         self.description = utils_giswater.getWidgetText(dialog, "descript")
 
-
-    def tab_feature_changed(self, dialog, table_object, feature_id=None):
+    def tab_feature_changed(self, dialog, table_object):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
-
         self.get_values_from_form(dialog)
-        if dialog.tab_feature.currentIndex() == 3:
-            dialog.btn_snapping.setEnabled(False)
-        else:
-            dialog.btn_snapping.setEnabled(True)
-
         tab_position = dialog.tab_feature.currentIndex()
         if tab_position == 0:
             self.geom_type = "arc"   
@@ -412,8 +405,6 @@ class ParentManage(ParentAction, object):
         elif tab_position == 2:
             self.geom_type = "connec"
         elif tab_position == 3:
-            self.geom_type = "element"
-        elif tab_position == 4:
             self.geom_type = "gully"
 
         self.hide_generic_layers()                  

@@ -66,8 +66,8 @@ class GwToolBox(ApiParent):
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
-
-        body = self.create_body()
+        extras = '"isToolbox":true'
+        body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
@@ -117,6 +117,7 @@ class GwToolBox(ApiParent):
         self.dlg_functions.rbt_layer.setChecked(True)
 
         extras = '"filterText":"' + self.alias_function + '"'
+        extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
@@ -416,8 +417,7 @@ class GwToolBox(ApiParent):
 
         for group, functions in result['fields'].items():
             parent1 = QStandardItem('{}   [{} Giswater algorithm]'.format(group, len(functions)))
-
-            self.no_clickable_items.append('{}'.format(group))
+            self.no_clickable_items.append('{}   [{} Giswater algorithm]'.format(group, len(functions)))
             functions.sort(key=self.sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem('{}'.format(function['functionname']))
@@ -457,17 +457,22 @@ class GwToolBox(ApiParent):
 
         self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
-        cahange_tab = False
+        qtabwidget = dialog.mainTab
+        qtextedit = dialog.txt_infolog
         for k, v in list(data.items()):
             if str(k) == "info":
-                text = ""
-                for x in data['info']['values']:
-                    if x['error_message'] is not None:
-                        text += str(x['error_message']) + "\n"
-                        cahange_tab = True
-                    else:
-                        text += "\n"
-                dialog.txt_infolog.setText(text + "\n")
+                #TODO sustituir este codigo por la funcion:
+                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
+                # text = ""
+                # for x in data['info']['values']:
+                #     if x['message'] is not None:
+                #         text += str(x['message']) + "\n"
+                #         cahange_tab = True
+                #     else:
+                #         text += "\n"
+                # dialog.txt_infolog.setText(text + "\n")
+                # if cahange_tab:
+                #     dialog.mainTab.setCurrentIndex(1)
             else:
                 counter = len(data[k]['values'])
                 if counter > 0:
@@ -477,8 +482,7 @@ class GwToolBox(ApiParent):
 
                     self.populate_vlayer(dialog, v_layer, data, k, counter)
 
-        if cahange_tab:
-            dialog.mainTab.setCurrentIndex(1)
+
 
 
     def populate_vlayer(self, dialog, virtual_layer, data, layer_type, counter):
