@@ -370,11 +370,13 @@ class Psector_rapport(QDialog, FORM_CLASS):
         QDialog.__init__(self)
         self.setupUi(self)
 
+
 FORM_CLASS = get_ui_class('readsql.ui')
 class Readsql(QMainWindow, FORM_CLASS):
     def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
+
 
 FORM_CLASS = get_ui_class('readsql_create_project.ui')
 class ReadsqlCreateProject(QMainWindow, FORM_CLASS):
@@ -382,17 +384,27 @@ class ReadsqlCreateProject(QMainWindow, FORM_CLASS):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+
+FORM_CLASS = get_ui_class('readsql_create_gis_project.ui')
+class ReadsqlCreateGisProject(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('readsql_rename.ui')
 class ReadsqlRename(QMainWindow, FORM_CLASS):
     def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+
 FORM_CLASS = get_ui_class('readsql_show_info.ui')
 class ReadsqlShowInfo(QMainWindow, FORM_CLASS):
     def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
+
 
 FORM_CLASS = get_ui_class('selector_date.ui')
 class SelectorDate(QDialog, FORM_CLASS):
@@ -413,6 +425,7 @@ class UDcatalog(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
+
 
 FORM_CLASS = get_ui_class('cf_ud_catalog.ui')
 class CFUDcatalog(QDialog, FORM_CLASS):
@@ -440,6 +453,7 @@ class WScatalog(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
+
 
 FORM_CLASS = get_ui_class('cf_ws_catalog.ui')
 class CFWScatalog(QDialog, FORM_CLASS):

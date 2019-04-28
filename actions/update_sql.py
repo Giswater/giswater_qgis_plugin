@@ -190,8 +190,7 @@ class UpdateSQL(ParentAction):
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
         self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
 
-        self.dlg_readsql.btn_gis_folder.clicked.connect(partial(self.get_folder_dialog, self.dlg_readsql, "txt_gis_folder"))
-        self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.gis_create_project))
+        self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.open_form_create_gis_project))
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -228,12 +227,12 @@ class UpdateSQL(ParentAction):
     def gis_create_project(self):
 
         # Get gis folder, gis file, project type and schema
-        gis_folder = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.txt_gis_folder)
+        gis_folder = utils_giswater.getWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.txt_gis_folder)
         if gis_folder is None or gis_folder == 'null':
             self.controller.show_warning("GIS folder not set")
             return
 
-        gis_file = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.txt_gis_file)
+        gis_file = utils_giswater.getWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.txt_gis_file)
         if gis_file is None or gis_file == 'null':
             self.controller.show_warning("GIS file name not set")
             return
@@ -241,10 +240,28 @@ class UpdateSQL(ParentAction):
         project_type = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
+        # Get roletype and export password
+        roletype = utils_giswater.getWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype)
+        export_passwd = utils_giswater.isChecked(self.dlg_create_gis_project, self.dlg_create_gis_project.chk_export_passwd)
+
         # Generate QGIS project
         gis = CreateGisProject(self.controller, self.plugin_dir)
         gis.gis_project_database(gis_folder, gis_file, project_type, schema_name)
         self.close_dialog(self.dlg_readsql)
+
+
+    def open_form_create_gis_project(self):
+
+        self.dlg_create_gis_project = ReadsqlCreateGisProject()
+        self.load_settings(self.dlg_create_gis_project)
+
+        # Set listeners
+        self.dlg_create_gis_project.btn_gis_folder.clicked.connect(partial(self.get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
+        self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self.gis_create_project))
+        self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_create_gis_project))
+
+        # Open MainWindow
+        self.dlg_create_gis_project.show()
 
 
     def btn_constrains_changed(self, button, call_function=False):
@@ -1815,15 +1832,19 @@ class UpdateSQL(ParentAction):
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as "+'"SRID"' + ", substr(split_part(srtext, ',', 1), 9) as "+'"Description"'+" FROM public.spatial_ref_sys WHERE CAST(srid AS TEXT) LIKE '" + str(self.filter_srid_value)+"%' ORDER BY substr(srtext, 1, 6), srid"
+        sql = ("SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as " + '"SRID"' + ", "
+               "substr(split_part(srtext, ',', 1), 9) as " + '"Description"' + " "
+               "FROM public.spatial_ref_sys "
+               "WHERE CAST(srid AS TEXT) LIKE '" + str(self.filter_srid_value) + "%' ORDER BY substr(srtext, 1, 6), srid")
 
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
 
         self.cmb_create_project_type = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_create_project_type')
-        for type in self.project_types:
-            self.cmb_create_project_type.addItem(str(type))
-        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type))
+        for porject_type in self.project_types:
+            self.cmb_create_project_type.addItem(str(porject_type))
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type,
+                                     utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type))
         self.change_project_type(self.cmb_create_project_type)
 
         # Enable_disable data file widgets
