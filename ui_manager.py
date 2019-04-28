@@ -40,6 +40,12 @@ class AddPicture(QDialog, FORM_CLASS):
         QDialog.__init__(self)
         self.setupUi(self)
 
+FORM_CLASS = get_ui_class('api_import_inp.ui')
+class ApiImportInp(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
 
 FORM_CLASS = get_ui_class('api_composers.ui')
 class ApiComposerUi(QDialog, FORM_CLASS):

@@ -14,28 +14,23 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
-import os
-import json
-
-from qgis.PyQt.QtCore import Qt, QDate, QPoint, QUrl, QThread, pyqtSignal, QVariant
+from qgis.PyQt.QtCore import Qt, QVariant
 from qgis.PyQt.QtGui import QColor, QIcon
-from qgis.PyQt.QtWidgets import QMenu, QApplication, QSpinBox, QDoubleSpinBox, QTextEdit
-from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
-from qgis.PyQt.QtWidgets import QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QListWidget
-from qgis.PyQt.QtWidgets import QTableView, QListWidgetItem, QTabWidget, QRadioButton
+from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox
+from qgis.PyQt.QtWidgets import QGridLayout, QRadioButton, QAbstractItemView
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTreeWidgetItem
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsMapLayerRegistry, QgsProject, QgsDataSourceURI as QgsDataSourceUri
+    from qgis.core import QgsMapLayerRegistry, QgsProject
 else:
-    from qgis.core import QgsProject, QgsDataSourceUri
+    from qgis.core import QgsProject
 
-from qgis.core import QgsPoint, QgsFeature, QgsGeometry
-from qgis.core import QgsVectorLayer, QgsLayerTreeLayer, QgsField
+from qgis.core import QgsFeature, QgsGeometry
+from qgis.core import QgsVectorLayer, QgsField
 
+import os
+import json
 from collections import OrderedDict
-from datetime import datetime
 from functools import partial
 
 import utils_giswater
@@ -71,8 +66,8 @@ class GwToolBox(ApiParent):
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox)
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
-
-        body = self.create_body()
+        extras = '"isToolbox":true'
+        body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row or row[0] is None:
@@ -122,6 +117,7 @@ class GwToolBox(ApiParent):
         self.dlg_functions.rbt_layer.setChecked(True)
 
         extras = '"filterText":"' + self.alias_function + '"'
+        extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_gettoolbox($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
@@ -421,8 +417,7 @@ class GwToolBox(ApiParent):
 
         for group, functions in result['fields'].items():
             parent1 = QStandardItem('{}   [{} Giswater algorithm]'.format(group, len(functions)))
-
-            self.no_clickable_items.append('{}'.format(group))
+            self.no_clickable_items.append('{}   [{} Giswater algorithm]'.format(group, len(functions)))
             functions.sort(key=self.sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem('{}'.format(function['functionname']))
@@ -462,17 +457,22 @@ class GwToolBox(ApiParent):
 
         self.delete_layer_from_toc(function_name)
         srid = self.controller.plugin_settings_value('srid')
-        cahange_tab = False
+        qtabwidget = dialog.mainTab
+        qtextedit = dialog.txt_infolog
         for k, v in list(data.items()):
             if str(k) == "info":
-                text = ""
-                for x in data['info']['values']:
-                    if x['error_message'] is not None:
-                        text += str(x['error_message']) + "\n"
-                        cahange_tab = True
-                    else:
-                        text += "\n"
-                dialog.txt_infolog.setText(text + "\n")
+                #TODO sustituir este codigo por la funcion:
+                self.populate_info_text(dialog, qtabwidget, qtextedit, data)
+                # text = ""
+                # for x in data['info']['values']:
+                #     if x['message'] is not None:
+                #         text += str(x['message']) + "\n"
+                #         cahange_tab = True
+                #     else:
+                #         text += "\n"
+                # dialog.txt_infolog.setText(text + "\n")
+                # if cahange_tab:
+                #     dialog.mainTab.setCurrentIndex(1)
             else:
                 counter = len(data[k]['values'])
                 if counter > 0:
@@ -482,8 +482,7 @@ class GwToolBox(ApiParent):
 
                     self.populate_vlayer(dialog, v_layer, data, k, counter)
 
-        if cahange_tab:
-            dialog.mainTab.setCurrentIndex(1)
+
 
 
     def populate_vlayer(self, dialog, virtual_layer, data, layer_type, counter):
@@ -526,5 +525,4 @@ class GwToolBox(ApiParent):
             my_group = root.insertGroup(0, 'GW Functions results')
 
         my_group.insertLayer(0, virtual_layer)
-
 

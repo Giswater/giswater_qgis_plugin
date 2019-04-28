@@ -21,9 +21,8 @@ from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QA
 from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-
 from qgis.core import QgsPoint, QgsGeometry
-from qgis.gui import QgsVertexMarker, QgsRubberBand
+from qgis.gui import QgsRubberBand
 
 import re
 from functools import partial
@@ -44,6 +43,7 @@ class AddNewLot(ParentManage):
 
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
+
         # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
         self.autocommit = True
         self.remove_ids = False
@@ -66,14 +66,12 @@ class AddNewLot(ParentManage):
         self.dropdown = self.dlg_lot.findChild(QToolButton, 'action_selector')
         self.dropdown.setPopupMode(QToolButton.MenuButtonPopup)
 
-
         # Create action and put into QToolButton
         action_by_expression = self.create_action('action_by_expression', self.dlg_lot.action_selector, '204', 'Select by expression')
         action_by_polygon = self.create_action('action_by_polygon', self.dlg_lot.action_selector, '205', 'Select by polygon')
         self.dropdown.addAction(action_by_expression)
         self.dropdown.addAction(action_by_polygon)
         self.dropdown.setDefaultAction(action_by_expression)
-
 
         self.dlg_lot.open()
 
@@ -165,11 +163,8 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
 
-    def test(self):
-        self.controller.log_info(str("HOLAs"))
-
-
     def open_visit(self, qtable):
+
         # Get selected rows
         field_index = qtable.model().fieldIndex('visit_id')
         selected_list = qtable.selectionModel().selectedRows(field_index)
@@ -188,6 +183,7 @@ class AddNewLot(ParentManage):
 
 
     def read_standaritemmodel(self, qtable):
+
         headers = self.get_headers(qtable)
         rows = []
         model = qtable.model()
@@ -209,6 +205,7 @@ class AddNewLot(ParentManage):
 
     def fill_fields(self):
         """ Fill combo boxes of the form """
+
         # Visit tab
         # Set current date and time
         current_date = QDate.currentDate()
@@ -260,6 +257,7 @@ class AddNewLot(ParentManage):
 
 
     def get_next_id(self, table_name, pk):
+
         sql = ("SELECT max("+pk+"::integer) FROM " + self.schema_name + "."+table_name+";")
         row = self.controller.get_row(sql, log_sql=False)
         if not row or not row[0]:
@@ -288,8 +286,10 @@ class AddNewLot(ParentManage):
 
         self.set_headers(self.tbl_relation)
 
+
     def clear_selection(self, remove_groups=True):
         """ Remove all previous selections """
+
         layer = self.controller.get_layer_by_tablename("v_edit_arc")
         if layer:
             layer.removeSelection()
@@ -327,10 +327,11 @@ class AddNewLot(ParentManage):
 
 
     def set_values(self, lot_id):
+
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot "
                " WHERE id ='"+str(lot_id)+"'")
         lot = self.controller.get_row(sql, log_sql=False)
-        if lot is not None:
+        if lot:
             utils_giswater.setWidgetText(self.dlg_lot, 'txt_idval', lot['idval'])
             utils_giswater.setCalendarDate(self.dlg_lot, 'startdate', lot['startdate'])
             utils_giswater.setCalendarDate(self.dlg_lot, 'enddate', lot['enddate'])
@@ -350,6 +351,7 @@ class AddNewLot(ParentManage):
 
 
     def set_headers(self, qtable):
+
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
         columns_name.append(['validate'])
@@ -366,6 +368,7 @@ class AddNewLot(ParentManage):
 
 
     def populate_table_relations(self, lot_id):
+
         standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(feature_type) + ""
@@ -384,8 +387,10 @@ class AddNewLot(ParentManage):
 
     def populate_visits(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -403,6 +408,7 @@ class AddNewLot(ParentManage):
         widget.setModel(model)
 
 
+
     def update_id_list(self):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         list_ids = self.get_table_values(self.tbl_relation, feature_type)
@@ -412,6 +418,7 @@ class AddNewLot(ParentManage):
 
 
     def get_table_values(self, qtable, geom_type):
+
         column_index = utils_giswater.get_col_index_by_col_name(qtable, geom_type+'_id')
         model = qtable.model()
         id_list = []
@@ -422,6 +429,7 @@ class AddNewLot(ParentManage):
 
 
     def activate_selection(self, dialog, action, action_name):
+
         self.set_active_layer()
         self.dropdown.setDefaultAction(action)
         self.disconnect_signal_selection_changed()
@@ -431,12 +439,12 @@ class AddNewLot(ParentManage):
 
 
     def selection_changed_by_expr(self, dialog, layer, geom_type):
-        # "arc_id" = '2020'
         self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog,  layer, geom_type))
 
 
     def manage_selection(self, dialog, layer, geom_type):
         """ Slot function for signal 'canvas.selectionChanged' """
+
         field_id = geom_type + "_id"
         # Iterate over layer
         if layer.selectedFeatureCount() > 0:
@@ -450,7 +458,9 @@ class AddNewLot(ParentManage):
         self.reload_table_relations()
         self.enable_combos(dialog)
 
+
     def enable_combos(self, dialog):
+
         assigned_to = dialog.findChild(QComboBox, 'cmb_assigned_to')
         visit_class = dialog.findChild(QComboBox, 'cmb_visit_class')
         if len(self.ids) > 0:
@@ -463,6 +473,7 @@ class AddNewLot(ParentManage):
 
     def reload_table_relations(self):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
+
         standard_model = self.tbl_relation.model()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
@@ -490,6 +501,7 @@ class AddNewLot(ParentManage):
 
     def insert_row(self):
         """ Inser single row into QStandardItemModel """
+
         standard_model = self.tbl_relation.model()
         feature_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.feature_id)
         lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.lot_id)
@@ -515,16 +527,18 @@ class AddNewLot(ParentManage):
                 self.insert_single_checkbox(self.tbl_relation)
 
 
-    def get_feature_by_id(self, layer, id, field_id):
-        iter = layer.getFeatures()
-        for feature in iter:
-            if feature[field_id] == id:
+    def get_feature_by_id(self, layer, id_, field_id):
+
+        features = layer.getFeatures()
+        for feature in features:
+            if feature[field_id] == id_:
                 return feature
         return False
 
 
     def insert_single_checkbox(self, qtable):
         """ Create one QCheckBox and put into QTableView at position @self.chk_position """
+
         cell_widget = QWidget()
         chk = QCheckBox()
         lay_out = QHBoxLayout(cell_widget)
@@ -537,6 +551,7 @@ class AddNewLot(ParentManage):
 
 
     def remove_selection(self, dialog, qtable):
+
         self.disconnect_signal_selection_changed()
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
         # Get selected rows
@@ -878,7 +893,6 @@ class AddNewLot(ParentManage):
         self.fill_table_object(self.dlg_lot_man.tbl_visit, self.schema_name + "." + table_object)
         self.set_table_columns(self.dlg_lot_man, self.dlg_lot_man.tbl_visit, table_object)
 
-
         # manage save and rollback when closing the dialog
         self.dlg_lot_man.rejected.connect(partial(self.close_dialog, self.dlg_lot_man))
         self.dlg_lot_man.accepted.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_visit, table_object))
@@ -894,7 +908,6 @@ class AddNewLot(ParentManage):
         sql = ("SELECT MIN(startdate), MAX(enddate)"
                " FROM {}.{}".format(self.schema_name, table_object))
         row = self.controller.get_row(sql, log_info=True, commit=self.autocommit)
-
         if row:
             if row[0]:
                 self.dlg_lot_man.date_event_from.setDate(row[0])

@@ -31,6 +31,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="btn_print">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>Print</string>
        </property>
@@ -38,6 +41,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="btn_preview">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>Preview</string>
        </property>
@@ -45,6 +51,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="btn_close">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>Close</string>
        </property>

@@ -264,7 +264,6 @@ class ParentManage(ParentAction, object):
 
             return
 
-
         # Fill input widgets with data of the @row
         self.fill_widgets(dialog, table_object, row)
 
@@ -323,6 +322,7 @@ class ParentManage(ParentAction, object):
 
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
+
         active_layer = self.iface.activeLayer()
         if active_layer is None:
             active_layer = self.controller.get_layer_by_tablename('version')
@@ -392,18 +392,11 @@ class ParentManage(ParentAction, object):
         self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
         self.description = utils_giswater.getWidgetText(dialog, "descript")
 
-
-    def tab_feature_changed(self, dialog, table_object, feature_id=None):
+    def tab_feature_changed(self, dialog, table_object):
         """ Set geom_type and layer depending selected tab
             @table_object = ['doc' | 'element' | 'cat_work']
         """
-
         self.get_values_from_form(dialog)
-        if dialog.tab_feature.currentIndex() == 3:
-            dialog.btn_snapping.setEnabled(False)
-        else:
-            dialog.btn_snapping.setEnabled(True)
-
         tab_position = dialog.tab_feature.currentIndex()
         if tab_position == 0:
             self.geom_type = "arc"   
@@ -412,8 +405,6 @@ class ParentManage(ParentAction, object):
         elif tab_position == 2:
             self.geom_type = "connec"
         elif tab_position == 3:
-            self.geom_type = "element"
-        elif tab_position == 4:
             self.geom_type = "gully"
 
         self.hide_generic_layers()                  
@@ -460,6 +451,7 @@ class ParentManage(ParentAction, object):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
         """
+
         if not widget:
             return
 
@@ -607,6 +599,7 @@ class ParentManage(ParentAction, object):
     def apply_lazy_init(self, widget):
         """Apply the init function related to the model. It's necessary
         a lazy init because model is changed everytime is loaded."""
+
         if self.lazy_widget is None:
             return
         if widget != self.lazy_widget:
@@ -618,6 +611,7 @@ class ParentManage(ParentAction, object):
         """set the init_function where all necessary events are set.
         This is necessary to allow a lazy setup of the events because set_table_events
         can create a table with a None model loosing any event connection."""
+
         # TODO: create a dictionary with key:widged.objectName value:initFuction
         # to allow multiple lazy initialization
         self.lazy_widget = widget
@@ -971,8 +965,10 @@ class ParentManage(ParentAction, object):
 
     def fill_table_object(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -1079,6 +1075,7 @@ class ParentManage(ParentAction, object):
             self.manage_visit(visit_id=selected_object_id)
         elif "v_ui_om_visitman_x_" in table_object:
             self.manage_visit(visit_id=selected_object_id)
+
 
     def set_selectionbehavior(self, dialog):
         

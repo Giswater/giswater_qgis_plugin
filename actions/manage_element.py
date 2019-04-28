@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-
-
 # -*- coding: utf-8 -*-
 try:
     from qgis.core import Qgis
@@ -162,6 +160,7 @@ class ManageElement(ParentManage):
 
 
     def update_location_cmb(self):
+
         element_type = utils_giswater.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = ("SELECT location_type FROM " + self.schema_name + ".man_type_location"
                " WHERE feature_type = 'ELEMENT' "
@@ -396,6 +395,7 @@ class ManageElement(ParentManage):
             # filter_ = "node_id = '" + str(feature_id) + "'"
             # table_element = "v_ui_element_x_node"
             # self.set_model_to_table(self.tbl_element, table_element, filter_)
+
 
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """

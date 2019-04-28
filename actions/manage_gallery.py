@@ -23,13 +23,12 @@ else:
 from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt
+
 import urllib.request, urllib.error, urllib.parse
 import urllib.parse
-
-from . import ExtendedQLabel
 from functools import partial
 
-import utils_giswater
+from . import ExtendedQLabel
 from ui_manager import Gallery
 from ui_manager import GalleryZoom
 from actions.parent_manage import ParentManage

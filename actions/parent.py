@@ -32,9 +32,7 @@ from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
 from functools import partial
-
 import sys
-
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
@@ -105,20 +103,20 @@ class ParentAction(object):
         if giswater_folder is None:
             message = "Cannot get giswater folder from windows registry"
             self.controller.log_info(message, parameter=reg_path)
-            return (None, None)
+            return None, None
             
         # Check if giswater folder exists
         if not os.path.exists(giswater_folder):
             message = "Giswater folder not found"
             self.controller.log_info(message, parameter=giswater_folder)
-            return (None, None)           
+            return None, None
             
         # Check if giswater executable file file exists
         giswater_file_path = giswater_folder+"\giswater.jar"
         if not os.path.exists(giswater_file_path):
             message = "Giswater executable file not found"
             self.controller.log_info(message, parameter=giswater_file_path)
-            return (None, None) 
+            return None, None
 
         # Get giswater major version
         reg_name = "MajorVersion"
@@ -126,7 +124,7 @@ class ParentAction(object):
         if major_version is None:
             message = "Cannot get giswater major version from windows registry"
             self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)    
+            return giswater_file_path, None
 
         # Get giswater minor version
         reg_name = "MinorVersion"
@@ -134,7 +132,7 @@ class ParentAction(object):
         if minor_version is None:
             message = "Cannot get giswater minor version from windows registry" + reg_path
             self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)  
+            return giswater_file_path, None
                         
         # Get giswater build version
         reg_name = "BuildVersion"
@@ -142,11 +140,11 @@ class ParentAction(object):
         if build_version is None:
             message = "Cannot get giswater build version from windows registry"
             self.controller.log_info(message, parameter=reg_path)
-            return (giswater_file_path, None)        
+            return giswater_file_path, None
         
         giswater_build_version = major_version + '.' + minor_version + '.' + build_version
         
-        return (giswater_file_path, giswater_build_version)
+        return giswater_file_path, giswater_build_version
     
            
     def get_java_exe(self):
@@ -523,8 +521,10 @@ class ParentAction(object):
 
     def fill_table_psector(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected @table_name. Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(table_name)
@@ -543,8 +543,10 @@ class ParentAction(object):
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
+
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(table_name)
@@ -564,6 +566,7 @@ class ParentAction(object):
         :param qtable: QTableView to show
         :param query: query to set model
         """
+
         model = QSqlQueryModel()
         model.setQuery(query)
         qtable.setModel(model)
@@ -607,8 +610,9 @@ class ParentAction(object):
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)      
-            return (False, expr)
-        return (True, expr)               
+            return False, expr
+
+        return True, expr
         
 
     def refresh_map_canvas(self, restore_cursor=False):
@@ -713,8 +717,6 @@ class ParentAction(object):
         utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
 
 
-
-
     def multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
         :param QTableView widget: origin
@@ -747,6 +749,7 @@ class ParentAction(object):
             self.controller.execute_sql(sql)
             widget.model().select()
 
+
     def select_features_by_expr(self, layer, expr):
         """ Select features of @layer applying @expr """
 
@@ -760,6 +763,7 @@ class ParentAction(object):
                 layer.selectByIds(id_list)
             else:
                 layer.removeSelection()
+
 
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
@@ -821,7 +825,7 @@ class ParentAction(object):
 
 
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
-        # rect = QgsRectangle(float(x1)+10, float(y1)+10, float(x2)-10, float(y2)-10)
+
         rect = QgsRectangle(float(x1)-margin, float(y1)-margin, float(x2)+margin, float(y2)+margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
@@ -855,6 +859,7 @@ class ParentAction(object):
 
     def delete_layer_from_toc(self, layer_name):
         """ Delete layer from toc if exist """
+
         layer = None
         for lyr in list(QgsProject.instance().mapLayers().values()):
             if lyr.name() == layer_name:
@@ -863,6 +868,7 @@ class ParentAction(object):
         if layer is not None:
             QgsProject.instance().removeMapLayer(layer)
             self.delete_layer_from_toc(layer_name)
+
 
     def get_snapper(self):
         """ Return snapper """
@@ -874,4 +880,51 @@ class ParentAction(object):
             snapper = QgsMapCanvas.snappingUtils()
 
         return snapper
+
+
+    def create_body(self, form='', feature='', filter_fields='', extras=None):
+        """ Create and return parameters as body to functions"""
+
+        client = '"client":{"device":9, "infoType":100, "lang":"ES"}, '
+        form = '"form":{' + form + '}, '
+        feature = '"feature":{' + feature + '}, '
+        filter_fields = '"filterFields":{' + filter_fields + '}'
+        page_info = '"pageInfo":{}'
+        data = '"data":{' + filter_fields + ', ' + page_info
+        if extras is not None:
+            data += ', ' + extras
+        data += '}'
+        body = "" + client + form + feature + data
+
+        return body
+
+
+    def populate_info_text(self, dialog, qtabwidget, qtextedit, data):
+
+        cahange_tab = False
+        text = utils_giswater.getWidgetText(dialog, qtextedit, return_string_null=False)
+        for item in data['info']['values']:
+            if 'message' in item:
+                if item['message'] is not None:
+                    text += str(item['message']) + "\n"
+                    cahange_tab = True
+                else:
+                    text += "\n"
+
+        utils_giswater.setWidgetText(dialog, qtextedit, text+"\n")
+        if cahange_tab:
+            qtabwidget.setCurrentIndex(1)
+
+
+    def get_composers_list(self):
+
+        active_composers = []
+        if Qgis.QGIS_VERSION_INT < 29900:
+            active_composers = self.iface.activeComposers()
+        else:
+            # Todo 3.x  "self.iface.activeComposers()" dont work
+            projectInstance = QgsProject.instance()
+            self.controller.log_info(str(type(projectInstance)))
+
+        return  active_composers
 
