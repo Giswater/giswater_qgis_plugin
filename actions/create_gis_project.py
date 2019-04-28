@@ -29,7 +29,7 @@ class CreateGisProject():
 
         # Get folder with QGS templates
         gis_extension = "qgs"
-        gis_folder = self.plugin_dir + os.sep + "gis"
+        gis_folder = self.plugin_dir + os.sep + "templates" + os.sep + "qgisproject"
         gis_locale_path = gis_folder + os.sep + locale
 
         # If QGIS template locale folder not found, use English one
@@ -40,7 +40,7 @@ class CreateGisProject():
         # Check if template_path and folder_path exists
         template_path = gis_locale_path + os.sep + project_type + "_" + roletype + "." + gis_extension
         if not os.path.exists(template_path):
-            self.controller.show_warning("Template GIS file not found", parameter=template_path)
+            self.controller.show_warning("Template GIS file not found", parameter=template_path, duration=20)
             return
 
         # Get database parameters from layer source
