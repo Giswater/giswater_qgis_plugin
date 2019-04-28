@@ -13,7 +13,8 @@ class CreateGisProject():
         self.plugin_dir = plugin_dir
 
 
-    def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample', export_passwd=False):
+    def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
+                             export_passwd=False, roletype='admin'):
 
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
@@ -37,9 +38,9 @@ class CreateGisProject():
             gis_locale_path = gis_folder + os.sep + "en"
 
         # Check if template_path and folder_path exists
-        template_path = gis_locale_path + os.sep + project_type + "_template." + gis_extension
+        template_path = gis_locale_path + os.sep + project_type + "_" + roletype + "." + gis_extension
         if not os.path.exists(template_path):
-            self.controller.show_warning("File not found", parameter=template_path)
+            self.controller.show_warning("Template GIS file not found", parameter=template_path)
             return
 
         # Get database parameters from layer source

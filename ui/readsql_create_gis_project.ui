@@ -49,7 +49,38 @@
      </widget>
     </item>
     <item row="0" column="1" colspan="3">
-     <widget class="QComboBox" name="cmb_roletype"/>
+     <widget class="QComboBox" name="cmb_roletype">
+      <item>
+       <property name="text">
+        <string>admin</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>plan</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>epa</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>edit</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>om</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>basic</string>
+       </property>
+      </item>
+     </widget>
     </item>
     <item row="2" column="0">
      <widget class="QLabel" name="label_2">
