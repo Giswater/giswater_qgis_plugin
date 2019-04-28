@@ -244,6 +244,7 @@ class UpdateSQL(ParentAction):
         # Generate QGIS project
         gis = CreateGisProject(self.controller, self.plugin_dir)
         gis.gis_project_database(gis_folder, gis_file, project_type, schema_name)
+        self.close_dialog(self.dlg_readsql)
 
 
     def btn_constrains_changed(self, button, call_function=False):

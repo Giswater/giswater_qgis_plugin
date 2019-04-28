@@ -1,4 +1,5 @@
 from qgis.PyQt.QtCore import QSettings
+from qgis.core import QgsProject
 
 import os
 import shutil
@@ -42,9 +43,7 @@ class CreateGisProject():
             return
 
         # Get database parameters from layer source
-        print("get_layer_source_from_credentials")
         layer_source, not_version = self.controller.get_layer_source_from_credentials()
-        print(layer_source)
         if layer_source is None:
             self.controller.show_warning("Error getting database parameters")
             return
@@ -54,7 +53,6 @@ class CreateGisProject():
         db = layer_source['db']
         user = layer_source['user']
         password = layer_source['password']
-        #schema = layer_source['schema'].replace('"', '')
         srid = self.controller.get_srid('v_edit_node', schema)
 
         # Manage default parameters
@@ -103,10 +101,20 @@ class CreateGisProject():
         try:
             with open(qgs_path, "w") as f:
                 f.write(content)
-            self.controller.show_info("GIS file completed", parameter=qgs_path)
+            self.controller.show_info("GIS file generated successfully", parameter=qgs_path)
+            message = "Do you want to open GIS project?"
+            answer = self.controller.ask_question(message, "GIS file generated successfully")
+            if answer:
+                self.open_project(qgs_path)
         except IOError:
             message = "File cannot be created. Check if it is already opened"
             self.controller.show_warning(message, parameter=qgs_path)
+
+
+    def open_project(self, qgs_path):
+
+        project = QgsProject.instance()
+        project.read(qgs_path)
 
 
     def replace_spatial_parameters(self, srid, content):
