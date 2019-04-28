@@ -2,7 +2,6 @@
 ## Project
 #################
 
-*.qgs
 *.qgs~
 *.bat
 *.db
@@ -12,40 +11,17 @@ log/*.*
 templates/profile.png
 
 
-#################
-## Eclipse
-#################
-
-build_runnable.xml
-*.pydevproject
-.project
-.metadata
-bin/
-tmp/
-*.tmp
-*.bak
-*.swp
-*~.nib
-.classpath
-.settings/
-
-
 #############
 ## Python
 #############
 
+*.pydevproject
+.project
+.metadata
 *.py[co]
-*.egg
-*.egg-info
 dist/
 build/
-eggs/
-parts/
-var/
-sdist/
-develop-eggs/
 .installed.cfg
-i18n/lrelease.exe
 .idea/giswater.iml
 .idea/misc.xml
 .idea/modules.xml

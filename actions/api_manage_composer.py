@@ -14,7 +14,6 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposerMap, QgsComposerLabel
     from qgis.PyQt.QtGui import QPrintDialog, QPrinter, QDialog
 else:
-    from qgis.core import QgsProject
     pass
 
 from qgis.PyQt.QtGui import QRegExpValidator
