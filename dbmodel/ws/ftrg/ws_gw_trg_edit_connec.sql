@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 1304
+--FUNCTION CODE: 1304F
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec() RETURNS trigger LANGUAGE plpgsql AS $$
@@ -26,7 +26,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	IF promixity_buffer_aux IS NULL THEN promixity_buffer_aux = 0.5	END IF;
+	IF promixity_buffer_aux IS NULL THEN promixity_buffer_aux = 0.5; END IF;
 	
     
     -- Control insertions ID

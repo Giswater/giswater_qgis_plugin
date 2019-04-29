@@ -33,6 +33,9 @@ DECLARE
 	v_insertnode boolean;
 	v_projecttype text;
 	rec record;
+	v_nodecat text;
+	v_nodetype_id text;
+	v_isarcdivide boolean;
 
 BEGIN
 
@@ -81,20 +84,20 @@ BEGIN
 	
 		-- set isarcdivide of chosed nodetype on false
 		IF v_projecttype ='WS' THEN
-			v_nodecat =  (SELECT value FROM config_param_user WHERE parameter='nodecat_vdefault' AND cur_user=current_user;
+			v_nodecat =  (SELECT value FROM config_param_user WHERE parameter='nodecat_vdefault' AND cur_user=current_user);
 			SELECT nodetype_id INTO v_nodetype_id FROM cat_node WHERE id=v_nodecat;
-		ELSIF
-			v_nodetype_id =  (SELECT value FROM config_param_user WHERE parameter='nodetype_vdefault' AND cur_user=current_user;		
+		ELSE
+			v_nodetype_id =  (SELECT value FROM config_param_user WHERE parameter='nodetype_vdefault' AND cur_user=current_user);		
 		END IF;
 	
 		SELECT isarcdivide INTO v_isarcdivide FROM node_type WHERE id=v_nodetype_id;
-		UPDATE node_type SET isarcdivide=FALSE id=v_nodetype_id;	
+		UPDATE node_type SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
 	
 		-- execute function
 		PERFORM gw_fct_repair_arc(arc_id, 0,0) FROM arc WHERE exp_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
 	
 		-- restore isarcdivide to previous value
-		UPDATE node_type SET isarcdivide=v_isarcdivide id=v_nodetype_id;	
+		UPDATE node_type SET isarcdivide=v_isarcdivide WHERE id=v_nodetype_id;	
 		
 	END IF;	
 

@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-INSERT INTO ws_sample.audit_cat_param_user VALUES ('inp_options_overwritedemands', 'epaoptions', 'Overwrite demands from junctions when demand scenario is called', 'role_epa', NULL, 'overwrite_demands', 'Overwrite demands when dscenario is used:', NULL, NULL, true, 16, 2, 'ws', false, NULL, NULL, NULL, false, 'boolean', 'check', true, NULL, 'FALSE', 'grl_inpother_16', NULL, NULL, NULL, NULL, NULL, NULL, false, '{"from":"2.0.12", "to":null, "language":"english"}');
+INSERT INTO SCHEMA_NAME.audit_cat_param_user VALUES ('inp_options_overwritedemands', 'epaoptions', 'Overwrite demands from junctions when demand scenario is called', 'role_epa', NULL, 'overwrite_demands', 'Overwrite demands when dscenario is used:', NULL, NULL, true, 16, 2, 'ws', false, NULL, NULL, NULL, false, 'boolean', 'check', true, NULL, 'FALSE', 'grl_inpother_16', NULL, NULL, NULL, NULL, NULL, NULL, false, '{"from":"2.0.12", "to":null, "language":"english"}');
 
 
 
