@@ -86,8 +86,14 @@ class ApiManageComposer(ApiParent):
 
         self.dlg_composer.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_composer.show()
-        self.accept(self.dlg_composer, self.my_json)
-        self.iface.mapCanvas().extentsChanged.connect(partial(self.accept, self.dlg_composer, self.my_json))
+        
+        # Control if no have composers
+        if composers_list != '"{}"':
+            self.accept(self.dlg_composer, self.my_json)
+            self.iface.mapCanvas().extentsChanged.connect(partial(self.accept, self.dlg_composer, self.my_json))
+        else:
+            self.dlg_composer.btn_print.setEnabled(False)
+            self.dlg_composer.btn_preview.setEnabled(False)
 
 
     def preview(self, dialog, show):
