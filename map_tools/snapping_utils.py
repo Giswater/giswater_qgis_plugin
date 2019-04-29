@@ -102,13 +102,13 @@ class SnappingConfigManager():
         QgsProject.instance().snapSettingsChanged.emit()
         
 
-    def snap_to_layer(self, layer):
+    def snap_to_layer(self, layer, tolerance = 1.0):
         """ Set snapping to @layer """
         
         if layer is None:
             return
         
-        QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+        QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, tolerance, False)
 
 
     def apply_snapping_options(self, snappings_options):
