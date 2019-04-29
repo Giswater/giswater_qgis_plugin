@@ -1213,6 +1213,10 @@ class UpdateSQL(ApiParent):
 
     def create_project_data_schema(self):
 
+        #Save user values
+        self.controller.plugin_settings_set_value('project_title_schema', utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'project_title'))
+        self.controller.plugin_settings_set_value('inp_file_path',utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'data_file'))
+
         self.title = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_title)
         self.author = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_author)
         self.date = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.project_date)
@@ -1867,6 +1871,10 @@ class UpdateSQL(ApiParent):
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
 
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
+
+        #Load user values
+        self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
+        self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
 
         # TODO: do and call listener for buton + table -> temp_csv2pg
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
