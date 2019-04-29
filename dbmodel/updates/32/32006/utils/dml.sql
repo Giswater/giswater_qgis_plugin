@@ -71,7 +71,9 @@ DELETE FROM config_param_system WHERE parameter='node_proximity_control';
 UPDATE config_param_system SET value=
 (SELECT row_to_json(a) FROM (SELECT connec_proximity_control as activated, connec_proximity as value FROM config) a),
 descript='Enable/disable control of inserting duplicated connec.Minimum accepted distance between two connecs' , 
-data_type='json'
+data_type='json',
+widgettype='linetext',
+datatype='string'
 WHERE parameter='connec_proximity';
 DELETE FROM config_param_system WHERE parameter='connec_proximity_control';
 
@@ -109,8 +111,14 @@ Before execute it, check all new nodes will be inserted into mapzones boudaries.
 Uncheck direct insert into node table if you are looking to use intermediate table (anl_node)'
 WHERE function_name='gw_fct_built_nodefromarc';
 
+UPDATE audit_cat_param_user
+SET dv_querytext ='SELECT id, id as idval FROM anl_mincut_result_cat WHERE id IS NOT NULL'
+WHERE id='om_mincut_analysis_dinletsector';
 
+UPDATE audit_cat_param_user
+SET dv_querytext ='SELECT id, id as idval FROM anl_mincut_result_cat WHERE id IS NOT NULL'
+WHERE id='om_mincut_analysis_dminsector;
 
-
-
-
+UPDATE audit_cat_param_user
+SET dv_querytext ='SELECT id, id as idval FROM anl_mincut_result_cat WHERE id IS NOT NULL'
+WHERE id='om_mincut_analysis_pipehazard';
