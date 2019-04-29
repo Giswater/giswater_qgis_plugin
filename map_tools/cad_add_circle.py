@@ -203,11 +203,6 @@ class CadAddCircle(ParentMapTool):
             # Get current layer
             self.vdefault_layer = self.iface.activeLayer()
 
-        # Set snapping
-        options = QgsProject.instance().snapSettingsForLayer(self.vdefault_layer.id())
-        tolerance = options[4]
-        self.snapper_manager.snap_to_layer(self.vdefault_layer, tolerance=tolerance)
-
 
     def deactivate(self):
 
