@@ -81,6 +81,8 @@ class ApiManageComposer(ApiParent):
         self.dlg_composer.btn_close.clicked.connect(self.destructor)
         self.dlg_composer.rejected.connect(partial(self.save_settings, self.dlg_composer))
         self.dlg_composer.rejected.connect(self.destructor)
+
+        self.dlg_composer.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_composer.show()
         self.accept(self.dlg_composer, self.my_json)
         self.iface.mapCanvas().extentsChanged.connect(partial(self.accept, self.dlg_composer, self.my_json))
