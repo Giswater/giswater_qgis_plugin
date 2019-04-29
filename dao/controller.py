@@ -1150,11 +1150,17 @@ class DaoController(object):
         role_epa = self.check_role_user("role_epa")
         role_edit = self.check_role_user("role_edit")
         role_om = self.check_role_user("role_om")
-        
+        super_users = self.settings.value('system_variables/super_users')
+
         # Manage user 'postgres'
         if self.user == 'postgres' or self.user == 'gisadmin':
             role_master = True
-        
+
+        # Manage super_user
+        if super_users is not None:
+            if self.user in super_users:
+                role_master = True
+
         if role_admin:
             pass
         elif role_master:
