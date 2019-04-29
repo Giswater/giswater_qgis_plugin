@@ -251,7 +251,6 @@ class ApiParent(ParentAction):
 
         for i in range(0, len(polygon)):
             x, y = polygon[i].split(' ')
-            print(x)
             point = QgsPoint(float(x), float(y))
             points.append(point)
         return points
