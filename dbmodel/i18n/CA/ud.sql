@@ -76,7 +76,6 @@ INSERT INTO arc_type VALUES ('FICTICI', 'VARC', 'OUTLET', 'man_varc', 'inp_outle
 -- Records of connec_type
 -- ----------------------------
 INSERT INTO connec_type VALUES ('ESCOMESA', 'CONNEC', 'man_connec', TRUE, TRUE);
-INSERT INTO connec_type VALUES ('ESCOMESA_FICTICIA', 'CONNEC', 'man_connec', TRUE, TRUE);
 
 
 -- Records of gully_type
