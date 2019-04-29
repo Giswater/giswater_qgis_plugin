@@ -557,8 +557,7 @@ class ApiParent(ParentAction):
             if field['datatype'] == 'integer':  # Integer
                 widget.setValidator(QIntValidator())
             elif field['datatype'] == 'string':  # String
-                function_name = "test"
-                widget.returnPressed.connect(partial(getattr(self, function_name)))
+                pass
             elif field['datatype'] == 'date':  # Date
                 pass
             elif field['datatype'] == 'datetime':  # DateTime
