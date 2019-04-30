@@ -923,8 +923,11 @@ class ParentAction(object):
             active_composers = self.iface.activeComposers()
         else:
             # Todo 3.x  "self.iface.activeComposers()" dont work
-            projectInstance = QgsProject.instance()
-            self.controller.log_info(str(type(projectInstance)))
+            layour_manager = QgsProject.instance().layoutManager().layouts()
+            active_composers = [layout for layout in layour_manager]
+            print("TEST 10: " + str(active_composers))
+            self.controller.log_info("TEST 10: " + str(active_composers))
+        return active_composers
 
-        return  active_composers
+
 

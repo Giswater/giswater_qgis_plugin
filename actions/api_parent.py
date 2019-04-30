@@ -824,20 +824,12 @@ class ApiParent(ParentAction):
 
     def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
-
-        if Qgis.QGIS_VERSION_INT < 29900:
-            rb = self.rubber_polygon
-            rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
-            rb.setColor(color)
-            rb.setWidth(width)
-            rb.show()
-            return rb
-        else:
-            self.vMarker = QgsVertexMarker(self.canvas)
-            self.vMarker.setIconSize(width)
-            self.vMarker.setCenter(points)
-            self.vMarker.show()
-            return self.vMarker
+        rb = self.rubber_polygon
+        rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+        rb.setColor(color)
+        rb.setWidth(width)
+        rb.show()
+        return rb
 
 
     def resetRubberbands(self):
