@@ -68,7 +68,7 @@
     </message>
     <message>
         <source>58_text</source>
-        <translation>Composer impresio senzilla</translation>
+        <translation>Impresio</translation>
     </message>
     <!--message>
         <source>64_text</source>

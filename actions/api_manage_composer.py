@@ -46,11 +46,16 @@ class ApiManageComposer(ApiParent):
 
     def composer(self):
         self.my_json = {}
+        composers_list = self.get_composer()
+        if composers_list == '"{}"':
+            msg = "No composers found."
+            result = self.controller.show_info_box(msg, "Info")
+            return
         self.dlg_composer = ApiComposerUi()
         self.load_settings(self.dlg_composer)
 
         # Create and populate dialog
-        composers_list = self.get_composer()
+
         extras = '"composers":' + str(composers_list)
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getprint($${" + body + "}$$)::text")
@@ -84,6 +89,7 @@ class ApiManageComposer(ApiParent):
         self.dlg_composer.rejected.connect(partial(self.save_settings, self.dlg_composer))
         self.dlg_composer.rejected.connect(self.destructor)
 
+        self.load_composer_values(self.dlg_composer)
         self.dlg_composer.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_composer.show()
         
@@ -94,6 +100,16 @@ class ApiManageComposer(ApiParent):
         else:
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
+    def load_composer_values(self, dialog):
+        """ Load values from composer into form dialog """
+        selected_com = self.get_current_composer()
+        if selected_com is not None:
+            widget_list = dialog.grb_option_values.findChildren(QLineEdit)
+            composition = selected_com.composition()
+            for widget in widget_list:
+                item = composition.getComposerItemById(widget.property('column_id'))
+                if type(item) == QgsComposerLabel:
+                    widget.setText(item.text())
 
 
     def preview(self, dialog, show):
@@ -131,7 +147,7 @@ class ApiManageComposer(ApiParent):
             if composer != removed and composer.composerWindow():
                 cur = composer.composerWindow().windowTitle()
                 composers += cur + ', '
-        if len(composers) > 1:
+        if len(composers) > 2:
             composers = composers[:-2] + '}"'
         else:
             composers += '}"'

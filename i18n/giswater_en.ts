@@ -67,7 +67,7 @@
     </message>
     <message>
         <source>58_text</source>
-        <translation>Composer easy print</translation>
+        <translation>Easy print</translation>
     </message>
     <message>
         <source>64_text</source>
