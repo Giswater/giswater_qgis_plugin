@@ -50,6 +50,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btn_open">
+       <property name="text">
+        <string>Open</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btn_close">
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
@@ -62,7 +69,7 @@
     </layout>
    </item>
    <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="grb_option_values">
      <property name="title">
       <string>Optional values:</string>
      </property>

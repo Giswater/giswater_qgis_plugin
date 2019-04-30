@@ -1226,6 +1226,11 @@ class ApiParent(ParentAction):
             widget = self.add_combobox(field)
             widget = self.set_widget_size(widget, field)
             widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+            if 'widgetfunction' in field:
+                if field['widgetfunction'] is not None:
+                    function_name = field['widgetfunction']
+                    widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+
         return label, widget
 
 
