@@ -91,7 +91,9 @@ class ApiManageComposer(ApiParent):
         self.dlg_composer.rejected.connect(partial(self.save_settings, self.dlg_composer))
         self.dlg_composer.rejected.connect(self.destructor)
 
+        self.check_whidget_exist(self.dlg_composer)
         self.load_composer_values(self.dlg_composer)
+
         self.dlg_composer.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_composer.show()
 
@@ -104,6 +106,16 @@ class ApiManageComposer(ApiParent):
             self.dlg_composer.btn_preview.setEnabled(False)
             self.dlg_composer.btn_open.setEnabled(False)
 
+
+    def check_whidget_exist(self, dialog):
+        """ Check if widget exist in composer """
+        selected_com = self.get_current_composer()
+        widget_list = dialog.grb_option_values.findChildren(QLineEdit)
+        for widget in widget_list:
+            item = selected_com.itemById(widget.property('column_id'))
+            if type(item)!= QgsLayoutItemLabel or item is None:
+                widget.setStyleSheet("border: 1px solid red")
+                widget.setPlaceholderText("Widget '{}' not found into composer".format(widget.property('column_id')))
 
     def load_composer_values(self, dialog):
         """ Load values from composer into form dialog """
@@ -131,8 +143,8 @@ class ApiManageComposer(ApiParent):
             if Qgis.QGIS_VERSION_INT < 29900:
                 selected_com.composerWindow().show()
             else:
-                #TODO 3.x how to open composer???
-                pass
+                self.iface.openLayoutDesigner(layout=selected_com)
+
         self.load_composer_values(dialog)
 
 
@@ -284,8 +296,6 @@ class ApiManageComposer(ApiParent):
             else:
                 composer_template = {'ComposerTemplate': composer.name()}
                 index = 0
-                self.controller.log_info("TEST: "+str(composer.name()))
-                print(type(composer))
                 for item in composer.items():
                     cur_map = {}
                     if isinstance(item, QgsLayoutItemMap):
