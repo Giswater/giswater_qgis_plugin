@@ -9,9 +9,11 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_upsertmincut"(mincut_id_arg int
 RETURNS pg_catalog.json AS 
 $BODY$
 
+
 /*
-SELECT SCHEMA_NAME.gw_fct_upsertmincut(477,419203.72254917,4576479.7842369,25831,3,$${"work_order":null,"mincut_state":"0","mincut_type":"Real","anl_cause":"Accidental","assigned_to":"1","anl_descript":null,"anl_tstamp":"2019-01-08 11:50:41",
-"forecast_start":null,"forecast_end":null,"muni_id":"Sant Boi del Llobregat","postcode":"08830","streetaxis_id":"1-10100C","postnumber":null,"exec_start":null,"exec_descript":null,"exec_from_plot":null,"exec_depth":null,
+SELECT SCHEMA_NAME.gw_fct_upsertmincut(477,419203.72254917,4576479.7842369,25831,3,$${"work_order":null,"mincut_state":"0","mincut_type":"Real",
+"anl_cause":"Accidental","assigned_to":"1","anl_descript":null,"anl_tstamp":"2019-01-08 11:50:41",
+"forecast_start":null,"forecast_end":null,"muni_id":"Sant Boi del Llobregat","postcode":"08830","streetaxis_id":"1-10240C","postnumber":33,"exec_start":null,"exec_descript":null,"exec_from_plot":null,"exec_depth":null,
 "exec_user":null,"exec_appropiate":"false","exec_end":null}$$,'arc','2021')
 */
 
@@ -146,13 +148,6 @@ BEGIN
         -- Update municipality value in the JSON
         insert_data := gw_fct_json_object_set_key(insert_data, 'muni_id', muni_id_var);
 
-        -- Find street axis ID
-        SELECT ext_streetaxis.id INTO streetaxis_id_var FROM ext_streetaxis WHERE name = insert_data->>'streetaxis_id';
-
-        -- Update streetaxis value in the JSON
-        insert_data := gw_fct_json_object_set_key(insert_data, 'streetaxis_id', streetaxis_id_var);
-
-
     END IF;
 
 --    Update feature id
@@ -193,7 +188,7 @@ BEGIN
 --    Perform UPDATE (<9.5)
     FOR column_name_var, column_type_var IN SELECT column_name, data_type FROM information_schema.Columns WHERE table_schema = schemas_array[1]::TEXT AND table_name = 'anl_mincut_result_cat' LOOP
         IF (insert_data->>column_name_var) IS NOT NULL THEN
-            EXECUTE 'UPDATE anl_mincut_result_cat SET ' || quote_ident(column_name_var) || ' = $1::' || quote_literal(column_type_var) || ' WHERE anl_mincut_result_cat.id = $2'
+            EXECUTE 'UPDATE anl_mincut_result_cat SET ' || quote_ident(column_name_var) || ' = $1::' || (column_type_var) || ' WHERE anl_mincut_result_cat.id = $2'
             USING insert_data->>column_name_var, v_mincut_id;
         END IF;
     END LOOP;
