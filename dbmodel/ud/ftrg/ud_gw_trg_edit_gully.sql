@@ -282,7 +282,7 @@ BEGIN
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
 	-- delete links & vnode's
-	FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
+	FOR v_record_link IN SELECT * FROM link WHERE feature_type='GULLY' AND feature_id=OLD.gully_id
 	LOOP
 		-- delete link
 		DELETE FROM link WHERE link_id=v_record_link.link_id;
