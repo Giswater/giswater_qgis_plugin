@@ -57,13 +57,16 @@ class ApiManageComposer(ApiParent):
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getprint($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
-        if not row:
+        if not row or row[0] is None:
             self.controller.show_warning("NOT ROW FOR: " + sql)
             return False
 
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if complet_result[0]['formTabs']:
             fields = complet_result[0]['formTabs'][0]
+            # This dialog is created from config_api_form_fieds
+            # where formname == 'printGeneric' and formtype == 'utils'
+            # At the moment, u can set column widgetfunction with 'gw_api_setprint' or open_composer
             self.create_dialog(self.dlg_composer, fields)
         self.hide_void_groupbox(self.dlg_composer)
 
