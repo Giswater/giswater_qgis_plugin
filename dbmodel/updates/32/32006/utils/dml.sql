@@ -117,7 +117,7 @@ WHERE id='om_mincut_analysis_dinletsector';
 
 UPDATE audit_cat_param_user
 SET dv_querytext ='SELECT id, id as idval FROM anl_mincut_result_cat WHERE id IS NOT NULL'
-WHERE id='om_mincut_analysis_dminsector;
+WHERE id='om_mincut_analysis_dminsector';
 
 UPDATE audit_cat_param_user
 SET dv_querytext ='SELECT id, id as idval FROM anl_mincut_result_cat WHERE id IS NOT NULL'
