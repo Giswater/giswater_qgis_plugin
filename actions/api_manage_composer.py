@@ -42,7 +42,6 @@ class ApiManageComposer(ApiParent):
 
 
     def composer(self):
-
         self.my_json = {}
         composers_list = self.get_composer()
         if composers_list == '"{}"':
@@ -108,21 +107,32 @@ class ApiManageComposer(ApiParent):
 
     def load_composer_values(self, dialog):
         """ Load values from composer into form dialog """
-        selected_com = self.get_current_composer()
-        if selected_com is not None:
-            widget_list = dialog.grb_option_values.findChildren(QLineEdit)
-            composition = selected_com.composition()
-            for widget in widget_list:
-                item = composition.getComposerItemById(widget.property('column_id'))
-                if type(item) == QgsComposerLabel:
-                    widget.setText(item.text())
 
+        selected_com = self.get_current_composer()
+        widget_list = dialog.grb_option_values.findChildren(QLineEdit)
+
+        if selected_com is not None:
+            if Qgis.QGIS_VERSION_INT < 29900:
+                composition = selected_com.composition()
+                for widget in widget_list:
+                    item = composition.getComposerItemById(widget.property('column_id'))
+                    if type(item) == QgsComposerLabel:
+                        widget.setText(item.text())
+            else:
+                for widget in widget_list:
+                    item = selected_com.itemById(widget.property('column_id'))
+                    if type(item) == QgsLayoutItemLabel:
+                        widget.setText(str(item.text()))
 
     def open_composer(self, dialog, widget, my_json):
         """ Open selected composer and load values from composer into form dialog """
         selected_com = self.get_current_composer()
         if selected_com is not None:
-            selected_com.composerWindow().show()
+            if Qgis.QGIS_VERSION_INT < 29900:
+                selected_com.composerWindow().show()
+            else:
+                #TODO 3.x how to open composer???
+                pass
         self.load_composer_values(dialog)
 
 
@@ -272,7 +282,6 @@ class ApiManageComposer(ApiParent):
                         composer_template['ComposerMap'] = composer_map
                         index += 1
             else:
-                # TODO 3.x
                 composer_template = {'ComposerTemplate': composer.name()}
                 index = 0
                 self.controller.log_info("TEST: "+str(composer.name()))
