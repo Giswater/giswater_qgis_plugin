@@ -610,7 +610,7 @@ class UpdateSQL(ApiParent):
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep))
+                                            self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -631,12 +631,8 @@ class UpdateSQL(ApiParent):
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
                                     if status is False:
                                         return False
-                                if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
-                                        '') is True:
-                                    status = self.executeFiles(
-                                        self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep))
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),'') is True:
+                                    status = self.executeFiles(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -655,17 +651,14 @@ class UpdateSQL(ApiParent):
                     if new_project:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
-                                if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(
-                                        project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep))
+                                if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), '') is True:
-                                        status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'EN', True)
-                                        if status is False:
-                                            return False
+                                elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
+                                    if status is False:
+                                        return False
 
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.',''):
@@ -678,7 +671,7 @@ class UpdateSQL(ApiParent):
                                         self.locale + os.sep), '') is True:
                                     status = self.executeFiles(self.sql_dir + os.sep + str(
                                         project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep))
+                                        self.locale + os.sep), True)
                                 elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
                                     status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'EN', True)
                                     if status is False:
@@ -701,7 +694,7 @@ class UpdateSQL(ApiParent):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),'') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep))
+                                            self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -727,7 +720,7 @@ class UpdateSQL(ApiParent):
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                            self.locale + os.sep))
+                                            self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -788,7 +781,7 @@ class UpdateSQL(ApiParent):
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep))
+                                        self.locale + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is False:
@@ -813,7 +806,7 @@ class UpdateSQL(ApiParent):
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep))
+                                        self.locale + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
@@ -841,7 +834,7 @@ class UpdateSQL(ApiParent):
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep))
+                                    self.locale + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -860,7 +853,7 @@ class UpdateSQL(ApiParent):
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep))
+                                    self.locale + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -1028,7 +1021,7 @@ class UpdateSQL(ApiParent):
                                 '') is True:
                             status = self.executeFiles(
                                 self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep))
+                                    self.locale + os.sep), True)
                             if status is False:
                                 return False
                         elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -1056,7 +1049,7 @@ class UpdateSQL(ApiParent):
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep))
+                                        self.locale + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep,
@@ -1086,7 +1079,7 @@ class UpdateSQL(ApiParent):
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep))
+                                        self.locale + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
@@ -1114,7 +1107,7 @@ class UpdateSQL(ApiParent):
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep))
+                                        self.locale + os.sep), True)
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep,
@@ -2040,7 +2033,7 @@ class UpdateSQL(ApiParent):
                 if f:
                     if Qgis.QGIS_VERSION_INT < 29900:
                         f_to_read = str(f.read()).decode(str('utf-8-sig'))
-                    f_to_read = f_to_read + '\n \n'
+                    f_to_read = f_to_read + '\n'
                     self.message_update = self.message_update + '\n' + str(f_to_read)
                 else:
                     return False
