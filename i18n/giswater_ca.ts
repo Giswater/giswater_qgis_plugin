@@ -66,6 +66,10 @@
         <source>57_text</source>
         <translation>Sortida de flux</translation>
     </message>
+    <message>
+        <source>58_text</source>
+        <translation>Composer impresio senzilla</translation>
+    </message>
     <!--message>
         <source>64_text</source>
         <translation>Afegir visita</translation>

@@ -67,6 +67,10 @@
         <translation>Salida de flujo</translation>
     </message>
     <message>
+        <source>58_text</source>
+        <translation>Composer impresion sencilla</translation>
+    </message>
+    <message>
         <source>64_text</source>
         <translation>Añadir visita</translation>
     </message>	

@@ -66,6 +66,10 @@
         <translation>Flow exit</translation>
     </message>
     <message>
+        <source>58_text</source>
+        <translation>Composer easy print</translation>
+    </message>
+    <message>
         <source>64_text</source>
         <translation>Add visit</translation>
     </message>	
