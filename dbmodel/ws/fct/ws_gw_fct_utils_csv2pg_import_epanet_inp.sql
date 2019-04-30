@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE:XXXX
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(text);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp(p_data json)
   RETURNS json AS
 
@@ -539,15 +539,15 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 	
+	v_version := COALESCE(v_version, '{}'); 	
 
 --  	Return
 	RETURN ('{"status":"Accepted", "message":{"priority":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-		       '}'||
-	    '}')::json;
+				'"line":'||v_result_line||'}'||
+	    '}}')::json;
 	
 END;
 $BODY$
