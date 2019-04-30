@@ -925,9 +925,14 @@ class ParentAction(object):
             # Todo 3.x  "self.iface.activeComposers()" dont work
             layour_manager = QgsProject.instance().layoutManager().layouts()
             active_composers = [layout for layout in layour_manager]
-            print("TEST 10: " + str(active_composers))
-            self.controller.log_info("TEST 10: " + str(active_composers))
         return active_composers
 
 
-
+    def get_all_actions(self):
+        self.controller.log_info(str("TEST"))
+        actions_list = self.iface.mainWindow().findChildren(QAction)
+        for action in actions_list:
+           self.controller.log_info(str(action.objectName()))
+           action.triggered.connect(partial(self.show_action_name, action))
+    def show_action_name(self, action):
+        self.controller.log_info(str(action.objectName()))
