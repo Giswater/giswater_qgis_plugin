@@ -135,8 +135,8 @@ BEGIN
 
 --		Update the selector
 		--current user
-		DELETE FROM anl_mincut_result_selector WHERE cur_user=current_user_var AND result_id = mincut_id_arg;
-		INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user_var, mincut_id_arg);
+		DELETE FROM anl_mincut_result_selector WHERE cur_user=current_user;
+		INSERT INTO anl_mincut_result_selector(cur_user, result_id) VALUES (current_user, mincut_id_arg);
 		
 		-- publish user
 		SELECT value FROM config_param_system WHERE parameter='api_publish_user' INTO v_publish_user;
