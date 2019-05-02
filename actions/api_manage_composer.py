@@ -15,7 +15,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import  QgsComposerView
     from qgis.PyQt.QtGui import QPrintDialog, QPrinter, QDialog
 else:
-    from qgis.core import QgsProject, QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel
+    from qgis.core import QgsProject, QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
     from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 
 from qgis.PyQt.QtGui import QRegExpValidator
@@ -174,11 +174,7 @@ class ApiManageComposer(ApiParent):
                     item = selected_com.itemById(widget.property('column_id'))
                     if type(item) == QgsLayoutItemLabel:
                         item.setText(str(widget.text()))
-                # selected_com.refreshItems()
-                # selected_com.update()
-                # selected_com.reloadSettings()
-                # selected_com.updateSettings()
-                # selected_com.reloadSettings()
+                        item.refresh()
 
 
     def destructor(self):
@@ -242,24 +238,21 @@ class ApiManageComposer(ApiParent):
 
         if not self.printer:
             self.printer = QPrinter()
-
-        printdialog = QPrintDialog(self.printer)
-        if printdialog.exec_() != QDialog.Accepted:
-            return
         self.preview(dialog, False)
         selected_com = self.get_current_composer()
         if selected_com is None:
             return
+        printdialog = QPrintDialog(self.printer)
+
+
         if Qgis.QGIS_VERSION_INT < 29900:
             print_ = getattr(selected_com.composition(), 'print')
             success = print_(self.printer)
-        # else:
-        #     actual_printer = QgsLayoutExporter(layout_item)
-        #     success = actual_printer.print(self.printer, QgsLayoutExporter.PrintExportSettings())
-        # self.controller.log_info(str(success))
-        # if not success:
-        #     QMessageBox.warning(self.iface.mainWindow(), self.controller.tr("Print Failed"), self.controller.tr("Failed to print the composition."))
-
+        else:
+            actual_printer = QgsLayoutExporter(selected_com)
+            if printdialog.exec_() != QDialog.Accepted:
+                return
+            success = actual_printer.print(self.printer, QgsLayoutExporter.PrintExportSettings())
 
     def update_rectangle(self, dialog, my_json):
         pass
