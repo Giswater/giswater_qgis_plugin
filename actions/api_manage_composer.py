@@ -11,7 +11,7 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsComposerMap, QgsComposerLabel
+    from qgis.core import QgsComposerMap, QgsComposerLabel as QgsLayoutItemLabel
     from qgis.gui import  QgsComposerView
     from qgis.PyQt.QtGui import QPrintDialog, QPrinter, QDialog
 else:
@@ -112,8 +112,12 @@ class ApiManageComposer(ApiParent):
         selected_com = self.get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
-            item = selected_com.itemById(widget.property('column_id'))
-            if type(item)!= QgsLayoutItemLabel or item is None:
+            if Qgis.QGIS_VERSION_INT < 29900:
+                composition = selected_com.composition()
+                item = composition.getComposerItemById(widget.property('column_id'))
+            else:
+                item = selected_com.itemById(widget.property('column_id'))
+            if type(item) != QgsLayoutItemLabel or item is None:
                 widget.setStyleSheet("border: 1px solid red")
                 widget.setPlaceholderText("Widget '{}' not found into composer".format(widget.property('column_id')))
 
@@ -128,7 +132,7 @@ class ApiManageComposer(ApiParent):
                 composition = selected_com.composition()
                 for widget in widget_list:
                     item = composition.getComposerItemById(widget.property('column_id'))
-                    if type(item) == QgsComposerLabel:
+                    if type(item) == QgsLayoutItemLabel:
                         widget.setText(item.text())
             else:
                 for widget in widget_list:
@@ -161,7 +165,7 @@ class ApiManageComposer(ApiParent):
                 composition = selected_com.composition()
                 for widget in widget_list:
                     item = composition.getComposerItemById(widget.property('column_id'))
-                    if type(item) == QgsComposerLabel:
+                    if type(item) == QgsLayoutItemLabel:
                         item.setText(str(widget.text()))
                 composition.refreshItems()
                 composition.update()
