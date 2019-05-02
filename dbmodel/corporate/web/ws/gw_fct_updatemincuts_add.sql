@@ -1,11 +1,17 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatemincuts_add"(search_data json) RETURNS pg_catalog.json AS $BODY$DECLARE
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatemincuts_add"(search_data json) RETURNS pg_catalog.json AS 
+$BODY$
+/*
+SELECT SCHEMA_NAME.gw_fct_updatemincuts_add($${"tabName":"on_going","mincut_muni":{"id":"1","name":"Sant Boi del Llobregat"},"mincut_class":{"id":"1","name":"Corte de red"},"mincut_workorder":{"text":"cal"}}$$) AS result
+*/
+
+DECLARE
 
 --    Variables
     response_json json;
@@ -55,11 +61,15 @@ BEGIN
 
 -- Searh query
     v_query_text = 'SELECT array_to_json(array_agg(row_to_json(a))) 
-    FROM (SELECT work_order as display_name, st_x(anl_the_geom) as sys_x, st_y(anl_the_geom) as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid FROM anl_mincut_result_cat
-    JOIN ext_municipality USING (muni_id)
-    WHERE mincut_state='||v_state|| ' AND mincut_class='||v_class||' AND ext_municipality.muni_id= '||v_muni||
-    'AND work_order ILIKE ''%'||v_search||'%'' LIMIT 10 
+	FROM (SELECT * FROM (SELECT 
+	(CASE WHEN work_order IS NULL THEN concat (a.id::text,''-'',ext_streetaxis.name) ELSE concat (a.id::text,''-'',a.work_order,''-'',ext_streetaxis.name) END) 
+	as display_name, st_x(anl_the_geom) as sys_x, st_y(anl_the_geom) as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid FROM anl_mincut_result_cat a
+	JOIN ext_municipality USING (muni_id)
+	LEFT JOIN ext_streetaxis ON (streetaxis_id = ext_streetaxis.id)    
+	WHERE mincut_state='||v_state|| ' AND mincut_class='||v_class||' AND ext_municipality.muni_id= '||v_muni||')b WHERE display_name ILIKE ''%'||v_search||'%'' LIMIT 10 
     )a';
+
+    raise notice 'v_query_text %', v_query_text;
 
     EXECUTE v_query_text INTO response_json;
 
@@ -73,8 +83,8 @@ BEGIN
         '}')::json;
 
 --    Exception handling
-    --EXCEPTION WHEN OTHERS THEN 
-    --    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    EXCEPTION WHEN OTHERS THEN 
+        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;$BODY$
