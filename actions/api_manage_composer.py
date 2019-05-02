@@ -84,7 +84,6 @@ class ApiManageComposer(ApiParent):
         # Signals
         self.dlg_composer.btn_print.clicked.connect(partial(self.__print, self.dlg_composer))
         self.dlg_composer.btn_preview.clicked.connect(partial(self.preview, self.dlg_composer, True))
-        self.dlg_composer.btn_open.clicked.connect(partial(self.open_composer, self.dlg_composer, None, None))
         self.dlg_composer.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(partial(self.save_settings, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(self.destructor)
@@ -93,7 +92,6 @@ class ApiManageComposer(ApiParent):
 
         self.check_whidget_exist(self.dlg_composer)
         self.load_composer_values(self.dlg_composer)
-
         self.dlg_composer.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_composer.show()
 
@@ -104,7 +102,6 @@ class ApiManageComposer(ApiParent):
         else:
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
-            self.dlg_composer.btn_open.setEnabled(False)
 
 
     def check_whidget_exist(self, dialog):
@@ -118,10 +115,14 @@ class ApiManageComposer(ApiParent):
             else:
                 item = selected_com.itemById(widget.property('column_id'))
             if type(item) != QgsLayoutItemLabel or item is None:
+                widget.clear()
                 widget.setStyleSheet("border: 1px solid red")
                 widget.setPlaceholderText("Widget '{}' not found into composer".format(widget.property('column_id')))
+            elif type(item) == QgsLayoutItemLabel and item is not None:
+                widget.setStyleSheet("border: 1px solid gray")
 
-    def load_composer_values(self, dialog):
+
+    def load_composer_values(self, dialog, widget=None, my_json=None):
         """ Load values from composer into form dialog """
 
         selected_com = self.get_current_composer()
@@ -136,11 +137,13 @@ class ApiManageComposer(ApiParent):
                         widget.setText(item.text())
             else:
                 for widget in widget_list:
+                    print(widget.property('column_id'))
                     item = selected_com.itemById(widget.property('column_id'))
                     if type(item) == QgsLayoutItemLabel:
+                        print(str(item.text()))
                         widget.setText(str(item.text()))
 
-    def open_composer(self, dialog, widget, my_json):
+    def open_composer(self, dialog):
         """ Open selected composer and load values from composer into form dialog """
         selected_com = self.get_current_composer()
         if selected_com is not None:
@@ -159,23 +162,24 @@ class ApiManageComposer(ApiParent):
         composition = None
         selected_com = self.get_current_composer()
         widget_list = dialog.findChildren(QLineEdit)
-        if show:
-            if Qgis.QGIS_VERSION_INT < 29900:
-                selected_com.composerWindow().show()
-                composition = selected_com.composition()
-                for widget in widget_list:
-                    item = composition.getComposerItemById(widget.property('column_id'))
-                    if type(item) == QgsLayoutItemLabel:
-                        item.setText(str(widget.text()))
-                composition.refreshItems()
-                composition.update()
-            else:
-                for widget in widget_list:
-                    item = selected_com.itemById(widget.property('column_id'))
-                    if type(item) == QgsLayoutItemLabel:
-                        item.setText(str(widget.text()))
-                        item.refresh()
 
+        if Qgis.QGIS_VERSION_INT < 29900:
+            selected_com.composerWindow().show()
+            composition = selected_com.composition()
+            for widget in widget_list:
+                item = composition.getComposerItemById(widget.property('column_id'))
+                if type(item) == QgsLayoutItemLabel:
+                    item.setText(str(widget.text()))
+            composition.refreshItems()
+            composition.update()
+        else:
+            for widget in widget_list:
+                item = selected_com.itemById(widget.property('column_id'))
+                if type(item) == QgsLayoutItemLabel:
+                    item.setText(str(widget.text()))
+                    item.refresh()
+        if show:
+            self.open_composer(dialog)
 
     def destructor(self):
 
@@ -242,17 +246,22 @@ class ApiManageComposer(ApiParent):
         selected_com = self.get_current_composer()
         if selected_com is None:
             return
-        printdialog = QPrintDialog(self.printer)
 
+        printdialog = QPrintDialog(self.printer)
+        if printdialog.exec_() != QDialog.Accepted:
+            return
 
         if Qgis.QGIS_VERSION_INT < 29900:
             print_ = getattr(selected_com.composition(), 'print')
             success = print_(self.printer)
         else:
             actual_printer = QgsLayoutExporter(selected_com)
-            if printdialog.exec_() != QDialog.Accepted:
-                return
-            success = actual_printer.print(self.printer, QgsLayoutExporter.PrintExportSettings())
+            # The correct instruction for python3 is:
+            # success = actual_printer.print(self.printer, QgsLayoutExporter.PrintExportSettings())
+            # but python2 produces an error in the word 'print' at actual_printer.print(...),
+            # then we need to create a fake to cheat python2
+            print_ = getattr(actual_printer, 'print')
+            success = print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
     def update_rectangle(self, dialog, my_json):
         pass
@@ -260,7 +269,11 @@ class ApiManageComposer(ApiParent):
 
     def gw_api_setprint(self, dialog, widget, my_json):
         if my_json['composer'] != '-1':
+
+            self.check_whidget_exist(self.dlg_composer)
+            self.load_composer_values(dialog)
             self.accept(dialog, my_json)
+
 
 
     def accept(self, dialog, my_json):
