@@ -199,7 +199,11 @@ BEGIN
 
     
         IF v_mincut_class = 2 THEN
+        
             INSERT INTO anl_mincut_result_connec(result_id, connec_id, the_geom) VALUES (v_mincut_id, id_arg, point_geom);
+            INSERT INTO anl_mincut_result_hydrometer(result_id, hydrometer_id) 
+            SELECT v_mincut_id, hydrometer_id FROM rtc_hydrometer_x_connec WHERE connec_id=id_arg;
+            
         ELSIF v_mincut_class = 3 THEN
             INSERT INTO anl_mincut_result_hydrometer(result_id, hydrometer_id) VALUES (v_mincut_id, id_arg);
         ELSE
