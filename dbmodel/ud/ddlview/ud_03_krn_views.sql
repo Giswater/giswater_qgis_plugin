@@ -61,7 +61,7 @@ FROM gully
 JOIN selector_state ON gully.state=selector_state.state_id;
 
 
-
+-- definiton updated on 3.2.008
 DROP VIEW IF EXISTS v_ui_arc_x_relations CASCADE;
 CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
 SELECT row_number() OVER () + 1000000 AS rid,
