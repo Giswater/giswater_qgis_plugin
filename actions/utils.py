@@ -239,13 +239,11 @@ class Utils(ParentAction):
         self.dlg_csv.rejected.connect(partial(self.close_dialog, self.dlg_csv))
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
-        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.disable_import_label, self.dlg_csv))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.get_function_name))
         self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self.preview_csv, self.dlg_csv))
-        self.disable_import_label(self.dlg_csv)
         self.get_function_name()
         self.load_settings_values()
 
@@ -260,17 +258,6 @@ class Utils(ParentAction):
     def get_function_name(self):
         self.func_name = utils_giswater.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
         self.controller.log_info(str(self.func_name))
-
-        
-    def disable_import_label(self, dialog):
-
-        csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
-        if csv2pgcat_id_aux == 4:
-            dialog.txt_import.setEnabled(False)
-            dialog.txt_import.setReadOnly(True)
-        else:
-            dialog.txt_import.setEnabled(True)
-            dialog.txt_import.setReadOnly(False)
 
 
     def populate_cmb_unicodes(self, combo):
@@ -324,13 +311,6 @@ class Utils(ParentAction):
         self.preview_csv(dialog)
         if path is None or path == 'null':
             return False
-        csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
-        if csv2pgcat_id_aux != 4:
-            if label_aux is None or label_aux == 'null':
-                message = "Please put a import label"
-                self.controller.show_warning(message)
-                return False
-
         return True
 
 
@@ -405,29 +385,31 @@ class Utils(ParentAction):
 
     def write_csv(self, dialog, temp_tablename):
         """ Write csv in postgre and call gw_fct_utils_csv2pg function """
-
+        insert_status = True
         if not self.validate_params(dialog):
             return
 
         csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
         self.delete_table_csv(temp_tablename, csv2pgcat_id_aux)
         path = utils_giswater.getWidgetText(dialog, dialog.txt_file_csv)
-        label_aux = utils_giswater.getWidgetText(dialog, dialog.txt_import)
+        label_aux = utils_giswater.getWidgetText(dialog, dialog.txt_import, return_string_null=False)
         delimiter = self.get_delimiter(dialog)
         _unicode = utils_giswater.getWidgetText(dialog, dialog.cmb_unicode_list)
         try:
             if Qgis.QGIS_VERSION_INT < 29900:
                 with open(path, 'r') as csvfile:
-                    self.insert_into_db(dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename)
+                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename)
             else:
                 with open(path, 'r', encoding=_unicode) as csvfile:
-                    self.insert_into_db(dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename)
+                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename)
         except Exception as e:
             self.controller.show_warning(str(e))
-            return
+            self.controller.log_info(str(insert_status))
         self.save_settings_values()
-
-        extras = '"importparam":"' + label_aux + '"'
+        if insert_status is False:
+            return
+        extras = '"importParam":"' + label_aux + '"'
+        extras += ', "csv2pgCat":"' + str(csv2pgcat_id_aux) + '"'
         body = self.create_body(extras=extras)
         sql = ("SELECT " + self.schema_name + "." + str(self.func_name) + "($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True, commit=True)
@@ -489,8 +471,9 @@ class Utils(ParentAction):
 
                 status = self.controller.execute_sql(sql)
                 if not status:
-                    return
+                    return False
                 dialog.progressBar.setValue(progress)
+                return True
 
 
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
