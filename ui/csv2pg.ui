@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
+    <width>896</width>
     <height>390</height>
    </rect>
   </property>
@@ -90,20 +90,20 @@
             <item>
              <widget class="QComboBox" name="cmb_import_type">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
               <property name="minimumSize">
                <size>
-                <width>100</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>150</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -199,6 +199,12 @@
               </item>
               <item alignment="Qt::AlignLeft">
                <widget class="QComboBox" name="cmb_unicode_list">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>100</width>
@@ -207,7 +213,7 @@
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>16777215</width>
                   <height>16777215</height>
                  </size>
                 </property>
