@@ -16,8 +16,8 @@ else:
     from builtins import range
 
 from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy, QLineEdit
-from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QGroupBox, QSpacerItem, QSizePolicy
+from qgis.PyQt.QtWidgets import QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
 
 from collections import OrderedDict
 import json
@@ -201,6 +201,14 @@ class ApiConfig(ApiParent):
                     else:
                         widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'textarea':
+                    widget = QTextEdit()
+                    widget.setText(field['value'])
+                    if Qgis.QGIS_VERSION_INT < 29900:
+                        widget.lostFocus.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    else:
+                        widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
                     self.populate_combo(widget, field)
@@ -281,6 +289,14 @@ class ApiConfig(ApiParent):
 
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
+                    widget.setText(field['value'])
+                    if Qgis.QGIS_VERSION_INT < 29900:
+                        widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
+                    else:
+                        widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'textarea':
+                    widget = QTextEdit()
                     widget.setText(field['value'])
                     if Qgis.QGIS_VERSION_INT < 29900:
                         widget.lostFocus.connect(partial(self.get_values_changed_param_system, widget))
