@@ -309,7 +309,7 @@ BEGIN
 --		Return geometry
 		IF v_mincut_class=1 THEN
 			EXECUTE 'SELECT row_to_json(row) 
-				FROM (SELECT St_AsText(St_simplify(St_closestPoint(arc.the_geom,$1),0)) FROM ws_sample.arc ORDER BY ST_Distance(arc.the_geom, $1) LIMIT 1)row'
+				FROM (SELECT St_AsText(St_simplify(St_closestPoint(arc.the_geom,$1),0)) FROM arc ORDER BY ST_Distance(arc.the_geom, $1) LIMIT 1)row'
 				INTO v_geometry
 				USING point_geom;
 		ELSE
