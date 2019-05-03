@@ -126,6 +126,7 @@ class UpdateSQL(ApiParent):
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
+            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "others")
             self.project_types = self.settings.value('system_variables/project_types')
         else:
             self.project_types = self.settings.value('system_variables/project_types_dev')
