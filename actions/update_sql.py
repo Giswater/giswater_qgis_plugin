@@ -21,6 +21,7 @@ import re
 import json
 from functools import partial
 from collections import OrderedDict
+from xml.etree import ElementTree as et
 
 import utils_giswater
 
@@ -196,6 +197,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self.delete_schema))
         self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
+        self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self.create_qgis_template))
 
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.open_form_create_gis_project))
 
@@ -2119,6 +2121,73 @@ class UpdateSQL(ApiParent):
         self.close_dialog(self.dlg_readsql_create_project)
 
 
+    def create_qgis_template(self):
+
+        #Set wait cursor
+        self.set_wait_cursor()
+
+        # Get dev config file
+        setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
+        if not os.path.exists(setting_file):
+            message = "Dev Config file not found at: " + setting_file
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            return
+
+        # Set plugin settings
+        self.dev_settings = QSettings(setting_file, QSettings.IniFormat)
+        self.dev_settings.setIniCodec(sys.getfilesystemencoding())
+
+        # Get values
+        self.folder_path = self.dev_settings.value('general_dev/folder_path')
+        self.text_replace_labels = self.dev_settings.value('text_replace/labels')
+        self.xml_set_labels = self.dev_settings.value('xml_set/labels')
+        if not os.path.exists(self.folder_path):
+            message = "Directory not found at: " + self.folder_path
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            return
+
+        # Start read files
+        qgis_files = sorted(os.listdir(self.folder_path))
+        for file in qgis_files:
+            self.controller.log_info("Reading file", parameter=file)
+            # Open file for read
+            f = open(self.folder_path + os.sep + file, 'r')
+            if f:
+                f_to_read = str(f.read())
+
+                # Replace into template text
+                for text_replace in self.text_replace_labels:
+                    self.text_replace = self.dev_settings.value('text_replace/' + text_replace)
+                    self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
+                    f_to_read = str(f_to_read.replace(self.text_replace[0], self.text_replace[1]))
+
+                # Close file
+                f.close()
+
+                # Open file for write
+                f = open(self.folder_path + os.sep + file, 'w')
+                f.write(f_to_read)
+
+                # Close file
+                f.close()
+
+                # Set template values
+                for xml_set in self.xml_set_labels:
+                    self.xml_set = self.dev_settings.value('xml_set/' + xml_set)
+                    tree = et.parse(str(self.folder_path + os.sep + file))
+                    if tree.find(self.xml_set[0]) is not None:
+                        self.controller.log_info("Seting template value", parameter=self.xml_set[1])
+                        tree.find(self.xml_set[0]).text = self.xml_set[1]
+                        tree.write(str(self.folder_path + os.sep + file))
+
+        # Set arrow cursor
+        self.set_arrow_cursor()
+
+        # Finish proces
+        msg = "The QGIS Projects templates was correctly created."
+        self.controller.show_info_box(msg, "Info")
+
+
     """ Take current project type changed """
 
     def change_project_type(self, widget):
@@ -2223,6 +2292,7 @@ class UpdateSQL(ApiParent):
                 break
 
         return status
+
 
     def set_log_text(self, dialog, data):
 

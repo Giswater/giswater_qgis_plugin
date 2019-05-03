@@ -80,7 +80,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="general">
        <attribute name="title">
@@ -579,9 +579,9 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="custom">
+      <widget class="QWidget" name="others">
        <attribute name="title">
-        <string>Custom</string>
+        <string>Others</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
@@ -656,7 +656,23 @@
           </layout>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Others</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_14">
+           <item row="0" column="0">
+            <widget class="QPushButton" name="btn_create_qgis_template">
+             <property name="text">
+              <string>Create QGIS template</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0">
          <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
