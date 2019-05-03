@@ -128,7 +128,7 @@ class ManConnecDialog(ParentDialog):
 
         self.load_state_type(self.dialog, state_type, self.geom_type)
         self.load_dma(self.dialog, dma_id, self.geom_type)
-        self.load_pressure_zone(self.dialog ,presszonecat_id, self.geom_type)
+        #self.load_pressure_zone(self.dialog ,presszonecat_id, self.geom_type)
 
 
     def check_url(self):
