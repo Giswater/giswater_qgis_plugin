@@ -165,7 +165,7 @@ class DaoController(object):
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
 
-        if layer is None and settings is None:
+        if layer is None and type(settings.value('port')) != int:
             not_version = False
             self.log_warning("Layer 'v_edit_node' is None and settings is None")
             self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
