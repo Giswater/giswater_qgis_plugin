@@ -150,8 +150,10 @@ BEGIN
 				END IF;
 			END IF;
 			
-	ELSE 	
+			v_presszone := (SELECT row_to_json(a) FROM (SELECT "descript"::text FROM config_param_user 
+							JOIN cat_presszone on cat_presszone.id=value WHERE "parameter"='presszone_vdefault' AND cur_user=current_user)a);
 			
+	ELSE 		
 			-- definition of variables
 			v_fieldtype = concat(v_feature_type,'_type');
 			v_type_vdef = concat(v_feature_type,'type_vdefault');
@@ -215,7 +217,6 @@ BEGIN
 	v_inventory := (SELECT row_to_json(a) FROM (SELECT "value"::boolean FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault' LIMIT 1)a);
 	v_publish := (SELECT row_to_json(a) FROM (SELECT "value"::boolean FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault' LIMIT 1)a);
 	v_uncertain := (SELECT row_to_json(a) FROM (SELECT "value"::boolean FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault' LIMIT 1)a);
-	v_presszone := (SELECT row_to_json(a) FROM (SELECT "descript"::text FROM config_param_user JOIN cat_presszone on cat_presszone.id=value WHERE "parameter"='presszone_vdefault' AND cur_user=current_user)a);
 
 --    Control NULL's
     v_feature_id := COALESCE(v_feature_id, '{}');
