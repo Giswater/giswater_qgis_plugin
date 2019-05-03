@@ -7,10 +7,9 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2128
 
 
-
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result(text, integer, double precision, text);
 
-CREATE OR REPLACE FUNCTION ws_sample32.gw_fct_plan_result( p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result( p_data json)
   RETURNS json AS
 $BODY$
 
@@ -22,6 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_plan_result($${
 
 DECLARE 
 project_type_aux 	text;
+v_project_type		text;
 v_version		text;
 id_last 		integer;
 v_saveondatabase	boolean;
@@ -29,17 +29,18 @@ v_result_id		text;
 v_result_type		integer;
 v_coefficient		float;
 v_descript		text;
+v_return		json;
 BEGIN 
 
-    SET search_path = "ws_sample32", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 
 	-- getting input data 	
 	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
-	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
-	v_result_type := ((p_data ->>'data')::json->>'parameters')::json->>'resultType'::text;
-	v_coefficient := ((p_data ->>'data')::json->>'parameters')::json->>'coefficient'::float;
-	v_descript := ((p_data ->>'data')::json->>'parameters')::json->>'description'::float;
+	v_result_id := (((p_data ->>'data')::json->>'parameters')::json->>'resultId')::text;
+	v_result_type := (((p_data ->>'data')::json->>'parameters')::json->>'resultType')::text;
+	v_coefficient := (((p_data ->>'data')::json->>'parameters')::json->>'coefficient')::float;
+	v_descript := (((p_data ->>'data')::json->>'parameters')::json->>'description')::text;
 
 	-- select config values
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
