@@ -10,37 +10,64 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result(text, integer, double precision, text);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_result( result_name_var text, result_type_var integer, coefficient_var double precision, descript_var text)
-  RETURNS integer AS
+CREATE OR REPLACE FUNCTION ws_sample32.gw_fct_plan_result( p_data json)
+  RETURNS json AS
 $BODY$
 
-DECLARE 
-id_last integer;
+/*EXAMPLE
+SELECT SCHEMA_NAME.gw_fct_plan_result($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"feature":{},"data":{"parameters":{"coefficient":1.67, "description":"test descript", "resultType":1, "resultId":"test1"},"saveOnDatabase":true}}$$)
+*/
 
+DECLARE 
+project_type_aux 	text;
+v_version		text;
+id_last 		integer;
+v_saveondatabase	boolean;
+v_result_id		text;
+v_result_type		integer;
+v_coefficient		float;
+v_descript		text;
 BEGIN 
 
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample32", public;
+
+
+	-- getting input data 	
+	v_saveondatabase :=  ((p_data ->>'data')::json->>'saveOnDatabase')::boolean;
+	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
+	v_result_type := ((p_data ->>'data')::json->>'parameters')::json->>'resultType'::text;
+	v_coefficient := ((p_data ->>'data')::json->>'parameters')::json->>'coefficient'::float;
+	v_descript := ((p_data ->>'data')::json->>'parameters')::json->>'description'::float;
+
+	-- select config values
+	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
+
+	SELECT gw_fct_plan_audit_check_data (p_data) INTO v_return;
 
 	-- insert into result_cat table
 	INSERT INTO om_result_cat (name, result_type, network_price_coeff, tstamp, cur_user, descript, pricecat_id) 
-	VALUES ( result_name_var, result_type_var, coefficient_var, now(), 
-		current_user, descript_var, (SELECT id FROM price_cat_simple ORDER BY tstamp DESC LIMIT 1))  RETURNING result_id INTO id_last;
+	VALUES ( v_result_id, v_result_type, v_coefficient, now(), 
+		current_user, v_descript, (SELECT id FROM price_cat_simple ORDER BY tstamp DESC LIMIT 1))  RETURNING result_id INTO id_last;
 	
 	DELETE FROM plan_result_selector WHERE cur_user=current_user;
 	INSERT INTO plan_result_selector (result_id, cur_user) VALUES (id_last, current_user);
 	
-	IF result_type_var=1 THEN
+	IF v_result_type=1 THEN
 	
-		PERFORM gw_fct_plan_result_rec(id_last, coefficient_var, descript_var);
+		PERFORM gw_fct_plan_result_rec(id_last, v_coefficient, v_descript);
 		
-	ELSIF result_type_var=2 THEN
+	ELSIF v_result_type=2 THEN
 		
-		PERFORM gw_fct_plan_result_reh(id_last, coefficient_var, descript_var);
+		PERFORM gw_fct_plan_result_reh(id_last, v_coefficient, v_descript);
 	
 	END IF;
 		
+
 	
-RETURN 1;
+--  Return
+    RETURN v_return;
 
 END;
 $BODY$
