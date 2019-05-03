@@ -18,48 +18,67 @@ EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
-"data":{"visitDescript":"Test"}}$$)
+"data":{"csv2pgCat":13, "importParam":"Test"}}$$)
 
 
 INSTRUCTIONS
 ------------
-Two parameters:
-1: v_isvisitexists: 	- If true, no visit is added because events are related to existing visits
-2: v_visit_descript:	- om_visit.descript value
+CSV file may have four type of column data:
 
-Three steps:
-1) PREVIOUS
-	1) Check all the news visit_id does not exists on om_visit table
-	2) Check the visicat_id is defined on om_visit_cat table
-	3) Define the parameters that will be imported on the variable utils_csv2pg_om_visit_parameters on config_param_system  {"p1", "p2", "p3"......"p11"} according with rows csv10, csv11, csv12...... csv20
-	4) Parameters defined on 3) must exists on om_visit_parameter table
-	5) Dates must have the format of date
-
-2) INSERT DATA ON temp_csv2pg (using any way any technology)
-	data on table must be:
-	(csv2pgcat_id, user_name, visit_id, visitcat_id, startdate, enddate, feature_type, feature_id, date, ext_code, user_field, parameter1, parameter2, parameter3, parameter4, parameter5, parameter6....	
-				  csv1      csv2         csv3       csv4     csv5          csv6        csv7  csv8      csv9        csv10...
-
-	DELETE FROM SCHEMA_NAME.temp_csv2pg where user_name=current_user AND csv2pgcat_id=2;
-	INSERT INTO SCHEMA_NAME.temp_csv2pg (csv2pgcat_id, user_name, csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10, csv11, csv12) 
-	SELECT 2, current_user, visit_id, visitcat_id, startdate, enddate, 'arc', "PrimeroDearc_id", "DATA", ext_code, user_name, "ESTAT_GENERAL", "ESTAT_SEDIMENTS", "DEFECTES_PUNTUALS" from public.traspas_events
-
-select distinct "DEFECTES_PUNTUALS" from public.traspas_events
-select distinct "ESTAT_SEDIMENTS" from public.traspas_events
-select distinct "ESTAT_GENERAL" from public.traspas_events
-
+	visit_id, visit_cat,   visit_team, visit_date, visit_code, 			feature_type, feature_id, 		inventory1, inventory2......., inventoryn, 		   parameter1, parameter2.... parametern
+	  csv1      csv2         csv3          csv4        csv5  			   csv6          csv7       	  csv8			csv9			 csvn				csvn+1      csvn+2          csvn+m
 	
-3) MOVE DATA FROM temp_csv2pg TO om_visit tables
-	SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_omvisit(2,'Events importats dels GIS vell')
+	Visit data: (csv1....csv5) - all mandatory
+		visit_id: Check all the news visit_id does not exists on om_visit table
+		visit_cat: Check the visicat_id is defined on om_visit_cat table
+		visit_team: Check the visicat_id is defined on team's table
+		visit_date: Dates must have the format of date
+		visit_code: Not mandatory code to put things like workorder or any other info
+	
+	Feature values:  (csv6,csv7)  - all mandatory
+		feature_type (ARC / NODE / CONNEC /GULLY)
+		feature_id
+		
+	Inventory values: (csv8....csvn) - not mandatory
+		This is a not mandatory values defined on config_param_system: The goal of this is use the visit work to improve the inventory data. 
+		Parameters defined must exists on table of inventory
+		System must be cofigured. 
+			To configure inventory columns to be checked use configure utils_csv2pg_om_visit_parameters_* 
+				key "feature"."columns":["node1", "node2", "y1", "y2", "shape", "geom1", "geom2", "material")
+			To configure tolerance values use utils_csv2pg_om_visit_parameters_* ,  
+				key "feature"."tolerance": ["y1":">0.05", "y2":">0.05", "shape":"!=shape", "geom1":">0.05", "geom2":">0.05, "material":"!=shape"]
+		
+	Visit parameters: (csvn+1....csvn+m) - at least one mandatory
+		Parameters defined must exists on om_visit_parameter table: At least one parameter is mandatory
+		System must be configured 
+			To configure the parameters use utils_csv2pg_om_visit_parameters_*
+				key "visit"."firstCsvParameter" to define n+1 position
+				key "visit"."visitParameters":["residus_percen", "estat_general", "estat_parets", "estat_solera", "estat_tester", "estat_volta", "observacions"])
+		
+
+Configuration tips:
+	Variables on config_param_system
+		visit for arc:  utils_csv2pg_om_visit_parameters_13
+		visit for node: utils_csv2pg_om_visit_parameters_14
+		visit for connec: utils_csv2pg_om_visit_parameters_15
+		visit for gully: utils_csv2pg_om_visit_parameters_16
+	
+	Details of the structure configuration for variables
+		{"id":"inspeccioPreviaTram", 
+			"feature": {"tableName":"arc", "columns":["node1", "node2", "y1", "y2", "shape", "geom1", "geom2", "material"
+					   "tolerance":["y1":">0.05", "y2":"0.05", "shape":"!=shape", "geom1":">0.05", "geom2":">0.05, "material":"!=shape"]}, 
+			"visit":{"isVisitExists":false, "tableName":"om_visit_x_arc", "featureColumn":"arc_id", "firstCsvParameter":16, 
+						"visitParameters": ["residus_percen", "estat_general", "estat_parets", "estat_solera", "estat_tester", "estat_volta", "observacions"]}}		
 */
 
+
 DECLARE
-	v_parameters record;
+	v_parameters text;
 	v_visit record;
 	v_parameter_id text;
 	v_csv integer = 0;
 	v_csv_id text;
-	v_parameter_value text;
+	v_value text;
 	v_isvisitexists boolean;
 	v_visit_descript text;
 	v_result_id text= 'import visit file';
@@ -68,85 +87,154 @@ DECLARE
 	v_project_type text;
 	v_version text;
 	v_featuretable text;
+	v_csv2pgcat_id integer;
+	v_column text;
+	v_visittablename text;
+	v_visitcolumnname text;
+	v_featuretablename text;
+	
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
+	delete from om_visit;
+
 	-- get system parameters
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
 
-	-- get config parameteres
-	v_isvisitexists = (SELECT value::json->>'isVisitExists' FROM config_param_system WHERE parameter = 'utils_csv2pg_om_visit_parameters');
-
 	-- get input parameter
-	v_visit_descript =  (p_data::json->>'data')::json->>'visitDescript';
+	v_visit_descript =  (p_data::json->>'data')::json->>'importParam';
+	v_csv2pgcat_id =  (p_data::json->>'data')::json->>'csv2pgCat';
+	v_csv2pgcat_id = 13;
+
+	-- get config parameteres
+	v_isvisitexists = (SELECT (value::json->>'visit')::json->>'isVisitExists' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
+	v_visittablename = (SELECT (value::json->>'visit')::json->>'tableName' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
+	v_visitcolumnname = (SELECT (value::json->>'visit')::json->>'featureColumn' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
+	v_featuretablename = (SELECT (value::json->>'feature')::json->>'tableName' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
+	
 
 	-- manage log (fprocesscat 42)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND user_name=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORT VISIT FILE'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('----------------------'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORTACIO VISITES CONTRATA'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('-------------------------------'));
    
  	-- starting process
 	-- Insert into audit table
 	INSERT INTO audit_log_csv2pg 
 	(csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20)
 	SELECT csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
-	FROM temp_csv2pg WHERE csv2pgcat_id=9 AND user_name=current_user;
+	FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND user_name=current_user;
 
-	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=9 AND user_name=current_user
+	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND user_name=current_user
 	LOOP
 	
 		IF v_isvisitexists IS FALSE OR v_isvisitexists IS NULL THEN
 		
 			-- Insert into visit table
 			INSERT INTO om_visit (id, visitcat_id, startdate, enddate, ext_code, user_name, descript) 
-			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv7::date, v_visit.csv7::date, v_visit.csv8, v_visit.csv9, v_visit_descript);
+			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv4::date, v_visit.csv4::date, v_visit.csv5, v_visit.csv3, v_visit_descript);
 	
 			-- Insert into feature table
-			v_featuretable = concat ('om_visit_x_', v_visit.csv5);
-			EXECUTE 'UPDATE '||v_featuretable||' SET is_last=FALSE where '||v_visit.csv5||'_id::text='||v_visit.csv6||'::text';
-			EXECUTE 'INSERT '||v_featuretable||' (visit_id, '||v_visit.csv5||'_id) VALUES ( '||v_visit.csv1||','||v_visit.csv6||')';
-		
-		END IF;
-	
-		v_csv=10;
+			EXECUTE 'UPDATE '||v_visittablename||' SET is_last=FALSE where '||v_visitcolumnname||'::text='||v_visit.csv4||'::text';
+			EXECUTE 'INSERT INTO ' ||v_visittablename||' (visit_id, '||v_visitcolumnname||') VALUES ( '||v_visit.csv1||','||v_visit.csv7||')';
 			
-		FOR v_parameters IN SELECT json_array_elements((value::json->>'parameters')::json) FROM config_param_system WHERE parameter = 'utils_csv2pg_om_visit_parameters'
+		END IF;
+
+		-- feature columns
+		v_csv=8;
+			
+		FOR v_column IN SELECT json_array_elements(((value::json->>'feature')::json->>'columns')::json) FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
+		LOOP
+
+			IF v_csv = 8 THEN
+				v_value = v_visit.csv8;
+			ELSIF v_csv = 9 THEN
+				v_value = v_visit.csv9;
+			ELSIF v_csv = 10 THEN	
+				v_value = v_visit.csv10;
+			ELSIF v_csv = 11 THEN
+				v_value = v_visit.csv11;
+			ELSIF v_csv = 12 THEN
+				v_value = v_visit.csv12;
+			ELSIF v_csv = 13 THEN
+				v_value = v_visit.csv13;
+			ELSIF v_csv = 14 THEN
+				v_value = v_visit.csv14;
+			ELSIF v_csv = 15 THEN
+				v_value = v_visit.csv15;
+			ELSIF v_csv = 16 THEN
+				v_value = v_visit.csv16;
+			ELSIF v_csv = 17 THEN
+				v_value = v_visit.csv17;
+			ELSIF v_csv = 18 THEN
+				v_value = v_visit.csv18;
+			END IF;
+			
+			v_csv=v_csv+1;
+			raise notice 'v_column: %, v_value: %', v_column, v_value;
+
+			-- need to compare values and create json log
+			--LOOP COMPARING VALUES
+
+		END LOOP;
+					
+
+		-- visit parameters	
+	
+		v_csv = (SELECT (value::json->>'visit')::json->>'firstCsvParameter' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id))::integer;
+			
+		FOR v_parameters IN SELECT json_array_elements(((value::json->>'visit')::json->>'visitParameters')::json) FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
 		LOOP			
 			-- parameters are defined from row csv10 to row csv20
-			IF v_csv = 10 THEN
-				v_parameter_value = v_visit.csv10;
+			IF v_csv = 8 THEN
+				v_value = v_visit.csv8;
+			ELSIF v_csv = 9 THEN
+				v_value = v_visit.csv9;
+			ELSIF v_csv = 10 THEN	
+				v_value = v_visit.csv10;
 			ELSIF v_csv = 11 THEN
-				v_parameter_value = v_visit.csv11;
-			ELSIF v_csv = 12 THEN	
-				v_parameter_value = v_visit.csv12;
+				v_value = v_visit.csv11;
+			ELSIF v_csv = 12 THEN
+				v_value = v_visit.csv12;
 			ELSIF v_csv = 13 THEN
-				v_parameter_value = v_visit.csv13;
+				v_value = v_visit.csv13;
 			ELSIF v_csv = 14 THEN
-				v_parameter_value = v_visit.csv14;
+				v_value = v_visit.csv14;
 			ELSIF v_csv = 15 THEN
-				v_parameter_value = v_visit.csv15;
+				v_value = v_visit.csv15;
 			ELSIF v_csv = 16 THEN
-				v_parameter_value = v_visit.csv16;
+				v_value = v_visit.csv16;
 			ELSIF v_csv = 17 THEN
-				v_parameter_value = v_visit.csv17;
+				v_value = v_visit.csv17;
 			ELSIF v_csv = 18 THEN
-				v_parameter_value = v_visit.csv18;
+				v_value = v_visit.csv18;
 			ELSIF v_csv = 19 THEN
-				v_parameter_value = v_visit.csv19;
+				v_value = v_visit.csv19;
 			ELSIF v_csv = 20 THEN
-				v_parameter_value = v_visit.csv20;
+				v_value = v_visit.csv20;
+			ELSIF v_csv = 21 THEN
+				v_value = v_visit.csv21;
+			ELSIF v_csv = 22 THEN
+				v_value = v_visit.csv22;
+			ELSIF v_csv = 23 THEN
+				v_value = v_visit.csv23;
+			ELSIF v_csv = 24 THEN
+				v_value = v_visit.csv24;
 			END IF;
+			
 			v_csv=v_csv+1;
-				raise notice 'v_parameter_id: %, v_parameter_value: %', v_parameter_id, v_parameter_value;
+
+			raise notice 'v_parameter_id: %, v_value: %', v_parameters, v_value;
+
+			v_parameters=replace(v_parameters,'"','');
 	
 			-- set previous to is_last=false
-			EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_id)||' AND visit_id IN (SELECT visit_id FROM om_visit_x_'||v_visit.csv5||'
-				WHERE '||v_visit.csv5||'_id = '||v_visit.csv6||'::text)';
+			--EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_id)||' AND visit_id IN (SELECT visit_id FROM '||v_visittablename||' WHERE '||v_visitcolumnname||' = '||v_visit.csv4||'::text)';
 
 			-- insert event
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (v_visit.csv1::bigint, v_parameter_id, v_parameter_value , v_visit.csv7::timestamp);			
+			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (v_visit.csv1::bigint, (v_parameters), v_value , v_visit.csv5::timestamp);			
 		END LOOP;				
 	END LOOP;
 
@@ -178,8 +266,8 @@ BEGIN
 	    '}')::json;
 	    
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","message":{"priority":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--EXCEPTION WHEN OTHERS THEN 
+--	RETURN ('{"status":"Failed","message":{"priority":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	
 	
 END;
