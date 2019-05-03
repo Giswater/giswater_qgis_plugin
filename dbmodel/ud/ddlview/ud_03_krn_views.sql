@@ -142,6 +142,7 @@ CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS
 
 	 
 -- 'definiton updated on 3.1.110'
+-- definiton updated on 3.2.008
 DROP VIEW IF EXISTS "v_ui_node_x_connection_upstream" CASCADE;
 CREATE OR REPLACE VIEW "v_ui_node_x_connection_upstream" AS 
  SELECT row_number() OVER (ORDER BY v_edit_arc.node_1)+1000000 AS rid,
