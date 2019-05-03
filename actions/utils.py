@@ -425,7 +425,7 @@ class Utils(ParentAction):
                     " WHERE connec_type.type = 'TAP'")
             rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_config.tapcat_vdefault, rows, 1)
-            sql = ("SELECT DISTINCT(id), id FROM " + self.schema_name + ".cat_presszone"
+            sql = ("SELECT DISTINCT(id), descript FROM " + self.schema_name + ".cat_presszone"
                    " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg_config, self.dlg_config.exploitation_vdefault, 0)) + "'")
             rows = self.controller.get_rows(sql)
             utils_giswater.set_item_data(self.dlg_config.presszone_vdefault, rows, 1)
@@ -1239,7 +1239,7 @@ class Utils(ParentAction):
     def filter_presszone_vdefault(self):
         """ Filter QComboBox @presszone_vdefault according QComboBox @exploitation_vdefault """
 
-        sql = ("SELECT DISTINCT(id), id FROM " + self.schema_name + ".cat_presszone"
+        sql = ("SELECT DISTINCT(id), descript FROM " + self.schema_name + ".cat_presszone"
                " WHERE expl_id = '" + str(utils_giswater.get_item_data(self.dlg_config, self.dlg_config.exploitation_vdefault, 0)) + "'")
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_config.presszone_vdefault, rows, False)

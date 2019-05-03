@@ -170,6 +170,8 @@ class ParentDialog(QDialog):
                 utils_giswater.setWidgetText(self.dialog, 'state', values['state']['name'])
             if 'name' in values['state_type']:
                 utils_giswater.setWidgetText(self.dialog, 'state_type', values['state_type']['name'])
+            if 'descript' in values['presszone']:
+                utils_giswater.setWidgetText(self.dialog, 'presszonecat_id', values['presszone']['descript'])
             if 'id' in values['cat_id']:
                 widget_list = ['nodecat_id', 'arccat_id', 'conneccat_id', 'gratecat_id']
                 for w in widget_list:
@@ -214,7 +216,6 @@ class ParentDialog(QDialog):
         if row:
             utils_giswater.setWidgetText(dialog, "state_type", row[0])
 
-        self.set_vdefault(dialog, 'presszone_vdefault', 'presszonecat_id')
         self.set_vdefault(dialog, 'verified_vdefault', 'verified')
         self.set_vdefault(dialog, 'workcat_vdefault', 'workcat_id')
         self.set_vdefault(dialog, 'soilcat_vdefault', 'soilcat_id')
@@ -2313,7 +2314,7 @@ class ParentDialog(QDialog):
         """ Load id cat_presszone from  table and set into combobox @presszonecat_id """
 
         feature_id = utils_giswater.getWidgetText(dialog, geom_type + "_id")
-        if feature_id == 'NULL':
+        if feature_id.lower() == 'null':
             return
                 
         sql = ("SELECT t1.descript FROM " + self.schema_name + ".cat_presszone AS t1"
