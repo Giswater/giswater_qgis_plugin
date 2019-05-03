@@ -265,11 +265,11 @@ class Master(ParentAction):
                 self.controller.show_warning(message, parameter='plan_result_cat')
                 return
 
-            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.result_name, row['result_id'])
+            utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.result_id, row['result_id'])
             dlg_estimate_result_new.cmb_result_type.setCurrentIndex(index)
             utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.prices_coefficient, row['network_price_coeff'])
             utils_giswater.setWidgetText(dlg_estimate_result_new, dlg_estimate_result_new.observ, row['descript'])
-            dlg_estimate_result_new.result_name.setEnabled(False)
+            dlg_estimate_result_new.result_id.setEnabled(False)
             dlg_estimate_result_new.cmb_result_type.setEnabled(False)
             dlg_estimate_result_new.prices_coefficient.setEnabled(False)
             dlg_estimate_result_new.observ.setEnabled(False)
