@@ -53,7 +53,9 @@ INSERT INTO doc VALUES ('Demo document 3', 'OTHER', 'https://github.com/Giswater
 INSERT INTO doc VALUES ('Demo document 2', 'OTHER', 'https://github.com/Giswater/giswater/blob/master-2.1/legal/Readme.txt', NULL, '2018-03-14 17:09:19.852804', current_user, '2018-03-14 17:09:19.852804');
 
 
-SELECT gw_fct_plan_result( 'Starting prices', 1, 1, 'Demo prices for reconstruction');
+SELECT gw_fct_plan_result($${"client":{"device":3, "infoType":100, "lang":"ES"},
+							"feature":{},"data":{"parameters":{"coefficient":1, "description":"Demo prices for reconstruction", "resultType":1, "resultId":"Starting prices"},"saveOnDatabase":true}}$$);
+							
 SELECT gw_fct_fill_doc_tables();
 SELECT gw_fct_fill_om_tables();
 
