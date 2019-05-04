@@ -23,8 +23,12 @@ BEGIN
 	SELECT id, code, start_date, end_date FROM crm.hydro_cat_period WHERE id NOT IN (SELECT id::integer FROM ws.ext_cat_period);
 
 	-- dma period values
-	INSERT INTO ws.ext_rtc_scada_dma_period (dma_id, cat_period_id, minc, maxc, effc, isscada)
-	SELECT dma_id, id, dma.minc, dma.maxc, effc, false FROM crm.hydro_cat_period, ws.dma 
+	--Table ext_rtc_scada_dma_period is inserted value when first register of that cat_period_id is inserted (dma_id, period_id)
+	--Table ext_rtc_scada_dma_period is updated by daily process using function gw_fct_utils_update_dma_hydroval adding period values from dma customers. 
+	--Fields updated are: m3_total_period, m3_total_period_hdyro, effc=1 . As you can see  (m3_total_period = m3_total_period_hdyro) is updated without losses 
+	-- At the end table is re-updated by function csv2pg_import_patterns fixing losses and pattern
+	INSERT INTO ws.ext_rtc_scada_dma_period (dma_id, cat_period_id, minc, maxc, pattern_id, isscada)
+	SELECT dma_id, id, minc, maxc, pattern_id, false FROM crm.hydro_cat_period, ws.dma 
 	WHERE id NOT IN (SELECT id::integer FROM ws.ext_cat_period) 
 	order by id, dma_id;
 

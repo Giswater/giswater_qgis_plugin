@@ -12,6 +12,13 @@ $BODY$
 
 /* example
 SELECT SCHEMA_NAME.gw_fct_utils_update_dma_hydroval()
+
+GOAL:
+Function with the goal to update ext_rtc_scada_dma_period using daily process, values from CRM in  order to have updated it to make a good hydraulic model
+Table ext_rtc_scada_dma_period is inserted value when first register of that cat_period_id is inserted (dma_id, period_id)
+Fields updated here are: m3_total_period, m3_total_period_hdyro, effc=1 . As you can see  (m3_total_period = m3_total_period_hdyro) is updated without losses 
+After that function table may be re-updated by function csv2pg_import_patterns updating effc, min, max and pattern values
+
 */
 
 DECLARE
@@ -21,7 +28,9 @@ BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-
+	
+	
+	
 	UPDATE ext_rtc_scada_dma_period SET m3_total_period=b.sum, m3_total_period_hydro=b.sum, effc=1 
 	FROM (	SELECT cat_period_id, dma_id, sum(sum) FROM ext_rtc_hydrometer_x_data a
 			JOIN rtc_hydrometer_x_connec b on b.hydrometer_id=a.hydrometer_id
