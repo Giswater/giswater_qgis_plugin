@@ -1,0 +1,3 @@
+3.2.010
+*******
+Improve view v_om_visit using feature's geometry when visit's geometry is null
