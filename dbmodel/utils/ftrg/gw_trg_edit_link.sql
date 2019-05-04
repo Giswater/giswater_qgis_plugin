@@ -169,11 +169,11 @@ BEGIN
 
 		-- Update connec or gully arc_id
 		IF v_gully1.gully_id IS NOT NULL  THEN
-			UPDATE gully SET arc_id=v_arc.arc_id , feature_id=null, featurecat_id=null
+			UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_node.node_id, featurecat_id=v_node.node_type
 			 WHERE gully_id=v_gully1.gully_id;
 				
 		ELSIF v_connec1.connec_id IS NOT NULL THEN
-			UPDATE connec SET arc_id=v_arc.arc_id , feature_id=null, featurecat_id=null
+			UPDATE connec SET arc_id=v_arc.arc_id , feature_id=v_node.node_id, featurecat_id=v_node.node_type
 			WHERE connec_id=v_connec1.connec_id;	
 		END IF;
 		
@@ -186,11 +186,11 @@ BEGIN
 		-- update arc values
 		SELECT arc_id INTO v_arc.arc_id FROM connec WHERE connec_id=v_connec2.connec_id;
 
-		UPDATE connec SET arc_id=v_arc.arc_id, feature_id=null, featurecat_id=null
+		UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type
 		WHERE connec_id=v_connec1.connec_id;
 
 		IF v_projectype='UD' then
-			UPDATE gully SET arc_id=v_arc.arc_id , feature_id=null, featurecat_id=null
+			UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type
 			WHERE gully_id=v_gully1.gully_id;
 		END IF;
 
@@ -204,12 +204,12 @@ BEGIN
 		-- update arc values
 		SELECT arc_id INTO v_arc.arc_id FROM gully WHERE gully_id=v_gully2.gully_id;
 
-		UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.sys_type WHERE connec_id=v_connec1.connec_id;
+		UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type 
+		WHERE connec_id=v_connec1.connec_id;
 
-		IF v_projectype='UD' then
-			UPDATE gully SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.sys_type WHERE gully_id=v_gully1.gully_id;
-		END IF;
-		
+		UPDATE gully SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type 
+		WHERE gully_id=v_gully1.gully_id;
+				
 		NEW.exit_type='GULLY';
 		NEW.exit_id=v_gully2.gully_id;
 		v_end_point = v_gully2.the_geom;
