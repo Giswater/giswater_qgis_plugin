@@ -73,3 +73,42 @@ CREATE OR REPLACE VIEW v_om_visit AS
              JOIN connec ON connec.connec_id::text = om_visit_x_connec.connec_id::text
              JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
           WHERE selector_state.state_id = connec.state AND selector_state.cur_user = "current_user"()::text) a;
+		  
+		  
+
+DROP VIEW v_rtc_hydrometer_x_node_period;
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
+ SELECT a.hydrometer_id,
+    a.node_1 AS node_id,
+    a.arc_id,
+    b.dma_id,
+    b.period_id,
+    b.lps_avg * 0.5::double precision AS lps_avg_real,
+    c.effc::numeric(5,4) AS losses,
+    b.lps_avg * 0.5::double precision / c.effc AS lps_avg,
+    c.minc AS cmin,
+    b.lps_avg * 0.5::double precision / c.effc * c.minc AS lps_min,
+    c.maxc AS cmax,
+    b.lps_avg * 0.5::double precision / c.effc * c.maxc AS lps_max,
+    pattern_id
+   FROM v_rtc_hydrometer_x_arc a
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::bigint = a.hydrometer_id::bigint
+     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text
+UNION
+ SELECT a.hydrometer_id,
+    a.node_2 AS node_id,
+    a.arc_id,
+    b.dma_id,
+    b.period_id,
+    b.lps_avg * 0.5::double precision AS lps_avg_real,
+    c.effc::numeric(5,4) AS losses,
+    b.lps_avg * 0.5::double precision / c.effc AS lps_avg,
+    c.minc AS cmin,
+    b.lps_avg * 0.5::double precision / c.effc * c.minc AS lps_min,
+    c.maxc AS cmax,
+    b.lps_avg * 0.5::double precision / c.effc * c.maxc AS lps_max,
+    pattern_id
+   FROM v_rtc_hydrometer_x_arc a
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::bigint = a.hydrometer_id::bigint
+     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text;
+

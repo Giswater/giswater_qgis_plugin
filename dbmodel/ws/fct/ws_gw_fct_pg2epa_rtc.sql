@@ -45,12 +45,8 @@ BEGIN
 		UPDATE rpt_inp_node SET demand=(lps_avg::float*v_epaunitsfactor)::numeric(12,6) FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 	ELSIF v_coefficient = 'MAX' THEN
 		UPDATE rpt_inp_node SET demand=(lps_max::float*v_epaunitsfactor)::numeric(12,6) FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
-
-		--v_sql = 'UPDATE rpt_inp_node SET demand=lps_max::numeric(12,6)*'||v_epaunitsfactor||' FROM v_rtc_hydrometer_x_node_period a WHERE result_id='||result_id_var||' AND rpt_inp_node.node_id=a.node_id';
-		--raise exception 'v_sql %' ,v_sql;
-		
 	ELSIF v_coefficient = 'REAL' THEN
-		UPDATE rpt_inp_node SET demand=lps_avg::numeric(12,6)*v_epaunitsfactor FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+		UPDATE rpt_inp_node SET demand=lps_avg::numeric(12,6)*v_epaunitsfactor, pattern_id=a.pattern_id FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 	END IF;
 
 	-- update patterns
