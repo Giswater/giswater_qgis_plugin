@@ -399,12 +399,12 @@ class Utils(ParentAction):
         try:
             if Qgis.QGIS_VERSION_INT < 29900:
                 with open(path, 'r') as csvfile:
-                    insert_status = self.insert_into_db(dialog, csvfile, delimiter)
+                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, _unicode)
                     csvfile.close()
                     del csvfile
             else:
                 with open(path, 'r', encoding=_unicode) as csvfile:
-                    insert_status = self.insert_into_db(dialog, csvfile, delimiter)
+                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, _unicode)
                     csvfile.close()
                     del csvfile
         except Exception as e:
@@ -437,7 +437,7 @@ class Utils(ParentAction):
 
 
 
-    def insert_into_db(self, dialog, csvfile, delimiter,):
+    def insert_into_db(self, dialog, csvfile, delimiter, _unicode):
         sql = ""
         progress = 0
         dialog.progressBar.setVisible(True)
@@ -457,6 +457,7 @@ class Utils(ParentAction):
                     if "''" not in row[x]:
                         sql += "csv" + str(x + 1) + ", "
                         value = "'" + row[x].strip().replace("\n", "") + "', "
+                        value = str(value.decode(str(_unicode)))
                         values += value.replace("''", "null")
                     else:
                         sql += "csv" + str(x + 1) + ", "
