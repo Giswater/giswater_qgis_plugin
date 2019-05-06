@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --04/05/2019
-INSERT INTO sys_csv2pg_cat VALUES (17, 'Import pattern values from dma flowmeter', 'Import pattern values from dma flowmeter', 'The csv template is defined on the same function. Open pgadmin to more details', 'role_epa');
+INSERT INTO sys_csv2pg_cat VALUES (17, 'Import pattern values from dma flowmeter', 'Import pattern values from dma flowmeter', 
+'The csv template is defined on the same function. Open pgadmin to more details', 'role_epa', 'importcsv', 'gw_fct_utils_csv2pg_import_patterns',false);
 ON CONFLICT (id) DO NOTHING;
 
