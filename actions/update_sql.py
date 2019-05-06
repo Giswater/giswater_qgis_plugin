@@ -49,6 +49,9 @@ class UpdateSQL(ApiParent):
     def init_sql(self, connection_status=False):
         """ Button 100: Execute SQL. Info show info """
 
+        # Check if connection is still False
+        connection_status, not_version = self.controller.set_database_connection()
+
         # Set logger file
         self.controller.set_logger()
 
