@@ -6,7 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1116
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_link()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_link()
+  RETURNS trigger AS
 $BODY$
 
 DECLARE 
@@ -134,7 +135,7 @@ BEGIN
 
 	
 	-- end control
-	IF ( v_arc.arc_id IS NOT NULL) THEN
+	IF ( v_arc.arc_id IS NOT NULL AND v_node.node_id IS NULL) THEN
 
 		-- end point of link geometry
 		v_end_point = (ST_ClosestPoint(v_arc.the_geom, ST_EndPoint(NEW.the_geom)));
@@ -172,7 +173,7 @@ BEGIN
 			UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_node.node_id, featurecat_id=v_node.node_type
 			 WHERE gully_id=v_gully1.gully_id;
 				
-		ELSIF v_connec1.connec_id IS NOT NULL THEN
+		ELSIF v_connec1.connec_id IS NOT NULL AND v_projectype='UD' THEN
 			UPDATE connec SET arc_id=v_arc.arc_id , feature_id=v_node.node_id, featurecat_id=v_node.node_type
 			WHERE connec_id=v_connec1.connec_id;	
 		END IF;
@@ -186,12 +187,16 @@ BEGIN
 		-- update arc values
 		SELECT arc_id INTO v_arc.arc_id FROM connec WHERE connec_id=v_connec2.connec_id;
 
-		UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type
-		WHERE connec_id=v_connec1.connec_id;
-
 		IF v_projectype='UD' then
 			UPDATE gully SET arc_id=v_arc.arc_id , feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type
 			WHERE gully_id=v_gully1.gully_id;
+
+			UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type
+			WHERE connec_id=v_connec1.connec_id;
+		ELSE 
+
+			--UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connectype_id
+			--WHERE connec_id=v_connec1.connec_id;
 		END IF;
 
 		NEW.exit_type='CONNEC';
@@ -204,8 +209,8 @@ BEGIN
 		-- update arc values
 		SELECT arc_id INTO v_arc.arc_id FROM gully WHERE gully_id=v_gully2.gully_id;
 
-		UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type 
-		WHERE connec_id=v_connec1.connec_id;
+		--UPDATE connec SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type 
+		--WHERE connec_id=v_connec1.connec_id;
 
 		UPDATE gully SET arc_id=v_arc.arc_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type 
 		WHERE gully_id=v_gully1.gully_id;
@@ -264,6 +269,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
 
