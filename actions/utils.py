@@ -843,8 +843,7 @@ class Utils(ParentAction):
         label_aux = utils_giswater.getWidgetText(dialog, dialog.txt_import)
         delimiter = self.get_delimiter(dialog)
         _unicode = utils_giswater.getWidgetText(dialog, dialog.cmb_unicode_list)
-        cabecera = True
-        fields = "csv2pgcat_id, "
+        sql = ""
         progress = 0
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setValue(progress)
@@ -859,35 +858,35 @@ class Utils(ParentAction):
                 csvfile.seek(0)  # Position the cursor at position 0 of the file
                 reader = csv.reader(csvfile, delimiter=delimiter)
                 for row in reader:
-                    values = "'" + str(csv2pgcat_id_aux)+"', '"
-                    progress += 1
-
-                    for x in range(0, len(row)):
-                        row[x] = row[x].replace("'", "''")
-                    if cabecera:
-                        for x in range(1, len(row)+1):
-                            fields += 'csv' + str(x)+", "
-                        cabecera = False
-                        fields = fields[:-2]
-                    else:
-                        for value in row:
-                            if len(value) != 0:
-                                values += str(value.decode(str(_unicode))) + "', '"
+                    if len(row) > 0:
+                        sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
+                        values = "VALUES("+str(csv2pgcat_id_aux)+", "
+                        for x in range(0, len(row)):
+                            if "''" not in row[x]:
+                                sql += "csv" + str(x + 1) + ", "
+                                value = "'" + row[x].strip().replace("\n", "") + "', "
+                                value = str(value.decode(str(_unicode)))
+                                values += value.replace("''", "null")
                             else:
-                                values = values[:-1]
-                                values += "null, '"
-                        values = values[:-3]
-                        sql = ("INSERT INTO " + self.controller.schema_name + "." + temp_tablename + " ("
-                               + str(fields) + ") VALUES (" + str(values) + ")")
+                                sql += "csv" + str(x + 1) + ", "
+                                values = "VALUES(null, "
+                        sql = sql[:-2] + ") "
+                        values = values[:-2] + ");\n"
+                        sql += values
+                        progress += 1
+                    dialog.progressBar.setValue(progress)
 
-                        status = self.controller.execute_sql(sql)
+                    if progress % 500 == 0:
+                        status = self.controller.execute_sql(sql, commit=True)
                         if not status:
-                            return
-                        dialog.progressBar.setValue(progress)
-
+                            return False
+                        sql = ""
+                if sql != "":
+                    status = self.controller.execute_sql(sql, commit=True)
+                self.controller.log_info(str(sql))
         except Exception as e:
             self.controller.show_warning(str(e))
-            return
+
 
         sql = ("SELECT " + self.schema_name + ".gw_fct_utils_csv2pg("
                + str(csv2pgcat_id_aux) + ", '" + str(label_aux) + "')")
