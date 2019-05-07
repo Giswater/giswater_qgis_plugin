@@ -83,7 +83,7 @@ BEGIN
 		SELECT gw_api_get_formfields( 'lot', 'lot', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 		-- getting values from feature
-		EXECUTE ('SELECT (row_to_json(a)) FROM (SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_idname) || ' = CAST($1 AS ' || quote_literal(v_columntype) || '))a')
+		EXECUTE ('SELECT (row_to_json(a)) FROM (SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_idname) || ' = CAST($1 AS ' || (v_columntype) || '))a')
 			INTO v_values
 			USING v_id;
 		

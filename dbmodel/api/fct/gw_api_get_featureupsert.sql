@@ -315,14 +315,18 @@ BEGIN
 					INTO v_shape, v_geom1, v_geom2, v_matcat_id;
 			END IF;
 		END IF;
+
+		
 		
 	-- getting values on insert from feature
 	ELSIF p_tg_op ='UPDATE' THEN	
 		EXECUTE 'SELECT (row_to_json(a)) FROM 
-			(SELECT * FROM '||quote_ident(p_table_id)||' WHERE '||quote_ident(v_idname)||' = CAST($1 AS '||quote_literal(v_columntype)||'))a'
+			(SELECT * FROM '||quote_ident(p_table_id)||' WHERE '||quote_ident(v_idname)||' = CAST($1 AS '||(v_columntype)||'))a'
 			INTO v_values_array
 			USING p_id;
 	END IF;
+
+
 
 	-- setting values
 	FOREACH aux_json IN ARRAY v_fields_array 
@@ -391,7 +395,8 @@ BEGIN
 		END IF;
 	
         END LOOP;  
-   
+
+   */
 --    Convert to json
     v_fields := array_to_json(v_fields_array);
 

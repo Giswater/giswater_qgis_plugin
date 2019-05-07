@@ -245,7 +245,7 @@ BEGIN
 --     Get geometry (to feature response)
 ------------------------------------------
 	IF v_the_geom IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||quote_literal(column_type)||'))row'
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
 		INTO v_geometry;
 	END IF;
 
@@ -257,13 +257,13 @@ BEGIN
 
 	IF  link_id_aux IS NOT NULL THEN 
 		-- Get link field value
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||quote_literal(column_type)||'))row'
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
 		INTO v_linkpath;
 
 		-- IF v_linkpath is null and layer it's child layer --> parent v_linkpath is used
 		IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
 			-- Get link field value
-			EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||quote_literal(column_type)||'))row'
+			EXECUTE 'SELECT row_to_json(row) FROM (SELECT '||quote_ident(link_id_aux)||' FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(column_type)||'))row'
 			INTO v_linkpath;
 		END IF;
 	END IF;
@@ -288,13 +288,13 @@ BEGIN
 
 --        Getting actions and layer manager
 ------------------------------------------
-        EXECUTE 'SELECT actions,  layermanager FROM config_api_form_actions WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
+        EXECUTE 'SELECT actions,  layermanager FROM config_api_form WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
 		INTO v_formactions, v_layermanager
 		USING v_tablename;
 
 	-- IF actions and tooltip are null's and layer it's child layer --> parent form_tabs is used
         IF v_formactions IS NULL AND v_table_parent IS NOT NULL THEN
-		EXECUTE 'SELECT actions,  layermanager FROM config_api_form_actions WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
+		EXECUTE 'SELECT actions,  layermanager FROM config_api_form WHERE formname = $1 AND projecttype='||quote_literal(LOWER(v_project_type))
 			INTO v_formactions, v_layermanager
 			USING v_table_parent;
 		END IF;
@@ -345,6 +345,7 @@ BEGIN
 
 		IF v_tablename IS NULL THEN
 
+
 			v_message  = '{"priority":1, "text":"Epa type is not defined for this feature. Basic values are used"}';
 
 			-- check parent_view
@@ -352,7 +353,6 @@ BEGIN
 				INTO tableparent_id_arg
 				USING v_tablename_original;
 
-			raise notice'Parent-Child with epa table. Table child: % table parent %' , v_tablename_original, tableparent_id_arg;
 
                 
 				-- Identify tableinfotype_id		

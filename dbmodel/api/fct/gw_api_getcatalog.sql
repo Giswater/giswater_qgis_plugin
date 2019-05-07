@@ -91,11 +91,12 @@ BEGIN
 				END IF;
 			END LOOP;
 		END IF;
+		raise notice 'v_query_result %', v_query_result;
 
-		EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (' || quote_literal(v_query_result) || ') a'
+		EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (' || (v_query_result) || ') a'
 			INTO query_result_ids;
 
-		EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM (' || quote_literal(v_query_result) || ') a'
+		EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM (' || (v_query_result) || ') a'
 		INTO query_result_names;
 
 		-- Set new values json of id's (it's supossed that id is on 4th position on json)	

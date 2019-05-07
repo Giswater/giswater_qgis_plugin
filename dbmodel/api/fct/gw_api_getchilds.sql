@@ -117,11 +117,11 @@ BEGIN
 		
 		-- Get combo id's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_combovalue IS NOT NULL THEN
-			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((v_aux_json_child->>'dv_querytext'))||quote_literal((v_aux_json_child->>'dv_querytext_filterc'))||' '||quote_literal(quote_literal(v_combovalue))||'
+			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||((v_aux_json_child->>'dv_querytext_filterc'))||' '||(quote_literal(v_combovalue))||'
 			 ORDER BY idval) a';
 			execute query_text INTO combo_json_child;
 		ELSE 	
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||quote_literal((v_aux_json_child->>'dv_querytext'))||' ORDER BY idval)a' INTO combo_json_child;
+			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY idval)a' INTO combo_json_child;
 		END IF;
 		combo_json_child := COALESCE(combo_json_child, '[]');
 		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
@@ -131,7 +131,7 @@ BEGIN
 			query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_combovalue)||' ORDER BY idval) a';
 			execute query_text INTO combo_json_child;
 		ELSE 	
-			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||quote_literal((v_aux_json_child->>'dv_querytext'))||' ORDER BY idval)a'
+			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY idval)a'
 				INTO combo_json_child;
 		END IF;
 		combo_json_child := COALESCE(combo_json_child, '[]');
@@ -148,13 +148,13 @@ BEGIN
 					-- if there is only one because dv_parent_value is null then
 					v_current_value = (SELECT value FROM config_param_user JOIN audit_cat_param_user ON audit_cat_param_user.id=config_param_user.parameter 
 							WHERE feature_field_id = (v_aux_json_child->>'column_id')
-							AND cur_user=current_user);			
+							AND cur_user=current_user LIMIT 1);			
 				ELSE
 					-- if there are more than one, taking that parameter with the same feature_dv_parent_value
 					v_current_value = (SELECT value FROM config_param_user JOIN audit_cat_param_user ON audit_cat_param_user.id=config_param_user.parameter 
 							WHERE feature_field_id = quote_ident(v_aux_json_child->>'column_id')
 							AND feature_dv_parent_value = v_combovalue
-							AND cur_user=current_user);
+							AND cur_user=current_user LIMIT 1);
 				END IF;
 			END LOOP;
 			

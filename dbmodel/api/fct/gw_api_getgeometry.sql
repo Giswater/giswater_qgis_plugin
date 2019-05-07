@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2630
 
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getgeometry(p_data json)
   RETURNS json AS
 $BODY$
@@ -96,7 +95,7 @@ BEGIN
            
 	-- get geometry
 	IF v_the_geom IS NOT NULL THEN
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||quote_literal(v_columntype)||'))row'
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT St_AsText('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_tablename)||' WHERE '||quote_ident(v_idname)||' = CAST('||quote_nullable(v_id)||' AS '||(v_columntype)||'))row'
 		INTO v_geometry;
 	END IF;
 	
@@ -109,7 +108,7 @@ BEGIN
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"This is a test message"}, "apiVersion":'||v_apiversion||
              ',"body":{"feature":'||v_feature||
-					 ',"data":{"geometry":"'||v_geometry||'}}"'||
+					 ',"data":{"geometry":'||v_geometry||'}}'||
 	    '}')::json;
 END;
 $BODY$
