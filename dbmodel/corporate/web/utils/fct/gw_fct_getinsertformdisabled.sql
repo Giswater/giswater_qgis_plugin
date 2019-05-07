@@ -96,7 +96,7 @@ BEGIN
 		raise notice 'aux_json %', aux_json;
 
 	--      Get combo id's
-		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || ')) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
+		EXECUTE 'SELECT array_to_json(array_agg(' || quote_ident(aux_json->>'dv_id_column') || '::text)) FROM (SELECT ' || quote_ident(aux_json->>'dv_id_column') || ' FROM ' 
 		|| quote_ident(aux_json->>'dv_table') || ' ORDER BY '||quote_ident(aux_json->>'dv_name_column') || ') a'
 		INTO combo_json; 
 
