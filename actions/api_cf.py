@@ -94,17 +94,17 @@ class ApiCF(ApiParent):
     #     self.info_cf.get_point(point, button_clicked, tab_type)
 
 
-    def get_point(self, point, button_clicked, tab_type):
-        """ Get coord from clicked point """
-        self.controller.log_info(str(button_clicked))
-        self.controller.log_info(str(type(button_clicked)))
-        if button_clicked == Qt.LeftButton:
-            complet_result = self.open_form(point, tab_type=tab_type)
-            if not complet_result:
-                print("FAIL get_point")
-                return
-        elif button_clicked == Qt.RightButton:
-            self.hilight_feature(point, tab_type)
+    # def get_point(self, point, button_clicked, tab_type):
+    #     """ Get coord from clicked point """
+    #     if button_clicked == Qt.LeftButton:
+    #         self.controller.log_info("button_clicked" + str(button_clicked))
+    #         complet_result = self.open_form(point, tab_type=tab_type)
+    #         self.controller.log_info(str("TEST 99"))
+    #         if not complet_result:
+    #             print("FAIL get_point")
+    #             return
+    #     elif button_clicked == Qt.RightButton:
+    #         self.hilight_feature(point, tab_type)
 
 
     def hilight_feature(self, point, tab_type=None):
@@ -183,7 +183,7 @@ class ApiCF(ApiParent):
         layer = self.controller.get_layer_by_layername(parent_menu.title())
         table_name = self.controller.get_layer_source(layer)
         self.iface.setActiveLayer(layer)
-        complet_result = self.open_form(table_name=table_name['table'], feature_id=action.text(), tab_type=tab_type)
+        complet_result, dialog = self.open_form(table_name=table_name['table'], feature_id=action.text(), tab_type=tab_type)
         self.draw(complet_result)
 
 
@@ -196,6 +196,7 @@ class ApiCF(ApiParent):
         :param feature_id: id of feature to do info
         :return:
         """
+        print("2 - FEATURE_ID: " + str(feature_id))
         # Manage tab signal
         self.tab_element_loaded = False
         self.tab_relations_loaded = False
@@ -231,7 +232,7 @@ class ApiCF(ApiParent):
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
 
-
+        print("3 - FEATURE_ID: " + str(feature_id))
         # IF insert new feature
         if point and feature_cat:
             self.new_feature_id = new_feature_id
@@ -254,9 +255,8 @@ class ApiCF(ApiParent):
             extras += ', "coordinates":{"epsg":'+str(self.srid)+', "xcoord":' + str(point.x()) + ',"ycoord":' + str(point.y()) + ', "zoomRatio":1000}'
             body = self.create_body(extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromcoordinates($${" + body + "}$$)")
-        # IF come from QPushButtons node1 or node2 from custom form
+        # IF come from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
-            self.controller.log_info(str("TEST 1"))
             feature = '"tableName":"' + str(table_name) + '", "id":"' + str(feature_id) + '"'
             body = self.create_body(feature=feature, extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromid($${" + body + "}$$)")
@@ -264,11 +264,11 @@ class ApiCF(ApiParent):
         row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
+            return False, None
         if 'results' in row[0]:
             if row[0]['results'] == 0:
                 self.controller.show_message(row[0]['message']['text'], 2)
-                return False
+                return False, None
 
         # Control fail when insert new feature
         if 'status' in row[0]['body']['data']['fields']:
@@ -278,14 +278,14 @@ class ApiCF(ApiParent):
                 self.controller.show_message(msg, message_level=priority)
                 self.controller.restore_info()
                 self.controller.show_message(msg, message_level=priority)
-                return False, False
+                return False, None
 
         self.complet_result = row
 
         result = row[0]['body']['data']
         if 'fields' not in result:
             self.controller.show_message("NOT fileds in result FOR: " + sql, 2)
-            return False
+            return False, None
         if self.complet_result[0]['body']['form']['template'] == 'GENERIC':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new feature
@@ -293,11 +293,11 @@ class ApiCF(ApiParent):
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
         elif self.complet_result[0]['body']['form']['template'] == 'custom feature':
-            self.controller.log_info(str("TEST 10"))
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
+
 
     def manage_new_feature(self, complet_result, dialog):
         result = complet_result[0]['body']['data']
@@ -333,7 +333,6 @@ class ApiCF(ApiParent):
         # Dialog
         self.dlg_cf = ApiCfUi()
         self.load_settings(self.dlg_cf)
-
         self.draw(complet_result, zoom=False)
 
         if feature_id:
@@ -483,7 +482,7 @@ class ApiCF(ApiParent):
         layout_inp_1 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_1')
         layout_inp_2 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_2')
         layout_inp_3 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_3')
-
+        print("layout_inp_1: " +str(layout_inp_1))
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
 
         # Get feature type as geom_type (node, arc, connec)
@@ -943,7 +942,9 @@ class ApiCF(ApiParent):
         else:
             msg = "parameter button_function not found"
             self.controller.show_message(msg, 2)
-
+        print(str(function_name))
+        print("dialog: " + str(dialog))
+        print("widget: " + str(widget))
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
@@ -2278,8 +2279,11 @@ class ApiCF(ApiParent):
     def open_node(self, dialog, widget=None, message_level=None):
 
         feature_id = utils_giswater.getWidgetText(dialog, widget)
+        tab_type = dialog.tab_main
+
+
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id)
+        complet_result, dialog = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id, tab_type='data')
         if not complet_result:
             print("FAIL open_node")
             return

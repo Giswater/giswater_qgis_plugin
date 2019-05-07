@@ -34,7 +34,7 @@ import sys
 import operator
 if 'nt' in sys.builtin_module_names:
     import winreg
-
+from actions.HyperLinkLabel import HyperLinkLabel
 
 def setDialog(p_dialog):
     global _dialog
@@ -102,7 +102,8 @@ def getText(dialog, widget, return_string_null=True):
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if widget:
-        if type(widget) is QLineEdit:
+        if type(widget) is QLineEdit or type(widget) is QPushButton or type(widget) is QLabel \
+                or type(widget) is HyperLinkLabel:
             text = widget.text()
         elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.value()
@@ -218,7 +219,8 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
         return None
 
     text = None
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is HyperLinkLabel \
+            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton:
         text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)

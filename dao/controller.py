@@ -46,6 +46,7 @@ class DaoController(object):
         self.logger = None
         self.schema_name = None
         self.dao = None
+        self.cont = 1
         if create_logger:
             self.set_logger(logger_name)
                 

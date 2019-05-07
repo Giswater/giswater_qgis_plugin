@@ -17,10 +17,10 @@ else:
     from qgis.core import QgsPointXY
 
 from qgis.core import QgsPointLocator, QgsMapToPixel
-from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint
+from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsMapTool
 
-from qgis.PyQt.QtCore import QPoint, Qt
-
+from qgis.PyQt.QtCore import QPoint, Qt, pyqtSignal
+from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtWidgets import QApplication
 
 
@@ -31,15 +31,21 @@ from giswater.actions.api_cf import ApiCF
 from giswater.actions.api_parent import ApiParent
 
 
-class CadApiInfo(ParentMapTool):
-    """ Button 71: Add circle """
+class CadApiInfo(QgsMapTool):
+    """ Button 37: Info """
 
     def __init__(self, iface, settings, action, index_action, controller, plugin_dir):
         """ Class constructor """
         # Call ParentMapTool constructor
-        super(CadApiInfo, self).__init__(iface, settings, action, index_action)
+        self.iface = iface
+        self.canvas = self.iface.mapCanvas()
+        QgsMapTool.__init__(self, self.canvas)
+        self.settings = settings
+        self.action = action
+        self.index_action = index_action
         self.controller = controller
         self.plugin_dir = plugin_dir
+        self.is_active = None
 
 
 
@@ -49,48 +55,62 @@ class CadApiInfo(ParentMapTool):
         self.controller.log_info(str(event.key()))
         if event.key() == Qt.Key_Escape:
             self.controller.log_info("keyPressEvent")
-            self.cancel_map_tool()
             self.deactivate()
 
-            return
-
     def canvasMoveEvent(self, event):
-
         pass
 
     def canvasReleaseEvent(self, event):
+        complet_result = None
         self.controller.log_info("CANVASRELEASE")
         self.controller.log_info(str(event.button()))
-        if event.button() == Qt.LeftButton or event.button() == Qt.RightButton:
+        if event.button() == Qt.LeftButton and self.is_active:
             self.controller.log_info("LeftButton")
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            try:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-            except(TypeError, KeyError):
-                self.iface.actionPan().trigger()
+            point = self.create_point(event)
+            if point is False:
                 return
-            self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir)
-            self.info_cf.get_point(point, event.button(), 'data')
+            complet_result = self.info_cf.open_form(point, tab_type='data')
 
+        if not complet_result is None:
+                print("FAIL get_point")
+                return
+        elif event.button() == Qt.RightButton and self.is_active:
+            point = self.create_point(event)
+            if point is False:
+                return
+            self.info_cf.hilight_feature(point, tab_type='data')
         else:
             self.controller.log_info("cacacaca")
 
-    def activate(self):
-        self.std_cursor = self.parent().cursor()
-        self.action().setChecked(True)
-        self.canvas = self.iface.mapCanvas()
-        QApplication.setOverrideCursor(Qt.WhatsThisCursor)
 
+    def create_point(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
+        try:
+            point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+        except(TypeError, KeyError):
+            self.iface.actionPan().trigger()
+            return False
+        return point
+
+    def activate(self):
+        self.is_active = True
+        self.std_cursor = self.parent().cursor()
+        self.action.setChecked(True)
+        self.canvas = self.iface.mapCanvas()
+
+        # Change map tool cursor
+        self.cursor = QCursor()
+        self.cursor.setShape(Qt.WhatsThisCursor)
+        self.canvas.setCursor(self.cursor)
+        self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir)
 
 
     def deactivate(self):
-
+        self.is_active = False
         # Call parent method
-        self.action().setChecked(False)
-
+        self.action.setChecked(False)
         self.canvas.setCursor(self.std_cursor)
-        self.cancel_map_tool()
-        ParentMapTool.deactivate(self)
+        QgsMapTool.deactivate(self)
+        self.deactivated.emit()
 
