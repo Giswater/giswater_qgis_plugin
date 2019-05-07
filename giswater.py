@@ -34,6 +34,7 @@ from .actions.utils import Utils
 from .dao.controller import DaoController
 from .map_tools.cad_add_circle import CadAddCircle
 from .map_tools.cad_add_point import CadAddPoint
+from map_tools.cad_api_info import CadApiInfo
 from .map_tools.change_elem_type import ChangeElemType
 from .map_tools.connec import ConnecMapTool
 from .map_tools.delete_node import DeleteNodeMapTool
@@ -167,7 +168,7 @@ class Giswater(QObject):
             action = self.actions[index_action]                
 
             # Basic toolbar actions
-            if int(index_action) in (41, 48, 86, 32):
+            if int(index_action) in (32, 41, 48, 86):
                 callback_function = getattr(self.basic, function_name)  
                 action.triggered.connect(callback_function)
             # Mincut toolbar actions
@@ -183,7 +184,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 25, 29, 196):
+            elif int(index_action) in (23, 25, 29, 196, 199):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
@@ -314,7 +315,9 @@ class Giswater(QObject):
         elif int(index_action) == 20:
             map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 28:
-            map_tool = ChangeElemType(self.iface, self.settings, action, index_action)            
+            map_tool = ChangeElemType(self.iface, self.settings, action, index_action)
+        elif int(index_action) ==37:
+            map_tool = CadApiInfo(self.iface, self.settings, action, index_action, self.controller, self.plugin_dir)
         elif int(index_action) == 39:
             map_tool = Dimensioning(self.iface, self.settings, action, index_action)                     
         elif int(index_action) == 43:
@@ -343,9 +346,9 @@ class Giswater(QObject):
         list_actions = None        
         toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
-            list_actions = ['41', '48', '86', '32']
+            list_actions = ['37', '41', '48', '86', '32']
         elif self.controller.get_project_type() == 'ud':
-            list_actions = ['41', '48', '32']
+            list_actions = ['37', '41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)
 
         toolbar_id = "om_ws"
@@ -365,7 +368,7 @@ class Giswater(QObject):
         self.manage_toolbar(toolbar_id, list_actions)   
         
         toolbar_id = "epa"
-        list_actions = ['196', '23', '25', '29']
+        list_actions = ['199', '196', '23', '25', '29']
         self.manage_toolbar(toolbar_id, list_actions)    
         
         toolbar_id = "master"

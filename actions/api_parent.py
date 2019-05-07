@@ -790,7 +790,10 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
-
+        self.controller.log_info("TEST ----")
+        print("-------")
+        self.controller.log_info(str(complet_result))
+        self.controller.log_info("TEST ----")
         if complet_result[0]['body']['feature']['geometry'] is None:
             return
         if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
