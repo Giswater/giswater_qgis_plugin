@@ -10,55 +10,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -----------------------
--- remove all the tables that are refactored in the v3.2
------------------------
-/*
-DROP TABLE IF EXISTS config;
-
-DROP TABLE IF EXISTS ext_cat_hydrometer_priority;
-DROP TABLE IF EXISTS ext_cat_hydrometer_type;
-
-DROP TABLE IF EXISTS "inp_typevalue_energy";
-DROP TABLE IF EXISTS "inp_typevalue_pump";
-DROP TABLE IF EXISTS "inp_typevalue_reactions_gl";
-DROP TABLE IF EXISTS "inp_typevalue_source";
-DROP TABLE IF EXISTS "inp_typevalue_valve";
-DROP TABLE IF EXISTS "inp_value_ampm";
-DROP TABLE IF EXISTS "inp_value_curve";
-DROP TABLE IF EXISTS "inp_value_mixing";
-DROP TABLE IF EXISTS "inp_value_noneall";
-DROP TABLE IF EXISTS "inp_value_opti_headloss";
-DROP TABLE IF EXISTS "inp_value_opti_hyd";
-DROP TABLE IF EXISTS "inp_value_opti_qual";
-DROP TABLE IF EXISTS "inp_value_opti_rtc_coef";
-DROP TABLE IF EXISTS "inp_value_opti_unbal";
-DROP TABLE IF EXISTS "inp_value_opti_units";
-DROP TABLE IF EXISTS "inp_value_opti_valvemode";
-DROP TABLE IF EXISTS "inp_value_param_energy";
-DROP TABLE IF EXISTS "inp_value_reactions_el";
-DROP TABLE IF EXISTS "inp_value_reactions_gl";
-DROP TABLE IF EXISTS "inp_value_status_pipe";
-DROP TABLE IF EXISTS "inp_value_status_pump";
-DROP TABLE IF EXISTS "inp_value_status_valve";
-DROP TABLE IF EXISTS "inp_value_times";
-DROP TABLE IF EXISTS "inp_value_yesno";
-DROP TABLE IF EXISTS "inp_value_yesnofull";
-
-DROP TABLE IF EXISTS "man_addfields_cat_combo";
-DROP TABLE IF EXISTS "man_addfields_cat_datatype";
-DROP TABLE IF EXISTS "man_addfields_cat_widgettype";
-
-DROP TABLE IF EXISTS selector_composer;
-*/
-
-
-
-
------------------------
 -- create om tables
 -----------------------
 
-
+/*
 CREATE TABLE om_visit_typevalue
 ( typevalue character varying(50) NOT NULL,
   id character varying(30) NOT NULL,
@@ -75,7 +30,7 @@ CREATE TABLE rpt_selector_hourly_compare
   CONSTRAINT rpt_selector_result_hourly_compare_pkey PRIMARY KEY (id)
 );
 
-
+*/
 CREATE TABLE audit_cat_table_x_column
 ( id text,
   table_id text NOT NULL,

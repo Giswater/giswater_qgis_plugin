@@ -8,9 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE SCHEMA_NAME.config_api_layer ADD COLUMN tableparentepa_id text;
-
-
 CREATE OR REPLACE VIEW SCHEMA_NAME.vp_epa_arc AS 
  SELECT arc_id AS nid,
  epa_type,
@@ -107,6 +104,7 @@ CREATE TABLE config_api_cat_widgettype
   CONSTRAINT config_api_cat_widgettype_pkey PRIMARY KEY (id)
 );
 
+/*
 CREATE TABLE config_api_form_groupbox
 (  id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.config_api_form_layout_id_seq'::regclass),
   formname character varying(50) NOT NULL,
@@ -114,7 +112,7 @@ CREATE TABLE config_api_form_groupbox
   label text,
   CONSTRAINT config_api_form_layout_pkey PRIMARY KEY (id)
 );
-
+*/
 
 
 CREATE TABLE config_api_layer
@@ -128,8 +126,10 @@ CREATE TABLE config_api_layer
   orderby integer,
   link_id text,
   is_tiled boolean,
+  tableparentepa_id text,
   CONSTRAINT config_api_layer_pkey PRIMARY KEY (layer_id)
 );
+
 
 
 CREATE TABLE config_api_layer_child
@@ -150,20 +150,13 @@ CREATE TABLE config_api_tableinfo_x_infotype
 
 
 
+/* created in 3.106
+
 CREATE TABLE config_api_visit
 (  visitclass_id serial NOT NULL,
   formname character varying(30),
   tablename character varying(30),
   CONSTRAINT config_api_visit_pkey PRIMARY KEY (visitclass_id)
-);
-
-/* created in 3.106
-CREATE TABLE config_api_form_actions
-(  id integer NOT NULL,
-  formname character varying(50),
-  formaction text,
-  project_type character varying,
-  CONSTRAINT config_api_actions_pkey PRIMARY KEY (id)
 );
 
 

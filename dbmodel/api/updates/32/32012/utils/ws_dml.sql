@@ -11,17 +11,17 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -----------------------
 
 INSERT INTO config_api_list 
-VALUES (1, 've_arc_pipe', 'SELECT arc_id as sys_id, * FROM ve_arc_pipe WHERE arc_id IS NOT NULL', 3, '{"geometry":{"name":"the_geom"}, "linkpath":{"name":"link"}}');
+VALUES (1000, 've_arc_pipe', 'SELECT arc_id as sys_id, * FROM ve_arc_pipe WHERE arc_id IS NOT NULL', 3, '{"geometry":{"name":"the_geom"}, "linkpath":{"name":"link"}}');
 INSERT INTO config_api_list 
-VALUES (2, 'v_ui_arc_x_relations', 'SELECT rid as sys_id, * FROM v_ui_arc_x_relations  WHERE rid IS NOT NULL', 3, '{"geometry":{"name":"the_geom"}, "linkpath":{"name":"link"}}');
+VALUES (2000, 'v_ui_arc_x_relations', 'SELECT rid as sys_id, * FROM v_ui_arc_x_relations  WHERE rid IS NOT NULL', 3, '{"geometry":{"name":"the_geom"}, "linkpath":{"name":"link"}}');
 INSERT INTO config_api_list 
-VALUES (3, 'v_ui_node_x_connection_upstream', 'SELECT rid as sys_id, * FROM v_ui_node_x_connection_upstream  WHERE rid IS NOT NULL', 3, '{"geometry":{"name":"the_geom"}, "linkpath":{"name":"link"}}');
+VALUES (3000, 'v_ui_node_x_connection_upstream', 'SELECT rid as sys_id, * FROM v_ui_node_x_connection_upstream  WHERE rid IS NOT NULL', 3, '{"geometry":{"name":"the_geom"}, "linkpath":{"name":"link"}}');
 
 
-INSERT INTO config_api_layer (layer_id, is_parent, tableparent_id, is_editable, tableinfo_id, formtemplate, headertext, orderby, link_id, is_tiled) VALUES ('ve_arc', true, 've_arc_parent', false, NULL, 'custom feature', 'Arc', 2, NULL, NULL);
-INSERT INTO config_api_layer (layer_id, is_parent, tableparent_id, is_editable, tableinfo_id, formtemplate, headertext, orderby, link_id, is_tiled) VALUES ('ve_node', true, 've_node_parent', false, NULL, 'custom feature', 'Node', 1, NULL, NULL);
-INSERT INTO config_api_layer (layer_id, is_parent, tableparent_id, is_editable, tableinfo_id, formtemplate, headertext, orderby, link_id, is_tiled) VALUES ('v_edit_cad_auxpoint', true, 'v_edit_cad_auxpoint_parent', true, NULL, 'GENERIC', 'Basic Info', 4, NULL, NULL);
-INSERT INTO config_api_layer (layer_id, is_parent, tableparent_id, is_editable, tableinfo_id, formtemplate, headertext, orderby, link_id, is_tiled) VALUES ('ve_connec', true, 've_connec_parent', false, NULL, 'custom feature', 'Connec', 3, NULL, NULL);
+INSERT INTO config_api_layer VALUES ('ve_arc', true, 'vp_basic_arc', false, NULL, 'custom feature', 'Arc', 2, NULL, NULL,'vp_epa_arc');
+INSERT INTO config_api_layer VALUES ('ve_node', true, 'vp_basic_node', false, NULL, 'custom feature', 'Node', 1, NULL, NULL, 'vp_epa_node');
+INSERT INTO config_api_layer VALUES ('v_edit_cad_auxpoint', true, 'v_edit_cad_auxpoint_parent', true, NULL, 'GENERIC', 'Basic Info', 4, NULL, NULL);
+INSERT INTO config_api_layer VALUES ('ve_connec', true, 'vp_basic_connec', false, NULL, 'custom feature', 'Connec', 3, NULL, NULL);
 
 
 INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('SHUTOFF-VALVE', 've_node_shutoffvalve');

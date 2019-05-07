@@ -44,8 +44,32 @@ DROP VIEW IF EXISTS v_edit_man_wwtp_pol;
 
 
 
---connec
+DROP VIEW IF EXISTS v_parent_arc;
+CREATE OR REPLACE VIEW v_parent_arc AS 
+ SELECT v_edit_arc.arc_id AS nid,
+    v_edit_arc.arc_type AS custom_type
+   FROM v_edit_arc;
+   
+  
+DROP VIEW IF EXISTS v_parent_node;
+CREATE OR REPLACE VIEW v_parent_node AS 
+ SELECT v_edit_node.node_id AS nid,
+    v_edit_node.node_type AS custom_type
+   FROM v_edit_node;
+   
+   
+DROP VIEW IF EXISTS v_parent_node ;
+CREATE OR REPLACE VIEW ve_connec_parent AS 
+ SELECT .connec_id AS nid,
+    v_edit_connec.connec_type AS custom_type
+   FROM SCHEMA_NAME.v_edit_connec;
+   
 
+DROP VIEW IF EXISTS v_parent_gully;
+CREATE OR REPLACE VIEW v_parent_gully AS 
+ SELECT v_edit_arc.arc_id AS nid,
+    v_edit_arc.arc_type AS custom_type
+   FROM v_edit_arc;
 
 -----------------------
 -- create views ve

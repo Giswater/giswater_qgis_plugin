@@ -9,18 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --DROP CONSTRAINT
-
-ALTER TABLE rpt_selector_compare DROP CONSTRAINT IF EXISTS rpt_selector_compare_result_id_cur_user_unique ;
-
-ALTER TABLE rpt_selector_hourly_compare DROP CONSTRAINT IF EXISTS time_compare_cur_user_unique;
-
 DROP INDEX IF EXISTS shortcut_unique;
 
 --ADD CONSTRAINT
-
-
-ALTER TABLE rpt_selector_compare ADD CONSTRAINT rpt_selector_compare_result_id_cur_user_unique UNIQUE(result_id, cur_user);
-
-ALTER TABLE rpt_selector_hourly_compare ADD CONSTRAINT time_compare_cur_user_unique UNIQUE("time", cur_user);
-
 CREATE UNIQUE INDEX shortcut_unique ON cat_feature USING btree (shortcut_key COLLATE pg_catalog."default");

@@ -11,16 +11,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setsearch_add(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_api_setsearch_add($${
-		"client":{"device":9, "infoType":100, "lang":"ES"},
-		"form":{"tabName": "address"},
-		"data":{"add_street":{"text":"Calle d'Antoni Gaudí"}, "add_postnumber":{"text":"8"}}
-		}$$)
 SELECT "SCHEMA_NAME".gw_api_setsearch_add($${
 		"client":{"device":9, "infoType":100, "lang":"ES"}, 
 		"form":{"tabName":"address"}, "feature":{}, 
-		"data":{"filterFields":{}, "pageInfo":{}, "add_muni":{"id":"1", "name":"Sant Boi del Llóbregat"}, 
-		"add_street":{"text":"Calle de Salvador Seguí"}, "add_postnumber":{"text":"32"}}}$$)
+		"data":{"filterFields":{}, "pageInfo":{}, "add_muni":{"id":"1", "name":"Sant Boi del Llobregat"}, 
+		"add_street":{"text":"Calle de Salvador Seguí"}, "add_postnumber":{"text":"3"}}}$$)
 */
 
 DECLARE
@@ -92,21 +87,21 @@ IF v_tab = 'address' THEN
 	v_editable := (((p_data->>'data')::json)->>'add_postnumber')::json->>'text';
 	v_searchtext := concat('%', v_editable ,'%');
 	raise notice 'name_arg %', v_idarg;
-	--raise notice 'v_searchtext %', v_searchtext;
+	raise notice 'v_searchtext % % % % % % % % % % % % %', v_searchtext, v_address_layer, v_address_display_field, v_address_layer, v_address_geom_id_field, v_street_layer, v_street_id_field, v_address_street_id_field, v_street_display_field, v_idarg, v_street_muni_id_field, v_muni, v_searchtext;
 
 
 	-- Get address
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
-		FROM (SELECT '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' as display_name, st_x ('||quote_ident(v_address_layer)||'.'||quote_ident(v_address_geom_id_field)||') as sys_x
+		FROM (SELECT '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' as display_name, st_x ('||quote_ident(v_address_layer)||'.
+		'||quote_ident(v_address_geom_id_field)||') as sys_x
 		,st_y ('||quote_ident(v_address_layer)||'.'||quote_ident(v_address_geom_id_field)||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid
 		FROM '||quote_ident(v_address_layer)||'
-		JOIN '||quote_ident(v_street_layer)||' ON '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' = '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_street_id_field) ||'
-		WHERE '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' = $$'||quote_literal(v_idarg)||'$$
-		AND '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field)|' = '||quote_literal(v_muni)||'
+		JOIN '||quote_ident(v_street_layer)||' ON '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' = 
+		'||quote_ident(v_address_layer)||'.'||quote_ident(v_address_street_id_field) ||'
+		WHERE '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' = '||quote_literal(v_idarg)||'
 		AND '||quote_ident(v_address_layer)||'.'||quote_ident(v_address_display_field)||' ILIKE '||quote_literal(v_searchtext)||' LIMIT 10 
 		)a'
 		INTO v_response;
-
 END IF;
 
   --    Control NULL's

@@ -16,7 +16,7 @@ In function of role of user, buttons are parameters are passed to client';
 */
 
 /*
-COMMENT ON TABLE config_api_form_actions IS 
+COMMENT ON TABLE config_api_form IS 
 'INSTRUCIONS TO WORK WITH THIS TABLE:
 Wiht this table actions on form are configured
 Actions are builded on form using this table, but not are activated
