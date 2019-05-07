@@ -22,7 +22,7 @@ SELECT SCHEMA_NAME.gw_api_setsearch($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"tabName": "address"},
 		"feature":{},
-		"data":{"add_muni": {"id": 1, "name": "Sant Boi del Llóbregat"}, "add_street": {"text": "Calle de Francesc Layret"}}}$$)
+		"data":{"add_muni": {"id": 1, "name": "Sant Boi del Llobregat"}, "add_street": {"text": "Calle de Francesc Layret"}}}$$)
 
 
 */
@@ -214,8 +214,6 @@ IF tab_arg = 'network' THEN
     edit1 := ((p_data->>'data')::json)->>'net_code';
     text_arg := concat('%',edit1->>'text' ,'%');
 
-    raise notice'text_arg %', text_arg;
-
 
    IF p_network_layer_arc IS NOT NULL THEN
     query_text=concat ('SELECT ',p_network_search_field_arc_id,' AS sys_id, ',
@@ -280,10 +278,11 @@ IF tab_arg = 'network' THEN
 	RAISE NOTICE ' query_text %',query_text;
 	RAISE NOTICE ' text_arg %',text_arg;
 	RAISE NOTICE ' id_arg %',id_arg;
+	
     IF id_arg = '' THEN 
         -- Get Ids for type combo
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||quote_literal(query_text)||')b
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(query_text)||')b
                     WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(text_arg) || ' 
                     ORDER BY search_field LIMIT 10) a'
                     INTO response_json;
@@ -294,15 +293,11 @@ IF tab_arg = 'network' THEN
                     ORDER BY search_field LIMIT 10) a';*/
         
 
-raise notice 'qt2 %', qt2;
-
     ELSE 
-        -- Get Ids for type combo
-
-      
+        -- Get Ids for type combo    
 
         EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||quote_literal(query_text)||')b
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, feature_type FROM ('||(query_text)||')b
                     WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(text_arg) || ' AND sys_table_id = '||quote_literal(id_arg)||'
                     ORDER BY search_field LIMIT 10) a'
                     INTO response_json;
@@ -359,9 +354,10 @@ ELSIF tab_arg = 'address' THEN
         FROM '||quote_ident(v_street_layer)||'
         JOIN '||quote_ident(v_muni_layer)||' ON '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_id_field)||' = '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_muni_id_field) ||'
         WHERE '||quote_ident(v_muni_layer)||'.'||quote_ident(v_muni_display_field)||' = '||quote_literal(name_arg)||'
-        AND '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
+        AND '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
         INTO response_json;
-    raise notice'response %', response_json;
+        
+    raise notice'response % % %', v_muni_layer, v_muni_display_field, name_arg;
 
 -- Hydro tab
 ------------
