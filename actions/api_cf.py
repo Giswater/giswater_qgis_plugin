@@ -19,13 +19,13 @@ else:
     import urllib.parse
 
 from qgis.PyQt.QtCore import QDate, QPoint, Qt
-from qgis.PyQt.QtGui import QCursor, QStandardItem, QStandardItemModel
+from qgis.PyQt.QtGui import QCursor, QStandardItem, QStandardItemModel, QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
 from qgis.PyQt.QtWidgets import QFrame, QGridLayout, QGroupBox, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
 from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget
 
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsMapToPixel, QgsPoint
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsMapToPixel, QgsPoint, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 import json
@@ -142,19 +142,33 @@ class ApiCF(ApiParent):
                 action.hovered.connect(partial(self.draw_by_action, feature))
 
         main_menu.addSeparator()
-        # TODO identify all
-        # action = QAction('Identify all', None)
+        # TODO hide identify all if no feature under mouse
+        action = QAction('Identify all', None)
         # #action.triggered.connect(partial(self.identify_all))
-        # action.hovered.connect(partial(self.identify_all, complet_list))
-        # main_menu.addAction(action)
-        # main_menu.addSeparator()
+        action.hovered.connect(partial(self.identify_all, complet_list))
+        main_menu.addAction(action)
+        main_menu.addSeparator()
+
         main_menu.exec_(click_point)
 
     def identify_all(self, complet_list):
-        self.controller.log_info(str("WORK"))
+
+        points = []
         for layer in complet_list[0]['body']['data']['layersNames']:
             for feature in layer['ids']:
-                self.draw_by_action(feature, False)
+                list_coord = re.search('\((.*)\)', str(feature['geometry']))
+                coords = list_coord.group(1)
+                polygon = coords.split(',')
+                for z in range(len(polygon) - 1, -1, -1):
+                    x, y = polygon[z].split(' ')
+                    point = QgsPoint(float(x), float(y))
+                    points.append(point)
+                for i in range(0, len(polygon)):
+                    x, y = polygon[i].split(' ')
+                    point = QgsPoint(float(x), float(y))
+                    points.append(point)
+
+        self.draw_polygon(points)
 
 
     def draw_by_action(self, feature, reset_rb=True):
@@ -191,7 +205,7 @@ class ApiCF(ApiParent):
         :param feature_id: id of feature to do info
         :return:
         """
-        print("2 - FEATURE_ID: " + str(feature_id))
+
         # Manage tab signal
         self.tab_element_loaded = False
         self.tab_relations_loaded = False
@@ -227,7 +241,6 @@ class ApiCF(ApiParent):
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
 
-        print("3 - FEATURE_ID: " + str(feature_id))
         # IF insert new feature
         if point and feature_cat:
             self.new_feature_id = new_feature_id
@@ -271,7 +284,6 @@ class ApiCF(ApiParent):
                 msg = row[0]['body']['data']['fields']['message']['text']
                 priority = int(row[0]['body']['data']['fields']['message']['priority'])
                 self.controller.show_message(msg, message_level=priority)
-                self.controller.restore_info()
                 self.controller.show_message(msg, message_level=priority)
                 return False, None
 
@@ -477,7 +489,7 @@ class ApiCF(ApiParent):
         layout_inp_1 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_1')
         layout_inp_2 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_2')
         layout_inp_3 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_3')
-        print("layout_inp_1: " +str(layout_inp_1))
+
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
 
         # Get feature type as geom_type (node, arc, connec)
@@ -937,9 +949,6 @@ class ApiCF(ApiParent):
         else:
             msg = "parameter button_function not found"
             self.controller.show_message(msg, 2)
-        print(str(function_name))
-        print("dialog: " + str(dialog))
-        print("widget: " + str(widget))
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 

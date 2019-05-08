@@ -46,7 +46,6 @@ class ApiCatalog(ApiParent):
         self.project_type = project_type
 
     def api_catalog(self, previous_dialog, widget_name, geom_type):
-        self.controller.restore_info()
 
         form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
         body = self.create_body(form)

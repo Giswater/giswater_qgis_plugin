@@ -28,7 +28,6 @@ from functools import partial
 
 from map_tools.parent import ParentMapTool
 from giswater.actions.api_cf import ApiCF
-from giswater.actions.api_parent import ApiParent
 
 
 class CadApiInfo(ParentMapTool):
@@ -38,11 +37,7 @@ class CadApiInfo(ParentMapTool):
         """ Class constructor """
         # Call ParentMapTool constructor
         super(CadApiInfo, self).__init__(iface, settings, action, index_action)
-        # self.iface = iface
-        # self.canvas = self.iface.mapCanvas()
-        # self.settings = settings
-        # self.action = action
-        # self.index_action = index_action
+        self.index_action = index_action
 
 
     def create_point(self, event):
@@ -59,9 +54,10 @@ class CadApiInfo(ParentMapTool):
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
-        self.controller.log_info(str(event.key()))
         if event.key() == Qt.Key_Escape:
-            self.deactivate()
+            self.cancel_map_tool()
+            return
+
 
 
     def canvasMoveEvent(self, event):
@@ -84,23 +80,23 @@ class CadApiInfo(ParentMapTool):
             if point is False:
                 return
             self.info_cf.hilight_feature(point, tab_type='data')
-        else:
-            self.controller.log_info("cacacaca")
 
 
     def activate(self):
-        self.is_active = True
+        # Check button
         self.action().setChecked(True)
-        # self.canvas = self.iface.mapCanvas()
 
         # Change map tool cursor
         self.cursor = QCursor()
         self.cursor.setShape(Qt.WhatsThisCursor)
         self.canvas.setCursor(self.cursor)
+
         self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, 'data')
+
 
 
     def deactivate(self):
         ParentMapTool.deactivate(self)
+
 
 
