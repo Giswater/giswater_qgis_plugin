@@ -28,19 +28,19 @@
        </widget>
       </item>
       <item>
+       <widget class="QRadioButton" name="rdb_sample">
+        <property name="text">
+         <string>Example data</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="rdb_import_data">
         <property name="enabled">
          <bool>true</bool>
         </property>
         <property name="text">
          <string>Import INP data</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="rdb_sample">
-        <property name="text">
-         <string>Example data</string>
         </property>
        </widget>
       </item>
@@ -225,7 +225,7 @@
     <item row="7" column="1" colspan="3">
      <widget class="QLineEdit" name="srid_id"/>
     </item>
-    <item row="8" column="0" colspan="4">
+    <item row="8" column="1" colspan="3">
      <widget class="QTableView" name="tbl_srid">
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAsNeeded</enum>
@@ -291,7 +291,6 @@
   <tabstop>date</tabstop>
   <tabstop>rdb_data</tabstop>
   <tabstop>rdb_import_data</tabstop>
-  <tabstop>rdb_sample</tabstop>
   <tabstop>rdb_sample_dev</tabstop>
   <tabstop>data_file</tabstop>
   <tabstop>btn_push_file</tabstop>
