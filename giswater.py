@@ -34,7 +34,7 @@ from .actions.utils import Utils
 from .dao.controller import DaoController
 from .map_tools.cad_add_circle import CadAddCircle
 from .map_tools.cad_add_point import CadAddPoint
-from map_tools.cad_api_info import CadApiInfo
+from map_tools.cad_api_info_data import CadApiInfo
 from .map_tools.change_elem_type import ChangeElemType
 from .map_tools.connec import ConnecMapTool
 from .map_tools.delete_node import DeleteNodeMapTool
@@ -959,7 +959,7 @@ class Giswater(QObject):
     
     def manage_map_tools(self):
         """ Manage map tools """
-        self.set_map_tool('map_tool_basic_api_info')
+        self.set_map_tool('map_tool_api_info_data')
         self.set_map_tool('map_tool_move_node')
         self.set_map_tool('map_tool_delete_node')
         self.set_map_tool('map_tool_flow_trace')

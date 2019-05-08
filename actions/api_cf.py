@@ -117,12 +117,17 @@ class ApiCF(ApiParent):
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
         sql = ("SELECT " + self.schema_name + ".gw_api_getlayersfromcoordinates($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
+        # hide QMenu identify if no feature under mouse
+        len_layers = len(complet_list[0]['body']['data']['layersNames'])
+        print(len_layers)
+        if len_layers == 0:
+            return False
         self.icon_folder = self.plugin_dir + '/icons/'
         main_menu = QMenu()
         for layer in complet_list[0]['body']['data']['layersNames']:
@@ -139,10 +144,11 @@ class ApiCF(ApiParent):
                 action = QAction(str(feature['id']), None)
                 sub_menu.addAction(action)
                 action.triggered.connect(partial(self.set_active_layer, action, tab_type))
-                action.hovered.connect(partial(self.draw_by_action, feature))
+                action.hovered.connect(partial(self.draw_by_action, feature, rb_list))
 
         main_menu.addSeparator()
-        # TODO hide identify all if no feature under mouse
+
+
         action = QAction('Identify all', None)
         # #action.triggered.connect(partial(self.identify_all))
         action.hovered.connect(partial(self.identify_all, complet_list, rb_list))
@@ -152,6 +158,9 @@ class ApiCF(ApiParent):
         main_menu.exec_(click_point)
 
     def identify_all(self, complet_list, rb_list):
+        self.resetRubberbands()
+        for rb in rb_list:
+            rb.reset()
         for layer in complet_list[0]['body']['data']['layersNames']:
             for feature in layer['ids']:
                 points = []
@@ -172,8 +181,10 @@ class ApiCF(ApiParent):
         # self.draw_polygon(points)
 
 
-    def draw_by_action(self, feature, reset_rb=True):
+    def draw_by_action(self, feature, rb_list, reset_rb=True):
         """ Draw lines based on geometry """
+        for rb in rb_list:
+            rb.reset()
         if feature['geometry'] is None:
             return
         list_coord = re.search('\((.*)\)', str(feature['geometry']))
@@ -270,7 +281,7 @@ class ApiCF(ApiParent):
             body = self.create_body(feature=feature, extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfofromid($${" + body + "}$$)")
 
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False, None
@@ -674,7 +685,7 @@ class ApiCF(ApiParent):
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
         sql = ("SELECT " + self.schema_name + ".gw_api_getinfocrossection($${" + body + "}$$)")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
         if not row:
             return False
         section_result = row
@@ -905,7 +916,7 @@ class ApiCF(ApiParent):
         extras = '"comboParent":"'+combo_parent+'", "comboId":"'+combo_id+'"'
         body = self.create_body(feature=feature, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getchilds($${" + body + "}$$)")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
         for combo_child in row[0]['body']['data']:
             if combo_child is not None:
                 self.populate_child(combo_child)
@@ -1071,7 +1082,7 @@ class ApiCF(ApiParent):
         field_object_id = "id"
         sql = ("SELECT * FROM " + self.schema_name + "." + view_object + ""
                " WHERE " + field_object_id + " = '" + object_id + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=True)
         if not row:
             self.controller.show_warning("Object id not found", parameter=object_id)
             return
@@ -1083,7 +1094,7 @@ class ApiCF(ApiParent):
                " FROM " + self.schema_name + "." + str(tablename) + ""
                " WHERE " + str(self.field_id) + " = '" + str(self.feature_id) + "'"
                " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
-        row = self.controller.get_row(sql, log_info=False, log_sql=False)
+        row = self.controller.get_row(sql, log_info=False, log_sql=False, commit=True)
 
         # If object already exist show warning message
         if row:
@@ -1192,7 +1203,7 @@ class ApiCF(ApiParent):
         # Check if data in the view
         sql = ("SELECT * FROM " + self.schema_name + "." + viewname + ""
                " WHERE " + str(field_id) + " = '" + str(self.feature_id) + "';")
-        row = self.controller.get_row(sql, log_info=True, log_sql=False)
+        row = self.controller.get_row(sql, log_info=True, log_sql=False, commit=True)
 
         if not row:
             # Hide tab 'relations'
@@ -1357,7 +1368,7 @@ class ApiCF(ApiParent):
         sql = ("SELECT DISTINCT cat_period_id, cat_period_id "
                " FROM " + self.schema_name + ".ve_ui_hydroval_x_connec ORDER BY cat_period_id")
 
-        rows = self.controller.get_rows(sql, log_sql=False)
+        rows = self.controller.get_rows(sql, log_sql=False, commit=True)
         rows.append(['', ''])
         utils_giswater.set_item_data(cmb_cat_period_id_filter, rows)
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
@@ -1454,14 +1465,14 @@ class ApiCF(ApiParent):
         sql = ("SELECT DISTINCT(id), id FROM " + self.schema_name + "." + table_name_event_id + ""
                " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
                " ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         rows.append(['', ''])
         utils_giswater.set_item_data(self.dlg_cf.event_id, rows)
         # Fill ComboBox event_type
         sql = ("SELECT DISTINCT(parameter_type), parameter_type FROM " + self.schema_name + "." + table_name_event_id + ""
                " WHERE feature_type = '" + feature_type + "' OR feature_type = 'ALL'"
                " ORDER BY parameter_type")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         rows.append(['', ''])
         utils_giswater.set_item_data(self.dlg_cf.event_type, rows)
 
@@ -1497,7 +1508,7 @@ class ApiCF(ApiParent):
         # Get all data for one visit
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_event"
                " WHERE id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=True)
         if not row:
             return
 
@@ -1551,7 +1562,7 @@ class ApiCF(ApiParent):
 
         sql = ("SELECT gallery, document FROM " + table_name + ""
                " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
         if not row:
             return
 
@@ -1597,7 +1608,7 @@ class ApiCF(ApiParent):
         if event_type_value != 'null':
             sql += " AND parameter_type ILIKE '%" + event_type_value + "%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=False)
+        rows = self.controller.get_rows(sql, log_sql=False, commit=True)
         rows.append(['', ''])
         utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
 
@@ -1705,7 +1716,7 @@ class ApiCF(ApiParent):
         # Get all documents for one visit
         sql = ("SELECT doc_id FROM " + self.schema_name + ".doc_x_visit"
                " WHERE visit_id = '" + str(self.visit_id) + "'")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         if not rows:
             return
 
@@ -1718,7 +1729,7 @@ class ApiCF(ApiParent):
             sql = ("SELECT path"
                    " FROM " + self.schema_name + ".ve_ui_doc"
                    " WHERE id = '" + str(rows[0][0]) + "'")
-            row = self.controller.get_row(sql)
+            row = self.controller.get_row(sql, commit=True)
             if not row:
                 return
 
@@ -1768,7 +1779,7 @@ class ApiCF(ApiParent):
         # Get path of selected document
         sql = ("SELECT path FROM " + self.schema_name + ".ve_ui_doc"
                " WHERE id = '" + str(selected_document) + "'")
-        row = self.controller.get_row(sql)
+        row = self.controller.get_row(sql, commit=True)
         if not row:
             return
 
@@ -1830,7 +1841,7 @@ class ApiCF(ApiParent):
 
         # Fill ComboBox doc_type
         sql = ("SELECT id, id FROM " + self.schema_name + ".doc_type ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = self.controller.get_rows(sql, commit=True)
         rows.append(['', ''])
         utils_giswater.set_item_data(doc_type, rows)
 
@@ -1997,7 +2008,7 @@ class ApiCF(ApiParent):
         feature = '"tableName":"' + self.tablename + '", "idName":"'+id_name+'", "id":"'+self.feature_id+'"'
         body = self.create_body(form, feature,  filter_fields)
         sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
 
         if row is None or row[0] is None:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -2094,7 +2105,7 @@ class ApiCF(ApiParent):
             feature += '"id":"' + self.feature_id + '"'
             body = self.create_body(form, feature, filter_fields='')
             sql = ("SELECT " + self.schema_name + ".gw_api_getinfoplan($${" + body + "}$$)::text")
-            row = self.controller.get_row(sql, log_sql=False)
+            row = self.controller.get_row(sql, log_sql=False, commit=True)
 
             if not row:
                 self.controller.show_message("NOT ROW FOR: " + sql, 2)
@@ -2140,7 +2151,7 @@ class ApiCF(ApiParent):
         body += '"data":{}'
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
 
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
@@ -2209,14 +2220,14 @@ class ApiCF(ApiParent):
                 sql = ("SELECT DISTINCT(id)"
                        " FROM " + self.schema_name + "." + str(table_object) + ""
                        " WHERE id = '" + str(cat_work_id) + "'")
-                row = self.controller.get_row(sql, log_info=False)
+                row = self.controller.get_row(sql, log_info=False, commit=True)
 
                 if row is None :
                     sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
                     self.controller.execute_sql(sql)
 
                     sql = ("SELECT id, id FROM " + self.schema_name + ".cat_work ORDER BY id")
-                    rows = self.controller.get_rows(sql)
+                    rows = self.controller.get_rows(sql, commit=True)
                     if rows:
                         cmb_workcat_id = self.dlg_cf.findChild(QComboBox, tab_type + "_workcat_id")
                         utils_giswater.set_item_data(cmb_workcat_id, rows, index_to_show=1, combo_clear=True)
@@ -2325,7 +2336,7 @@ class ApiCF(ApiParent):
                " FROM " + self.schema_name + ".config_client_forms"
                " WHERE table_id = '" + table_name + "'"
                " ORDER BY column_index")
-        rows = self.controller.get_rows(sql, log_info=False)
+        rows = self.controller.get_rows(sql, log_info=False, commit=True)
         if not rows:
             return
 
@@ -2357,7 +2368,7 @@ class ApiCF(ApiParent):
     def check_column_exist(self, table_name, column_name):
         sql = ("SELECT DISTINCT column_name FROM information_schema.columns"
                " WHERE table_name = '" + table_name + "' AND column_name = '" + column_name + "'")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=False, commit=True)
         return row
     # def disconnect_snapping(self, refresh_canvas=True):
     #     """ Select 'refreshAllLayers' as current map tool and disconnect snapping """

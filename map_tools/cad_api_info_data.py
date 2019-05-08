@@ -99,6 +99,9 @@ class CadApiInfo(ParentMapTool):
 
 
     def deactivate(self):
+        for rb in self.rb_list:
+            rb.reset()
+        self.info_cf.resetRubberbands()
         ParentMapTool.deactivate(self)
 
 
