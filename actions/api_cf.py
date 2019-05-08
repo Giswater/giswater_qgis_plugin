@@ -6,8 +6,6 @@ or (at your option) any later version.
 """
 
 # -*- coding: latin-1 -*-
-from PyQt4.QtGui import QIcon
-
 try:
     from qgis.core import Qgis
 except:
@@ -19,7 +17,7 @@ else:
     import urllib.parse
 
 from qgis.PyQt.QtCore import QDate, QPoint, Qt
-from qgis.PyQt.QtGui import QCursor, QStandardItem, QStandardItemModel, QColor
+from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
 from qgis.PyQt.QtWidgets import QFrame, QGridLayout, QGroupBox, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
@@ -183,6 +181,7 @@ class ApiCF(ApiParent):
 
     def draw_by_action(self, feature, rb_list, reset_rb=True):
         """ Draw lines based on geometry """
+        print(rb_list)
         for rb in rb_list:
             rb.reset()
         if feature['geometry'] is None:
@@ -854,11 +853,19 @@ class ApiCF(ApiParent):
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
-                widget.lostFocus.connect(partial(self.clean_my_json, widget))
-                widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
-                widget.lostFocus.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    widget.lostFocus.connect(partial(self.clean_my_json, widget))
+                    widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
+                    widget.lostFocus.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+                else:
+                    widget.editingFinished.connect(partial(self.clean_my_json, widget))
+                    widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
+                    widget.editingFinished.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
             else:
-                widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
+                else:
+                    widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
 
     def set_auto_update_combobox(self, field, dialog, widget):

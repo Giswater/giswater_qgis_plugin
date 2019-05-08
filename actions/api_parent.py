@@ -835,10 +835,9 @@ class ApiParent(ParentAction):
     
         if Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_point.reset(Qgis.Point)
-            self.rubber_polygon.reset()
         else:
             self.rubber_point.reset(QgsWkbTypes.PointGeometry)
-            self.rubber_polygon.reset()
+        self.rubber_polygon.reset()
 
             
     def fill_table(self, widget, table_name, filter_=None):
