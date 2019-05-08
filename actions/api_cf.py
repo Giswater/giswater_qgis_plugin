@@ -14,28 +14,19 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4 import QtCore
-    from PyQt4.QtCore import Qt, QDate, QPoint
-    from PyQt4.QtGui import QIntValidator, QDoubleValidator, QMenu, QApplication, QSpinBox, QDoubleSpinBox
-    from PyQt4.QtGui import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, QDateEdit
-    from PyQt4.QtGui import QGridLayout, QSpacerItem, QSizePolicy, QStringListModel, QCompleter, QListWidget, \
-        QTableView, QListWidgetItem, QStandardItemModel, QStandardItem, QTabWidget, QAbstractItemView
-    from PyQt4.QtSql import QSqlTableModel
-    import urlparse
-    import win32gui
-
+    import urlparse as parse
 else:
-    from qgis.PyQt import QtCore
-    from qgis.PyQt.QtCore import Qt, QDate, QStringListModel,QPoint
-    from qgis.PyQt.QtGui import QIntValidator, QDoubleValidator, QStandardItem, QStandardItemModel
-    from qgis.PyQt.QtWidgets import QWidget, QAction, QPushButton, QLabel, QLineEdit, QComboBox, QCheckBox, \
-        QGridLayout, QSpacerItem, QSizePolicy, QCompleter, QTableView, QListWidget, QListWidgetItem, \
-        QTabWidget, QAbstractItemView, QMenu,  QApplication,QSpinBox, QDoubleSpinBox
-    from qgis.PyQt.QtSql import QSqlTableModel
-    import urllib.parse as urlparse
+    import urllib.parse
 
-from qgis.core import QgsPoint, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsMapToPixel
-from qgis.gui import QgsMapToolEmitPoint, QgsDateTimeEdit
+from qgis.PyQt.QtCore import QDate, QPoint, Qt
+from qgis.PyQt.QtGui import QCursor, QStandardItem, QStandardItemModel
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
+from qgis.PyQt.QtWidgets import QFrame, QGridLayout, QGroupBox, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
+from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget
+
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsMapToPixel, QgsPoint
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
 
 import json
 import os
@@ -61,7 +52,7 @@ from giswater.ui_manager import ApiBasicInfo
 
 class ApiCF(ApiParent):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self, iface, settings, controller, plugin_dir, tab_type):
         """ Class constructor """
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.iface = iface
@@ -70,6 +61,7 @@ class ApiCF(ApiParent):
         self.plugin_dir = plugin_dir
         self.new_feature_id = None
         self.layer_new_feature = None
+        self.tab_type = tab_type
 
 
     # def api_info(self):
@@ -108,9 +100,12 @@ class ApiCF(ApiParent):
 
 
     def hilight_feature(self, point, tab_type=None):
-        x, y = win32gui.GetCursorPos()
 
+        cursor = QCursor()
+        x = cursor.pos().x()
+        y = cursor.pos().y()
         click_point = QPoint(x + 5, y + 5)
+
         visible_layers = self.get_visible_layers(as_list=True)
         scale_zoom = self.iface.mapCanvas().scale()
         srid = self.controller.plugin_settings_value('srid')
@@ -177,6 +172,7 @@ class ApiCF(ApiParent):
             points = self.get_points(list_coord)
             self.draw_polygon(points)
 
+
     def set_active_layer(self, action, tab_type):
         """ Set active selected layer """
         parent_menu = action.associatedWidgets()[0]
@@ -185,7 +181,6 @@ class ApiCF(ApiParent):
         self.iface.setActiveLayer(layer)
         complet_result, dialog = self.open_form(table_name=table_name['table'], feature_id=action.text(), tab_type=tab_type)
         self.draw(complet_result)
-
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None, layer_new_feature=None, tab_type=None):
@@ -1232,8 +1227,8 @@ class ApiCF(ApiParent):
             self.controller.show_message(message, parameter=table_name)
             return
 
-        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id)
+        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             print("FAIL open_relation")
             return
@@ -1264,8 +1259,8 @@ class ApiCF(ApiParent):
         row = selected_list[0].row()
         table_name = qtable.model().record(row).value("sys_table_id")
         feature_id = qtable.model().record(row).value("sys_id")
-        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id)
+        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             print("FAIL open_up_down_stream")
             return
@@ -1301,8 +1296,8 @@ class ApiCF(ApiParent):
         feature_id = index.sibling(row, column_index).data()
 
         # return
-        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id)
+        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             print("FAIL open_selected_hydro")
             return
@@ -1720,7 +1715,7 @@ class ApiCF(ApiParent):
             path = str(row[0])
 
             # Parse a URL into components
-            url = urlparse.urlsplit(path)
+            url = parse.urlsplit(path)
 
             # Open selected document
             # Check if path is URL
@@ -1770,7 +1765,7 @@ class ApiCF(ApiParent):
         path = str(row[0])
 
         # Parse a URL into components
-        url = urlparse.urlsplit(path)
+        url = parse.urlsplit(path)
 
         # Open selected document
         # Check if path is URL
@@ -2067,8 +2062,8 @@ class ApiCF(ApiParent):
         feature_id = index.sibling(row, column_index).data()
 
         # return
-        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id)
+        api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             print("FAIL open_rpt_result")
             return
@@ -2282,8 +2277,8 @@ class ApiCF(ApiParent):
         tab_type = dialog.tab_main
 
 
-        self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-        complet_result, dialog = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id, tab_type='data')
+        self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        complet_result, dialog = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             print("FAIL open_node")
             return

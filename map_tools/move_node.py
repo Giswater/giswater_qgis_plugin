@@ -270,4 +270,4 @@ class MoveNodeMapTool(ParentMapTool):
         
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
-            
+

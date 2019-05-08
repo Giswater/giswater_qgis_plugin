@@ -316,8 +316,8 @@ class Giswater(QObject):
             map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 28:
             map_tool = ChangeElemType(self.iface, self.settings, action, index_action)
-        elif int(index_action) ==37:
-            map_tool = CadApiInfo(self.iface, self.settings, action, index_action, self.controller, self.plugin_dir)
+        elif int(index_action) == 37:
+            map_tool = CadApiInfo(self.iface, self.settings, action, index_action)
         elif int(index_action) == 39:
             map_tool = Dimensioning(self.iface, self.settings, action, index_action)                     
         elif int(index_action) == 43:
@@ -959,7 +959,7 @@ class Giswater(QObject):
     
     def manage_map_tools(self):
         """ Manage map tools """
-        
+        self.set_map_tool('map_tool_basic_api_info')
         self.set_map_tool('map_tool_move_node')
         self.set_map_tool('map_tool_delete_node')
         self.set_map_tool('map_tool_flow_trace')

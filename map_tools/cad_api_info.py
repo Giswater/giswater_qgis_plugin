@@ -31,56 +31,18 @@ from giswater.actions.api_cf import ApiCF
 from giswater.actions.api_parent import ApiParent
 
 
-class CadApiInfo(QgsMapTool):
+class CadApiInfo(ParentMapTool):
     """ Button 37: Info """
 
-    def __init__(self, iface, settings, action, index_action, controller, plugin_dir):
+    def __init__(self, iface, settings, action, index_action):
         """ Class constructor """
         # Call ParentMapTool constructor
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        QgsMapTool.__init__(self, self.canvas)
-        self.settings = settings
-        self.action = action
-        self.index_action = index_action
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.is_active = None
-
-
-
-    """ QgsMapTools inherited event functions """
-
-    def keyPressEvent(self, event):
-        self.controller.log_info(str(event.key()))
-        if event.key() == Qt.Key_Escape:
-            self.controller.log_info("keyPressEvent")
-            self.deactivate()
-
-    def canvasMoveEvent(self, event):
-        pass
-
-    def canvasReleaseEvent(self, event):
-        complet_result = None
-        self.controller.log_info("CANVASRELEASE")
-        self.controller.log_info(str(event.button()))
-        if event.button() == Qt.LeftButton and self.is_active:
-            self.controller.log_info("LeftButton")
-            point = self.create_point(event)
-            if point is False:
-                return
-            complet_result = self.info_cf.open_form(point, tab_type='data')
-
-        if not complet_result is None:
-                print("FAIL get_point")
-                return
-        elif event.button() == Qt.RightButton and self.is_active:
-            point = self.create_point(event)
-            if point is False:
-                return
-            self.info_cf.hilight_feature(point, tab_type='data')
-        else:
-            self.controller.log_info("cacacaca")
+        super(CadApiInfo, self).__init__(iface, settings, action, index_action)
+        # self.iface = iface
+        # self.canvas = self.iface.mapCanvas()
+        # self.settings = settings
+        # self.action = action
+        # self.index_action = index_action
 
 
     def create_point(self, event):
@@ -93,24 +55,52 @@ class CadApiInfo(QgsMapTool):
             return False
         return point
 
+
+    """ QgsMapTools inherited event functions """
+
+    def keyPressEvent(self, event):
+        self.controller.log_info(str(event.key()))
+        if event.key() == Qt.Key_Escape:
+            self.deactivate()
+
+
+    def canvasMoveEvent(self, event):
+        pass
+
+
+
+    def canvasReleaseEvent(self, event):
+        complet_result = None
+        if event.button() == Qt.LeftButton:
+            point = self.create_point(event)
+            if point is False:
+                return
+            complet_result, dialog = self.info_cf.open_form(point, tab_type='data')
+        if not complet_result is None:
+                print("FAIL get_point")
+                return
+        elif event.button() == Qt.RightButton:
+            point = self.create_point(event)
+            if point is False:
+                return
+            self.info_cf.hilight_feature(point, tab_type='data')
+        else:
+            self.controller.log_info("cacacaca")
+
+
     def activate(self):
         self.is_active = True
-        self.std_cursor = self.parent().cursor()
-        self.action.setChecked(True)
-        self.canvas = self.iface.mapCanvas()
+        self.action().setChecked(True)
+        # self.canvas = self.iface.mapCanvas()
 
         # Change map tool cursor
         self.cursor = QCursor()
         self.cursor.setShape(Qt.WhatsThisCursor)
         self.canvas.setCursor(self.cursor)
-        self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir)
+        self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, 'data')
 
 
     def deactivate(self):
-        self.is_active = False
-        # Call parent method
-        self.action.setChecked(False)
-        self.canvas.setCursor(self.std_cursor)
-        QgsMapTool.deactivate(self)
-        self.deactivated.emit()
+        ParentMapTool.deactivate(self)
+
 
