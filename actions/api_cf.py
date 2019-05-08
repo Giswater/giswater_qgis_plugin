@@ -26,7 +26,7 @@ from qgis.PyQt.QtWidgets import QFrame, QGridLayout, QGroupBox, QLabel, QLineEdi
 from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsMapToPixel, QgsPoint, QgsGeometry
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
 import json
 import os
@@ -99,7 +99,7 @@ class ApiCF(ApiParent):
     #         self.hilight_feature(point, tab_type)
 
 
-    def hilight_feature(self, point, tab_type=None):
+    def hilight_feature(self, point, rb_list, tab_type=None):
 
         cursor = QCursor()
         x = cursor.pos().x()
@@ -117,7 +117,7 @@ class ApiCF(ApiParent):
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
         sql = ("SELECT " + self.schema_name + ".gw_api_getlayersfromcoordinates($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = self.controller.get_row(sql, log_sql=True)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
@@ -145,30 +145,31 @@ class ApiCF(ApiParent):
         # TODO hide identify all if no feature under mouse
         action = QAction('Identify all', None)
         # #action.triggered.connect(partial(self.identify_all))
-        action.hovered.connect(partial(self.identify_all, complet_list))
+        action.hovered.connect(partial(self.identify_all, complet_list, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
 
         main_menu.exec_(click_point)
 
-    def identify_all(self, complet_list):
-
-        points = []
+    def identify_all(self, complet_list, rb_list):
         for layer in complet_list[0]['body']['data']['layersNames']:
             for feature in layer['ids']:
+                points = []
+                print(str(feature['id']))
                 list_coord = re.search('\((.*)\)', str(feature['geometry']))
                 coords = list_coord.group(1)
                 polygon = coords.split(',')
-                for z in range(len(polygon) - 1, -1, -1):
-                    x, y = polygon[z].split(' ')
-                    point = QgsPoint(float(x), float(y))
-                    points.append(point)
                 for i in range(0, len(polygon)):
                     x, y = polygon[i].split(' ')
                     point = QgsPoint(float(x), float(y))
                     points.append(point)
-
-        self.draw_polygon(points)
+                rb = QgsRubberBand(self.canvas)
+                rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
+                rb.setColor(QColor(255, 0, 0, 100))
+                rb.setWidth(5)
+                rb.show()
+                rb_list.append(rb)
+        # self.draw_polygon(points)
 
 
     def draw_by_action(self, feature, reset_rb=True):

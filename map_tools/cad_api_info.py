@@ -55,7 +55,7 @@ class CadApiInfo(ParentMapTool):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
+            self.action().trigger()
             return
 
 
@@ -66,6 +66,8 @@ class CadApiInfo(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
+        for rb in self.rb_list:
+            rb.reset()
         complet_result = None
         if event.button() == Qt.LeftButton:
             point = self.create_point(event)
@@ -79,7 +81,8 @@ class CadApiInfo(ParentMapTool):
             point = self.create_point(event)
             if point is False:
                 return
-            self.info_cf.hilight_feature(point, tab_type='data')
+
+            self.info_cf.hilight_feature(point, rb_list=self.rb_list, tab_type='data')
 
 
     def activate(self):
@@ -90,7 +93,7 @@ class CadApiInfo(ParentMapTool):
         self.cursor = QCursor()
         self.cursor.setShape(Qt.WhatsThisCursor)
         self.canvas.setCursor(self.cursor)
-
+        self.rb_list = []
         self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, 'data')
 
 
