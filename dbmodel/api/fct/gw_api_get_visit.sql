@@ -227,7 +227,7 @@ BEGIN
 		v_queryinfra = (SELECT feature_id FROM (SELECT node_id AS feature_id, visit_id FROM om_visit_x_node LIMIT 1) a WHERE visit_id=v_id::int8);
 	ELSE
 		v_queryinfra = (SELECT feature_id FROM (SELECT arc_id as feature_id, visit_id FROM om_visit_x_arc UNION SELECT node_id, visit_id FROM om_visit_x_node 
-				UNION SELECT connec_id, visit_id FROM om_visit_x_connec UNION SELECT gully, visit_id FROM om_visit_x_gully LIMIT 1) a WHERE visit_id=v_id::int8);
+				UNION SELECT connec_id, visit_id FROM om_visit_x_connec UNION SELECT gully_id, visit_id FROM om_visit_x_gully LIMIT 1) a WHERE visit_id=v_id::int8);
 	END IF;
 
 	IF v_queryinfra IS NOT NULL OR v_featureid IS NOT NULL THEN  -- for existing and for new visits
