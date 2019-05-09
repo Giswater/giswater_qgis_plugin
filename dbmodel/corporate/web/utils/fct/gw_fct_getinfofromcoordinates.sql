@@ -24,8 +24,8 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates(419082.2424301,4576638.9710621,25831,'v_edit_man_wjoin','{"v_edit_man_junction","v_edit_man_wjoin","v_edit_man_pipe","v_edit_plan_psector"}',
 '{"v_edit_man_wjoin","v_edit_man_pipe","v_edit_dma","v_anl_mincut_result_valve","v_edit_man_junction","exploitation"}',False,0.14912394710811,3,100,'es') AS result
 
-SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates(419082.2424301,4576638.9710621,25831,'v_edit_man_wjoin','{"v_edit_man_junction","v_edit_man_wjoin","v_edit_man_pipe","v_edit_plan_psector"}',
-'{"v_edit_man_wjoin","v_edit_man_pipe","v_edit_dma","v_anl_mincut_result_valve","v_edit_man_junction","exploitation"}',False,0.14912394710811,3,100,'es') AS result
+SELECT ws_sample.gw_fct_getinfofromcoordinates(419082.2424301,4576638.9710621,25831,'v_edit_man_wjoin','{"v_edit_man_junction","v_edit_man_wjoin","v_edit_man_pipe","v_edit_plan_psector"}',
+'{"v_edit_man_wjoin","v_edit_man_pipe","v_edit_dma","v_anl_mincut_result_valve","v_edit_man_junction","exploitation"}',True,0.14912394710811,3,100,'es') AS result
 */
 
 
@@ -80,7 +80,7 @@ BEGIN
     -- is tilemap
     IF p_istilemap IS TRUE THEN
     v_sql := 'SELECT layer_id, 0 as orderby FROM config_web_layer WHERE layer_id= '||quote_literal(p_active_layer)||' UNION 
-          SELECT layer_id, orderby FROM config_web_layer WHERE is_tiled IS TRUE UNION
+          SELECT layer_id, orderby FROM config_web_layer WHERE is_tiled IS TRUE AND (is_tiled_add->>''isInfo'')::boolean IS TRUE UNION
           SELECT layer_id, orderby FROM config_web_layer WHERE layer_id = any('''||p_visible_layer||'''::text[]) ORDER BY orderby';
     ELSE
 
