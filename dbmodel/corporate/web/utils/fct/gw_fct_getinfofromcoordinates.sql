@@ -80,7 +80,7 @@ BEGIN
     -- is tilemap
     IF p_istilemap IS TRUE THEN
     v_sql := 'SELECT layer_id, 0 as orderby FROM config_web_layer WHERE layer_id= '||quote_literal(p_active_layer)||' UNION 
-          SELECT layer_id, orderby FROM config_web_layer WHERE is_tiled IS TRUE AND (is_tiled_add->>''isInfo'')::boolean IS TRUE UNION
+          SELECT layer_id, orderby FROM config_web_layer WHERE is_tiled IS TRUE AND ((is_tiled_add->>''isInfo'')::boolean IS TRUE OR (is_tiled_add->>''isInfo'') IS NULL) UNION
           SELECT layer_id, orderby FROM config_web_layer WHERE layer_id = any('''||p_visible_layer||'''::text[]) ORDER BY orderby';
     ELSE
 
