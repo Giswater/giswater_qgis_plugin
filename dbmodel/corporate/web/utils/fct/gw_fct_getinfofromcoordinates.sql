@@ -24,7 +24,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates(419082.2424301,4576638.9710621,25831,'v_edit_man_wjoin','{"v_edit_man_junction","v_edit_man_wjoin","v_edit_man_pipe","v_edit_plan_psector"}',
 '{"v_edit_man_wjoin","v_edit_man_pipe","v_edit_dma","v_anl_mincut_result_valve","v_edit_man_junction","exploitation"}',False,0.14912394710811,3,100,'es') AS result
 
-SELECT ws_sample.gw_fct_getinfofromcoordinates(419082.2424301,4576638.9710621,25831,'v_edit_man_wjoin','{"v_edit_man_junction","v_edit_man_wjoin","v_edit_man_pipe","v_edit_plan_psector"}',
+SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates(419082.2424301,4576638.9710621,25831,'v_edit_man_wjoin','{"v_edit_man_junction","v_edit_man_wjoin","v_edit_man_pipe","v_edit_plan_psector"}',
 '{"v_edit_man_wjoin","v_edit_man_pipe","v_edit_dma","v_anl_mincut_result_valve","v_edit_man_junction","exploitation"}',True,0.14912394710811,3,100,'es') AS result
 */
 
