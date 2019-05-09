@@ -6,7 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1334
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_node_update() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update() RETURNS trigger AS
+$BODY$
 DECLARE 
     numNodes numeric;
     psector_vdefault_var integer;
@@ -29,14 +30,17 @@ DECLARE
     v_querytext text;
 	v_node_proximity_control boolean;
 	v_node_proximity double precision;
+	v_dsbl_error boolean;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    -- Get parameters
-    SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
+	-- Get parameters
+	SELECT ((value::json)->>'activated') INTO v_node_proximity_control FROM config_param_system WHERE parameter='node_proximity';
 	SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='node_proximity';
+   	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_dsbl_error' ;
+
 
     -- Lookig for state=0
     IF NEW.state=0 THEN
@@ -49,14 +53,19 @@ BEGIN
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 
 			-- Checking number of nodes 
-			numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state!=0);
+			numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.state!=0);
 			
 			IF (numNodes >1) AND (v_node_proximity_control IS TRUE) THEN
-				PERFORM audit_function(1096,1334);
+				IF v_dsbl_error IS NOT TRUE THEN
+					PERFORM audit_function (1096,1334, NEW.node_id);	
+				ELSE
+					INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node is over another node with incompatible state (state 1 or 2)');
+				END IF;
 				
 			ELSIF (numNodes =1) AND (v_node_proximity_control IS TRUE) THEN
 				SELECT * INTO node_rec FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state!=0;
-				IF (NEW.state=1 AND node_rec.state=1) OR (NEW.state=2 AND node_rec.state=1) THEN
+				IF (NEW.state=2 AND node_rec.state=1) THEN
+				--IF (NEW.state=1 AND node_rec.state=2) OR (NEW.state=2 AND node_rec.state=1) THEN
 
 					-- inserting on plan_psector_x_node the existing node as state=0
 					INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0);
@@ -117,7 +126,12 @@ BEGIN
 					END LOOP;
 				
 				ELSIF (NEW.state=2 AND node_rec.state=2) THEN
-					PERFORM audit_function(1100,1334);
+				
+					IF v_dsbl_error IS NOT TRUE THEN
+						PERFORM audit_function (1100,1334, NEW.node_id);	
+					ELSE
+						INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.node_id, 'Node is over another node with incompatible state (state = 2)');
+					END IF;
 				END IF;
 			END IF;
 			
@@ -167,4 +181,7 @@ BEGIN
 RETURN NEW;
     
 END; 
-$$;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
