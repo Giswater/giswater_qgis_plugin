@@ -174,6 +174,7 @@ IF tab_arg = 'network' THEN
     SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_visit FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_visit';
     SELECT ((value::json)->>'sys_table_id') INTO p_network_layer_samplepoint FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_samplepoint';
 
+  
     -- Layer's primary key;
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_arc_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_arc';
     SELECT ((value::json)->>'sys_id_field') INTO p_network_search_field_node_id FROM config_param_system WHERE context='api_search_network' AND parameter='api_search_node';
@@ -204,10 +205,10 @@ IF tab_arg = 'network' THEN
     
     -- Text to search
     combo1 := search_data->>'net_type';
-    id_arg := combo1->>'id';
-    name_arg := combo1->>'name';
-    edit1 := search_data->>'net_code';
-    text_arg := concat('%',edit1->>'text' ,'%');
+    id_arg := quote_ident(combo1->>'id');
+    name_arg := quote_ident(combo1->>'name');
+    edit1 := ((search_data->>'net_code')::json->>'text');
+    text_arg := (concat('%',(edit1) ,'%'));
 
 
    IF p_network_layer_arc IS NOT NULL THEN
@@ -271,20 +272,19 @@ IF tab_arg = 'network' THEN
                  quote_literal(p_network_layer_samplepoint), '::text AS sys_table_id FROM ', p_network_layer_samplepoint);
    END IF;
 
+-- Get Ids 
     IF id_arg = '' THEN 
-        -- Get Ids for type combo
         EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( ' || quote_literal(query_text) || ' ) b
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( ' || (query_text) || ' ) b
                     WHERE search_field::text ILIKE $1 
                     ORDER BY search_field LIMIT 10) a')
                     USING text_arg
                     INTO response_json;
     ELSE 
-        -- Get Ids for type combo
         EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( ' || quote_literal(query_text) || ' ) b
+                    CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( ' || (query_text) || ' ) b
                     WHERE search_field::text ILIKE $1 AND sys_table_id = $2
-                    ORDER BY search_field LIMIT 10) a')
+                    ORDER BY regexp_replace(search_field,''[^0-9]+'','''',''g'') LIMIT 10) a')
                     USING text_arg, id_arg
                     INTO response_json;
     END IF;
@@ -309,8 +309,8 @@ ELSIF tab_arg = 'address' THEN
 
     --Text to search
     combo1 := search_data->>'add_muni';
-    id_arg := combo1->>'id';
-    name_arg := combo1->>'name';
+    id_arg := (combo1->>'id');
+    name_arg := (combo1->>'name');
     edit1 := search_data->>'add_street';
     text_arg := concat('%', edit1->>'text' ,'%');
 
@@ -346,8 +346,8 @@ ELSIF tab_arg = 'address' THEN
 
     -- Text to search
     combo1 := search_data->>'hydro_expl';
-    id_arg := combo1->>'id';
-    name_arg := combo1->>'name';
+    id_arg := quote_ident(combo1->>'id');
+    name_arg := quote_ident(combo1->>'name');
     edit1 := search_data->>'hydro_search';
     text_arg := concat('%', edit1->>'text' ,'%');
 
