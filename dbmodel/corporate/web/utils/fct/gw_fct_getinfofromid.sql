@@ -80,7 +80,7 @@ BEGIN
 
 
     IF (form_info->>'formId')='CHILD' THEN
-	EXECUTE 'SELECT tableinfo_id FROM v_web_parent_connec 
+	EXECUTE 'SELECT tableinfo_id FROM '||quote_ident(table_id_arg)||'
 		JOIN config_web_layer_child  ON featurecat_id=custom_type
 		WHERE nid=$1'
 		INTO table_id_arg
