@@ -9,3 +9,4 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 ALTER TABLE config_web_layer ADD COLUMN is_tiled_add json;
+ALTER TABLE config_web_layer ADD COLUMN observ text;

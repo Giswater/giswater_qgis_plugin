@@ -75,8 +75,24 @@ BEGIN
 	FROM config_web_layer WHERE layer_id = $1 LIMIT 1) row'
         INTO form_info
         USING table_id_arg; 
+
+    raise notice 'Form info: %', form_info;
+
+
+    IF (form_info->>'formId')='CHILD' THEN
+	EXECUTE 'SELECT tableinfo_id FROM v_web_parent_connec 
+		JOIN config_web_layer_child  ON featurecat_id=custom_type
+		WHERE nid=$1'
+		INTO table_id_arg
+		USING id;
+
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT formname AS "formName", formid AS "formId" 
+		FROM config_web_layer WHERE layer_id = $1 LIMIT 1) row'
+		INTO form_info
+		USING table_id_arg; 
+	END IF;
             
-    raise notice 'Form number: %', form_info;
+    raise notice 'Form info: %', form_info;
 
 --    Get id column
 ---------------------
