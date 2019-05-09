@@ -1058,7 +1058,7 @@ descript = 'Enable/disable control of inserting duplicated connecs', label = 'Co
 	widgetcontrols = NULL, placeholder = NULL, isdeprecated= NULL
 	WHERE parameter = 'connec_proximity_control';
 UPDATE config_param_system SET data_type = NULL, context = 'edit', 
-descript = 'Enable/diable automatic delete of orphan nodes', label = 'Orphan node delete:', 
+descript = 'Enable/disable automatic delete of orphan nodes', label = 'Orphan node delete:', 
 	dv_querytext = NULL, dv_filterbyfield = NULL, isenabled = true, layout_id = 13, 
 	layout_order = 4, project_type = 'utils', dv_isparent = false, isautoupdate = false, 
 	datatype = 'boolean', widgettype = 'check', tooltip = NULL, ismandatory = false,iseditable = true, 

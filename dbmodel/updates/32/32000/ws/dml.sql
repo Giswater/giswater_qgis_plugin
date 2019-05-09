@@ -236,7 +236,7 @@ UPDATE inp_pipe SET status='OPEN_PIPE' WHERE status='OPEN';
 UPDATE inp_pump SET status='CLOSED_PUMP' WHERE status='CLOSED';
 UPDATE inp_pump SET status='OPEN_PUMP' WHERE status='OPEN';
 UPDATE inp_valve SET status='OPEN_VALVE' WHERE status='OPEN';
-UPDATE inp_valve SET status='ACTIVE_VALVE' WHERE status='ACTIV';
+UPDATE inp_valve SET status='ACTIVE_VALVE' WHERE status='ACTIVE';
 UPDATE inp_valve SET status='CLOSED_VALVE' WHERE status='CLOSED';
 
 
