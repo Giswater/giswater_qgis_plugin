@@ -127,7 +127,11 @@ class ApiCF(ApiParent):
         if len_layers == 0:
             return False
         self.icon_folder = self.plugin_dir + '/icons/'
+
+        # Right click main QMenu
         main_menu = QMenu()
+
+        # Create one menu for each layer
         for layer in complet_list[0]['body']['data']['layersNames']:
             layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
             icon = None
@@ -138,6 +142,7 @@ class ApiCF(ApiParent):
             else:
                 sub_menu = main_menu.addMenu(layer_name.name())
 
+            # Create one QAction for each id
             for feature in layer['ids']:
                 action = QAction(str(feature['id']), None)
                 sub_menu.addAction(action)
@@ -145,10 +150,11 @@ class ApiCF(ApiParent):
                 action.hovered.connect(partial(self.draw_by_action, feature, rb_list))
 
         main_menu.addSeparator()
-
-
-        action = QAction('Identify all', None)
-        # #action.triggered.connect(partial(self.identify_all))
+        # Identify all
+        cont = 0
+        for layer in complet_list[0]['body']['data']['layersNames']:
+            cont += len(layer['ids'])
+        action = QAction('Identify all (' + str(cont) + ')', None)
         action.hovered.connect(partial(self.identify_all, complet_list, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
@@ -162,7 +168,6 @@ class ApiCF(ApiParent):
         for layer in complet_list[0]['body']['data']['layersNames']:
             for feature in layer['ids']:
                 points = []
-                print(str(feature['id']))
                 list_coord = re.search('\((.*)\)', str(feature['geometry']))
                 coords = list_coord.group(1)
                 polygon = coords.split(',')
@@ -176,12 +181,10 @@ class ApiCF(ApiParent):
                 rb.setWidth(5)
                 rb.show()
                 rb_list.append(rb)
-        # self.draw_polygon(points)
 
 
     def draw_by_action(self, feature, rb_list, reset_rb=True):
         """ Draw lines based on geometry """
-        print(rb_list)
         for rb in rb_list:
             rb.reset()
         if feature['geometry'] is None:
