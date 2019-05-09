@@ -52,8 +52,12 @@ BEGIN
 	
 	-- Force psector vdefault visible to current_user (only to => role_master)
 	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) and  psector_vdef_aux is not null THEN
-	  DELETE FROM selector_psector WHERE psector_id =(SELECT value FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer AND cur_user=current_user;
-	  INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT value FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer, current_user);
+	  	IF (SELECT psector_id FROM plan_psector WHERE psector_id=(SELECT value FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer) IS NOT NULL THEN
+			DELETE FROM selector_psector WHERE psector_id =(SELECT value FROM config_param_user 
+			WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer AND cur_user=current_user;
+			INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT value FROM config_param_user 
+			WHERE parameter='psector_vdefault' AND cur_user=current_user)::integer, current_user);
+		END IF;
 	END IF;
 
 	-- Reset sequences
