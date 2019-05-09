@@ -491,68 +491,36 @@ class ApiCF(ApiParent):
         self.set_icon(self.dlg_cf.btn_doc_new, "131b")
         self.set_icon(self.dlg_cf.btn_open_doc, "170b")
 
-        # Layouts
-        top_layout = self.dlg_cf.findChild(QGridLayout, 'top_layout')
-        bot_layout_1 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_1')
-        bot_layout_2 = self.dlg_cf.findChild(QGridLayout, 'bot_layout_2')
-
-        layout_data_1 = self.dlg_cf.findChild(QGridLayout, 'layout_data_1')
-        layout_data_2 = self.dlg_cf.findChild(QGridLayout, 'layout_data_2')
-        layout_data_3 = self.dlg_cf.findChild(QGridLayout, 'layout_data_3')
-
-        layout_inp_1 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_1')
-        layout_inp_2 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_2')
-        layout_inp_3 = self.dlg_cf.findChild(QGridLayout, 'layout_inp_3')
-
-        plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
-
         # Get feature type as geom_type (node, arc, connec)
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
+
         # Get field id name
         self.field_id = str(complet_result[0]['body']['feature']['idName'])
+        
         self.feature_id = None
         result = complet_result[0]['body']['data']
-
+        layout_list = []
         for field in result['fields']:
             label, widget = self.set_widgets(self.dlg_cf, field)
-            # Prepare layouts
-            # Common layouts
-            if field['layout_id'] == 0:
-                top_layout.addWidget(label, 0, field['layout_order'])
-                top_layout.addWidget(widget, 1, field['layout_order'])
-            elif field['layout_id'] == 4:
-                bot_layout_1.addWidget(label, 0, field['layout_order'])
-                bot_layout_1.addWidget(widget, 1, field['layout_order'])
-            elif field['layout_id'] == 5:
-                bot_layout_2.addWidget(label, 0, field['layout_order'])
-                bot_layout_2.addWidget(widget, 1, field['layout_order'])
-            # Tab data
-            elif field['layout_id'] == 1:
-                layout_data_1.addWidget(label, field['layout_order'], 0)
-                layout_data_1.addWidget(widget, field['layout_order'], 1)
-                if field['widgettype'] == 'button':
-                    v = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-                    layout_data_1.addItem(v, field['layout_order'], 2)
-            elif field['layout_id'] == 2:
-                layout_data_2.addWidget(label, field['layout_order'], 0)
-                layout_data_2.addWidget(widget, field['layout_order'], 1)
-            elif field['layout_id'] == 3:
-                layout_data_3.addWidget(label, field['layout_order'], 0)
-                layout_data_3.addWidget(widget, field['layout_order'], 1)
-            # Tab inp
-            elif field['layout_id'] == 6:
-                layout_inp_1.addWidget(label, field['layout_order'], 0)
-                layout_inp_1.addWidget(widget, field['layout_order'], 1)
-            elif field['layout_id'] == 7:
-                layout_inp_2.addWidget(label, field['layout_order'], 0)
-                layout_inp_2.addWidget(widget, field['layout_order'], 1)
-            elif field['layout_id'] == 8:
-                layout_inp_3.addWidget(label, field['layout_order'], 0)
-                layout_inp_3.addWidget(widget, field['layout_order'], 1)
-        vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        layout_data_1.addItem(vertical_spacer1)
-        vertical_spacer2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        layout_data_2.addItem(vertical_spacer2)
+            layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
+            if layout is None:
+                continue
+
+            # Take the QGridLayout with the intention of adding a QSpacerItem later
+            if layout not in layout_list and layout.objectName() not in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+                layout_list.append(layout)
+
+            # Add widgets into layout
+            if field['layoutname'] in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
+                layout.addWidget(label, 0, field['layout_order'])
+                layout.addWidget(widget, 1, field['layout_order'])
+            else:
+                self.put_widgets(self.dlg_cf, field, label, None, widget)
+
+        # Add a QSpacerItem into each QGridLayout of the list
+        for layout in layout_list:
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            layout.addItem(vertical_spacer1)
 
         # Find combo parents:
         for field in result['fields']:
