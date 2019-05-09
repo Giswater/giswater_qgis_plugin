@@ -18,8 +18,6 @@ UPDATE config_param_system SET label='custom_giswater_folder:' ,isenabled=FALSE 
 SELECT setval('SCHEMA_NAME.config_param_system_id_seq', (SELECT max(id) FROM config_param_system), true);
 
 INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, dv_querytext, dv_filterbyfield, isenabled, layout_id, layout_order, project_type, dv_isparent, isautoupdate, datatype, widgettype, tooltip) 
-VALUES ('nodeisert_arcendpoint', 'FALSE', 'boolean', 'edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, dv_querytext, dv_filterbyfield, isenabled, layout_id, layout_order, project_type, dv_isparent, isautoupdate, datatype, widgettype, tooltip) 
 VALUES ('orphannode_delete', 'false', 'boolean', NULL, NULL, 'Orphan node delete:', NULL, NULL, true, 13, 6, 'utils', false, false, 'boolean', 'checkbox', NULL);
 INSERT INTO config_param_system (parameter, value, data_type, context, descript, label, dv_querytext, dv_filterbyfield, isenabled, layout_id, layout_order, project_type, dv_isparent, isautoupdate, datatype, widgettype, tooltip) 
 VALUES ('nodetype_change_enabled', 'FALSE', 'boolean', NULL, NULL, 'nodetype_change_enabled', NULL, NULL, true, 13, 12, 'utils', false, false, 'boolean', 'checkbox', NULL);
