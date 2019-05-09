@@ -23,7 +23,7 @@ BEGIN
 RAISE NOTICE 'gw_fct_createwidgetjson() Args: %, %, %, %, %, %', label_arg, name_arg, type_arg, datatype_arg, placeholder_arg, disabled_arg;
 
 --    Create JSON
-    widget_json := json_build_object('label', label_arg, 'name', name_arg, 'type', type_arg, 'dataType', datatype_arg, 'placeholder', placeholder_arg, 'disabled', disabled_arg);
+    widget_json := json_build_object('label', label_arg, 'widgetname', name_arg, 'type', type_arg, 'dataType', datatype_arg, 'placeholder', placeholder_arg, 'disabled', disabled_arg);
 
 --    Cast value
     IF datatype_arg = 'integer' THEN
