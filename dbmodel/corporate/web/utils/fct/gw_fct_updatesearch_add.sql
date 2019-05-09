@@ -5,7 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch_add"(search_data json) RETURNS pg_catalog.json AS $BODY$DECLARE
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch_add"(search_data json) RETURNS pg_catalog.json AS 
+$BODY$
+
+/*
+SELECT SCHEMA_NAME.gw_fct_updatesearch_add($${"tabName":"address","add_muni":{"id":1,"name":"Sant Boi del Llobregat"},"add_street":{"text":"Avenida del General Prim"},"add_postnumber":{"text":"1"}}$$)
+*/
+
+DECLARE
 
 --    Variables
     response_json json;
@@ -38,8 +45,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_updatesearch_add"(search_data j
     v_address_display_field varchar;
     v_address_street_id_field varchar;
     v_address_geom_id_field varchar;
-
-
+    v_querytext text;
 
 BEGIN
 
@@ -69,11 +75,11 @@ IF tab_arg = 'address' THEN
     SELECT ((value::json)->>'sys_geom_field') INTO v_street_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_street';
 
     -- Parameters of the postnumber layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_address_layer FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-    SELECT ((value::json)->>'sys_id_field') INTO v_address_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-    SELECT ((value::json)->>'sys_search_field') INTO v_address_display_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-    SELECT ((value::json)->>'sys_parent_field') INTO v_address_street_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
-    SELECT ((value::json)->>'sys_geom_field') INTO v_address_geom_id_field FROM SCHEMA_NAME.config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_table_id') INTO v_address_layer FROM config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_id_field') INTO v_address_id_field FROM config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_search_field') INTO v_address_display_field FROM config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_parent_field') INTO v_address_street_id_field FROM config_param_system WHERE parameter='api_search_postnumber';
+    SELECT ((value::json)->>'sys_geom_field') INTO v_address_geom_id_field FROM config_param_system WHERE parameter='api_search_postnumber';
 
     --Text to search
     combo1 := search_data->>'add_street';
@@ -85,15 +91,20 @@ IF tab_arg = 'address' THEN
     raise notice 'name_arg %', id_arg;
     raise notice 'text_arg %', text_arg;
 
+
     
-    -- Get address
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
+    -- Get address 
+	v_querytext = 'SELECT array_to_json(array_agg(row_to_json(a))) 
         FROM (SELECT a.'||quote_ident(v_address_display_field)||' as display_name, st_x (a.'||quote_ident(v_address_geom_id_field)||') as sys_x
         ,st_y (a.'||quote_ident(v_address_geom_id_field)||') as sys_y, (SELECT concat(''EPSG:'',epsg) FROM version LIMIT 1) AS srid
         FROM '||quote_ident(v_address_layer)||' a
         JOIN '||quote_ident(v_street_layer)||' b ON b.'||quote_ident(v_street_id_field)||' = a.'||quote_ident(v_address_street_id_field) ||'
         WHERE b.'||quote_ident(v_street_display_field)||' = $1 
-        AND a.'||quote_ident(v_address_display_field)||' ILIKE $2 LIMIT 10 )a'
+        AND a.'||quote_ident(v_address_display_field)||' ILIKE $2 ORDER BY regexp_replace('||quote_ident(v_address_display_field)||',''[^0-9]+'','''',''g'')::integer LIMIT 10 )a';
+
+        RAISE NOTICE ' v_querytext %',  v_querytext;
+
+       EXECUTE v_querytext
         USING id_arg, text_arg
         INTO response_json;
 
@@ -109,8 +120,8 @@ END IF;
         '}')::json;
 
 --    Exception handling
-      EXCEPTION WHEN OTHERS THEN 
-        RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+      --EXCEPTION WHEN OTHERS THEN 
+       -- RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;$BODY$
