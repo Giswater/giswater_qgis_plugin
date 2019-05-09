@@ -52,6 +52,8 @@ INSERT INTO cat_feature VALUES ('MEDIDOR', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('CALDERIN_EXPANSION', 'EXPANSIONTANK', 'NODE');
 INSERT INTO cat_feature VALUES ('MEDIDOR_PRESION', 'METER', 'NODE');
 INSERT INTO cat_feature VALUES ('ADAPTACION', 'JUNCTION', 'NODE');
+INSERT INTO cat_feature VALUES ('TAP', 'JUNCTION', 'NODE');
+
 
 
 
@@ -91,7 +93,7 @@ INSERT INTO node_type VALUES ('ACOMETIDA_TOPO', 'NETWJOIN', 'JUNCTION', 'man_net
 INSERT INTO node_type VALUES ('CALDERIN_EXPANSION', 'EXPANSIONTANK', 'JUNCTION', 'man_expansiontank', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Calderín de expansión');
 INSERT INTO node_type VALUES ('DILATADOR', 'FLEXUNION', 'JUNCTION', 'man_flexunion', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Dilatador');
 INSERT INTO node_type VALUES ('MEDIDOR', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Medidor');
-INSERT INTO node_type VALUES ('MEDIDOR_PRESSION', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Medidor de pressión');
+INSERT INTO node_type VALUES ('MEDIDOR_PRESION', 'METER', 'JUNCTION', 'man_meter', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Medidor de pressión');
 INSERT INTO node_type VALUES ('PUNTO_MOSTREO', 'NETSAMPLEPOINT', 'JUNCTION', 'man_netsamplepoint', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Punto de mostreo');
 INSERT INTO node_type VALUES ('ESTACION_TRATAMIENTO', 'WTP', 'RESERVOIR', 'man_wtp', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Estación de tratamiento');
 INSERT INTO node_type VALUES ('ELEMENTO_RED', 'NETELEMENT', 'JUNCTION', 'man_netelement', 'inp_junction', TRUE, TRUE, 2, TRUE, 'Elemento de red');
