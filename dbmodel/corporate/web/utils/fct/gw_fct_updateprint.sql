@@ -6,6 +6,12 @@ SELECT SCHEMA_NAME.gw_fct_updateprint($${"composer":"mincutA3","scale":"10000","
 {"width":"77.729","height":"55.9066","name":"map7"}]},{"ComposerTemplate":"mincutA3","ComposerMap":
 [{"width":"53.44","height":"55.9066","name":"map7"},{"width":"337.865","height":"275.914","name":"map6"}]}],
 "extent":"418284.06010078074,4576197.139572782,419429.332014571,4576756.056126544"}$$,418284.06010078074,4576197.139572782,419429.332014571,4576756.056126544,False,3)
+
+SELECT SCHEMA_NAME.gw_fct_updateprint($${"composer":"mincutA3","scale":"10000","ComposerTemplates":
+[{"ComposerTemplate":"mincutA4","ComposerMap":[{"width":"179.414","height":"140.826","name":"map0"},
+{"width":"77.729","height":"55.9066","name":"map7"}]},{"ComposerTemplate":"mincutA3","ComposerMap":
+[{"width":"53.44","height":"55.9066","name":"map7"},{"width":"337.865","height":"275.914","name":"map6"}]}],
+"extent":"418284.06010078074,4576197.139572782,419429.332014571,4576756.056126544"}$$,418284.06010078074,4576197.139572782,419429.332014571,4576756.056126544,True,3)
 */
 DECLARE
 
@@ -61,10 +67,10 @@ BEGIN
     -- get layers of tilemap
     IF p_istilemap IS TRUE THEN
     
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT layer_id FROM config_web_layer WHERE is_tiled=TRUE) row'
-        INTO v_tiled_layers ;
-    RAISE NOTICE 'v_tiled_layers %', v_tiled_layers;
-    END IF;  
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT layer_id FROM config_web_layer WHERE is_tiled=TRUE ORDER BY (is_tiled_add->>''printOrderBy'')::integer ) row'
+		INTO v_tiled_layers ;
+	RAISE NOTICE 'v_tiled_layers %', v_tiled_layers;
+	END IF;  
 
     -- Get composer
     v_composer := p_data->>'composer';
