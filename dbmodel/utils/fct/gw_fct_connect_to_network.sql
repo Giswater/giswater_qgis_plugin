@@ -24,7 +24,7 @@ MAIN CHANGES
 - Connect_to_network works also with node/connec/gully as endpoints
 
 EXAPLE:
-select SCHEMA_NAME.gw_fct_connect_to_network((select array_agg(connec_id)from SCHEMA_NAME.connec where connec_id IN ('3019')), 'CONNEC')
+select SCHEMA_NAME.gw_fct_connect_to_network((select array_agg(connec_id)from SCHEMA_NAME.connec where connec_id IN ('3112')), 'CONNEC')
 select SCHEMA_NAME.gw_fct_connect_to_network((select array_agg(connec_id)from SCHEMA_NAME.connec where connec_id='30123237'), 'CONNEC')
 select SCHEMA_NAME.gw_fct_connect_to_network((select array_agg(gully_id)from SCHEMA_NAME.gully where gully_id='30108'), 'GULLY')
 */
@@ -64,9 +64,6 @@ BEGIN
 			SELECT * INTO v_connect FROM gully WHERE gully_id = connect_id_aux;
 		END IF;
 		
-		-- Delete old link
-		DELETE FROM link WHERE link.link_id=v_link.link_id;
-
 		raise notice 'LINK: %', v_link;
 		raise notice 'C0NNECT: %', v_connect;
 
@@ -77,12 +74,20 @@ BEGIN
 			SELECT * INTO v_exit FROM vnode WHERE vnode_id::text=v_link.exit_id;
 
 			RAISE NOTICE 'vnode %', v_exit;
+			RAISE NOTICE 'vnode %', v_exit;
+
 	
-			-- get arc_id (if feature does have) using buffer  
-			IF v_connect.arc_id IS NULL THEN
+			-- get arc_id (if feature does not have) using buffer  
+			IF v_connect.arc_id IS NULL AND v_link.exit_id IS NULL THEN
 				WITH index_query AS(
 				SELECT ST_Distance(the_geom, v_connect.the_geom) as distance, arc_id FROM v_edit_arc WHERE state=1 ORDER BY the_geom <-> v_connect.the_geom LIMIT 10)
 				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;
+				
+			ELSIF v_connect.arc_id IS NULL AND v_link.exit_id IS NOT NULL THEN
+				raise notice 'gashasrfh';
+				WITH index_query AS(
+				SELECT ST_Distance(the_geom, v_exit.the_geom) as distance, arc_id FROM v_edit_arc WHERE state=1 ORDER BY the_geom <-> v_exit.the_geom LIMIT 10)
+				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;			
 			END IF;
 			
 			-- get v_edit_arc information
@@ -110,30 +115,14 @@ BEGIN
 
 				v_exit.the_geom = ST_EndPoint(v_link.the_geom);
 			END IF;
+
+			-- Insert new vnode
+			DELETE FROM vnode WHERE vnode_id=v_exit.vnode_id::integer;
+			INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
+			VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_arc.state, v_arc.sector_id, v_arc.dma_id, v_arc.expl_id, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;
 	
-			--Checking if there is an exiting vnode
-			SELECT * INTO v_vnode FROM vnode WHERE ST_DWithin(v_exit.the_geom, vnode.the_geom, 0.01) LIMIT 1;
-
-			IF v_vnode.vnode_id IS NULL THEN
-
-				-- Insert new vnode
-				INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_arc.state, v_arc.sector_id, v_arc.dma_id, v_arc.expl_id, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;
-
-				RAISE NOTICE 'new vnode %', v_exit_id;
-				
-			ELSIF v_vnode.vnode_id IS NOT NULL THEN
-				v_exit.the_geom = v_vnode.the_geom;
-				v_exit_id = v_vnode.vnode_id;
-
-				RAISE NOTICE 'existing vnode %', v_exit_id;
-
-			END IF;
-			
 			v_link.exit_type = 'VNODE';
 
-			-- delete old vnode
-			DELETE FROM vnode WHERE vnode_id::text=v_link.exit_id;
 				
 		ELSIF v_link.exit_type='NODE' THEN
 				SELECT * INTO v_exit FROM node WHERE node_id=v_exit_id;
@@ -154,9 +143,13 @@ BEGIN
 			RAISE NOTICE '%', v_link.the_geom;
 		END IF;
   
-		-- Insert new link                
-		INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id) 
-		VALUES ((SELECT nextval('link_link_id_seq')), v_link.the_geom, connect_id_aux, feature_type_aux, v_link.exit_type, v_exit_id, v_link.userdefined_geom, v_connect.state, v_connect.expl_id);
+		-- Insert new link
+		IF v_link.link_id IS NULL THEN
+			INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, userdefined_geom, state, expl_id) 
+			VALUES ((SELECT nextval('link_link_id_seq')), v_link.the_geom, connect_id_aux, feature_type_aux, v_link.exit_type, v_exit_id, v_link.userdefined_geom, v_connect.state, v_connect.expl_id);
+		ELSE
+			UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_exit_id WHERE link_id=v_link.link_id;
+		END IF;
 
 		-- Update feaute arc_id and state_type
 		IF feature_type_aux ='CONNEC' THEN          
