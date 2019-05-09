@@ -14,7 +14,7 @@ SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"network","net_type":{"id":"
 SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"network","net_type":{"id":"v_edit_node","name":"Nodes"},"net_code":{"text":"100"}}$$)
 SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"network","net_type":{"id":"v_edit_connec","name":"Escomeses"},"net_code":{"text":"300"}}$$)
 SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"network","net_type":{"id":"v_edit_element","name":"Elements"},"net_code":{"text":"400"}}$$)
-SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"network","net_type":{"id":"om_visit","name":"Visita"},"net_code":{"text":"00"}}$$)
+SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"network","net_type":{"id":"om_visit","name":"Visita"},"net_code":{"text":"10"}}$$)
 SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"network","net_type":{"id":"samplepoint","name":"Punt de mostreig"},"net_code":{"text":"1"}}$$) AS result
 
 -- address
@@ -284,7 +284,7 @@ IF tab_arg = 'network' THEN
         EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
                     CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname FROM ( ' || (query_text) || ' ) b
                     WHERE search_field::text ILIKE $1 AND sys_table_id = $2
-                    ORDER BY regexp_replace(search_field,''[^0-9]+'','''',''g'') LIMIT 10) a')
+                    ORDER BY regexp_replace(search_field,''[^0-9]+'','''',''g'')::integer LIMIT 10) a')
                     USING text_arg, id_arg
                     INTO response_json;
     END IF;
@@ -316,7 +316,7 @@ ELSIF tab_arg = 'address' THEN
 
     -- Fix municipality vdefault
     DELETE FROM config_param_user WHERE parameter='search_municipality_vdefault' AND cur_user=current_user;
-    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_municipality_vdefault',id_arg, current_user);
+    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_municipality_vdefault',id_arg::integer, current_user);
 
     -- Get street
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
