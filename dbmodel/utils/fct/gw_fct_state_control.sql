@@ -193,25 +193,47 @@ BEGIN
 	
 	IF tg_op_aux = 'INSERT' THEN
 		IF state_aux=2 THEN
+			-- check user's role
+			IF 'role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+				PERFORM audit_function(1080,2130);
+			END IF;
+
+			-- check at least one psector defined
+			IF (SELECT psector_id FROM plan_psector LIMIT 1) IS NULL THEN
+				PERFORM audit_function(1081,2130);
+			END IF;
+
+			-- check user's variable
 			SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
 			IF psector_vdefault_var IS NULL THEN	
-				PERFORM audit_function(1080,2130);
+				PERFORM audit_function(1083,2130);
 			END IF;
 		END IF;
 	
 	ELSIF tg_op_aux = 'UPDATE' THEN
 		IF state_aux=2 AND old_state_aux<2 THEN
-			SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
-			IF psector_vdefault_var IS NULL THEN	
+		
+			-- check user's role
+			IF 'role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 				PERFORM audit_function(1080,2130);
 			END IF;
-		ELSIF state_aux<2 AND old_state_aux=2 THEN
+
+			-- check user's variable
 			SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
 			IF psector_vdefault_var IS NULL THEN	
+				PERFORM audit_function(1083,2130);
+			END IF;
+
+			
+		ELSIF state_aux<2 AND old_state_aux=2 THEN
+
+			-- check user's role
+			IF 'role_master' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 				PERFORM audit_function(1080,2130);
-		END IF;
-	END IF;	
-END IF;
+			END IF;
+
+		END IF;	
+	END IF;
 
 RETURN 0;
 
