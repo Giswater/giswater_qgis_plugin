@@ -77,12 +77,14 @@ class CadApiInfo(ParentMapTool):
             if point is False:
                 return
             complet_result, dialog = self.info_cf.open_form(point, tab_type='data')
-        if not complet_result is None:
-                print("FAIL get_point")
+            print(complet_result)
+        if complet_result is False:
+                print("No point under mouse(LeftButton)")
                 return
         elif event.button() == Qt.RightButton:
             point = self.create_point(event)
             if point is False:
+                print("No point under mouse(RightButton)")
                 return
 
             self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type='data')

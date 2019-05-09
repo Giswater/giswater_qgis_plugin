@@ -123,7 +123,6 @@ class ApiCF(ApiParent):
 
         # hide QMenu identify if no feature under mouse
         len_layers = len(complet_list[0]['body']['data']['layersNames'])
-        print(len_layers)
         if len_layers == 0:
             return False
         self.icon_folder = self.plugin_dir + '/icons/'
@@ -454,7 +453,6 @@ class ApiCF(ApiParent):
         # TODO action_edit.setEnabled(lo que venga del json segun permisos)
         self.set_action(action_edit, visible=True, enabled=True)
 
-
         # Set actions icon
         self.set_icon(action_edit, "101")
         self.set_icon(action_copy_paste, "107b")
@@ -636,9 +634,9 @@ class ApiCF(ApiParent):
             widget = self.add_hyperlink(dialog, field)
             widget = self.set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
-            widget = self.add_horizontal_spacer(field)
+            widget = self.add_horizontal_spacer()
         elif field['widgettype'] == 'vspacer':
-            widget = self.add_verical_spacer(field)
+            widget = self.add_verical_spacer()
         elif field['widgettype'] == 'textarea':
             # TODO this make an error because def add_textarea don't exit at the moment
             widget = self.add_textarea(field)
@@ -1954,9 +1952,10 @@ class ApiCF(ApiParent):
             # rpt_layout1.addItem(vertical_spacer, field['layout_order'], rpt_layout1.columnCount())
             # Find combo parents:
             for field in complet_list[0]['body']['data']['filterFields']:
-                if field['isparent']:
-                    widget = dialog.findChild(QComboBox, field['widgetname'])
-                    widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
+                if 'isparent' in field:
+                    if field['isparent']:
+                        widget = dialog.findChild(QComboBox, field['widgetname'])
+                        widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
 
         # Related by Qtable
         qtable.setModel(standar_model)
@@ -1986,14 +1985,13 @@ class ApiCF(ApiParent):
         feature = '"tableName":"' + self.tablename + '", "idName":"'+id_name+'", "id":"'+self.feature_id+'"'
         body = self.create_body(form, feature,  filter_fields)
         sql = ("SELECT " + self.schema_name + ".gw_api_getlist($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=False, commit=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         if row is None or row[0] is None:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
         # Parse string to order dict into List
         complet_list = [json.loads(row[0],  object_pairs_hook=OrderedDict)]
-
         return complet_list
 
 
