@@ -1271,7 +1271,10 @@ class ApiCF(ApiParent):
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydro)
         self.set_configuration(self.tbl_hydrometer, table_hydro)
-        txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer,  table_hydro))
+        if Qgis.QGIS_VERSION_INT < 29900:
+            txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer,  table_hydro))
+        else:
+            txt_hydrometer_id.editingFinished.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer, table_hydro))
         self.tbl_hydrometer.doubleClicked.connect(partial(self.open_selected_hydro, self.tbl_hydrometer))
         self.dlg_cf.findChild(QPushButton, "btn_link").clicked.connect(self.check_url)
 
@@ -1974,7 +1977,12 @@ class ApiCF(ApiParent):
     def set_listeners(self, complet_result, complet_list, standar_model, dialog, widget_list):
         for widget in widget_list:
             if type(widget) is QLineEdit:
-                widget.textChanged.connect(partial(self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
+                if Qgis.QGIS_VERSION_INT < 29900:
+                    widget.textChanged.connect(partial(
+                        self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
+                else:
+                    widget.editingFinished.connect(partial(
+                        self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(partial(self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
 
