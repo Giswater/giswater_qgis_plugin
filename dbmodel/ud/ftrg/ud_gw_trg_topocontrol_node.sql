@@ -27,7 +27,6 @@ DECLARE
     yvar double precision;
 	pol_id_var varchar;
 	top_elev_aux double precision;
-	v_psector_id integer;
 	v_arc record;
 	v_arcrecord "SCHEMA_NAME".v_edit_arc;
 	v_node_proximity_control boolean;
@@ -55,9 +54,7 @@ BEGIN
 
 	-- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
 	PERFORM gw_fct_state_control('NODE', NEW.node_id, NEW.state, TG_OP);
-    
-		v_psector_id := (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter = 'psector_vdefault');
-	
+    	
 		IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 		
 		-- Checking number of nodes 
@@ -84,61 +81,7 @@ BEGIN
 
 				ELSIF (NEW.state=2 AND node_rec.state=1) THEN
 				
-					-- inserting on plan_psector_x_node the existing node as state=0
-					INSERT INTO plan_psector_x_node (psector_id, node_id, state) VALUES (v_psector_id, node_rec.node_id, 0);
-
-					-- looking for all the arcs (1 and 2) using existing node
-					FOR v_arc IN (SELECT arc_id, node_1 as node_id FROM arc WHERE node_1=node_rec.node_id UNION SELECT arc_id, node_2 FROM arc WHERE node_2=node_rec.node_id)
-					LOOP
-						-- if exists some arc planified on same alternative attached to that existing node
-						IF v_arc.arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id=v_psector_id) THEN 
-							
-							-- reconnect the planified arc to the new planified node in spite of connected to the node state=1
-							IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
-								UPDATE arc SET node_1=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_1=node_rec.node_id;							
-							ELSE
-								UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=node_rec.node_id;
-							END IF;
-								
-						ELSE
-							-- getting values to create new 'fictius' arc
-							SELECT * INTO v_arcrecord FROM v_edit_arc WHERE arc_id = v_arc.arc_id::text;
-								
-							-- refactoring values fo new one
-							PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-							v_arcrecord.arc_id:= (SELECT nextval('urn_id_seq'));
-							v_arcrecord.code = v_arcrecord.arc_id;
-							v_arcrecord.state=2;
-							v_arcrecord.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius');
-							
-							IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
-								v_arcrecord.node_1 = NEW.node_id;
-							ELSE
-								v_arcrecord.node_2 = NEW.node_id;
-								END IF;
-						
-							-- Insert new records into arc table
-							-- downgrade temporary the state_topocontrol to prevent conflicts	
-								UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
-														
-							INSERT INTO v_edit_arc SELECT v_arcrecord.*;
-								--Copy addfields from old arc to new arcs	
-							INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
-							SELECT 	
-							v_arcrecord.arc_id,
-							parameter_id,
-							value_param
-							FROM man_addfields_value WHERE feature_id=v_arc.arc_id;
-																					
-							-- restore the state_topocontrol variable
-							UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
-	
-								-- Update doability for the new arc (false)
-							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=v_arcrecord.arc_id;
-								-- insert old arc on the alternative							
-							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector_id, v_arc.arc_id, 0, FALSE);
-						END IF;
-					END LOOP;
+					-- insertion is enabled. Logics done on topocontrol after
 				
 				ELSIF (NEW.state=2 AND node_rec.state=2)  AND (v_node_proximity_control IS TRUE) THEN
 
