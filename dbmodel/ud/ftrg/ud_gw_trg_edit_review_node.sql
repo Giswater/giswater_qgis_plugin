@@ -115,7 +115,7 @@ BEGIN
 		
 			-- upserting values on review_audit_node node table	
 			IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN					
-				UPDATE review_audit_node SET old_top_elev=rec_node.old_top_elev, new_top_elev=NEW.top_elev, old_ymax=rec_node.ymax, 
+				UPDATE review_audit_node SET old_top_elev=rec_node.top_elev, new_top_elev=NEW.top_elev, old_ymax=rec_node.ymax, 
        			new_ymax=NEW.ymax, old_node_type=rec_node.node_type, new_node_type=NEW.node_type, old_matcat_id=rec_node.matcat_id, 
        			new_matcat_id=NEW.matcat_id, old_shape=rec_node.shape, new_shape=NEW.shape, old_geom1=rec_node.geom1, new_geom1=NEW.geom1, 
        			old_geom2=rec_node.geom2, new_geom2=NEW.geom2, old_nodecat_id=rec_node.nodecat_id, annotation=NEW.annotation, observ=NEW.observ,
