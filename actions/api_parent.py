@@ -432,7 +432,7 @@ class ApiParent(ParentAction):
                 if utils_giswater.getWidgetType(dialog, widget) is QLineEdit:
                     utils_giswater.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif utils_giswater.getWidgetType(dialog, widget) is QComboBox:
-                    utils_giswater.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 1)
+                    utils_giswater.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
 
         self.api_disable_copy_paste(dialog)
 
