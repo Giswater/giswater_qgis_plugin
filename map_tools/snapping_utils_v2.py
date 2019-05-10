@@ -33,7 +33,7 @@ from qgis.core import QgsProject
 
 class SnappingConfigManager(object):
 
-    def __init__(self, iface):
+    def __init__(self, iface, controller=None):
         """ Class constructor """
 
         self.iface = iface
@@ -42,7 +42,7 @@ class SnappingConfigManager(object):
         self.layer_connec = None
         self.layer_node = None
         self.previous_snapping = None
-        self.controller = None
+        self.controller = controller
 
         # Snapper
         try:
@@ -62,7 +62,6 @@ class SnappingConfigManager(object):
 
     def get_snapping_options(self):
         """ Function that collects all the snapping options and put it in an array """
-
         snapping_layers_options = []
         layers = self.controller.get_layers()
         for layer in layers:

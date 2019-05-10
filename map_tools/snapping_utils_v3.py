@@ -28,7 +28,7 @@ from qgis.core import QgsProject
 
 
 class SnappingConfigManager(object):
-    def __init__(self, iface):
+    def __init__(self, iface, controller=None):
         """ Class constructor """
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
@@ -36,7 +36,7 @@ class SnappingConfigManager(object):
         self.layer_connec = None
         self.layer_node = None
         self.previous_snapping = None
-        self.controller = None
+        self.controller = controller
 
         # Snapper
         self.snapper = self.get_snapper()

@@ -38,7 +38,6 @@ from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
-from map_tools.snapping_utils_v2 import SnappingConfigManager
 from giswater.actions.parent import ParentAction
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
 
@@ -433,7 +432,7 @@ class ApiParent(ParentAction):
                 if utils_giswater.getWidgetType(dialog, widget) is QLineEdit:
                     utils_giswater.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif utils_giswater.getWidgetType(dialog, widget) is QComboBox:
-                    utils_giswater.set_combo_itemData(widget, snapped_feature_attr_aux[i], 1)
+                    utils_giswater.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 1)
 
         self.api_disable_copy_paste(dialog)
 

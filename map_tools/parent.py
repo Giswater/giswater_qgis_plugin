@@ -137,7 +137,6 @@ class ParentMapTool(QgsMapTool):
         
         
     def deactivate(self):
-        print("100")
         # Uncheck button
         self.action().setChecked(False)
 
