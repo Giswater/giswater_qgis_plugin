@@ -401,8 +401,10 @@ class Giswater(QObject):
         self.om.set_project_type(self.wsoftware)
         self.utils.set_project_type(self.wsoftware)
 
-        # Enable toobar 'basic' and 'info'
-        self.enable_toolbar("basic")           
+        # Enable toobar 'basic' and 'utils'
+        self.enable_toolbar("basic")
+        self.enable_toolbar("utils")
+
 
            
     def manage_toolbar(self, toolbar_id, list_actions): 
