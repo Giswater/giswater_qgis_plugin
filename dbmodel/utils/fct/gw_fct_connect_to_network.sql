@@ -64,18 +64,13 @@ BEGIN
 			SELECT * INTO v_connect FROM gully WHERE gully_id = connect_id_aux;
 		END IF;
 		
-		raise notice 'LINK: %', v_link;
-		raise notice 'C0NNECT: %', v_connect;
+		--raise notice 'LINK: % CONNECT % ', v_link, v_connect;
 
 		-- starting process
-		IF v_link.exit_type='VNODE' OR v_link.exit_type IS NULL THEN
+		IF v_link.exit_type='VNODE' THEN
 
 			-- get values from old vnode
 			SELECT * INTO v_exit FROM vnode WHERE vnode_id::text=v_link.exit_id;
-
-			RAISE NOTICE 'vnode %', v_exit;
-			RAISE NOTICE 'vnode %', v_exit;
-
 	
 			-- get arc_id (if feature does not have) using buffer  
 			IF v_connect.arc_id IS NULL AND v_link.exit_id IS NULL THEN
@@ -84,7 +79,6 @@ BEGIN
 				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;
 				
 			ELSIF v_connect.arc_id IS NULL AND v_link.exit_id IS NOT NULL THEN
-				raise notice 'gashasrfh';
 				WITH index_query AS(
 				SELECT ST_Distance(the_geom, v_exit.the_geom) as distance, arc_id FROM v_edit_arc WHERE state=1 ORDER BY the_geom <-> v_exit.the_geom LIMIT 10)
 				SELECT arc_id INTO v_connect.arc_id FROM index_query ORDER BY distance limit 1;			
@@ -92,8 +86,6 @@ BEGIN
 			
 			-- get v_edit_arc information
 			SELECT * INTO v_arc FROM v_edit_arc WHERE state=1 AND arc_id = v_connect.arc_id;
-
-			RAISE NOTICE 'v_arc %', v_arc;
 
 			-- compute link
 			IF v_arc.the_geom IS NOT NULL THEN
@@ -118,20 +110,28 @@ BEGIN
 
 			-- Insert new vnode
 			DELETE FROM vnode WHERE vnode_id=v_exit.vnode_id::integer;
-			INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
-			VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_arc.state, v_arc.sector_id, v_arc.dma_id, v_arc.expl_id, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;
+			IF v_exit.the_geom IS NOT NULL THEN
+				INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
+				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', v_arc.state, v_arc.sector_id, v_arc.dma_id, v_arc.expl_id, v_exit.the_geom) RETURNING vnode_id INTO v_exit_id;
+			END IF;
 	
 			v_link.exit_type = 'VNODE';
 
 				
 		ELSIF v_link.exit_type='NODE' THEN
-				SELECT * INTO v_exit FROM node WHERE node_id=v_link.exit_id;
-				v_exit_id = v_exit.node_id;
-				v_connect.arc_id = (SELECT arc_id FROM arc WHERE state=1 AND node_1=v_link.exit_id LIMIT 1);
+			SELECT * INTO v_exit FROM node WHERE node_id=v_link.exit_id;
+			v_exit_id = v_exit.node_id;
+			v_connect.arc_id = (SELECT arc_id FROM arc WHERE state=1 AND node_1=v_link.exit_id LIMIT 1);
+			
+		ELSIF v_link.exit_type='CONNEC' THEN
+			SELECT * INTO v_exit FROM connec WHERE connec_id=v_link.exit_id;
+			
+		ELSIF v_link.exit_type='GULLY' THEN
+			SELECT * INTO v_exit FROM gully WHERE gully_id=v_link.exit_id;
 		END IF;
 
-		-- redraw link according situation of exit feature
-		IF v_link.exit_type IS NOT NULL THEN
+		-- redraw link according situation of exit feature only for vnode and node exits (not affected when connec / gully ara exit_type).....
+		IF v_link.exit_type IS NOT NULL AND (v_link.exit_type='VNODE' OR v_link.exit_type='NODE') THEN
 			v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1), v_exit.the_geom); 
 		END IF;
   

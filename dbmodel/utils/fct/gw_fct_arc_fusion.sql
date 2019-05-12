@@ -40,7 +40,8 @@ DECLARE
     addfieldRecord1 record;
     addfieldRecord2 record;
     rec_param integer;
-
+    v_vnode integer;
+    v_node_geom public.geometry;
 
 BEGIN
 
@@ -51,6 +52,7 @@ BEGIN
 
     -- Check if the node is exists
     SELECT node_id INTO exists_id FROM v_edit_node WHERE node_id = node_id_arg;
+    SELECT the_geom INTO v_node_geom FROM node WHERE node_id = node_id_arg;
     
 
     -- Compute proceed
@@ -137,14 +139,26 @@ BEGIN
 			UPDATE connec SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
 			UPDATE node SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
 
+			-- update links related to node
+			IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=node_id_arg LIMIT 1) IS NOT NULL THEN
+			
+				-- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
+				INSERT INTO vnode (vnode_id, vnode_type, state, sector_id, dma_id, expl_id, the_geom) 
+				VALUES ((SELECT nextval('vnode_vnode_id_seq')), 'AUTO', newRecord.state, newRecord.sector_id, newRecord.dma_id, newRecord.expl_id, v_node_geom) RETURNING vnode_id INTO v_vnode;
+				
+				-- update link with new vnode
+				UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=node_id_arg;	
+			END IF;
 	
 			IF project_type_aux='UD' THEN
-				UPDATE gully SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;    
+				UPDATE gully SET arc_id=newRecord.arc_id WHERE arc_id=myRecord1.arc_id OR arc_id=myRecord2.arc_id;
 			END IF;
 
 			-- Delete information of arc deleted
 			DELETE FROM arc WHERE arc_id = myRecord1.arc_id;
 			DELETE FROM arc WHERE arc_id = myRecord2.arc_id;
+
+			-- create links that where related to deprecated node
 		
 			-- Moving to obsolete the previous node
 			UPDATE node SET state=0, workcat_id_end=workcat_id_end_aux, enddate=enddate_aux WHERE node_id = node_id_arg;
