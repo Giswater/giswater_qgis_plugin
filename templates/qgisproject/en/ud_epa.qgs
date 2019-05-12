@@ -841,10 +841,10 @@
   <mapcanvas>
     <units>meters</units>
     <extent>
-      <xmin>418308.4736269999993965</xmin>
-      <ymin>4576237.72664999961853027</ymin>
-      <xmax>419639.83136200008448213</xmax>
-      <ymax>4578106.61799000017344952</ymax>
+      <xmin>__XMIN__</xmin>
+      <ymin>__YMIN__</ymin>
+      <xmax>__XMAX__</xmax>
+      <ymax>__YMAX__</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
