@@ -32,6 +32,7 @@ DECLARE
 	v_node_proximity_control boolean;
 	v_node_proximity double precision;
 	v_dsbl_error boolean;
+	v_psector_id integer;
 
 
 BEGIN
