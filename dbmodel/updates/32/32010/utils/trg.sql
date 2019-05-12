@@ -12,8 +12,7 @@ DROP TRIGGER gw_trg_node_update ON node;
 CREATE TRIGGER gw_trg_edit_dimensions  INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.v_edit_dimensions
 FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_dimensions('dimensions');
 
-
-
-CREATE TRIGGER gw_trg_topocontrol_node_after AFTER INSERT OR UPDATE OF the_geom, state ON node  
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_topocontrol_node_after();
+DROP TRIGGER gw_trg_topocontrol_node ON node;
+CREATE TRIGGER gw_trg_topocontrol_node AFTER INSERT OR UPDATE OF the_geom, state ON node  
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_topocontrol_node();
 

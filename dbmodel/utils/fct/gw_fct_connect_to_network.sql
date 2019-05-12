@@ -125,22 +125,14 @@ BEGIN
 
 				
 		ELSIF v_link.exit_type='NODE' THEN
-				SELECT * INTO v_exit FROM node WHERE node_id=v_exit_id;
+				SELECT * INTO v_exit FROM node WHERE node_id=v_link.exit_id;
 				v_exit_id = v_exit.node_id;
-
-		ELSIF v_link.exit_type='CONNEC' THEN
-				SELECT * INTO v_exit FROM connec WHERE connec_id=v_exit_id;
-				v_exit_id = v_exit.connec_id;
-
-		ELSIF v_link.exit_type='GULLY' THEN
-				SELECT * INTO v_exit FROM gully WHERE gully_id=v_exit_id;
-				v_exit_id = v_exit.gully_id;
+				v_connect.arc_id = (SELECT arc_id FROM arc WHERE state=1 AND node_1=v_link.exit_id LIMIT 1);
 		END IF;
 
 		-- redraw link according situation of exit feature
 		IF v_link.exit_type IS NOT NULL THEN
 			v_link.the_geom = ST_SetPoint(v_link.the_geom, (ST_NumPoints(v_link.the_geom) - 1), v_exit.the_geom); 
-			RAISE NOTICE '%', v_link.the_geom;
 		END IF;
   
 		-- Insert new link
