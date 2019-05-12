@@ -2199,13 +2199,13 @@ class UpdateSQL(ApiParent):
                 f.close()
 
                 # Set template values
-                for xml_set in self.xml_set_labels:
-                    self.xml_set = self.dev_settings.value('xml_set/' + xml_set)
-                    tree = et.parse(str(self.folder_path + os.sep + file))
-                    if tree.find(self.xml_set[0]) is not None:
-                        self.controller.log_info("Seting template value", parameter=self.xml_set[1])
-                        tree.find(self.xml_set[0]).text = self.xml_set[1]
-                        tree.write(str(self.folder_path + os.sep + file))
+                #for xml_set in self.xml_set_labels:
+                #    self.xml_set = self.dev_settings.value('xml_set/' + xml_set)
+                #    tree = et.parse(str(self.folder_path + os.sep + file))
+                #    if tree.find(self.xml_set[0]) is not None:
+                #        self.controller.log_info("Seting template value", parameter=self.xml_set[1])
+                #        tree.find(self.xml_set[0]).text = self.xml_set[1]
+                #        tree.write(str(self.folder_path + os.sep + file))
 
         # Set arrow cursor
         self.set_arrow_cursor()
