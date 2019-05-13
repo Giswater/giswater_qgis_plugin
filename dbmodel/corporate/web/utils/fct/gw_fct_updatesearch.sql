@@ -24,6 +24,9 @@ SELECT SCHEMA_NAME.gw_fct_updatesearch_add($${"tabName":"address","add_muni":{"i
 -- hdyro
 SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"hydro","hydro_expl":{"id":1,"name":"expl_01"},"hydro_search":{"text":"cc"}}$$)
 
+SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"hydro","hydro_expl":{"id":1,"name":"Mataró"},"hydro_search":{"text":"2"}}$$) AS result
+
+
 -- workcat
 SELECT SCHEMA_NAME.gw_fct_updatesearch($${"tabName":"workcat","workcat_search":{"text":"wor"}}$$) AS result
 
@@ -155,7 +158,7 @@ BEGIN
         INTO api_version;
 
 --   Get project type
-     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+     SELECT SCHEMA_NAMEoftware INTO project_type_aux FROM version LIMIT 1;
 
 --   Get tab
      tab_arg := search_data->>'tabName';
@@ -346,8 +349,8 @@ ELSIF tab_arg = 'address' THEN
 
     -- Text to search
     combo1 := search_data->>'hydro_expl';
-    id_arg := quote_ident(combo1->>'id');
-    name_arg := quote_ident(combo1->>'name');
+    id_arg := (combo1->>'id');
+    name_arg := (combo1->>'name');
     edit1 := search_data->>'hydro_search';
     text_arg := concat('%', edit1->>'text' ,'%');
 
@@ -380,8 +383,9 @@ ELSIF tab_arg = 'address' THEN
 		FROM '||quote_ident(v_hydro_layer)||' a
 		JOIN connec ON (connec.connec_id = a.'||quote_ident(v_hydro_connec_field)||')
 		WHERE a.'||quote_ident(v_exploitation_display_field)||' = $1
-			AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||')
-			ILIKE $2 LIMIT 10) a'
+			AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||') 
+			ILIKE $2 LIMIT 10
+			) a'
 			USING name_arg, text_arg
 			INTO response_json; 
      END IF;
