@@ -24,6 +24,7 @@ else:
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsPoint, QgsGeometry
+from qgis.core import QgsPointLocator
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
@@ -346,7 +347,10 @@ class ApiParent(ParentAction):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        if Qgis.QGIS_VERSION_INT < 29900:
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        else:
+            result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
 
         # That's the snapped point
         if not result:
