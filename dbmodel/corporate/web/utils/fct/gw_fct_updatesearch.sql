@@ -333,63 +333,86 @@ ELSIF tab_arg = 'address' THEN
         INTO response_json;
     
 
--- Hydro tab
+ -- Hydro tab
 ------------
+
+   --***SEARCH WORKS ONLY FOR 1,3 FIELDS****
+   -- v_hydro_search_field_4 is optative
+   -- v_hydro_search_field_1 must be an integer (customer code)
+   -- v_hydro_search_field_3 must be an text (name)
+
     ELSIF tab_arg = 'hydro' THEN
 
         -- Parameters of the hydro layer
-    SELECT ((value::json)->>'sys_table_id') INTO v_hydro_layer FROM config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_id_field') INTO v_hydro_id_field FROM config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_connec_id') INTO v_hydro_connec_field FROM config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_search_field_1') INTO v_hydro_search_field_1 FROM config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_search_field_2') INTO v_hydro_search_field_2 FROM config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_search_field_3') INTO v_hydro_search_field_3 FROM config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_search_field_4') INTO v_hydro_search_field_4 FROM config_param_system WHERE parameter='api_search_hydrometer';
-    SELECT ((value::json)->>'sys_parent_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='api_search_hydrometer';
+        SELECT ((value::json)->>'sys_table_id') INTO v_hydro_layer FROM config_param_system WHERE parameter='api_search_hydrometer';
+        SELECT ((value::json)->>'sys_id_field') INTO v_hydro_id_field FROM config_param_system WHERE parameter='api_search_hydrometer';
+        SELECT ((value::json)->>'sys_connec_id') INTO v_hydro_connec_field FROM config_param_system WHERE parameter='api_search_hydrometer';
+        SELECT ((value::json)->>'sys_search_field_1') INTO v_hydro_search_field_1 FROM config_param_system WHERE parameter='api_search_hydrometer';
+        SELECT ((value::json)->>'sys_search_field_2') INTO v_hydro_search_field_2 FROM config_param_system WHERE parameter='api_search_hydrometer';
+        SELECT ((value::json)->>'sys_search_field_3') INTO v_hydro_search_field_3 FROM config_param_system WHERE parameter='api_search_hydrometer';
+        SELECT ((value::json)->>'sys_search_field_4') INTO v_hydro_search_field_4 FROM config_param_system WHERE parameter='api_search_hydrometer';
+        SELECT ((value::json)->>'sys_parent_field') INTO v_exploitation_display_field FROM config_param_system WHERE parameter='api_search_hydrometer';
 
-    -- Text to search
-    combo1 := search_data->>'hydro_expl';
-    id_arg := (combo1->>'id');
-    name_arg := (combo1->>'name');
-    edit1 := search_data->>'hydro_search';
-    text_arg := concat('%', edit1->>'text' ,'%');
+        -- Text to search
+        combo1 := search_data->>'hydro_expl';
+        id_arg := (combo1->>'id');
+        name_arg := (combo1->>'name');
+        edit1 := search_data->>'hydro_search';
+        text_arg := concat('%', edit1->>'text' ,'%');
 
-    -- Fix exploitation vdefault
-    DELETE FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user;
-    INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_exploitation_vdefault',id_arg, current_user);
+        -- Fix exploitation vdefault
+        DELETE FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user;
+        INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_exploitation_vdefault',id_arg, current_user);
 
 
-    IF v_hydro_search_field_4 IS NULL THEN
+        IF v_hydro_search_field_4 IS NULL THEN
    
-	-- Get hydrometer 
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		SELECT a.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
-		concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
-		AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
-		FROM '||quote_ident(v_hydro_layer)||' a
-		JOIN connec ON (connec.connec_id = a.'||quote_ident(v_hydro_connec_field)||')
-			WHERE a.'||quote_ident(v_exploitation_display_field)||' = $1
-			AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
-			ILIKE $2 LIMIT 10) a'
-		USING name_arg, text_arg
-		INTO response_json; 
-     ELSE
-     
-	-- Get hydrometer with v_hydro_search_field_4 NOT NULL
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		SELECT a.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
-		concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||')
-		AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
-		FROM '||quote_ident(v_hydro_layer)||' a
-		JOIN connec ON (connec.connec_id = a.'||quote_ident(v_hydro_connec_field)||')
-		WHERE a.'||quote_ident(v_exploitation_display_field)||' = $1
-			AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||') 
-			ILIKE $2 LIMIT 10
-			) a'
-			USING name_arg, text_arg
-			INTO response_json; 
-     END IF;
-  
+            -- Get hydrometer 
+            EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+                SELECT a.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
+                concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+                AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
+            FROM '||quote_ident(v_hydro_layer)||' a
+            JOIN connec ON (connec.connec_id = a.'||quote_ident(v_hydro_connec_field)||')
+                WHERE a.'||quote_ident(v_exploitation_display_field)||' = $1
+                AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+                ILIKE $2 LIMIT 10) a'
+            USING name_arg, text_arg
+            INTO response_json; 
+        ELSE
+
+            IF (left(edit1->>'text'::text,1))>'99999999' THEN
+      
+                -- Get hydrometer with v_hydro_search_field_4 NOT NULL
+                EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+                    SELECT a.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
+                    concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||')
+                    AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
+                    FROM '||quote_ident(v_hydro_layer)||' a
+                    JOIN connec ON (connec.connec_id = a.'||quote_ident(v_hydro_connec_field)||')
+                    WHERE a.'||quote_ident(v_exploitation_display_field)||' = $1
+                    AND '||quote_ident(v_hydro_search_field_3)||' LIKE $2 
+                    LIMIT 10
+                    ) a'
+				USING name_arg, text_arg
+				INTO response_json; 
+            ELSE
+                -- Get hydrometer with v_hydro_search_field_4 NOT NULL
+                EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+                    SELECT a.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
+                    concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||','' - '','||quote_ident(v_hydro_search_field_4)||')
+                    AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
+                    FROM '||quote_ident(v_hydro_layer)||' a
+                    JOIN connec ON (connec.connec_id = a.'||quote_ident(v_hydro_connec_field)||')
+                    WHERE a.'||quote_ident(v_exploitation_display_field)||' = $1
+                    AND '||quote_ident(v_hydro_search_field_1)||' LIKE $2 
+                    ORDER BY '||quote_ident(v_hydro_search_field_1)||'::integer ASC
+                    LIMIT 10
+                    ) a'
+				USING name_arg, text_arg
+				INTO response_json;
+            END IF;
+	    END IF;
 
 -- Workcat tab
 --------------
