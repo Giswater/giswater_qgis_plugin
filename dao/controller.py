@@ -231,6 +231,12 @@ class DaoController(object):
     def connect_to_database(self, host, port, db, user, pwd):
         """ Connect to database with selected parameters """
         
+        # Check if selected parameters is correct
+        if None in (host, port, db, user, pwd):
+            message = "Database connection error. Please check your connection parameters."
+            self.last_error = self.tr(message)
+            return False
+
         # Update current user
         self.user = user
         

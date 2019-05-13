@@ -401,8 +401,10 @@ class Giswater(QObject):
         self.om.set_project_type(self.wsoftware)
         self.utils.set_project_type(self.wsoftware)
 
-        # Enable toobar 'basic' and 'info'
-        self.enable_toolbar("basic")           
+        # Enable toobar 'basic' and 'utils'
+        self.enable_toolbar("basic")
+        self.enable_toolbar("utils")
+
 
            
     def manage_toolbar(self, toolbar_id, list_actions): 
@@ -557,7 +559,7 @@ class Giswater(QObject):
         """ Function executed when a user creates a new QGIS project """
 
         self.unload(False)
-        self.set_info_button(True)
+        self.set_info_button(self.connection_status)
 
                           
     def project_read(self, show_warning=True): 
@@ -567,9 +569,9 @@ class Giswater(QObject):
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
         self.controller.set_giswater(self)
-        connection_status, not_version = self.controller.set_database_connection()
-        self.set_info_button(connection_status)
-        if not connection_status or not_version:
+        self.connection_status, not_version = self.controller.set_database_connection()
+        self.set_info_button(self.connection_status)
+        if not self.connection_status or not_version:
             message = self.controller.last_error
             if show_warning:
                 if message:

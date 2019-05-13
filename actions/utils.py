@@ -395,19 +395,25 @@ class Utils(ParentAction):
         label_aux = utils_giswater.getWidgetText(dialog, dialog.txt_import, return_string_null=False)
         delimiter = self.get_delimiter(dialog)
         _unicode = utils_giswater.getWidgetText(dialog, dialog.cmb_unicode_list)
+
         try:
             if Qgis.QGIS_VERSION_INT < 29900:
                 with open(path, 'r') as csvfile:
-                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename)
+                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, _unicode)
+                    csvfile.close()
+                    del csvfile
             else:
                 with open(path, 'r', encoding=_unicode) as csvfile:
-                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename)
+                    insert_status = self.insert_into_db(dialog, csvfile, delimiter, _unicode)
+                    csvfile.close()
+                    del csvfile
         except Exception as e:
-            self.controller.show_warning(str(e))
-            self.controller.log_info(str(insert_status))
+            self.controller.show_warning("ESCEPTION: " + str(e))
+
         self.save_settings_values()
         if insert_status is False:
             return
+
         extras = '"importParam":"' + label_aux + '"'
         extras += ', "csv2pgCat":"' + str(csv2pgcat_id_aux) + '"'
         body = self.create_body(extras=extras)
@@ -431,9 +437,8 @@ class Utils(ParentAction):
 
 
 
-    def insert_into_db(self, dialog, csvfile, delimiter, csv2pgcat_id_aux, _unicode, temp_tablename):
-        cabecera = True
-        fields = "csv2pgcat_id, "
+    def insert_into_db(self, dialog, csvfile, delimiter, _unicode):
+        sql = ""
         progress = 0
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setValue(progress)
@@ -445,35 +450,34 @@ class Utils(ParentAction):
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter)
         for row in reader:
-            values = "'" + str(csv2pgcat_id_aux) + "', '"
-            progress += 1
-
-            for x in range(0, len(row)):
-                row[x] = row[x].replace("'", "''")
-            if cabecera:
-                for x in range(1, len(row) + 1):
-                    fields += 'csv' + str(x) + ", "
-                cabecera = False
-                fields = fields[:-2]
-            else:
-                for value in row:
-                    if len(value) != 0:
-                        if Qgis.QGIS_VERSION_INT < 29900:
-                            values += str(value.decode(str(_unicode))) + "', '"
-                        else:
-                            values += str(value) + "', '"
+            if len(row) > 0:
+                sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
+                values = "VALUES(11, "
+                for x in range(0, len(row)):
+                    if "''" not in row[x]:
+                        sql += "csv" + str(x + 1) + ", "
+                        value = "'" + row[x].strip().replace("\n", "") + "', "
+                        value = str(value.decode(str(_unicode)))
+                        values += value.replace("''", "null")
                     else:
-                        values = values[:-1]
-                        values += "null, '"
-                values = values[:-3]
-                sql = ("INSERT INTO " + self.controller.schema_name + "." + temp_tablename + " ("
-                       + str(fields) + ") VALUES (" + str(values) + ")")
+                        sql += "csv" + str(x + 1) + ", "
+                        values = "VALUES(null, "
+                sql = sql[:-2] + ") "
+                values = values[:-2] + ");\n"
+                sql += values
+                progress += 1
+            dialog.progressBar.setValue(progress)
 
-                status = self.controller.execute_sql(sql)
+            if progress % 500 == 0:
+                status = self.controller.execute_sql(sql, commit=True)
                 if not status:
                     return False
-                dialog.progressBar.setValue(progress)
-                return True
+                sql = ""
+        if sql != "":
+            status = self.controller.execute_sql(sql, commit=True)
+            if not status:
+                return False
+        return True
 
 
     def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):

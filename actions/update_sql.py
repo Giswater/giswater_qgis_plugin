@@ -49,6 +49,9 @@ class UpdateSQL(ApiParent):
     def init_sql(self, connection_status=False):
         """ Button 100: Execute SQL. Info show info """
 
+        # Check if connection is still False
+        connection_status, not_version = self.controller.set_database_connection()
+
         # Set logger file
         self.controller.set_logger()
 
@@ -1019,6 +1022,10 @@ class UpdateSQL(ApiParent):
                             status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                             if status is False:
                                 return False
+                        if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep, '') is True:
+                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep + '')
+                            if status is False:
+                                return False
                         if self.process_folder(
                                 self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                 '') is True:
@@ -1044,6 +1051,11 @@ class UpdateSQL(ApiParent):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
+                                if status is False:
+                                    return False
+                            if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
+                                                   '') is True:
+                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
@@ -1078,6 +1090,13 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
+                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
+                                    '') is True:
+                                status = self.executeFiles(
+                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
+                                if status is False:
+                                    return False
+                            if self.process_folder(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
@@ -1102,6 +1121,11 @@ class UpdateSQL(ApiParent):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
+                                if status is False:
+                                    return False
+                            if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
+                                                   '') is True:
+                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
@@ -1266,26 +1290,27 @@ class UpdateSQL(ApiParent):
         project_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
         self.locale = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale)
 
-        self.set_wait_cursor()
-
         # Initial checks
         if self.rdb_import_data.isChecked():
             self.file_inp = utils_giswater.getWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.data_file)
             if self.file_inp is 'null':
-                self.set_arrow_cursor()
                 msg = "The 'Path' field is required for Import INP data."
                 self.controller.show_info_box(msg, "Info")
                 return
 
         elif self.rdb_sample.isChecked() or self.rdb_sample_dev.isChecked():
-            if self.locale != 'EN':
-                msg = "This functionality is only allowed with the locality 'EN'. Do you want change it and continue?"
+            if self.locale != 'EN' or self.filter_srid_value != '25831':
+                msg = "This functionality is only allowed with the locality 'EN' and SRID 25831.\n Do you want change it and continue?"
                 result = self.controller.ask_question(msg, "Info Message")
                 if result:
-                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
+                    self.filter_srid_value = '25831'
+                    utils_giswater.setWidgetText(self.dlg_readsql_create_project,self.dlg_readsql_create_project.srid_id, '25831')
+                    utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.dlg_readsql_create_project.cmb_locale, 'EN')
+
                 else:
-                    self.set_arrow_cursor()
                     return
+
+        self.set_wait_cursor()
 
         # Common execution
         status = self.load_base(project_type=project_type)
@@ -1690,10 +1715,10 @@ class UpdateSQL(ApiParent):
     def enable_datafile(self):
 
         if self.rdb_import_data.isChecked() is True:
-            self.data_file.setReadOnly(True)
+            self.data_file.setEnabled(True)
             self.btn_push_file.setEnabled(True)
         else:
-            self.data_file.setReadOnly(True)
+            self.data_file.setEnabled(False)
             self.btn_push_file.setEnabled(False)
 
 
@@ -1870,13 +1895,14 @@ class UpdateSQL(ApiParent):
 
         #Load user values
         self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
-        self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
+        if str(self.controller.plugin_settings_value('inp_file_path')) != 'null':
+            self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
 
         # TODO: do and call listener for buton + table -> temp_csv2pg
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
         if self.dev_user != 'TRUE':
-            self.rdb_sample_dev.setEnabled(False)
+            self.rdb_sample_dev.setVisible(False)
 
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
         utils_giswater.setWidgetText(self.dlg_readsql_create_project, 'srid_id', str(self.filter_srid_value))
@@ -2124,9 +2150,6 @@ class UpdateSQL(ApiParent):
 
     def create_qgis_template(self):
 
-        #Set wait cursor
-        self.set_wait_cursor()
-
         # Get dev config file
         setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
         if not os.path.exists(setting_file):
@@ -2146,6 +2169,9 @@ class UpdateSQL(ApiParent):
             message = "Directory not found at: " + self.folder_path
             self.iface.messageBar().pushMessage("", message, 1, 20)
             return
+
+        # Set wait cursor
+        self.set_wait_cursor()
 
         # Start read files
         qgis_files = sorted(os.listdir(self.folder_path))
@@ -2173,13 +2199,13 @@ class UpdateSQL(ApiParent):
                 f.close()
 
                 # Set template values
-                for xml_set in self.xml_set_labels:
-                    self.xml_set = self.dev_settings.value('xml_set/' + xml_set)
-                    tree = et.parse(str(self.folder_path + os.sep + file))
-                    if tree.find(self.xml_set[0]) is not None:
-                        self.controller.log_info("Seting template value", parameter=self.xml_set[1])
-                        tree.find(self.xml_set[0]).text = self.xml_set[1]
-                        tree.write(str(self.folder_path + os.sep + file))
+                #for xml_set in self.xml_set_labels:
+                #    self.xml_set = self.dev_settings.value('xml_set/' + xml_set)
+                #    tree = et.parse(str(self.folder_path + os.sep + file))
+                #    if tree.find(self.xml_set[0]) is not None:
+                #        self.controller.log_info("Seting template value", parameter=self.xml_set[1])
+                #        tree.find(self.xml_set[0]).text = self.xml_set[1]
+                #        tree.write(str(self.folder_path + os.sep + file))
 
         # Set arrow cursor
         self.set_arrow_cursor()
