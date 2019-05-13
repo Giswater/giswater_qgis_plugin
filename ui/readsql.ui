@@ -273,7 +273,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Create</string>
+           <string>Create PostgreSQL project schema</string>
           </property>
          </widget>
         </item>
@@ -309,7 +309,7 @@
         <item row="4" column="1">
          <widget class="QPushButton" name="btn_gis_create">
           <property name="text">
-           <string>Create GIS project</string>
+           <string>Create QGIS project file</string>
           </property>
          </widget>
         </item>
