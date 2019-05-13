@@ -19,7 +19,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
-    from qgis.core import QgsWkbTypes
+    from qgis.core import QgsWkbTypes, QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
@@ -753,7 +753,10 @@ class ApiParent(ParentAction):
 
         for i in range(0, len(polygon)):
             x, y = polygon[i].split(' ')
-            point = QgsPoint(float(x), float(y))
+            if Qgis.QGIS_VERSION_INT < 29900:
+                point = QgsPoint(float(x), float(y))
+            else:
+                point = QgsPointXY(float(x), float(y))
             points.append(point)
         return points
 
@@ -802,7 +805,10 @@ class ApiParent(ParentAction):
 
         self.resetRubberbands()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPoint(float(max_x), float(max_y))
+            if Qgis.QGIS_VERSION_INT < 29900:
+                point = QgsPoint(float(max_x), float(max_y))
+            else:
+                point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
         else:
             points = self.get_points(list_coord)
