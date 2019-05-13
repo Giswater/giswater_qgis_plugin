@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_get_featureupsert(
     p_configtable boolean)
   RETURNS json AS
 $BODY$
-DECLARE
+
 
 /*EXAMPLE
 arc with no nodes
@@ -25,6 +25,8 @@ arc with nodes
 SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', null, '0102000020E764000002000000998B3C512F881941B28315AA7F76514105968D7D748819419FDF72D781765141', 9, 100,'INSERT', true)
 SELECT SCHEMA_NAME.gw_api_get_featureupsert('ve_arc_pipe', '2001', null, 9, 100,'UPDATE', true)
 */
+
+DECLARE
 
 	v_columntype character varying;
 	v_fields json;
@@ -327,7 +329,7 @@ BEGIN
 	END IF;
 
 
-
+/*
 	-- setting values
 	FOREACH aux_json IN ARRAY v_fields_array 
         LOOP          
