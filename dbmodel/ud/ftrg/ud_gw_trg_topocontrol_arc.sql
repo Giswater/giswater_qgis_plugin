@@ -81,79 +81,79 @@ BEGIN
 		-- Starting process
 		IF TG_OP='INSERT' THEN
 
-			SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), v_edit_node.the_geom, v_arc_searchnodes)
-			AND (NEW.state=1 AND v_edit_node.state=1)
+			SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
+			AND ((NEW.state=1 AND node.state=1)
 					-- looking for existing nodes that not belongs on the same alternatives that arc
-					OR (NEW.state=2 AND v_edit_node.state=1 AND node_id NOT IN 
+					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
 						(SELECT node_id FROM plan_psector_x_node 
-						 WHERE plan_psector_x_node.node_id=v_edit_node.node_id AND state=0 AND psector_id = 
+						 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id = 
 							(SELECT value::integer FROM config_param_user 
 							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1 )))
 					
 					-- looking for planified nodes that belongs on the same alternatives that arc
-					OR (NEW.state=2 AND v_edit_node.state=2 AND node_id IN 
+					OR (NEW.state=2 AND node.state=2 AND node_id IN 
 						(SELECT node_id FROM plan_psector_x_node 
-						 WHERE plan_psector_x_node.node_id=v_edit_node.node_id AND state=1 AND psector_id =
+						 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id =
 							(SELECT value::integer FROM config_param_user 
-							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1)))
+							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1))))
 
-					ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+					ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 	
-			SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), v_edit_node.the_geom, v_arc_searchnodes) 
-			AND (NEW.state=1 AND v_edit_node.state=1)
+			SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
+			AND ((NEW.state=1 AND node.state=1)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
-					OR (NEW.state=2 AND v_edit_node.state=1 AND node_id NOT IN 
+					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
 						(SELECT node_id FROM plan_psector_x_node 
-						 WHERE plan_psector_x_node.node_id=v_edit_node.node_id AND state=0 AND psector_id = 
+						 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id = 
 							(SELECT value::integer FROM config_param_user 
 							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1)))
 					
 					-- looking for planified nodes that belongs on the same alternatives that arc
-					OR (NEW.state=2 AND v_edit_node.state=2 AND node_id IN 
+					OR (NEW.state=2 AND node.state=2 AND node_id IN 
 						(SELECT node_id FROM plan_psector_x_node 
-						 WHERE plan_psector_x_node.node_id=v_edit_node.node_id AND state=1 AND psector_id =
+						 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id =
 							(SELECT value::integer FROM config_param_user 
-							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1 )))
+							WHERE parameter='psector_vdefault' AND cur_user="current_user"() LIMIT 1 ))))
 
-					ORDER BY ST_Distance(v_edit_node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+					ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
 		ELSIF TG_OP='UPDATE' THEN
 
-			SELECT * INTO nodeRecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), v_edit_node.the_geom, v_arc_searchnodes)
-			AND (NEW.state=1 AND v_edit_node.state=1)
+			SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
+			AND ((NEW.state=1 AND node.state=1)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
-					OR (NEW.state=2 AND v_edit_node.state=1 AND node_id NOT IN 
+					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
 						(SELECT node_id FROM plan_psector_x_node 
-						 WHERE plan_psector_x_node.node_id=v_edit_node.node_id AND  state=0 AND psector_id IN 
+						 WHERE plan_psector_x_node.node_id=node.node_id AND  state=0 AND psector_id IN 
 							(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id)))
 							
 
 					-- looking for planified nodes that belongs on the same alternatives that arc
-					OR (NEW.state=2 AND v_edit_node.state=2 AND node_id IN 
+					OR (NEW.state=2 AND node.state=2 AND node_id IN 
 						(SELECT node_id FROM plan_psector_x_node 
-						 WHERE plan_psector_x_node.node_id=v_edit_node.node_id AND  state=1 AND psector_id IN
-							(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id)))
+						 WHERE plan_psector_x_node.node_id=node.node_id AND  state=1 AND psector_id IN
+							(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id))))
 
-					ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+					ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 	
-			SELECT * INTO nodeRecord2 FROM v_edit_node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), v_edit_node.the_geom, v_arc_searchnodes) 
-			AND (NEW.state=1 AND v_edit_node.state=1)
+			SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
+			AND ((NEW.state=1 AND node.state=1)
 
 					-- looking for existing nodes that not belongs on the same alternatives that arc
-					OR (NEW.state=2 AND v_edit_node.state=1 AND node_id NOT IN 
+					OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
 						(SELECT node_id FROM plan_psector_x_node 
-						 WHERE plan_psector_x_node.node_id=v_edit_node.node_id AND  state=0 AND psector_id IN 
+						 WHERE plan_psector_x_node.node_id=node.node_id AND  state=0 AND psector_id IN 
 							(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id)))					
 
 					-- looking for planified nodes that belongs on the same alternatives that arc
-					OR (NEW.state=2 AND v_edit_node.state=2 AND node_id IN 
+					OR (NEW.state=2 AND node.state=2 AND node_id IN 
 						(SELECT node_id FROM plan_psector_x_node 
-						 WHERE plan_psector_x_node.node_id=v_edit_node.node_id AND  state=1 AND psector_id IN
-							(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id)))
+						 WHERE plan_psector_x_node.node_id=node.node_id AND  state=1 AND psector_id IN
+							(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id))))
 
-					ORDER BY ST_Distance(v_edit_node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+					ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 		END IF;
 	
     END IF;

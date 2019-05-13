@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- FUNCTION CODE: XXXX
+-- FUNCTION CODE: 2688
 
 
 
@@ -25,11 +25,11 @@ BEGIN
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
 			
-				UPDATE v_edit_connec SET arc_id=NEW.arc_id WHERE connec_id=v_link.feature_id;
+				UPDATE connec SET arc_id=NEW.arc_id WHERE connec_id=v_link.feature_id;
 			
 			ELSIF v_link.feature_type='GULLY' THEN
  		
-				UPDATE v_edit_gully SET arc_id=NEW.arc_id WHERE gully_id=v_link.feature_id;
+				UPDATE gully SET arc_id=NEW.arc_id WHERE gully_id=v_link.feature_id;
 				
 			END IF;
 		END LOOP;

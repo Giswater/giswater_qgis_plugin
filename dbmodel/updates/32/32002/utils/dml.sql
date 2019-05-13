@@ -35,6 +35,7 @@ UPDATE sys_csv2pg_cat SET csv_structure='The csv file needs the standard INP fil
 -- 2019/03/29
 delete from audit_cat_function;
 
+
 INSERT INTO audit_cat_function VALUES (2436, 'gw_fct_plan_audit_check_data', 'utils', 'function', '{"featureType":""}', '[{"widgetname":"resultId", "label":"Result Id:","widgettype":"text","datatype":"string","layout_name":"grl_option_parameters","layout_order":1,"value":""}]', NULL, 'The function allows the possibility to find errors and data inconsistency before first budget calculation. It checks on PLAN feature tables prices and geometry mandatory data to enable the calculation.', 'role_master', false, true, 'Check plan missing/wrong data before prices', true);
 INSERT INTO audit_cat_function VALUES (2632, 'gw_trg_visit_update_enddate', 'utils', 'trigger function', NULL, NULL, NULL, 'Trigger to update the enddate of visits', 'role_basic', true, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2544, 'gw_trg_link_connecrotation_update', 'utils', 'trigger function', NULL, NULL, NULL, 'Updates the rotation of connecs related to the azimut of link', 'role_edit', false, false, NULL, false);

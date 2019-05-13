@@ -120,7 +120,7 @@ BEGIN
 
 -- Search tab
 -------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND formtab='tab_search' ;
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_search' ;
     IF rec_tab.id IS NOT NULL THEN
     
         -- Create search field
@@ -134,11 +134,11 @@ BEGIN
         -- Create search tab form
 	
         IF v_firsttab THEN 
-            formSearch := json_build_object('tabName','search','tabHeaderText',rec_tab.headertext, 'active', v_active );
+            formSearch := json_build_object('tabName','search','tabHeaderText',rec_tab.tabtext, 'active', v_active );
             formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
             v_form := v_form || ',' || formSearch::text;
         ELSE 
-            formSearch := json_build_object('tabName','search','tabHeaderText',rec_tab.headertext, 'active', true );
+            formSearch := json_build_object('tabName','search','tabHeaderText',rec_tab.tabtext, 'active', true );
             formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
             v_form := v_form || formSearch::text;
         END IF;
@@ -151,7 +151,7 @@ BEGIN
 
 -- Address tab
 -------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND formtab='tab_address' ;
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_address' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Parameters of the municipality layer
@@ -206,12 +206,12 @@ BEGIN
         
         -- Create tabs array
         IF v_firsttab THEN 
-            formAddress := json_build_object('tabName','address','tabHeaderText',rec_tab.headertext, 'active', v_active );
+            formAddress := json_build_object('tabName','address','tabHeaderText',rec_tab.tabtext, 'active', v_active );
             formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
 
             v_form := v_form || ',' || formAddress::text;
         ELSE 
-            formAddress := json_build_object('tabName','address','tabHeaderText',rec_tab.headertext, 'active', true );
+            formAddress := json_build_object('tabName','address','tabHeaderText',rec_tab.tabtext, 'active', true );
             formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
 
             v_form := v_form || formAddress::text;
@@ -225,7 +225,7 @@ BEGIN
 
 -- Hydro tab
 ------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND formtab='tab_hydro' ;
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_hydro' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
@@ -271,11 +271,11 @@ BEGIN
         
         -- Create tabs array
         IF v_firsttab THEN 
-            formHydro := json_build_object('tabName','hydro','tabHeaderText',rec_tab.headertext, 'active', v_active );
+            formHydro := json_build_object('tabName','hydro','tabHeaderText',rec_tab.tabtext, 'active', v_active );
             formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
             v_form := v_form || ',' || formHydro::text;
         ELSE 
-            formHydro := json_build_object('tabName','hydro','tabHeaderText',rec_tab.headertext, 'active', true );
+            formHydro := json_build_object('tabName','hydro','tabHeaderText',rec_tab.tabtext, 'active', true );
             formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
             v_form := v_form || formHydro::text;
         END IF;
@@ -288,7 +288,7 @@ BEGIN
 
 -- Workcat tab
 --------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND formtab='tab_workcat' ;
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_workcat' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Add edit box to introduce search text
@@ -301,11 +301,11 @@ BEGIN
 
         -- Create tabs array
         IF v_firsttab THEN 
-            formWorkcat := json_build_object('tabName','workcat','tabHeaderText',rec_tab.headertext, 'active', v_active );
+            formWorkcat := json_build_object('tabName','workcat','tabHeaderText',rec_tab.tabtext, 'active', v_active );
             formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
             v_form := v_form || ',' || formWorkcat::text;
         ELSE 
-            formWorkcat := json_build_object('tabName','workcat','tabHeaderText',rec_tab.headertext, 'active', true );
+            formWorkcat := json_build_object('tabName','workcat','tabHeaderText',rec_tab.tabtext, 'active', true );
             formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
             v_form := v_form || formWorkcat::text;
         END IF;
@@ -319,7 +319,7 @@ BEGIN
 
 -- Psector tab
 --------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND formtab='tab_psector' ;
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_psector' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Init combo json
@@ -364,11 +364,11 @@ BEGIN
    
         -- Create tabs array
         IF v_firsttab THEN 
-            formPsector := json_build_object('tabName','psector','tabHeaderText',rec_tab.headertext, 'active', v_active );
+            formPsector := json_build_object('tabName','psector','tabHeaderText',rec_tab.tabtext, 'active', v_active );
             formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
             v_form := v_form || ',' || formPsector::text;
         ELSE 
-            formPsector := json_build_object('tabName','psector','tabHeaderText',rec_tab.headertext, 'active', true );
+            formPsector := json_build_object('tabName','psector','tabHeaderText',rec_tab.tabtext, 'active', true );
             formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
             v_form := v_form || formPsector::text;
         END IF;
@@ -378,7 +378,7 @@ BEGIN
 
 -- Visit tab
 --------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND formtab='tab_visit' ;
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_visit' ;
     IF rec_tab.id IS NOT NULL THEN
 
         -- Add edit box to introduce search text

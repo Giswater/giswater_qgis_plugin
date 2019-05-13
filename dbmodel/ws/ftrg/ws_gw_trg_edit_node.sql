@@ -219,9 +219,9 @@ BEGIN
         ELSIF (NEW.epa_type = 'RESERVOIR') THEN
 			INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
         ELSIF (NEW.epa_type = 'PUMP') THEN
-			INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN_PUMP');
+			INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN');
         ELSIF (NEW.epa_type = 'VALVE') THEN
-			INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE_VALVE');
+			INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE');
         ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
 			INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
         END IF;

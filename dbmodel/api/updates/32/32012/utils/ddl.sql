@@ -149,6 +149,7 @@ CREATE TABLE config_api_tableinfo_x_infotype
 );
 
 
+ALTER TABLE config_api_form_fields ADD COLUMN layout_name character varying;
 
 /* created in 3.106
 

@@ -201,8 +201,14 @@ This version of Giswater is provided by Giswater Association
 			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x, 
 			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 			
+			-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
 			IF edit_enable_arc_nodes_update_aux IS TRUE THEN
-				UPDATE arc SET node_1=NEW.node_1, node_2=NEW.node_2 WHERE arc_id=NEW.arc_id;
+				IF NEW.node_1 IS NOT NULL THEN
+					UPDATE arc SET node_1=NEW.node_1 WHERE arc_id=NEW.arc_id;
+				END IF;
+				IF NEW.node_2 IS NOT NULL THEN
+					UPDATE arc SET node_2=NEW.node_2 WHERE arc_id=NEW.arc_id;
+				END IF;
 			END IF;
 				
 			IF man_table='man_conduit' THEN

@@ -71,13 +71,16 @@ BEGIN
 	END IF;
 
 	-- Check if it's a end/start point node in case of wrong topology without start or end nodes
-	SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), node_geom, v_arc_searchnodes) 
-		    OR ST_DWithin(ST_endpoint(the_geom), node_geom, v_arc_searchnodes) LIMIT 1;
+	SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), node_geom, v_arc_searchnodes) OR ST_DWithin(ST_endpoint(the_geom), node_geom, v_arc_searchnodes) LIMIT 1;
 	IF arc_id_aux IS NOT NULL THEN
 		-- force trigger of topology in order to reconnect extremal nodes (in case of null's)
 		UPDATE arc SET the_geom=the_geom WHERE arc_id=arc_id_aux;
+		-- get another arc if exists
 		SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_DWithin(the_geom, node_geom, v_arc_searchnodes) AND arc_id != arc_id_aux;
 	END IF;
+
+	-- For the specificic case of extremal node not reconnected due topology issues (i.e. arc state (1) and node state (2)
+	
 
 	-- Find closest arc inside tolerance
 	SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
@@ -85,7 +88,7 @@ BEGIN
 	ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
 
 
-	RAISE NOTICE 'arc_id_aux %', arc_id_aux;
+	--RAISE EXCEPTION 'arc_id_aux %', arc_id_aux;
 
 	IF arc_id_aux IS NOT NULL THEN 
 
@@ -338,8 +341,7 @@ BEGIN
 			
 		END IF;
 	ELSE
-		PERFORM audit_function(2122,2114);
-	
+		RETURN 0;
 	END IF;
 
 	
