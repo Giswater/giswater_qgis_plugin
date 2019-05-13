@@ -378,7 +378,6 @@ class ReplaceNodeMapTool(ParentMapTool):
 
 
     def activate(self):
-        print("20")
         # Check button
         self.action().setChecked(True)
 
@@ -405,8 +404,7 @@ class ReplaceNodeMapTool(ParentMapTool):
 
 
     def deactivate(self):
-        print("21")
-        # Call parent method     
+        # Call parent method
         ParentMapTool.deactivate(self)
 
 

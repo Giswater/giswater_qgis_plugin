@@ -272,9 +272,9 @@ class ApiParent(ParentAction):
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
 
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT > 29900:
-            return
+        # # TODO 3.x
+        # if Qgis.QGIS_VERSION_INT > 29900:
+        #     return
         
         # Set map tool emit point and signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -320,17 +320,29 @@ class ApiParent(ParentAction):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        if Qgis.QGIS_VERSION_INT < 29900:
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+            if not result:
+                return
+            # Check snapped features
+            for snapped_point in result:
+                point = QgsPoint(snapped_point.snappedVertex)
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
+                break
+        else:
+            result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
+            if not result:
+                return
+            # That's the snapped features
+            if result:
+                # Get the point and add marker on it
+                point = QgsPointXY(result.point())
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
 
-        if not result:
-            return
 
-        # Check snapped features
-        for snapped_point in result:
-            point = QgsPoint(snapped_point.snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-            break
+
 
             
     def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, point, btn):
@@ -360,17 +372,23 @@ class ApiParent(ParentAction):
         layer = self.iface.activeLayer()
         layername = layer.name()
         is_valid = False
-        for snapped_point in result:
-            # Get only one feature
-            point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
-            snapped_feature = next(
-                snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+        if Qgis.QGIS_VERSION_INT < 29900:
+            for snapped_point in result:
+                # Get only one feature
+                point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
+                snapped_feature = next(
+                    snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                snapped_feature_attr = snapped_feature.attributes()
+                # Leave selection
+                snapped_point.layer.select([snapped_point.snappedAtGeometry])
+                is_valid = True
+                break
+        else:
+            snapped_feature = next(result.layer().getFeatures(QgsFeatureRequest().setFilterFid(result.featureId())))
             snapped_feature_attr = snapped_feature.attributes()
             # Leave selection
-            snapped_point.layer.select([snapped_point.snappedAtGeometry])
+            result.layer().select([result.featureId()])
             is_valid = True
-            break
-
         if not is_valid:
             message = "Any of the snapped features belong to selected layer"
             self.controller.show_info(message, parameter=self.iface.activeLayer().name(), duration=10)

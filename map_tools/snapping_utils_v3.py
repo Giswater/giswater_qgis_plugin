@@ -24,7 +24,7 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 from qgis.gui import QgsMapCanvas
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsSnappingUtils, QgsPointLocator, QgsTolerance
 
 
 class SnappingConfigManager(object):
@@ -62,16 +62,15 @@ class SnappingConfigManager(object):
         self.previous_snapping = self.get_snapping_options()
 
 
-    def clear_snapping(self, snapping_mode=0):
+    def clear_snapping(self):
         """ Removing snap """
-
         QgsProject.instance().blockSignals(True)
         layers = self.controller.get_layers()
         # Loop through all the layers in the project
         for layer in layers:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, snapping_mode, 0, 1, False)
+            QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.All, 15, QgsTolerance.Pixels)
         QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snapSettingsChanged.emit()
+        #QgsProject.instance().snapSettingsChanged.emit()
 
 
     def snap_to_node(self):
@@ -79,7 +78,7 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_node_man:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 2, 1.0, False)
+            QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
@@ -89,10 +88,10 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_connec_man:
-            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+            QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
         if self.layer_gully_man:
             for layer in self.layer_gully_man:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+                QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.Edge, 15, QgsTolerance.Pixels)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()
 
@@ -102,8 +101,7 @@ class SnappingConfigManager(object):
 
         if layer is None:
             return
-
-        QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+        QgsSnappingUtils.LayerConfig(layer, QgsPointLocator.All, 15, QgsTolerance.Pixels)
 
 
     def apply_snapping_options(self, snappings_options):
