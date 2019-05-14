@@ -306,7 +306,11 @@ class ParentAction(object):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)        
         message = "Select file"
-        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
+        if Qgis.QGIS_VERSION_INT < 29900:
+            folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
+        else:
+            folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
+
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
                 

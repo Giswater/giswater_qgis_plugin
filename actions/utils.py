@@ -521,7 +521,11 @@ class Utils(ParentAction):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select CSV file")
-        file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
+        if Qgis.QGIS_VERSION_INT < 29900:
+            file_csv = QFileDialog.getOpenFileName(None, message, "", '*.csv')
+        else:
+            file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
+
         self.controller.set_path_from_qfiledialog(self.dlg_csv.txt_file_csv, file_csv)
         self.save_settings_values()
         self.preview_csv(self.dlg_csv)

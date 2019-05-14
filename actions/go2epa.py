@@ -417,7 +417,11 @@ class Go2Epa(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select INP file")
-        self.file_inp = QFileDialog.getSaveFileName(None, message, "", '*.inp')
+        if Qgis.QGIS_VERSION_INT < 29900:
+            self.file_inp = QFileDialog.getSaveFileName(None, message, "", '*.inp')
+        else:
+            self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
+
         self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_inp, self.file_inp)
 
 
@@ -434,7 +438,11 @@ class Go2Epa(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select RPT file")
-        self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
+        if Qgis.QGIS_VERSION_INT < 29900:
+            self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
+        else:
+            self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
+
         self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
 

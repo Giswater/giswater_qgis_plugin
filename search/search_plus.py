@@ -409,9 +409,12 @@ class SearchPlus(QObject):
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
-
         msg = "Save as"
-        folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
+        if Qgis.QGIS_VERSION_INT < 29900:
+            folder_path = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
+        else:
+            folder_path, filter_ = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
+
         self.controller.set_path_from_qfiledialog(widget, folder_path)
 
 

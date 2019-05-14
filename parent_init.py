@@ -1252,7 +1252,11 @@ class ParentDialog(QDialog):
 
         # File dialog select just photos
         file_dialog.setFileMode(QFileDialog.AnyFile)
-        folder_path = file_dialog.getOpenFileName(self, 'Open picture', 'c:\\', "Images (*.png *.jpg)")
+        if Qgis.QGIS_VERSION_INT < 29900:
+            folder_path = file_dialog.getOpenFileName(self, 'Open picture', 'c:\\', "Images (*.png *.jpg)")
+        else:
+            folder_path, filter_ = file_dialog.getOpenFileName(self, 'Open picture', 'c:\\', "Images (*.png *.jpg)")
+
         if folder_path:
             utils_giswater.setWidgetText(self.dlg_add_img, widget, str(folder_path))
 

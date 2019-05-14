@@ -2302,7 +2302,11 @@ class UpdateSQL(ApiParent):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select INP file")
-        file_inp = QFileDialog.getOpenFileName(None, message, "", '*.inp')
+        if Qgis.QGIS_VERSION_INT < 29900:
+            file_inp = QFileDialog.getOpenFileName(None, message, "", '*.inp')
+        else:
+            file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
+
         self.dlg_readsql_create_project.data_file.setText(file_inp)
 
 
