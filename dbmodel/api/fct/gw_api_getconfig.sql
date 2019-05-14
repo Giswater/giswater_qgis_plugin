@@ -270,6 +270,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_api_getconfig(json)
-  OWNER TO postgres;
 
