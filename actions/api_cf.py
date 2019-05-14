@@ -11,10 +11,11 @@ try:
 except:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     import urlparse as parse
 else:
     import urllib.parse
+    from qgis.core import QgsPointXY
 
 from qgis.PyQt.QtCore import QDate, QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
@@ -62,41 +63,6 @@ class ApiCF(ApiParent):
         self.tab_type = tab_type
 
 
-    # def api_info(self):
-    #     """ Button 37: Own Giswater info """
-    #     # add "listener" to all actions to deactivate api_info
-    #     if self.controller.api_on is not True:
-    #         self.controller.api_on = True
-    #         actions_list = self.iface.mainWindow().findChildren(QAction)
-    #         for action in actions_list:
-    #             if action.objectName() != 'go2epa_api_info' and action.objectName() != 'basic_api_info':
-    #                 action.triggered.connect(partial(self.controller.restore_info, restore_cursor=True))
-    #
-    #     self.canvas = self.iface.mapCanvas()
-    #     self.emit_point = QgsMapToolEmitPoint(self.canvas)
-    #     self.canvas.setMapTool(self.emit_point)
-    #     QApplication.setOverrideCursor(Qt.WhatsThisCursor)
-    #     self.emit_point.canvasClicked.connect(partial(self.init_info))
-
-    #
-    # def init_info(self, point, button_clicked, tab_type):
-    #     self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir)
-    #     self.info_cf.get_point(point, button_clicked, tab_type)
-
-
-    # def get_point(self, point, button_clicked, tab_type):
-    #     """ Get coord from clicked point """
-    #     if button_clicked == Qt.LeftButton:
-    #         self.controller.log_info("button_clicked" + str(button_clicked))
-    #         complet_result = self.open_form(point, tab_type=tab_type)
-    #         self.controller.log_info(str("TEST 99"))
-    #         if not complet_result:
-    #             print("FAIL get_point")
-    #             return
-    #     elif button_clicked == Qt.RightButton:
-    #         self.hilight_feature(point, tab_type)
-
-
     def hilight_feature(self, point, rb_list, tab_type=None):
 
         cursor = QCursor()
@@ -140,7 +106,6 @@ class ApiCF(ApiParent):
                 sub_menu = main_menu.addMenu(icon, layer_name.name())
             else:
                 sub_menu = main_menu.addMenu(layer_name.name())
-
             # Create one QAction for each id
             for feature in layer['ids']:
                 action = QAction(str(feature['id']), None)
@@ -188,12 +153,16 @@ class ApiCF(ApiParent):
             rb.reset()
         if feature['geometry'] is None:
             return
+
         list_coord = re.search('\((.*)\)', str(feature['geometry']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
         if reset_rb is True:
             self.resetRubberbands()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPoint(float(max_x), float(max_y))
+            if Qgis.QGIS_VERSION_INT < 29900:
+                point = QgsPoint(float(max_x), float(max_y))
+            else:
+                point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
         else:
             points = self.get_points(list_coord)
@@ -556,7 +525,7 @@ class ApiCF(ApiParent):
         action_centered.triggered.connect(partial(self.api_action_centered, self.feature, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
-        #action_rotation.triggered.connect(partial(self.api_action_zoom_out, self.feature, self.canvas, self.layer))
+        action_rotation.triggered.connect(partial(self.action_rotation, self.dlg_cf))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(self.api_action_help, 'ud', 'node'))

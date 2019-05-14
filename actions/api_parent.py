@@ -268,14 +268,67 @@ class ApiParent(ParentAction):
                 message = "File not found"
                 self.controller.show_warning(message, parameter=pdf_path)
 
-                
+    def action_rotation(self, dialog):
+
+        # Set map tool emit point and signals
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.previous_map_tool = self.canvas.mapTool()
+        self.canvas.setMapTool(self.emit_point)
+        self.emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog))
+
+
+    def action_rotation_canvas_clicked(self, dialog, point, btn):
+        if btn == Qt.RightButton:
+            self.canvas.setMapTool(self.previous_map_tool)
+            return
+
+        viewname = self.controller.get_layer_source_table_name(self.layer)
+        sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
+               " FROM " + self.schema_name + "." + viewname + ""
+               " WHERE node_id = '" + self.feature_id + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            existing_point_x = row[0]
+            existing_point_y = row[1]
+
+        sql = ("UPDATE " + self.schema_name + ".node"
+               " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
+               " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+               " WHERE node_id = '" + str(self.feature_id) + "'")
+        status = self.controller.execute_sql(sql)
+        if not status:
+            self.canvas.setMapTool(self.previous_map_tool)
+            return
+        sql = ("SELECT rotation FROM " + self.schema_name + ".node "
+               " WHERE node_id='" + str(self.feature_id) + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(dialog, "rotation", str(row[0]))
+
+        sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
+               " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(dialog, "hemisphere", str(row[0]))
+            message = "Hemisphere of the node has been updated. Value is"
+            self.controller.show_info(message, parameter=str(row[0]))
+        self.api_disable_rotation(dialog)
+
+    def api_disable_rotation(self, dialog):
+        """ Disable actionRotation and set action 'Identify' """
+
+        action_widget = dialog.findChild(QAction, "actionRotation")
+        if action_widget:
+            action_widget.setChecked(False)
+        try:
+            self.emit_point.canvasClicked.disconnect()
+            self.canvas.setMapTool(self.previous_map_tool)
+        except Exception as e:
+            print(type(e).__name__)
+
+
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
-
-        # # TODO 3.x
-        # if Qgis.QGIS_VERSION_INT > 29900:
-        #     return
-        
         # Set map tool emit point and signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -342,9 +395,6 @@ class ApiParent(ParentAction):
                 self.vertex_marker.show()
 
 
-
-
-            
     def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, point, btn):
         """ Slot function when canvas is clicked """
 
@@ -771,10 +821,11 @@ class ApiParent(ParentAction):
 
         for i in range(0, len(polygon)):
             x, y = polygon[i].split(' ')
-            if Qgis.QGIS_VERSION_INT < 29900:
-                point = QgsPoint(float(x), float(y))
-            else:
-                point = QgsPointXY(float(x), float(y))
+            # if Qgis.QGIS_VERSION_INT < 29900:
+            #     point = QgsPoint(float(x), float(y))
+            # else:
+            #     point = QgsPointXY(float(x), float(y))
+            point = QgsPoint(float(x), float(y))
             points.append(point)
         return points
 
