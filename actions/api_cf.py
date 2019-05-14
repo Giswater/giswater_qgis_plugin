@@ -377,7 +377,6 @@ class ApiCF(ApiParent):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
                 utils_giswater.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
 
-
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
         action_copy_paste = self.dlg_cf.findChild(QAction, "actionCopyPaste")
@@ -393,34 +392,11 @@ class ApiCF(ApiParent):
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
-
-        # Set all action enabled(False) and visible(False) less separators
-        actions_list = self.dlg_cf.findChildren(QAction)
-        for action in actions_list:
-            action.setEnabled(False)
-            action.setVisible(False)
-            if action.objectName() == "":
-                action.setEnabled(True)
-                action.setVisible(True)
-
-        actions_to_show = complet_result[0]['body']['form']['actions']
-        for x in range(0, len(actions_to_show)):
-            action = None
-            action = self.dlg_cf.findChild(QAction, actions_to_show[x]['actionName'])
-            if action is not None:
-                action.setVisible(True)
-                action.setToolTip(actions_to_show[x]['actionTooltip'])
-
-        # Force not edition actions  enabled(True) and visible(True)
-        self.set_action(action_zoom_in)
-        self.set_action(action_zoom_out)
-        self.set_action(action_centered)
-        self.set_action(action_link)
-        self.set_action(action_help)
-        self.set_action(action_section)
+        self.show_actions('tab_data')
 
         # TODO action_edit.setEnabled(lo que venga del json segun permisos)
-        self.set_action(action_edit, visible=True, enabled=True)
+        # action_edit.setVisible(True)
+        # action_edit.setEnabled(True)
 
         # Set actions icon
         self.set_icon(action_edit, "101")
@@ -432,7 +408,7 @@ class ApiCF(ApiParent):
         self.set_icon(action_zoom_out, "107")
         self.set_icon(action_centered, "104")
         self.set_icon(action_link, "173")
-        self.set_icon(action_section, "204")
+        self.set_icon(action_section, "207")
         self.set_icon(action_help, "73")
         self.set_icon(action_interpolate, "194")
         # self.set_icon(action_switch_arc_id, "141")
@@ -463,15 +439,13 @@ class ApiCF(ApiParent):
 
         # Get field id name
         self.field_id = str(complet_result[0]['body']['feature']['idName'])
-        
+
         self.feature_id = None
         result = complet_result[0]['body']['data']
         layout_list = []
         for field in result['fields']:
             label, widget = self.set_widgets(self.dlg_cf, field)
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
-            if layout is None:
-                continue
 
             # Take the QGridLayout with the intention of adding a QSpacerItem later
             if layout not in layout_list and layout.objectName() not in ('top_layout', 'bot_layout_1', 'bot_layout_2'):
@@ -494,7 +468,8 @@ class ApiCF(ApiParent):
             if field['isparent']:
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
-                    widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
+                    if widget is not None:
+                        widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget))
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
@@ -512,9 +487,9 @@ class ApiCF(ApiParent):
             self.layer.editingStarted.connect(partial(self.enable_all, self.dlg_cf, result))
             self.layer.editingStopped.connect(partial(self.disable_all, self.dlg_cf, result, False))
             # Actions
-            self.enable_actions(self.dlg_cf, self.layer.isEditable())
-            self.layer.editingStarted.connect(partial(self.enable_actions, self.dlg_cf, True))
-            self.layer.editingStopped.connect(partial(self.enable_actions, self.dlg_cf, False))
+            self.enable_actions(self.layer.isEditable())
+            self.layer.editingStarted.connect(partial(self.enable_actions, True))
+            self.layer.editingStopped.connect(partial(self.enable_actions, False))
 
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(self.start_editing)
@@ -736,15 +711,14 @@ class ApiCF(ApiParent):
 
 
 
-    def enable_actions(self, dialog, enabled):
+    def enable_actions(self, enabled):
         """ Enable actions according if layer is editable or not"""
-        # if dialog.actionEdit.isVisible():
-
-        dialog.actionCopyPaste.setEnabled(enabled)
-        dialog.actionRotation.setEnabled(enabled)
-        dialog.actionCatalog.setEnabled(enabled)
-        dialog.actionWorkcat.setEnabled(enabled)
-        #dialog.actionSwicthArcid.setEnabled(enabled)
+        actions_list = self.dlg_cf.findChildren(QAction)
+        static_actions = ('actionEdit', 'actionCentered', 'actionZoomOut', 'actionZoom', 'actionLink', 'actionHelp',
+                          'actionSection')
+        for action in actions_list:
+            if action.objectName() not in static_actions:
+                action.setEnabled(enabled)
 
 
     def get_values(self, dialog, widget, _json=None):
@@ -915,14 +889,29 @@ class ApiCF(ApiParent):
         self.catalog.api_catalog(self.dlg_cf, tab_type+"_"+self.geom_type+'cat_id', self.geom_type)
 
 
+    def show_actions(self, tab_name):
+        actions_list = self.dlg_cf.findChildren(QAction)
+        for action in actions_list:
+            action.setVisible(False)
+        for tab in self.complet_result[0]['body']['form']['visibleTabs']:
+            if tab['tabName'] == tab_name:
+                for a in tab['tabactions']:
+                    action = self.dlg_cf.findChild(QAction, a['actionName'])
+                    if action is not None:
+                        action.setToolTip(a['actionTooltip'])
+                        action.setVisible(True)
+        self.enable_actions(self.layer.isEditable())
 
 
+        #for action in self.controller.log_info(str(action))
     """ MANAGE TABS """
     def tab_activation(self):
         """ Call functions depend on tab selection """
 
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
+        tab_name = self.tab_main.widget(index_tab).objectName()
+        self.show_actions(tab_name)
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
             self.fill_tab_element()

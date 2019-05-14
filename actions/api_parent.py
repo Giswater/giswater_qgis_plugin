@@ -64,6 +64,7 @@ class ApiParent(ParentAction):
         self.list_update = []
 
 
+
     def get_editable_project(self):
         """ Get variable 'editable_project' from qgis project variables """
         
@@ -196,11 +197,6 @@ class ApiParent(ParentAction):
                 layer.selectByIds(id_list)
             else:
                 layer.removeSelection()
-
-
-    def set_action(self, action, visible=True, enabled=True):
-        action.setVisible(visible)
-        action.setEnabled(enabled)
 
 
     def start_editing(self):
