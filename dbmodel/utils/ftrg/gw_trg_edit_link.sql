@@ -176,7 +176,12 @@ BEGIN
 
 		-- get arc values
 		SELECT * INTO v_arc FROM arc WHERE node_1=v_node.node_id LIMIT 1;
-
+		
+		-- in case of null values for arc_id (i.e. node sink where there are only entry arcs)
+		IF v_arc.arc_id IS NULL THEN
+			SELECT * INTO v_arc FROM arc WHERE node_2=v_node.node_id LIMIT 1;
+		END IF;
+		
 		IF v_projectype='UD' then
 			-- Update connec or gully arc_id
 			IF v_gully1.gully_id IS NOT NULL  THEN
