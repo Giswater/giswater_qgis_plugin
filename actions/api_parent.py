@@ -23,7 +23,7 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsPoint, QgsGeometry
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsProject, QgsRectangle, QgsPoint, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
@@ -67,10 +67,12 @@ class ApiParent(ParentAction):
     def get_editable_project(self):
         """ Get variable 'editable_project' from qgis project variables """
         
-        # TODO: 3.x
         editable_project = False
         try:
-            editable_project = QgsExpressionContextUtils.projectScope().variable('editable_project')
+            if Qgis.QGIS_VERSION_INT < 29900:
+                editable_project = QgsExpressionContextUtils.projectScope().variable('editable_project')
+            else:
+                editable_project = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('editable_project')
             if editable_project is None:
                 return False
         except:

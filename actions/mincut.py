@@ -18,7 +18,7 @@ else:
     from builtins import next
     from builtins import range
 
-from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsVectorLayer
+from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsProject, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt, QDate, QTime
 from qgis.PyQt.QtWidgets import QLineEdit, QTextEdit, QAction, QCompleter, QAbstractItemView
@@ -2192,8 +2192,13 @@ class MincutParent(ParentAction, MultipleSelection):
             message = "Param portal_field_postal not found"
             self.controller.show_warning(message)
             return
+
         # Get project variable 'expl_id'
-        expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
+        if Qgis.QGIS_VERSION_INT < 29900:
+            expl_id = QgsExpressionContextUtils.projectScope().variable(str(self.street_field_expl[0]))
+        else:
+            expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable(str(self.street_field_expl[0]))
+
         if expl_id:
             # Set SQL to get 'expl_name'
             sql = ("SELECT " + self.params['expl_field_name'] + ""

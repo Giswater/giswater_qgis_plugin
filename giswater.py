@@ -1042,9 +1042,8 @@ class Giswater(QObject):
         try:
             if Qgis.QGIS_VERSION_INT < 29900:
                 expl_id = QgsExpressionContextUtils.projectScope().variable('expl_id')
-            # TODO: 3.x
             else:
-                expl_id = None
+                expl_id = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('expl_id')
         except:
             pass
         
