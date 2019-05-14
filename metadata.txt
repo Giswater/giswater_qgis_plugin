@@ -6,7 +6,7 @@ name=giswater
 qgisMinimumVersion=2.18
 qgisMaximumVersion=3.99
 description=Plugin to manage water supply, sewerage and urban drainage networks using all capabilities of Giswater working together QGIS with PosgreSQL, EPANET and SWMM. The plugin works using system roles (basic, om, edit, epa, master and admin).
-version=3.2.010
+version=3.2.012
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Xavier Torret
 # End of mandatory metadata
 
