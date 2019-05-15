@@ -26,3 +26,6 @@ CREATE TABLE cat_arc_shape
 -----------------------
 
 ALTER TABLE cat_arc ADD COLUMN  shape character varying(30);
+
+ALTER TABLE connec ADD COLUMN featurecat_id character varying(50);
+ALTER TABLE connec ADD COLUMN feature_id character varying(16);
