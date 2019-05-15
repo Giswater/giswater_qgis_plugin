@@ -1132,18 +1132,21 @@ class DaoController(object):
     
     def get_rolenames(self):
         """ Get list of rolenames of current user """
-        
-        sql = ("SELECT rolname FROM pg_roles "
-               " WHERE pg_has_role(current_user, oid, 'member')")
-        rows = self.get_rows(sql)
-        if not rows:
-            return None
-        
-        roles = "("
-        for i in range(0, len(rows)):
-            roles += "'" + str(rows[i][0]) + "', "
-        roles = roles[:-2]
-        roles += ")"
+        super_users = self.settings.value('system_variables/super_users')
+        if self.user in super_users:
+            roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
+        else:
+            sql = ("SELECT rolname FROM pg_roles "
+                   " WHERE pg_has_role(current_user, oid, 'member')")
+            rows = self.get_rows(sql)
+            if not rows:
+                return None
+
+            roles = "("
+            for i in range(0, len(rows)):
+                roles += "'" + str(rows[i][0]) + "', "
+            roles = roles[:-2]
+            roles += ")"
         
         return roles        
              
