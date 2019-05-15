@@ -208,7 +208,8 @@ class ManNodeDialog(ParentDialog):
         widget_ymax.setStyleSheet("border: 1px solid gray")
         node_id = utils_giswater.getWidgetText(self.dialog, 'node_id')
         ymax = utils_giswater.getWidgetText(self.dialog, widget_ymax)
-        if ymax is None:
+
+        if ymax is None or str(ymax) == 'null':
             return
 
         sql = ("SELECT * from " + self.schema_name + ".v_ui_node_x_connection_upstream "

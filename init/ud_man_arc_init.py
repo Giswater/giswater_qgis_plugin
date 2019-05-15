@@ -165,7 +165,7 @@ class ManArcDialog(ParentDialog):
         row = self.controller.get_row(sql, log_sql=True)
         if row:
             if row['ymax'] is not None:
-                if float(row['ymax']) < float(text) :
+                if float(row['ymax']) < float(text):
                     widget_y.setStyleSheet("border: 1px solid red")
 
 
