@@ -27,9 +27,10 @@ from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtil
 from qgis.core import QgsPointLocator
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
-from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
+from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
+from qgis.PyQt.QtWidgets import QTableView
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import json
@@ -683,6 +684,38 @@ class ApiParent(ParentAction):
             list_items.append(field['idval'])
         self.set_completer_object_api(completer, model, widget, list_items)
 
+
+    def add_tableview(self, field):
+        """ Add widgets QTableView type """
+        widget = QTableView()
+        widget.setObjectName(field['widgetname'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
+        return widget
+
+    def set_headers(self, widget, field):
+        standar_model = QStandardItemModel()
+        # Related by Qtable
+        widget.setModel(standar_model)
+        widget.horizontalHeader().setStretchLastSection(True)
+
+        # # Get headers
+        headers = []
+        for x in field['value'][0]:
+            headers.append(x)
+        # Set headers
+        standar_model.setHorizontalHeaderLabels(headers)
+        return widget
+
+    def populate_table(self, widget, field):
+        standar_model = widget.model()
+        for item in field['value']:
+            row = []
+            for value in item.values():
+                row.append(QStandardItem(str(value)))
+            if len(row) > 0:
+                standar_model.appendRow(row)
+        return widget
 
     def add_combobox(self, field):
     

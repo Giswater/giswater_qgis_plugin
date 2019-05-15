@@ -347,8 +347,7 @@ class ApiCF(ApiParent):
         utils_giswater.set_qtv_config(self.tbl_event)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
         utils_giswater.set_qtv_config(self.tbl_document)
-        self.tbl_rpt = self.dlg_cf.findChild(QTableView, "tbl_rpt")
-        utils_giswater.set_qtv_config(self.tbl_rpt)
+
 
         # Get table name for use as title
         self.tablename = complet_result[0]['body']['feature']['tableName']
@@ -587,7 +586,10 @@ class ApiCF(ApiParent):
         elif field['widgettype'] in ('spinbox', 'doubleSpinbox'):
             widget = self.add_spinbox(field)
             widget = self.set_auto_update_spinbox(field, dialog, widget)
-
+        elif field['widgettype'] == 'tableView':
+            widget = self.add_tableview(field)
+            widget = self.set_headers(widget, field)
+            widget = self.populate_table(widget, field)
         return label, widget
 
 
@@ -1875,59 +1877,55 @@ class ApiCF(ApiParent):
 
     """ FUNCTIONS RELATED WITH TAB RPT """
     def fill_tab_rpt(self, complet_result):
-        standar_model = QStandardItemModel()
-        complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf, standar_model, "rpt_layout1", "tbl_rpt")
+
+        complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf)
         if complet_list is False:
             return False
-        result = self.populate_table(complet_result, complet_list, standar_model, self.dlg_cf, widget_list, _filter=False)
-        self.set_listeners(complet_result, complet_list, standar_model, self.dlg_cf, widget_list)
-        self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
-        self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
-        return result
 
-    def init_tbl_rpt(self, complet_result, dialog, standar_model, layout_name, qtv_name):
+        #result = self.populate_table(complet_result, complet_list, standar_model, self.dlg_cf, widget_list, _filter=False)
+        #self.set_listeners(complet_result, complet_list, standar_model, self.dlg_cf, widget_list)
+        #self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
+        #self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
+        return False
+
+    def init_tbl_rpt(self, complet_result, dialog):
         """ Put filter widgets into layout and set headers into QTableView"""
-
-        rpt_layout1 = dialog.findChild(QGridLayout, layout_name)
-        qtable = dialog.findChild(QTableView, qtv_name)
+        rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
+        # qtable = dialog.findChild(QTableView, qtv_name)
         self.clear_gridlayout(rpt_layout1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         complet_list = self.get_list(complet_result, tab_name=tab_name)
         if complet_list is False:
             return False, False
+
         # Put filter widgets into layout
         widget_list = []
-        for field in complet_list[0]['body']['data']['filterFields']:
+        for field in complet_list[0]['body']['data']['fields']:
             label, widget = self.set_widgets(dialog, field)
             if widget is not None:
-                if (type(widget)) != QSpacerItem:
-                    widget.setMaximumWidth(125)
+                if (type(widget)) == QSpacerItem:
+                    rpt_layout1.addItem(widget, 1, field['layout_order'])
+                elif (type(widget)) == QTableView:
+                    rpt_layout1.addWidget(widget, 1, field['layout_order'])
+                    self.populate_table(widget, field)
+                    widget_list.append(widget)
+                else:
+                    widget.setMaximumWidth(150)
                     widget_list.append(widget)
                     if label:
                         rpt_layout1.addWidget(label, 0, field['layout_order'])
                     rpt_layout1.addWidget(widget, 1, field['layout_order'])
-                else:
-                    rpt_layout1.addItem(widget, 1, field['layout_order'])
+
+
             # vertical_spacer = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
             # rpt_layout1.addItem(vertical_spacer, field['layout_order'], rpt_layout1.columnCount())
             # Find combo parents:
-            for field in complet_list[0]['body']['data']['filterFields']:
+            for field in complet_list[0]['body']['data']['fields'][0]:
                 if 'isparent' in field:
                     if field['isparent']:
                         widget = dialog.findChild(QComboBox, field['widgetname'])
                         widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget))
-
-        # Related by Qtable
-        qtable.setModel(standar_model)
-        qtable.horizontalHeader().setStretchLastSection(True)
-
-        # # Get headers
-        headers = []
-        for x in complet_list[0]['body']['data']['listValues'][0]:
-            headers.append(x)
-        # Set headers
-        standar_model.setHorizontalHeaderLabels(headers)
 
         return complet_list, widget_list
 
@@ -1961,26 +1959,26 @@ class ApiCF(ApiParent):
         return complet_list
 
 
-    def populate_table(self, complet_result, complet_list, standar_model, dialog, widget_list, _filter=True):
-        filter_fields = ''
-        if _filter:
-            filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
-        index_tab = self.tab_main.currentIndex()
-        tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self.get_list(complet_result, tab_name=tab_name, filter_fields=filter_fields)
-        if complet_list is False:
-            return False
-        # for item in complet_list[0]['body']['data']['listValues'][0]:
-        #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
-        #     if len(row) > 0:
-        #         standar_model.appendRow(row)
-        for item in complet_list[0]['body']['data']['listValues']:
-            row = []
-            for value in item.values():
-                row.append(QStandardItem(str(value)))
-            if len(row) > 0:
-                standar_model.appendRow(row)
-        return complet_list
+    # def populate_table(self, complet_result, complet_list, standar_model, dialog, widget_list, _filter=True):
+    #     filter_fields = ''
+    #     if _filter:
+    #         filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
+    #     index_tab = self.tab_main.currentIndex()
+    #     tab_name = self.tab_main.widget(index_tab).objectName()
+    #     complet_list = self.get_list(complet_result, tab_name=tab_name, filter_fields=filter_fields)
+    #     if complet_list is False:
+    #         return False
+    #     # for item in complet_list[0]['body']['data']['listValues'][0]:
+    #     #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
+    #     #     if len(row) > 0:
+    #     #         standar_model.appendRow(row)
+    #     for item in complet_list[0]['body']['data']['listValues']:
+    #         row = []
+    #         for value in item.values():
+    #             row.append(QStandardItem(str(value)))
+    #         if len(row) > 0:
+    #             standar_model.appendRow(row)
+    #     return complet_list
 
     def get_filter_qtableview(self, complet_list, standar_model, dialog, widget_list):
         standar_model.clear()
