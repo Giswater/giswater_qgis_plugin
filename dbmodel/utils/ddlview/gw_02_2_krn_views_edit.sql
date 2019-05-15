@@ -40,6 +40,7 @@ FROM selector_expl, macrodma
 WHERE ((macrodma.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
+-- definiton updated on 3.2.011
 DROP VIEW IF EXISTS v_edit_dma CASCADE;
 CREATE VIEW v_edit_dma AS SELECT
 	dma_id,

@@ -312,3 +312,21 @@ CREATE OR REPLACE VIEW ve_visit_node_singlevent AS
 			JOIN om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
 			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''tipus_incidencia''),(''comentari_incidencia'')'::text) ct(visit_id integer, param_1 text, param_2 text)) a ON a.visit_id = om_visit.id
   WHERE om_visit_class.ismultievent = true;
+  
+  
+CREATE OR REPLACE VIEW v_edit_dma AS 
+ SELECT dma.dma_id,
+    dma.name,
+    dma.macrodma_id,
+    dma.descript,
+    dma.the_geom,
+    dma.undelete,
+    dma.expl_id,
+    dma.pattern_id,
+    dma.link,
+    dma.minc,
+    dma.maxc,
+    dma.effc
+   FROM selector_expl,
+    dma
+  WHERE dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
