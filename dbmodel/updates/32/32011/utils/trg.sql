@@ -8,6 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+DROP TRIGGER gw_trg_arc_vnodelink_update ON SCHEMA_NAME.arc;
+DROP FUNCTION IF EXISTS gw_trg_arc_vnodelink_update ;
+
+
 DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".om_visit;
 CREATE TRIGGER gw_trg_om_visit AFTER INSERT OR UPDATE OF class_id, status OR DELETE ON "SCHEMA_NAME".om_visit
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit();
