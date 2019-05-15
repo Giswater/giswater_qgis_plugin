@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: XXXX
 
 
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_visit_event_manager(visit_id_aux integer)
   RETURNS text AS
 $BODY$
@@ -145,15 +146,19 @@ BEGIN
 
     END IF;
 
-    -- check if exits price parameter related to the price parameter (action type=5)
+        -- check if exits price parameter related to the price parameter (action type=5 or 4)
      IF (SELECT count(*) FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
-        JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=5 AND feature_type='NODE')>0  THEN
+        JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND (action_type=5 OR action_type=4) AND feature_type='NODE')>0  THEN
 
         FOR rec_parameter IN SELECT * FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
-        JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=5 AND feature_type='NODE'
+        JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND (action_type=5 OR action_type=4) AND feature_type='NODE'
 
         LOOP
-            work_aux := rec_parameter.action_value;
+        	IF rec_parameter.action_type=4 then
+			work_aux:=(SELECT id FROM cat_work WHERE parameter_id=rec_parameter.parameter_id); 
+		ELSE 
+			work_aux := rec_parameter.action_value;
+		END IF;
             builder_aux:= (select om_visit_cat.id from om_visit_cat JOIN om_visit ON om_visit_cat.id=om_visit.visitcat_id WHERE om_visit.id=visit_id_aux);
             size_id_aux= (select size_id FROM node WHERE node_id=node_id_aux);
             event_date_aux=(SELECT date(value) FROM om_visit_event WHERE id=rec_parameter.id);
