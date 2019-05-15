@@ -6,24 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1112
 
-
--- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_arc();
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dma()
-  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dma()  RETURNS trigger AS
 $BODY$
+
 DECLARE 
 	expl_id_int integer;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-
 	
     IF TG_OP = 'INSERT' THEN
-	
-			/*
-	        -- Sector ID
+		/*
+	     -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1320);  
@@ -34,10 +29,11 @@ BEGIN
             END IF;            
         END IF;
 		*/
+		
 		--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(1012,1112);
-				RETURN NULL;				
+        IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+            --PERFORM audit_function(1012,1112);
+			RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
@@ -47,40 +43,38 @@ BEGIN
 			
 		-- Municipality 
 		/*
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
-				NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='municipality_vdefault' AND "cur_user"="current_user"());
-				IF (NEW.muni_id IS NULL) THEN
-					NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
-						PERFORM audit_function(2024,1212);
-				END IF;
+				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+					PERFORM audit_function(2024,1212);
 			END IF;
-			*/
+		END IF;
+		*/
 			
-        -- FEATURE INSERT
-				INSERT INTO dma (dma_id, name, descript,  the_geom, undelete,  expl_id)
-				VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int, NEW.pattern_id, NEW.link);
+		INSERT INTO dma (dma_id, name, descript,  the_geom, undelete,  expl_id, pattern_id, link, minc, maxc, effc)
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int, NEW.pattern_id, NEW.link, NEW.minc, NEW.maxc, NEW.effc);
 
 		RETURN NEW;
 		
     ELSIF TG_OP = 'UPDATE' THEN
-   	-- FEATURE UPDATE
-			UPDATE dma 
-			SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, pattern_id=NEW.pattern_id, link=NEW.link
-			WHERE dma_id=NEW.dma_id;
+   	
+		UPDATE dma 
+		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
+		pattern_id=NEW.pattern_id, link=NEW.link, minc=NEW.minc, maxc=NEW.maxc, effc=NEW.effc
+		WHERE dma_id=NEW.dma_id;
 		
-        RETURN NEW;
-
+		RETURN NEW;
 		
-		
-     ELSIF TG_OP = 'DELETE' THEN  
-	 -- FEATURE DELETE
+    ELSIF TG_OP = 'DELETE' THEN  
+	 
 		DELETE FROM dma WHERE dma_id = OLD.dma_id;		
-
 		RETURN NULL;
      
-     END IF;
+	END IF;
 
 END;
+	
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
