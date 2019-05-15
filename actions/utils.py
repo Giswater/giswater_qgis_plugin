@@ -223,7 +223,20 @@ class Utils(ParentAction):
         self.func_name  = None
         self.dlg_csv = Csv2Pg()
         self.load_settings(self.dlg_csv)
+        # Get roles from BD
         roles = self.controller.get_rolenames()
+        # Get roles from variable
+        super_users = self.settings.value('system_variables/super_users')
+        # Link roles and super_users 
+        if super_users is not None:
+            if roles is not None:
+                roles = roles[:-1] + ", "
+            else:
+                roles = "("
+            for role in super_users:
+                roles += "'" + str(role) + "', "
+            roles = roles[:-2]
+            roles += ")"
 
         temp_tablename = 'temp_csv2pg'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
