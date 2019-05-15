@@ -695,16 +695,19 @@ class ApiParent(ParentAction):
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
-            else:
-                msg = ("parameter button_function is null for tableview " + widget.objectName())
-                self.controller.show_message(msg, 2)
-                return widget
         else:
             msg = "parameter button_function not found"
             self.controller.show_message(msg, 2)
-            return widget
+            #return widget
+
         widget.doubleClicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
+
+
+    def no_function_asociated(self, dialog, widget=None, message_level=1):
+        msg = "No function asociated to {} {}: ".format(str(type(widget)), str(widget.objectName()))
+        self.controller.show_message(msg, message_level)
+
 
     def set_headers(self, widget, field):
         standar_model = widget.model()
@@ -732,7 +735,7 @@ class ApiParent(ParentAction):
                 standar_model.appendRow(row)
         return widget
 
-    def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
+    def set_columns_config(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
         # Set width and alias of visible columns
         columns_to_delete = []

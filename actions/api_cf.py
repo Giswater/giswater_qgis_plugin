@@ -590,8 +590,8 @@ class ApiCF(ApiParent):
             widget = self.add_tableview(field, dialog)
             widget = self.set_headers(widget, field)
             widget = self.populate_table(widget, field)
-            widget = self.set_configuration(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-
+            widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+            utils_giswater.set_qtv_config(widget)
         return label, widget
 
 
@@ -960,7 +960,7 @@ class ApiCF(ApiParent):
 
         table_element = "ve_ui_element_x_" + self.geom_type
         self.fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
-        self.set_configuration(self.tbl_element, table_element)
+        self.set_columns_config(self.tbl_element, table_element)
 
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
         """ Fill the table control to show elements """
@@ -1156,7 +1156,7 @@ class ApiCF(ApiParent):
 
         table_relations = "v_ui_"+self.geom_type+"_x_relations"
         self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
-        self.set_configuration(self.tbl_relations, table_relations)
+        self.set_columns_config(self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
 
     def open_relation(self, field_id):
@@ -1198,10 +1198,10 @@ class ApiCF(ApiParent):
     def fill_tab_connections(self):
         """ Fill tab 'Connections' """
         self.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream")
-        self.set_configuration(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
+        self.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
 
         self.fill_table(self.dlg_cf.tbl_downstream, self.schema_name + ".v_ui_node_x_connection_downstream")
-        self.set_configuration(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
+        self.set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
         self.dlg_cf.tbl_downstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
@@ -1232,7 +1232,7 @@ class ApiCF(ApiParent):
         table_hydro = "v_rtc_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer,  table_hydro)
-        self.set_configuration(self.tbl_hydrometer, table_hydro)
+        self.set_columns_config(self.tbl_hydrometer, table_hydro)
         if Qgis.QGIS_VERSION_INT < 29900:
             txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer,  table_hydro))
         else:
@@ -1313,7 +1313,7 @@ class ApiCF(ApiParent):
         rows.append(['', ''])
         utils_giswater.set_item_data(cmb_cat_period_id_filter, rows)
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
-        self.set_configuration(self.tbl_hydrometer_value, table_hydro_value)
+        self.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
 
         cmb_cat_period_id_filter = self.dlg_cf.findChild(QComboBox, "cmb_cat_period_id_filter")
         cmb_cat_period_id_filter.currentIndexChanged.connect(
@@ -1352,7 +1352,7 @@ class ApiCF(ApiParent):
         table_event_geom = "ve_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_visit_event)
-        self.set_configuration(self.tbl_event, table_event_geom)
+        self.set_columns_config(self.tbl_event, table_event_geom)
 
         self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['body']['feature']['vdefaultValues'], 'om_param_type_vdefault')
         self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['body']['feature']['vdefaultValues'], 'parameter_vdefault')
@@ -1751,7 +1751,7 @@ class ApiCF(ApiParent):
         self.set_vdefault_values(self.dlg_cf.date_document_from, self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
         table_document = "v_ui_doc_x_"+self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
-        self.set_configuration(self.tbl_document, table_document)
+        self.set_columns_config(self.tbl_document, table_document)
         self.set_vdefault_values(self.dlg_cf.doc_type, self.complet_result[0]['body']['feature']['vdefaultValues'], 'document_type_vdefault')
 
 
@@ -2191,8 +2191,8 @@ class ApiCF(ApiParent):
 
 
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
-    def no_function_asociated(self, widget=None, message_level=1):
-        self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)
+    # def no_function_asociated(self, widget=None, message_level=1):
+    #     self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)
 
 
     def action_open_url(self, dialog, result, message_level=None):
