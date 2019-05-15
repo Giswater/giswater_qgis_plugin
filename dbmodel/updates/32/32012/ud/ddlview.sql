@@ -60,7 +60,7 @@ CREATE OR REPLACE VIEW v_parent_node AS
    
 DROP VIEW IF EXISTS v_parent_node ;
 CREATE OR REPLACE VIEW ve_connec_parent AS 
- SELECT .connec_id AS nid,
+ SELECT v_edit_connec.connec_id AS nid,
     v_edit_connec.connec_type AS custom_type
    FROM SCHEMA_NAME.v_edit_connec;
    
