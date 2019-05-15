@@ -2291,12 +2291,17 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def set_template(self):
+
         template = self.dlg_comp.cbx_template.currentText()
         self.template = template[:-4]
 
 
     def open_composer(self):
         
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT > 29900:
+            return
+
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
             message = "You need to select a template"
@@ -2315,12 +2320,8 @@ class MincutParent(ParentAction, MultipleSelection):
         if index == num_comp:
             # Create new composer with template selected in combobox(self.template)
             plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-            template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
-            # TODO 3.x
-            if Qgis.QGIS_VERSION_INT < 29900:
-                template_file = file(template_path, 'rt')
-            else:
-                template_file = open(template_path, 'rt')
+            template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
+            template_file = file(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()

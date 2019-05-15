@@ -102,7 +102,6 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.save_rotation_vdefault)
 
-
         # Plugin path
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -115,12 +114,10 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.cbx_template.addItem('')
         for template in self.files_qpt:
             self.dlg_draw_profile.cbx_template.addItem(str(template))
-
             self.dlg_draw_profile.cbx_template.currentIndexChanged.connect(self.set_template)
 
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
-
 
         self.nodes = []
         self.list_of_selected_nodes = []
@@ -271,7 +268,6 @@ class DrawProfiles(ParentMapTool):
         for element in node_id:
             if element not in singles_list:
                 singles_list.append(element)
-        node_id = []
         node_id = singles_list
 
         # Select nodes of shortest path on layers v_edit_man_|feature
@@ -424,7 +420,6 @@ class DrawProfiles(ParentMapTool):
                         self.widget_additional_point.clear()
                         item_arc = QListWidgetItem(str(self.element_id))
                         self.widget_additional_point.addItem(item_arc)
-
                         n = len(self.start_end_node)
                         if n <=2:
                             self.start_end_node.insert(1, str(self.element_id))
@@ -498,7 +493,7 @@ class DrawProfiles(ParentMapTool):
 
         # If file profile.png exist overwrite
         plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        img_path = plugin_path + "\\templates\\profile.png"
+        img_path = plugin_path + os.sep + "templates" + os.sep + "profile.png"
         fig_size = plt.rcParams["figure.figsize"]
 
         # Set figure width to 10.4  and height to 4.8
@@ -585,9 +580,7 @@ class DrawProfiles(ParentMapTool):
                    " FROM  " + self.schema_name + ".v_edit_node"
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
-
             columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
-
             if row:
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None:
                     test_id_list.append(node_id)
@@ -598,13 +591,11 @@ class DrawProfiles(ParentMapTool):
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
 
-
                 parameters[1] = row[0]
                 parameters[2] = row[1]
                 parameters[13] = row[2]
                 nodecat_id = row[3]
                 parameters[14] = row[4]
-
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
@@ -613,9 +604,7 @@ class DrawProfiles(ParentMapTool):
                    " FROM " + self.schema_name + ".cat_node"
                    " WHERE id = '" + str(nodecat_id) + "'")
             row = self.controller.get_row(sql)
-
             columns = ['geom1']
-
             if row:
                 if row[0] is None:
                     test_id_list.append(node_id)
@@ -640,10 +629,7 @@ class DrawProfiles(ParentMapTool):
                    " FROM " + self.schema_name + ".v_edit_arc"
                    " WHERE arc_id = '" + str(element_id) + "'")
             row = self.controller.get_row(sql)
-
-
             columns = ['z1','z2','cat_geom1', 'sys_elev1', 'sys_elev2', 'y1', 'y2', 'slope']
-
             if row:
                 # Check if we have all data for drawing
                 if row[0] is None or row[1] is None or row[2] is None or row[3] is None or row[4] is None or \
@@ -654,8 +640,6 @@ class DrawProfiles(ParentMapTool):
                         sql = ("SELECT value::decimal(12,3) FROM  " + self.schema_name + ".config_param_system WHERE parameter = '" + str(columns[x]) + "_vd'")
                         result = self.controller.get_row(sql)
                         row[x] = result[0]
-
-
 
                 self.memory[n][3] = row[0]
                 self.memory[n][4] = row[1]
@@ -675,7 +659,7 @@ class DrawProfiles(ParentMapTool):
         """ Draw first node """
 
         # Draw first node
-        x = [0, -(geom1), -(geom1), (geom1), (geom1)]
+        x = [0, -geom1, -geom1, geom1, geom1]
         y = [top_elev, top_elev, top_elev - ymax, top_elev - ymax, top_elev - ymax + z1]
 
         x1 = [geom1, geom1, 0]
@@ -784,11 +768,11 @@ class DrawProfiles(ParentMapTool):
         # cat_geom_1 from node before
         ytop2 = ymax - z22 - cat2
 
-        x = [start_point, start_point - (geom1), start_point - (geom1)]
+        x = [start_point, start_point - geom1, start_point - geom1]
         y = [top_elev, top_elev, top_elev  - ymax + z22 + cat2]
-        x1 = [start_point - (geom1), start_point - (geom1), start_point + (geom1), start_point + (geom1)]
+        x1 = [start_point - geom1, start_point - geom1, start_point + geom1, start_point + geom1]
         y1 = [top_elev - ymax + z22, top_elev - ymax, top_elev - ymax, top_elev - ymax + z1]
-        x2 = [start_point + (geom1),start_point + (geom1), start_point]
+        x2 = [start_point + geom1,start_point + geom1, start_point]
         y2 = [top_elev - ytop1, top_elev, top_elev]
 
         plt.plot(x, y, 'black',zorder=100)
@@ -800,14 +784,13 @@ class DrawProfiles(ParentMapTool):
         self.y = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3] + self.memory[indx - 1][5]
         self.x1 = self.memory[indx - 1][6] + self.memory[indx - 1][0]
         self.y1 = self.y1 = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3]
-        self.x2 = (start_point - (geom1))
+        self.x2 = start_point - geom1
         self.y2 = top_elev - ytop2
-        self.x3 = (start_point - (geom1))
+        self.x3 = start_point - geom1
         self.y3 = top_elev - ymax + z22
 
         self.node_top_x = start_point
         self.node_top_y = top_elev
-
         self.first_top_x = self.memory[indx - 1][0]
         self.first_top_y = self.memory[indx - 1][1]
 
@@ -818,7 +801,7 @@ class DrawProfiles(ParentMapTool):
         self.fill_data(start_point,indx)
 
 
-    def fill_data(self,start_point,indx):
+    def fill_data(self, start_point, indx):
 
         # Fill top_elevation and node_id for all nodes
         # Fill top_elevation
@@ -848,7 +831,7 @@ class DrawProfiles(ParentMapTool):
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Last node : y_max,y1 and top_elev, elev1
-        elif (indx == self.n-1):
+        elif indx == self.n-1:
             pass
             # Fill y_max
             plt.annotate(str(round(self.memory[indx-1][11], 2)) + '\n' + str(round(self.memory[indx][2], 2)) + '\n' + ' ',
@@ -877,7 +860,7 @@ class DrawProfiles(ParentMapTool):
                              rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Fill diameter and slope / length for all nodes except last node
-        if (indx != self.n - 1):
+        if indx != self.n - 1:
             # Draw diameter
             center = self.gis_length[indx + 1] / 2
             plt.text(center + start_point, self.min_top_elev - 1*self.height_row - Decimal(0.45)*self.height_row, round(self.memory[indx][5], 2),
@@ -892,7 +875,7 @@ class DrawProfiles(ParentMapTool):
 
     def draw_last_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx, z22, cat2):  #@UnusedVariable
 
-        x = [start_point, start_point - (geom1), start_point - (geom1)]
+        x = [start_point, start_point - geom1, start_point - geom1]
         y = [top_elev, top_elev, top_elev  - ymax + z22 + cat2]
         x1 = [start_point - geom1, start_point - geom1, start_point + geom1, start_point + geom1, start_point]
         y1 = [top_elev - ymax + z2, top_elev - ymax, top_elev - ymax, top_elev, top_elev]
@@ -906,14 +889,13 @@ class DrawProfiles(ParentMapTool):
         self.y1 = self.y1 = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3]
 
         ytop2 = ymax - z22 - cat2
-        self.x2 = (start_point - (geom1))
+        self.x2 = (start_point - geom1)
         self.y2 = top_elev - ytop2
-        self.x3 = (start_point - (geom1))
+        self.x3 = (start_point - geom1)
         self.y3 = top_elev - ymax + z22
 
         self.first_top_x = self.memory[indx - 1][0]
         self.first_top_y = self.memory[indx - 1][1]
-
         self.node_top_x = start_point
         self.node_top_y = top_elev
 
@@ -1307,12 +1289,8 @@ class DrawProfiles(ParentMapTool):
             
         if index == num_comp:
             # Create new composer with template selected in combobox(self.template)
-            template_path = plugin_path + "\\" + "templates" + "\\" + str(self.template) + ".qpt"
-            # TODO 3.x
-            if Qgis.QGIS_VERSION_INT < 29900:
-                template_file = file(template_path, 'rt')
-            else:
-                template_file = open(template_path, 'rt')
+            template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
+            template_file = file(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()
@@ -1332,7 +1310,7 @@ class DrawProfiles(ParentMapTool):
         
         # Set profile
         picture_item = composition.getComposerItemById('profile')
-        profile = plugin_path + "\\templates\\profile.png"
+        profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
         picture_item.setPictureFile(profile)
 
         # Refresh map, zoom map to extent
@@ -1364,6 +1342,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def set_template(self):
+
         template = self.dlg_draw_profile.cbx_template.currentText()
         self.template = template[:-4]
 
@@ -1371,10 +1350,10 @@ class DrawProfiles(ParentMapTool):
     def export_pdf(self):
         """ Export PDF of selected template"""
 
-
         # Generate Composer
         self.execute_profiles_composer()
         self.generate_composer()
+
 
     def save_rotation_vdefault(self):
 
@@ -1556,10 +1535,11 @@ class DrawProfiles(ParentMapTool):
     def exec_path(self):
 
         self.rotation_vd_exist = False
-        if str(self.start_end_node[0]) != None:
+        if str(self.start_end_node[0]) is not None:
             self.dlg_draw_profile.btn_add_end_point.setDisabled(False)
+
         # Shortest path - if additional point doesn't exist
-        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
+        if str(self.start_end_node[0]) is not None and self.start_end_node[1] is not None:
             self.shortest_path(str(self.start_end_node[0]), str(self.start_end_node[1]))
             self.dlg_draw_profile.btn_add_additional_point.setDisabled(False)
             self.dlg_draw_profile.list_additional_points.setDisabled(False)
@@ -1567,7 +1547,8 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.rotation.setDisabled(False)
 
             # Get rotation vdefaut if exist
-            sql = "SELECT value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'rotation_vdefault' AND cur_user = current_user"
+            sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+                   "WHERE parameter = 'rotation_vdefault' AND cur_user = current_user")
             rows = self.controller.get_rows(sql)
             if rows:
                 row = rows[0]
@@ -1583,8 +1564,7 @@ class DrawProfiles(ParentMapTool):
             self.dlg_draw_profile.btn_export_pdf.setDisabled(False)
             self.dlg_draw_profile.cbx_template.setDisabled(False)
 
-
-        if str(self.start_end_node[0]) != None and self.start_end_node[1] != None:
+        if str(self.start_end_node[0]) is not None and self.start_end_node[1] is not None:
             self.dlg_draw_profile.btn_delete_additional_point.setDisabled(False)
 
         # Manual path - if additional point exist
@@ -1602,6 +1582,7 @@ class DrawProfiles(ParentMapTool):
             message = "Any record selected"
             self.controller.show_warning(message)
             return
+
         # Selected item from list
         selected_profile = self.dlg_load.tbl_profiles.currentItem().text()
 
@@ -1646,6 +1627,4 @@ class DrawProfiles(ParentMapTool):
             if type(layer) is QgsVectorLayer:
                 layer.removeSelection()
         self.canvas.refresh()
-        
-                
         

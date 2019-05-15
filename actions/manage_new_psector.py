@@ -481,27 +481,27 @@ class ManageNewPsector(ParentManage):
 
     def generate_composer(self, path):
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
-            comp_view = self.iface.activeComposers()[index]
-            my_comp = comp_view.composition()
-            if my_comp is not None:
-                my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
-                try:
-                    result = my_comp.exportAsPDF(path)
-                    if result:
-                        message = "Document PDF created in"
-                        self.controller.show_info(message, parameter=path)
-                        os.startfile(path)
-                    else:
-                        message = "Cannot create file, check if its open"
-                        self.controller.show_warning(message, parameter=path)
-                except:
-                    msg = "Cannot create file, check if selected composer is the correct composer"
-                    self.controller.show_warning(msg, parameter=path)
         # TODO: 3.x
-        else:
-            pass
+        if Qgis.QGIS_VERSION_INT > 29900:
+            return
+
+        index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
+        comp_view = self.iface.activeComposers()[index]
+        my_comp = comp_view.composition()
+        if my_comp is not None:
+            my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
+            try:
+                result = my_comp.exportAsPDF(path)
+                if result:
+                    message = "Document PDF created in"
+                    self.controller.show_info(message, parameter=path)
+                    os.startfile(path)
+                else:
+                    message = "Cannot create file, check if its open"
+                    self.controller.show_warning(message, parameter=path)
+            except:
+                msg = "Cannot create file, check if selected composer is the correct composer"
+                self.controller.show_warning(msg, parameter=path)
 
 
     def generate_csv(self, path, viewname):
