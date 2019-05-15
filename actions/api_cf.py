@@ -587,9 +587,11 @@ class ApiCF(ApiParent):
             widget = self.add_spinbox(field)
             widget = self.set_auto_update_spinbox(field, dialog, widget)
         elif field['widgettype'] == 'tableView':
-            widget = self.add_tableview(field)
+            widget = self.add_tableview(field, dialog)
             widget = self.set_headers(widget, field)
             widget = self.populate_table(widget, field)
+            widget = self.set_configuration(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+
         return label, widget
 
 
@@ -1881,12 +1883,9 @@ class ApiCF(ApiParent):
         complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf)
         if complet_list is False:
             return False
-
-        #result = self.populate_table(complet_result, complet_list, standar_model, self.dlg_cf, widget_list, _filter=False)
-        #self.set_listeners(complet_result, complet_list, standar_model, self.dlg_cf, widget_list)
-        #self.set_configuration(self.tbl_rpt, "table_rpt", sort_order=1, isQStandardItemModel=True)
+        self.set_listeners(complet_result, self.dlg_cf, widget_list)
         #self.dlg_cf.tbl_rpt.doubleClicked.connect(partial(self.open_rpt_result, self.dlg_cf.tbl_rpt,  complet_list))
-        return False
+        return complet_list
 
     def init_tbl_rpt(self, complet_result, dialog):
         """ Put filter widgets into layout and set headers into QTableView"""
@@ -1899,7 +1898,7 @@ class ApiCF(ApiParent):
         if complet_list is False:
             return False, False
 
-        # Put filter widgets into layout
+        # Put widgets into layout
         widget_list = []
         for field in complet_list[0]['body']['data']['fields']:
             label, widget = self.set_widgets(dialog, field)
@@ -1907,8 +1906,8 @@ class ApiCF(ApiParent):
                 if (type(widget)) == QSpacerItem:
                     rpt_layout1.addItem(widget, 1, field['layout_order'])
                 elif (type(widget)) == QTableView:
-                    rpt_layout1.addWidget(widget, 1, field['layout_order'])
-                    self.populate_table(widget, field)
+                    gridLayout_7 = self.dlg_cf.findChild(QGridLayout, "gridLayout_7")
+                    gridLayout_7.addWidget(widget, 2, field['layout_order'])
                     widget_list.append(widget)
                 else:
                     widget.setMaximumWidth(150)
@@ -1917,9 +1916,6 @@ class ApiCF(ApiParent):
                         rpt_layout1.addWidget(label, 0, field['layout_order'])
                     rpt_layout1.addWidget(widget, 1, field['layout_order'])
 
-
-            # vertical_spacer = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
-            # rpt_layout1.addItem(vertical_spacer, field['layout_order'], rpt_layout1.columnCount())
             # Find combo parents:
             for field in complet_list[0]['body']['data']['fields'][0]:
                 if 'isparent' in field:
@@ -1930,17 +1926,21 @@ class ApiCF(ApiParent):
         return complet_list, widget_list
 
 
-    def set_listeners(self, complet_result, complet_list, standar_model, dialog, widget_list):
+    def set_listeners(self, complet_result, dialog, widget_list):
+        for widget in widget_list:
+            if type(widget) is QTableView:
+                standar_model = widget.model()
         for widget in widget_list:
             if type(widget) is QLineEdit:
                 if Qgis.QGIS_VERSION_INT < 29900:
                     widget.textChanged.connect(partial(
-                        self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
+                        self.filter_table, complet_result, standar_model, dialog, widget_list))
                 else:
                     widget.editingFinished.connect(partial(
-                        self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
+                        self.filter_table, complet_result, standar_model, dialog, widget_list))
             elif type(widget) is QComboBox:
-                widget.currentIndexChanged.connect(partial(self.populate_table, complet_result, complet_list, standar_model, dialog, widget_list, True))
+                widget.currentIndexChanged.connect(partial(
+                    self.filter_table, complet_result, standar_model, dialog, widget_list))
 
 
     def get_list(self, complet_result, form_name='', tab_name='', filter_fields=''):
@@ -1959,46 +1959,37 @@ class ApiCF(ApiParent):
         return complet_list
 
 
-    # def populate_table(self, complet_result, complet_list, standar_model, dialog, widget_list, _filter=True):
-    #     filter_fields = ''
-    #     if _filter:
-    #         filter_fields = self.get_filter_qtableview(complet_list, standar_model, dialog, widget_list)
-    #     index_tab = self.tab_main.currentIndex()
-    #     tab_name = self.tab_main.widget(index_tab).objectName()
-    #     complet_list = self.get_list(complet_result, tab_name=tab_name, filter_fields=filter_fields)
-    #     if complet_list is False:
-    #         return False
-    #     # for item in complet_list[0]['body']['data']['listValues'][0]:
-    #     #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
-    #     #     if len(row) > 0:
-    #     #         standar_model.appendRow(row)
-    #     for item in complet_list[0]['body']['data']['listValues']:
-    #         row = []
-    #         for value in item.values():
-    #             row.append(QStandardItem(str(value)))
-    #         if len(row) > 0:
-    #             standar_model.appendRow(row)
-    #     return complet_list
+    def filter_table(self, complet_result,  standar_model,  dialog, widget_list):
+        filter_fields = self.get_filter_qtableview(standar_model, dialog, widget_list)
+        index_tab = self.tab_main.currentIndex()
+        tab_name = self.tab_main.widget(index_tab).objectName()
+        complet_list = self.get_list(complet_result, tab_name=tab_name, filter_fields=filter_fields)
+        if complet_list is False:
+            return False
+        # for item in complet_list[0]['body']['data']['listValues'][0]:
+        #     row = [QStandardItem(str(value)) for value in item.values() if filter in str(item['event_id'])]
+        #     if len(row) > 0:
+        #         standar_model.appendRow(row)
+        for field in complet_list[0]['body']['data']['fields']:
+            if field['widgettype'] == "tableView":
+                qtable = dialog.findChild(QTableView, field['widgetname'])
+                if qtable:
+                    self.set_headers(qtable, field)
+                    self.populate_table(qtable, field)
+        return complet_list
 
-    def get_filter_qtableview(self, complet_list, standar_model, dialog, widget_list):
+    def get_filter_qtableview(self, standar_model, dialog, widget_list):
         standar_model.clear()
-        # Get headers
-        headers = []
-        for x in complet_list[0]['body']['data']['listValues'][0]:
-            headers.append(x)
-        # Set headers
-        standar_model.setHorizontalHeaderLabels(headers)
-
         filter_fields = ""
         for widget in widget_list:
-            column_id = widget.property('column_id')
-            text = utils_giswater.getWidgetText(dialog, widget)
-            if text != "null":
-                filter_fields += '"' + column_id + '":"'+text+'", '
+            if type(widget) != QTableView:
+                column_id = widget.property('column_id')
+                text = utils_giswater.getWidgetText(dialog, widget)
+                if text != "null":
+                    filter_fields += '"' + column_id + '":"'+text+'", '
 
         if filter_fields != "":
             filter_fields = filter_fields[:-2]
-
         return filter_fields
 
 
@@ -2258,47 +2249,6 @@ class ApiCF(ApiParent):
         elif type(widget) is QComboBox:
             if parameter in values:
                 utils_giswater.set_combo_itemData(widget, values[parameter], 0)
-
-
-
-
-
-    def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
-        """ Configuration of tables. Set visibility and width of columns """
-
-        widget = utils_giswater.getWidget(self.dlg_cf, widget)
-        if not widget:
-            return
-
-        # Set width and alias of visible columns
-        columns_to_delete = []
-        sql = ("SELECT column_index, width, alias, status"
-               " FROM " + self.schema_name + ".config_client_forms"
-               " WHERE table_id = '" + table_name + "'"
-               " ORDER BY column_index")
-        rows = self.controller.get_rows(sql, log_info=False, commit=True)
-        if not rows:
-            return
-
-        for row in rows:
-            if not row['status']:
-                columns_to_delete.append(row['column_index'] - 1)
-            else:
-                width = row['width']
-                if width is None:
-                    width = 100
-                widget.setColumnWidth(row['column_index'] - 1, width)
-                widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
-
-        # Set order
-        if not isQStandardItemModel:
-            widget.model().setSort(sort_order, Qt.AscendingOrder)
-            widget.model().select()
-        else:
-            widget.model().sort(sort_order, Qt.AscendingOrder)
-        # Delete columns
-        for column in columns_to_delete:
-            widget.hideColumn(column)
 
 
     def set_image(self, dialog, widget):

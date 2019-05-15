@@ -738,6 +738,9 @@
         <item row="0" column="0">
          <layout class="QGridLayout" name="rpt_layout1"/>
         </item>
+        <item row="1" column="0">
+         <layout class="QGridLayout" name="gridLayout_7"/>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_plan">

@@ -685,16 +685,31 @@ class ApiParent(ParentAction):
         self.set_completer_object_api(completer, model, widget, list_items)
 
 
-    def add_tableview(self, field):
+    def add_tableview(self, field, dialog):
         """ Add widgets QTableView type """
         widget = QTableView()
         widget.setObjectName(field['widgetname'])
         if 'column_id' in field:
             widget.setProperty('column_id', field['column_id'])
+        function_name = 'no_function_asociated'
+        if 'widgetfunction' in field:
+            if field['widgetfunction'] is not None:
+                function_name = field['widgetfunction']
+            else:
+                msg = ("parameter button_function is null for tableview " + widget.objectName())
+                self.controller.show_message(msg, 2)
+                return widget
+        else:
+            msg = "parameter button_function not found"
+            self.controller.show_message(msg, 2)
+            return widget
+        widget.doubleClicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
     def set_headers(self, widget, field):
-        standar_model = QStandardItemModel()
+        standar_model = widget.model()
+        if standar_model is None:
+            standar_model = QStandardItemModel()
         # Related by Qtable
         widget.setModel(standar_model)
         widget.horizontalHeader().setStretchLastSection(True)
@@ -716,6 +731,43 @@ class ApiParent(ParentAction):
             if len(row) > 0:
                 standar_model.appendRow(row)
         return widget
+
+    def set_configuration(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
+        """ Configuration of tables. Set visibility and width of columns """
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False, commit=True)
+        if not rows:
+            return widget
+
+        for row in rows:
+            print(row)
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                if row['alias'] is not None:
+                    widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        if isQStandardItemModel:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+        else:
+            widget.model().setSort(sort_order, Qt.AscendingOrder)
+            widget.model().select()
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
+
+        return widget
+
 
     def add_combobox(self, field):
     
