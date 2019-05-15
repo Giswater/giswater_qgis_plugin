@@ -199,7 +199,6 @@ BEGIN
 		
 	ELSIF v_action = 'DISABLE TOPO-TRIGGERS' THEN
 		ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
-		ALTER TABLE node DISABLE TRIGGER gw_trg_node_update;
 		ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
 		ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 
@@ -207,7 +206,6 @@ BEGIN
 
 	ELSIF v_action = 'ENABLE TOPO-TRIGGERS' THEN
 		ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
-		ALTER TABLE node ENABLE TRIGGER gw_trg_node_update;
 		ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
 		ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
 

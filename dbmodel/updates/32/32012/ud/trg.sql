@@ -127,6 +127,20 @@ DROP TRIGGER IF EXISTS gw_trg_edit_node ON "SCHEMA_NAME".ve_node;
 CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".ve_node
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node();
 
+CREATE TRIGGER gw_trg_edit_inp_node_outfall INSTEAD OF INSERT OR UPDATE OR DELETE 
+ON ve_inp_outfall FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_outfall', 'OUTFALL');
+
+CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR UPDATE OR DELETE
+ON ve_inp_junction FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_junction', 'JUNCTION');
+
+CREATE TRIGGER gw_trg_edit_inp_node_divider INSTEAD OF INSERT OR UPDATE OR DELETE
+ON ve_inp_divider FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_divider', 'DIVIDER');
+
+CREATE TRIGGER gw_trg_edit_inp_node_storage INSTEAD OF INSERT OR UPDATE OR DELETE
+ON ve_inp_storage FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_storage', 'STORAGE');
+
+
+
 /*
 DROP TRIGGER IF EXISTS gw_trg_edit_plan_node ON "SCHEMA_NAME".v_edit_plan_node;
 CREATE TRIGGER gw_trg_edit_plan_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_plan_node
