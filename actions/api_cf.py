@@ -442,8 +442,8 @@ class ApiCF(ApiParent):
         self.feature_id = None
         result = complet_result[0]['body']['data']
         layout_list = []
-        for field in result['fields']:
-            label, widget = self.set_widgets(self.dlg_cf, field)
+        for field in complet_result[0]['body']['data']['fields']:
+            label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
 
             # Take the QGridLayout with the intention of adding a QSpacerItem later
@@ -535,7 +535,7 @@ class ApiCF(ApiParent):
         return widget
 
 
-    def set_widgets(self, dialog, field):
+    def set_widgets(self, dialog, complet_result, field):
         widget = None
         label = None
         if field['label']:
@@ -587,7 +587,7 @@ class ApiCF(ApiParent):
             widget = self.add_spinbox(field)
             widget = self.set_auto_update_spinbox(field, dialog, widget)
         elif field['widgettype'] == 'tableView':
-            widget = self.add_tableview(field, dialog)
+            widget = self.add_tableview(complet_result, field)
             widget = self.set_headers(widget, field)
             widget = self.populate_table(widget, field)
             widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
@@ -881,9 +881,7 @@ class ApiCF(ApiParent):
             else:
                 msg = ("parameter button_function is null for button " + widget.objectName())
                 self.controller.show_message(msg, 2)
-        else:
-            msg = "parameter button_function not found"
-            self.controller.show_message(msg, 2)
+
         widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
@@ -907,7 +905,6 @@ class ApiCF(ApiParent):
         self.enable_actions(self.layer.isEditable())
 
 
-        #for action in self.controller.log_info(str(action))
     """ MANAGE TABS """
     def tab_activation(self):
         """ Call functions depend on tab selection """
@@ -1901,7 +1898,7 @@ class ApiCF(ApiParent):
         # Put widgets into layout
         widget_list = []
         for field in complet_list[0]['body']['data']['fields']:
-            label, widget = self.set_widgets(dialog, field)
+            label, widget = self.set_widgets(dialog, complet_list, field)
             if widget is not None:
                 if (type(widget)) == QSpacerItem:
                     rpt_layout1.addItem(widget, 1, field['layout_order'])
@@ -1992,6 +1989,8 @@ class ApiCF(ApiParent):
             filter_fields = filter_fields[:-2]
         return filter_fields
 
+    def gw_api_open_rpt_result(self, widget, complet_resutlt):
+        self.open_rpt_result(widget, complet_resutlt)
 
     def open_rpt_result(self, qtable,  complet_list):
         """ Open form of selected element of the @widget?? """
@@ -2015,7 +2014,7 @@ class ApiCF(ApiParent):
 
         # return
         api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
-        complet_result = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
+        complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             print("FAIL open_rpt_result")
             return

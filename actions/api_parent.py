@@ -672,7 +672,7 @@ class ApiParent(ParentAction):
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
         sql = ("SELECT " + self.schema_name + ".gw_api_gettypeahead($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=False)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
@@ -685,22 +685,21 @@ class ApiParent(ParentAction):
         self.set_completer_object_api(completer, model, widget, list_items)
 
 
-    def add_tableview(self, field, dialog):
+    def add_tableview(self, complet_result, field):
         """ Add widgets QTableView type """
         widget = QTableView()
         widget.setObjectName(field['widgetname'])
         if 'column_id' in field:
             widget.setProperty('column_id', field['column_id'])
         function_name = 'no_function_asociated'
-        if 'widgetfunction' in field:
-            if field['widgetfunction'] is not None:
-                function_name = field['widgetfunction']
-        else:
-            msg = "parameter button_function not found"
-            self.controller.show_message(msg, 2)
-            #return widget
-
-        widget.doubleClicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
+        function_name = 'gw_api_open_rpt_result'
+        widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
+        # if 'widgetfunction' in field:
+        #     if field['widgetfunction'] is not None:
+        #         function_name = field['widgetfunction']
+        #         widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
+        # else:
+        #     widget.doubleClicked.connect(partial(getattr(self, function_name), None, widget, 2))
         return widget
 
 
@@ -748,7 +747,6 @@ class ApiParent(ParentAction):
             return widget
 
         for row in rows:
-            print(row)
             if not row['status']:
                 columns_to_delete.append(row['column_index'] - 1)
             else:
@@ -1026,11 +1024,9 @@ class ApiParent(ParentAction):
 
         
     def populate_basic_info(self, dialog, result, field_id):
-    
         fields = result[0]['body']['data']
         if 'fields' not in fields:
             return
-
         grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
         for field in fields["fields"]:
             label = QLabel()
@@ -1049,7 +1045,7 @@ class ApiParent(ParentAction):
                 widget = self.set_data_type(field, widget)
                 if field['widgettype'] == 'typeahead':
                     widget = self.manage_lineedit(field, dialog, widget, completer)
-                if widget.objectName() == field_id:
+                if widget.property('column_id') == field_id:
                     self.feature_id = widget.text()
             elif field['widgettype'] == 'datepickertime':
                 widget = self.add_calendar(dialog, field)
