@@ -862,30 +862,6 @@ class ApiCF(ApiParent):
         return widget
 
 
-    def add_button(self, dialog, field):
-        
-        widget = QPushButton()
-        widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
-        if 'value' in field:
-            widget.setText(field['value'])
-        # widget.setStyleSheet("Text-align:left; Text-decoration:underline")
-        # widget.setFlat(True)
-        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
-        function_name = 'no_function_asociated'
-
-        if 'widgetfunction' in field:
-            if field['widgetfunction'] is not None:
-                function_name = field['widgetfunction']
-            else:
-                msg = ("parameter button_function is null for button " + widget.objectName())
-                self.controller.show_message(msg, 2)
-
-        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
-        return widget
-
-
     def open_catalog(self, tab_type):
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
         self.catalog.api_catalog(self.dlg_cf, tab_type+"_"+self.geom_type+'cat_id', self.geom_type)

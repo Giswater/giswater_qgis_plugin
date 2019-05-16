@@ -30,7 +30,7 @@ from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
-from qgis.PyQt.QtWidgets import QTableView
+from qgis.PyQt.QtWidgets import QTableView, QPushButton
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import json
@@ -599,6 +599,29 @@ class ApiParent(ParentAction):
                 widget.setMaximumWidth(field['widgetdim'])
                 widget.setMinimumWidth(field['widgetdim'])
 
+        return widget
+
+
+    def add_button(self, dialog, field):
+
+        widget = QPushButton()
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
+        if 'value' in field:
+            widget.setText(field['value'])
+        # widget.setStyleSheet("Text-align:left; Text-decoration:underline")
+        # widget.setFlat(True)
+        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+        function_name = 'no_function_asociated'
+        if 'widgetfunction' in field:
+            if field['widgetfunction'] is not None:
+                function_name = field['widgetfunction']
+            else:
+                msg = ("parameter button_function is null for button " + widget.objectName())
+                self.controller.show_message(msg, 2)
+
+        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
         return widget
 
 
