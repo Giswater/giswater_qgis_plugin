@@ -176,7 +176,8 @@ BEGIN
 			ELSE 
 				top_elev_aux=NEW.custom_top_elev;
 			END IF;
-	
+
+			--updating arcs
 			FOR arcrec IN EXECUTE querystring
 			LOOP
 		
@@ -231,6 +232,16 @@ BEGIN
 					
 				END IF;
 			END LOOP; 
+
+			--updating links
+			querystring := 'SELECT * FROM "link" WHERE link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
+
+			FOR arcrec IN EXECUTE querystring
+			LOOP
+				-- Coordinates
+				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(arcrec."link_id") USING arcrec.the_geom, NEW.the_geom; 					
+			END LOOP; 
+			
 		END IF;
     END IF;
 

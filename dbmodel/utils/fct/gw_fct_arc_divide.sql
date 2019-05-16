@@ -152,20 +152,20 @@ BEGIN
 
 			-- Capture linked feature information to redraw (later on this function)
 			-- connec
-			FOR connec_id_aux IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND (exit_type='VNODE' OR exit_type='NODE') AND arc_id=arc_id_aux
+			FOR connec_id_aux IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND arc_id=arc_id_aux
 			LOOP
 				array_agg_connec:= array_append(array_agg_connec, connec_id_aux);
-				UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
 			END LOOP;
-			
+			UPDATE connec SET arc_id=NULL WHERE arc_id=arc_id_aux;
+
 			-- gully
 			IF project_type_aux='UD' THEN
 
-				FOR gully_id_aux IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND (exit_type='VNODE' OR exit_type='NODE') AND arc_id=arc_id_aux
+				FOR gully_id_aux IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND arc_id=arc_id_aux
 				LOOP
 					array_agg_gully:= array_append(array_agg_gully, gully_id_aux);
-					UPDATE gully SET arc_id=NULL WHERE gully_id=gully_id_aux;
 				END LOOP;
+				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;
 			END IF;
 					
 			-- Insert data into traceability table
