@@ -93,9 +93,11 @@ SELECT SCHEMA_NAME.gw_api_getlist($${
 DECLARE
 	v_apiversion text;
 	v_filter_fields  json[];
+	v_filter_fields_  json[];
 	v_footer_fields json[];
 	v_filter_feature json;
 	v_fields_json json;
+	v_fields_json_ json;
 	v_filter_values  json;
 	v_schemaname text;
 	aux_json json;
@@ -357,7 +359,7 @@ BEGIN
 		v_limit = 10;
 	END IF;
 	
-	EXECUTE 'SELECT count(*)/'||quote_literal(v_limit)||' FROM (' || quote_literal(v_query_result) || ') a'
+	EXECUTE 'SELECT count(*)/'||quote_literal(v_limit)||' FROM (' || v_query_result || ') a'
 		INTO v_lastpage;
 	
 	-- add limit
@@ -377,7 +379,7 @@ BEGIN
 	RAISE NOTICE '--- gw_api_getlist - Query Result: % ---', v_query_result;
 
 	-- Execute query result
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(v_query_result) || ') a'
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
 
 	RAISE NOTICE '--- gw_api_getlist - List: % ---', v_result_list;
@@ -423,9 +425,13 @@ BEGIN
 		INTO v_listclass
 		USING v_tablename;
 
-	-- setting new element
+	IF v_listclass IS NULL THEN
+		v_listclass = 'tableView';
+	END IF;
+	
+	-- setting new element	
 	IF v_device =9 THEN
-		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
+		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'widgetfunction','gw_api_open_rpt_result','label','','stylesheet','','layout_order',0,'layout_name','rpt_layout1','widgetname','tableview_rpt','datatype','tableView','column_id','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	ELSE
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
@@ -440,8 +446,29 @@ BEGIN
 		v_i=v_i+1;
 	END LOOP;
 
+
+	raise notice 'v_tablename -->> %',v_tablename;
+   	SELECT gw_api_get_formfields(v_tablename, 'listfilter', v_tabname, null, null, null, null,'INSERT', null, v_device)
+		INTO v_filter_fields_;
+		
+		
+	-- adding common widgets
+	FOREACH aux_json IN ARRAY v_filter_fields_
+	LOOP
+		--identifing the dimension of array
+		v_i = cardinality(v_filter_fields) ;
+
+		-- adding spacer
+		IF v_device=9 THEN
+			v_filter_fields[v_i+1] := aux_json;
+			v_i=v_i+1;
+		END IF;
+	END LOOP;
+
+
 -- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
+	v_fields_json_ = array_to_json (v_filter_fields_);
 
 --    Control NULL's
 	v_apiversion := COALESCE(v_apiversion, '{}');
