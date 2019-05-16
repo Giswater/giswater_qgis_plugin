@@ -101,9 +101,9 @@ BEGIN
 
                 -- Create a new arc values
                 newRecord.the_geom := arc_geom;
-                newRecord.node_1 := (SELECT node_id FROM v_edit_node WHERE  ST_DWithin(ST_StartPoint(arc_geom), v_edit_node.the_geom, 0.001) LIMIT 1);
-                newRecord.node_2 := (SELECT node_id FROM v_edit_node WHERE  ST_DWithin(ST_EndPoint(arc_geom), v_edit_node.the_geom, 0.001) LIMIT 1);
-				newRecord.arc_id := (SELECT nextval('urn_id_seq'));
+                newRecord.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
+                newRecord.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
+		newRecord.arc_id := (SELECT nextval('urn_id_seq'));
 
             --Compare addfields and assign them to new arc
             FOR rec_param IN SELECT DISTINCT parameter_id FROM man_addfields_value WHERE feature_id=myRecord1.arc_id
@@ -124,9 +124,13 @@ BEGIN
                END IF;
 
             END LOOP;
-
-
+			-- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
+			-- to get values topocontrol arc needs to be before, but this is not possible
+			UPDATE config SET arc_searchnodes_control='false';
 			INSERT INTO v_edit_arc SELECT newRecord.*;
+			UPDATE config SET arc_searchnodes_control='true';
+
+			UPDATE arc SET node_1=newRecord.node_1, node_2=newRecord.node_2 where arc_id=newRecord.arc_id;
 					
 			--Insert data on audit_log_arc_traceability table
 			INSERT INTO audit_log_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") 

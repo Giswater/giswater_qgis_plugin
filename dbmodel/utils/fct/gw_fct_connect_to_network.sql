@@ -24,7 +24,7 @@ MAIN CHANGES
 - Connect_to_network works also with node/connec/gully as endpoints
 
 EXAPLE:
-select SCHEMA_NAME.gw_fct_connect_to_network((select array_agg(connec_id)from SCHEMA_NAME.connec where connec_id IN ('3112')), 'CONNEC')
+select SCHEMA_NAME.gw_fct_connect_to_network((select array_agg(connec_id)from SCHEMA_NAME.connec where connec_id IN ('3097')), 'CONNEC')
 select SCHEMA_NAME.gw_fct_connect_to_network((select array_agg(connec_id)from SCHEMA_NAME.connec where connec_id='30123237'), 'CONNEC')
 select SCHEMA_NAME.gw_fct_connect_to_network((select array_agg(gully_id)from SCHEMA_NAME.gully where gully_id='30108'), 'GULLY')
 */
@@ -64,10 +64,10 @@ BEGIN
 			SELECT * INTO v_connect FROM gully WHERE gully_id = connect_id_aux;
 		END IF;
 		
-		--raise notice 'LINK: % CONNECT % ', v_link, v_connect;
+		raise notice 'LINK: % CONNECT % ', v_link, v_connect;
 
 		-- starting process
-		IF v_link.exit_type='VNODE' THEN
+		IF v_link.exit_type='VNODE' OR v_link.link_id IS NULL THEN
 
 			-- get values from old vnode
 			SELECT * INTO v_exit FROM vnode WHERE vnode_id::text=v_link.exit_id;

@@ -60,7 +60,7 @@ BEGIN
 	SELECT state INTO state_node_arg FROM node WHERE node_id=node_id_arg;
 
     -- Get parameters from configs table
-	SELECT value::boolean INTO plan_arc_vdivision_dsbl_aux FROM config_param_user WHERE "parameter"='plan_arc_vdivision_dsbl' AND cur_user=current_user;	  
+	SELECT value::boolean INTO plan_arc_vdivision_dsbl_aux FROM config_param_user WHERE "parameter"='plan_arc_vdivision_dsbl' AND cur_user=current_user; -- deprecated variable	  
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='arc_searchnodes';
 
 	-- State control
@@ -80,19 +80,14 @@ BEGIN
 	END IF;
 
 	-- For the specificic case of extremal node not reconnected due topology issues (i.e. arc state (1) and node state (2)
-	
 
 	-- Find closest arc inside tolerance
 	SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
 	WHERE ST_DWithin(node_geom, a.the_geom, arc_divide_tolerance_aux) AND node_1 != node_id_arg AND node_2 != node_id_arg
 	ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
 
-
-	--RAISE EXCEPTION 'arc_id_aux %', arc_id_aux;
-
 	IF arc_id_aux IS NOT NULL THEN 
 
-	
 		--  Locate position of the nearest point
 		intersect_loc := ST_LineLocatePoint(arc_geom, node_geom);
 		
@@ -112,30 +107,25 @@ BEGIN
 		-- Update values of new arc_id (1)
 		rec_aux1.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
 		rec_aux1.code := rec_aux1.arc_id;
-		rec_aux1.node_1 := null;
-		rec_aux1.node_2 := null;
+		rec_aux1.node_2 := node_id_arg ;-- rec_aux1.node_1 take values from original arc
 		rec_aux1.the_geom := line1;
 
 		-- Update values of new arc_id (2)
 		rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
 		rec_aux2.code := rec_aux2.arc_id;
-		rec_aux2.node_1 := null;
-		rec_aux2.node_2 := null;
+		rec_aux2.node_1 := node_id_arg; -- rec_aux2.node_2 take values from original arc
 		rec_aux2.the_geom := line2;
 		
 		-- In function of states and user's variables proceed.....
 		IF (state_aux=1 AND state_node_arg=1) THEN 
 		
 			-- Insert new records into arc table
-			-- downgrade temporary the state_topocontrol to prevent conflicts	
-			UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
 			INSERT INTO v_edit_arc SELECT rec_aux1.*;
 			INSERT INTO v_edit_arc SELECT rec_aux2.*;
-			-- force trg topocontrol to prevent conflicts
-			update arc set the_geom=the_geom where arc_id=rec_aux1.arc_id;
-			update arc set the_geom=the_geom where arc_id=rec_aux2.arc_id;
-			-- restore the state_topocontrol variable
-			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
+
+			-- update node_1 and node_2 because it's not possible to pass using parameters
+			UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
+			UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
 			
 			--Copy addfields from old arc to new arcs	
 			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
@@ -225,7 +215,7 @@ BEGIN
 			PERFORM gw_fct_connect_to_network(array_agg_gully, 'GULLY');
 					
 	
-		ELSIF (state_aux=1 AND state_node_arg=2 AND plan_arc_vdivision_dsbl_aux IS NOT TRUE) THEN 
+		ELSIF (state_aux=1 AND state_node_arg=2) THEN-- AND plan_arc_vdivision_dsbl_aux IS NOT TRUE) THEN 
 			rec_aux1.state=2;
 			rec_aux1.state_type=(SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius');
 			
@@ -233,18 +223,15 @@ BEGIN
 			rec_aux2.state_type=(SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius');
 			
 			-- Insert new records into arc table
-			-- downgrade temporary the state_topocontrol to prevent conflicts	
-			UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
+			UPDATE config SET arc_searchnodes_control='false';
 			INSERT INTO v_edit_arc SELECT rec_aux1.*;
 			INSERT INTO v_edit_arc SELECT rec_aux2.*;
-			
-			-- force trg topocontrol to prevent conflicts
-			update arc set the_geom=the_geom where arc_id=rec_aux1.arc_id;
-			update arc set the_geom=the_geom where arc_id=rec_aux2.arc_id;
-			
-			-- restore the state_topocontrol variable
-			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
-	
+			UPDATE config SET arc_searchnodes_control='true';
+
+			-- update node_1 and node_2 because it's not possible to pass using parameters
+			UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
+			UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
+
 			-- Update doability for the new arcs
 			UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
 			UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
@@ -252,22 +239,22 @@ BEGIN
 			-- Insert existig arc (on service) to the current alternative
 			INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (
 			(SELECT value::smallint FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user), arc_id_aux, 0, FALSE);
-	
-		ELSIF (state_aux=1 AND state_node_arg=2) AND plan_arc_vdivision_dsbl_aux IS TRUE THEN
-			PERFORM audit_function(1054,2114);
+
+		-- deprecated
+		--ELSIF (state_aux=1 AND state_node_arg=2) AND plan_arc_vdivision_dsbl_aux IS TRUE THEN
+		--	PERFORM audit_function(1054,2114);
 				
 		ELSIF (state_aux=2 AND state_node_arg=2) THEN 
 		
 			-- Insert new records into arc table
-			-- downgrade temporary the state_topocontrol to prevent conflicts	
-			UPDATE config_param_system SET value='FALSE' where parameter='state_topocontrol';
+			UPDATE config SET arc_searchnodes_control='false';
 			INSERT INTO v_edit_arc SELECT rec_aux1.*;
 			INSERT INTO v_edit_arc SELECT rec_aux2.*;
-			-- force trg topocontrol to prevent conflicts
-			update arc set the_geom=the_geom where arc_id=rec_aux1.arc_id;
-			update arc set the_geom=the_geom where arc_id=rec_aux2.arc_id;
-			-- restore the state_topocontrol variable
-			UPDATE config_param_system SET value='TRUE' where parameter='state_topocontrol';
+			UPDATE config SET arc_searchnodes_control='true';
+
+			-- update node_1 and node_2 because it's not possible to pass using parameters
+			UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
+			UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;j
 			
 			--Copy addfields from old arc to new arcs	
 			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
