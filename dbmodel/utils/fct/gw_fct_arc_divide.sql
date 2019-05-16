@@ -155,8 +155,9 @@ BEGIN
 			FOR connec_id_aux IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=arc_id_aux
 			LOOP
 				array_agg_connec:= array_append(array_agg_connec, connec_id_aux);
+				UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
 			END LOOP;
-			UPDATE connec SET arc_id=NULL WHERE arc_id=arc_id_aux;	
+			
 	
 			-- gully
 			IF project_type_aux='UD' THEN
@@ -164,8 +165,8 @@ BEGIN
 				FOR gully_id_aux IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=arc_id_auxº
 				LOOP
 					array_agg_gully:= array_append(array_agg_gully, gully_id_aux);
+					UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
 				END LOOP;
-				UPDATE gully SET arc_id=NULL WHERE arc_id=arc_id_aux;		
 			END IF;
 					
 			-- Insert data into traceability table
@@ -254,7 +255,7 @@ BEGIN
 
 			-- update node_1 and node_2 because it's not possible to pass using parameters
 			UPDATE arc SET node_1=rec_aux1.node_1,node_2=rec_aux1.node_2 where arc_id=rec_aux1.arc_id;
-			UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;j
+			UPDATE arc SET node_1=rec_aux2.node_1,node_2=rec_aux2.node_2 where arc_id=rec_aux2.arc_id;
 			
 			--Copy addfields from old arc to new arcs	
 			INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
