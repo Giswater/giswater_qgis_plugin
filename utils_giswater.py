@@ -36,18 +36,6 @@ if 'nt' in sys.builtin_module_names:
     import winreg
 
 
-def setDialog(p_dialog):
-    global _dialog
-    _dialog = p_dialog
-
-
-def dialog():
-    if '_dialog' in globals():
-        return _dialog
-    else:
-        return None
-
-
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
 
     if rows is None:
@@ -140,7 +128,7 @@ def setText(dialog, widget, text):
         widget.setValue(float(value))
 
 
-def getCalendarDate(dialog, widget, date_format = "yyyy/MM/dd", datetime_format = "yyyy/MM/dd hh:mm:ss"):
+def getCalendarDate(dialog, widget, date_format="yyyy/MM/dd", datetime_format="yyyy/MM/dd hh:mm:ss"):
 
     date = None
     if type(widget) is str or type(widget) is str:
@@ -328,11 +316,6 @@ def setImage(dialog, widget,cat_shape):
         widget.show()
 
 
-# def setRow(p_row):
-#     global _row
-#     _row = p_row
-
-
 def fillWidget(dialog, widget, row):
 
     if type(widget) is str or type(widget) is str:
@@ -494,13 +477,15 @@ def remove_tab_by_tabName(tab_widget, tab_name):
             break
 
 
-def double_validator(widget, min=0, max=999999, decimals=3, notation=QDoubleValidator().StandardNotation):
-    validator = QDoubleValidator(min, max, decimals)
+def double_validator(widget, min_=0, max_=999999, decimals=3, notation=QDoubleValidator().StandardNotation):
+
+    validator = QDoubleValidator(min_, max_, decimals)
     validator.setNotation(notation)
     widget.setValidator(validator)
 
 
 def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
+
     widget_list = dialog.findChildren(QWidget)
     for widget in widget_list:
         if str(widget.objectName()) not in ignore_widgets:
@@ -518,12 +503,14 @@ def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
 
 def set_qtv_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
     """ Set QTableView configurations """
+
     widget.setSelectionBehavior(selection)
     widget.setEditTriggers(edit_triggers)
 
 
 def get_col_index_by_col_name(qtable, column_name):
     """ Return column index searching by column name """
+
     column_index = False
     for x in range(0, qtable.model().columnCount()):
         if qtable.model().headerData(x, Qt.Horizontal) == column_name:
@@ -566,6 +553,7 @@ def set_regexp_date_validator(widget, button=None, regex_type=1):
 
 
 def eval_regex(widget, reg_exp, button, placeholder, text):
+
     is_valid = False
     if reg_exp.exactMatch(text) is True:
         widget.setStyleSheet("border: 1px solid gray")
@@ -583,3 +571,4 @@ def eval_regex(widget, reg_exp, button, placeholder, text):
             button.setEnabled(False)
         else:
             button.setEnabled(True)
+
