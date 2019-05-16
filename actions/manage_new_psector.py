@@ -21,7 +21,7 @@ else:
     from builtins import str
     from builtins import range
 
-from qgis.core import QgsRectangle
+from qgis.core import QgsRectangle, QgsProject, QgsLayoutExporter
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel
@@ -406,20 +406,28 @@ class ManageNewPsector(ParentManage):
 
     def populate_cmb_templates(self):
         
-        composers = self.iface.activeComposers()
         index = 0
         records = []
-        for comp_view in composers:
-            elem = [index, comp_view.composerWindow().windowTitle()]
-            records.append(elem)
-            index = index +1
+        if Qgis.QGIS_VERSION_INT < 29900:
+            composers = self.iface.activeComposers()
+            for comp_view in composers:
+                elem = [index, comp_view.composerWindow().windowTitle()]
+                records.append(elem)
+                index = index + 1
+        else:
+            layout_manager = QgsProject.instance().layoutManager()
+            layouts = layout_manager.layouts()    # QgsPrintLayout
+            for layout in layouts:
+                elem = [index, layout.name()]
+                records.append(elem)
+                index = index + 1
+
         utils_giswater.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
         sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
-               " WHERE parameter = 'composer_" + self.plan_om + "_vdefault' AND cur_user= current_user")
+               "WHERE parameter = 'composer_" + self.plan_om + "_vdefault' AND cur_user= current_user")
         row = self.controller.get_row(sql)
-        if not row:
-            return
-        utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, row[0])
+        if row:
+            utils_giswater.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, row[0])
 
 
     def generate_rapports(self):
@@ -476,17 +484,16 @@ class ManageNewPsector(ParentManage):
                 file_name += '.csv'
             path = folder_path + '/' + file_name
             self.generate_csv(path, viewname)
+
         self.close_dialog(self.dlg_psector_rapport)
 
 
     def generate_composer(self, path):
 
-        # TODO: 3.x
-        if Qgis.QGIS_VERSION_INT > 29900:
-            return
+        if Qgis.QGIS_VERSION_INT < 29900:
 
-        index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
-        comp_view = self.iface.activeComposers()[index]
+            index = utils_giswater.get_item_data(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates, 0)
+            comp_view = self.iface.activeComposers()[index]
         my_comp = comp_view.composition()
         if my_comp is not None:
             my_comp.setAtlasMode(QgsComposition.PreviewAtlas)
@@ -496,12 +503,45 @@ class ManageNewPsector(ParentManage):
                     message = "Document PDF created in"
                     self.controller.show_info(message, parameter=path)
                     os.startfile(path)
-                else:
-                    message = "Cannot create file, check if its open"
-                    self.controller.show_warning(message, parameter=path)
-            except:
-                msg = "Cannot create file, check if selected composer is the correct composer"
-                self.controller.show_warning(msg, parameter=path)
+                    else:
+                        message = "Cannot create file, check if its open"
+                        self.controller.show_warning(message, parameter=path)
+                except Exception as e:
+                    self.controller.log_warning(str(e))
+                    msg = "Cannot create file, check if selected composer is the correct composer"
+                    self.controller.show_warning(msg, parameter=path)
+
+        else:
+
+            # Get layout manager object
+            layout_manager = QgsProject.instance().layoutManager()
+
+            # Show layout names
+            # for layout in layout_manager.printLayouts():
+            #     print(layout.name())
+
+            # Get our layout
+            layout_name = utils_giswater.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.cmb_templates)
+            layout = layout_manager.layoutByName(layout_name)
+
+            # Export to PDF file
+            if layout:
+                try:
+                    exporter = QgsLayoutExporter(layout)
+                    exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
+                    if os.path.exists(path):
+                        message = "Document PDF created in"
+                        self.controller.show_info(message, parameter=path)
+                        os.startfile(path)
+                    else:
+                        message = "Cannot create file, check if its open"
+                        self.controller.show_warning(message, parameter=path)
+                except Exception as e:
+                    self.controller.log_warning(str(e))
+                    msg = "Cannot create file, check if selected composer is the correct composer"
+                    self.controller.show_warning(msg, parameter=path)
+            else:
+                self.controller.show_warning("Layout not found", parameter=layout_name)
 
 
     def generate_csv(self, path, viewname):
