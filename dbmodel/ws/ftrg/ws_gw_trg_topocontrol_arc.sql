@@ -164,8 +164,6 @@ BEGIN
 				NEW.node_1:= nodeRecord1.node_id; 
 				NEW.node_2:= nodeRecord2.node_id;
 
-				
-				RETURN NEW;
 			END IF;
 			
 		-- Update vnode/link
@@ -194,11 +192,11 @@ BEGIN
 				INSERT INTO inp_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
 				INSERT INTO man_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
 
-			-- Update coordinates
-			NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-			NEW.node_1:= nodeRecord1.node_id; 
-			NEW.node_2:= (SELECT currval('urn_id_seq'));  
-			RETURN NEW;
+				-- Update coordinates
+				NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+				NEW.node_1:= nodeRecord1.node_id; 
+				NEW.node_2:= (SELECT currval('urn_id_seq'));  
+				RETURN NEW;
 			END IF;
 		
 	--	Error, no existing nodes
