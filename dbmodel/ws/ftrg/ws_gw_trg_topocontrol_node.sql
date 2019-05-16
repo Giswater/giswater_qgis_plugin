@@ -56,7 +56,7 @@ BEGIN
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 
 		-- Checking number of nodes 
-		numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.state!=0);
+		numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node_id!=NEW.node_id AND node.state!=0);
 			
 		IF (numNodes >1) AND (v_node_proximity_control IS TRUE) THEN
 			IF v_dsbl_error IS NOT TRUE THEN
@@ -107,7 +107,7 @@ BEGIN
 							v_arcrecord.arc_id:= (SELECT nextval('urn_id_seq'));
 							v_arcrecord.code = v_arcrecord.arc_id;
 							v_arcrecord.state=2;
-							v_arcrecord.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius');
+							v_arcrecord.state_type := (SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius' LIMIT 1);
 							IF (SELECT node_1 FROM arc WHERE arc_id=v_arc.arc_id)=v_arc.node_id THEN
 								v_arcrecord.node_1 = NEW.node_id;
 							ELSE
