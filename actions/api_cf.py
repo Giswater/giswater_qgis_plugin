@@ -2184,7 +2184,7 @@ class ApiCF(ApiParent):
             getattr(self, function_name)(dialog, widget, 2)
 
 
-    def open_url(self, dialog, widget, message_level=None):
+    def gw_api_open_url(self, dialog, widget, message_level=None):
 
         path = widget.text()
         # Check if file exist
@@ -2199,11 +2199,9 @@ class ApiCF(ApiParent):
             webbrowser.open(path)
 
 
-    def open_node(self, dialog, widget=None, message_level=None):
+    def gw_api_open_node(self, dialog, widget=None, message_level=None):
 
         feature_id = utils_giswater.getWidgetText(dialog, widget)
-        tab_type = dialog.tab_main
-
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
         complet_result, dialog = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id, tab_type=self.tab_type)
