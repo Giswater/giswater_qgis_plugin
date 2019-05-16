@@ -897,11 +897,12 @@ class ApiCF(ApiParent):
             action.setVisible(False)
         for tab in self.complet_result[0]['body']['form']['visibleTabs']:
             if tab['tabName'] == tab_name:
-                for a in tab['tabactions']:
-                    action = self.dlg_cf.findChild(QAction, a['actionName'])
-                    if action is not None:
-                        action.setToolTip(a['actionTooltip'])
-                        action.setVisible(True)
+                if tab['tabactions'] is not None:
+                    for act in tab['tabactions']:
+                        action = self.dlg_cf.findChild(QAction, act['actionName'])
+                        if action is not None:
+                            action.setToolTip(act['actionTooltip'])
+                            action.setVisible(True)
         self.enable_actions(self.layer.isEditable())
 
 
