@@ -16,10 +16,6 @@ DROP TRIGGER IF EXISTS gw_trg_topocontrol_node ON SCHEMA_NAME.node;
 CREATE TRIGGER gw_trg_topocontrol_node AFTER INSERT OR UPDATE OF the_geom, state
 ON SCHEMA_NAME.node FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_topocontrol_node();
 
-DROP TRIGGER IF EXISTS gw_trg_topocontrol_arc ON SCHEMA_NAME.arc;
-CREATE TRIGGER gw_trg_topocontrol_arc AFTER INSERT OR UPDATE OF the_geom, state
-ON SCHEMA_NAME.arc  FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_topocontrol_arc();
-
 DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".om_visit;
 CREATE TRIGGER gw_trg_om_visit AFTER INSERT OR UPDATE OF class_id, status OR DELETE ON "SCHEMA_NAME".om_visit
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit();

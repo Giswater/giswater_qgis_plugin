@@ -146,25 +146,25 @@ BEGIN
 
    END IF;
 
-    -- Control of length line
-		IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+	--  Control of start/end node
+	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
     
-        -- Control of same node initial and final
-			IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
-				IF v_dsbl_error IS NOT TRUE THEN
-					PERFORM audit_function (1040,1344, nodeRecord1.node_id);	
-				ELSE
-					INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
-				END IF;
-				
+		-- Control of same node initial and final
+		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
+			IF v_dsbl_error IS NOT TRUE THEN
+				PERFORM audit_function (1040,1344, nodeRecord1.node_id);	
 			ELSE
-				-- Update coordinates
-				NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-				NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
-				NEW.node_1:= nodeRecord1.node_id; 
-				NEW.node_2:= nodeRecord2.node_id;
-
+				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
 			END IF;
+			
+		ELSE
+			-- Update coordinates
+			NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+			NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
+			NEW.node_1:= nodeRecord1.node_id; 
+			NEW.node_2:= nodeRecord2.node_id;
+
+		END IF;
 			
 		-- Update vnode/link
 		FOR connec_id_aux IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=NEW.arc_id
@@ -175,50 +175,48 @@ BEGIN
 		END LOOP;
 		PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
 
-		-- Check auto insert end nodes
-		ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
-			IF TG_OP = 'INSERT' THEN
-
+	-- Check auto insert end nodes
+	ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
+		IF TG_OP = 'INSERT' THEN
 			INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 
 				VALUES (
-                (SELECT nextval('urn_id_seq')),
-                (SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1), 
+				(SELECT nextval('urn_id_seq')),
+				(SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1), 
 				'JUNCTION'::text,
 				(SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"()),
-                (SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
-                ST_endpoint(NEW.the_geom)
+				(SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
+				ST_endpoint(NEW.the_geom)
 				);
 
-				INSERT INTO inp_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
-				INSERT INTO man_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
+			INSERT INTO inp_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
+			INSERT INTO man_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
 
-				-- Update coordinates
-				NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-				NEW.node_1:= nodeRecord1.node_id; 
-				NEW.node_2:= (SELECT currval('urn_id_seq'));  
-				RETURN NEW;
-			END IF;
-		
-	--	Error, no existing nodes
-		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
-			IF v_dsbl_error IS NOT TRUE THEN
-				PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
-			ELSE
-				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
-			END IF;
-		
-	--	Not existing nodes but accepted insertion
-		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS FALSE) THEN
-			RETURN NEW;
-			
-		ELSE		
-			IF v_dsbl_error IS NOT TRUE THEN
-				PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
-			ELSE
-				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
-			END IF;
+			-- Update coordinates
+			NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+			NEW.node_1:= nodeRecord1.node_id; 
+			NEW.node_2:= (SELECT currval('urn_id_seq'));  
 		END IF;
 		
+	--Error, no existing nodes
+	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
+		IF v_dsbl_error IS NOT TRUE THEN
+			PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
+		ELSE
+			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
+		END IF;
+		
+	--Not existing nodes but accepted insertion
+	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS FALSE) THEN
+		RETURN NEW;
+		
+	ELSE		
+		IF v_dsbl_error IS NOT TRUE THEN
+			PERFORM audit_function (1042,1344, nodeRecord1.node_id);	
+		ELSE
+			INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (4, NEW.arc_id, 'Node_1 or Node_2 does not exists or does not has compatible state with arc');
+		END IF;
+	END IF;
+	
 RETURN NEW;
 		
 END; 

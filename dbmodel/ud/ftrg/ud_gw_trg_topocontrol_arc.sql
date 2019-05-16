@@ -161,16 +161,14 @@ BEGIN
 	--  Control of start/end node
 	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
 
-		-- Control de lineas de longitud 0
+        -- Control of same node initial and final
 		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
 			IF v_dsbl_error IS NOT TRUE THEN
 				PERFORM audit_function (1040,1244, nodeRecord1.node_id);	
 			ELSE
 				INSERT INTO audit_log_data (fprocesscat_id, feature_id, log_message) VALUES (3, NEW.arc_id, 'Node_1 and Node_2 are the same');
 			END IF;
-			
 		ELSE
-
 			-- Calculate system parameters
 			is_reversed= FALSE;
 			sys_y1_aux:= (CASE WHEN (NEW.custom_y1 IS NOT NULL) THEN NEW.custom_y1::numeric (12,3) ELSE NEW.y1::numeric (12,3) END);
@@ -224,10 +222,8 @@ BEGIN
 	
 					NEW.sys_elev1 := sys_elev2_aux;
 					NEW.sys_elev2 := sys_elev1_aux;
-					is_reversed = TRUE;
-						
+					is_reversed = TRUE;	
 				END IF;
-
 			END IF;
 
 			NEW.sys_length:= ST_length(NEW.the_geom);
@@ -253,34 +249,30 @@ BEGIN
 		FOR connec_id_aux IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=NEW.arc_id
 		LOOP
 			array_agg:= array_append(array_agg, connec_id_aux);
-			UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;
-					
+			UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;		
 		END LOOP;
 		PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
 
-		IF project_type_aux='UD' THEN
-
-			array_agg:=NULL;
-			FOR gully_id_aux IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=NEW.arc_id
-			LOOP	
-				array_agg:= array_append(array_agg, gully_id_aux);
-				UPDATE gully SET arc_id=NULL WHERE gully_id=gully_id_aux;
-			END LOOP;
-			PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
-		END IF;
-		
+		array_agg:=NULL;
+		FOR gully_id_aux IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=NEW.arc_id
+		LOOP	
+			array_agg:= array_append(array_agg, gully_id_aux);
+			UPDATE gully SET arc_id=NULL WHERE gully_id=gully_id_aux;
+		END LOOP;
+		PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
+			
 
 	-- Check auto insert end nodes
 	ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
 		IF TG_OP = 'INSERT' THEN
 			INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 
 			VALUES (
-            (SELECT nextval('urn_id_seq')),
-            (SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1),
+			(SELECT nextval('urn_id_seq')),
+			(SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1),
 			'JUNCTION'::text,
 			(SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"()),
-            (SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
-            ST_endpoint(NEW.the_geom)
+			(SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
+			ST_endpoint(NEW.the_geom)
 			);
 
 			INSERT INTO inp_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
@@ -289,9 +281,7 @@ BEGIN
 			-- Update coordinates
 			NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
 			NEW.node_1:= nodeRecord1.node_id; 
-			NEW.node_2:= (SELECT currval('urn_id_seq'));  
-			RETURN NEW;
-			
+			NEW.node_2:= (SELECT currval('urn_id_seq'));  			
 		END IF;
 
 	-- Error, no existing nodes
