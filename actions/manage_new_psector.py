@@ -228,31 +228,32 @@ class ManageNewPsector(ParentManage):
             expr = " psector_id = " + str(psector_id)
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
-
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
-            if utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id) != 'null':
-                sql = ("DELETE FROM " + self.schema_name + "."+self.plan_om + "_psector_selector "
-                       " WHERE cur_user= current_user")
+            psector_id_aux = utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
+            if psector_id_aux != 'null':
+                sql = ("DELETE FROM " + self.schema_name + "." + self.plan_om + "_psector_selector "
+                       "WHERE cur_user= current_user")
                 self.controller.execute_sql(sql)
-                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id',
-                                             utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
+                self.insert_psector_selector(self.plan_om + '_psector_selector', 'psector_id', psector_id_aux)
             if self.plan_om == 'plan':
-                sql = ("DELETE FROM " + self.schema_name + ".selector_psector"
-                       " WHERE cur_user = current_user AND psector_id='" + ""
-                       "" + utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id) + "'")
+                sql = ("DELETE FROM " + self.schema_name + ".selector_psector "
+                       "WHERE cur_user = current_user AND psector_id = '" + psector_id_aux + "'")
                 self.controller.execute_sql(sql)
-                self.insert_psector_selector('selector_psector', 'psector_id', utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
+                self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
 
-            layer = self.controller.get_layer_by_tablename('v_edit_'+self.plan_om+'_psector')
-            expr_filter = "psector_id = '" + str(psector_id) + "'"
+            layername = 'v_edit_' + self.plan_om + '_psector'
+            layer = self.controller.get_layer_by_tablename(layername, show_warning=True)
+            if layer:
 
-            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
-            if not is_valid:
-                return
-            self.select_features_by_expr(layer, expr)
+                expr_filter = "psector_id = '" + str(psector_id) + "'"
+                (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+                if not is_valid:
+                    return
 
-            # Get canvas extend in order to create a QgsRectangle
+                self.select_features_by_expr(layer, expr)
+
+                # Get canvas extend in order to create a QgsRectangle
             ext = self.canvas.extent()
             startPoint = QgsPointXY(ext.xMinimum(), ext.yMaximum())
             endPoint = QgsPointXY(ext.xMaximum(), ext.yMinimum())
@@ -260,13 +261,12 @@ class ManageNewPsector(ParentManage):
             canvas_width = ext.xMaximum() - ext.xMinimum()
             canvas_height = ext.yMaximum() - ext.yMinimum()
 
-            # Get boundingBox(QgsRectangle) from selected feature
-            feature = layer.selectedFeatures()[0]
-            psector_rec = feature.geometry().boundingBox()
-
-            # Do zoom when QgsRectangles don't intersect
-            if not canvas_rec.intersects(psector_rec):
-                self.zoom_to_selected_features(layer)
+                # Get boundingBox(QgsRectangle) from selected feature
+                feature = layer.selectedFeatures()[0]
+                psector_rec = feature.geometry().boundingBox()
+                # Do zoom when QgsRectangles don't intersect
+                if not canvas_rec.intersects(psector_rec):
+                    self.zoom_to_selected_features(layer)
             if psector_rec.width() < (canvas_width * 10)/100 or psector_rec.height() < (canvas_height * 10)/100:
                 self.zoom_to_selected_features(layer)
             layer.removeSelection()

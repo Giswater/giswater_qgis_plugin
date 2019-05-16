@@ -757,6 +757,9 @@ class ParentAction(object):
     def select_features_by_expr(self, layer, expr):
         """ Select features of @layer applying @expr """
 
+        if not layer:
+            return
+
         if expr is None:
             layer.removeSelection()
         else:
