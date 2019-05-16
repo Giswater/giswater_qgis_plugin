@@ -500,7 +500,7 @@ macrodma_id,
 expl_id,
 num_value
 FROM v_arc 
-	JOIN man_varc ON man_varc.arc_id=v_arc.arc_id;
+	JOIN man_pipe ON man_pipe.arc_id=v_arc.arc_id;
 	
 	
 DROP VIEW IF EXISTS v_edit_man_hydrant CASCADE;	
