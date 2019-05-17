@@ -513,7 +513,7 @@ class ApiCF(ApiParent):
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_cancel.clicked.connect(partial(self.roll_back))
 
-        btn_accept.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, self.my_json))
+        btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
         self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
         self.dlg_cf.dlg_closed.connect(partial(self.roll_back))
@@ -621,10 +621,10 @@ class ApiCF(ApiParent):
         self.open_dialog(dlg_sections, maximize_button=False)
 
         
-    def accept(self, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
+    def accept(self, dialog, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
 
         if _json == '' or str(_json) == '{}':
-            self.close_dialog(self.dlg_cf)
+            self.close_dialog(dialog)
             return
         p_table_id = complet_result['body']['feature']['tableName']
         if self.new_feature_id is not None:
@@ -668,7 +668,7 @@ class ApiCF(ApiParent):
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
         if close_dialog:
-            self.close_dialog(self.dlg_cf)
+            self.close_dialog(dialog)
 
 
     def get_scale_zoom(self):
@@ -677,8 +677,7 @@ class ApiCF(ApiParent):
 
 
     def disable_all(self, dialog, result, enable):
-        
-        # if not self.dlg_is_destroyed:
+
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
             for field in result['fields']:
@@ -692,8 +691,7 @@ class ApiCF(ApiParent):
      
 
     def enable_all(self, dialog, result):
-        
-        # if not self.dlg_is_destroyed:
+
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
             for field in result['fields']:
@@ -772,11 +770,11 @@ class ApiCF(ApiParent):
                 if Qgis.QGIS_VERSION_INT < 29900:
                     widget.lostFocus.connect(partial(self.clean_my_json, widget))
                     widget.lostFocus.connect(partial(self.get_values, dialog, widget, _json))
-                    widget.lostFocus.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+                    widget.lostFocus.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
                 else:
                     widget.editingFinished.connect(partial(self.clean_my_json, widget))
                     widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
-                    widget.editingFinished.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+                    widget.editingFinished.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
             else:
                 if Qgis.QGIS_VERSION_INT < 29900:
                     widget.lostFocus.connect(partial(self.get_values, dialog, widget, self.my_json))
@@ -790,7 +788,7 @@ class ApiCF(ApiParent):
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
-                widget.currentIndexChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+                widget.currentIndexChanged.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
             else:
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
@@ -801,7 +799,7 @@ class ApiCF(ApiParent):
                 _json = {}
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
-                widget.dateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+                widget.dateChanged.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
             else:
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
@@ -812,7 +810,7 @@ class ApiCF(ApiParent):
                 _json = {}
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
-                widget.valueChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+                widget.valueChanged.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
             else:
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
@@ -823,7 +821,7 @@ class ApiCF(ApiParent):
                 _json = {}
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
-                widget.stateChanged.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+                widget.stateChanged.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
             else:
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget

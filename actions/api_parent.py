@@ -1107,7 +1107,7 @@ class ApiParent(ParentAction):
         widget.setAllowNull(True)
         widget.setCalendarPopup(True)
         widget.setDisplayFormat('yyyy/MM/dd')
-        if 'value' in field:
+        if 'value' in field and field['value'] not in ('', None, 'null'):
             date = QDate.fromString(field['value'], 'yyyy-MM-dd')
             utils_giswater.setCalendarDate(dialog, widget, date)
         else:
@@ -1117,7 +1117,7 @@ class ApiParent(ParentAction):
         if field['isautoupdate']:
             _json = {}
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
-            btn_calendar.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+            btn_calendar.clicked.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
         else:
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
         btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
