@@ -17,11 +17,11 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsPoint as QgsPointXY
 else:
     from qgis.PyQt.QtCore import QStringListModel
-    from qgis.core import QgsPointXY
+    from qgis.core import QgsPointXY, QgsLayoutExporter
     from builtins import str
     from builtins import range
 
-from qgis.core import QgsRectangle, QgsProject, QgsLayoutExporter
+from qgis.core import QgsRectangle, QgsProject
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
 from qgis.PyQt.QtWidgets import QCheckBox, QLineEdit, QComboBox, QDateEdit, QLabel

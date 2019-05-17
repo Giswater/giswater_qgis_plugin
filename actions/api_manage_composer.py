@@ -11,11 +11,11 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.core import QgsComposerMap, QgsComposerLabel as QgsLayoutItemLabel
+    from qgis.core import QgsComposerMap, QgsComposerLabel as QgsLayoutItemLabel, QgsLayoutExporter
     from qgis.gui import  QgsComposerView
     from qgis.PyQt.QtGui import QPrintDialog, QPrinter, QDialog
 else:
-    from qgis.core import QgsProject, QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
+    from qgis.core import QgsProject, QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel
     from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 
 from qgis.PyQt.QtGui import QRegExpValidator
