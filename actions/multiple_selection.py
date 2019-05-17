@@ -61,8 +61,8 @@ class MultipleSelection(QgsMapTool):
         if Qgis.QGIS_VERSION_INT < 29900:
             snapper = QgsMapCanvasSnapper(self.canvas)
         else:
-            # TODO: 3.x
-            snapper = QgsMapCanvas.snappingUtils()
+            snapper = QgsMapCanvas.snappingUtils(self.canvas)
+
         return snapper
 
 
