@@ -511,12 +511,12 @@ class ApiCF(ApiParent):
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
 
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
-        btn_cancel.clicked.connect(partial(self.roll_back))
+        #btn_cancel.clicked.connect(partial(self.roll_back))
 
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
         self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
-        self.dlg_cf.dlg_closed.connect(partial(self.roll_back))
+        #self.dlg_cf.dlg_closed.connect(partial(self.roll_back))
 
         # Open dialog
         #self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
