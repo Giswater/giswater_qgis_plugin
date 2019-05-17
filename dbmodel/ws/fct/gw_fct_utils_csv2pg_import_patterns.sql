@@ -77,7 +77,7 @@ BEGIN
 
 			-- control if pattern exists
 			IF (SELECT pattern_id FROM inp_pattern WHERE pattern_id=v_pattern) IS NOT NULL THEN
-				RAISE EXCEPTION 'Pattern exists';
+				DELETE FROM inp_pattern WHERE pattern_id=v_pattern;
 			END IF;
 			
 		ELSIF v_csv.csv1 = 'source' THEN

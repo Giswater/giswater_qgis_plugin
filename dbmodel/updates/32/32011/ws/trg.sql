@@ -9,5 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 DROP TRIGGER IF EXISTS gw_trg_topocontrol_arc ON SCHEMA_NAME.arc;
-CREATE TRIGGER gw_trg_topocontrol_arc AFTER INSERT OR UPDATE OF the_geom, state
+CREATE TRIGGER gw_trg_topocontrol_arc BEFORE INSERT OR UPDATE OF the_geom, state
 ON SCHEMA_NAME.arc  FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_topocontrol_arc();

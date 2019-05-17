@@ -8,8 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-DROP TRIGGER IF EXISTS gw_trg_arc_vnodelink_update ON SCHEMA_NAME.arc;
-
 DROP TRIGGER IF EXISTS gw_trg_node_update ON SCHEMA_NAME.node;
 
 DROP TRIGGER IF EXISTS gw_trg_topocontrol_node ON SCHEMA_NAME.node;

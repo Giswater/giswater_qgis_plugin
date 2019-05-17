@@ -244,24 +244,7 @@ BEGIN
 			END IF;
 
 		END IF;
-
-		-- Update vnode/link
-		FOR connec_id_aux IN SELECT connec_id FROM connec JOIN link ON link.feature_id=connec_id WHERE link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=NEW.arc_id
-		LOOP
-			array_agg:= array_append(array_agg, connec_id_aux);
-			UPDATE connec SET arc_id=NULL WHERE connec_id=connec_id_aux;		
-		END LOOP;
-		PERFORM gw_fct_connect_to_network(array_agg, 'CONNEC');
-
-		array_agg:=NULL;
-		FOR gully_id_aux IN SELECT gully_id FROM gully JOIN link ON link.feature_id=gully_id WHERE link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=NEW.arc_id
-		LOOP	
-			array_agg:= array_append(array_agg, gully_id_aux);
-			UPDATE gully SET arc_id=NULL WHERE gully_id=gully_id_aux;
-		END LOOP;
-		PERFORM gw_fct_connect_to_network(array_agg, 'GULLY');
-			
-
+		
 	-- Check auto insert end nodes
 	ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
 		IF TG_OP = 'INSERT' THEN
