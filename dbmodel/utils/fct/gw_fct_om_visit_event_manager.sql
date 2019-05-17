@@ -41,12 +41,13 @@ v_node_id bigint;
 v_parameter text;
 v_querytext text;
 rec_parameter_child record;
+result text;
 
 BEGIN
 
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
-
+    
     -- select main values (stardate, node_id, mu_id)
     -- getting start date using event value (legacy)
     SELECT value INTO startdate_aux FROM om_visit_event WHERE visit_id=visit_id_aux limit 1; 
@@ -55,8 +56,8 @@ BEGIN
     
     -- check if exits multiplier parameter (action type=1)
     v_parameter = (SELECT parameter_id2 FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
-		   JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE');
-   
+		   JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE' limit 1);
+    
     IF v_parameter IS NOT NULL THEN
 
 	-- loop for those nodes that has the same attribute
@@ -65,24 +66,31 @@ BEGIN
 		rec_node.startdate= (SELECT startdate::date from om_visit join om_visit_x_node on visit_id=om_visit.id where node_id=rec_node.node_id order by startdate desc limit 1 );
        
 		-- insert visit
-		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done,status)
-		SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, 4
+		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done,status, class_id)
+		SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, 4, 2
 		FROM om_visit WHERE id=visit_id_aux RETURNING id into id_last;
 
 		INSERT INTO om_visit_x_node (visit_id,node_id) VALUES (id_last, rec_node.node_id);
-		
+				
 		RAISE NOTICE 'inserting new visit %', id_last;
-    
+
+		
 		-- insert parameters
 		FOR rec_parameter IN SELECT * FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
 		JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND action_type=1 AND feature_type='NODE'
 		LOOP 
+
+			
+			
 			-- desmultiplier parameter (action_type=1)
 			INSERT INTO om_visit_event (ext_code, visit_id, parameter_id, value, text) VALUES 
 			(rec_parameter.ext_code, id_last, v_parameter, rec_parameter.value, rec_parameter.text) RETURNING id INTO id_event;
 
 			RAISE NOTICE 'inserting new event %',id_event ;
 
+			--check if the function was planned before by poblacion
+			PERFORM tm_fct_planned_visit(id_last, 2);
+			
 			-- sql parameter (action_type=4)
 			FOR rec_parameter_child IN SELECT * FROM om_visit_parameter_x_parameter WHERE parameter_id1=v_parameter AND action_type=4
 			LOOP 
@@ -127,7 +135,9 @@ BEGIN
 	IF v_querytext IS NOT NULL THEN
 		EXECUTE v_querytext;
 	END IF;
-
+	ELSE
+		--check if the function was planned before by unit
+		PERFORM tm_fct_planned_visit(visit_id_aux,1);
       END IF;
 
      -- check if exits sql sentence parameter related to the query text parameter (action type=4)
@@ -146,7 +156,8 @@ BEGIN
 
     END IF;
 
-        -- check if exits price parameter related to the price parameter (action type=5 or 4)
+    -- check if exits price parameter related to the price parameter (action type=5)
+        -- check if exits price parameter related to the price parameter (action type=5)
      IF (SELECT count(*) FROM om_visit_event JOIN om_visit_parameter_x_parameter ON parameter_id=parameter_id1 
         JOIN om_visit_parameter ON parameter_id=om_visit_parameter.id WHERE visit_id=visit_id_aux AND (action_type=5 OR action_type=4) AND feature_type='NODE')>0  THEN
 
@@ -159,6 +170,7 @@ BEGIN
 		ELSE 
 			work_aux := rec_parameter.action_value;
 		END IF;
+
             builder_aux:= (select om_visit_cat.id from om_visit_cat JOIN om_visit ON om_visit_cat.id=om_visit.visitcat_id WHERE om_visit.id=visit_id_aux);
             size_id_aux= (select size_id FROM node WHERE node_id=node_id_aux);
             event_date_aux=(SELECT date(value) FROM om_visit_event WHERE id=rec_parameter.id);
@@ -215,6 +227,7 @@ BEGIN
 
     -- adding the initial node to array
     concat_agg=concat(concat_agg, (SELECT concat('POINT (',st_x(the_geom),' ', st_y(the_geom),')') FROM node WHERE node_id=node_id_aux)::text);
+    
     raise notice '%', concat_agg;
    
 RETURN concat_agg;
