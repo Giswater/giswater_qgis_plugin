@@ -138,8 +138,7 @@ BEGIN
 		IF v_field ='the_geom' OR v_field ='geom' THEN 
 			v_columntype='geometry';
 		END IF;
-
-		IF v_value !='null' OR v_value !='NULL' THEN 
+		--IF v_value !='null' OR v_value !='NULL' THEN 
 	
 			IF v_field='state' THEN
 				PERFORM gw_fct_state_control(v_featuretype, v_id, v_value::integer, 'UPDATE');
@@ -156,7 +155,7 @@ BEGIN
 				v_querytext := concat (v_querytext, ' , ',  quote_ident(v_field) , ' = CAST(' , quote_nullable(v_value) , ' AS ' , v_columntype , ')');
 			END IF;
 			n=n+1;			
-		END IF;
+		--END IF;
 		i=i+1;
 
 	END LOOP;
