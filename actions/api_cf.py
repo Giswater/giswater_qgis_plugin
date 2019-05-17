@@ -849,17 +849,6 @@ class ApiCF(ApiParent):
             self.populate_combo(child, combo_child)
 
 
-    def add_checkbox(self, dialog, field):
-        widget = QCheckBox()
-        widget.setObjectName(field['widgetname'])
-        widget.setProperty('column_id', field['column_id'])
-        if 'value' in field:
-            if field['value'] == "t":
-                widget.setChecked(True)
-        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
-        return widget
-
-
     def open_catalog(self, tab_type):
         self.catalog = ApiCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
         self.catalog.api_catalog(self.dlg_cf, tab_type+"_"+self.geom_type+'cat_id', self.geom_type)

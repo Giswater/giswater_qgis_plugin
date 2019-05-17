@@ -793,6 +793,16 @@ class ApiParent(ParentAction):
         return widget
 
 
+    def add_checkbox(self, dialog, field):
+        widget = QCheckBox()
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
+        if 'value' in field:
+            if field['value'] in ("t", "true", True):
+                widget.setChecked(True)
+        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return widget
+
     def add_combobox(self, field):
     
         widget = QComboBox()
