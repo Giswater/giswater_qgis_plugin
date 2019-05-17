@@ -60,7 +60,7 @@ CREATE OR REPLACE VIEW vp_basic_node AS
    
 DROP VIEW IF EXISTS vp_basic_connec ;
 CREATE OR REPLACE VIEW vp_basic_connec AS 
- SELECT .connec_id AS nid,
+ SELECT v_edit_connec.connec_id AS nid,
     v_edit_connec.connec_type AS custom_type
    FROM SCHEMA_NAME.v_edit_connec;
    
