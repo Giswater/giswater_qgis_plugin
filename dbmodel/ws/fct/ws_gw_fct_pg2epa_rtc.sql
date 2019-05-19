@@ -40,17 +40,17 @@ BEGIN
 
 	-- Updating values from rtc into inp_rpt table
 	IF v_coefficient = 'MIN' THEN
-		UPDATE rpt_inp_node SET demand=(lps_min::float*v_epaunitsfactor)::numeric(12,6) FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+		UPDATE rpt_inp_node SET demand=(lps_min::float*v_epaunitsfactor)::numeric(12,8), pattern_id=NULL FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 	ELSIF v_coefficient = 'AVG' THEN
-		UPDATE rpt_inp_node SET demand=(lps_avg::float*v_epaunitsfactor)::numeric(12,6) FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+		UPDATE rpt_inp_node SET demand=(lps_avg::float*v_epaunitsfactor)::numeric(12,8), pattern_id=NULL FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 	ELSIF v_coefficient = 'MAX' THEN
-		UPDATE rpt_inp_node SET demand=(lps_max::float*v_epaunitsfactor)::numeric(12,6) FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+		UPDATE rpt_inp_node SET demand=(lps_max::float*v_epaunitsfactor)::numeric(12,8), pattern_id=NULL FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 	ELSIF v_coefficient = 'REAL' THEN
-		UPDATE rpt_inp_node SET demand=lps_avg::numeric(12,6)*v_epaunitsfactor, pattern_id=a.pattern_id FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
+		UPDATE rpt_inp_node SET demand=(m3_hydrometer_period*v_epaunitsfactor/m3_total_period)::numeric(12,8), pattern_id=a.pattern_id -- m3_hydrometer from hydrometer and m3_total_period from dma
+		FROM v_rtc_hydrometer_x_node_period a
+		JOIN v_rtc_dma_hydrometer_period b ON a.dma_id=b.dma_id AND a.period_id=b.period_id
+		WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 	END IF;
-
-	-- update patterns
-	UPDATE rpt_inp_node SET pattern_id=a.pattern_id FROM v_rtc_hydrometer_x_node_period a WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 
 	
 RETURN 1;

@@ -142,9 +142,9 @@ BEGIN
 	v_sum = (SELECT sum(factor_1)+sum(factor_2)+sum(factor_3)+sum(factor_4)+sum(factor_5)+sum(factor_6)+sum(factor_7)+sum(factor_8)+sum(factor_9)+sum(factor_10)+sum(factor_11)
 			+sum(factor_12)+sum(factor_13)+ sum(factor_14)+sum(factor_15)+sum(factor_16) FROM inp_pattern_value WHERE pattern_id=v_pattern)::float;
 
-	UPDATE inp_pattern_value SET factor_1=factor_1/v_sum, factor_2=factor_2/v_sum, factor_3=factor_3/v_sum, factor_4=factor_4/v_sum, factor_5=factor_5/v_sum, factor_6=factor_6/v_sum, factor_7=factor_7/v_sum,
-				factor_8=factor_8/v_sum, factor_9=factor_9/v_sum, factor_10=factor_10/v_sum, factor_11=factor_11/v_sum, factor_12=factor_12/v_sum, factor_13=factor_13/v_sum, factor_14=factor_14/v_sum,
-				factor_15=factor_15/v_sum, factor_16=factor_16/v_sum WHERE pattern_id=v_pattern;
+	--UPDATE inp_pattern_value SET factor_1=factor_1/v_sum, factor_2=factor_2/v_sum, factor_3=factor_3/v_sum, factor_4=factor_4/v_sum, factor_5=factor_5/v_sum, factor_6=factor_6/v_sum, factor_7=factor_7/v_sum,
+	--		factor_8=factor_8/v_sum, factor_9=factor_9/v_sum, factor_10=factor_10/v_sum, factor_11=factor_11/v_sum, factor_12=factor_12/v_sum, factor_13=factor_13/v_sum, factor_14=factor_14/v_sum,
+	--		factor_15=factor_15/v_sum, factor_16=factor_16/v_sum WHERE pattern_id=v_pattern;
 
 	-- get min value from pattern
 	v_min = (SELECT  min(min) FROM (SELECT min(factor_1) FROM inp_pattern_value WHERE pattern_id=v_pattern UNION

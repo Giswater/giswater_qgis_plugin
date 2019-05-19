@@ -8,44 +8,44 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
------------------------
--- remove all the views that are refactored in the v3.2
------------------------
-/*DROP VIEW IF EXISTS v_edit_inp_demand;
-DROP VIEW IF EXISTS v_edit_inp_junction;
-DROP VIEW IF EXISTS v_edit_inp_pipe;
-DROP VIEW IF EXISTS v_edit_inp_pump;
-DROP VIEW IF EXISTS v_edit_inp_reservoir;
-DROP VIEW IF EXISTS v_edit_inp_shortpipe;
-DROP VIEW IF EXISTS v_edit_inp_tank;
-DROP VIEW IF EXISTS v_edit_inp_valve;
+DROP VIEW v_rtc_hydrometer_x_node_period;
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
+ SELECT a.hydrometer_id,
+    a.node_1 AS node_id,
+    a.arc_id,
+    b.dma_id,
+    b.period_id,
+    b.m3_total_period*0.5 AS m3_hydrometer_period,
+    b.lps_avg * 0.5::double precision AS lps_avg_real,
+    c.effc::numeric(5,4) AS losses,
+    b.lps_avg * 0.5::double precision / c.effc AS lps_avg,
+    c.minc AS cmin,
+    b.lps_avg * 0.5::double precision / c.effc * c.minc AS lps_min,
+    c.maxc AS cmax,
+    b.lps_avg * 0.5::double precision / c.effc * c.maxc AS lps_max,
+    c.pattern_id
+   FROM v_rtc_hydrometer_x_arc a
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text
+UNION
+ SELECT a.hydrometer_id,
+    a.node_2 AS node_id,
+    a.arc_id,
+    b.dma_id,
+    b.period_id,
+    b.m3_total_period*0.5,
+    b.lps_avg * 0.5::double precision AS lps_avg_real,
+    c.effc::numeric(5,4) AS losses,
+    b.lps_avg * 0.5::double precision / c.effc AS lps_avg,
+    c.minc AS cmin,
+    b.lps_avg * 0.5::double precision / c.effc * c.minc AS lps_min,
+    c.maxc AS cmax,
+    b.lps_avg * 0.5::double precision / c.effc * c.maxc AS lps_max,
+    c.pattern_id
+   FROM v_rtc_hydrometer_x_arc a
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text;
 
-DROP VIEW IF EXISTS v_edit_man_expansiontank;
-DROP VIEW IF EXISTS v_edit_man_filter;
-DROP VIEW IF EXISTS v_edit_man_flexunion;
-DROP VIEW IF EXISTS v_edit_man_fountain;
-DROP VIEW IF EXISTS v_edit_man_greentap;
-DROP VIEW IF EXISTS v_edit_man_hydrant;
-DROP VIEW IF EXISTS v_edit_man_junction;
-DROP VIEW IF EXISTS v_edit_man_manhole;
-DROP VIEW IF EXISTS v_edit_man_meter;
-DROP VIEW IF EXISTS v_edit_man_netelement;
-DROP VIEW IF EXISTS v_edit_man_netsamplepoint;
-DROP VIEW IF EXISTS v_edit_man_netwjoin;
-DROP VIEW IF EXISTS v_edit_man_pipe;
-DROP VIEW IF EXISTS v_edit_man_pump;
-DROP VIEW IF EXISTS v_edit_man_reduction;
-DROP VIEW IF EXISTS v_edit_man_register;
-DROP VIEW IF EXISTS v_edit_man_source;
-DROP VIEW IF EXISTS v_edit_man_tank;
-DROP VIEW IF EXISTS v_edit_man_tap;
-DROP VIEW IF EXISTS v_edit_man_valve;
-DROP VIEW IF EXISTS v_edit_man_varc;
-DROP VIEW IF EXISTS v_edit_man_waterwell;
-DROP VIEW IF EXISTS v_edit_man_wjoin;
-DROP VIEW IF EXISTS v_edit_man_wtp;
-
-*/
 
 
 DROP VIEW IF EXISTS vp_basic_arc;

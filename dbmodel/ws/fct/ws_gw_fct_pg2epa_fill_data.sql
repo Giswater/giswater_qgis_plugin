@@ -38,8 +38,12 @@ BEGIN
 
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
 
-	IF v_usedmapattern THEN
+	IF v_usedmapattern='DMA' THEN
 		UPDATE rpt_inp_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id WHERE rpt_inp_node.node_id=node.node_id AND result_id=result_id_var;
+		
+	ELSIF v_usedmapattern='CUSTOM' THEN
+		-- todo
+	
 	END IF;
 
 
