@@ -247,20 +247,6 @@ CREATE OR REPLACE VIEW v_rpt_comp_arc AS
   WHERE rpt_arc.result_id::text = rpt_selector_compare.result_id::text AND rpt_arc."time"::text = rpt_selector_hourly."time"::text AND rpt_selector_compare.cur_user = "current_user"()::text AND rpt_selector_hourly.cur_user = "current_user"()::text
  AND arc.result_id=rpt_selector_compare.result_id;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   
 CREATE OR REPLACE VIEW v_rpt_comp_node AS 
  SELECT node.node_id,

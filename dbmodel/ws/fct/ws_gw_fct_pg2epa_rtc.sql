@@ -52,6 +52,8 @@ BEGIN
 		WHERE result_id=result_id_var AND rpt_inp_node.node_id=a.node_id;
 	END IF;
 
+	-- profilactic control of null demands (because epanet cmd does not runs with null demands
+	UPDATE rpt_inp_node SET demand=0 WHERE result_id=result_id_var AND demand IS NULL;
 	
 RETURN 1;
 END;
