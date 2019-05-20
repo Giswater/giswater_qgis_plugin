@@ -354,16 +354,16 @@ BEGIN
 	END IF;
 		raise notice '%', v_query_result;
 
-	-- calculating last page
-	IF v_limit IS NULL THEN
-		v_limit = 10;
-	END IF;
-	
-	EXECUTE 'SELECT count(*)/'||quote_literal(v_limit)||' FROM (' || v_query_result || ') a'
-		INTO v_lastpage;
-	
+
 	-- add limit
-	v_query_result := v_query_result || ' LIMIT '|| v_limit;
+	IF v_limit IS NULL THEN
+		v_query_result := v_query_result;
+	ELSE
+		-- calculating last page
+		EXECUTE 'SELECT count(*)/'||quote_literal(v_limit)||' FROM (' || v_query_result || ') a'
+		INTO v_lastpage;
+		v_query_result := v_query_result || ' LIMIT '|| v_limit;
+	END IF;
 
 	-- calculating current page
 	IF v_currentpage IS NULL THEN 
