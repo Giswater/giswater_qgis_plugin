@@ -34,7 +34,7 @@ from .actions.utils import Utils
 from .dao.controller import DaoController
 from .map_tools.cad_add_circle import CadAddCircle
 from .map_tools.cad_add_point import CadAddPoint
-from map_tools.cad_api_info_data import CadApiInfo
+from map_tools.cad_api_info import CadApiInfo
 from .map_tools.change_elem_type import ChangeElemType
 from .map_tools.connec import ConnecMapTool
 from .map_tools.delete_node import DeleteNodeMapTool
@@ -184,7 +184,7 @@ class Giswater(QObject):
                 callback_function = getattr(self.edit, function_name)
                 action.triggered.connect(callback_function)
             # Go2epa toolbar actions
-            elif int(index_action) in (23, 25, 29, 196, 199):
+            elif int(index_action) in (23, 25, 29, 196):
                 callback_function = getattr(self.go2epa, function_name)
                 action.triggered.connect(callback_function)
             # Master toolbar actions
@@ -316,7 +316,8 @@ class Giswater(QObject):
             map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
         elif int(index_action) == 28:
             map_tool = ChangeElemType(self.iface, self.settings, action, index_action)
-        elif int(index_action) == 37:
+        elif int(index_action) in (37, 199):
+            self.controller.log_info(str(index_action))
             map_tool = CadApiInfo(self.iface, self.settings, action, index_action)
         elif int(index_action) == 39:
             map_tool = Dimensioning(self.iface, self.settings, action, index_action)                     
@@ -962,6 +963,7 @@ class Giswater(QObject):
     def manage_map_tools(self):
         """ Manage map tools """
         self.set_map_tool('map_tool_api_info_data')
+        self.set_map_tool('map_tool_api_info_inp')
         self.set_map_tool('map_tool_move_node')
         self.set_map_tool('map_tool_delete_node')
         self.set_map_tool('map_tool_flow_trace')

@@ -38,7 +38,7 @@ class CadApiInfo(ParentMapTool):
         # Call ParentMapTool constructor
         super(CadApiInfo, self).__init__(iface, settings, action, index_action)
         self.index_action = index_action
-
+        self.tab_type = None
 
     def create_point(self, event):
         x = event.pos().x()
@@ -76,7 +76,7 @@ class CadApiInfo(ParentMapTool):
             point = self.create_point(event)
             if point is False:
                 return
-            complet_result, dialog = self.info_cf.open_form(point, tab_type='data')
+            complet_result, dialog = self.info_cf.open_form(point, tab_type=self.tab_type)
         if complet_result is False:
                 print("No point under mouse(LeftButton)")
                 return
@@ -86,19 +86,24 @@ class CadApiInfo(ParentMapTool):
                 print("No point under mouse(RightButton)")
                 return
 
-            self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type='data')
+            self.info_cf.hilight_feature(point, rb_list=self.rubberband_list, tab_type=self.tab_type)
 
 
     def activate(self):
         # Check button
         self.action().setChecked(True)
-
+        print(self.index_action)
         # Change map tool cursor
         self.cursor = QCursor()
         self.cursor.setShape(Qt.WhatsThisCursor)
         self.canvas.setCursor(self.cursor)
         self.rubberband_list = []
-        self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, 'data')
+        if self.index_action == '37':
+            self.tab_type = 'data'
+        elif self.index_action == '199':
+            self.tab_type = 'inp'
+
+        self.info_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
 
 
 
