@@ -34,7 +34,7 @@ import sys
 import operator
 if 'nt' in sys.builtin_module_names:
     import winreg
-
+from actions.HyperLinkLabel import HyperLinkLabel
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
 
@@ -90,7 +90,8 @@ def getText(dialog, widget, return_string_null=True):
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if widget:
-        if type(widget) is QLineEdit:
+        if type(widget) is QLineEdit or type(widget) is QPushButton or type(widget) is QLabel \
+                or type(widget) is HyperLinkLabel:
             text = widget.text()
         elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.value()
@@ -139,9 +140,9 @@ def getCalendarDate(dialog, widget, date_format="yyyy/MM/dd", datetime_format="y
         date = widget.date().toString(date_format)
     elif type(widget) is QDateTimeEdit:
         date = widget.dateTime().toString(datetime_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy':
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd'):
         date = widget.dateTime().toString(date_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss':
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss'):
         date = widget.dateTime().toString(datetime_format)
 
     return date
@@ -154,7 +155,7 @@ def setCalendarDate(dialog, widget, date, default_current_date=True):
     if not widget:
         return
     if type(widget) is QDateEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy'):
+        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd')):
         if date is None:
             if default_current_date:
                 date = QDate.currentDate()
@@ -162,7 +163,7 @@ def setCalendarDate(dialog, widget, date, default_current_date=True):
                 date = QDate.fromString('01/01/2000', 'dd/MM/yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit \
-        or (type(widget) is QgsDateTimeEdit and widget.displayFormat() == 'dd/MM/yyyy hh:mm:ss'):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss')):
         if date is None:
             date = QDateTime.currentDateTime()
         widget.setDateTime(date)
@@ -206,7 +207,8 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
         return None
 
     text = None
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is HyperLinkLabel \
+            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton:
         text = getText(dialog, widget, return_string_null)
     elif type(widget) is QComboBox:
         text = getSelectedItem(dialog, widget, return_string_null)

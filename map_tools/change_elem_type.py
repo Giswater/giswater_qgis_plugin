@@ -396,7 +396,6 @@ class ChangeElemType(ParentMapTool):
 
 
     def activate(self):
-        
         # Check button
         self.action().setChecked(True)     
 
@@ -420,7 +419,6 @@ class ChangeElemType(ParentMapTool):
 
 
     def deactivate(self):
-
-        # Call parent method     
+        # Call parent method
         ParentMapTool.deactivate(self)
 

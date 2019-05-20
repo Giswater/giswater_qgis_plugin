@@ -13,6 +13,30 @@ def get_ui_class(ui_file_name):
     return uic.loadUiType(ui_file_path)[0]
 
 
+FORM_CLASS = get_ui_class('api_basic_info.ui')
+class ApiBasicInfo(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('api_catalog.ui')
+class ApiCatalogUi(QMainWindow, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+FORM_CLASS = get_ui_class('api_cf.ui')
+class ApiCfUi(QMainWindow, FORM_CLASS):
+    dlg_closed = QtCore.pyqtSignal()
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
+
+    def closeEvent(self, event):
+        print('event: {0}'.format(event))
+        self.dlg_closed.emit()
+        return super(ApiCfUi, self).closeEvent(event)
+
 FORM_CLASS = get_ui_class('add_doc.ui')
 class AddDoc(QDialog, FORM_CLASS):
     def __init__(self):
@@ -411,6 +435,11 @@ class ReadsqlShowInfo(QMainWindow, FORM_CLASS):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+FORM_CLASS = get_ui_class('sections.ui')
+class Sections(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
 
 FORM_CLASS = get_ui_class('selector_date.ui')
 class SelectorDate(QDialog, FORM_CLASS):

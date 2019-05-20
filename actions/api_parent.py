@@ -19,16 +19,19 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
-    from qgis.core import QgsWkbTypes
+    from qgis.core import QgsWkbTypes, QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsProject, QgsRectangle, QgsPoint, QgsGeometry
+
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsPoint, QgsGeometry
+from qgis.core import QgsPointLocator
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
-from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator
+from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QGroupBox, QAction
+from qgis.PyQt.QtWidgets import QTableView, QPushButton
 from qgis.PyQt.QtSql import QSqlTableModel
 
 import json
@@ -38,7 +41,6 @@ from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
-from map_tools.snapping_utils_v2 import SnappingConfigManager
 from giswater.actions.parent import ParentAction
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
 
@@ -62,6 +64,7 @@ class ApiParent(ParentAction):
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
         self.list_update = []
+
 
 
     def get_editable_project(self):
@@ -200,11 +203,6 @@ class ApiParent(ParentAction):
                 layer.removeSelection()
 
 
-    def set_action(self, action, visible=True, enabled=True):
-        action.setVisible(visible)
-        action.setEnabled(enabled)
-
-
     def start_editing(self):
         """ start or stop the edition based on your current status"""
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
@@ -270,14 +268,67 @@ class ApiParent(ParentAction):
                 message = "File not found"
                 self.controller.show_warning(message, parameter=pdf_path)
 
-                
+    def action_rotation(self, dialog):
+
+        # Set map tool emit point and signals
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.previous_map_tool = self.canvas.mapTool()
+        self.canvas.setMapTool(self.emit_point)
+        self.emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog))
+
+
+    def action_rotation_canvas_clicked(self, dialog, point, btn):
+        if btn == Qt.RightButton:
+            self.canvas.setMapTool(self.previous_map_tool)
+            return
+
+        viewname = self.controller.get_layer_source_table_name(self.layer)
+        sql = ("SELECT ST_X(the_geom), ST_Y(the_geom)"
+               " FROM " + self.schema_name + "." + viewname + ""
+               " WHERE node_id = '" + self.feature_id + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            existing_point_x = row[0]
+            existing_point_y = row[1]
+
+        sql = ("UPDATE " + self.schema_name + ".node"
+               " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "), "
+               " ST_Point(" + str(point.x()) + ", " + str(point.y()) + "))))"
+               " WHERE node_id = '" + str(self.feature_id) + "'")
+        status = self.controller.execute_sql(sql)
+        if not status:
+            self.canvas.setMapTool(self.previous_map_tool)
+            return
+        sql = ("SELECT rotation FROM " + self.schema_name + ".node "
+               " WHERE node_id='" + str(self.feature_id) + "'")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(dialog, "rotation", str(row[0]))
+
+        sql = ("SELECT degrees(ST_Azimuth(ST_Point(" + str(existing_point_x) + ", " + str(existing_point_y) + "),"
+               " ST_Point( " + str(point.x()) + ", " + str(point.y()) + ")))")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(dialog, "hemisphere", str(row[0]))
+            message = "Hemisphere of the node has been updated. Value is"
+            self.controller.show_info(message, parameter=str(row[0]))
+        self.api_disable_rotation(dialog)
+
+    def api_disable_rotation(self, dialog):
+        """ Disable actionRotation and set action 'Identify' """
+
+        action_widget = dialog.findChild(QAction, "actionRotation")
+        if action_widget:
+            action_widget.setChecked(False)
+        try:
+            self.emit_point.canvasClicked.disconnect()
+            self.canvas.setMapTool(self.previous_map_tool)
+        except Exception as e:
+            print(type(e).__name__)
+
+
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
-
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT > 29900:
-            return
-        
         # Set map tool emit point and signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -322,19 +373,28 @@ class ApiParent(ParentAction):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        if Qgis.QGIS_VERSION_INT < 29900:
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+            if not result:
+                return
+            # Check snapped features
+            for snapped_point in result:
+                point = QgsPoint(snapped_point.snappedVertex)
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
+                break
+        else:
+            result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
+            if not result:
+                return
+            # That's the snapped features
+            if result:
+                # Get the point and add marker on it
+                point = QgsPointXY(result.point())
+                self.vertex_marker.setCenter(point)
+                self.vertex_marker.show()
 
-        if not result:
-            return
 
-        # Check snapped features
-        for snapped_point in result:
-            point = QgsPoint(snapped_point.snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()
-            break
-
-            
     def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, point, btn):
         """ Slot function when canvas is clicked """
 
@@ -349,7 +409,10 @@ class ApiParent(ParentAction):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        if Qgis.QGIS_VERSION_INT < 29900:
+            (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
+        else:
+            result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
 
         # That's the snapped point
         if not result:
@@ -359,17 +422,23 @@ class ApiParent(ParentAction):
         layer = self.iface.activeLayer()
         layername = layer.name()
         is_valid = False
-        for snapped_point in result:
-            # Get only one feature
-            point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
-            snapped_feature = next(
-                snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+        if Qgis.QGIS_VERSION_INT < 29900:
+            for snapped_point in result:
+                # Get only one feature
+                point = QgsPoint(snapped_point.snappedVertex)  # @UnusedVariable
+                snapped_feature = next(
+                    snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                snapped_feature_attr = snapped_feature.attributes()
+                # Leave selection
+                snapped_point.layer.select([snapped_point.snappedAtGeometry])
+                is_valid = True
+                break
+        else:
+            snapped_feature = next(result.layer().getFeatures(QgsFeatureRequest().setFilterFid(result.featureId())))
             snapped_feature_attr = snapped_feature.attributes()
             # Leave selection
-            snapped_point.layer.select([snapped_point.snappedAtGeometry])
+            result.layer().select([result.featureId()])
             is_valid = True
-            break
-
         if not is_valid:
             message = "Any of the snapped features belong to selected layer"
             self.controller.show_info(message, parameter=self.iface.activeLayer().name(), duration=10)
@@ -435,7 +504,7 @@ class ApiParent(ParentAction):
                 if utils_giswater.getWidgetType(dialog, widget) is QLineEdit:
                     utils_giswater.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif utils_giswater.getWidgetType(dialog, widget) is QComboBox:
-                    utils_giswater.set_combo_itemData(widget, snapped_feature_attr_aux[i], 1)
+                    utils_giswater.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
 
         self.api_disable_copy_paste(dialog)
 
@@ -536,6 +605,29 @@ class ApiParent(ParentAction):
         return widget
 
 
+    def add_button(self, dialog, field):
+
+        widget = QPushButton()
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
+        if 'value' in field:
+            widget.setText(field['value'])
+        # widget.setStyleSheet("Text-align:left; Text-decoration:underline")
+        # widget.setFlat(True)
+        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+        function_name = 'no_function_asociated'
+        if 'widgetfunction' in field:
+            if field['widgetfunction'] is not None:
+                function_name = field['widgetfunction']
+            else:
+                msg = ("parameter button_function is null for button " + widget.objectName())
+                self.controller.show_message(msg, 2)
+
+        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
+        return widget
+
+
     def add_lineedit(self, field):
         """ Add widgets QLineEdit type """
         
@@ -606,7 +698,7 @@ class ApiParent(ParentAction):
         body = self.create_body(extras=extras)
         # Get layers under mouse clicked
         sql = ("SELECT " + self.schema_name + ".gw_api_gettypeahead($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql, log_sql=False)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
@@ -618,6 +710,101 @@ class ApiParent(ParentAction):
             list_items.append(field['idval'])
         self.set_completer_object_api(completer, model, widget, list_items)
 
+
+    def add_tableview(self, complet_result, field):
+        """ Add widgets QTableView type """
+        widget = QTableView()
+        widget.setObjectName(field['widgetname'])
+        if 'column_id' in field:
+            widget.setProperty('column_id', field['column_id'])
+        function_name = 'no_function_asociated'
+        function_name = 'gw_api_open_rpt_result'
+        widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
+        # if 'widgetfunction' in field:
+        #     if field['widgetfunction'] is not None:
+        #         function_name = field['widgetfunction']
+        #         widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
+        # else:
+        #     widget.doubleClicked.connect(partial(getattr(self, function_name), None, widget, 2))
+        return widget
+
+
+    def no_function_asociated(self, dialog, widget=None, message_level=1):
+        msg = "No function asociated to {} {}: ".format(str(type(widget)), str(widget.objectName()))
+        self.controller.show_message(msg, message_level)
+
+
+    def set_headers(self, widget, field):
+        standar_model = widget.model()
+        if standar_model is None:
+            standar_model = QStandardItemModel()
+        # Related by Qtable
+        widget.setModel(standar_model)
+        widget.horizontalHeader().setStretchLastSection(True)
+
+        # # Get headers
+        headers = []
+        for x in field['value'][0]:
+            headers.append(x)
+        # Set headers
+        standar_model.setHorizontalHeaderLabels(headers)
+        return widget
+
+    def populate_table(self, widget, field):
+        standar_model = widget.model()
+        for item in field['value']:
+            row = []
+            for value in item.values():
+                row.append(QStandardItem(str(value)))
+            if len(row) > 0:
+                standar_model.appendRow(row)
+        return widget
+
+    def set_columns_config(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
+        """ Configuration of tables. Set visibility and width of columns """
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = ("SELECT column_index, width, alias, status"
+               " FROM " + self.schema_name + ".config_client_forms"
+               " WHERE table_id = '" + table_name + "'"
+               " ORDER BY column_index")
+        rows = self.controller.get_rows(sql, log_info=False, commit=True)
+        if not rows:
+            return widget
+
+        for row in rows:
+            if not row['status']:
+                columns_to_delete.append(row['column_index'] - 1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index'] - 1, width)
+                if row['alias'] is not None:
+                    widget.model().setHeaderData(row['column_index'] - 1, Qt.Horizontal, row['alias'])
+
+        # Set order
+        if isQStandardItemModel:
+            widget.model().sort(sort_order, Qt.AscendingOrder)
+        else:
+            widget.model().setSort(sort_order, Qt.AscendingOrder)
+            widget.model().select()
+        # Delete columns
+        for column in columns_to_delete:
+            widget.hideColumn(column)
+
+        return widget
+
+
+    def add_checkbox(self, dialog, field):
+        widget = QCheckBox()
+        widget.setObjectName(field['widgetname'])
+        widget.setProperty('column_id', field['column_id'])
+        if 'value' in field:
+            if field['value'] in ("t", "true", True):
+                widget.setChecked(True)
+        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        return widget
 
     def add_combobox(self, field):
     
@@ -752,6 +939,10 @@ class ApiParent(ParentAction):
 
         for i in range(0, len(polygon)):
             x, y = polygon[i].split(' ')
+            # if Qgis.QGIS_VERSION_INT < 29900:
+            #     point = QgsPoint(float(x), float(y))
+            # else:
+            #     point = QgsPointXY(float(x), float(y))
             point = QgsPoint(float(x), float(y))
             points.append(point)
         return points
@@ -792,7 +983,6 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
-
         if complet_result[0]['body']['feature']['geometry'] is None:
             return
         if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
@@ -802,7 +992,10 @@ class ApiParent(ParentAction):
 
         self.resetRubberbands()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPoint(float(max_x), float(max_y))
+            if Qgis.QGIS_VERSION_INT < 29900:
+                point = QgsPoint(float(max_x), float(max_y))
+            else:
+                point = QgsPointXY(float(max_x), float(max_y))
             self.draw_point(point)
         else:
             points = self.get_points(list_coord)
@@ -838,10 +1031,9 @@ class ApiParent(ParentAction):
     
         if Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_point.reset(Qgis.Point)
-            self.rubber_polygon.reset()
         else:
             self.rubber_point.reset(QgsWkbTypes.PointGeometry)
-            self.rubber_polygon.reset()
+        self.rubber_polygon.reset()
 
             
     def fill_table(self, widget, table_name, filter_=None):
@@ -868,11 +1060,9 @@ class ApiParent(ParentAction):
 
         
     def populate_basic_info(self, dialog, result, field_id):
-    
         fields = result[0]['body']['data']
         if 'fields' not in fields:
             return
-
         grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
         for field in fields["fields"]:
             label = QLabel()
@@ -891,7 +1081,7 @@ class ApiParent(ParentAction):
                 widget = self.set_data_type(field, widget)
                 if field['widgettype'] == 'typeahead':
                     widget = self.manage_lineedit(field, dialog, widget, completer)
-                if widget.objectName() == field_id:
+                if widget.property('column_id') == field_id:
                     self.feature_id = widget.text()
             elif field['widgettype'] == 'datepickertime':
                 widget = self.add_calendar(dialog, field)
@@ -930,7 +1120,7 @@ class ApiParent(ParentAction):
         widget.setAllowNull(True)
         widget.setCalendarPopup(True)
         widget.setDisplayFormat('yyyy/MM/dd')
-        if 'value' in field:
+        if 'value' in field and field['value'] not in ('', None, 'null'):
             date = QDate.fromString(field['value'], 'yyyy-MM-dd')
             utils_giswater.setCalendarDate(dialog, widget, date)
         else:
@@ -940,7 +1130,7 @@ class ApiParent(ParentAction):
         if field['isautoupdate']:
             _json = {}
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, _json))
-            btn_calendar.clicked.connect(partial(self.accept, self.complet_result[0], self.feature_id, _json, True, False))
+            btn_calendar.clicked.connect(partial(self.accept, dialog, self.complet_result[0], self.feature_id, _json, True, False))
         else:
             btn_calendar.clicked.connect(partial(self.get_values, dialog, widget, self.my_json))
         btn_calendar.clicked.connect(partial(self.set_calendar_empty, widget))
