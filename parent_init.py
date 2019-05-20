@@ -1359,8 +1359,8 @@ class ParentDialog(QDialog):
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
             return
-        filter_ += " AND tstamp >= '" + date_from + "' AND tstamp <= '" + date_to + "'"
-
+        filter_ += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
+        
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
         self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
@@ -1406,7 +1406,7 @@ class ParentDialog(QDialog):
 
         # Set filter to model
         expr = self.field_id + " = '" + self.id + "'"
-        expr += " AND tstamp >= '" + date_from + "' AND tstamp <= '" + date_to + "'"
+        expr += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
 
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.getWidgetText(self.dialog, "event_type")
