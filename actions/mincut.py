@@ -2269,9 +2269,8 @@ class MincutParent(ParentAction, MultipleSelection):
         self.dlg_comp = MincutComposer()
         self.load_settings(self.dlg_comp)
 
-        # Fill ComboBox cbx_template with templates *.qpt from ...giswater/templates
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        template_folder = plugin_path + os.sep + "templates"
+        # Fill ComboBox cbx_template with templates *.qpt from ...system_variables/composers_path
+        template_folder = self.settings.value('system_variables/composers_path')
         template_files = os.listdir(template_folder)
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
         self.dlg_comp.cbx_template.clear()
@@ -2319,8 +2318,7 @@ class MincutParent(ParentAction, MultipleSelection):
 
         if index == num_comp:
             # Create new composer with template selected in combobox(self.template)
-            plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-            template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
+            template_path = self.settings.value('system_variables/composers_path/' + os.sep + str(self.template) + '.qpt')
             template_file = file(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
