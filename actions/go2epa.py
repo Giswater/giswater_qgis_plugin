@@ -43,7 +43,7 @@ class Go2Epa(ApiParent):
 
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.g2epa_opt = Go2EpaOptions(iface, settings, controller, plugin_dir)
-
+        self.iterations = 0
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -439,9 +439,9 @@ class Go2Epa(ApiParent):
         os.chdir(folder_path)
         message = self.controller.tr("Select RPT file")
         if Qgis.QGIS_VERSION_INT < 29900:
-            self.file_rpt = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
+            self.file_rpt = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
         else:
-            self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
+            self.file_rpt, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
 
         self.controller.set_path_from_qfiledialog(self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
