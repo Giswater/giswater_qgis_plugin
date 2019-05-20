@@ -25,7 +25,7 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS
     b.lps_avg * 0.5::double precision / c.effc * c.maxc AS lps_max,
     c.pattern_id
    FROM v_rtc_hydrometer_x_arc a
-     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::bigint = a.hydrometer_id::bigint
      JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text
 UNION
  SELECT a.hydrometer_id,
@@ -43,7 +43,7 @@ UNION
     b.lps_avg * 0.5::double precision / c.effc * c.maxc AS lps_max,
     c.pattern_id
    FROM v_rtc_hydrometer_x_arc a
-     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id = a.hydrometer_id::bigint
+     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::bigint = a.hydrometer_id::bigint
      JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text;
 
 
