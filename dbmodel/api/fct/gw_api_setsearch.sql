@@ -418,7 +418,7 @@ ELSIF tab_arg = 'address' THEN
         FROM (SELECT '||quote_ident(v_workcat_display_field)||' as display_name, '||quote_literal(v_workcat_layer)||' AS sys_table_id , 
         '||quote_ident((v_workcat_id_field))||' AS sys_id, '||quote_literal(v_workcat_layer)||' 
         AS sys_idname, '||quote_literal(v_filter_text)||' AS filter_text FROM '||quote_ident(v_workcat_layer)|| '
-        WHERE '||quote_ident(v_workcat_display_field)||'::text ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
+        WHERE '||quote_ident(v_workcat_display_field)||'::text ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
         INTO response_json;
 
 -- Visit tab
@@ -440,7 +440,7 @@ ELSIF tab_arg = 'address' THEN
         FROM (SELECT '||quote_ident(v_visit_display_field)||'::text as display_name, '||quote_literal(v_visit_layer)||' AS sys_table_id , 
         '||quote_ident((v_visit_id_field))||' AS sys_id, '||quote_literal(v_visit_layer)||' 
         AS sys_idname FROM '||v_visit_layer||'  
-        WHERE '||quote_ident(v_visit_display_field)||'::text ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
+        WHERE '||quote_ident(v_visit_display_field)||'::text ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
         INTO response_json;
 
 
@@ -481,7 +481,7 @@ ELSIF tab_arg = 'address' THEN
         FROM '||quote_ident(v_psector_layer)||'  
         JOIN '||quote_ident(v_exploitation_layer)||' ON '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_id_field)||' = '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_parent_field)||'
         WHERE '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
-        AND '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_display_field)||' ILIKE '''||quote_literal(text_arg)||''' LIMIT 10 )a'
+        AND '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_display_field)||' ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
         INTO response_json;
     ELSE
  

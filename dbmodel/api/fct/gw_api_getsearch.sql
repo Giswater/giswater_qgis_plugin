@@ -69,7 +69,7 @@ BEGIN
 
 -- Network Tab
 -------------------------
-    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND formtab='tab_network' ;
+    SELECT * INTO rec_tab FROM config_api_form_tabs WHERE formname='search' AND tabname='tab_network' ;
 
     IF rec_tab.id IS NOT NULL THEN
 
@@ -105,9 +105,9 @@ BEGIN
         
         -- Create network tab form
         IF v_firsttab THEN
-	    formNetwork := json_build_object('tabName','network','tabHeaderText',rec_tab.headertext, 'active' , v_active);
+	    formNetwork := json_build_object('tabName','network','tabtext',rec_tab.tabtext, 'active' , v_active);
         ELSE
-            formNetwork := json_build_object('tabName','network','tabHeaderText',rec_tab.headertext, 'active' , true);
+            formNetwork := json_build_object('tabName','network','tabtext',rec_tab.tabtext, 'active' , true);
         formNetwork := gw_fct_json_object_set_key(formNetwork, 'fields', fieldsJson);
 	END IF;
         -- Create tabs array
@@ -134,11 +134,11 @@ BEGIN
         -- Create search tab form
 	
         IF v_firsttab THEN 
-            formSearch := json_build_object('tabName','search','tabHeaderText',rec_tab.tabtext, 'active', v_active );
+            formSearch := json_build_object('tabName','search','tabtext',rec_tab.tabtext, 'active', v_active );
             formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
             v_form := v_form || ',' || formSearch::text;
         ELSE 
-            formSearch := json_build_object('tabName','search','tabHeaderText',rec_tab.tabtext, 'active', true );
+            formSearch := json_build_object('tabName','search','tabtext',rec_tab.tabtext, 'active', true );
             formSearch := gw_fct_json_object_set_key(formSearch, 'fields', fieldsJson);
             v_form := v_form || formSearch::text;
         END IF;
@@ -206,12 +206,12 @@ BEGIN
         
         -- Create tabs array
         IF v_firsttab THEN 
-            formAddress := json_build_object('tabName','address','tabHeaderText',rec_tab.tabtext, 'active', v_active );
+            formAddress := json_build_object('tabName','address','tabtext',rec_tab.tabtext, 'active', v_active );
             formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
 
             v_form := v_form || ',' || formAddress::text;
         ELSE 
-            formAddress := json_build_object('tabName','address','tabHeaderText',rec_tab.tabtext, 'active', true );
+            formAddress := json_build_object('tabName','address','tabtext',rec_tab.tabtext, 'active', true );
             formAddress := gw_fct_json_object_set_key(formAddress, 'fields', fieldsJson);
 
             v_form := v_form || formAddress::text;
@@ -271,11 +271,11 @@ BEGIN
         
         -- Create tabs array
         IF v_firsttab THEN 
-            formHydro := json_build_object('tabName','hydro','tabHeaderText',rec_tab.tabtext, 'active', v_active );
+            formHydro := json_build_object('tabName','hydro','tabtext',rec_tab.tabtext, 'active', v_active );
             formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
             v_form := v_form || ',' || formHydro::text;
         ELSE 
-            formHydro := json_build_object('tabName','hydro','tabHeaderText',rec_tab.tabtext, 'active', true );
+            formHydro := json_build_object('tabName','hydro','tabtext',rec_tab.tabtext, 'active', true );
             formHydro := gw_fct_json_object_set_key(formHydro, 'fields', fieldsJson);
             v_form := v_form || formHydro::text;
         END IF;
@@ -301,11 +301,11 @@ BEGIN
 
         -- Create tabs array
         IF v_firsttab THEN 
-            formWorkcat := json_build_object('tabName','workcat','tabHeaderText',rec_tab.tabtext, 'active', v_active );
+            formWorkcat := json_build_object('tabName','workcat','tabtext',rec_tab.tabtext, 'active', v_active );
             formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
             v_form := v_form || ',' || formWorkcat::text;
         ELSE 
-            formWorkcat := json_build_object('tabName','workcat','tabHeaderText',rec_tab.tabtext, 'active', true );
+            formWorkcat := json_build_object('tabName','workcat','tabtext',rec_tab.tabtext, 'active', true );
             formWorkcat := gw_fct_json_object_set_key(formWorkcat, 'fields', fieldsJson);
             v_form := v_form || formWorkcat::text;
         END IF;
@@ -364,11 +364,11 @@ BEGIN
    
         -- Create tabs array
         IF v_firsttab THEN 
-            formPsector := json_build_object('tabName','psector','tabHeaderText',rec_tab.tabtext, 'active', v_active );
+            formPsector := json_build_object('tabName','psector','tabtext',rec_tab.tabtext, 'active', v_active );
             formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
             v_form := v_form || ',' || formPsector::text;
         ELSE 
-            formPsector := json_build_object('tabName','psector','tabHeaderText',rec_tab.tabtext, 'active', true );
+            formPsector := json_build_object('tabName','psector','tabtext',rec_tab.tabtext, 'active', true );
             formPsector := gw_fct_json_object_set_key(formPsector, 'fields', fieldsJson);
             v_form := v_form || formPsector::text;
         END IF;
@@ -392,11 +392,11 @@ BEGIN
 
         -- Create tabs array
         IF v_firsttab THEN 
-            formVisit := json_build_object('tabName','visit','tabHeaderText','Visita', 'active', v_active );
+            formVisit := json_build_object('tabName','visit','tabtext','Visita', 'active', v_active );
             formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
             v_form := v_form || ',' || formVisit::text;
         ELSE 
-            formVisit := json_build_object('tabName','visit','tabHeaderText','Visita', 'active', true );
+            formVisit := json_build_object('tabName','visit','tabtext','Visita', 'active', true );
             formVisit := gw_fct_json_object_set_key(formVisit, 'fields', fieldsJson);
             v_form := v_form || formVisit::text;
         END IF;
