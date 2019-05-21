@@ -28,6 +28,14 @@ user_name text,
 CONSTRAINT UNIQUE (pattern_id, node_id, period_id, isunitary)
 );
 
+
+CREATE TABLE inp_pattern_x_pattern(
+id serial PRIMARY KEY,
+pattern_id character varying(16),
+pattern_id2 character varying(16),
+CONSTRAINT UNIQUE (pattern_id, pattern_id2)
+);
+
 ALTER TABLE inp_pattern ADD COLUMN timesteps integer;
 ALTER TABLE inp_pattern ADD COLUMN isunitary boolean DEFAULT TRUE;
 ALTER TABLE inp_pattern ADD COLUMN feature json;
