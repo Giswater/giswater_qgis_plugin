@@ -807,7 +807,8 @@ SELECT v_node.node_id,
      JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.shtvalve_param_1,ct.shtvalve_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''SHUTOFF-VALVE''
+                    FROM SCHEMA_NAME.man_addfields_value 
+                    JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''SHUTOFF-VALVE''
                     ORDER  BY 1,2'::text, ' VALUES (''22''),(''23'')'::text) 
                     ct(feature_id character varying, shtvalve_param_1 text, shtvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.nodetype_id::text = 'SHUTOFF-VALVE'::text;
@@ -892,7 +893,8 @@ SELECT v_node.node_id,
      JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.checkvalve_param_1,ct.checkvalve_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CHECK-VALVE''
+                    FROM SCHEMA_NAME.man_addfields_value 
+                    JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CHECK-VALVE''
                     ORDER  BY 1,2'::text, ' VALUES (''47''),(''48'')'::text) 
                     ct(feature_id character varying, checkvalve_param_1 text, checkvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.nodetype_id::text = 'CHECK-VALVE'::text;
@@ -1445,7 +1447,8 @@ SELECT v_node.node_id,
      JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.airvalve_param_1,ct.airvalve_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''AIR-VALVE''
+                FROM SCHEMA_NAME.man_addfields_value 
+                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''AIR-VALVE''
                 ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) 
                 ct(feature_id character varying, airvalve_param_1 text, airvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'AIR-VALVE'::text;
@@ -1532,7 +1535,8 @@ SELECT v_node.node_id,
      JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.greenvalve_param_1,ct.greenvalve_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''GREEN-VALVE''
+                FROM SCHEMA_NAME.man_addfields_value 
+                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''GREEN-VALVE''
                 ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) 
                 ct(feature_id character varying, greenvalve_param_1 text, greenvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'GREEN-VALVE'::text;
@@ -1618,7 +1622,8 @@ SELECT v_node.node_id,
      JOIN man_valve ON man_valve.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.outfallvalve_param_1,ct.outfallvalve_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''OUTFALL-VALVE''
+                FROM SCHEMA_NAME.man_addfields_value 
+                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''OUTFALL-VALVE''
                 ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) 
                 ct(feature_id character varying, outfallvalve_param_1 text, outfallvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'OUTFALL-VALVE'::text;
@@ -1689,7 +1694,8 @@ CREATE VIEW ve_node_register AS
      JOIN man_register ON v_node.node_id::text = man_register.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.register_param_1,ct.register_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''REGISTER''
+                FROM SCHEMA_NAME.man_addfields_value 
+                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''REGISTER''
                 ORDER  BY 1,2'::text, ' VALUES (''3''),(''4'')'::text) 
                 ct(feature_id character varying, register_param_1 text, register_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'REGISTER'::text;
@@ -1890,7 +1896,8 @@ CREATE VIEW ve_node_controlregister AS
      JOIN man_register ON v_node.node_id::text = man_register.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.ctrlregister_param_1,ct.ctrlregister_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CONTROL-REGISTER''
+                FROM SCHEMA_NAME.man_addfields_value 
+                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''CONTROL-REGISTER''
                 ORDER  BY 1,2'::text, ' VALUES (''28''),(''29'')'::text) 
                 ct(feature_id character varying, ctrlregister_param_1 text, ctrlregister_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'CONTROL-REGISTER'::text;
@@ -2153,7 +2160,8 @@ CREATE VIEW ve_node_hydrant AS
      JOIN man_hydrant ON man_hydrant.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.hydrant_param_1,ct.hydrant_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                    FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''HYDRANT''
+                    FROM SCHEMA_NAME.man_addfields_value 
+                    JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''HYDRANT''
                     ORDER  BY 1,2'::text, ' VALUES (''35''),(''36'')'::text) 
                     ct(feature_id character varying, hydrant_param_1 text, hydrant_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                     WHERE v_node.nodetype_id::text = 'HYDRANT'::text;
@@ -3190,7 +3198,8 @@ CREATE VIEW ve_node_tank AS
      JOIN man_tank ON man_tank.node_id::text = v_node.node_id::text
      LEFT JOIN ( SELECT ct.feature_id, ct.tank_param_1,ct.tank_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
-                FROM man_addfields_value JOIN man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''TANK''
+                FROM SCHEMA_NAME.man_addfields_value 
+                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''TANK''
                 ORDER  BY 1,2'::text, ' VALUES (''5''),(''6'')'::text) 
                 ct(feature_id character varying, tank_param_1 text, tank_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'TANK'::text;
