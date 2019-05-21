@@ -37,10 +37,14 @@ from qgis.PyQt.QtSql import QSqlTableModel
 import json
 import os
 import re
+import subprocess
+import sys
+import webbrowser
 from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
+
 from giswater.actions.parent import ParentAction
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
 
@@ -52,6 +56,7 @@ class ApiParent(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.dlg_is_destroyed = None
         self.tabs_removed = 0
+        self.tab_type = None
 
         if Qgis.QGIS_VERSION_INT < 29900:
             self.rubber_point = QgsRubberBand(self.canvas, Qgis.Point)
@@ -616,15 +621,16 @@ class ApiParent(ParentAction):
         # widget.setFlat(True)
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
-        function_name = 'no_function_asociated'
+        function_name = 'no_function_associated'
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
             else:
                 msg = ("parameter button_function is null for button " + widget.objectName())
                 self.controller.show_message(msg, 2)
-
-        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
+        # Call def gw_api_open_node(self, dialog, widget) of the class ApiCf
+        # or def no_function_associated(self, widget=None, message_level=1)
+        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget))
         return widget
 
 
@@ -718,19 +724,19 @@ class ApiParent(ParentAction):
         if 'column_id' in field:
             widget.setProperty('column_id', field['column_id'])
         function_name = 'no_function_asociated'
-        function_name = 'gw_api_open_rpt_result'
-        widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
-        # if 'widgetfunction' in field:
-        #     if field['widgetfunction'] is not None:
-        #         function_name = field['widgetfunction']
-        #         widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
-        # else:
-        #     widget.doubleClicked.connect(partial(getattr(self, function_name), None, widget, 2))
+        if 'widgetfunction' in field:
+            if field['widgetfunction'] is not None:
+                function_name = field['widgetfunction']
+                # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
+                widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
+        else:
+            # Call  def no_function_associated(self, widget=None, message_level=1)
+            widget.doubleClicked.connect(partial(getattr(self, function_name), widget, 2))
         return widget
 
 
-    def no_function_asociated(self, dialog, widget=None, message_level=1):
-        msg = "No function asociated to {} {}: ".format(str(type(widget)), str(widget.objectName()))
+    def no_function_associated(self, widget=None, message_level=1):
+        msg = "No function associated to {} {}: ".format(str(type(widget)), str(widget.objectName()))
         self.controller.show_message(msg, message_level)
 
 
@@ -878,8 +884,7 @@ class ApiParent(ParentAction):
             widget.setText(field['value'])
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
-        function_name = 'no_function_asociated'
-
+        function_name = 'no_function_associated'
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
@@ -889,8 +894,8 @@ class ApiParent(ParentAction):
         else:
             msg = "parameter widgetfunction not found"
             self.controller.show_message(msg, 2)
-
-        widget.clicked.connect(partial(getattr(self, function_name), dialog, widget, 2))
+        # Call def gw_api_open_url(self, widget) or def no_function_associated(self, widget=None, message_level=1)
+        widget.clicked.connect(partial(getattr(self, function_name), widget))
         return widget
 
         
@@ -1389,7 +1394,7 @@ class ApiParent(ParentAction):
         self.list_update.append(elem)
 
 
-    def set_widgets(self, dialog, field):
+    def set_widgets_into_composer(self, dialog, field):
 
         widget = None
         label = None
@@ -1421,7 +1426,8 @@ class ApiParent(ParentAction):
             if 'widgetfunction' in field:
                 if field['widgetfunction'] is not None:
                     function_name = field['widgetfunction']
-                    widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                    # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
+                    widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, self.my_json))
 
         return label, widget
 
@@ -1454,12 +1460,14 @@ class ApiParent(ParentAction):
             self.controller.show_message(msg, 2)
         if type(widget) == QLineEdit:
             if Qgis.QGIS_VERSION_INT < 29900:
-                widget.lostFocus.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
-                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
-                #widget.textChanged.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
+                widget.lostFocus.connect(partial(getattr(self, function_name), dialog, self.my_json))
+                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
+                #widget.textChanged.connect(partial(getattr(self, function_name), dialog, self.my_json))
             else:
-                widget.editingFinished.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
-                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, widget, self.my_json))
+                # Call def gw_api_setprint(self, dialog, my_json): of the class ApiManageComposer
+                widget.editingFinished.connect(partial(getattr(self, function_name), dialog, self.my_json))
+                widget.returnPressed.connect(partial(getattr(self, function_name), dialog, self.my_json))
 
         return widget
 
@@ -1483,4 +1491,40 @@ class ApiParent(ParentAction):
             if len(widget_list) == 0:
                 grbox.setVisible(False)
 
-                
+
+
+
+    """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
+
+
+    # def no_function_asociated(self, widget=None, message_level=1):
+    #     self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)
+
+
+    def action_open_url(self, dialog, result):
+        widget = None
+        function_name = 'no_function_associated'
+        for field in result['fields']:
+            if field['action_function'] == 'action_link':
+                function_name = field['widgetfunction']
+                widget = dialog.findChild(HyperLinkLabel, field['widgetname'])
+                break
+        if widget:
+            # Call def  def gw_api_open_url(self, widget)
+            getattr(self, function_name)(widget)
+
+
+    def gw_api_open_url(self, widget):
+        path = widget.text()
+        # Check if file exist
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
+        else:
+            webbrowser.open(path)
+
+

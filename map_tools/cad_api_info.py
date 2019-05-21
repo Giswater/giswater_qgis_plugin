@@ -92,7 +92,6 @@ class CadApiInfo(ParentMapTool):
     def activate(self):
         # Check button
         self.action().setChecked(True)
-        print(self.index_action)
         # Change map tool cursor
         self.cursor = QCursor()
         self.cursor.setShape(Qt.WhatsThisCursor)

@@ -37,6 +37,12 @@ class ApiCfUi(QMainWindow, FORM_CLASS):
         self.dlg_closed.emit()
         return super(ApiCfUi, self).closeEvent(event)
 
+FORM_CLASS = get_ui_class('api_search.ui')
+class ApiSearchUi(QDockWidget, FORM_CLASS):
+    def __init__(self, parent=None):
+        super(ApiSearchUi, self).__init__(parent)
+        self.setupUi(self)
+        
 FORM_CLASS = get_ui_class('add_doc.ui')
 class AddDoc(QDialog, FORM_CLASS):
     def __init__(self):
@@ -257,6 +263,13 @@ FORM_CLASS = get_ui_class('info_show_info.ui')
 class InfoShowInfo(QDialog, FORM_CLASS):
     def __init__(self):
         QMainWindow.__init__(self)
+        self.setupUi(self)
+
+
+FORM_CLASS = get_ui_class('list_items.ui')
+class ListItems(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
         self.setupUi(self)
 
 

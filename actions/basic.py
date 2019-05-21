@@ -11,6 +11,7 @@ from functools import partial
 
 import utils_giswater
 from giswater.ui_manager import Multirow_selector
+from giswater.actions.api_search import ApiSearch
 from giswater.actions.parent import ParentAction
 
 
@@ -99,22 +100,11 @@ class Basic(ParentAction):
         self.open_dialog(self.dlg_hydro_state, maximize_button=False)
 
 
-    def basic_search_plus(self):   
-        """ Button 32: Open search plus dialog """
-                
-        try:
-            if self.search_plus is not None:
-                if self.search_plus.dlg_search.tab_main.count() > 0:
-                    # TODO pending translation
-                    # Manage 'i18n' of the form and make it visible
-                    # self.controller.translate_form(self.search_plus.dlg_search, 'search_plus')
-                    self.search_plus.dock_dialog()
-                else:
-                    message = "Search Plus: Any layer has been found. Check parameters in table 'config_param_system'"
-                    self.controller.show_warning(message, duration=20)   
-        except RuntimeError:
-            pass
-     
+
+    def basic_api_search(self):
+        """ Button 32: SearchPlus """
+        self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.api_search.api_search()
      
     def close_dialog(self, dlg):
         ParentAction.close_dialog(self, dlg)

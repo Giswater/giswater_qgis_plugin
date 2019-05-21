@@ -216,7 +216,7 @@ class ApiManageComposer(ApiParent):
     def create_dialog(self, dialog, fields):
 
         for field in fields['fields']:
-            label, widget = self.set_widgets(dialog, field)
+            label, widget = self.set_widgets_into_composer(dialog, field)
             self.put_widgets(dialog, field, label, None, widget)
             self.get_values(dialog, widget, self.my_json)
 
@@ -267,9 +267,8 @@ class ApiManageComposer(ApiParent):
         pass
 
 
-    def gw_api_setprint(self, dialog, widget, my_json):
+    def gw_api_setprint(self, dialog, my_json):
         if my_json['composer'] != '-1':
-
             self.check_whidget_exist(self.dlg_composer)
             self.load_composer_values(dialog)
             self.accept(dialog, my_json)

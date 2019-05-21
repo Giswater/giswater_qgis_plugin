@@ -1953,8 +1953,8 @@ class ApiCF(ApiParent):
             filter_fields = filter_fields[:-2]
         return filter_fields
 
-    def gw_api_open_rpt_result(self, widget, complet_resutlt):
-        self.open_rpt_result(widget, complet_resutlt)
+    def gw_api_open_rpt_result(self, widget, complet_result):
+        self.open_rpt_result(widget, complet_result)
 
     def open_rpt_result(self, qtable,  complet_list):
         """ Open form of selected element of the @widget?? """
@@ -2153,51 +2153,6 @@ class ApiCF(ApiParent):
         dlg.open()
 
 
-    """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
-    # def no_function_asociated(self, widget=None, message_level=1):
-    #     self.controller.show_message(str("no_function_asociated for button: ") + str(widget.objectName()), message_level)
-
-
-    def action_open_url(self, dialog, result, message_level=None):
-        
-        widget = None
-        function_name = 'no_function_associated'
-        for field in result['fields']:
-                if field['action_function'] == 'action_link':
-                    function_name = field['widgetfunction']
-                    widget = dialog.findChild(HyperLinkLabel, field['widgetname'])
-                    break
-        if widget:
-            getattr(self, function_name)(dialog, widget, 2)
-
-
-    def gw_api_open_url(self, dialog, widget, message_level=None):
-
-        path = widget.text()
-        # Check if file exist
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
-
-
-    def gw_api_open_node(self, dialog, widget=None, message_level=None):
-
-        feature_id = utils_giswater.getWidgetText(dialog, widget)
-
-        self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
-        complet_result, dialog = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id, tab_type=self.tab_type)
-        if not complet_result:
-            print("FAIL open_node")
-            return
-        self.draw(complet_result)
-
-
     """ OTHER FUNCTIONS """
     def set_vdefault_values(self, widget, values, parameter):
         # Set dates from
@@ -2234,3 +2189,15 @@ class ApiCF(ApiParent):
     #         pass
 
 
+
+    """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
+
+    def gw_api_open_node(self, dialog, widget=None):
+        feature_id = utils_giswater.getWidgetText(dialog, widget)
+
+        self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        complet_result, dialog = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id, tab_type=self.tab_type)
+        if not complet_result:
+            print("FAIL open_node")
+            return
+        self.draw(complet_result)

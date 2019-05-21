@@ -46,7 +46,6 @@ from .map_tools.replace_node import ReplaceNodeMapTool
 from .map_tools.open_visit import OpenVisit
 from .models.plugin_toolbar import PluginToolbar
 from .models.sys_feature_cat import SysFeatureCat
-from .search.search_plus import SearchPlus
 from .ui_manager import AuditCheckProjectResult
 
 
@@ -64,7 +63,6 @@ class Giswater(QObject):
         # Initialize instance attributes
         self.iface = iface
         self.actions = {}
-        self.search_plus = None
         self.map_tools = {}
         self.srid = None  
         self.plugin_toolbars = {}
@@ -317,7 +315,6 @@ class Giswater(QObject):
         elif int(index_action) == 28:
             map_tool = ChangeElemType(self.iface, self.settings, action, index_action)
         elif int(index_action) in (37, 199):
-            self.controller.log_info(str(index_action))
             map_tool = CadApiInfo(self.iface, self.settings, action, index_action)
         elif int(index_action) == 39:
             map_tool = Dimensioning(self.iface, self.settings, action, index_action)                     
@@ -505,9 +502,6 @@ class Giswater(QObject):
                     plugin_toolbar.toolbar.setVisible(False)                
                     del plugin_toolbar.toolbar
 
-            if self.search_plus:
-                self.search_plus.unload()
-
             if remove_modules:
                 # unload all loaded giswater related modules
                 for modName, mod in list(sys.modules.items()):
@@ -649,9 +643,7 @@ class Giswater(QObject):
         # Set objects for map tools classes
         self.manage_map_tools()
 
-        # Set SearchPlus object
-        self.set_search_plus()
-         
+
         # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
         self.manage_custom_forms()
         
@@ -990,22 +982,7 @@ class Giswater(QObject):
                 map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud, self.layer_gully_man_ud)
                 map_tool.set_controller(self.controller)
 
-       
-    def set_search_plus(self):
-        """ Set SearchPlus object """
 
-        try:         
-            self.search_plus = SearchPlus(self.iface, self.srid, self.controller, self.settings, self.plugin_dir)
-            self.basic.search_plus = self.search_plus
-            status = self.search_plus.init_config()
-            self.actions['32'].setVisible(status) 
-            self.actions['32'].setEnabled(status) 
-            self.actions['32'].setCheckable(False)
-            self.search_plus.feature_cat = self.feature_cat
-        except Exception as e:
-            self.controller.show_warning("Error setting searchplus button: " + str(e))     
-               
-        
     def manage_actions_linux(self):
         """ Disable for Linux 'go2epa' actions """
         

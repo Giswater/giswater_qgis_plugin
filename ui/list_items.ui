@@ -114,7 +114,11 @@
       </layout>
      </item>
      <item row="4" column="2">
-      <widget class="QTableView" name="tbl_psm_end"/>
+      <widget class="QTableView" name="tbl_psm_end">
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
@@ -269,7 +273,11 @@
       <widget class="QLineEdit" name="txt_name_end"/>
      </item>
      <item row="4" column="0">
-      <widget class="QTableView" name="tbl_psm"/>
+      <widget class="QTableView" name="tbl_psm">
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="0" column="2">
       <widget class="QLabel" name="label_end">
