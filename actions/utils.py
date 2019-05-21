@@ -442,17 +442,18 @@ class Utils(ParentAction):
         progress = 0
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setValue(progress)
-        # counts rows in csvfile, using var "row_count" to do progresbar
+        # counts rows in csvfile, using var "row_count" to do progressbar
         row_count = sum(1 for rows in csvfile)  # @UnusedVariable
         if row_count > 20:
             row_count -= 20
         dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter)
+        csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
         for row in reader:
             if len(row) > 0:
                 sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
-                values = "VALUES(11, "
+                values = "VALUES("+str(csv2pgcat_id_aux)+", "
                 for x in range(0, len(row)):
                     if "''" not in row[x]:
                         sql += "csv" + str(x + 1) + ", "
