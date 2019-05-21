@@ -227,7 +227,7 @@ class Utils(ParentAction):
         roles = self.controller.get_rolenames()
         temp_tablename = 'temp_csv2pg'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure, functionname', 'sys_csv2pg_cat', roles, False)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure, functionname, isheader', 'sys_csv2pg_cat', roles, False)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -450,7 +450,11 @@ class Utils(ParentAction):
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter)
         csv2pgcat_id_aux = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 0)
+        isheader = utils_giswater.get_item_data(dialog, dialog.cmb_import_type, 4)
         for row in reader:
+            if isheader is False:
+                isheader = True
+                continue
             if len(row) > 0:
                 sql += "INSERT INTO " + self.schema_name + ".temp_csv2pg (csv2pgcat_id, "
                 values = "VALUES("+str(csv2pgcat_id_aux)+", "
