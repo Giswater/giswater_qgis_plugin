@@ -417,7 +417,8 @@ ELSIF tab_arg = 'address' THEN
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
         FROM (SELECT '||quote_ident(v_workcat_display_field)||' as display_name, '||quote_literal(v_workcat_layer)||' AS sys_table_id , 
         '||quote_ident((v_workcat_id_field))||' AS sys_id, '||quote_literal(v_workcat_layer)||' 
-        AS sys_idname, '||quote_literal(v_filter_text)||' AS filter_text FROM '||quote_ident(v_workcat_layer)|| '
+        AS sys_idname, '||quote_literal(v_filter_text)||' AS filter_text, st_astext(the_geom) AS sys_geometry
+		FROM '||quote_ident(v_workcat_layer)|| '
         WHERE '||quote_ident(v_workcat_display_field)||'::text ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
         INTO response_json;
 
@@ -438,8 +439,8 @@ ELSIF tab_arg = 'address' THEN
     --  Search in the visit
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
         FROM (SELECT '||quote_ident(v_visit_display_field)||'::text as display_name, '||quote_literal(v_visit_layer)||' AS sys_table_id , 
-        '||quote_ident((v_visit_id_field))||' AS sys_id, '||quote_literal(v_visit_layer)||' 
-        AS sys_idname FROM '||v_visit_layer||'  
+        '||quote_ident((v_visit_id_field))||' AS sys_id, '||quote_literal(v_visit_layer)||' AS sys_idname, st_astext(the_geom) as sys_geometry
+		FROM '||v_visit_layer||'  
         WHERE '||quote_ident(v_visit_display_field)||'::text ILIKE '||quote_literal(text_arg)||' LIMIT 10 )a'
         INTO response_json;
 
@@ -477,7 +478,7 @@ ELSIF tab_arg = 'address' THEN
     -- Get psector (improved version)
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
         FROM (SELECT '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_display_field)||' as display_name, '||quote_literal(v_psector_layer)||' AS sys_table_id , 
-        '||quote_ident(v_psector_layer)||'.'||quote_ident((v_psector_id_field))||' AS sys_id, '||quote_literal(v_psector_layer)||' AS sys_idname 
+        '||quote_ident(v_psector_layer)||'.'||quote_ident((v_psector_id_field))||' AS sys_id, '||quote_literal(v_psector_layer)||' AS sys_idname , st_astext(st_envelope(the_geom)) AS sys_geometry
         FROM '||quote_ident(v_psector_layer)||'  
         JOIN '||quote_ident(v_exploitation_layer)||' ON '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_id_field)||' = '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_parent_field)||'
         WHERE '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
