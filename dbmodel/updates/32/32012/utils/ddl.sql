@@ -90,3 +90,6 @@ ALTER TABLE om_visit_cat ADD COLUMN duration text;
 ALTER TABLE sys_feature_type ADD COLUMN  icon character varying(30);
 
 --table v_project_type???
+
+--21/05/2019
+ALTER TABLE sys_csv2pg_cat ADD COLUMN  isheader boolean NOT NULL DEFAULT false;
