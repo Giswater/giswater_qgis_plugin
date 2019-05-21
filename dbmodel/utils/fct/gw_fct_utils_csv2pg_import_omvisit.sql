@@ -25,8 +25,8 @@ INSTRUCTIONS
 ------------
 CSV file may have four type of column data:
 
-	visit_id, visit_cat,   visit_team, visit_date, visit_code, 			feature_type, feature_id, 		inventory1, inventory2......., inventoryn, 		   parameter1, parameter2.... parametern
-	  csv1      csv2         csv3          csv4        csv5  			   csv6          csv7       	  csv8			csv9			 csvn				csvn+1      csvn+2          csvn+m
+-- visit_id, visit_cat, visit_team, visit_date, visit_code,feature_type, feature_id, inventory1, inventory2......., inventoryn, parameter1, parameter2.... parametern
+--   csv1      csv2         csv3       csv4        csv5        csv6          csv7    	csv8	    csv9	       csvn	  csvn+1      csvn+2          csvn+m
 	
 	Visit data: (csv1....csv5) - all mandatory
 		visit_id: Check all the news visit_id does not exists on om_visit table
@@ -95,10 +95,9 @@ DECLARE
 	
 BEGIN
 
+
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-
-	delete from om_visit;
 
 	-- get system parameters
 	SELECT wsoftware, giswater  INTO v_project_type, v_version FROM version order by 1 desc limit 1;
@@ -106,19 +105,24 @@ BEGIN
 	-- get input parameter
 	v_visit_descript =  (p_data::json->>'data')::json->>'importParam';
 	v_csv2pgcat_id =  (p_data::json->>'data')::json->>'csv2pgCat';
-	v_csv2pgcat_id = 13;
 
 	-- get config parameteres
 	v_isvisitexists = (SELECT (value::json->>'visit')::json->>'isVisitExists' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
 	v_visittablename = (SELECT (value::json->>'visit')::json->>'tableName' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
 	v_visitcolumnname = (SELECT (value::json->>'visit')::json->>'featureColumn' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
 	v_featuretablename = (SELECT (value::json->>'feature')::json->>'tableName' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id));
+
+	-- hardcoded to test
+	----------------------------------------
+	DELETE FROM om_visit;
+	----------------------------------------
 	
+	RAISE NOTICE 'v_isvisitexists % v_visittablename % v_visitcolumnname  % v_featuretablename %', v_isvisitexists, v_visittablename, v_visitcolumnname, v_featuretablename;
 
 	-- manage log (fprocesscat 42)
 	DELETE FROM audit_check_data WHERE fprocesscat_id=42 AND user_name=current_user;
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('IMPORTACIO VISITES CONTRATA'));
-	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('-------------------------------'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('LOG IMPORTACIO DE FITXER DE VISITES DE LA CONTRATA DE SANEJAMENT'));
+	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('--------------------------------------------------------------------------------------'));
    
  	-- starting process
 	-- Insert into audit table
@@ -127,8 +131,10 @@ BEGIN
 	SELECT csv2pgcat_id, user_name,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20
 	FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND user_name=current_user;
 
+
 	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE csv2pgcat_id=v_csv2pgcat_id AND user_name=current_user
 	LOOP
+		RAISE NOTICE 'v_visit %', v_visit;
 	
 		IF v_isvisitexists IS FALSE OR v_isvisitexists IS NULL THEN
 		
@@ -137,7 +143,7 @@ BEGIN
 			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv4::date, v_visit.csv4::date, v_visit.csv5, v_visit.csv3, v_visit_descript);
 	
 			-- Insert into feature table
-			EXECUTE 'UPDATE '||v_visittablename||' SET is_last=FALSE where '||v_visitcolumnname||'::text='||v_visit.csv4||'::text';
+			EXECUTE 'UPDATE '||v_visittablename||' SET is_last=FALSE where '||v_visitcolumnname||'::text='||v_visit.csv7||'::text';
 			EXECUTE 'INSERT INTO ' ||v_visittablename||' (visit_id, '||v_visitcolumnname||') VALUES ( '||v_visit.csv1||','||v_visit.csv7||')';
 			
 		END IF;
@@ -145,7 +151,8 @@ BEGIN
 		-- feature columns
 		v_csv=8;
 			
-		FOR v_column IN SELECT json_array_elements(((value::json->>'feature')::json->>'columns')::json) FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
+		FOR v_column IN SELECT json_array_elements(((value::json->>'feature')::json->>'columns')::json) 
+		FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
 		LOOP
 
 			IF v_csv = 8 THEN
@@ -179,14 +186,16 @@ BEGIN
 			--LOOP COMPARING VALUES
 
 		END LOOP;
-					
-
-		-- visit parameters	
 	
-		v_csv = (SELECT (value::json->>'visit')::json->>'firstCsvParameter' FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id))::integer;
+		v_csv = (SELECT (value::json->>'visit')::json->>'firstCsvParameter' FROM config_param_system 
+		WHERE parameter = concat('utils_csv2pg_om_visit_parameters_', v_csv2pgcat_id))::integer;
+
+		raise notice 'v_csv %', v_csv;
 			
-		FOR v_parameters IN SELECT json_array_elements(((value::json->>'visit')::json->>'visitParameters')::json) FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
+		FOR v_parameters IN SELECT json_array_elements(((value::json->>'visit')::json->>'visitParameters')::json) 
+		FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
 		LOOP			
+			raise notice 'v_parameters %', v_parameters;
 			-- parameters are defined from row csv10 to row csv20
 			IF v_csv = 8 THEN
 				v_value = v_visit.csv8;
@@ -226,7 +235,7 @@ BEGIN
 			
 			v_csv=v_csv+1;
 
-			raise notice 'v_parameter_id: %, v_value: %', v_parameters, v_value;
+			raise notice 'v_csv % v_parameter_id: %, v_value: %',v_csv, v_parameters, v_value;
 
 			v_parameters=replace(v_parameters,'"','');
 	
@@ -234,12 +243,14 @@ BEGIN
 			--EXECUTE 'UPDATE om_visit_event SET is_last=FALSE WHERE parameter_id= '||quote_literal(v_parameter_id)||' AND visit_id IN (SELECT visit_id FROM '||v_visittablename||' WHERE '||v_visitcolumnname||' = '||v_visit.csv4||'::text)';
 
 			-- insert event
-			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp) VALUES (v_visit.csv1::bigint, (v_parameters), v_value , v_visit.csv5::timestamp);			
+			INSERT INTO om_visit_event (visit_id, parameter_id, value, tstamp, is_last) VALUES (v_visit.csv1::bigint, v_parameters, v_value , v_visit.csv4::timestamp, true);			
 		END LOOP;				
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=9;
+	DELETE FROM temp_csv2pg WHERE user_name=current_user AND csv2pgcat_id=v_csv2pgcat_id;
+
+	
 
 	-- manage log (fprocesscat 42)
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
@@ -248,7 +259,8 @@ BEGIN
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit_event table -> Done'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
 	INSERT INTO audit_check_data (fprocesscat_id, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
-	
+
+
 	-- get log (fprocesscat 42)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE user_name="current_user"() AND fprocesscat_id=42) row; 
@@ -258,13 +270,13 @@ BEGIN
 	-- Control nulls
 	v_version := COALESCE(v_version, '{}'); 
 	v_result_info := COALESCE(v_result_info, '{}'); 
- 
+
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"priority":0, "text":"Process executed"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||'}}'||
 	    '}')::json;
-	    
+ 
 	-- Exception handling
 	--EXCEPTION WHEN OTHERS THEN 
 --	RETURN ('{"status":"Failed","message":{"priority":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
