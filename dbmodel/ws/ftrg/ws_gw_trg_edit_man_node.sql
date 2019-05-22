@@ -3,8 +3,9 @@ This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
---FUNCTION CODE: 1318
+--Function deprecated from version 3.2.012
 
+--FUNCTION CODE: 1318
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node();
 

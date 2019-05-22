@@ -11,26 +11,34 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_arc()
 $BODY$
 DECLARE 
 
-    inp_table varchar;
-    man_table varchar;
+    v_inp_table varchar;
+    v_man_table varchar;
     v_sql varchar;
-    arc_id_seq int8;
-	code_autofill_bool boolean;
-	count_aux integer;
-	promixity_buffer_aux double precision;
-	edit_enable_arc_nodes_update_aux boolean;
-	link_path_aux varchar;
-	new_arc_type_aux text;
-	old_arc_type_aux text;
-	query_text text;
+	v_code_autofill_bool boolean;
+	v_count integer;
+	v_promixity_buffer double precision;
+	v_edit_enable_arc_nodes_update boolean;
+	v_link_path varchar;
+	v_new_arc_type text;
+	v_old_arc_type text;
+	v_customfeature text;
+	v_addfields record;
+	v_new_value_param text;
+	v_old_value_param text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	        man_table:= TG_ARGV[0];
-		
-	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	edit_enable_arc_nodes_update_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
+	        v_man_table:= TG_ARGV[0];
+
+	--modify values for custom view inserts	
+	IF v_man_table IN (SELECT id FROM arc_type) THEN
+		v_customfeature:=v_man_table;
+		v_man_table:=(SELECT man_table FROM arc_type WHERE id=v_man_table);
+	END IF;
+
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	v_edit_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_enable_arc_nodes_update');
 	
 	
     IF TG_OP = 'INSERT' THEN
@@ -46,29 +54,39 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
 				RETURN audit_function(1020,1314); 
 			END IF; 
-			IF man_table='parent' THEN
-				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSE
-				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pipecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+
+			IF v_customfeature IS NOT NULL THEN
+				NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
+
 			IF (NEW.arccat_id IS NULL) THEN
-			NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
-			IF (NEW.arccat_id IS NULL) THEN
-				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
-			END IF;       
+				IF v_man_table='parent' THEN
+					NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='arccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				ELSE
+					NEW.arccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pipecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				END IF;
+
+				IF (NEW.arccat_id IS NULL) THEN
+					NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
+
+				IF (NEW.arccat_id IS NULL) THEN
+					NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+				END IF;       
+				END IF;
+			END IF;
 		END IF;
-		END IF;
-        
+
+
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1314);  
 			END IF;
-				SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
@@ -84,11 +102,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(1012,1314);  
             END IF;
-				SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
@@ -147,10 +165,10 @@ BEGIN
 			END IF;
 		END IF;
 
-		SELECT code_autofill INTO code_autofill_bool FROM arc_type JOIN cat_arc ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
+		SELECT code_autofill INTO v_code_autofill_bool FROM arc_type JOIN cat_arc ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
 	
 		--Copy id to code field	
-		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.arc_id;
 		END IF;
 
@@ -196,7 +214,7 @@ BEGIN
 					NEW.descript,NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value);
 
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
-		IF edit_enable_arc_nodes_update_aux IS TRUE THEN
+		IF v_edit_enable_arc_nodes_update IS TRUE THEN
 			IF NEW.node_1 IS NOT NULL THEN
 				UPDATE arc SET node_1=NEW.node_1 WHERE arc_id=NEW.arc_id;
 			END IF;
@@ -207,24 +225,39 @@ BEGIN
 
 					
 		-- MAN INSERT
-		IF man_table='man_pipe' THEN 			
+		IF v_man_table='man_pipe' THEN 			
 				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);			
 			
-		ELSIF man_table='man_varc' THEN		
+		ELSIF v_man_table='man_varc' THEN		
 				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 
-		ELSIF man_table='parent' THEN
-			man_table := (SELECT arc_type.man_table FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
-        	IF man_table IS NOT NULL THEN
-            	v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
+		ELSIF v_man_table='parent' THEN
+			v_man_table := (SELECT arc_type.v_man_table FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
+        	IF v_man_table IS NOT NULL THEN
+            	v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
            		EXECUTE v_sql;
       		END IF;		
 		END IF;
-		
+
+	-- man addfields insert
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN
+					EXECUTE 'INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES ($1, $2, $3)'
+						USING NEW.arc_id, v_addfields.id, v_new_value_param;
+				END IF;	
+			END LOOP;
+		END IF;		
+
         -- EPA INSERT
         IF (NEW.epa_type = 'PIPE') THEN 
-            inp_table:= 'inp_pipe';
-            v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
+            v_inp_table:= 'inp_pipe';
+            v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
             EXECUTE v_sql;
         END IF;
 		
@@ -235,15 +268,15 @@ BEGIN
 		-- epa type
 		IF (NEW.epa_type != OLD.epa_type) THEN    
 			IF (OLD.epa_type = 'PIPE') THEN
-				inp_table:= 'inp_pipe';            
-				v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+				v_inp_table:= 'inp_pipe';            
+				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
 				EXECUTE v_sql;
 			END IF;
-			inp_table := NULL;
+			v_inp_table := NULL;
 
 			IF (NEW.epa_type = 'PIPE') THEN
-				inp_table:= 'inp_pipe';   
-				v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
+				v_inp_table:= 'inp_pipe';   
+				v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
 				EXECUTE v_sql;
 			END IF;
 		END IF;
@@ -280,22 +313,22 @@ BEGIN
 		END IF;
 
 		--link_path
-		SELECT link_path INTO link_path_aux FROM arc_type JOIN cat_arc ON cat_arc.arctype_id=arc_type.id WHERE cat_arc.id=NEW.arccat_id;
+		SELECT link_path INTO v_link_path FROM arc_type JOIN cat_arc ON cat_arc.arctype_id=arc_type.id WHERE cat_arc.id=NEW.arccat_id;
 		
-		IF link_path_aux IS NOT NULL THEN
-			NEW.link = replace(NEW.link, link_path_aux,'');
+		IF v_link_path IS NOT NULL THEN
+			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 
 		 -- Arc type for parent view
-    	IF man_table='parent' THEN
+    	IF v_man_table='parent' THEN
 	    	IF (NEW.arccat_id != OLD.arccat_id) THEN
-				new_arc_type_aux= (SELECT type FROM arc_type JOIN cat_arc ON arc_type.id=arctype_id where cat_arc.id=NEW.arccat_id);
-				old_arc_type_aux= (SELECT type FROM arc_type JOIN cat_arc ON arc_type.id=arctype_id where cat_arc.id=OLD.arccat_id);
-				IF new_arc_type_aux != old_arc_type_aux THEN
-					query_text='INSERT INTO man_'||lower(new_arc_type_aux)||' (arc_id) VALUES ('||NEW.arc_id||')';
-					EXECUTE query_text;
-					query_text='DELETE FROM man_'||lower(old_arc_type_aux)||' WHERE arc_id='||quote_literal(OLD.arc_id);
-					EXECUTE query_text;
+				v_new_arc_type= (SELECT type FROM arc_type JOIN cat_arc ON arc_type.id=arctype_id where cat_arc.id=NEW.arccat_id);
+				v_old_arc_type= (SELECT type FROM arc_type JOIN cat_arc ON arc_type.id=arctype_id where cat_arc.id=OLD.arccat_id);
+				IF v_new_arc_type != v_old_arc_type THEN
+					v_sql='INSERT INTO man_'||lower(v_new_arc_type)||' (arc_id) VALUES ('||NEW.arc_id||')';
+					EXECUTE v_sql;
+					v_sql='DELETE FROM man_'||lower(v_old_arc_type)||' WHERE arc_id='||quote_literal(OLD.arc_id);
+					EXECUTE v_sql;
 				END IF;
 			END IF;
 		END IF;
@@ -311,7 +344,38 @@ BEGIN
 				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 				expl_id=NEW.expl_id,num_value=NEW.num_value, link=NEW.link
 			WHERE arc_id=OLD.arc_id;
-			
+
+
+-- man addfields update
+	IF v_customfeature IS NOT NULL THEN
+		FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+		LOOP
+
+			EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+				USING NEW
+				INTO v_new_value_param;
+ 
+			EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+				USING OLD
+				INTO v_old_value_param;
+
+			IF v_new_value_param IS NOT NULL THEN 
+
+				EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
+					ON CONFLICT (feature_id, parameter_id)
+					DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
+					USING NEW.arc_id , v_addfields.id, v_new_value_param;	
+
+			ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+
+				EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
+					USING NEW.arc_id , v_addfields.id;
+			END IF;
+		
+		END LOOP;
+    END IF;       
+		
+
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN 
