@@ -446,12 +446,18 @@ def set_combo_itemData(combo, value, item1):
             combo.setCurrentIndex(i)
 
 
-def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True):
-    """ Populate @combo with list @rows and show field @index_to_show """
+def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1):
+    """ Populate @combo with list @rows and show field @index_to_show
+    :param sort_by: sort combo by this element (column)
+    """
     
     records = []
     if rows is None:
         return
+
+    if sort_by > len(rows[0])-1:
+        sort_by = 1
+
     for row in rows:
         elem = []
         for x in range(0, len(row)):
@@ -463,7 +469,7 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
         combo.clear()
     records_sorted = records
     if sort_combo:
-        records_sorted = sorted(records, key=operator.itemgetter(1))
+        records_sorted = sorted(records, key=operator.itemgetter(sort_by))
 
     for record in records_sorted:
         combo.addItem(record[index_to_show], record)
