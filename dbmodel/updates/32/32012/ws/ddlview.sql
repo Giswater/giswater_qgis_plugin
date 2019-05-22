@@ -1537,7 +1537,7 @@ SELECT v_node.node_id,
             FROM crosstab('SELECT feature_id, parameter_id, value_param
                 FROM SCHEMA_NAME.man_addfields_value 
                 JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''GREEN-VALVE''
-                ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) 
+                ORDER  BY 1,2'::text, ' VALUES (''24''),(''25'')'::text) 
                 ct(feature_id character varying, greenvalve_param_1 text, greenvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'GREEN-VALVE'::text;
 
@@ -1624,13 +1624,13 @@ SELECT v_node.node_id,
             FROM crosstab('SELECT feature_id, parameter_id, value_param
                 FROM SCHEMA_NAME.man_addfields_value 
                 JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''OUTFALL-VALVE''
-                ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) 
+                ORDER  BY 1,2'::text, ' VALUES (''11''),(''12'')'::text) 
                 ct(feature_id character varying, outfallvalve_param_1 text, outfallvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
                 WHERE v_node.nodetype_id::text = 'OUTFALL-VALVE'::text;
 
 
-DROP VIEW IF EXISTS ve_node_register;
-CREATE VIEW ve_node_register AS 
+DROP VIEW IF EXISTS ve_node_bypassregister;
+CREATE VIEW ve_node_bypassregister AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.elevation,
@@ -1695,14 +1695,14 @@ CREATE VIEW ve_node_register AS
      LEFT JOIN ( SELECT ct.feature_id, ct.register_param_1,ct.register_param_2
             FROM crosstab('SELECT feature_id, parameter_id, value_param
                 FROM SCHEMA_NAME.man_addfields_value 
-                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''REGISTER''
+                JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''BYPASS-REGISTER''
                 ORDER  BY 1,2'::text, ' VALUES (''3''),(''4'')'::text) 
                 ct(feature_id character varying, register_param_1 text, register_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
-                WHERE v_node.nodetype_id::text = 'REGISTER'::text;
+                WHERE v_node.nodetype_id::text = 'BYPASS-REGISTER'::text;
 
 
-DROP VIEW IF EXISTS ve_node_bypassregister;
-CREATE VIEW ve_node_bypassregister AS 
+DROP VIEW IF EXISTS ve_node_register;
+CREATE VIEW ve_node_register AS 
  SELECT v_node.node_id,
     v_node.code,
     v_node.elevation,
@@ -1762,7 +1762,7 @@ CREATE VIEW ve_node_bypassregister AS
     man_register.pol_id
    FROM v_node
      JOIN man_register ON v_node.node_id::text = man_register.node_id::text
-     WHERE nodetype_id='BYPASS-REGISTER';
+     WHERE nodetype_id='REGISTER';
 
 
 

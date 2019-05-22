@@ -12,42 +12,43 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    inp_table varchar;
-    v_sql varchar;
-    v_sql2 varchar;
-    man_table varchar;
-	man_table_2 varchar;
-    new_man_table varchar;
-    old_man_table varchar;
-    old_nodetype varchar;
-    new_nodetype varchar;
-    node_id_seq int8;
-	code_autofill_bool boolean;
-	rec_aux text;
-	node_id_aux text;
-	delete_aux text;
-	tablename_aux varchar;
-	pol_id_aux varchar;
-	query_text text;
-	count_aux integer;
-	promixity_buffer_aux double precision;
-	edit_node_reduction_auto_d1d2_aux boolean;
-	link_path_aux varchar;
+    v_inp_table varchar;
+    v_man_table varchar;
+	v_type_man_table varchar;
+	v_code_autofill_bool boolean;
+	v_node_id text;
+	v_tablename varchar;
+	v_pol_id varchar;
+	v_sql text;
+	v_count integer;
+	v_promixity_buffer double precision;
+	v_edit_node_reduction_auto_d1d2 boolean;
+	v_link_path varchar;
 	v_insert_double_geom boolean;
 	v_double_geom_buffer double precision;
-	new_node_type_aux text;
-	old_node_type_aux text;
-
+	v_new_node_type text;
+	v_old_node_type text;
+	v_addfields record;
+	v_new_value_param text;
+	v_old_value_param text;
+	v_customfeature text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	man_table:= TG_ARGV[0];
-	man_table_2:=man_table;
+	v_man_table:= TG_ARGV[0];
+
+	--modify values for custom view inserts
+	IF v_man_table IN (SELECT id FROM node_type) THEN
+		v_customfeature:=v_man_table;
+		v_man_table:=(SELECT man_table FROM node_type WHERE id=v_man_table);
+	END IF;
 	
+	v_type_man_table=v_man_table;
+
 	--Get data from config table
-	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	edit_node_reduction_auto_d1d2_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_node_reduction_auto_d1d2');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	v_edit_node_reduction_auto_d1d2 = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_node_reduction_auto_d1d2');
 	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 
@@ -68,60 +69,74 @@ BEGIN
 				RETURN audit_function(1006,1318);  
 			END IF;
 			
-			IF man_table='man_tank' OR man_table='man_tank_pol' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tankcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_hydrant' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='hydrantcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_junction' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='junctioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_pump' THEN		
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pumpcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_reduction' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='reductioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_valve' THEN	
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='valvecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_manhole' THEN	
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='manholecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_meter' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='metercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_source' THEN	
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='sourcecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_waterwell' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='waterwellcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_filter' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='filtercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_register' OR man_table='man_register_pol' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='registercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_netwjoin' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netwjoincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_expansiontank' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='expansiontankcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_flexunion' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='flexuioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_netelement' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netelementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_netsamplepoint' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netsamplepointcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_wtp' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wtpcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='parent' THEN
-				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			END IF;
+				IF v_customfeature IS NOT NULL THEN
+					NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
+				END IF;
 
-			IF (NEW.nodecat_id IS NULL) AND man_table='parent' THEN
-				NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
+				IF (NEW.nodecat_id IS NULL) THEN
+					IF v_man_table='man_tank' OR v_man_table='man_tank_pol' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tankcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_hydrant' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='hydrantcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_junction' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='junctioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_pump' THEN		
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='pumpcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_reduction' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='reductioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_valve' THEN	
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='valvecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_manhole' THEN	
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='manholecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_meter' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='metercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_source' THEN	
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='sourcecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_waterwell' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='waterwellcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_filter' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='filtercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_register' OR v_man_table='man_register_pol' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='registercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_netwjoin' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netwjoincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_expansiontank' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='expansiontankcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_flexunion' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='flexuioncat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_netelement' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netelementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_netsamplepoint' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='netsamplepointcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='man_wtp' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wtpcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSIF v_man_table='parent' THEN
+						NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					END IF;
+				END IF;
+
+			IF (NEW.nodecat_id IS NULL) AND v_man_table='parent' THEN
+				NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=v_type_man_table LIMIT 1);
 			ELSIF (NEW.nodecat_id IS NULL) THEN
 				PERFORM audit_function(1090,1318);
 			END IF;				
 			
-			IF  man_table!='parent' THEN
-				IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)) THEN 
+			IF v_customfeature IS NOT NULL THEN
+				IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node WHERE nodetype_id=v_customfeature)) THEN 
 					PERFORM audit_function(1092,1318);
 				END IF;
 			END IF;
 
+			IF  v_man_table!='parent' AND v_customfeature IS NULL THEN
+
+				IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=v_type_man_table)) THEN 
+					PERFORM audit_function(1092,1318);
+				END IF;
+
+			END IF;
+
 		END IF;
-		
+
 		-- Epa type
 		IF (NEW.epa_type IS NULL) THEN
 			NEW.epa_type:= (SELECT epa_default FROM cat_node JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
@@ -132,11 +147,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1318);  
 			END IF;
-				SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
@@ -152,11 +167,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(1012,1318);  
             END IF;
-				SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
@@ -215,10 +230,10 @@ BEGIN
 			END IF;
 		END IF;
 
-		SELECT code_autofill INTO code_autofill_bool FROM node_type JOIN cat_node ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
+		SELECT code_autofill INTO v_code_autofill_bool FROM node_type JOIN cat_node ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
 		
 		--Copy id to code field
-		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.node_id;
 		END IF;
 
@@ -245,13 +260,13 @@ BEGIN
 
 		
 		-- Parent id
-		SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat.id=polygon.sys_type
+		SELECT substring (tablename from 8 for 30), pol_id INTO v_tablename, v_pol_id FROM polygon JOIN sys_feature_cat ON sys_feature_cat.id=polygon.sys_type
 		WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 	
-		IF pol_id_aux IS NOT NULL THEN
-			query_text:= 'SELECT node_id FROM '||tablename_aux||' WHERE pol_id::bigint='||pol_id_aux||' LIMIT 1';
-			EXECUTE query_text INTO node_id_aux;
-			NEW.parent_id=node_id_aux;
+		IF v_pol_id IS NOT NULL THEN
+			v_sql:= 'SELECT node_id FROM '||v_tablename||' WHERE pol_id::bigint='||v_pol_id||' LIMIT 1';
+			EXECUTE v_sql INTO v_node_id;
+			NEW.parent_id=v_node_id;
 		END IF;
 
 		--Arc id ,for those nodes that are not connected (node_type.isarcdivide = FALSE)
@@ -273,7 +288,7 @@ BEGIN
 		NEW.streetaxis_id, NEW.streetaxis2_id, NEW.postcode,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere,NEW.num_value);
 		
-		IF man_table='man_tank' THEN
+		IF v_man_table='man_tank' THEN
 			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
@@ -287,19 +302,19 @@ BEGIN
 				INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name);
 			END IF;
 					
-		ELSIF man_table='man_hydrant' THEN
+		ELSIF v_man_table='man_hydrant' THEN
 			INSERT INTO man_hydrant (node_id, fire_code, communication,valve) VALUES (NEW.node_id,NEW.fire_code, NEW.communication,NEW.valve);		
 		
-		ELSIF man_table='man_junction' THEN
+		ELSIF v_man_table='man_junction' THEN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
 			
-		ELSIF man_table='man_pump' THEN		
+		ELSIF v_man_table='man_pump' THEN		
 			INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height,name, pump_number) 
 			VALUES(NEW.node_id, NEW.max_flow, NEW.min_flow, NEW.nom_flow, NEW.power, NEW.pressure, NEW.elev_height, NEW.name, NEW.pump_number);
 		
-		ELSIF man_table='man_reduction' THEN
+		ELSIF v_man_table='man_reduction' THEN
 			
-			IF edit_node_reduction_auto_d1d2_aux = 'TRUE' THEN
+			IF v_edit_node_reduction_auto_d1d2 = 'TRUE' THEN
 				IF (NEW.diam1 IS NULL) THEN
 					NEW.diam1=(SELECT dnom FROM cat_node WHERE id=NEW.nodecat_id);
 				END IF;
@@ -310,27 +325,27 @@ BEGIN
 
 			INSERT INTO man_reduction (node_id,diam1,diam2) VALUES(NEW.node_id,NEW.diam1, NEW.diam2);
 			
-		ELSIF man_table='man_valve' THEN	
+		ELSIF v_man_table='man_valve' THEN	
 			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,lin_meters, exit_type,exit_code,drive_type, cat_valve2) 
 			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pression_entry, NEW.pression_exit, NEW.depth_valveshaft, NEW.regulator_situation, NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, 
 			NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2);
 		
-		ELSIF man_table='man_manhole' THEN	
+		ELSIF v_man_table='man_manhole' THEN	
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
 		
-		ELSIF man_table='man_meter' THEN
+		ELSIF v_man_table='man_meter' THEN
 			INSERT INTO man_meter (node_id) VALUES(NEW.node_id);
 		
-		ELSIF man_table='man_source' THEN	
+		ELSIF v_man_table='man_source' THEN	
 			INSERT INTO man_source (node_id, name) VALUES(NEW.node_id, NEW.name);
 		
-		ELSIF man_table='man_waterwell' THEN
+		ELSIF v_man_table='man_waterwell' THEN
 			INSERT INTO man_waterwell (node_id, name) VALUES(NEW.node_id, NEW.name);
 		
-		ELSIF man_table='man_filter' THEN
+		ELSIF v_man_table='man_filter' THEN
 			INSERT INTO man_filter (node_id) VALUES(NEW.node_id);	
 		
-		ELSIF man_table='man_register' THEN
+		ELSIF v_man_table='man_register' THEN
 			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
@@ -341,38 +356,51 @@ BEGIN
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 			END IF;
 			
-		ELSIF man_table='man_netwjoin' THEN
+		ELSIF v_man_table='man_netwjoin' THEN
 			INSERT INTO man_netwjoin (node_id, top_floor,  cat_valve, customer_code) 
 			VALUES(NEW.node_id, NEW.top_floor, NEW.cat_valve, NEW.customer_code);
 		
-		ELSIF man_table='man_expansiontank' THEN
+		ELSIF v_man_table='man_expansiontank' THEN
 			INSERT INTO man_expansiontank (node_id) VALUES(NEW.node_id);
 		
-		ELSIF man_table='man_flexunion' THEN
+		ELSIF v_man_table='man_flexunion' THEN
 			INSERT INTO man_flexunion (node_id) VALUES(NEW.node_id);
 		
-		ELSIF man_table='man_netelement' THEN
+		ELSIF v_man_table='man_netelement' THEN
 			INSERT INTO man_netelement (node_id, serial_number) VALUES(NEW.node_id, NEW.serial_number);		
 		
-		ELSIF man_table='man_netsamplepoint' THEN
+		ELSIF v_man_table='man_netsamplepoint' THEN
 			INSERT INTO man_netsamplepoint (node_id, lab_code) VALUES(NEW.node_id, NEW.lab_code);
 		
-		ELSIF man_table='man_wtp' THEN
+		ELSIF v_man_table='man_wtp' THEN
 			INSERT INTO man_wtp (node_id, name) VALUES(NEW.node_id, NEW.name);
 		
 		END IF;
 
-		IF man_table='parent' THEN
-		    man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE node_type.id = cat_node.nodetype_id LIMIT 1)::text;
-
+		IF v_man_table='parent' THEN
+		    v_man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE node_type.id = cat_node.nodetype_id LIMIT 1)::text;
 	         
-	        IF man_table IS NOT NULL THEN
-	            v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+	        IF v_man_table IS NOT NULL THEN
+	            v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
 	            EXECUTE v_sql;
 	        END IF;
 	    END IF;
 
-								
+	-- man addfields insert
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN
+					EXECUTE 'INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES ($1, $2, $3)'
+						USING NEW.node_id, v_addfields.id, v_new_value_param;
+				END IF;	
+			END LOOP;
+		END IF;				
+
 	-- EPA insert
         IF (NEW.epa_type = 'JUNCTION') THEN 
 			INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
@@ -403,39 +431,39 @@ BEGIN
         IF (NEW.epa_type != OLD.epa_type) THEN    
          
             IF (OLD.epa_type = 'JUNCTION') THEN
-                inp_table:= 'inp_junction';            
+                v_inp_table:= 'inp_junction';            
             ELSIF (OLD.epa_type = 'TANK') THEN
-                inp_table:= 'inp_tank';                
+                v_inp_table:= 'inp_tank';                
             ELSIF (OLD.epa_type = 'RESERVOIR') THEN
-                inp_table:= 'inp_reservoir';    
+                v_inp_table:= 'inp_reservoir';    
             ELSIF (OLD.epa_type = 'SHORTPIPE') THEN
-                inp_table:= 'inp_shortpipe';    
+                v_inp_table:= 'inp_shortpipe';    
             ELSIF (OLD.epa_type = 'VALVE') THEN
-                inp_table:= 'inp_valve';    
+                v_inp_table:= 'inp_valve';    
             ELSIF (OLD.epa_type = 'PUMP') THEN
-                inp_table:= 'inp_pump';  
+                v_inp_table:= 'inp_pump';  
             END IF;
-            IF inp_table IS NOT NULL THEN
-                v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
+            IF v_inp_table IS NOT NULL THEN
+                v_sql:= 'DELETE FROM '||v_inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
                 EXECUTE v_sql;
             END IF;
-			inp_table := NULL;
+			v_inp_table := NULL;
 
             IF (NEW.epa_type = 'JUNCTION') THEN
-                inp_table:= 'inp_junction';   
+                v_inp_table:= 'inp_junction';   
             ELSIF (NEW.epa_type = 'TANK') THEN
-                inp_table:= 'inp_tank';     
+                v_inp_table:= 'inp_tank';     
             ELSIF (NEW.epa_type = 'RESERVOIR') THEN
-                inp_table:= 'inp_reservoir';  
+                v_inp_table:= 'inp_reservoir';  
             ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
-                inp_table:= 'inp_shortpipe';    
+                v_inp_table:= 'inp_shortpipe';    
             ELSIF (NEW.epa_type = 'VALVE') THEN
-                inp_table:= 'inp_valve';    
+                v_inp_table:= 'inp_valve';    
             ELSIF (NEW.epa_type = 'PUMP') THEN
-                inp_table:= 'inp_pump';  
+                v_inp_table:= 'inp_pump';  
             END IF;
-            IF inp_table IS NOT NULL THEN
-                v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+            IF v_inp_table IS NOT NULL THEN
+                v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
                 EXECUTE v_sql;
             END IF;
         END IF;
@@ -478,13 +506,13 @@ BEGIN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
 			
 			-- Parent id
-			SELECT substring (tablename from 8 for 30), pol_id INTO tablename_aux, pol_id_aux FROM polygon JOIN sys_feature_cat ON sys_feature_cat.id=polygon.sys_type
+			SELECT substring (tablename from 8 for 30), pol_id INTO v_tablename, v_pol_id FROM polygon JOIN sys_feature_cat ON sys_feature_cat.id=polygon.sys_type
 			WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 	
-			IF pol_id_aux IS NOT NULL THEN
-				query_text:= 'SELECT node_id FROM '||tablename_aux||' WHERE pol_id::integer='||pol_id_aux||' LIMIT 1';
-				EXECUTE query_text INTO node_id_aux;
-				NEW.parent_id=node_id_aux;
+			IF v_pol_id IS NOT NULL THEN
+				v_sql:= 'SELECT node_id FROM '||v_tablename||' WHERE pol_id::integer='||v_pol_id||' LIMIT 1';
+				EXECUTE v_sql INTO v_node_id;
+				NEW.parent_id=v_node_id;
 			END IF;
 						
 		END IF;
@@ -500,22 +528,22 @@ BEGIN
 		END IF;
 
 		--link_path
-		SELECT link_path INTO link_path_aux FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id WHERE cat_node.id=NEW.nodecat_id;
-		IF link_path_aux IS NOT NULL THEN
-			NEW.link = replace(NEW.link, link_path_aux,'');
+		SELECT link_path INTO v_link_path FROM node_type JOIN cat_node ON cat_node.nodetype_id=node_type.id WHERE cat_node.id=NEW.nodecat_id;
+		IF v_link_path IS NOT NULL THEN
+			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 		
 
 		-- Node type for parent table
-		IF man_table='parent' THEN
+		IF v_man_table='parent' THEN
 	    	IF (NEW.nodecat_id != OLD.nodecat_id) THEN
-				new_node_type_aux= (SELECT type FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=NEW.nodecat_id);
-				old_node_type_aux= (SELECT type FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=OLD.nodecat_id);
-				IF new_node_type_aux != old_node_type_aux THEN
-					query_text='INSERT INTO man_'||lower(new_node_type_aux)||' (node_id) VALUES ('||NEW.node_id||')';
-					EXECUTE query_text;
-					query_text='DELETE FROM man_'||lower(old_node_type_aux)||' WHERE node_id='||quote_literal(OLD.node_id);
-					EXECUTE query_text;
+				v_new_node_type= (SELECT type FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=NEW.nodecat_id);
+				v_old_node_type= (SELECT type FROM node_type JOIN cat_node ON node_type.id=nodetype_id where cat_node.id=OLD.nodecat_id);
+				IF v_new_node_type != v_old_node_type THEN
+					v_sql='INSERT INTO man_'||lower(v_new_node_type)||' (node_id) VALUES ('||NEW.node_id||')';
+					EXECUTE v_sql;
+					v_sql='DELETE FROM man_'||lower(v_old_node_type)||' WHERE node_id='||quote_literal(OLD.node_id);
+					EXECUTE v_sql;
 				END IF;
 			END IF;
 		END IF;
@@ -530,98 +558,125 @@ BEGIN
 		label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link
 		WHERE node_id = OLD.node_id;
 		
-		IF man_table ='man_junction' THEN
+		IF v_man_table ='man_junction' THEN
 			UPDATE man_junction SET node_id=NEW.node_id	
 			WHERE node_id=OLD.node_id;
 
-		ELSIF man_table ='man_tank' THEN
+		ELSIF v_man_table ='man_tank' THEN
 			UPDATE man_tank SET pol_id=NEW.pol_id, vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name
 			WHERE node_id=OLD.node_id;
 	
-		ELSIF man_table ='man_pump' THEN
+		ELSIF v_man_table ='man_pump' THEN
 			UPDATE man_pump SET max_flow=NEW.max_flow, min_flow=NEW.min_flow, nom_flow=NEW.nom_flow, "power"=NEW.power, 
 			pressure=NEW.pressure, elev_height=NEW.elev_height, name=NEW.name, pump_number=NEW.pump_number
 			WHERE node_id=OLD.node_id;
 		
-		ELSIF man_table ='man_manhole' THEN
+		ELSIF v_man_table ='man_manhole' THEN
 			UPDATE man_manhole SET name=NEW.name
 			WHERE node_id=OLD.node_id;
 
-		ELSIF man_table ='man_hydrant' THEN
+		ELSIF v_man_table ='man_hydrant' THEN
 			UPDATE man_hydrant SET fire_code=NEW.fire_code, communication=NEW.communication, valve=NEW.valve
 			WHERE node_id=OLD.node_id;			
 
-		ELSIF man_table ='man_source' THEN
+		ELSIF v_man_table ='man_source' THEN
 			UPDATE man_source SET name=NEW.name
 			WHERE node_id=OLD.node_id;
 
-		ELSIF man_table ='man_meter' THEN
+		ELSIF v_man_table ='man_meter' THEN
 			UPDATE man_meter SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;
 
-		ELSIF man_table ='man_waterwell' THEN
+		ELSIF v_man_table ='man_waterwell' THEN
 			UPDATE man_waterwell SET name=NEW.name
 			WHERE node_id=OLD.node_id;
 
-		ELSIF man_table ='man_reduction' THEN
+		ELSIF v_man_table ='man_reduction' THEN
 			UPDATE man_reduction SET diam1=NEW.diam1, diam2=NEW.diam2
 			WHERE node_id=OLD.node_id;
 
-		ELSIF man_table ='man_valve' THEN
+		ELSIF v_man_table ='man_valve' THEN
 			UPDATE man_valve 
 			SET closed=NEW.closed, broken=NEW.broken, buried=NEW.buried, irrigation_indicator=NEW.irrigation_indicator, pression_entry=NEW.pression_entry, pression_exit=NEW.pression_exit, 
 			depth_valveshaft=NEW.depth_valveshaft, regulator_situation=NEW.regulator_situation, regulator_location=NEW.regulator_location, regulator_observ=NEW.regulator_observ, lin_meters=NEW.lin_meters, 
 			exit_type=NEW.exit_type, exit_code=NEW.exit_code, drive_type=NEW.drive_type, cat_valve2=NEW.cat_valve2
 			WHERE node_id=OLD.node_id;	
 		
-		ELSIF man_table ='man_register' THEN
+		ELSIF v_man_table ='man_register' THEN
 			UPDATE man_register	SET pol_id=NEW.pol_id
 			WHERE node_id=OLD.node_id;		
 	
-		ELSIF man_table ='man_netwjoin' THEN			
+		ELSIF v_man_table ='man_netwjoin' THEN			
 			UPDATE man_netwjoin
 			SET top_floor= NEW.top_floor, cat_valve=NEW.cat_valve, customer_code=NEW.customer_code
 			WHERE node_id=OLD.node_id;		
 		
-		ELSIF man_table ='man_expansiontank' THEN
+		ELSIF v_man_table ='man_expansiontank' THEN
 			UPDATE man_expansiontank SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;		
 
-		ELSIF man_table ='man_flexunion' THEN
+		ELSIF v_man_table ='man_flexunion' THEN
 			UPDATE man_flexunion SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;				
 		
-		ELSIF man_table ='man_netelement' THEN
+		ELSIF v_man_table ='man_netelement' THEN
 			UPDATE man_netelement SET serial_number=NEW.serial_number
 			WHERE node_id=OLD.node_id;	
 	
-		ELSIF man_table ='man_netsamplepoint' THEN
+		ELSIF v_man_table ='man_netsamplepoint' THEN
 			UPDATE man_netsamplepoint SET node_id=NEW.node_id, lab_code=NEW.lab_code
 			WHERE node_id=OLD.node_id;		
 		
-		ELSIF man_table ='man_wtp' THEN		
+		ELSIF v_man_table ='man_wtp' THEN		
 			UPDATE man_wtp SET name=NEW.name
 			WHERE node_id=OLD.node_id;			
 			
-		ELSIF man_table ='man_filter' THEN
+		ELSIF v_man_table ='man_filter' THEN
 			UPDATE man_filter SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;
 		
 		END IF;
 
-            
+			-- man addfields update
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+	 
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING OLD
+					INTO v_old_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN 
+
+					EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
+						ON CONFLICT (feature_id, parameter_id)
+						DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
+						USING NEW.node_id , v_addfields.id, v_new_value_param;	
+
+				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+
+					EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
+						USING NEW.node_id , v_addfields.id;
+				END IF;
+			
+			END LOOP;
+	    END IF;       
+
 		RETURN NEW;
-    
 
 	-- DELETE
     ELSIF TG_OP = 'DELETE' THEN
 
 		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
 	
-		IF man_table='man_tank' THEN
+		IF v_man_table='man_tank' THEN
 			DELETE FROM node WHERE node_id=OLD.node_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_tank WHERE node_id=OLD.node_id );
-		ELSIF man_table='man_register' THEN
+		ELSIF v_man_table='man_register' THEN
 			DELETE FROM node WHERE node_id=OLD.node_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_register WHERE node_id=OLD.node_id );
 		ELSE 

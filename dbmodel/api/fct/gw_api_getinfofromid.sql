@@ -120,6 +120,7 @@ DECLARE
 	v_canvasmargin_text text ;
 	v_toolbar text;
 	v_layermanager json;
+	v_role text;
    
 BEGIN
 
@@ -137,6 +138,7 @@ BEGIN
 	v_inputgeometry := (p_data ->> 'feature')::json->> 'inputGeometry';
 	v_editable := (p_data ->> 'form')::json->> 'editable';
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
+	v_role = (p_data ->> 'data')::json->> 'rolePermissions';
 	if v_toolbar is NULL THEN
 		v_toolbar := 'basic';
 	END IF;
@@ -280,9 +282,16 @@ BEGIN
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
         IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
 		-- Get form_tabs
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", tablabel as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
-			INTO form_tabs
-			USING v_table_parent;
+		IF v_role = 'role_basic' OR v_role = 'role_om' THEN
+			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", tablabel as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", ''[{"actionName":"actionZoom", "actionTooltip":"actionZoom",  "disabled":false},{"actionName":"actionCentered", "actionTooltip":"actionCentered",  "disabled":false},{"actionName":"actionZoomOut", "actionTooltip":"actionZoomOut",  "disabled":false},{"actionName":"actionSection", "actionTooltip":"actionSection",  "disabled":false},{"actionName":"actionLink", "actionTooltip":"actionLink",  "disabled":false},{"actionName":"actionHelp", "actionTooltip":"actionHelp",  "disabled":false}]''::json as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+				INTO form_tabs
+				USING v_table_parent;
+		ELSE
+			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", tablabel as "tabHeaderText", tooltip as "tabTooltip", tabfunction as "tabFunction", tabactions as tabActions FROM config_api_form_tabs WHERE formname = $1 order by id desc) a'
+				INTO form_tabs
+				USING v_table_parent;
+		END IF;
+		
 	END IF;
 
 

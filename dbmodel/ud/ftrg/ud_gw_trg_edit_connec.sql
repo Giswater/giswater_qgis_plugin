@@ -9,21 +9,28 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec()  RETURNS trigger AS $BODY$
 DECLARE 
     v_sql varchar;
-    connec_id_seq int8;
-	code_autofill_bool boolean;
-	count_aux integer;
-	promixity_buffer_aux double precision;
-	link_path_aux varchar;
+	v_code_autofill_bool boolean;
+	v_promixity_buffer double precision;
+	v_link_path varchar;
 	v_record_link record;
-	v_record_vnode record;
 	v_count integer;
+	v_addfields record;
+	v_new_value_param text;
+	v_old_value_param text;
+	v_customfeature text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	
-	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	IF promixity_buffer_aux IS NULL THEN promixity_buffer_aux=0.5; END IF;
+	--set custom feature custom view inserts
+	v_customfeature= TG_ARGV[0];
+
+	IF v_customfeature='parent' THEN
+		v_customfeature:=NULL;
+	END IF;
+
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
         
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -35,8 +42,10 @@ BEGIN
         END IF;
 
         -- connec type
-        IF (NEW.connec_type IS NULL) THEN
-			   NEW.connec_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='connectype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+        IF (NEW.connec_type IS NULL) AND v_customfeature IS NOT NULL THEN
+		    	NEW.connec_type:= v_customfeature;
+		ELSIF (NEW.connec_type IS NULL) THEN
+			  NEW.connec_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='connectype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.connec_type IS NULL) THEN
 				NEW.connec_type:=(SELECT id FROM connec_type LIMIT 1);
 			END IF;
@@ -58,11 +67,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1214);  
 			END IF;
-				SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
@@ -78,11 +87,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(1012,1214);  
             END IF;
-				SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
@@ -150,10 +159,10 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
-		SELECT code_autofill INTO code_autofill_bool FROM connec_type WHERE id=NEW.connec_type;
+		SELECT code_autofill INTO v_code_autofill_bool FROM connec_type WHERE id=NEW.connec_type;
 
 		--Copy id to code field
-			IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+			IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
 				NEW.code=NEW.connec_id;
 			END IF;
 
@@ -194,7 +203,22 @@ BEGIN
 		AND cur_user=current_user LIMIT 1) IS TRUE THEN
 			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
 		END IF;
-              
+ 
+	-- man addfields insert
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN
+					EXECUTE 'INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES ($1, $2, $3)'
+						USING NEW.connec_id, v_addfields.id, v_new_value_param;
+				END IF;	
+			END LOOP;
+		END IF;		
+
         RETURN NEW;
 
 
@@ -247,9 +271,9 @@ BEGIN
 		END IF;
 		
 		--link_path
-		SELECT link_path INTO link_path_aux FROM connec_type WHERE id=NEW.connec_type;
-		IF link_path_aux IS NOT NULL THEN
-			NEW.link = replace(NEW.link, link_path_aux,'');
+		SELECT link_path INTO v_link_path FROM connec_type WHERE id=NEW.connec_type;
+		IF v_link_path IS NOT NULL THEN
+			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 
         UPDATE connec 
@@ -263,7 +287,36 @@ BEGIN
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, private_connecat_id=NEW.private_connecat_id
         WHERE connec_id = OLD.connec_id;
-                
+
+			-- man addfields update
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+	 
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING OLD
+					INTO v_old_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN 
+
+					EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
+						ON CONFLICT (feature_id, parameter_id)
+						DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
+						USING NEW.connec_id , v_addfields.id, v_new_value_param;	
+
+				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+
+					EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
+						USING NEW.connec_id , v_addfields.id;
+				END IF;
+			
+			END LOOP;
+	    END IF;     
+
         RETURN NEW;
 
 

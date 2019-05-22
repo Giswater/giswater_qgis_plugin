@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--Function deprecated from version 3.2.012
+
 --FUNCTION CODE: 1218
    
 

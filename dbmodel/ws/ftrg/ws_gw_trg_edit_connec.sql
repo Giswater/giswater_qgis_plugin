@@ -13,37 +13,41 @@ $BODY$
 
 DECLARE 
     v_sql varchar;
-    v_sql2 varchar;
-	man_table varchar;
-	new_man_table varchar;
-	old_man_table varchar;
-    connec_id_seq int8;
-	code_autofill_bool boolean;
-	man_table_2 varchar;
-	count_aux integer;
-	promixity_buffer_aux double precision;
-	link_path_aux varchar;
+	v_man_table varchar; 
+	v_code_autofill_bool boolean;
+	v_type_man_table varchar;
+	v_promixity_buffer double precision;
+	v_link_path varchar;
 	v_record_link record;
 	v_record_vnode record;
 	v_count integer;
 	v_insert_double_geom boolean;
 	v_double_geom_buffer double precision;
-	new_connec_type_aux text;
-	old_connec_type_aux text;
-	query_text text;
-	
+	v_new_connec_type text;
+	v_old_connec_type text;
+	v_customfeature text;
+	v_addfields record;
+	v_new_value_param text;
+	v_old_value_param text;
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    man_table:= TG_ARGV[0];
-	man_table_2:=man_table;
+    v_man_table:= TG_ARGV[0];
+	
+	IF v_man_table IN (SELECT id FROM connec_type) THEN
+		v_customfeature:=v_man_table;
+		v_man_table:=(SELECT man_table FROM connec_type WHERE id=v_man_table);
+	END IF;
+	
+	v_type_man_table:=v_man_table;
 	
 	--Get data from config table
-	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
 	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 	
-	IF promixity_buffer_aux IS NULL THEN promixity_buffer_aux=0.5; END IF;
+	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	IF v_insert_double_geom IS NULL THEN v_insert_double_geom=FALSE; END IF;
 	IF v_double_geom_buffer IS NULL THEN v_double_geom_buffer=1; END IF;
 	
@@ -62,27 +66,40 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
 				RETURN audit_function(1022,1316);
 			END IF;
-			
-			IF man_table='man_greentap' THEN
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='greentapcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_wjoin' THEN
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wjoincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-			ELSIF man_table='man_fountain' OR man_table='man_fountain_pol' THEN
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='fountaincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);	
-			ELSIF man_table='man_tap' THEN
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tapcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);	
-			ELSIF man_table='parent' THEN
-				NEW.connecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			IF v_customfeature IS NOT NULL THEN
+				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
+			END IF;			
+
+			IF (NEW.connecat_id IS NULL) THEN			
+				IF v_man_table='man_greentap' THEN
+					NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='greentapcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				ELSIF v_man_table='man_wjoin' THEN
+					NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='wjoincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				ELSIF v_man_table='man_fountain' OR v_man_table='man_fountain_pol' THEN
+					NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='fountaincat_vdefault' AND "cur_user"="current_user"() LIMIT 1);	
+				ELSIF v_man_table='man_tap' THEN
+					NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='tapcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);	
+				ELSIF v_man_table='parent' THEN
+					NEW.connecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				END IF;
 			END IF;
 				
-			IF (NEW.connecat_id IS NULL) AND man_table='parent' THEN
+			IF (NEW.connecat_id IS NULL) AND v_man_table='parent' THEN
 				NEW.connecat_id := (SELECT id FROM cat_connec LIMIT 1);
 			ELSIF (NEW.connecat_id IS NULL) THEN
 				PERFORM audit_function(1086,1316);
 			END IF;				
 
-			IF man_table!='parent' and (NEW.connecat_id NOT IN (select cat_connec.id FROM cat_connec JOIN connec_type ON cat_connec.connectype_id=connec_type.id WHERE connec_type.man_table=man_table_2)) THEN 
-				PERFORM audit_function(1088,1316);
+			IF v_customfeature IS NOT NULL THEN
+				IF (NEW.connecat_id NOT IN (select cat_connec.id FROM cat_connec WHERE connectype_id=v_customfeature)) THEN 
+					PERFORM audit_function(1092,1318);
+				END IF;
+			END IF;
+
+			IF v_man_table!='parent' AND v_customfeature IS NULL THEN
+				IF (NEW.connecat_id NOT IN (select cat_connec.id FROM cat_connec JOIN connec_type ON cat_connec.connectype_id=connec_type.id WHERE connec_type.man_table=v_type_man_table)) THEN 
+					PERFORM audit_function(1088,1316);
+				END IF;
 			END IF;
         END IF;
 
@@ -91,11 +108,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1316);  
 			END IF;
-				SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
@@ -111,11 +128,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(1012,1316);  
             END IF;
-				SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
@@ -194,10 +211,10 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
-		SELECT code_autofill INTO code_autofill_bool FROM connec_type join cat_connec on connec_type.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
+		SELECT code_autofill INTO v_code_autofill_bool FROM connec_type join cat_connec on connec_type.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
 		
 		--Copy id to code field
-		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.connec_id;
 		END IF;	 
 		
@@ -220,10 +237,10 @@ BEGIN
 		NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis2_id, NEW.postnumber, NEW.postnumber2, 
 		NEW.muni_id, NEW.streetaxis_id, NEW.postcode, NEW.postcomplement, NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory, NEW.num_value, NEW.connec_length, NEW.arc_id);
 		 
-		IF man_table='man_greentap' THEN
+		IF v_man_table='man_greentap' THEN
 			INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.linked_connec); 
 		
-		ELSIF man_table='man_fountain' THEN 
+		ELSIF v_man_table='man_fountain' THEN 
 			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('urn_id_seq'));
@@ -242,11 +259,11 @@ BEGIN
 			
 			END IF;
 		 
-		ELSIF man_table='man_tap' THEN		
+		ELSIF v_man_table='man_tap' THEN		
 			INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
 			VALUES (NEW.connec_id,  NEW.linked_connec, NEW.cat_valve,  NEW.drain_diam, NEW.drain_exit,  NEW.drain_gully, NEW.drain_distance, NEW.arq_patrimony, NEW.com_state);
 		  
-		ELSIF man_table='man_wjoin' THEN  
+		ELSIF v_man_table='man_wjoin' THEN  
 		 	INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
 			VALUES (NEW.connec_id, NEW.top_floor, NEW.cat_valve);
 			
@@ -257,7 +274,22 @@ BEGIN
 		AND cur_user=current_user LIMIT 1) IS TRUE THEN
 			PERFORM gw_fct_connect_to_network((select array_agg(NEW.connec_id)), 'CONNEC');
 		END IF;
-			 
+
+-- man addfields insert
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN
+					EXECUTE 'INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES ($1, $2, $3)'
+						USING NEW.connec_id, v_addfields.id, v_new_value_param;
+				END IF;	
+			END LOOP;
+		END IF;		
+									 
 		RETURN NEW;
 
 	
@@ -319,21 +351,21 @@ BEGIN
 		END IF;
 
 		--link_path
-		SELECT link_path INTO link_path_aux FROM connec_type JOIN cat_connec ON cat_connec.connectype_id=connec_type.id WHERE cat_connec.id=NEW.connecat_id;
-		IF link_path_aux IS NOT NULL THEN
-			NEW.link = replace(NEW.link, link_path_aux,'');
+		SELECT link_path INTO v_link_path FROM connec_type JOIN cat_connec ON cat_connec.connectype_id=connec_type.id WHERE cat_connec.id=NEW.connecat_id;
+		IF v_link_path IS NOT NULL THEN
+			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 		
 		-- Connec type for parent tables
-		IF man_table='parent' THEN
+		IF v_man_table='parent' THEN
 	    	IF (NEW.connecat_id != OLD.connecat_id) THEN
-				new_connec_type_aux= (SELECT type FROM connec_type JOIN cat_connec ON connec_type.id=connectype_id where cat_connec.id=NEW.connecat_id);
-				old_connec_type_aux= (SELECT type FROM connec_type JOIN cat_connec ON connec_type.id=connectype_id where cat_connec.id=OLD.connecat_id);
-				IF new_connec_type_aux != old_connec_type_aux THEN
-					query_text='INSERT INTO man_'||lower(new_connec_type_aux)||' (connec_id) VALUES ('||NEW.connec_id||')';
-					EXECUTE query_text;
-					query_text='DELETE FROM man_'||lower(old_connec_type_aux)||' WHERE connec_id='||quote_literal(OLD.connec_id);
-					EXECUTE query_text;
+				v_new_connec_type= (SELECT type FROM connec_type JOIN cat_connec ON connec_type.id=connectype_id where cat_connec.id=NEW.connecat_id);
+				v_old_connec_type= (SELECT type FROM connec_type JOIN cat_connec ON connec_type.id=connectype_id where cat_connec.id=OLD.connecat_id);
+				IF v_new_connec_type != v_old_connec_type THEN
+					v_sql='INSERT INTO man_'||lower(v_new_connec_type)||' (connec_id) VALUES ('||NEW.connec_id||')';
+					EXECUTE v_sql;
+					v_sql='DELETE FROM man_'||lower(v_old_connec_type)||' WHERE connec_id='||quote_literal(OLD.connec_id);
+					EXECUTE v_sql;
 				END IF;
 			END IF;
 		END IF;
@@ -348,26 +380,55 @@ BEGIN
 			publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, arc_id=NEW.arc_id
 			WHERE connec_id=OLD.connec_id;
 			
-        IF man_table ='man_greentap' THEN
+        IF v_man_table ='man_greentap' THEN
 		    UPDATE man_greentap SET linked_connec=NEW.linked_connec
 			WHERE connec_id=OLD.connec_id;
 			
-        ELSIF man_table ='man_wjoin' THEN
+        ELSIF v_man_table ='man_wjoin' THEN
 			UPDATE man_wjoin SET top_floor=NEW.top_floor,cat_valve=NEW.cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
-		ELSIF man_table ='man_tap' THEN
+		ELSIF v_man_table ='man_tap' THEN
 			UPDATE man_tap SET linked_connec=NEW.linked_connec, drain_diam=NEW.drain_diam,drain_exit=NEW.drain_exit,drain_gully=NEW.drain_gully,
 			drain_distance=NEW.drain_distance, arq_patrimony=NEW.arq_patrimony, com_state=NEW.com_state, cat_valve=NEW.cat_valve
 			WHERE connec_id=OLD.connec_id;
 			
-        ELSIF man_table ='man_fountain' THEN 			
+        ELSIF v_man_table ='man_fountain' THEN 			
 			UPDATE man_fountain SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
 			regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony,
 			pol_id=NEW.pol_id
 			WHERE connec_id=OLD.connec_id;	
 			
 		END IF;
+
+		-- man addfields update
+			IF v_customfeature IS NOT NULL THEN
+				FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+				LOOP
+
+					EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+						USING NEW
+						INTO v_new_value_param;
+		 
+					EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+						USING OLD
+						INTO v_old_value_param;
+
+					IF v_new_value_param IS NOT NULL THEN 
+
+						EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
+							ON CONFLICT (feature_id, parameter_id)
+							DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
+							USING NEW.connec_id , v_addfields.id, v_new_value_param;	
+
+					ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+
+						EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
+							USING NEW.connec_id , v_addfields.id;
+					END IF;
+				
+				END LOOP;
+		    END IF;   
 
         RETURN NEW;
     
@@ -376,7 +437,7 @@ BEGIN
 	
 		PERFORM gw_fct_check_delete(OLD.connec_id, 'CONNEC');
 		
-		IF man_table ='man_fountain'  THEN
+		IF v_man_table ='man_fountain'  THEN
 			DELETE FROM connec WHERE connec_id=OLD.connec_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_fountain WHERE connec_id=OLD.connec_id );
 		ELSE
