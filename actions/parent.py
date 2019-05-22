@@ -27,7 +27,8 @@ else:
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
 from qgis.PyQt.QtCore import Qt, QSettings
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 
@@ -940,5 +941,28 @@ class ParentAction(object):
         for action in actions_list:
            self.controller.log_info(str(action.objectName()))
            action.triggered.connect(partial(self.show_action_name, action))
+
+
     def show_action_name(self, action):
         self.controller.log_info(str(action.objectName()))
+
+
+    def set_restriction(self, dialog, widget_to_ignore):
+        """
+        Set all widget enabled(False) or readOnly(True) except those on the tuple
+        :param dialog:
+        :param widget_to_ignore: tuple = ('widgetname1', 'widgetname2', 'widgetname3', ...)
+        :return:
+        """
+        restriction = self.controller.get_restriction()
+        if restriction == 'role_basic':
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                if widget.objectName() in widget_to_ignore:
+                    continue
+                # Set editable/readonly
+                if type(widget) in (QLineEdit, QDoubleSpinBox, QTextEdit):
+                    widget.setReadOnly(True)
+                    widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
+                    widget.setEnabled(False)
