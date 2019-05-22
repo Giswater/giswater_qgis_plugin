@@ -33,3 +33,11 @@ WHERE parameter='api_search_psector';
 
 UPDATE config_param_system SET value='{"id":"EUR", "descript":"EURO", "symbol":"€"}' WHERE parameter='sys_currency';
 
+
+-----------------------
+-- audit_cat_function
+-----------------------
+UPDATE audit_cat_function SET isdeprecated=TRUE WHERE function_name='gw_trg_edit_man_arc';
+UPDATE audit_cat_function SET isdeprecated=TRUE WHERE function_name='gw_trg_edit_man_node';
+UPDATE audit_cat_function SET isdeprecated=TRUE WHERE function_name='gw_trg_edit_man_connec';
+UPDATE audit_cat_function SET isdeprecated=TRUE WHERE function_name='gw_trg_edit_man_gully';

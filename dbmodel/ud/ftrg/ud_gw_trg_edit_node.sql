@@ -13,33 +13,37 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    inp_table varchar;
-    man_table varchar;
-    new_man_table varchar;
-    old_man_table varchar;
+    v_inp_table varchar;
+    v_man_table varchar;
+    v_new_v_man_table varchar;
+    v_old_v_man_table varchar;
     v_sql varchar;
-    v_sql2 varchar;
-    old_nodetype varchar;
-    new_nodetype varchar;
-    man_table_2 varchar;
-    node_id_seq int8;
-	code_autofill_bool boolean;
-	count_aux integer;
-	promixity_buffer_aux double precision;
-	link_path_aux varchar;
+    v_type_v_man_table varchar;
+	v_code_autofill_bool boolean;
+	v_count integer;
+	v_promixity_buffer double precision;
+	v_link_path varchar;
 	v_insert_double_geom boolean;
 	v_double_geom_buffer double precision;
-
+	v_addfields record;
+	v_new_value_param text;
+	v_old_value_param text;
+	v_customfeature text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    man_table:= TG_ARGV[0];
-    man_table_2:=man_table;
+    v_man_table:= TG_ARGV[0];
+	--modify values for custom view inserts
+	IF v_man_table IN (SELECT id FROM node_type) THEN
+		v_customfeature:=v_man_table;
+		v_man_table:=(SELECT man_table FROM node_type WHERE id=v_man_table);
+	END IF;
 
+	v_type_v_man_table:=v_man_table;
 
 	--Get data from config table	
-	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
 	SELECT ((value::json)->>'activated') INTO v_insert_double_geom FROM config_param_system WHERE parameter='insert_double_geometry';
 	SELECT ((value::json)->>'value') INTO v_double_geom_buffer FROM config_param_system WHERE parameter='insert_double_geometry';
 	
@@ -58,14 +62,18 @@ BEGIN
             IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
                 RETURN audit_function(1004,1218);  
             END IF;
-            IF man_table='parent' THEN
+            
+ 			If v_customfeature IS NOT NULL THEN
+ 				NEW.node_type:=v_customfeature;
+ 			ELSE
             	NEW.node_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodetype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-            ELSE
-            	NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=man_table_2 LIMIT 1);
             END IF;
 
-            IF (NEW.node_type IS NULL) AND man_table='parent' THEN
+            IF (NEW.node_type IS NULL) AND v_man_table='parent' THEN
             	NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
+
+            ELSIF (NEW.node_type IS NULL) AND v_man_table !='parent' THEN
+            	NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=v_type_v_man_table LIMIT 1);
             END IF;
         END IF;
 
@@ -87,11 +95,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1218);  
 			END IF;
-				SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
@@ -107,11 +115,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(1012,1218);  
             END IF;
-				SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
@@ -170,10 +178,10 @@ BEGIN
 		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');		
 		
 		-- code autofill
-		SELECT code_autofill INTO code_autofill_bool FROM node_type WHERE id=NEW.node_type;
+		SELECT code_autofill INTO v_code_autofill_bool FROM node_type WHERE id=NEW.node_type;
 		
 		--Copy id to code field
-			IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+			IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
 				NEW.code=NEW.node_id;
 			END IF;		
 
@@ -214,19 +222,19 @@ BEGIN
 				NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 				NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value);	
 				
-		IF man_table='man_junction' THEN
+		IF v_man_table='man_junction' THEN
 					
 			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
 			        
-		ELSIF man_table='man_outfall' THEN
+		ELSIF v_man_table='man_outfall' THEN
 
 			INSERT INTO man_outfall (node_id, name) VALUES (NEW.node_id,NEW.name);
         
-		ELSIF man_table='man_valve' THEN
+		ELSIF v_man_table='man_valve' THEN
 
 			INSERT INTO man_valve (node_id, name) VALUES (NEW.node_id,NEW.name);	
 		
-		ELSIF man_table='man_storage' THEN
+		ELSIF v_man_table='man_storage' THEN
 			
 			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
@@ -242,7 +250,7 @@ BEGIN
 				VALUES(NEW.node_id, NEW.pol_id, NEW.length, NEW.width,NEW.custom_area, NEW.max_volume, NEW.util_volume, NEW.min_height,NEW.accessibility, NEW.name);
 			END IF;
 						
-		ELSIF man_table='man_netgully' THEN
+		ELSIF v_man_table='man_netgully' THEN
 					
 			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
@@ -258,7 +266,7 @@ BEGIN
 				INSERT INTO man_netgully (node_id) VALUES(NEW.node_id);
 			END IF;
 					 			
-		ELSIF man_table='man_chamber' THEN
+		ELSIF v_man_table='man_chamber' THEN
 
 			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
@@ -276,22 +284,22 @@ BEGIN
 				NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name);
 			END IF;	
 						
-		ELSIF man_table='man_manhole' THEN
+		ELSIF v_man_table='man_manhole' THEN
 		
 				INSERT INTO man_manhole (node_id,length, width, sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
 				VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility);	
 		
-		ELSIF man_table='man_netinit' THEN
+		ELSIF v_man_table='man_netinit' THEN
 			
 			INSERT INTO man_netinit (node_id,length, width, inlet, bottom_channel, accessibility, name) 
 			VALUES (NEW.node_id, NEW.length,NEW.width,NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.name);
 			
-		ELSIF man_table='man_wjump' THEN
+		ELSIF v_man_table='man_wjump' THEN
 	
 			INSERT INTO man_wjump (node_id, length, width,sander_depth,prot_surface, accessibility, name) 
 			VALUES (NEW.node_id, NEW.length,NEW.width, NEW.sander_depth,NEW.prot_surface,NEW.accessibility, NEW.name);	
 
-		ELSIF man_table='man_wwtp' THEN
+		ELSIF v_man_table='man_wwtp' THEN
 		
 			IF (v_insert_double_geom IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
@@ -306,18 +314,33 @@ BEGIN
 				INSERT INTO man_wwtp (node_id, name) VALUES (NEW.node_id,NEW.name);
 			END IF;	
 						
-		ELSIF man_table='man_netelement' THEN
+		ELSIF v_man_table='man_netelement' THEN
 					
 			INSERT INTO man_netelement (node_id, serial_number) VALUES(NEW.node_id, NEW.serial_number);		
 		
-		ELSIF man_table='parent' THEN
+		ELSIF v_man_table='parent' THEN
 
-			man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id=NEW.node_type);
-        	v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+			v_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id=NEW.node_type);
+        	v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         	EXECUTE v_sql;
 
 		END IF;
-		
+
+	-- man addfields insert
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN
+					EXECUTE 'INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES ($1, $2, $3)'
+						USING NEW.node_id, v_addfields.id, v_new_value_param;
+				END IF;	
+			END LOOP;
+		END IF;			
+
 		-- EPA INSERT
 	    IF (NEW.epa_type = 'JUNCTION') THEN
 			INSERT INTO inp_junction (node_id, y0, ysur, apond) VALUES (NEW.node_id, 0, 0, 0);
@@ -338,32 +361,32 @@ BEGIN
         IF (NEW.epa_type != OLD.epa_type) THEN    
          
             IF (OLD.epa_type = 'JUNCTION') THEN
-                inp_table:= 'inp_junction';            
+                v_inp_table:= 'inp_junction';            
             ELSIF (OLD.epa_type = 'DIVIDER') THEN
-                inp_table:= 'inp_divider';                
+                v_inp_table:= 'inp_divider';                
             ELSIF (OLD.epa_type = 'OUTFALL') THEN
-                inp_table:= 'inp_outfall';    
+                v_inp_table:= 'inp_outfall';    
             ELSIF (OLD.epa_type = 'STORAGE') THEN
-                inp_table:= 'inp_storage';    
+                v_inp_table:= 'inp_storage';    
 			END IF;
-			IF inp_table IS NOT NULL THEN
-                v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
+			IF v_inp_table IS NOT NULL THEN
+                v_sql:= 'DELETE FROM '||v_inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
                 EXECUTE v_sql;
             END IF;
             
-			inp_table := NULL;
+			v_inp_table := NULL;
 
             IF (NEW.epa_type = 'JUNCTION') THEN
-                inp_table:= 'inp_junction';   
+                v_inp_table:= 'inp_junction';   
             ELSIF (NEW.epa_type = 'DIVIDER') THEN
-                inp_table:= 'inp_divider';     
+                v_inp_table:= 'inp_divider';     
             ELSIF (NEW.epa_type = 'OUTFALL') THEN
-                inp_table:= 'inp_outfall';  
+                v_inp_table:= 'inp_outfall';  
             ELSIF (NEW.epa_type = 'STORAGE') THEN
-                inp_table:= 'inp_storage';
+                v_inp_table:= 'inp_storage';
             END IF;
-            IF inp_table IS NOT NULL THEN
-                v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+            IF v_inp_table IS NOT NULL THEN
+                v_sql:= 'INSERT INTO '||v_inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
 				EXECUTE v_sql;
             END IF;
 
@@ -373,13 +396,13 @@ BEGIN
 
                
 		IF (NEW.node_type <> OLD.node_type) THEN 
-			new_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
-			old_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = OLD.node_type);
-			IF new_man_table IS NOT NULL THEN
-				v_sql:= 'DELETE FROM '||old_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
+			v_new_v_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
+			v_old_v_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = OLD.node_type);
+			IF v_new_v_man_table IS NOT NULL THEN
+				v_sql:= 'DELETE FROM '||v_old_v_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
 				EXECUTE v_sql;
-				v_sql2:= 'INSERT INTO '||new_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-				EXECUTE v_sql2;
+				v_sql:= 'INSERT INTO '||v_new_v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+				EXECUTE v_sql;
 			END IF;
 		END IF;
 
@@ -422,9 +445,9 @@ BEGIN
 		END IF;
 			
 			--link_path
-		SELECT link_path INTO link_path_aux FROM node_type WHERE id=NEW.node_type;
-		IF link_path_aux IS NOT NULL THEN
-			NEW.link = replace(NEW.link, link_path_aux,'');
+		SELECT link_path INTO v_link_path FROM node_type WHERE id=NEW.node_type;
+		IF v_link_path IS NOT NULL THEN
+			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 			
 		UPDATE node 
@@ -438,74 +461,103 @@ BEGIN
 		 publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value
 		WHERE node_id = OLD.node_id;
 			
-		IF man_table ='man_junction' THEN			
+		IF v_man_table ='man_junction' THEN			
             UPDATE man_junction SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;
 			
-		ELSIF man_table='man_netgully' THEN
+		ELSIF v_man_table='man_netgully' THEN
 			UPDATE man_netgully SET pol_id=NEW.pol_id, sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon
 			WHERE node_id=OLD.node_id;
 			
-		ELSIF man_table='man_outfall' THEN
+		ELSIF v_man_table='man_outfall' THEN
 			UPDATE man_outfall SET name=NEW.name
 			WHERE node_id=OLD.node_id;
 			
-		ELSIF man_table='man_storage' THEN
+		ELSIF v_man_table='man_storage' THEN
 			UPDATE man_storage SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, custom_area=NEW.custom_area, max_volume=NEW.max_volume, util_volume=NEW.util_volume,min_height=NEW.min_height, 
 			accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
 			
-		ELSIF man_table='man_valve' THEN
+		ELSIF v_man_table='man_valve' THEN
 			UPDATE man_valve SET name=NEW.name
 			WHERE node_id=OLD.node_id;
 
 		
-		ELSIF man_table='man_chamber' THEN
+		ELSIF v_man_table='man_chamber' THEN
 			UPDATE man_chamber SET pol_id=NEW.pol_id, length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
 			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
 			
-		ELSIF man_table='man_manhole' THEN
+		ELSIF v_man_table='man_manhole' THEN
 			UPDATE man_manhole SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility
 			WHERE node_id=OLD.node_id;
 			
-		ELSIF man_table='man_netinit' THEN
+		ELSIF v_man_table='man_netinit' THEN
 			UPDATE man_netinit SET length=NEW.length, width=NEW.width, inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
 			
-		ELSIF man_table='man_wjump' THEN
+		ELSIF v_man_table='man_wjump' THEN
 			UPDATE man_wjump SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, accessibility=NEW.accessibility, name=NEW.name
 			WHERE node_id=OLD.node_id;
 		
-		ELSIF man_table='man_wwtp' THEN
+		ELSIF v_man_table='man_wwtp' THEN
 			UPDATE man_wwtp SET pol_id=NEW.pol_id, name=NEW.name
 			WHERE node_id=OLD.node_id;
 				
-		ELSIF man_table ='man_netelement' THEN
+		ELSIF v_man_table ='man_netelement' THEN
 			UPDATE man_netelement SET serial_number=NEW.serial_number
 			WHERE node_id=OLD.node_id;	
 		
 		END IF;
-		
+
+			-- man addfields update
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+	 
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING OLD
+					INTO v_old_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN 
+
+					EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
+						ON CONFLICT (feature_id, parameter_id)
+						DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
+						USING NEW.node_id , v_addfields.id, v_new_value_param;	
+
+				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+
+					EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
+						USING NEW.node_id , v_addfields.id;
+				END IF;
+			
+			END LOOP;
+	    END IF;       
+	    		
         RETURN NEW;
 			
     ELSIF TG_OP = 'DELETE' THEN
 	
 		PERFORM gw_fct_check_delete(OLD.node_id, 'NODE');
 	
-		IF man_table='man_chamber' THEN
+		IF v_man_table='man_chamber' THEN
 			DELETE FROM node WHERE node_id=OLD.node_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id );
 			
-		ELSIF man_table='man_storage' THEN
+		ELSIF v_man_table='man_storage' THEN
 			DELETE FROM node WHERE node_id=OLD.node_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id );
 			
-		ELSIF man_table='man_wwtp' THEN
+		ELSIF v_man_table='man_wwtp' THEN
 			DELETE FROM node WHERE node_id=OLD.node_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id );
 			
-		ELSIF man_table='man_netgully' THEN
+		ELSIF v_man_table='man_netgully' THEN
 			DELETE FROM node WHERE node_id=OLD.node_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id );
 		
