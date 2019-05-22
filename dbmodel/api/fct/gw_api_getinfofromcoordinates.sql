@@ -57,6 +57,7 @@ DECLARE
     v_the_geom text;
     v_config_layer text;
     v_toolbar text;
+    v_role text;
 
 BEGIN
 
@@ -75,6 +76,7 @@ BEGIN
 	v_epsg := ((p_data ->> 'data')::json->> 'coordinates')::json->>'epsg';
 	v_zoomratio := ((p_data ->> 'data')::json->> 'coordinates')::json->>'zoomRatio';
 	v_toolbar := ((p_data ->> 'data')::json->> 'toolBar');
+	v_role = (p_data ->> 'data')::json->> 'rolePermissions';
 
 
 	v_activelayer := (p_data ->> 'data')::json->> 'activeLayer';
@@ -196,7 +198,7 @@ BEGIN
 	RAISE NOTICE '----------------%',v_toolbar;
 --   Call and return gw_api_getinfofromid
 	RETURN SCHEMA_NAME.gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
-	'"},"feature":{"tableName":"',v_layer,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'"}}')::json);
+	'"},"feature":{"tableName":"',v_layer,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json);
 
 --    Exception handling
  --     RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
