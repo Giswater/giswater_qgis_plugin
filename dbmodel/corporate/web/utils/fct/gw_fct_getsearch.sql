@@ -5,7 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getsearch"(device int4, lang varchar) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getsearch"(device int4, lang varchar) 
+RETURNS pg_catalog.json AS 
+$BODY$
+/*EXAMPLE
+SELECT  "SCHEMA_NAME"."gw_fct_getsearch"(3,'en')
+*/
+
+
 DECLARE
 
 --    Variables
@@ -121,7 +128,7 @@ BEGIN
     
         -- Create search field
         SELECT * INTO rec_fields FROM config_web_fields WHERE table_id='F31' AND name='generic_search';
-        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead', 'searchService', 'dataType','string',
+        editCode := json_build_object('label',rec_fields.label,'name', rec_fields.name,'type','typeahead', 'searchService','', 'dataType','string',
         'threshold', threshold, 'placeholder','','disabled',false,'noresultsMsg','No results','loadingMsg','Searching...');
         
         fieldsJson := '[' ||  editCode || ']';
