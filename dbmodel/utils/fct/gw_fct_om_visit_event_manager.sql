@@ -116,12 +116,12 @@ BEGIN
 
 				RAISE NOTICE 'work_aux % builder_aux % size_id_aux % event_date_aux % campaign_aux % price_aux %', work_aux, builder_aux, size_id_aux, event_date_aux, campaign_aux, price_aux;
 				
-				IF rec_parameter.id not in (select event_id FROM om_visit_work_x_node) then
-					INSERT INTO om_visit_work_x_node (node_id, work_id, work_date, builder_id, size_id, price, units, work_cost, event_id) values 
-					(rec_node.node_id, work_aux, event_date_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, id_event);
-				ELSE 
+				IF id_event in (select event_id FROM om_visit_work_x_node) then
 					UPDATE om_visit_work_x_node SET work_id=work_aux, work_date=event_date_aux, builder_id=builder_aux, size_id=size_id_aux,
 					 price=price_aux, work_cost=price_aux*1 WHERE event_id=id_event;
+				ELSE 
+					INSERT INTO om_visit_work_x_node (node_id, work_id, work_date, builder_id, size_id, price, units, work_cost, event_id) values 
+					(rec_node.node_id, work_aux, event_date_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, id_event);
 				END IF;
 
 			END LOOP;
@@ -183,12 +183,12 @@ BEGIN
             price_aux = (select price FROM cat_price WHERE size_id=size_id_aux AND work_id=work_aux AND campaign_id=campaign_aux);
               
               
-			IF rec_parameter.id not in (select event_id FROM om_visit_work_x_node) then
-				INSERT INTO gw_trg_edit_man_node_pol (node_id, work_id, work_date, builder_id, size_id, price, units, work_cost, event_id) values 
-				(node_id_aux, work_aux, event_date_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, rec_parameter.id);
-			ELSE 
+			IF rec_parameter.id in (select event_id FROM om_visit_work_x_node) then
 				UPDATE om_visit_work_x_node SET work_id=work_aux, work_date=event_date_aux, builder_id=builder_aux, size_id=size_id_aux,
-				 price=price_aux, work_cost=price_aux*1 WHERE event_id=rec_parameter.id;
+				price=price_aux, work_cost=price_aux*1 WHERE event_id=rec_parameter.id;			
+			ELSE 
+				INSERT INTO om_visit_work_x_node (node_id, work_id, work_date, builder_id, size_id, price, units, work_cost, event_id) values 
+				(node_id_aux, work_aux, event_date_aux, builder_aux, size_id_aux, price_aux, 1, price_aux*1, rec_parameter.id);
 			END IF;
 
 	    RAISE NOTICE 'work_aux % builder_aux % size_id_aux % event_date_aux % campaign_aux % price_aux %', work_aux, builder_aux, size_id_aux, event_date_aux, campaign_aux, price_aux;
