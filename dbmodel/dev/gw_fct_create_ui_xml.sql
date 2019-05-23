@@ -18,9 +18,10 @@ DECLARE
 BEGIN
 SET search_path=SCHEMA_NAME;
 
+--iterate over fields defined for the selected form
 	FOR rec IN (SELECT * FROM config_api_form_fields where formname=p_tablename order by layout_order) LOOP
 		
-
+--changing defined widget types into Qt widgets types, set the label_name location for xml
 		IF rec.widgettype='combo' THEN
 			v_widget_type='QComboBox';
 			v_label_name='currentText';
@@ -40,6 +41,7 @@ SET search_path=SCHEMA_NAME;
 			v_label_name='text';
 		END IF;
 
+--create xml elements for each field in the form
 		IF rec.widgettype='combo' THEN
 			EXECUTE 'SELECT xmlelement(name item, xmlattributes( '||rec.layout_order||' as row,0 as column), 
 			xmlelement(name widget, xmlattributes('''||v_widget_type||''' as class, '''||rec.column_id||''' as name ),
@@ -55,6 +57,7 @@ SET search_path=SCHEMA_NAME;
 			INTO v_sql;
 		END IF;
 
+--Append the element to the corresponding layout
 		IF rec.layout_name= 'layout_data_1' THEN
 			v_sql_layout_1=concat(v_sql_layout_1,' ',v_sql);
 
@@ -67,6 +70,7 @@ SET search_path=SCHEMA_NAME;
 
 	END LOOP;
 
+--Concatenate the base of ui xml with the layout elements
 	v_xml='<?xml version="1.0" encoding="UTF-8"?>
 			<ui version="4.0">
 			 <class>Dialog</class>
