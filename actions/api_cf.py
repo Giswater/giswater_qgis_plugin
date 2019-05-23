@@ -1307,16 +1307,16 @@ class ApiCF(ApiParent):
     """ FUNCTIONS RELATED WITH TAB OM"""
     def fill_tab_om(self, geom_type):
         """ Fill tab 'O&M' (event) """
-        self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['body']['feature']['vdefaultValues'], 'to_date_vdefault')
-        self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
+        # self.set_vdefault_values(self.dlg_cf.date_event_to, self.complet_result[0]['body']['feature']['vdefaultValues'], 'to_date_vdefault')
+        # self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
 
         table_event_geom = "ve_ui_event_x_" + geom_type
-        self.fill_tbl_event(self.tbl_event_cf, self.schema_name + "." + table_event_geom, self.filter)
+        self.fill_tbl_event(self.tbl_event_cf, table_event_geom, self.filter)
         self.tbl_event_cf.doubleClicked.connect(self.open_visit_event)
         self.set_columns_config(self.tbl_event_cf, table_event_geom)
 
-        self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['body']['feature']['vdefaultValues'], 'om_param_type_vdefault')
-        self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['body']['feature']['vdefaultValues'], 'parameter_vdefault')
+        # self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['body']['feature']['vdefaultValues'], 'om_param_type_vdefault')
+        # self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['body']['feature']['vdefaultValues'], 'parameter_vdefault')
 
 
     def fill_tbl_event(self, widget, table_name, filter_):
@@ -1327,6 +1327,11 @@ class ApiCF(ApiParent):
         event_id = self.dlg_cf.findChild(QComboBox, "event_id")
         self.date_event_to = self.dlg_cf.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dlg_cf.findChild(QDateEdit, "date_event_from")
+
+        self.set_dates_from_to(self.date_event_to, self.date_event_from, table_name, 'visit_start', 'visit_end')
+        date = QDate.currentDate()
+        self.date_event_to.setDate(date)
+
 
         btn_open_visit = self.dlg_cf.findChild(QPushButton, "btn_open_visit")
         btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit")
@@ -1485,9 +1490,10 @@ class ApiCF(ApiParent):
         """ Get values selected by the user and sets a new filter for its table model """
         self.controller.log_info(str("TEST 1111"))
         # Get selected dates
-        date_from = self.date_event_from.date()
-        date_to = self.date_event_to.date()
-
+        visit_start = self.date_event_from.date()
+        visit_end = self.date_event_to.date()
+        date_from = visit_start.toString('yyyyMMdd 00:00:00')
+        date_to = visit_end.toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
@@ -1525,11 +1531,11 @@ class ApiCF(ApiParent):
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            date_from.toString(format_low), date_to.toString(format_high))
+            visit_start.toString(format_low), visit_end.toString(format_high))
         # Set filter to model
         expr = self.field_id + " = '" + self.feature_id + "'"
         # Set filter
-        expr += " AND(tstamp BETWEEN {0}) AND (tstamp BETWEEN {0})".format(interval)
+        expr += " AND visit_start BETWEEN {0}".format(interval)
 
         if event_type_value != 'null':
             expr += " AND parameter_type ILIKE '%" + event_type_value + "%'"
@@ -1546,8 +1552,10 @@ class ApiCF(ApiParent):
         """ Get values selected by the user and sets a new filter for its table model """
 
         # Get selected dates
-        date_from = self.date_event_from.date()
-        date_to = self.date_event_to.date()
+        visit_start = self.date_event_from.date()
+        visit_end = self.date_event_to.date()
+        date_from = visit_start.toString('yyyyMMdd 00:00:00')
+        date_to = visit_end.toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
@@ -1556,11 +1564,11 @@ class ApiCF(ApiParent):
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
-            date_from.toString(format_low), date_to.toString(format_high))
+            visit_start.toString(format_low), visit_end.toString(format_high))
         # Set filter to model
         expr = self.field_id + " = '" + self.feature_id + "'"
         # Set filter
-        expr += " AND(tstamp BETWEEN {0}) AND (tstamp BETWEEN {0})".format(interval)
+        expr += " AND visit_start BETWEEN {0}".format(interval)
 
         # Get selected values in Comboboxes
         event_type_value = utils_giswater.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)

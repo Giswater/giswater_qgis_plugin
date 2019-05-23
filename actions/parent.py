@@ -26,7 +26,7 @@ else:
     from builtins import object
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QSettings
+from qgis.PyQt.QtCore import Qt, QSettings, QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
@@ -967,3 +967,20 @@ class ParentAction(object):
                     widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
                 elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
                     widget.setEnabled(False)
+
+
+    def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
+        sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
+               " FROM {}.{}".format(self.schema_name, table_name))
+        row = self.controller.get_row(sql, log_sql=False)
+        if row:
+            if row[0]:
+                widget_from.setDate(row[0])
+            else:
+                current_date = QDate.currentDate()
+                widget_from.setDate(current_date)
+            if row[1]:
+                widget_to.setDate(row[1])
+            else:
+                current_date = QDate.currentDate()
+                widget_to.setDate(current_date)
