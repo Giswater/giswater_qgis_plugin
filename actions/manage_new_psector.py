@@ -349,7 +349,8 @@ class ManageNewPsector(ParentManage):
         self.tab_feature_changed(self.dlg_plan_psector, table_object)
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
-        self.set_restriction(self.dlg_plan_psector, widget_to_ignore)
+        restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
+        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
         # Open dialog
         self.open_dialog(self.dlg_plan_psector, maximize_button=False)
@@ -703,7 +704,8 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_delete.setEnabled(enabled)
         self.dlg_plan_psector.btn_snapping.setEnabled(enabled)
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
-        self.set_restriction(self.dlg_plan_psector, widget_to_ignore)
+        restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
+        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
     def selection_init(self, dialog, table_object, query=True):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
@@ -783,7 +785,9 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.chk_enable_all.setEnabled(True)
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
-        self.set_restriction(self.dlg_plan_psector, widget_to_ignore)
+        restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
+        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
+
 
     def populate_result_id(self, combo, table_name):
 

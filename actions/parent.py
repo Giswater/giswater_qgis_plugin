@@ -947,15 +947,16 @@ class ParentAction(object):
         self.controller.log_info(str(action.objectName()))
 
 
-    def set_restriction(self, dialog, widget_to_ignore):
+    def set_restriction(self, dialog, widget_to_ignore, restriction):
         """
         Set all widget enabled(False) or readOnly(True) except those on the tuple
         :param dialog:
         :param widget_to_ignore: tuple = ('widgetname1', 'widgetname2', 'widgetname3', ...)
+        :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
         :return:
         """
-        restriction = self.controller.get_restriction()
-        if restriction == 'role_basic':
+        role = self.controller.get_restriction()
+        if role in restriction:
             widget_list = dialog.findChildren(QWidget)
             for widget in widget_list:
                 if widget.objectName() in widget_to_ignore:
