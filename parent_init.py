@@ -1288,7 +1288,6 @@ class ParentDialog(QDialog):
 
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show documents """
-        
         # Get widgets
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         event_type = self.dialog.findChild(QComboBox, "event_type")
@@ -1360,7 +1359,7 @@ class ParentDialog(QDialog):
             self.controller.show_warning(message)
             return
         filter_ += " AND visit_start >= '" + date_from + "' AND visit_start <= '" + date_to + "'"
-        
+
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
         self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
@@ -1757,16 +1756,17 @@ class ParentDialog(QDialog):
 
         self.feature_cat = {}
         
-        # Dictionary to keep every record of table 'sys_feature_cat'
+        # Dictionary to keep every record of table 'feature_cat'
         # Key: field tablename. Value: Object of the class SysFeatureCat
-        sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
+        sql = "SELECT * FROM " + self.schema_name + ".cat_feature"
         rows = self.controller.get_rows(sql)
         if not rows:
             return
 
         for row in rows:
-            tablename = row['tablename']
-            elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
+            tablename = row['child_layer']
+            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'], row['parent_layer'],
+                                 row['child_layer'], row['orderby'], row['active'])
             self.feature_cat[tablename] = elem
 
 
@@ -2568,7 +2568,6 @@ class ParentDialog(QDialog):
     def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
         sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
                " FROM {}.{}".format(self.schema_name, table_name))
-        self.controller.log_info(str(sql))
         row = self.controller.get_row(sql, log_sql=False)
         if row:
             if row[0]:

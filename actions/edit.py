@@ -5,7 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 
-# -*- coding: utf-8 -*-          
+# -*- coding: utf-8 -*-
+try:
+    from qgis.core import Qgis
+except:
+    from qgis.core import QGis as Qgis
+from functools import partial
+from giswater.actions.api_cf import ApiCF
 from giswater.actions.manage_element import ManageElement        
 from giswater.actions.manage_document import ManageDocument      
 from giswater.actions.manage_workcat_end import ManageWorkcatEnd      
@@ -27,18 +33,53 @@ class Edit(ParentAction):
         self.project_type = project_type
 
 
-    def edit_add_feature(self, layername):
+    def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
-                
-        # Set active layer and triggers action Add Feature
-        layer = self.controller.get_layer_by_layername(layername)
+
+        layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if layer:
             self.iface.setActiveLayer(layer)
             layer.startEditing()
+            layer.featureAdded.connect(partial(self.open_new_feature, layer, feature_cat))
             self.iface.actionAddFeature().trigger()
         else:
             message = "Selected layer name not found"
-            self.controller.show_warning(message, parameter=layername)
+            self.controller.show_warning(message, parameter=feature_cat.parent_layer)
+
+
+    def open_new_feature(self, layer, feature_cat, feature_id):
+
+        feature = self.get_feature_by_id(layer, feature_id)
+        geom = feature.geometry()
+        list_points = None
+        if layer.geometryType() == Qgis.Point:
+            points = geom.asPoint()
+            list_points = '"x1":' + str(points.x()) + ', "y1":' + str(points.y())
+        elif layer.geometryType() in(Qgis.Line, Qgis.Polygon):
+            points = geom.asPolyline()
+            init_point = points[0]
+            last_point = points[-1]
+            list_points = '"x1":' + str(init_point.x()) + ', "y1":' + str(init_point.y())
+            list_points += ', "x2":' + str(last_point.x()) + ', "y2":' + str(last_point.y())
+
+        else:
+            self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
+
+        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
+        result, dialog = self.api_cf.open_form(point=list_points, feature_cat=feature_cat, new_feature_id=feature_id, layer_new_feature=layer, tab_type='data')
+
+        if result is False:
+            layer.deleteFeature(feature.id())
+            self.iface.actionRollbackEdits().trigger()
+
+        #self.iface.actionPan().trigger()
+
+    def get_feature_by_id(self, layer, id_):
+        iter = layer.getFeatures()
+        for feature in iter:
+            if feature.id() == id_:
+                return feature
+        return False
 
 
     def edit_add_element(self):

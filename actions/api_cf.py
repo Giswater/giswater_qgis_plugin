@@ -23,6 +23,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
 from qgis.PyQt.QtWidgets import QFrame, QGridLayout, QGroupBox, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
 from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget
+from qgis.PyQt.QtWidgets import QTextEdit
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsMapToPixel, QgsPoint, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
@@ -222,15 +223,14 @@ class ApiCF(ApiParent):
             extras = '"toolBar":"epa"'
         elif tab_type == 'data':
             extras = '"toolBar":"basic"'
-
+        role = self.controller.get_restriction()
+        extras += ', "rolePermissions":"' + role + '"'
         # IF insert new feature
         if point and feature_cat:
             self.new_feature_id = new_feature_id
             self.layer_new_feature = layer_new_feature
-            if self.controller.previous_maptool is not None:
-                self.canvas.setMapTool(self.controller.previous_maptool)
-            else:
-                self.iface.actionPan().trigger()
+
+            self.iface.actionPan().trigger()
             layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
             layer.featureAdded.disconnect()
             feature = '"tableName":"' + str(feature_cat.child_layer.lower()) + '"'
@@ -343,8 +343,8 @@ class ApiCF(ApiParent):
         utils_giswater.set_qtv_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
         utils_giswater.set_qtv_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
-        self.tbl_event = self.dlg_cf.findChild(QTableView, "tbl_event")
-        utils_giswater.set_qtv_config(self.tbl_event)
+        self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
+        utils_giswater.set_qtv_config(self.tbl_event_cf)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
         utils_giswater.set_qtv_config(self.tbl_document)
 
@@ -509,19 +509,17 @@ class ApiCF(ApiParent):
         # Buttons
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
-        #btn_cancel.clicked.connect(partial(self.roll_back))
-
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
         self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
-        #self.dlg_cf.dlg_closed.connect(partial(self.roll_back))
+        self.dlg_cf.dlg_closed.connect(partial(self.roll_back))
 
         # Open dialog
         #self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_cf.show()
         return self.complet_result, self.dlg_cf
+
 
     def roll_back(self):
         """ discard changes in current layer"""
@@ -601,7 +599,7 @@ class ApiCF(ApiParent):
         feature = '"id":"'+self.feature_id+'"'
         body = self.create_body(feature=feature)
         sql = ("SELECT " + self.schema_name + ".gw_api_getinfocrossection($${" + body + "}$$)")
-        row = self.controller.get_row(sql, log_sql=False, commit=True)
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
         if not row:
             return False
         section_result = row
@@ -688,7 +686,8 @@ class ApiCF(ApiParent):
                                              " color: rgb(100, 100, 100)}")
                     elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
                         widget.setEnabled(enable)
-     
+        self.new_feature_id = None
+        self.close_dialog(dialog)
 
     def enable_all(self, dialog, result):
 
@@ -1075,7 +1074,8 @@ class ApiCF(ApiParent):
     def set_model_to_table(self, widget, table_name, expr_filter=None, edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
-
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
         # Set model
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -1311,9 +1311,9 @@ class ApiCF(ApiParent):
         self.set_vdefault_values(self.dlg_cf.date_event_from, self.complet_result[0]['body']['feature']['vdefaultValues'], 'from_date_vdefault')
 
         table_event_geom = "ve_ui_event_x_" + geom_type
-        self.fill_tbl_event(self.tbl_event, self.schema_name + "." + table_event_geom, self.filter)
-        self.tbl_event.doubleClicked.connect(self.open_visit_event)
-        self.set_columns_config(self.tbl_event, table_event_geom)
+        self.fill_tbl_event(self.tbl_event_cf, self.schema_name + "." + table_event_geom, self.filter)
+        self.tbl_event_cf.doubleClicked.connect(self.open_visit_event)
+        self.set_columns_config(self.tbl_event_cf, table_event_geom)
 
         self.set_vdefault_values(self.dlg_cf.event_type, self.complet_result[0]['body']['feature']['vdefaultValues'], 'om_param_type_vdefault')
         self.set_vdefault_values(self.dlg_cf.event_id, self.complet_result[0]['body']['feature']['vdefaultValues'], 'parameter_vdefault')
@@ -1321,8 +1321,8 @@ class ApiCF(ApiParent):
 
     def fill_tbl_event(self, widget, table_name, filter_):
         """ Fill the table control to show events """
-
         # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
         event_type = self.dlg_cf.findChild(QComboBox, "event_type")
         event_id = self.dlg_cf.findChild(QComboBox, "event_id")
         self.date_event_to = self.dlg_cf.findChild(QDateEdit, "date_event_to")
@@ -1435,10 +1435,14 @@ class ApiCF(ApiParent):
         utils_giswater.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
 
         # Set all QLineEdit readOnly(True)
-        widget_list = self.dlg_event_full.findChildren(QLineEdit)
+
+        widget_list = self.dlg_event_full.findChildren(QTextEdit)
+        aux = self.dlg_event_full.findChildren(QLineEdit)
+        for w in aux:
+            widget_list.append(w)
         for widget in widget_list:
             widget.setReadOnly(True)
-            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
+            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
                                  " color: rgb(100, 100, 100)}")
         self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
 
@@ -1456,11 +1460,11 @@ class ApiCF(ApiParent):
         btn_open_visit_event.setEnabled(True)
 
         # Get selected row
-        selected_list = self.tbl_event.selectionModel().selectedRows()
+        selected_list = self.tbl_event_cf.selectionModel().selectedRows()
         selected_row = selected_list[0].row()
-        self.visit_id = self.tbl_event.model().record(selected_row).value("visit_id")
-        self.event_id = self.tbl_event.model().record(selected_row).value("event_id")
-        self.parameter_id = self.tbl_event.model().record(selected_row).value("parameter_id")
+        self.visit_id = self.tbl_event_cf.model().record(selected_row).value("visit_id")
+        self.event_id = self.tbl_event_cf.model().record(selected_row).value("event_id")
+        self.parameter_id = self.tbl_event_cf.model().record(selected_row).value("parameter_id")
 
         sql = ("SELECT gallery, document FROM " + table_name + ""
                " WHERE event_id = '" + str(self.event_id) + "' AND visit_id = '" + str(self.visit_id) + "'")
@@ -1479,7 +1483,7 @@ class ApiCF(ApiParent):
 
     def set_filter_table_event(self, widget):
         """ Get values selected by the user and sets a new filter for its table model """
-
+        self.controller.log_info(str("TEST 1111"))
         # Get selected dates
         date_from = self.date_event_from.date()
         date_to = self.date_event_to.date()
@@ -1582,13 +1586,13 @@ class ApiCF(ApiParent):
     # creat the new visit GUI
     def update_visit_table(self):
         """Convenience fuction set as slot to update table after a Visit GUI close."""
-        self.tbl_event.model().select()
+        self.tbl_event_cf.model().select()
 
 
     def new_visit(self):
         """ Call button 64: om_add_visit """
         # Get expl_id to save it on om_visit and show the geometry of visit
-        expl_id = utils_giswater.get_item_data(self.dlg_cf, 'expl_id', 0)
+        expl_id = utils_giswater.get_item_data(self.dlg_cf, self.tab_type+'_expl_id', 0)
         if expl_id == -1:
             msg = "Widget expl_id not found"
             self.controller.show_warning(msg)

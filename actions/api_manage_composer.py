@@ -137,10 +137,8 @@ class ApiManageComposer(ApiParent):
                         widget.setText(item.text())
             else:
                 for widget in widget_list:
-                    print(widget.property('column_id'))
                     item = selected_com.itemById(widget.property('column_id'))
                     if type(item) == QgsLayoutItemLabel:
-                        print(str(item.text()))
                         widget.setText(str(item.text()))
 
     def open_composer(self, dialog):

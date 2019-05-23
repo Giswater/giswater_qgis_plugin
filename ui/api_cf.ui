@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>634</width>
-             <height>382</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -369,7 +369,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_14">
         <item row="4" column="0">
-         <widget class="QTableView" name="tbl_event"/>
+         <widget class="QTableView" name="tbl_event_cf"/>
         </item>
         <item row="1" column="0">
          <widget class="Line" name="line_2">
