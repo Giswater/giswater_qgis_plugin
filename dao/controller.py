@@ -1066,9 +1066,10 @@ class DaoController(object):
         sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
                " WHERE type = '" + geom_type.upper() + "'")
         if union:
-            sql += (" UNION SELECT parentlayer FROM " + self.schema_name + ".sys_feature_type"
-                    " WHERE id='" + geom_type.upper() + "'")
+            sql += (" UNION SELECT parent_layer FROM " + self.schema_name + ".cat_feature"
+                    " WHERE feature_type='" + geom_type.upper() + "'")
         rows = self.get_rows(sql)
+        print(sql)
         if rows:
             for row in rows:
                 layer = self.get_layer_by_tablename(row[0])
