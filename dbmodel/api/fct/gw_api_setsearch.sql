@@ -478,7 +478,7 @@ ELSIF tab_arg = 'address' THEN
     -- Get psector (improved version)
     EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
         FROM (SELECT '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_display_field)||' as display_name, '||quote_literal(v_psector_layer)||' AS sys_table_id , 
-        '||quote_ident(v_psector_layer)||'.'||quote_ident((v_psector_id_field))||' AS sys_id, '||quote_literal(v_psector_layer)||' AS sys_idname , st_astext(st_envelope(the_geom)) AS sys_geometry
+        '||quote_ident(v_psector_layer)||'.'||quote_ident((v_psector_id_field))||' AS sys_id, '||quote_literal(v_psector_layer)||' AS sys_idname , st_astext(st_envelope('||quote_ident(v_psector_layer)||'.the_geom)) AS sys_geometry
         FROM '||quote_ident(v_psector_layer)||'  
         JOIN '||quote_ident(v_exploitation_layer)||' ON '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_id_field)||' = '||quote_ident(v_psector_layer)||'.'||quote_ident(v_psector_parent_field)||'
         WHERE '||quote_ident(v_exploitation_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(name_arg)||'
