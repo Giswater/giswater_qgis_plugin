@@ -167,7 +167,7 @@ class ApiCF(ApiParent):
             self.draw_point(point)
         else:
             points = self.get_points(list_coord)
-            self.draw_polygon(points)
+            self.draw_polyline(points)
 
 
     def set_active_layer(self, action, tab_type):

@@ -809,7 +809,7 @@ class AddNewLot(ParentManage):
         coords = coords[:-1] + ")"
         list_coord = re.search('\((.*)\)', str(coords))
         points = self.get_points(list_coord)
-        self.draw_polygon(points)
+        self.draw_polyline(points)
 
 
     def manage_rejected(self):
@@ -817,8 +817,8 @@ class AddNewLot(ParentManage):
         self.close_dialog(self.dlg_lot)
 
 
-    # TODO delete function draw_polygon(*args) when api_parent.py is integrated into giswater proyect
-    def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+    # TODO delete function draw_polyline(*args) when api_parent.py is integrated into giswater proyect
+    def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
 
         self.rubber_polygon = QgsRubberBand(self.canvas)
