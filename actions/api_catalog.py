@@ -82,32 +82,32 @@ class ApiCatalog(ApiParent):
         main_layout.addItem(verticalSpacer1)
 
         matcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
-        pn = self.dlg_catalog.findChild(QComboBox, 'pn')
-        dn = self.dlg_catalog.findChild(QComboBox, 'dn')
+        pnom = self.dlg_catalog.findChild(QComboBox, 'pnom')
+        dnom = self.dlg_catalog.findChild(QComboBox, 'dnom')
         id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Call get_api_catalog first time
-        self.get_api_catalog(matcat_id, pn, dn, id)
+        self.get_api_catalog(matcat_id, pnom, dnom, id)
 
         # Set Listeners
-        matcat_id.currentIndexChanged.connect(partial(self.populate_pn_dn, matcat_id, pn, dn))
-        pn.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pn, dn, id))
-        dn.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pn, dn, id))
+        matcat_id.currentIndexChanged.connect(partial(self.populate_pn_dn, matcat_id, pnom, dnom))
+        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id))
+        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id, pnom, dnom, id))
 
         # Open form
         self.dlg_catalog.show()
 
 
-    def get_api_catalog(self, matcat_id, pn, dn, id):
+    def get_api_catalog(self, matcat_id, pnom, dnom, id):
 
         # id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         matcat_id_value = utils_giswater.get_item_data(self.dlg_catalog, matcat_id)
-        pn_value = utils_giswater.get_item_data(self.dlg_catalog, pn)
-        dn_value = utils_giswater.get_item_data(self.dlg_catalog, dn)
+        pn_value = utils_giswater.get_item_data(self.dlg_catalog, pnom)
+        dn_value = utils_giswater.get_item_data(self.dlg_catalog, dnom)
 
         form = '"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"'
-        extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'", "pn":"'+str(pn_value)+'", "dn":"'+str(dn_value)+'"}'
+        extras = '"fields":{"matcat_id":"'+str(matcat_id_value)+'", "pnom":"'+str(pn_value)+'", "dnom":"'+str(dn_value)+'"}'
         body = self.create_body(form=form, extras=extras)
         sql = ("SELECT " + self.schema_name + ".gw_api_getcatalog($${" + body + "}$$)::text")
         row = self.controller.get_row(sql, log_sql=True)
@@ -118,7 +118,7 @@ class ApiCatalog(ApiParent):
                 self.populate_combo(id,field)
 
 
-    def populate_pn_dn(self, matcat_id, pn, dn):
+    def populate_pn_dn(self, matcat_id, pnom, dnom):
 
         matcat_id_value = utils_giswater.get_item_data(self.dlg_catalog, matcat_id)
 
@@ -130,10 +130,10 @@ class ApiCatalog(ApiParent):
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
         for field in result['fields']:
-            if field['column_id'] == 'pn':
-                self.populate_combo(pn,field)
-            elif field['column_id'] == 'dn':
-                self.populate_combo(dn,field)
+            if field['column_id'] == 'pnom':
+                self.populate_combo(pnom,field)
+            elif field['column_id'] == 'dnom':
+                self.populate_combo(dnom,field)
 
 
     def get_event_combo_parent(self, fields, row, geom_type):
@@ -159,8 +159,8 @@ class ApiCatalog(ApiParent):
 
         # Get widgets
         widget_metcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
-        widget_pn = self.dlg_catalog.findChild(QComboBox, 'pn')
-        widget_dn = self.dlg_catalog.findChild(QComboBox, 'dn')
+        widget_pn = self.dlg_catalog.findChild(QComboBox, 'pnom')
+        widget_dn = self.dlg_catalog.findChild(QComboBox, 'dnom')
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Get values from combo parents
