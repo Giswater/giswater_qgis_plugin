@@ -41,3 +41,9 @@ UPDATE audit_cat_function SET isdeprecated=TRUE WHERE function_name='gw_trg_edit
 UPDATE audit_cat_function SET isdeprecated=TRUE WHERE function_name='gw_trg_edit_man_node';
 UPDATE audit_cat_function SET isdeprecated=TRUE WHERE function_name='gw_trg_edit_man_connec';
 UPDATE audit_cat_function SET isdeprecated=TRUE WHERE function_name='gw_trg_edit_man_gully';
+
+-----------------------
+-- sys_csv2pg_cat
+-----------------------
+INSERT INTO sys_csv2pg_cat (id, name, name_i18n, sys_role, functionname, isdeprecated) VALUES (19, 'Exmport ui', 'Export ui', 'role_admin', 'gw_fct_export_ui_xml', FALSE);
+INSERT INTO sys_csv2pg_cat (id, name, name_i18n, sys_role, functionname, isdeprecated) VALUES (20, 'Import ui', 'Import ui', 'role_admin', 'gw_fct_import_ui_xml', FALSE);

@@ -169,7 +169,7 @@ SET search_path=SCHEMA_NAME;
 		 <connections/>
 		</ui>');
 
-	INSERT INTO temp_csv2pg(source,csv1) VALUES (p_tablename,v_xml);
+	INSERT INTO temp_csv2pg(source, csv1, csv2pgcat_id) VALUES (p_tablename,v_xml,19);
 
 return null;
 END;
