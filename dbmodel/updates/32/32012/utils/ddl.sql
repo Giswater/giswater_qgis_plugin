@@ -97,3 +97,5 @@ ALTER TABLE sys_csv2pg_cat ADD COLUMN  isheader boolean NOT NULL DEFAULT false;
 --24/05/2019
 ALTER TABLE man_addfields_parameter ADD COLUMN  orderby integer;
 ALTER TABLE man_addfields_parameter ADD COLUMN  active boolean;
+
+ALTER TABLE ext_municipality ADD COLUMN active boolean;

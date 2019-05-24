@@ -158,7 +158,7 @@ BEGIN
         INTO api_version;
 
 --   Get project type
-     SELECT SCHEMA_NAMEoftware INTO project_type_aux FROM version LIMIT 1;
+     SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
 
 --   Get tab
      tab_arg := search_data->>'tabName';
@@ -362,7 +362,7 @@ ELSIF tab_arg = 'address' THEN
 
         -- Fix exploitation vdefault
         DELETE FROM config_param_user WHERE parameter='search_exploitation_vdefault' AND cur_user=current_user;
-        INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_exploitation_vdefault',id_arg, current_user);
+        INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('search_exploitation_vdefault',id_arg::integer, current_user);
 
 
         IF v_hydro_search_field_4 IS NULL THEN
