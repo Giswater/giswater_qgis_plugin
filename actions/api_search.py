@@ -189,6 +189,7 @@ class ApiSearch(ApiParent):
             # textItem.setMapPosition(point)
 
             self.canvas.refresh()
+
         elif self.dlg_search.main_tab.widget(index).objectName() == 'hydro':
             x1 = item['sys_x']
             y1 = item['sys_y']
@@ -198,8 +199,14 @@ class ApiSearch(ApiParent):
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
         elif self.dlg_search.main_tab.widget(index).objectName() == 'workcat':
+            list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            points = self.get_points(list_coord)
+            self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
+            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.workcat_open_table_items(item)
             return
+
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
             points = self.get_points(list_coord)
@@ -207,6 +214,7 @@ class ApiSearch(ApiParent):
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
+
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)

@@ -1035,7 +1035,7 @@ class ApiParent(ParentAction):
         return rb
 
 
-    def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=5, duration_time=None, fill_color=None):
+    def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
         """ Draw 'polygon' over canvas following list of points """
         rb = self.rubber_polygon
         rb.setToGeometry(QgsGeometry.fromPolygon([points]), None)
