@@ -14,26 +14,23 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtGui import QSpacerItem, QSizePolicy, QStringListModel, QCompleter,  QTextDocument, QAbstractItemView
-    from PyQt4.QtGui import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QTableView, QFileDialog
-    from PyQt4.QtSql import QSqlTableModel
-    from qgis.core import QgsPoint, QgsMarkerSymbolV2
-    from qgis.gui import QgsTextAnnotationItem
+    from qgis.PyQt.QtGui import QStringListModel
 else:
-    from qgis.PyQt.QtCore import Qt, QStringListModel
-    from qgis.PyQt.QtWidgets import QWidget, QTabWidget, QGridLayout, QLabel, QLineEdit, QComboBox, QSizePolicy, QSpacerItem, QCompleter, QTableView
-    from qgis.PyQt.QtSql import QSqlTableModel
-    from qgis.core import QgsPointXY as QgsPoint, QgsMarkerSymbol as QgsMarkerSymbolV2
-    from qgis.core import QgsTextAnnotation as QgsTextAnnotationItem
+    from qgis.core import QgsPointXY
+    from qgis.PyQt.QtCore import QStringListModel
 
+from qgis.core import QgsPoint
+
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QLabel, QLineEdit
+from qgis.PyQt.QtWidgets import QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 import json
 import operator
 import os
 import re
-import subprocess
 import sys
-import webbrowser
 from functools import partial
 
 import utils_giswater
@@ -204,9 +201,22 @@ class ApiSearch(ApiParent):
             self.workcat_open_table_items(item)
             return
         elif self.dlg_search.main_tab.widget(index).objectName() == 'psector':
-            self.manage_new_psector.new_psector(item['sys_id'], 'plan')
-            #self.manage_new_psector.new_psector(item['sys_id'], item['sys_table_id'], 'workcat_id')
+            list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            points = self.get_points(list_coord)
+            self.draw_polygon(points, fill_color=QColor(255, 0, 255, 50))
+            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+            self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'visit':
+            list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
+            max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
+            self.resetRubberbands()
+            if Qgis.QGIS_VERSION_INT < 29900:
+                point = QgsPoint(float(max_x), float(max_y))
+            else:
+                point = QgsPointXY(float(max_x), float(max_y))
+            self.draw_point(point)
+            self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             return
         self.lbl_visible = False
@@ -601,7 +611,7 @@ class ApiSearch(ApiParent):
 
         points = self.get_points(list_coord)
         self.rubber_polygon.reset()
-        self.draw_polygon(points)
+        self.draw_polyline(points)
 
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
         self.zoom_to_rectangle(max_x, max_y, min_x, min_y)

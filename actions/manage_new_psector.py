@@ -51,7 +51,7 @@ class ManageNewPsector(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def new_psector(self, psector_id=None, plan_om=None):
+    def new_psector(self, psector_id=None, plan_om=None, is_api=False):
         """ Buttons 45 and 81: New psector """
 
         # Create the dialog and signals
@@ -243,9 +243,10 @@ class ManageNewPsector(ParentManage):
                        "WHERE cur_user = current_user AND psector_id = '" + psector_id_aux + "'")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
-
-            layername = 'v_edit_' + self.plan_om + '_psector'
-            layer = self.controller.get_layer_by_tablename(layername, show_warning=True)
+            layer = None
+            if not is_api:
+                layername = 'v_edit_' + self.plan_om + '_psector'
+                layer = self.controller.get_layer_by_tablename(layername, show_warning=True)
             if layer:
 
                 expr_filter = "psector_id = '" + str(psector_id) + "'"
