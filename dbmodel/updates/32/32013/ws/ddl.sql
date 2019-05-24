@@ -14,7 +14,7 @@ dma_id integer,
 period_id integer,
 isunitary boolean,
 user_name text,
-CONSTRAINT UNIQUE (pattern_id, dma_id, period_id, isunitary)
+CONSTRAINT inp_selector_pattern_dma_unique UNIQUE (pattern_id, dma_id, period_id, isunitary)
 );
 
 
@@ -25,7 +25,7 @@ node_id  character varying(16),
 period_id integer,
 isunitary boolean,
 user_name text,
-CONSTRAINT UNIQUE (pattern_id, node_id, period_id, isunitary)
+CONSTRAINT inp_selector_pattern_node_unique UNIQUE (pattern_id, node_id, period_id, isunitary)
 );
 
 
@@ -33,7 +33,7 @@ CREATE TABLE inp_pattern_x_pattern(
 id serial PRIMARY KEY,
 pattern_id character varying(16),
 pattern_id2 character varying(16),
-CONSTRAINT UNIQUE (pattern_id, pattern_id2)
+CONSTRAINT inp_pattern_x_pattern_unique UNIQUE (pattern_id, pattern_id2)
 );
 
 ALTER TABLE inp_pattern ADD COLUMN timesteps integer;

@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+DROP VIEW vi_patterns;
 CREATE OR REPLACE VIEW vi_patterns AS 
  SELECT inp_pattern_value.id,
     inp_pattern_value.pattern_id, inp_pattern_value.factor_1, inp_pattern_value.factor_2, inp_pattern_value.factor_3, inp_pattern_value.factor_4, inp_pattern_value.factor_5, inp_pattern_value.factor_6,    
@@ -28,3 +29,4 @@ UNION
    FROM inp_pattern_value
    JOIN v_inp_demand b ON inp_pattern_value.pattern_id=b.pattern_id
   ORDER BY 1;
+  
