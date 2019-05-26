@@ -7,26 +7,12 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE TABLE inp_selector_pattern_dma(
-id serial PRIMARY KEY,
-pattern_id character varying(16),
-dma_id integer,
-period_id integer,
-isunitary boolean,
-user_name text,
-CONSTRAINT inp_selector_pattern_dma_unique UNIQUE (pattern_id, dma_id, period_id, isunitary)
-);
+ALTER TABLE inp_junction ADD custom_pattern_id character varying (16);
 
+ALTER TABLE ext_rtc_hydrometer_x_data ADD pattern_id character varying (16);
+ALTER TABLE ext_rtc_hydrometer_x_data ADD custom_pattern_id character varying (16);
 
-CREATE TABLE inp_selector_pattern_node(
-id serial PRIMARY KEY,
-pattern_id character varying(16),
-node_id  character varying(16),
-period_id integer,
-isunitary boolean,
-user_name text,
-CONSTRAINT inp_selector_pattern_node_unique UNIQUE (pattern_id, node_id, period_id, isunitary)
-);
+ALTER TABLE ext_rtc_scada_dma_period ADD custom_pattern_id character varying (16);
 
 
 CREATE TABLE inp_pattern_x_pattern(
