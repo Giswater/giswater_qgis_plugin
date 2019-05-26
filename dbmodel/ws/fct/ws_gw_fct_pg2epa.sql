@@ -64,10 +64,8 @@ BEGIN
 		
 	END IF;
 
-	-- Real values of demand and patterns if rtc is enabled;
-	IF (SELECT value FROM config_param_user WHERE parameter='inp_options_rtc_enabled' AND cur_user=current_user ) THEN
-		PERFORM gw_fct_pg2epa_rtc(result_id_var);				
-	END IF;
+	-- set demand and patterns in function of demand type and pattern method choosed
+	PERFORM gw_fct_pg2epa_rtc(result_id_var);				
 
 	-- Calling for modify the valve status
 	PERFORM gw_fct_pg2epa_valve_status(result_id_var, v_mandatory_nodarc);

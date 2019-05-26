@@ -37,15 +37,7 @@ BEGIN
 		v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
 
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
-
-	IF v_usedmapattern='DMA' THEN
-		UPDATE rpt_inp_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id WHERE rpt_inp_node.node_id=node.node_id AND result_id=result_id_var;
-		
-	ELSIF v_usedmapattern='CUSTOM' THEN
-		-- todo
 	
-	END IF;
-
 
 -- Insert on arc rpt_inp table
 	INSERT INTO rpt_inp_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, the_geom)
