@@ -22,6 +22,13 @@ SELECT SCHEMA_NAME.gw_api_getchilds($${
 "form":{},
 "feature":{"featureType":"arc", "tableName":"ve_arc_pipe", "idName":"arc_id"},
 "data":{"comboParent":"expl_id", "comboId":"2"}}$$)
+
+SELECT SCHEMA_NAME.gw_api_getchilds($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"form":{},
+"feature":{"tableName":"config"},
+"data":{"comboParent":"inp_options_demandtype", "comboId":"1"}}$$)
+
 */
 
 DECLARE
@@ -34,7 +41,6 @@ DECLARE
 	v_featuretype character varying;
 	
 	v_fields json;
-	v_fields_array json[];
 	v_combo_rows_child json[];
 	v_aux_json_child json;    
 	combo_json_child json;
@@ -47,7 +53,8 @@ DECLARE
 	v_formtype varchar;
 	v_config_param_user record;
 	v_message json;
-
+	v_orderby text;
+	v_editability text;
 
 BEGIN
 
@@ -78,11 +85,22 @@ BEGIN
 	IF (v_tablename = 'config') THEN
 
 	--  Combo rows child CONFIG
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id as column_id, widgettype, datatype, id as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate
-		FROM audit_cat_param_user WHERE dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
-		INTO v_combo_rows_child;
-		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
+		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
+		 SELECT label, audit_cat_param_user.id as widgetname, datatype, widgettype, layout_id, layout_order,layoutname,
+		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
+		 row_number()over(ORDER BY layout_id, layout_order) AS orderby, value, project_type, dv_querytext, dv_querytext_filterc, dv_parent_id, isparent, sys_role_id,
+		 placeholder,
+		 dv_orderby_id,feature_dv_parent_value,
+		 editability,
+		 description AS tooltip
+		 FROM audit_cat_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=audit_cat_param_user.id 
+		 WHERE sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+		 AND dv_parent_id='||quote_literal(v_comboparent)||'
+		 AND isenabled IS TRUE
+		 ORDER BY orderby) a WHERE widgettype = ''combo'''
+			INTO v_combo_rows_child;
+			v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
+
 		v_formtype='config';
 
 	ELSIF (v_tablename = 'catalog') THEN
@@ -92,7 +110,7 @@ BEGIN
 
 		--  Combo rows child CATALOG
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT column_id, widgettype, column_id as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, feature_dv_parent_value, editability, description AS tooltip
 		FROM config_api_form_fields WHERE formname = '||quote_literal(v_parameter)||' AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
@@ -101,7 +119,7 @@ BEGIN
 	ELSE
 		--  Combo rows child
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, column_id, widgettype, datatype, concat(''data_'',column_id) as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate
+		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layout_id, layout_order) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, feature_dv_parent_value, editability, description AS tooltip
 		FROM config_api_form_fields WHERE formname = $1 AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
 		INTO v_combo_rows_child
 		USING v_tablename;
@@ -111,35 +129,50 @@ BEGIN
 
 	FOREACH v_aux_json_child IN ARRAY v_combo_rows_child
 	LOOP
+		-- Define the order by column
+		IF (v_aux_json_child->>'dv_orderby_id')::boolean IS TRUE THEN
+			v_orderby='id';
+		ELSE 
+			v_orderby='idval';
+		END IF;
+		
+		-- set false the editability
+		v_editability = replace (((v_aux_json_child->>'editability')::json->>'trueWhenParentIn'), '[', '{');
+		v_editability = replace (v_editability, ']', '}');
+
+		raise notice 'v_editability % v_combovalue %', v_editability, v_combovalue;
+
+		IF v_combovalue != ANY (v_editability::text[]) THEN
+			v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'iseditable', false);
+		END IF;
 
 		-- Get combo child name
-		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'widgetname', (v_aux_json_child->>'widgetname'));
+		--v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'widgetname', (v_aux_json_child->>'widgetname'));
 		
 		-- Get combo id's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_combovalue IS NOT NULL THEN
-			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||((v_aux_json_child->>'dv_querytext_filterc'))||' '||(quote_literal(v_combovalue))||'
-			 ORDER BY idval) a';
+			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||((v_aux_json_child->>'dv_querytext_filterc'))||' '||(quote_literal(v_combovalue))||' ORDER BY '||v_orderby||') a';
 			execute query_text INTO combo_json_child;
 		ELSE 	
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY idval)a' INTO combo_json_child;
+			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY '||v_orderby||')a' INTO combo_json_child;
 		END IF;
 		combo_json_child := COALESCE(combo_json_child, '[]');
-		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
-		
+		v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
+	
 		-- Get combo value's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_combovalue IS NOT NULL THEN
-			query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_combovalue)||' ORDER BY idval) a';
+			query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_combovalue)||' ORDER BY '||v_orderby||') a';
 			execute query_text INTO combo_json_child;
 		ELSE 	
-			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY idval)a'
+			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY '||v_orderby||')a'
 				INTO combo_json_child;
 		END IF;
 		combo_json_child := COALESCE(combo_json_child, '[]');
-		v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);
+		v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);
 
 		-- Set current value
 		IF v_formtype != 'feature' THEN
-			v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'selectedId', combo_json_child->0);
+			v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'selectedId', combo_json_child->0);
 		ELSE
 			--looping for the differents velues on audit_cat_param_user that are coincident with the child parameter
 			FOR v_config_param_user IN SELECT * FROM audit_cat_param_user WHERE feature_field_id = (v_aux_json_child->>'column_id')
@@ -158,14 +191,14 @@ BEGIN
 				END IF;
 			END LOOP;
 			
-			v_fields_array[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields_array[(v_aux_json_child->>'orderby')::INT], 'selectedId', v_current_value);           		
+			v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'selectedId', v_current_value);           		
 		END IF;
 
 
 	END LOOP;
 	
 --    Convert to json
-    v_fields := array_to_json(v_fields_array);
+    v_fields := array_to_json(v_combo_rows_child);
 
     v_message := '{"priority":"0", "text":"Childs update successfully"}';
 
