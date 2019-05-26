@@ -57,6 +57,9 @@ CREATE TABLE value_type
 -- create new fields
 ----------------------
 
+ALTER TABLE om_visit_class ADD COLUMN isopenparam boolean;
+ALTER TABLE om_visit_class ADD COLUMN ismultiplierparam boolean;
+
 
 ALTER TABLE cat_arc ADD COLUMN  dn integer;
 ALTER TABLE cat_arc ADD COLUMN  pn integer;
