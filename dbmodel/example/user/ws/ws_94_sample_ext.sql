@@ -10411,3 +10411,48 @@ INSERT INTO ext_rtc_scada_x_data VALUES (3, '01', 0.113164998200000005, 29.42289
 
 
 
+INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (1, 'low', NULL);
+INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (2, 'medium', NULL);
+INSERT INTO ext_cat_hydrometer_priority (id, code, observ) VALUES (3, 'high', NULL);
+
+
+INSERT INTO ext_hydrometer_category VALUES (4, 'Shops', NULL);
+INSERT INTO ext_hydrometer_category VALUES (5, 'business', NULL);
+
+
+update ext_rtc_hydrometer SET  priority_id=a.priority_id, category_id=a.category_id, hydrometer_category=null
+	FROM (SELECT id, CASE WHEN random()<0.6 then 1 when random()<0.9 then 2 else 3 end as priority_id,
+			CASE WHEN random()<0.2 then 1 when random()<0.4 then 2 when random()<0.6 then 3 when random()<0.8 then 4 else 5 end as category_id
+			FROM ext_rtc_hydrometer) a 	
+			WHERE ext_rtc_hydrometer.id=a.id;
+			
+		
+INSERT INTO ext_cat_period_type VALUES (1, 'spring', NULL);
+INSERT INTO ext_cat_period_type VALUES (2, 'summer', NULL);
+INSERT INTO ext_cat_period_type VALUES (3, 'fall', NULL);
+INSERT INTO ext_cat_period_type VALUES (4, 'winter', NULL);
+
+UPDATE ext_cat_period SET period_type=2;
+
+
+INSERT INTO ext_hydrometer_category_x_pattern VALUES ('1', 2, 'pattern_01', NULL);
+INSERT INTO ext_hydrometer_category_x_pattern VALUES ('4', 2, 'pattern_01', NULL);
+INSERT INTO ext_hydrometer_category_x_pattern VALUES ('2', 2, 'pattern_02', NULL);
+INSERT INTO ext_hydrometer_category_x_pattern VALUES ('3', 2, 'pattern_03', NULL);
+INSERT INTO ext_hydrometer_category_x_pattern VALUES ('5', 2, 'pattern_02', NULL);
+
+
+update ext_rtc_hydrometer_x_data SET pattern_id=e.pattern_id FROM (
+					--set search_path='SCHEMA_NAME';
+						select b.id, e.pattern_id FROM ext_rtc_hydrometer a JOIN ext_rtc_hydrometer_x_data b ON a.id=b.hydrometer_id
+							JOIN ext_cat_period c ON b.cat_period_id=c.id
+							JOIN ext_hydrometer_category d ON d.id=a.category_id::text
+							JOIN ext_hydrometer_category_x_pattern e ON e.category_id=a.category_id::text AND e.period_type=c.period_type
+							)e WHERE e.id::int8=ext_rtc_hydrometer_x_data.id;
+
+
+update ext_rtc_hydrometer_x_data SET pattern_id='pattern_02' where pattern_id is null;
+
+update ext_rtc_scada_dma_period SET effc=0.82, minc=0.2, maxc=2.2, pattern_id='pattern_02' where dma_id='2';
+update ext_rtc_scada_dma_period SET effc=0.73, minc=0.3, maxc=3.2, pattern_id='pattern_03' where dma_id='3';
+
