@@ -54,18 +54,18 @@ DECLARE
 	
 	
 	--AN EXAMPLE OF V_DEFITION IS LIKE THIS:
-	CREATE OR REPLACE VIEW ws_sample.ve_node_outfallvalve AS 
+	CREATE OR REPLACE VIEW SCHEMA_NAME.ve_node_outfallvalve AS 
 	SELECT v_node.*
     man_valve.*,
     a.outfallvalve_param_1,
     a.outfallvalve_param_2
-	FROM ws_sample.v_node
-    JOIN ws_sample.man_valve ON man_valve.node_id::text = v_node.node_id::text
+	FROM SCHEMA_NAME.v_node
+    JOIN SCHEMA_NAME.man_valve ON man_valve.node_id::text = v_node.node_id::text
     LEFT JOIN ( SELECT ct.feature_id,
             ct.outfallvalve_param_1,
             ct.outfallvalve_param_2
            FROM crosstab('SELECT feature_id, parameter_id, value_param
-                FROM ws_sample.man_addfields_value JOIN ws_sample.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''OUTFALL-VALVE''
+                FROM SCHEMA_NAME.man_addfields_value JOIN SCHEMA_NAME.man_addfields_parameter on man_addfields_parameter.id=parameter_id where cat_feature_id=''OUTFALL-VALVE''
                 ORDER  BY 1,2'::text, ' VALUES (''26''),(''27'')'::text) ct(feature_id character varying, outfallvalve_param_1 text, outfallvalve_param_2 text)) a ON a.feature_id::text = v_node.node_id::text
 				WHERE v_node.nodetype_id::text = 'OUTFALL-VALVE'::text;
 
