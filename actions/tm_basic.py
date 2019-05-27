@@ -12,9 +12,9 @@ from qgis.PyQt.Qt import QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from qgis.PyQt.QtSql import QSqlTableModel
 
-from .actions.tm_parent import TmParentAction
-from .actions.tm_manage_visit import TmManageVisit
-from .actions.tm_planning_unit import TmPlanningUnit
+from .tm_parent import TmParentAction
+from .tm_manage_visit import TmManageVisit
+from .tm_planning_unit import TmPlanningUnit
 from ..ui.tm.month_manage import MonthManage
 from ..ui.tm.month_selector import MonthSelector
 from ..ui.tm.new_prices import NewPrices
@@ -24,13 +24,13 @@ from ..ui.tm.tree_selector import TreeSelector
 from .. import widget_manager
 
 
-class TmBasic(ParentAction):
+class TmBasic(TmParentAction):
     
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
         
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
+        TmParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        self.manage_visit = TmManageVisit(iface, settings, controller, plugin_dir)
         self.selected_camp = None
         self.campaign_id = None
         self.campaign_name = None
@@ -41,12 +41,8 @@ class TmBasic(ParentAction):
         self.tree_manage = tree_manage
 
 
-    def set_project_type(self, project_type):
-        self.project_type = project_type
-
-
     def basic_new_prices(self, dialog=None):
-        """ Button 03: Price generator """
+        """ Button 303: Price generator """
         
         # Close previous dialog
         if dialog is not None:
@@ -187,7 +183,7 @@ class TmBasic(ParentAction):
 
 
     def main_tree_manage(self):
-        """ Button 01: Tree selector """
+        """ Button 301: Tree selector """
 
         dlg_tree_manage = TreeManage()
         self.load_settings(dlg_tree_manage)
@@ -564,7 +560,7 @@ class TmBasic(ParentAction):
 
 
     def basic_month_manage(self):
-        """ Button 02: Planned year manage """
+        """ Button 302: Planned year manage """
         
         month_manage = MonthManage()
 
@@ -820,7 +816,7 @@ class TmBasic(ParentAction):
 
 
     def add_visit(self):
-        """ Button 04: Add visit """
+        """ Button 304: Add visit """
         
         self.manage_visit.manage_visit()
         

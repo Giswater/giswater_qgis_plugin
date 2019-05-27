@@ -25,10 +25,8 @@ if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import QgsMessageBar, QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsDateTimeEdit
 
 import json
-import sys
 import operator
 from functools import partial
-from datetime import datetime
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent

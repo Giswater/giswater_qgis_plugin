@@ -26,18 +26,18 @@ from qgis.core import QgsFeatureRequest
 
 from functools import partial
 
-from tm import widget_manager
-from tm.actions.tm_multiple_selection import TmMultipleSelection
-from tm.actions.tm_parent import TmParentAction
-from tm.ui_manager import PlaningUnit
+from .. import widget_manager
+from .tm_multiple_selection import TmMultipleSelection
+from .tm_parent import TmParentAction
+from ..ui_manager import PlaningUnit
 
 
-class TmPlanningUnit(ParentAction):
+class TmPlanningUnit(TmParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
 
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        TmParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.iface = iface
         self.settings = settings
         self.controller = controller

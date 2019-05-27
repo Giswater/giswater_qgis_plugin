@@ -38,7 +38,6 @@ from functools import partial
 
 import utils_giswater
 from giswater.actions.api_parent import ApiParent
-from giswater.actions.HyperLinkLabel import HyperLinkLabel
 from giswater.actions.manage_document import ManageDocument
 from giswater.actions.manage_element import ManageElement
 from giswater.actions.manage_visit import ManageVisit

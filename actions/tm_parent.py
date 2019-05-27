@@ -24,9 +24,12 @@ else:
 
 from qgis.core import QgsExpression
 
-from .. import widget_manager
-import ctypes
 import os
+import sys
+if 'nt' in sys.builtin_module_names:
+    import ctypes
+
+from .. import widget_manager
 
 
 class TmParentAction(object):
@@ -79,13 +82,13 @@ class TmParentAction(object):
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
 
-        screens = ctypes.windll.user32
-        screen_x = screens.GetSystemMetrics(78)
-        screen_y = screens.GetSystemMetrics(79)
         if dialog is None:
             dialog = self.dlg
 
         try:
+            screens = ctypes.windll.user32
+            screen_x = screens.GetSystemMetrics(78)
+            screen_y = screens.GetSystemMetrics(79)
             x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
             y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
             width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
