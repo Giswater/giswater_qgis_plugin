@@ -7,13 +7,13 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+-- todo: deprecate views rtc
+
 -- 2019/05/24
 ALTER TABLE sys_csv2pg_cat ADD COLUMN orderby integer;
 
 -- 2019/05/27
 ALTER TABLE audit_cat_param_user ADD COLUMN editability json;
-ALTER TABLE config_api_form_fields ADD COLUMN editability json;
-
 
 
 CREATE TABLE ext_hydrometer_category_x_pattern(
@@ -31,3 +31,6 @@ CREATE TABLE ext_cat_period_type(
 );
 
 ALTER TABLE ext_cat_period ADD column period_type integer;
+
+ALTER TABLE ext_rtc_hydrometer_x_data ADD pattern_id character varying (16);
+ALTER TABLE ext_rtc_hydrometer_x_data ADD custom_pattern_id character varying (16);

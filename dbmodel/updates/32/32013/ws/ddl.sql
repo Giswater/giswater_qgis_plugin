@@ -9,11 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE inp_junction ADD custom_pattern_id character varying (16);
 
-ALTER TABLE ext_rtc_hydrometer_x_data ADD pattern_id character varying (16);
-ALTER TABLE ext_rtc_hydrometer_x_data ADD custom_pattern_id character varying (16);
-
 ALTER TABLE ext_rtc_scada_dma_period ADD custom_pattern_id character varying (16);
-
 
 CREATE TABLE inp_pattern_x_pattern(
 id serial PRIMARY KEY,

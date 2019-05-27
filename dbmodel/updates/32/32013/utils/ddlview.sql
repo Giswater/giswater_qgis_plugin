@@ -1,4 +1,11 @@
-set search_path='SCHEMA_NAME';
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
 
 drop view if exists v_rtc_hydrometer_period cascade;
 CREATE OR REPLACE VIEW v_rtc_period_hydrometer AS 
@@ -32,7 +39,7 @@ CREATE OR REPLACE VIEW v_rtc_period_hydrometer AS
      JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND connec.dma_id::text = c.dma_id::text
      WHERE ext_cat_period.id = (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_rtc_period_id');
 
-drop view v_rtc_period_dma;
+
 CREATE OR REPLACE VIEW v_rtc_period_dma AS 
  SELECT v_rtc_period_hydrometer.dma_id, 
     period_id, 
@@ -43,7 +50,6 @@ CREATE OR REPLACE VIEW v_rtc_period_dma AS
   GROUP BY v_rtc_period_hydrometer.dma_id,period_id, ext_rtc_hydrometer_x_data.pattern_id;
 
 
-drop view v_rtc_period_node;
 CREATE OR REPLACE VIEW v_rtc_period_node AS 
  SELECT 
     node_1 AS node_id,
@@ -58,7 +64,6 @@ CREATE OR REPLACE VIEW v_rtc_period_node AS
     sum((lps_avg * 0.5::double precision / effc ) * maxc) AS lps_max
    FROM v_rtc_period_hydrometer
    group by node_1,period_id ,dma_id, effc,minc,maxc
-     
 UNION
  SELECT 
     node_2 AS node_id,
@@ -72,6 +77,5 @@ UNION
     maxc,
     sum((lps_avg * 0.5::double precision / effc ) * maxc) AS lps_max
    FROM v_rtc_period_hydrometer
-   group by node_2,period_id ,dma_id, effc,minc,maxc
-
- 
+   group by node_2,period_id ,dma_id, effc,minc,maxc;
+   

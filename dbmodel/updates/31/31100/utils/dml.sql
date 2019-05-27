@@ -55,13 +55,13 @@ INSERT INTO sys_fprocess_cat VALUES (30, 'Analysis mincut areas', 'OM', 'Analysi
 -----------------------
 INSERT INTO audit_cat_param_user VALUES ('edit_connect_force_downgrade_linkvnode', null, null, 'role_edit');
 INSERT INTO audit_cat_param_user VALUES ('edit_connect_force_automatic_connect2network', null, null, 'role_edit');
-INSERT INTO config_param_user VALUES (110, 'edit_connect_force_downgrade_linkvnode', 'TRUE', 'postgres');
-INSERT INTO config_param_user VALUES (111, 'edit_connect_force_automatic_connect2network', 'TRUE', 'postgres');
+INSERT INTO config_param_user  (parameter, value, cur_user) VALUES ('edit_connect_force_downgrade_linkvnode', 'TRUE', 'postgres');
+INSERT INTO config_param_user  (parameter, value, cur_user) VALUES ('edit_connect_force_automatic_connect2network', 'TRUE', 'postgres');
 
 --04/06/2018
 -----------------------
 INSERT INTO audit_cat_param_user VALUES ('cf_keep_opened_edition', null, null, 'role_edit');
-INSERT INTO config_param_user VALUES (112, 'cf_keep_opened_edition', 'TRUE', 'postgres');
+INSERT INTO config_param_user  (parameter, value, cur_user) VALUES ('cf_keep_opened_edition', 'TRUE', 'postgres');
 INSERT INTO audit_cat_table VALUES ('v_edit_cad_auxcircle', 'CAD layer', 'Layer to store circle geometry when CAD tool is used', 'role_edit', 0, NULL, 'role_edit', 0, NULL, NULL, NULL);
 INSERT INTO audit_cat_table VALUES ('v_edit_cad_auxpoint', 'CAD layer', 'Layer to store point geometry when CAD tool is used', 'role_edit', 0, NULL, 'role_edit', 0, NULL, NULL, NULL); 
 
@@ -69,7 +69,7 @@ INSERT INTO audit_cat_table VALUES ('v_edit_cad_auxpoint', 'CAD layer', 'Layer t
 -----------------------
 INSERT INTO sys_fprocess_cat VALUES (31, 'Mincut conlfict scenario result', 'OM', 'Mincut conlfict scenario result', 'ws');
 INSERT INTO audit_cat_param_user VALUES ('edit_noderotation_update_dissbl', null, null, 'role_edit');
-INSERT INTO config_param_user VALUES (113, 'edit_noderotation_update_dissbl', 'FALSE', 'postgres');
+INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_noderotation_update_dissbl', 'FALSE', 'postgres');
 UPDATE audit_cat_table SET sys_sequence='om_psector_id_seq' WHERE id='om_psector';
 UPDATE audit_cat_table SET sys_sequence='plan_psector_id_seq' WHERE id='plan_psector';
 INSERT INTO sys_fprocess_cat VALUES (32, 'Node proximity analysis', 'EDIT', 'Node proximity analysis', 'utils');

@@ -136,9 +136,9 @@ UNION
     inp_pattern_value.factor_13, inp_pattern_value.factor_14, inp_pattern_value.factor_15, inp_pattern_value.factor_16, inp_pattern_value.factor_17, inp_pattern_value.factor_18
    FROM inp_pattern_value
    JOIN v_inp_demand b ON inp_pattern_value.pattern_id=b.pattern_id
-UNION * 
-	FROM v_rtc_period_nodepattern WHERE (SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_patternmethod' and cur_user=current_user)='23'
+UNION 
+	SELECT * FROM v_rtc_period_nodepattern WHERE (SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_patternmethod' and cur_user=current_user)='23'
 UNION	
-	FROM v_rtc_interval_nodepattern WHERE (SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_patternmethod' and cur_user=current_user)='25'
+	SELECT * FROM v_rtc_interval_nodepattern WHERE (SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_patternmethod' and cur_user=current_user)='25'
 ORDER BY 1;
   
