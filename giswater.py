@@ -497,7 +497,7 @@ class Giswater(QObject):
 
 
     def unload(self, remove_modules=True):
-        """ Removes the plugin menu item and icon from QGIS GUI """
+        """ Removes plugin menu items and icons from QGIS GUI """
 
         try:
 
@@ -515,14 +515,24 @@ class Giswater(QObject):
 
             if remove_modules:
                 # unload all loaded giswater related modules
-                for modName, mod in list(sys.modules.items()):
+                for mod_name, mod in list(sys.modules.items()):
                     if mod and hasattr(mod, '__file__') and self.plugin_dir in mod.__file__:
-                        del sys.modules[modName]
+                        del sys.modules[mod_name]
 
-        except AttributeError:
-            self.controller.log_info("unload - AttributeError")
-        except:
-            pass
+            # Reset instance attributes
+            self.actions = {}
+            self.map_tools = {}
+            self.srid = None
+            self.plugin_toolbars = {}
+
+        except Exception as e:
+            print(str(e))
+        finally:
+            # Reset instance attributes
+            self.actions = {}
+            self.map_tools = {}
+            self.srid = None
+            self.plugin_toolbars = {}
 
     
     """ Slots """             
@@ -573,7 +583,10 @@ class Giswater(QObject):
                           
     def project_read(self, show_warning=True): 
         """ Function executed when a user opens a QGIS project (*.qgs) """
-        
+
+        # Unload plugin before reading opened project
+        self.unload(False)
+
         self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=show_warning)
         self.controller.set_plugin_dir(self.plugin_dir)
         self.controller.set_qgis_settings(self.qgis_settings)
@@ -586,7 +599,6 @@ class Giswater(QObject):
                 if message:
                     self.controller.show_warning(message, 15)
                 self.controller.log_warning(str(self.controller.layer_source))
-            self.project_new()
             return
 
         # Cache error message with log_code = -1 (uncatched error)
