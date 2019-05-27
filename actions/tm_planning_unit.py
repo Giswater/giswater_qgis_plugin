@@ -26,7 +26,7 @@ from qgis.core import QgsFeatureRequest
 
 from functools import partial
 
-from .. import widget_manager
+from .. import utils_giswater
 from .tm_multiple_selection import TmMultipleSelection
 from .tm_parent import TmParentAction
 from ..ui_manager import PlaningUnit
@@ -85,15 +85,15 @@ class TmPlanningUnit(TmParentAction):
         validator = QIntValidator(1, 9999999)
         self.dlg_unit.txt_times.setValidator(validator)
 
-        widget_manager.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.DoubleClicked)
+        utils_giswater.set_qtv_config(self.dlg_unit.tbl_unit, edit_triggers=QTableView.DoubleClicked)
 
         sql = ("SELECT id, name FROM " + self.schema_name + ".cat_campaign")
         rows = self.controller.get_rows(sql, log_sql=True)
-        widget_manager.set_item_data(self.dlg_unit.cmb_campaign, rows, 1)
+        utils_giswater.set_item_data(self.dlg_unit.cmb_campaign, rows, 1)
         sql = ("SELECT id, name FROM " + self.schema_name + ".cat_work")
         rows = [('', '')]
         rows.extend(self.controller.get_rows(sql))
-        widget_manager.set_item_data(self.dlg_unit.cmb_work, rows, 1)
+        utils_giswater.set_item_data(self.dlg_unit.cmb_work, rows, 1)
         self.load_default_values()
         table_name = "v_ui_planning_unit"
         self.update_table(self.dlg_unit, self.dlg_unit.tbl_unit, table_name, self.dlg_unit.cmb_campaign, self.dlg_unit.cmb_work)
@@ -124,7 +124,7 @@ class TmPlanningUnit(TmParentAction):
 
     def populate_comboline(self, dialog, widget, completer):
 
-        _filter = widget_manager.getWidgetText(dialog, widget)
+        _filter = utils_giswater.getWidgetText(dialog, widget)
         sql = ("SELECT node_id FROM " + self.schema_name + ".v_edit_node "
                " WHERE node_id ILIKE '%" + str(_filter)+"%'")
         rows = self.controller.get_rows(sql, log_sql=True)
@@ -212,7 +212,7 @@ class TmPlanningUnit(TmParentAction):
 
     def insert_single(self, dialog, qline):
 
-        feature_id = widget_manager.getWidgetText(dialog, qline)
+        feature_id = utils_giswater.getWidgetText(dialog, qline)
         layer = self.controller.get_layer_by_tablename('v_edit_node')
         if not layer:
             self.last_error = self.tr("Layer not found") + ": v_edit_node"
@@ -267,9 +267,9 @@ class TmPlanningUnit(TmParentAction):
 
         model = qtable.model()
         record = model.record()
-        campaign_id = widget_manager.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
-        work_id = widget_manager.get_item_data(self.dlg_unit, self.dlg_unit.cmb_work, 0)
-        times = widget_manager.getWidgetText(self.dlg_unit, self.dlg_unit.txt_times, return_string_null=False)
+        campaign_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
+        work_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_work, 0)
+        times = utils_giswater.getWidgetText(self.dlg_unit, self.dlg_unit.txt_times, return_string_null=False)
         if times is None or times < 1 or times == "":
             times = "1"
 
@@ -282,8 +282,8 @@ class TmPlanningUnit(TmParentAction):
 
     def update_table(self, dialog, qtable, table_name, combo1, combo2):
 
-        campaign_id = widget_manager.get_item_data(dialog, combo1, 0)
-        work_id = widget_manager.get_item_data(dialog, combo2, 0)
+        campaign_id = utils_giswater.get_item_data(dialog, combo1, 0)
+        work_id = utils_giswater.get_item_data(dialog, combo2, 0)
 
         expr_filter = "campaign_id =" + str(campaign_id)
         if work_id is None or work_id == "":
@@ -342,7 +342,7 @@ class TmPlanningUnit(TmParentAction):
     def get_id_list(self):
 
         self.ids = []
-        column_index = widget_manager.get_col_index_by_col_name(self.dlg_unit.tbl_unit, 'node_id')
+        column_index = utils_giswater.get_col_index_by_col_name(self.dlg_unit.tbl_unit, 'node_id')
         for x in range(0, self.dlg_unit.tbl_unit.model().rowCount()):
             _id = self.dlg_unit.tbl_unit.model().data(self.dlg_unit.tbl_unit.model().index(x, column_index))
             self.ids.append(_id)
@@ -384,8 +384,8 @@ class TmPlanningUnit(TmParentAction):
     def save_default_values(self):
 
         cur_user = self.controller.get_current_user()
-        campaign = widget_manager.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
-        work = widget_manager.get_item_data(self.dlg_unit, self.dlg_unit.cmb_work, 0)
+        campaign = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
+        work = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_work, 0)
         self.controller.plugin_settings_set_value("PlanningUnit_cmb_campaign_" + cur_user, campaign)
         self.controller.plugin_settings_set_value("PlanningUnit_cmb_work_" + cur_user, work)
 
@@ -396,6 +396,6 @@ class TmPlanningUnit(TmParentAction):
         cur_user = self.controller.get_current_user()
         campaign = self.controller.plugin_settings_value('PlanningUnit_cmb_campaign_' + cur_user)
         work = self.controller.plugin_settings_value('PlanningUnit_cmb_work_' + cur_user)
-        widget_manager.set_combo_itemData(self.dlg_unit.cmb_campaign, str(campaign), 0)
-        widget_manager.set_combo_itemData(self.dlg_unit.cmb_work, str(work), 0)
+        utils_giswater.set_combo_itemData(self.dlg_unit.cmb_campaign, str(campaign), 0)
+        utils_giswater.set_combo_itemData(self.dlg_unit.cmb_work, str(work), 0)
 

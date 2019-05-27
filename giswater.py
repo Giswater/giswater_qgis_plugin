@@ -1147,7 +1147,7 @@ class Giswater(QObject):
             self.controller.show_warning(model.lastError().text())
 
 
-    def project_read_tm(self):
+    def project_read_tm(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         # Set actions classes (define one class per plugin toolbar)

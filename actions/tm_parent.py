@@ -29,7 +29,7 @@ import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from .. import widget_manager
+from .. import utils_giswater
 
 
 class TmParentAction(object):
@@ -188,7 +188,7 @@ class TmParentAction(object):
     def set_table_columns(self, dialog, widget, table_name, project_type=None):
         """ Configuration of tables. Set visibility and width of columns """
 
-        widget = widget_manager.getWidget(dialog, widget)
+        widget = utils_giswater.getWidget(dialog, widget)
         if not widget:
             return
 

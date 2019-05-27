@@ -20,7 +20,7 @@ from qgis.gui import QgsMapToolEmitPoint
 
 from functools import partial
 
-from .. import widget_manager
+from .. import utils_giswater
 from .tm_parent import TmParentAction
 from .tm_multiple_selection import TmMultipleSelection
 
@@ -203,7 +203,7 @@ class TmParentManage(TmParentAction, object):
 
         if type(table_object) is str:
             widget_name = "tbl_" + table_object + "_x_" + self.geom_type
-            widget = widget_manager.getWidget(dialog, widget_name)
+            widget = utils_giswater.getWidget(dialog, widget_name)
             if not widget:
                 message = "Widget not found"
                 self.controller.show_warning(message, parameter=widget_name)

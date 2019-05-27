@@ -21,7 +21,7 @@ from ..ui.tm.new_prices import NewPrices
 from ..ui.tm.price_management import PriceManagement
 from ..ui.tm.tree_manage import TreeManage
 from ..ui.tm.tree_selector import TreeSelector
-from .. import widget_manager
+from .. import utils_giswater
 
 
 class TmBasic(TmParentAction):
@@ -88,8 +88,8 @@ class TmBasic(TmParentAction):
 
         # If campaign not exist, create new one
         if row is None:
-            start_date = widget_manager.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.start_date)
-            end_date = widget_manager.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.end_date)
+            start_date = utils_giswater.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.start_date)
+            end_date = utils_giswater.getCalendarDate(self.dlg_new_campaign, self.dlg_new_campaign.end_date)
             sql = ("INSERT INTO " + self.schema_name + ".cat_campaign(name, start_date, end_date) "
                    " VALUES('" + str(new_camp) + "', '" + str(start_date) + "', '" + str(end_date) + "');")
             self.controller.execute_sql(sql)
@@ -105,7 +105,7 @@ class TmBasic(TmParentAction):
         # Check if want copy any campaign or do new price list
         copy_years = self.dlg_new_campaign.chk_campaign.isChecked()
         if copy_years:
-            id_old_camp = widget_manager.get_item_data(self.dlg_new_campaign, self.dlg_new_campaign.cbx_years)
+            id_old_camp = utils_giswater.get_item_data(self.dlg_new_campaign, self.dlg_new_campaign.cbx_years)
             # If checkbox is checked but don't have any campaign selected do return.
             if id_old_camp == -1:
                 msg = "No tens cap any seleccionat, desmarca l'opcio de copiar preus"
@@ -210,7 +210,7 @@ class TmBasic(TmParentAction):
         if rows is None:
             return
 
-        widget_manager.set_item_data(combo, rows, 1, reverse)
+        utils_giswater.set_item_data(combo, rows, 1, reverse)
 
 
     def get_year(self, dialog):
@@ -229,8 +229,8 @@ class TmBasic(TmParentAction):
                 return None
             self.campaign_id = row[0]
 
-            if widget_manager.isChecked(dialog, dialog.chk_campaign) and widget_manager.get_item_data(dialog, dialog.cbx_campaigns, 0) != -1:
-                self.selected_camp = widget_manager.get_item_data(dialog, dialog.cbx_campaigns, 0)
+            if utils_giswater.isChecked(dialog, dialog.chk_campaign) and utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0) != -1:
+                self.selected_camp = utils_giswater.get_item_data(dialog, dialog.cbx_campaigns, 0)
                 sql = ("SELECT DISTINCT(campaign_id) FROM " + self.schema_name + ".planning"
                        " WHERE campaign_id ='" + str(self.selected_camp) + "'")
                 row = self.controller.get_row(sql)
@@ -269,7 +269,7 @@ class TmBasic(TmParentAction):
         if self.rows_cmb_poda_type is None:
             self.update_cmb_poda_type()   
                     
-        widget_manager.set_item_data(dlg_selector.cmb_poda_type, self.rows_cmb_poda_type, 1)              
+        utils_giswater.set_item_data(dlg_selector.cmb_poda_type, self.rows_cmb_poda_type, 1)
         
         # Populate QTableView
         self.fill_table(dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers, update=True)
@@ -407,7 +407,7 @@ class TmBasic(TmParentAction):
                 if str(dialog.selected_rows.model().record(x).value('price')) != 'NULL':
                     total += float(dialog.selected_rows.model().record(x).value('price'))
                     
-        widget_manager.setText(dialog, dialog.lbl_total_price, str(total))
+        utils_giswater.setText(dialog, dialog.lbl_total_price, str(total))
 
 
     def insert_into_planning(self, tableright):
@@ -472,15 +472,15 @@ class TmBasic(TmParentAction):
 
         # Select all rows and get all id
         self.select_all_rows(dialog.selected_rows, id_table_right)
-        if widget_manager.isChecked(dialog, dialog.chk_current):
-            current_poda_type = widget_manager.get_item_data(dialog, dialog.cmb_poda_type, 0)
-            # current_poda_name = widget_manager.get_item_data(dialog, dialog.cmb_poda_type, 1)
+        if utils_giswater.isChecked(dialog, dialog.chk_current):
+            current_poda_type = utils_giswater.get_item_data(dialog, dialog.cmb_poda_type, 0)
+            # current_poda_name = utils_giswater.get_item_data(dialog, dialog.cmb_poda_type, 1)
             if current_poda_type is None:
                 message = "No heu seleccionat cap poda"
                 self.controller.show_warning(message)
                 return
             
-        if widget_manager.isChecked(dialog, dialog.chk_permanent):
+        if utils_giswater.isChecked(dialog, dialog.chk_permanent):
             for i in range(0, len(left_selected_list)):
                 row = left_selected_list[i].row()
                 sql = ("UPDATE " + self.schema_name + ".cat_mu "
@@ -499,7 +499,7 @@ class TmBasic(TmParentAction):
                 values += 'null, '
 
             if dialog.all_rows.model().record(row).value('work_id') is not None:
-                if widget_manager.isChecked(dialog, dialog.chk_current):
+                if utils_giswater.isChecked(dialog, dialog.chk_current):
                     values += "'" + str(current_poda_type) + "', "
                     function_values += "'" + str(current_poda_type) + "', "
                 else:
@@ -583,14 +583,14 @@ class TmBasic(TmParentAction):
 
     def get_planned_camp(self, dialog):
 
-        if str(widget_manager.getWidgetText(dialog, dialog.txt_plan_code)) == 'null':
+        if str(utils_giswater.getWidgetText(dialog, dialog.txt_plan_code)) == 'null':
             message = "El camp text a no pot estar vuit"
             self.controller.show_warning(message)
             return
 
-        self.plan_code = widget_manager.getWidgetText(dialog, dialog.txt_plan_code)
-        self.planned_camp_id = widget_manager.get_item_data(dialog, dialog.cbx_years, 0)
-        self.planned_camp_name = widget_manager.get_item_data(dialog, dialog.cbx_years, 1)
+        self.plan_code = utils_giswater.getWidgetText(dialog, dialog.txt_plan_code)
+        self.planned_camp_id = utils_giswater.get_item_data(dialog, dialog.cbx_years, 0)
+        self.planned_camp_name = utils_giswater.get_item_data(dialog, dialog.cbx_years, 1)
 
         if self.planned_camp_id == -1:
             message = "No hi ha cap any planificat"
@@ -625,8 +625,8 @@ class TmBasic(TmParentAction):
             start_date = QDate.currentDate()
             end_date = QDate.currentDate().addYears(1)
 
-        widget_manager.setCalendarDate(month_selector, month_selector.date_inici, start_date)
-        widget_manager.setCalendarDate(month_selector, month_selector.date_fi, end_date)
+        utils_giswater.setCalendarDate(month_selector, month_selector.date_inici, start_date)
+        utils_giswater.setCalendarDate(month_selector, month_selector.date_fi, end_date)
 
         view_name = 'v_plan_mu_year'
         tableleft = 'planning'
@@ -676,8 +676,8 @@ class TmBasic(TmParentAction):
             field_list.append(id_)
 
         # Get dates
-        plan_month_start = widget_manager.getCalendarDate(dialog, dialog.date_inici)
-        plan_month_end = widget_manager.getCalendarDate(dialog, dialog.date_fi)
+        plan_month_start = utils_giswater.getCalendarDate(dialog, dialog.date_inici)
+        plan_month_end = utils_giswater.getCalendarDate(dialog, dialog.date_fi)
 
         # Update values
         for i in range(0, len(left_selected_list)):
