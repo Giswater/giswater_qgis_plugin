@@ -51,7 +51,7 @@ class ManageNewPsector(ParentManage):
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def new_psector(self, psector_id=None, plan_om=None):
+    def new_psector(self, psector_id=None, plan_om=None, is_api=False):
         """ Buttons 45 and 81: New psector """
 
         # Create the dialog and signals
@@ -243,9 +243,10 @@ class ManageNewPsector(ParentManage):
                        "WHERE cur_user = current_user AND psector_id = '" + psector_id_aux + "'")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
-
-            layername = 'v_edit_' + self.plan_om + '_psector'
-            layer = self.controller.get_layer_by_tablename(layername, show_warning=True)
+            layer = None
+            if not is_api:
+                layername = 'v_edit_' + self.plan_om + '_psector'
+                layer = self.controller.get_layer_by_tablename(layername, show_warning=True)
             if layer:
 
                 expr_filter = "psector_id = '" + str(psector_id) + "'"
@@ -347,6 +348,10 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
         self.tab_feature_changed(self.dlg_plan_psector, table_object)
+
+        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
+        restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
+        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
         # Open dialog
         self.open_dialog(self.dlg_plan_psector, maximize_button=False)
@@ -699,7 +704,9 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.btn_insert.setEnabled(enabled)
         self.dlg_plan_psector.btn_delete.setEnabled(enabled)
         self.dlg_plan_psector.btn_snapping.setEnabled(enabled)
-
+        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
+        restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
+        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
     def selection_init(self, dialog, table_object, query=True):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
@@ -777,6 +784,10 @@ class ManageNewPsector(ParentManage):
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
 
         self.dlg_plan_psector.chk_enable_all.setEnabled(True)
+
+        widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
+        restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
+        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
 
     def populate_result_id(self, combo, table_name):

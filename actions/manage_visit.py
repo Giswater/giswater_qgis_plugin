@@ -86,13 +86,13 @@ class ManageVisit(ParentManage, QObject):
         # Get layers of every geom_type
         self.reset_lists()
         self.reset_layers()
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')
+        self.layers['arc'] = self.controller.get_group_layers('arc', True)
+        self.layers['node'] = self.controller.get_group_layers('node', True)
+        self.layers['connec'] = self.controller.get_group_layers('connec', True)
+        self.layers['element'] = self.controller.get_group_layers('element', True)
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() != 'ws':
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = self.controller.get_group_layers('gully', True)
           
         # Reset geometry  
         self.x = None

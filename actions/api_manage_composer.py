@@ -137,10 +137,8 @@ class ApiManageComposer(ApiParent):
                         widget.setText(item.text())
             else:
                 for widget in widget_list:
-                    print(widget.property('column_id'))
                     item = selected_com.itemById(widget.property('column_id'))
                     if type(item) == QgsLayoutItemLabel:
-                        print(str(item.text()))
                         widget.setText(str(item.text()))
 
     def open_composer(self, dialog):
@@ -273,6 +271,11 @@ class ApiManageComposer(ApiParent):
             self.load_composer_values(dialog)
             self.accept(dialog, my_json)
 
+
+    def gw_api_set_composer(self, dialog, my_json):
+        if my_json['composer'] != '-1':
+            self.preview(dialog, False)
+            self.accept(dialog, my_json)
 
 
     def accept(self, dialog, my_json):

@@ -227,7 +227,7 @@ class Utils(ParentAction):
         roles = self.controller.get_rolenames()
         temp_tablename = 'temp_csv2pg'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure, functionname, isheader', 'sys_csv2pg_cat', roles, False)
+        self.populate_combos(self.dlg_csv.cmb_import_type, 'id', 'name_i18n, csv_structure, functionname, isheader', 'sys_csv2pg_cat', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
         utils_giswater.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
@@ -485,7 +485,7 @@ class Utils(ParentAction):
         return True
 
 
-    def populate_combos(self, combo, field_id, fields, table_name, roles, allow_nulls=True):
+    def populate_combos(self, combo, field_id, fields, table_name, roles):
 
         if roles is None:
             return
@@ -501,15 +501,8 @@ class Utils(ParentAction):
             self.dlg_csv.setEnabled(False)
             return
 
-        combo.blockSignals(True)
-        combo.clear()
-        if allow_nulls:
-            combo.addItem("", "")
-        records_sorted = sorted(rows, key=operator.itemgetter(1))
-        for record in records_sorted:
-            combo.addItem(record[1], record)
-        combo.blockSignals(False)
 
+        utils_giswater.set_item_data(combo, rows, 1, True, True, 1)
         self.update_info(self.dlg_csv)
 
 

@@ -17,10 +17,11 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import QgsProject, QgsDataSourceUri
 
+
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog, QgsCredentials
+from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils
 
 import os.path
 import subprocess
@@ -1084,9 +1085,10 @@ class DaoController(object):
         sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
                " WHERE type = '" + geom_type.upper() + "'")
         if union:
-            sql += (" UNION SELECT parentlayer FROM " + self.schema_name + ".sys_feature_type"
-                    " WHERE id='" + geom_type.upper() + "'")
+            sql += (" UNION SELECT parent_layer FROM " + self.schema_name + ".cat_feature"
+                    " WHERE feature_type='" + geom_type.upper() + "'")
         rows = self.get_rows(sql)
+        print(sql)
         if rows:
             for row in rows:
                 layer = self.get_layer_by_tablename(row[0])
@@ -1173,58 +1175,68 @@ class DaoController(object):
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
         
-        role_admin = False
-        role_master = self.check_role_user("role_master")
-        role_epa = self.check_role_user("role_epa")
-        role_edit = self.check_role_user("role_edit")
-        role_om = self.check_role_user("role_om")
-        super_users = self.settings.value('system_variables/super_users')
+        # role_admin = False
+        # role_master = self.check_role_user("role_master")
+        # role_epa = self.check_role_user("role_epa")
+        # role_edit = self.check_role_user("role_edit")
+        # role_om = self.check_role_user("role_om")
+        # role_basic = self.check_role_user("role_basic")
+        # super_users = self.settings.value('system_variables/super_users')
+        #
+        # # Manage user 'postgres'
+        # if self.user == 'postgres' or self.user == 'gisadmin':
+        #     role_master = True
+        #
+        # # Manage super_user
+        # if super_users is not None:
+        #     if self.user in super_users:
+        #         role_master = True
+        #
+        #
+        #
+        # project_role = None
+        # if Qgis.QGIS_VERSION_INT < 29900:
+        #     project_role = QgsExpressionContextUtils.projectScope().variable('project_role')
+        # else:
+        #     project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
+        # self.log_info(str(role_basic))
+        # self.log_info(str(project_role))
 
-        # Manage user 'postgres'
-        if self.user == 'postgres' or self.user == 'gisadmin':
-            role_master = True
+        restriction = self.get_restriction()
 
-        # Manage super_user
-        if super_users is not None:
-            if self.user in super_users:
-                role_master = True
-
-        if role_admin:
+        if restriction == 'role_basic':
+            self.log_info(str("TEST 10"))
             pass
-        elif role_master:
-            self.giswater.enable_toolbar("utils")
+        elif restriction == 'role_om':
+            if self.giswater.wsoftware == 'ws':
+                self.giswater.enable_toolbar("om_ws")
+            elif self.giswater.wsoftware == 'ud':
+                self.giswater.enable_toolbar("om_ud")
+        elif restriction == 'role_edit':
+            if self.giswater.wsoftware == 'ws':
+                self.giswater.enable_toolbar("om_ws")
+            elif self.giswater.wsoftware == 'ud':
+                self.giswater.enable_toolbar("om_ud")
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
+        elif restriction == 'role_epa':
+            if self.giswater.wsoftware == 'ws':
+                self.giswater.enable_toolbar("om_ws")
+            elif self.giswater.wsoftware == 'ud':
+                self.giswater.enable_toolbar("om_ud")
+            self.giswater.enable_toolbar("edit")
+            self.giswater.enable_toolbar("cad")
+            self.giswater.enable_toolbar("epa")
+        elif restriction == 'role_master':
             self.giswater.enable_toolbar("master")
             self.giswater.enable_toolbar("epa")
             self.giswater.enable_toolbar("edit")
             self.giswater.enable_toolbar("cad")
-            if self.giswater.wsoftware == 'ws':            
+            if self.giswater.wsoftware == 'ws':
                 self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':                
+            elif self.giswater.wsoftware == 'ud':
                 self.giswater.enable_toolbar("om_ud")
-        elif role_epa:
-            if self.giswater.wsoftware == 'ws':            
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':                
-                self.giswater.enable_toolbar("om_ud")
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-            self.giswater.enable_toolbar("utils")            
-            self.giswater.enable_toolbar("epa")
-        elif role_edit:
-            if self.giswater.wsoftware == 'ws':            
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':                
-                self.giswater.enable_toolbar("om_ud")
-            self.giswater.enable_toolbar("utils")            
-            self.giswater.enable_toolbar("edit")
-            self.giswater.enable_toolbar("cad")
-        elif role_om:
-            self.giswater.enable_toolbar("utils")            
-            if self.giswater.wsoftware == 'ws':            
-                self.giswater.enable_toolbar("om_ws")
-            elif self.giswater.wsoftware == 'ud':                
-                self.giswater.enable_toolbar("om_ud")
-        
+
     
     def get_value_config_param_system(self, parameter, show_warning=True):
         """ Get value of @parameter from table 'config_param_system' """
@@ -1341,3 +1353,61 @@ class DaoController(object):
                 qtextedit.setText(path[0])
 
 
+
+    def get_restriction(self):
+        # Get project variable 'project_role'
+        project_role = None
+        if Qgis.QGIS_VERSION_INT < 29900:
+            project_role = QgsExpressionContextUtils.projectScope().variable('project_role')
+        else:
+            project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
+
+        role_edit = False
+        role_om = False
+        role_epa = False
+        role_basic = False
+
+        role_master = self.check_role_user("role_master")
+        if not role_master:
+            role_epa = self.check_role_user("role_epa")
+            if not role_epa:
+                role_edit = self.check_role_user("role_edit")
+                if not role_edit:
+                    role_om = self.check_role_user("role_om")
+                    if not role_om:
+                        role_basic = self.check_role_user("role_basic")
+        super_users = self.settings.value('system_variables/super_users')
+
+        # Manage user 'postgres'
+        if self.user == 'postgres' or self.user == 'gisadmin':
+            role_master = True
+
+        # Manage super_user
+        if super_users is not None:
+            if self.user in super_users:
+                role_master = True
+
+        if role_basic or project_role == 'role_basic':
+            return 'role_basic'
+        elif role_om or project_role == 'role_om':
+            return 'role_om'
+        elif role_edit or project_role == 'role_edit':
+            return 'role_edit'
+        elif role_epa or project_role == 'role_epa':
+            return 'role_epa'
+        elif role_master or project_role == 'role_master':
+            return 'role_master'
+        else:
+            return 'role_basic'
+
+
+    def get_values_from_dictionary(self, dictionary):
+        """ Return values from @dictionary """
+
+        list_values = None
+        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+            list_values = dictionary.itervalues()
+        else:
+            list_values = iter(dictionary.values())
+
+        return list_values

@@ -21,11 +21,12 @@ else:
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
-from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtSql import QSqlQueryModel
 
 import os.path
-import sys  
+import sys
+from collections import OrderedDict
 from functools import partial
 
 from .actions.basic import Basic
@@ -258,33 +259,38 @@ class Giswater(QObject):
         menu = QMenu()
 
         # List of nodes from node_type_cat_type - nodes which we are using
-        for feature_cat in list(self.feature_cat.values()):
-            if (index_action == '01' and feature_cat.type == 'NODE') or (index_action == '02' and feature_cat.type == 'ARC'):
-                obj_action = QAction(str(feature_cat.layername), self)
-                obj_action.setShortcut(str(feature_cat.shortcut_key))
+        list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
+
+        for feature_cat in list_feature_cat:
+            if (index_action == '01' and feature_cat.feature_type.upper() == 'NODE') or (
+                    index_action == '02' and feature_cat.feature_type.upper() == 'ARC'):
+                obj_action = QAction(str(feature_cat.id), self)
+                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
         menu.addSeparator()
-        for feature_cat in list(self.feature_cat.values()):
-            if index_action == '01' and feature_cat.type == 'CONNEC':
-                obj_action = QAction(str(feature_cat.layername), self)
-                obj_action.setShortcut(str(feature_cat.shortcut_key))
+        list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
+        for feature_cat in list_feature_cat:
+            if (index_action == '01' and feature_cat.feature_type.upper() == 'CONNEC'):
+                obj_action = QAction(str(feature_cat.id), self)
+                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
         menu.addSeparator()
-        for feature_cat in list(self.feature_cat.values()):
-            if index_action == '01' and feature_cat.type == 'GULLY' and self.wsoftware == 'ud':
-                obj_action = QAction(str(feature_cat.layername), self)
-                obj_action.setShortcut(str(feature_cat.shortcut_key))
+        list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
+        for feature_cat in list_feature_cat:
+            if (index_action == '01' and feature_cat.feature_type.upper() == 'GULLY' and self.wsoftware == 'ud'):
+                obj_action = QAction(str(feature_cat.id), self)
+                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 menu.addSeparator()
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
 
-            action.setMenu(menu)
-        
-        return action        
+        action.setMenu(menu)
 
-    
+        return action
+
+
     def add_action(self, index_action, toolbar, action_group):
         """ Add new action into specified @toolbar. 
             It has to be defined in the configuration file.
@@ -467,24 +473,29 @@ class Giswater(QObject):
         # Force project read (to work with PluginReloader)
         self.project_read(False)
 
-
     def manage_feature_cat(self):
         """ Manage records from table 'sys_feature_type' """
-        
+
         # Dictionary to keep every record of table 'sys_feature_cat'
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
-        self.feature_cat = {}             
+        self.feature_cat = {}
+        # TODO ya no es sys_feature_cat
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
-        rows = self.controller.get_rows(sql)
+        sql = "SELECT * FROM " + self.schema_name + ".cat_feature"
+        rows = self.controller.dao.get_rows(sql)
+
         if not rows:
             return False
 
         for row in rows:
-            tablename = row['tablename']
-            elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
+            tablename = row['child_layer']
+            # elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
+            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'], row['parent_layer'],
+                                 row['child_layer'], row['orderby'], row['active'])
             self.feature_cat[tablename] = elem
 
+        self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))
         return True
     
 

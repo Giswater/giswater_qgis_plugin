@@ -25,7 +25,7 @@ else:
 
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsPoint, QgsGeometry
-from qgis.core import QgsPointLocator
+from qgis.core import QgsPointLocator, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QPoint, QTimer, QDate, QRegExp
 from qgis.PyQt.QtGui import QColor, QIntValidator, QDoubleValidator, QRegExpValidator, QStandardItemModel, QStandardItem
@@ -1004,7 +1004,7 @@ class ApiParent(ParentAction):
             self.draw_point(point)
         else:
             points = self.get_points(list_coord)
-            self.draw_polygon(points)
+            self.draw_polyline(points)
         if zoom:
             margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
@@ -1022,13 +1022,31 @@ class ApiParent(ParentAction):
             QTimer.singleShot(duration_time, self.resetRubberbands)
 
 
-    def draw_polygon(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+    def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
         rb = self.rubber_polygon
         rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
         rb.setColor(color)
         rb.setWidth(width)
         rb.show()
+        # wait to simulate a flashing effect
+        if duration_time is not None:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
+        return rb
+
+
+    def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
+        """ Draw 'polygon' over canvas following list of points """
+        rb = self.rubber_polygon
+        rb.setToGeometry(QgsGeometry.fromPolygon([points]), None)
+        rb.setColor(border)
+        if fill_color:
+            rb.setFillColor(fill_color)
+        rb.setWidth(width)
+        rb.show()
+        # wait to simulate a flashing effect
+        if duration_time is not None:
+            QTimer.singleShot(duration_time, self.resetRubberbands)
         return rb
 
 
@@ -1078,7 +1096,6 @@ class ApiParent(ParentAction):
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
-
             if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
                 completer = QCompleter()
                 widget = self.add_lineedit(field)
@@ -1479,7 +1496,7 @@ class ApiParent(ParentAction):
             return
         list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
         points = self.get_points(list_coord)
-        self.draw_polygon(points)
+        self.draw_polyline(points)
 
 
     def hide_void_groupbox(self, dialog):
