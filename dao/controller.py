@@ -961,16 +961,31 @@ class DaoController(object):
             self.translate_form(dialog, locale_name)                              
       
       
-    def get_project_type(self):
+    def get_project_type(self, schemaname=None):
         """ Get water software from table 'version' """
-        
+
+        if schemaname is None:
+            schemaname = self.schema_name
+            if schemaname is None:
+                return None
+
+        schemaname = schemaname.replace('"', '')
+
         project_type = None
-        if self.schema_name is not None:
-            sql = ("SELECT lower(wsoftware)"
-                   " FROM " + self.schema_name + ".version ORDER BY id ASC LIMIT 1")
+        tablename = "version"
+        exists = self.check_table(tablename)
+        if exists:
+            sql = ("SELECT lower(wsoftware) "
+                   "FROM " + schemaname + "." + tablename + " "
+                   "ORDER BY id ASC LIMIT 1")
             row = self.get_row(sql)
             if row:
                 project_type = row[0]
+        else:
+            tablename = "version_tm"
+            exists = self.check_table(tablename)
+            if exists:
+                project_type = "tm"
 
         return project_type
     
@@ -979,11 +994,15 @@ class DaoController(object):
         """ Get project version from table 'version' """
         
         project_version = None
-        sql = ("SELECT giswater"
-               " FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1")
-        row = self.get_row(sql)
-        if row:
-            project_version = row[0]
+        tablename = "version"
+        exists = self.check_table(tablename)
+        if exists:
+            sql = ("SELECT giswater "
+                   "FROM " + self.schema_name + "." + tablename + " "
+                   "ORDER BY id DESC LIMIT 1")
+            row = self.get_row(sql)
+            if row:
+                project_version = row[0]
             
         return project_version    
     

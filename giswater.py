@@ -35,7 +35,7 @@ from .actions.utils import Utils
 from .dao.controller import DaoController
 from .map_tools.cad_add_circle import CadAddCircle
 from .map_tools.cad_add_point import CadAddPoint
-from map_tools.cad_api_info import CadApiInfo
+from .map_tools.cad_api_info import CadApiInfo
 from .map_tools.change_elem_type import ChangeElemType
 from .map_tools.connec import ConnecMapTool
 from .map_tools.delete_node import DeleteNodeMapTool
@@ -285,16 +285,17 @@ class Giswater(QObject):
             Associate it to corresponding @action_group
         """
         
-        text_action = self.tr(index_action+'_text')
-        function_name = self.settings.value('actions/'+str(index_action)+'_function')
+        text_action = self.tr(index_action + '_text')
+        function_name = self.settings.value('actions/' + str(index_action) + '_function')
         if not function_name:
             return None
             
         # Buttons NOT checkable (normally because they open a form)
         if int(index_action) in (19, 23, 25, 26, 27, 29, 33, 34, 38, 41, 45, 46, 47, 48, 49,
-                                 50, 58, 86, 64, 65, 66, 67, 68, 74, 75, 81, 82, 83, 84, 98, 99, 196, 206):
-
+                                 50, 58, 86, 64, 65, 66, 67, 68, 74, 75, 81, 82, 83, 84, 98, 99, 196, 206,
+                                 301, 302, 303, 304, 305):
             action = self.create_action(index_action, text_action, toolbar, False, function_name, action_group)
+
         # Buttons checkable (normally related with 'map_tools')                
         else:
             action = self.create_action(index_action, text_action, toolbar, True, function_name, action_group)
@@ -381,11 +382,6 @@ class Giswater(QObject):
         toolbar_id = "utils"
         list_actions = ['206', '19', '99', '83', '58']
         self.manage_toolbar(toolbar_id, list_actions)
-
-        if self.controller.get_project_type() == 'tm':
-            toolbar_id = "tm_basic"
-            list_actions = ['301', '302', '303', '304', '305']
-            self.manage_toolbar(toolbar_id, list_actions)
             
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()           
@@ -404,15 +400,13 @@ class Giswater(QObject):
         if self.wsoftware == 'ws':
             self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)  
-        self.utils.set_controller(self.controller)                   
-        self.tm_basic.set_controller(self.controller)
+        self.utils.set_controller(self.controller)
         self.basic.set_project_type(self.wsoftware)
         self.go2epa.set_project_type(self.wsoftware)
         self.edit.set_project_type(self.wsoftware)
         self.master.set_project_type(self.wsoftware)
         self.om.set_project_type(self.wsoftware)
         self.utils.set_project_type(self.wsoftware)
-        self.tm_basic.set_project_type(self.wsoftware)
 
         # Enable toobar 'basic' and 'utils'
         self.enable_toolbar("basic")
@@ -614,6 +608,10 @@ class Giswater(QObject):
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
 
+        if self.wsoftware == 'tm':
+            self.project_read_tm(show_warning)
+            return
+
         # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -624,7 +622,6 @@ class Giswater(QObject):
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.tm_basic = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers
         if not self.manage_layers():
@@ -654,7 +651,6 @@ class Giswater(QObject):
         
         # Set objects for map tools classes
         self.manage_map_tools()
-
 
         # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
         self.manage_custom_forms()
@@ -814,13 +810,13 @@ class Giswater(QObject):
                 if self.table_man_pgully == uri_table:
                     self.layer_man_pgully = cur_layer
 
-        # Set arrow cursor
-        QApplication.setOverrideCursor(Qt.ArrowCursor)       
-        layers = self.controller.get_layers()
-        status = self.populate_audit_check_project(layers)
-        QApplication.restoreOverrideCursor()      
-        if not status:
-            return False
+        if self.wsoftware in ('ud', 'ws'):
+            QApplication.setOverrideCursor(Qt.ArrowCursor)
+            layers = self.controller.get_layers()
+            status = self.populate_audit_check_project(layers)
+            QApplication.restoreOverrideCursor()
+            if not status:
+                return False
 
         return True
 
@@ -966,6 +962,7 @@ class Giswater(QObject):
     
     def manage_map_tools(self):
         """ Manage map tools """
+
         self.set_map_tool('map_tool_api_info_data')
         self.set_map_tool('map_tool_api_info_inp')
         self.set_map_tool('map_tool_move_node')
@@ -1142,4 +1139,40 @@ class Giswater(QObject):
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
 
+
+    def project_read_tm(self, show_warning=True):
+        """ Function executed when a user opens a QGIS project (*.qgs) """
+
+        # Set actions classes (define one class per plugin toolbar)
+        self.tm_basic = TmBasic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.tm_basic.set_tree_manage(self)
+
+        # Get SRID from table node
+        srid = self.controller.get_srid('v_edit_node', self.schema_name)
+        self.controller.plugin_settings_set_value("srid", srid)
+
+        # Manage actions of the different plugin_toolbars
+        self.manage_toolbars_tm()
+
+        # Set actions to controller class for further management
+        self.controller.set_actions(self.actions)
+
+
+    def manage_toolbars_tm(self):
+        """ Manage actions of the different plugin toolbars """
+
+        toolbar_id = "tm_basic"
+        list_actions = ['303', '301', '302', '304', '305']
+        self.manage_toolbar(toolbar_id, list_actions)
+
+        # Manage action group of every toolbar
+        parent = self.iface.mainWindow()
+        for plugin_toolbar in list(self.plugin_toolbars.values()):
+            ag = QActionGroup(parent)
+            for index_action in plugin_toolbar.list_actions:
+                self.add_action(index_action, plugin_toolbar.toolbar, ag)
+
+        # Enable only tolobar 'tm_basic'
+        self.enable_toolbar("tm_basic")
+        self.tm_basic.set_controller(self.controller)
 
