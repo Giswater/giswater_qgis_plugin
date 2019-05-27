@@ -12,22 +12,19 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
-    from qgis.PyQt.QtCore import Qt
     from qgis.PyQt.QtGui import QIntValidator, QStringListModel, QCompleter, QTableView
-    from qgis.PyQt.QtSql import QSqlTableModel
-
 else:
-    from qgis.PyQt.QtCore import Qt, QStringListModel
+    from qgis.PyQt.QtCore import QStringListModel
     from qgis.PyQt.QtGui import QIntValidator
     from qgis.PyQt.QtWidgets import QCompleter, QTableView
-    from qgis.PyQt.QtSql import QSqlTableModel
 
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
 
 from functools import partial
 
 from .. import utils_giswater
-from .tm_multiple_selection import TmMultipleSelection
 from .tm_parent import TmParentAction
 from ..ui_manager import PlaningUnit
 

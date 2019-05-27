@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
-from qgis.PyQt.Qt import QDate
+from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from qgis.PyQt.QtSql import QSqlTableModel
 

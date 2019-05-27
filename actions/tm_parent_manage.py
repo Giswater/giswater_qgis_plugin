@@ -11,8 +11,7 @@ try:
 except:
     from qgis.core import QGis as Qgis
 
-from qgis.PyQt.Qt import QDate
-from qgis.PyQt.QtCore import Qt, QStringListModel
+from qgis.PyQt.QtCore import Qt, QStringListModel, QDate
 from qgis.PyQt.QtWidgets import QCompleter, QTableView, QDateEdit, QLineEdit, QTextEdit, QDateTimeEdit, QComboBox
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsFeatureRequest
