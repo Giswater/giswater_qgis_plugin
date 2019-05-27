@@ -29,6 +29,7 @@ from .actions.go2epa import Go2Epa
 from .actions.master import Master
 from .actions.mincut import MincutParent
 from .actions.om import Om
+from .actions.tm_basic import TmBasic
 from .actions.update_sql import UpdateSQL
 from .actions.utils import Utils
 from .dao.controller import DaoController
@@ -192,7 +193,11 @@ class Giswater(QObject):
             # Utils toolbar actions
             elif int(index_action) in (206, 19, 58, 83, 99):
                 callback_function = getattr(self.utils, function_name)
-                action.triggered.connect(callback_function)                
+                action.triggered.connect(callback_function)
+            # Tm Basic toolbar actions
+            elif int(index_action) in (301, 302, 303, 304, 305):
+                callback_function = getattr(self.tm_basic, function_name)
+                action.triggered.connect(callback_function)
             # Generic function
             else:        
                 callback_function = getattr(self, 'action_triggered')  
@@ -212,7 +217,7 @@ class Giswater(QObject):
         """ Creates a new action with selected parameters """
         
         icon = None
-        icon_path = self.icon_folder+index_action+'.png'
+        icon_path = self.icon_folder + index_action + '.png'
         if os.path.exists(icon_path):        
             icon = QIcon(icon_path)
                 
@@ -375,7 +380,12 @@ class Giswater(QObject):
             
         toolbar_id = "utils"
         list_actions = ['206', '19', '99', '83', '58']
-        self.manage_toolbar(toolbar_id, list_actions)                                      
+        self.manage_toolbar(toolbar_id, list_actions)
+
+        if self.controller.get_project_type() == 'tm':
+            toolbar_id = "tm_basic"
+            list_actions = ['301', '302', '303', '304', '305']
+            self.manage_toolbar(toolbar_id, list_actions)
             
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()           
@@ -395,17 +405,18 @@ class Giswater(QObject):
             self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)  
         self.utils.set_controller(self.controller)                   
+        self.tm_basic.set_controller(self.controller)
         self.basic.set_project_type(self.wsoftware)
         self.go2epa.set_project_type(self.wsoftware)
         self.edit.set_project_type(self.wsoftware)
         self.master.set_project_type(self.wsoftware)
         self.om.set_project_type(self.wsoftware)
         self.utils.set_project_type(self.wsoftware)
+        self.tm_basic.set_project_type(self.wsoftware)
 
         # Enable toobar 'basic' and 'utils'
         self.enable_toolbar("basic")
         self.enable_toolbar("utils")
-
 
            
     def manage_toolbar(self, toolbar_id, list_actions): 
@@ -613,6 +624,7 @@ class Giswater(QObject):
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.tm_basic = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers
         if not self.manage_layers():
