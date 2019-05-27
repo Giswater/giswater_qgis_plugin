@@ -596,9 +596,9 @@ class Giswater(QObject):
         self.controller.manage_translation(self.plugin_name)
 
         # Get schema name from table 'v_edit_node' and set it in controller and in config file
-        layer = self.controller.get_layer_by_tablename("v_edit_node")
+        layer = self.controller.get_layer_by_tablename("ve_node")
         if not layer:
-            self.controller.show_warning("Layer not found", parameter="v_edit_node")
+            self.controller.show_warning("Layer not found", parameter="ve_node")
             return
 
         layer_source = self.controller.get_layer_source(layer)
