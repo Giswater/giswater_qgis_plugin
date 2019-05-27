@@ -323,6 +323,7 @@ class DaoController(object):
 
     def show_info(self, text, duration=5, context_name=None, parameter=None, logger_file=True):
         """ Show information message to the user """
+
         self.show_message(text, 0, duration, context_name, parameter)
         if self.logger and logger_file:
             self.logger.info(text)            
@@ -330,9 +331,18 @@ class DaoController(object):
 
     def show_warning(self, text, duration=5, context_name=None, parameter=None, logger_file=True):
         """ Show warning message to the user """
+
         self.show_message(text, 1, duration, context_name, parameter)
         if self.logger and logger_file:
             self.logger.warning(text)
+
+
+    def show_critical(self, text, duration=5, context_name=None, parameter=None, logger_file=True):
+        """ Show warning message to the user """
+
+        self.show_message(text, 2, duration, context_name, parameter)
+        if self.logger and logger_file:
+            self.logger.critical(text)
         
 
     def show_warning_detail(self, text, detail_text, context_name=None):
@@ -554,6 +564,7 @@ class DaoController(object):
                    " SET (" + sql_fields[:-2] + ") = (" + sql_values[:-2] + ")" 
                    " WHERE " + unique_field + " = " + unique_value)         
         sql = sql.replace("''","'")
+
         # Execute sql
         self.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit=commit)
@@ -618,7 +629,27 @@ class DaoController(object):
             return False
 
         return True
-    
+
+
+    def execute_api_function(self, function_name, body, format_return='::text'):
+        """ Manage execution API function """
+
+        # Check if function exists
+        row = self.check_function(function_name)
+        if not row:
+            self.show_warning("Function not found in database", parameter=function_name)
+            return None
+
+        sql = "SELECT " + self.schema_name + "." + function_name + "($${" + body + "}$$)"
+        if format_return:
+            sql += format_return
+        row = self.get_row(sql, log_sql=True)
+        if not row:
+            self.show_critical("NOT ROW FOR", parameter=sql)
+            return None
+
+        return row
+
     
     def get_error_from_audit(self, commit=True):
         """ Get last error from audit tables that has not been showed to the user """
@@ -1134,6 +1165,7 @@ class DaoController(object):
     
     def get_rolenames(self):
         """ Get list of rolenames of current user """
+
         super_users = self.settings.value('system_variables/super_users')
         if self.user in super_users:
             roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
@@ -1290,7 +1322,9 @@ class DaoController(object):
         return self.logger.log_folder
 
 
+
     """  Functions related with Qgis versions """
+
     def is_layer_visible(self, layer):
         """ Is layer visible """
 
@@ -1326,6 +1360,7 @@ class DaoController(object):
 
 
     def set_path_from_qfiledialog(self, qtextedit, path):
+
         if Qgis.QGIS_VERSION_INT < 29900:
             if path:
                 qtextedit.setText(path)
@@ -1334,8 +1369,8 @@ class DaoController(object):
                 qtextedit.setText(path[0])
 
 
-
     def get_restriction(self):
+
         # Get project variable 'project_role'
         project_role = None
         if Qgis.QGIS_VERSION_INT < 29900:
@@ -1392,3 +1427,4 @@ class DaoController(object):
             list_values = iter(dictionary.values())
 
         return list_values
+

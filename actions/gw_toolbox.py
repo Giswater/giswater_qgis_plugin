@@ -213,6 +213,7 @@ class GwToolBox(ApiParent):
             dialog.progressBar.setMaximum(1)
             dialog.progressBar.setValue(1)
             return
+
         if str(function[0]['input_params']['featureType']) != "":
             layer_name = utils_giswater.get_item_data(dialog, combo, 1)
             if layer_name != -1:
@@ -233,7 +234,6 @@ class GwToolBox(ApiParent):
                     feature_id_list = feature_id_list[:-2] + ']'
                 else:
                     feature_id_list += ']'
-
 
             if layer_name != -1:
                 feature_field = '"tableName":"' + layer_name + '", '
@@ -483,9 +483,8 @@ class GwToolBox(ApiParent):
                     self.populate_vlayer(dialog, v_layer, data, k, counter)
 
 
-
-
     def populate_vlayer(self, dialog, virtual_layer, data, layer_type, counter):
+
         prov = virtual_layer.dataProvider()
 
         # Enter editing mode
