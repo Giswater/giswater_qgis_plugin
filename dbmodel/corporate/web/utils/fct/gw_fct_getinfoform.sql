@@ -16,7 +16,6 @@ DECLARE
     formToDisplayName character varying;
     table_pkey varchar;
     schemas_array name[];
-    schemas_array name[];
     array_index integer DEFAULT 0;
     field_value character varying;
     class_id_var text;

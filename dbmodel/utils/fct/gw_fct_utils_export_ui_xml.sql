@@ -1,9 +1,17 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
---select SCHEMA_NAME.gw_fct_create_ui_xml('ve_node_x');
+--FUNCTION CODE: XXXX
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_create_ui_xml(p_tablename text)
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_export_ui_xml(p_formname text)
   RETURNS json AS
 $BODY$
+
+--select SCHEMA_NAME.gw_fct_utils_export_ui_xml('ve_node_x');
 
 DECLARE
 	rec record;
@@ -19,7 +27,7 @@ BEGIN
 SET search_path=SCHEMA_NAME;
 
 --iterate over fields defined for the selected form
-	FOR rec IN (SELECT * FROM config_api_form_fields where formname=p_tablename order by layout_order) LOOP
+	FOR rec IN (SELECT * FROM config_api_form_fields where formname=p_formname order by layout_order) LOOP
 		
 --changing defined widget types into Qt widgets types, set the label_name location for xml
 		IF rec.widgettype='combo' THEN
@@ -169,7 +177,7 @@ SET search_path=SCHEMA_NAME;
 		 <connections/>
 		</ui>');
 
-	INSERT INTO temp_csv2pg(source, csv1, csv2pgcat_id) VALUES (p_tablename,v_xml,19);
+	INSERT INTO temp_csv2pg(source, csv1, csv2pgcat_id) VALUES (p_formname,v_xml,19);
 
 return null;
 END;
