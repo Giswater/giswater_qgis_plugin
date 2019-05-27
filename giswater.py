@@ -359,12 +359,15 @@ class Giswater(QObject):
             list_actions = ['37', '41', '48', '86', '32']
         elif self.controller.get_project_type() == 'ud':
             list_actions = ['37', '41', '48', '32']
-        elif self.controller.get_project_type() == 'tm':
+        elif self.controller.get_project_type() in ('tm', 'pl'):
             list_actions = ['37', '41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)
 
         toolbar_id = "utils"
-        list_actions = ['206', '19', '99', '83', '58']
+        if self.controller.get_project_type() in ('ws', 'ud'):
+            list_actions = ['206', '19', '99', '83', '58']
+        elif self.controller.get_project_type() in ('tm', 'pl'):
+            list_actions = ['206', '19', '99', '83', '58']
         self.manage_toolbar(toolbar_id, list_actions)
 
         self.basic.set_controller(self.controller)
@@ -653,6 +656,11 @@ class Giswater(QObject):
         # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
             self.project_read_tm(show_warning)
+            return
+
+        # Manage project read of type 'pl'
+        elif self.wsoftware == 'pl':
+            self.project_read_pl(show_warning)
             return
 
         # Set custom plugin toolbars (one action class per toolbar)
@@ -1175,6 +1183,20 @@ class Giswater(QObject):
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
+
+
+    def project_read_pl(self, show_warning=True):
+        """ Function executed when a user opens a QGIS project of type 'pl' """
+
+        # Manage actions of the different plugin_toolbars
+        self.manage_toolbars_common()
+
+        # Set actions to controller class for further management
+        self.controller.set_actions(self.actions)
+
+        # Log it
+        message = "Project read successfully ('pl')"
+        self.controller.log_info(message)
 
 
     def project_read_tm(self, show_warning=True):
