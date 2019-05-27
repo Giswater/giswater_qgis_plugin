@@ -272,6 +272,11 @@ class ApiManageComposer(ApiParent):
             self.accept(dialog, my_json)
 
 
+    def gw_api_set_composer(self, dialog, my_json):
+        if my_json['composer'] != '-1':
+            self.preview(dialog, False)
+            self.accept(dialog, my_json)
+
 
     def accept(self, dialog, my_json):
 
