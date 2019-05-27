@@ -160,7 +160,7 @@ class DaoController(object):
         """ Get database parameters from layer 'v_edit_node' or  database connection settings """
 
         # Get layer 'v_edit_node'
-        layer = self.get_layer_by_tablename("ve_node")
+        layer = self.get_layer_by_tablename("v_edit_node")
 
         # Get database connection settings
         settings = QSettings()
@@ -168,8 +168,8 @@ class DaoController(object):
 
         if layer is None and settings is None:
             not_version = False
-            self.log_warning("Layer 've_node' is None and settings is None")
-            self.last_error = self.tr("Layer not found") + ": 've_node'"
+            self.log_warning("Layer 'v_edit_node' is None and settings is None")
+            self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
             return None, not_version
 
         if layer:
