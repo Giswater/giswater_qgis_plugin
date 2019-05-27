@@ -348,23 +348,42 @@ class Giswater(QObject):
         # If this action has an associated map tool, add this to dictionary of available map_tools
         if map_tool:
             self.map_tools[function_name] = map_tool
-                    
-     
-    def manage_toolbars(self):
-        """ Manage actions of the different plugin toolbars """           
-                        
-        list_actions = None        
+
+
+    def manage_toolbars_common(self):
+        """ Manage actions of the common plugin toolbars """
+
+        list_actions = None
         toolbar_id = "basic"
         if self.controller.get_project_type() == 'ws':
             list_actions = ['37', '41', '48', '86', '32']
         elif self.controller.get_project_type() == 'ud':
             list_actions = ['37', '41', '48', '32']
+        elif self.controller.get_project_type() == 'tm':
+            list_actions = ['37', '41', '48', '32']
         self.manage_toolbar(toolbar_id, list_actions)
+
+        toolbar_id = "utils"
+        list_actions = ['206', '19', '99', '83', '58']
+        self.manage_toolbar(toolbar_id, list_actions)
+
+        self.basic.set_controller(self.controller)
+        self.utils.set_controller(self.controller)
+        self.basic.set_project_type(self.wsoftware)
+        self.utils.set_project_type(self.wsoftware)
+
+
+    def manage_toolbars(self):
+        """ Manage actions of the custom plugin toolbars.
+        project_type in ('ws', 'ud')
+        """
+                        
+        list_actions = None
 
         toolbar_id = "om_ws"
         list_actions = ['26', '27', '74', '75', '61', '64', '65', '84']
-        self.manage_toolbar(toolbar_id, list_actions) 
-            
+        self.manage_toolbar(toolbar_id, list_actions)
+
         toolbar_id = "om_ud"
         list_actions = ['43', '56', '57', '74', '75', '61', '64', '65', '84']
         self.manage_toolbar(toolbar_id, list_actions)                           
@@ -383,10 +402,6 @@ class Giswater(QObject):
         
         toolbar_id = "master"
         list_actions = ['45', '46', '47', '38', '49', '50']               
-        self.manage_toolbar(toolbar_id, list_actions)  
-            
-        toolbar_id = "utils"
-        list_actions = ['206', '19', '99', '83', '58']
         self.manage_toolbar(toolbar_id, list_actions)
             
         # Manage action group of every toolbar
@@ -398,23 +413,20 @@ class Giswater(QObject):
 
         # Disable and hide all plugin_toolbars and actions
         self.enable_toolbars(False) 
-        
-        self.basic.set_controller(self.controller)            
+
         self.edit.set_controller(self.controller)            
         self.go2epa.set_controller(self.controller)            
         self.master.set_controller(self.controller)
         if self.wsoftware == 'ws':
             self.mincut.set_controller(self.controller)
         self.om.set_controller(self.controller)  
-        self.utils.set_controller(self.controller)
-        self.basic.set_project_type(self.wsoftware)
-        self.go2epa.set_project_type(self.wsoftware)
+
         self.edit.set_project_type(self.wsoftware)
+        self.go2epa.set_project_type(self.wsoftware)
         self.master.set_project_type(self.wsoftware)
         self.om.set_project_type(self.wsoftware)
-        self.utils.set_project_type(self.wsoftware)
 
-        # Enable toobar 'basic' and 'utils'
+        # Enable toolbar 'basic' and 'utils'
         self.enable_toolbar("basic")
         self.enable_toolbar("utils")
 
@@ -539,12 +551,14 @@ class Giswater(QObject):
 
     def enable_actions(self, enable=True, start=1, stop=100):
         """ Utility to enable/disable all actions """
+
         for i in range(start, stop+1):
             self.enable_action(enable, i)              
 
 
     def enable_action(self, enable=True, index=1):
         """ Enable/disable selected action """
+
         key = str(index).zfill(2)
         if key in self.actions:
             action = self.actions[key]
@@ -567,11 +581,12 @@ class Giswater(QObject):
         
     def enable_toolbar(self, toolbar_id, enable=True):
         """ Enable/Disable toolbar. Normally because user has no permission """
-        
-        plugin_toolbar = self.plugin_toolbars[toolbar_id]       
-        plugin_toolbar.toolbar.setVisible(enable)            
-        for index_action in plugin_toolbar.list_actions:
-            self.enable_action(enable, index_action)                 
+
+        if toolbar_id in self.plugin_toolbars:
+            plugin_toolbar = self.plugin_toolbars[toolbar_id]
+            plugin_toolbar.toolbar.setVisible(enable)
+            for index_action in plugin_toolbar.list_actions:
+                self.enable_action(enable, index_action)
 
 
     def project_new(self, show_warning=True):
@@ -623,6 +638,15 @@ class Giswater(QObject):
         if not self.schema_exists:
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
 
+        # Get SRID from table node
+        self.srid = self.controller.get_srid(self.table_node, self.schema_name)
+        self.controller.plugin_settings_set_value("srid", self.srid)
+
+        # Set common plugin toolbars (one action class per toolbar)
+        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic.set_giswater(self)
+        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
+
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
 
@@ -631,16 +655,13 @@ class Giswater(QObject):
             self.project_read_tm(show_warning)
             return
 
-        # Set actions classes (define one class per plugin toolbar)
+        # Set custom plugin toolbars (one action class per toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.basic.set_giswater(self)
         self.om = Om(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         if self.wsoftware == 'ws':
             self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.utils = Utils(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # Manage layers
         if not self.manage_layers():
@@ -650,18 +671,15 @@ class Giswater(QObject):
         self.manage_layer_names()   
         
         # Manage snapping layers
-        self.manage_snapping_layers()    
-        
-        # Get SRID from table node
-        self.srid = self.controller.get_srid(self.table_node, self.schema_name)
-        self.controller.plugin_settings_set_value("srid", self.srid)           
+        self.manage_snapping_layers()
 
         # Get list of actions to hide
         self.list_to_hide = self.settings.value('system_variables/action_to_hide')
 
         # Manage actions of the different plugin_toolbars
-        self.manage_toolbars()   
-        
+        self.manage_toolbars_common()
+        self.manage_toolbars()
+
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
             
@@ -1160,17 +1178,14 @@ class Giswater(QObject):
 
 
     def project_read_tm(self, show_warning=True):
-        """ Function executed when a user opens a QGIS project (*.qgs) """
+        """ Function executed when a user opens a QGIS project of type 'tm' """
 
         # Set actions classes (define one class per plugin toolbar)
         self.tm_basic = TmBasic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.tm_basic.set_tree_manage(self)
 
-        # Get SRID from table node
-        srid = self.controller.get_srid('v_edit_node', self.schema_name)
-        self.controller.plugin_settings_set_value("srid", srid)
-
         # Manage actions of the different plugin_toolbars
+        self.manage_toolbars_common()
         self.manage_toolbars_tm()
 
         # Set actions to controller class for further management
@@ -1195,7 +1210,9 @@ class Giswater(QObject):
             for index_action in plugin_toolbar.list_actions:
                 self.add_action(index_action, plugin_toolbar.toolbar, ag)
 
-        # Enable only tolobar 'tm_basic'
+        # Enable toolbars
+        self.enable_toolbar("basic")
+        self.enable_toolbar("utils")
         self.enable_toolbar("tm_basic")
         self.tm_basic.set_controller(self.controller)
 
