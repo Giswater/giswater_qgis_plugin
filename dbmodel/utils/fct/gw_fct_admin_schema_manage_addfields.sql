@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: XXXX
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_addfields(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_manage_addfields(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -34,9 +34,11 @@ DECLARE
 	v_feature text;
 	v_viewname text;
 	v_definition text;
+	v_json json;
 
-	
-	
+
+BEGIN
+
 	/*
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -111,7 +113,9 @@ DECLARE
 	*/
 	
 	-- Return
-	RETURN ('{"message":{"priority":"'||v_priority||'", "text":"'||v_message||'"}}');	
+	--RETURN ('{"message":{"priority":"'||v_priority||'", "text":"'||v_message||'"}}');	
+	RETURN v_json::json;
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
