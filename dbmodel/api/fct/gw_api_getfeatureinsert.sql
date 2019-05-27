@@ -12,7 +12,7 @@ $BODY$
 
 /*
 DEFINITION:
-Function called wheh new geometry is inserted to control topological geometry
+Function called wheh new geometry is inserted
 EXAMPLE:
 SELECT SCHEMA_NAME.gw_api_getfeatureinsert($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
@@ -52,7 +52,7 @@ BEGIN
 	END IF;
 	
 	-- Call gw_api_getinfofromid
-	RETURN SCHEMA_NAME.gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"True"},"feature":{"tableName":"'
+	RETURN gw_api_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"True"},"feature":{"tableName":"'
 			,v_tablename,'","inputGeometry":"',v_input_geometry,'"},"data":{}}')::json);
 
 --    Exception handling

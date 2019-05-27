@@ -121,6 +121,7 @@ DECLARE
 	v_toolbar text;
 	v_layermanager json;
 	v_role text;
+	v_parentfields text;
    
 BEGIN
 
@@ -153,12 +154,22 @@ BEGIN
 
 -- 	Check layer if it's child layer 
         IF (SELECT child_layer FROM cat_feature WHERE child_layer=v_tablename)IS NOT NULL THEN
-		v_table_parent := (SELECT parent_layer FROM cat_feature WHERE child_layer=v_tablename);
+		v_table_parent := (SELECT parent_layer FROM cat_feature WHERE child_layer=v_tablename);	
 	ELSE 
 		-- tablename is used as table parent.
 		v_table_parent = v_tablename;
-
 	END IF;
+
+	-- get tableparent fields
+	EXECUTE 'SELECT to_json(array_agg(column_id)) FROM 
+		(SELECT a.attname as column_id 	FROM pg_attribute a JOIN pg_class t on a.attrelid = t.oid JOIN pg_namespace s on t.relnamespace = s.oid
+		WHERE a.attnum > 0 AND NOT a.attisdropped AND t.relname = $1 AND s.nspname = $2	ORDER BY a.attnum) a'
+		INTO v_parentfields
+		USING v_table_parent, schemas_array[1]; 
+
+	raise notice 'v_parentfields %', v_parentfields;
+	v_parentfields = replace (v_parentfields::text, '{', '[');
+	v_parentfields = replace (v_parentfields::text, '}', ']');
 
 --      Get form (if exists) for the layer 
 ------------------------------------------
@@ -311,6 +322,8 @@ BEGIN
 
 --        Check if it is parent table 
 -------------------------------------
+
+
         IF v_tablename IN (SELECT layer_id FROM config_api_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' THEN
 
 		parent_child_relation:=true;
@@ -344,6 +357,7 @@ BEGIN
 		EXECUTE 'SELECT tableparentepa_id from config_api_layer WHERE layer_id=$1'
 			INTO tableparent_id_arg
 			USING v_tablename;
+
 			
 		-- Identify tableinfo
 		EXECUTE' SELECT epatable FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1'
@@ -392,7 +406,6 @@ BEGIN
 		v_tablename= null;
 		raise notice 'NO parent-child, NO editable NO informable: %' , v_tablename;
         END IF;
-
 
 
 -- Propierties of info layer's
@@ -518,11 +531,14 @@ BEGIN
 		v_message='{"priority":0, "text":"No feature founded on that point", "results":0}';
 	END IF;
 
+    
+
 --    Control NULL's
 ----------------------
     v_forminfo := COALESCE(v_forminfo, '{}');
     v_featureinfo := COALESCE(v_featureinfo, '{}');
     v_linkpath := COALESCE(v_linkpath, '{}');
+    v_parentfields := COALESCE(v_parentfields, '{}');
     v_fields := COALESCE(v_fields, '{}');
     v_message := COALESCE(v_message, '{}');
 
@@ -532,6 +548,7 @@ BEGIN
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
+			      ',"parentFields":' || v_parentfields ||
 			      ',"fields":' || v_fields || 
 			      '}'||
 			'}'||
