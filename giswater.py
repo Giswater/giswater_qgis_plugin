@@ -13,6 +13,11 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT < 29900:
+    import ConfigParser as configparser
+else:
+    import configparser
+
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
@@ -70,8 +75,9 @@ class Giswater(QObject):
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
-        self.plugin_name = os.path.basename(self.plugin_dir).lower()  
-        self.icon_folder = self.plugin_dir+'/icons/'    
+        self.plugin_name = os.path.basename(self.plugin_dir).lower()
+        #self.plugin_name = self.get_value_from_metadata('name', 'giswater')
+        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
@@ -608,6 +614,7 @@ class Giswater(QObject):
         # Get water software from table 'version'
         self.wsoftware = self.controller.get_project_type()
 
+        # Manage project read of type 'tm'
         if self.wsoftware == 'tm':
             self.project_read_tm(show_warning)
             return
@@ -1140,7 +1147,7 @@ class Giswater(QObject):
             self.controller.show_warning(model.lastError().text())
 
 
-    def project_read_tm(self, show_warning=True):
+    def project_read_tm(self):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         # Set actions classes (define one class per plugin toolbar)
@@ -1156,6 +1163,10 @@ class Giswater(QObject):
 
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
+
+        # Log it
+        message = "Project read successfully ('tm')"
+        self.controller.log_info(message)
 
 
     def manage_toolbars_tm(self):
@@ -1175,4 +1186,26 @@ class Giswater(QObject):
         # Enable only tolobar 'tm_basic'
         self.enable_toolbar("tm_basic")
         self.tm_basic.set_controller(self.controller)
+
+
+    def get_value_from_metadata(self, parameter, default_value):
+        """ Get @parameter from metadata.txt file """
+
+        # Check if metadata file exists
+        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
+        if not os.path.exists(metadata_file):
+            message = "Metadata file not found: " + metadata_file
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            return default_value
+
+        try:
+            metadata = configparser.ConfigParser()
+            metadata.read(metadata_file)
+            value = metadata.get('general', parameter)
+        except configparser.NoOptionError:
+            message = "Parameter not found: " + parameter
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            value = default_value
+        finally:
+            return value
 

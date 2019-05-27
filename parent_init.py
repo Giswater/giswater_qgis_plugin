@@ -21,10 +21,12 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
     from qgis.gui import QgsMapCanvasSnapper
+    import ConfigParser as configparser
 else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.gui import QgsMapCanvas
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+    import configparser
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMessageBar, QgsMapToolEmitPoint, QgsVertexMarker, QgsDateTimeEdit
@@ -99,7 +101,8 @@ class ParentDialog(QDialog):
         # Initialize plugin directory
         cur_path = os.path.dirname(__file__)
         self.plugin_dir = os.path.abspath(cur_path)
-        self.plugin_name = os.path.basename(self.plugin_dir) 
+        self.plugin_name = os.path.basename(self.plugin_dir).lower()
+        #self.plugin_name = self.get_value_from_metadata('name', 'giswater')
 
         # Get config file
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
@@ -2592,4 +2595,26 @@ class ParentDialog(QDialog):
             snapper = QgsMapCanvas.snappingUtils(self.canvas)
 
         return snapper
+
+
+    def get_value_from_metadata(self, parameter, default_value):
+        """ Get @parameter from metadata.txt file """
+
+        # Check if metadata file exists
+        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
+        if not os.path.exists(metadata_file):
+            message = "Metadata file not found: " + metadata_file
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            return default_value
+
+        try:
+            metadata = configparser.ConfigParser()
+            metadata.read(metadata_file)
+            value = metadata.get('general', parameter)
+        except configparser.NoOptionError:
+            message = "Parameter not found: " + parameter
+            self.iface.messageBar().pushMessage("", message, 1, 20)
+            value = default_value
+        finally:
+            return value
 
