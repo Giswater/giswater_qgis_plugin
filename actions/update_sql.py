@@ -1768,18 +1768,10 @@ class UpdateSQL(ApiParent):
         if schema_name is None:
             schema_name = 'Nothing to select'
             self.project_data_schema_version = "Version not found"
-
         else:
-            sql = "SELECT value FROM " + schema_name + ".config_param_system WHERE parameter = 'schema_manager'"
+            sql = "SELECT giswater FROM " + schema_name + ".version order by id desc LIMIT 1"
             row = self.controller.get_row(sql)
-            if row is None:
-                result = ['{"title":"","author":"","date":""}']
-            else:
-                result = [json.loads(row[0])]
-
-            sql = "SELECT giswater, date::date FROM " + schema_name + ".version order by id desc LIMIT 1"
-            row = self.controller.get_row(sql)
-            if row is not None:
+            if row:
                 self.project_data_schema_version = str(row[0])
 
         # Set label schema name
@@ -1890,12 +1882,10 @@ class UpdateSQL(ApiParent):
         self.project_title = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_title')
         self.project_author = self.dlg_readsql_create_project.findChild(QLineEdit, 'author')
         self.project_date = self.dlg_readsql_create_project.findChild(QLineEdit, 'date')
-
         self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
         self.rdb_sample_dev = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_dev')
         self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
         self.rdb_import_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_import_data')
-
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         #Load user values
@@ -1916,7 +1906,8 @@ class UpdateSQL(ApiParent):
         sql = ("SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as " + '"SRID"' + ", "
                "substr(split_part(srtext, ',', 1), 9) as " + '"Description"' + " "
                "FROM public.spatial_ref_sys "
-               "WHERE CAST(srid AS TEXT) LIKE '" + str(self.filter_srid_value) + "%' ORDER BY substr(srtext, 1, 6), srid")
+               "WHERE CAST(srid AS TEXT) LIKE '" + str(self.filter_srid_value) + "%' "
+               "ORDER BY substr(srtext, 1, 6), srid")
 
         # Populate Table
         self.fill_table_by_query(self.tbl_srid, sql)
@@ -2131,9 +2122,7 @@ class UpdateSQL(ApiParent):
 
             body = self.create_body(extras=extras)
             sql = ("SELECT " + self.schema_name + "." + str(function_name) + "($${" + body + "}$$)::text")
-            print(str(sql))
             row = self.controller.get_row(sql, log_sql=True, commit=True)
-
             if row:
                 complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
                 self.set_log_text(self.dlg_import_inp, complet_result[0]['body']['data'])
@@ -2142,6 +2131,7 @@ class UpdateSQL(ApiParent):
 
             # Manage process result
             self.manage_process_result()
+
         else:
             msg = "A rollback on schema will be done."
             self.controller.show_info_box(msg, "Info")
@@ -2158,8 +2148,8 @@ class UpdateSQL(ApiParent):
         # Get dev config file
         setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
         if not os.path.exists(setting_file):
-            message = "Dev Config file not found at: " + setting_file
-            self.iface.messageBar().pushMessage("", message, 1, 20)
+            message = "Dev Config file not found"
+            self.controller.show_warning(message, parameter=setting_file)
             return
 
         # Set plugin settings
@@ -2171,8 +2161,8 @@ class UpdateSQL(ApiParent):
         self.text_replace_labels = self.dev_settings.value('text_replace/labels')
         self.xml_set_labels = self.dev_settings.value('xml_set/labels')
         if not os.path.exists(self.folder_path):
-            message = "Directory not found at: " + self.folder_path
-            self.iface.messageBar().pushMessage("", message, 1, 20)
+            message = "Folder not found"
+            self.controller.show_warning(message, parameter=self.folder_path)
             return
 
         # Set wait cursor
@@ -2202,15 +2192,6 @@ class UpdateSQL(ApiParent):
 
                 # Close file
                 f.close()
-
-                # Set template values
-                #for xml_set in self.xml_set_labels:
-                #    self.xml_set = self.dev_settings.value('xml_set/' + xml_set)
-                #    tree = et.parse(str(self.folder_path + os.sep + file))
-                #    if tree.find(self.xml_set[0]) is not None:
-                #        self.controller.log_info("Seting template value", parameter=self.xml_set[1])
-                #        tree.find(self.xml_set[0]).text = self.xml_set[1]
-                #        tree.write(str(self.folder_path + os.sep + file))
 
         # Set arrow cursor
         self.set_arrow_cursor()
@@ -2280,16 +2261,16 @@ class UpdateSQL(ApiParent):
         if progress % 500 == 0:
             # TODO:: Use dev_commit or dev_user?
             if self.dev_user:
-                self.controller.execute_sql(sql, log_sql=False, commit=True)
+                self.controller.execute_sql(sql, commit=True)
             else:
-                self.controller.execute_sql(sql, log_sql=False, commit=False)
+                self.controller.execute_sql(sql, commit=False)
             sql = ""
         if sql != "":
             # TODO:: Use dev_commit or dev_user?
             if self.dev_user:
-                self.controller.execute_sql(sql, log_sql=False, commit=True)
+                self.controller.execute_sql(sql, commit=True)
             else:
-                self.controller.execute_sql(sql, log_sql=False, commit=False)
+                self.controller.execute_sql(sql, commit=False)
         _file.close()
         del _file
 
@@ -2301,12 +2282,14 @@ class UpdateSQL(ApiParent):
         # Set default value if necessary
         if file_inp is None or file_inp == '':
             file_inp = self.plugin_dir
+
         # Get directory of that file
         folder_path = os.path.dirname(file_inp)
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = self.controller.tr("Select INP file")
+
         if Qgis.QGIS_VERSION_INT < 29900:
             file_inp = QFileDialog.getOpenFileName(None, message, "", '*.inp')
         else:
