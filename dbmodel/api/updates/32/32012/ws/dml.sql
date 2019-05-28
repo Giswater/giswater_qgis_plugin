@@ -24,6 +24,13 @@ INSERT INTO config_api_layer VALUES ('v_edit_cad_auxpoint', true, 'v_edit_cad_au
 INSERT INTO config_api_layer VALUES ('v_edit_connec', true, 'vp_basic_connec', false, NULL, 'custom feature', 'Connec', 3, NULL, NULL);
 
 
+UPDATE config_api_form_tabs set formname='v_edit_node' WHERE formname='ve_node';
+UPDATE config_api_form_tabs set formname='v_edit_arc' WHERE formname='ve_arc';
+UPDATE config_api_form_tabs set formname='v_edit_connec' WHERE formname='ve_connec';
+UPDATE config_api_form_tabs set formname='v_edit_gully' WHERE formname='ve_gully';
+UPDATE config_api_form_tabs set formname='v_edit_element' WHERE formname='ve_element';
+
+
 INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('SHUTOFF-VALVE', 've_node_shutoffvalve');
 INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('CHECK-VALVE', 've_node_checkoffvalve');
 INSERT INTO config_api_layer_child (featurecat_id, tableinfo_id) VALUES ('PR-BREAK.VALVE', 've_node_prbkvalve');
