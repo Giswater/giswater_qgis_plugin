@@ -214,7 +214,13 @@ BEGIN
 	
 	-- getting if is new visit
 	IF (SELECT id FROM om_visit WHERE id=v_id::int8) IS NULL OR v_id IS NULL THEN
+
 		v_id := (SELECT max(id)+1 FROM om_visit);
+
+		IF v_id IS NULL AND (SELECT count(id) FROM om_visit) = 0 THEN
+			v_id=1;
+		END IF;
+		
 		isnewvisit = true;		
 	END IF;
 
