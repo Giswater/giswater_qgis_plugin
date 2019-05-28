@@ -17,14 +17,12 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import QgsProject, QgsDataSourceUri
 
-
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils
 
 import os.path
-import subprocess
 from functools import partial
 
 from giswater.dao.pg_dao import PgDao
@@ -63,12 +61,15 @@ class DaoController(object):
     def set_giswater(self, giswater):
         self.giswater = giswater
                 
+
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
                 
+
     def set_qgis_settings(self, qgis_settings):
         self.qgis_settings = qgis_settings       
         
+
     def set_plugin_dir(self, plugin_dir):
         self.plugin_dir = plugin_dir
         
@@ -122,16 +123,6 @@ class DaoController(object):
     def check_actions(self, check=True):
         """ Utility to check/uncheck all actions """
         for action_index, action in self.actions.items():   #@UnusedVariable
-            action.setChecked(check)    
-                    
-                           
-    def check_action(self, check=True, index=1):
-        """ Check/Uncheck selected action """
-        key = index
-        if type(index) is int:
-            key = str(index).zfill(2)
-        if key in self.actions:
-            action = self.actions[key]
             action.setChecked(check)
     
     
@@ -275,9 +266,9 @@ class DaoController(object):
         if self.schema_name is None:
             return       
 
-        sql = ("SELECT error_message"
-               " FROM " + self.schema_name + ".audit_cat_error"
-               " WHERE id = " + str(log_code_id))
+        sql = ("SELECT error_message "
+               "FROM " + self.schema_name + ".audit_cat_error "
+               "WHERE id = " + str(log_code_id))
         result = self.dao.get_row(sql)  
         if result:
             self.log_codes[log_code_id] = result[0]    
@@ -747,16 +738,6 @@ class DaoController(object):
                         widget.setText(text)
         except:
             pass
-
-                        
-    def start_program(self, program):     
-        """ Start an external program (hidden) """
-           
-        SW_HIDE = 0
-        info = subprocess.STARTUPINFO()
-        info.dwFlags = subprocess.STARTF_USESHOWWINDOW
-        info.wShowWindow = SW_HIDE
-        subprocess.Popen(program, startupinfo=info)   
         
         
     def get_layer_by_layername(self, layername, log_info=False):
@@ -1083,8 +1064,8 @@ class DaoController(object):
             schemaname = self.schema_name
 
         schemaname = schemaname.replace('"', '')
-        sql = ("SELECT * FROM information_schema.columns"
-               " WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
+        sql = ("SELECT * FROM information_schema.columns "
+               "WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
         params = [schemaname, tablename, columname]
         row = self.get_row(sql, log_info=False, commit=True, params=params)
         return row
@@ -1094,13 +1075,12 @@ class DaoController(object):
         """ Get layers of the group @geom_type """
         
         list_items = []        
-        sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
-               " WHERE type = '" + geom_type.upper() + "'")
+        sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat "
+               "WHERE type = '" + geom_type.upper() + "' ")
         if union:
-            sql += (" UNION SELECT parent_layer FROM " + self.schema_name + ".cat_feature"
-                    " WHERE feature_type='" + geom_type.upper() + "'")
+            sql += ("UNION SELECT parent_layer FROM " + self.schema_name + ".cat_feature "
+                    "WHERE feature_type='" + geom_type.upper() + "'")
         rows = self.get_rows(sql)
-        print(sql)
         if rows:
             for row in rows:
                 layer = self.get_layer_by_tablename(row[0])
@@ -1250,43 +1230,9 @@ class DaoController(object):
             elif self.giswater.wsoftware == 'ud':
                 self.giswater.enable_toolbar("om_ud")
 
-    
-    def get_value_config_param_system(self, parameter, show_warning=True):
-        """ Get value of @parameter from table 'config_param_system' """
-        
-        value = None
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-               " WHERE parameter = '" + parameter + "'") 
-        row = self.get_row(sql)
-        if row:
-            value = row[0]
-        elif not row and show_warning:
-            message = "Parameter not found in table 'config_param_system'"
-            self.show_warning(message, parameter=parameter)
-            return value           
-        
-        return value
-
-
-    def get_value_config_param_user(self, parameter, show_warning=True):
-        """ Get value of @parameter from table 'config_param_user' """
-
-        value = None
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
-        row = self.get_row(sql)
-        if row:
-            value = row[0]
-        elif not row and show_warning:
-            message = "Parameter not found in table 'config_param_user'"
-            self.show_warning(message, parameter=parameter)
-            return value
-
-        return value
-
 
     def get_columns_list(self, tablename, schemaname=None):
-        """  Return list of all columns in @tablename """
+        """ Return list of all columns in @tablename """
         
         if schemaname is None:
             schemaname = self.schema_name
