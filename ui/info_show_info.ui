@@ -26,19 +26,6 @@
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_open_giswater">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>320</y>
-     <width>100</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>go2Giswater</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btn_open_web">
    <property name="geometry">
     <rect>
