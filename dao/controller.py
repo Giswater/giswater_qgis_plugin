@@ -1117,7 +1117,10 @@ class DaoController(object):
 
         sql = ("SELECT pg_has_role('" + username + "', '" + role_name + "', 'MEMBER');")
         row = self.get_row(sql, commit=True)
-        return row[0]
+        if row:
+            return row[0]
+        else:
+            return False
          
          
     def get_current_user(self):
