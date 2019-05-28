@@ -191,7 +191,7 @@ BEGIN
 				END IF;
 			END IF;
 			
-		-- no infraestructure visit (only for unspected visits)
+		-- no infraestructure visit (only for unexpected visits)
 		ELSE 
 			--new visit
 			IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
