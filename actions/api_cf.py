@@ -180,7 +180,7 @@ class ApiCF(ApiParent):
         self.draw(complet_result)
 
 
-    def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None, layer_new_feature=None, tab_type=None):
+    def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None, layer_new_feature=None, tab_type=None, new_feature=None):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
@@ -205,7 +205,7 @@ class ApiCF(ApiParent):
         self.my_json = {}
         # Get srid
         self.srid = self.controller.plugin_settings_value('srid')
-
+        self.new_feature = new_feature
         if self.iface.activeLayer() is None:
             active_layer = ""
         else:
@@ -314,7 +314,6 @@ class ApiCF(ApiParent):
         self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
         field_id = str(self.complet_result[0]['body']['feature']['idName'])
         result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id)
-
         self.hydro_info_dlg.open()
         return result, self.hydro_info_dlg
 
@@ -511,9 +510,7 @@ class ApiCF(ApiParent):
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.feature_id, self.my_json))
-        self.dlg_cf.dlg_closed.connect(partial(self.close_dialog, self.dlg_cf))
         self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
-        self.dlg_cf.dlg_closed.connect(partial(self.roll_back))
 
         # Open dialog
         #self.dlg_cf.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -620,27 +617,32 @@ class ApiCF(ApiParent):
 
         
     def accept(self, dialog, complet_result, feature_id, _json, clear_json=False, close_dialog=True):
-
         if _json == '' or str(_json) == '{}':
             self.close_dialog(dialog)
             return
         p_table_id = complet_result['body']['feature']['tableName']
+        id_name = complet_result['body']['feature']['idName']
+        parent_fields = complet_result['body']['data']['parentFields']
+
         if self.new_feature_id is not None:
-            new_feature = None
-            iter = self.layer_new_feature.getFeatures()
-            for feature in iter:
-                if feature.id() == self.new_feature_id:
-                    new_feature = feature
-            geom = new_feature.geometry()
+            for k, v in list(_json.items()):
+                if k in (parent_fields):
+                    self.new_feature.setAttribute(k, v)
+                    _json.pop(k, None)
+
+            self.layer_new_feature.updateFeature(self.new_feature)
+            self.layer_new_feature.commitChanges()
+
+            geom = self.new_feature.geometry()
             the_geom = geom.asWkb().encode('hex').upper()
             _json['the_geom'] = the_geom
             my_json = json.dumps(_json)
-            self.iface.actionRollbackEdits().trigger()
-            feature = '"tableName":"' + str(p_table_id) + '", "id":"'+str(feature_id)+'"'
-            extras = '"fields":'+my_json+''
+            feature = '"featureType":"'+self.feature_type+'", '
+            feature += '"tableName":"' + p_table_id + '", '
+            feature += '"id":"' + self.new_feature.attribute(id_name) + '"'
+            extras = '"fields":' + my_json + ''
             body = self.create_body(feature=feature, extras=extras)
-            sql = ("SELECT " + self.schema_name + ".gw_api_setinsert($${" + body + "}$$)")
-
+            sql = ("SELECT " + self.schema_name + ".gw_api_setfields($${" + body + "}$$)")
         else:
             my_json = json.dumps(_json)
             feature = '"featureType":"'+self.feature_type+'", '
@@ -649,7 +651,8 @@ class ApiCF(ApiParent):
             extras = '"fields":' + my_json + ''
             body = self.create_body(feature=feature, extras=extras)
             sql = ("SELECT " + self.schema_name + ".gw_api_setfields($${" + body + "}$$)")
-        row = self.controller.execute_returning(sql, log_sql=False)
+        row = self.controller.execute_returning(sql, log_sql=True)
+
         if not row:
             msg = "Fail in: {0}".format(sql)
             self.controller.show_message(msg, message_level=2)
@@ -657,11 +660,12 @@ class ApiCF(ApiParent):
             return
         if clear_json:
             _json = {}
-        #msg = row[0]['message']
 
         if "Accepted" in str(row[0]['status']):
             msg = "OK"
             self.controller.show_message(msg, message_level=3)
+
+            self.layer_new_feature.commitChanges()
         elif "Failed" in str(row[0]['status']):
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)

@@ -50,6 +50,10 @@ class Edit(ParentAction):
     def open_new_feature(self, layer, feature_cat, feature_id):
 
         feature = self.get_feature_by_id(layer, feature_id)
+        # feature.setAttribute('state', '2')
+        # feature.setAttribute('state_type', '5')
+        # layer.updateFeature(feature)
+
         geom = feature.geometry()
         list_points = None
         if layer.geometryType() == Qgis.Point:
@@ -66,7 +70,7 @@ class Edit(ParentAction):
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
-        result, dialog = self.api_cf.open_form(point=list_points, feature_cat=feature_cat, new_feature_id=feature_id, layer_new_feature=layer, tab_type='data')
+        result, dialog = self.api_cf.open_form(point=list_points, feature_cat=feature_cat, new_feature_id=feature_id, layer_new_feature=layer, tab_type='data', new_feature=feature)
 
         if result is False:
             layer.deleteFeature(feature.id())
