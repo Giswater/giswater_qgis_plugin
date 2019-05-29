@@ -26,10 +26,3 @@ UPDATE sys_csv2pg_cat SET name='Import visit file', name_i18n='import visit file
 
 
 UPDATE om_visit_type SET idval='unexpected' WHERE idval ='unspected';
-
-UPDATE config_api_form_fields SET formname='unexpected_noinfra' WHERE formname='unspected_noinfra';
-UPDATE config_api_form_fields SET formname='unexpected_arc' WHERE formname= 'unspected_arc';
-
-UPDATE config_api_visit SET formname='unexpected_arc' WHERE formname= 'unspected_arc';
-UPDATE config_api_visit SET formname='unexpected_noinfra' WHERE formname= 'unspected_noinfra';
-

@@ -26,3 +26,9 @@ UPDATE cat_feature SET parent_layer = 'v_edit_arc', child_layer = concat('v_edit
 UPDATE cat_feature SET parent_layer = 'v_edit_connec', child_layer = concat('v_edit_connec_', lower(id)) where parent_layer = 've_connec';
 
 
+UPDATE config_api_form_fields SET formname='unexpected_noinfra' WHERE formname='unspected_noinfra';
+UPDATE config_api_form_fields SET formname='unexpected_arc' WHERE formname= 'unspected_arc';
+
+UPDATE config_api_visit SET formname='unexpected_arc' WHERE formname= 'unspected_arc';
+UPDATE config_api_visit SET formname='unexpected_noinfra' WHERE formname= 'unspected_noinfra';
+
