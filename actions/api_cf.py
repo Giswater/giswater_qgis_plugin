@@ -231,8 +231,9 @@ class ApiCF(ApiParent):
             self.layer_new_feature = layer_new_feature
 
             self.iface.actionPan().trigger()
-            layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
-            layer.featureAdded.disconnect()
+            self.layer_new_feature.featureAdded.disconnect()
+
+
             feature = '"tableName":"' + str(feature_cat.child_layer.lower()) + '"'
             extras += ', "coordinates":{'+str(point) + '}'
             body = self.create_body(feature=feature, extras=extras)
@@ -293,7 +294,7 @@ class ApiCF(ApiParent):
         for field in result['fields']:
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
-            if type(widget) is QLineEdit:
+            if type(widget) in(QLineEdit, QPushButton):
                 value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
             elif type(widget) is QComboBox:
                 value = utils_giswater.get_item_data(dialog, widget, 0)
@@ -301,6 +302,9 @@ class ApiCF(ApiParent):
                 value = utils_giswater.isChecked(dialog, widget)
             elif type(widget) is QgsDateTimeEdit:
                 value = utils_giswater.getCalendarDate(dialog, widget)
+            else:
+                print(type(widget))
+                print(type(widget.objectName()))
 
             if str(value) != '' and value is not None and value is not -1:
                 self.my_json[str(widget.property('column_id'))] = str(value)
