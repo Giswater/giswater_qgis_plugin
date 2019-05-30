@@ -16,9 +16,9 @@ if Qgis.QGIS_VERSION_INT < 29900:
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
+
 from qgis.PyQt.QtWidgets import QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QAbstractItemView
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint, QgsMapToPixel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsVertexMarker

@@ -732,17 +732,17 @@ class ParentAction(object):
 
     def get_composers_list(self):
 
-        active_composers = []
         if Qgis.QGIS_VERSION_INT < 29900:
             active_composers = self.iface.activeComposers()
         else:
-            # Todo 3.x  "self.iface.activeComposers()" dont work
             layour_manager = QgsProject.instance().layoutManager().layouts()
             active_composers = [layout for layout in layour_manager]
+
         return active_composers
 
 
     def get_all_actions(self):
+
         self.controller.log_info(str("TEST"))
         actions_list = self.iface.mainWindow().findChildren(QAction)
         for action in actions_list:

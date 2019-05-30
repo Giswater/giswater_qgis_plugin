@@ -13,6 +13,11 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT < 29900:
+    pass
+else:
+    from qgis.core import QgsSnappingUtils, QgsPointLocator, QgsTolerance
+
 from qgis.core import QgsExpressionContextUtils, QgsProject
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtWidgets import QAction, QActionGroup, QMenu, QApplication, QAbstractItemView, QToolButton, QDockWidget
@@ -827,30 +832,33 @@ class Giswater(QObject):
     def manage_snapping_layers(self):
         """ Manage snapping of layers """
 
-        # TODO 3.x
-        try:
-            layer = self.controller.get_layer_by_tablename('v_edit_man_pipe')
-            if layer:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_arc')
-            if layer:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_connec')
-            if layer:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_node')
-            if layer:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_gully')
-            if layer:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 1, 15.0, False)
-            layer = self.controller.get_layer_by_tablename('v_edit_man_conduit')
-            if layer:
-                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 1, 15.0, False)
-        except:
-            pass
+        self.manage_snapping_layer('v_edit_man_pipe', snapping_type=2)
+        self.manage_snapping_layer('v_edit_arc', snapping_type=2)
+        self.manage_snapping_layer('v_edit_connec', snapping_type=0)
+        self.manage_snapping_layer('v_edit_node', snapping_type=0)
+        self.manage_snapping_layer('v_edit_gully', snapping_type=0)
+        self.manage_snapping_layer('v_edit_man_conduit', snapping_type=2)
 
-                    
+
+    def manage_snapping_layer(self, layername, snapping_type=0, tolerance=15.0):
+        """ Manage snapping of @layername """
+
+        layer = self.controller.get_layer_by_tablename(layername)
+        if not layer:
+            return
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, snapping_type, 1, tolerance, False)
+        else:
+            if snapping_type == 0:
+                snapping_type = QgsPointLocator.Vertex
+            elif snapping_type == 1:
+                snapping_type = QgsPointLocator.Edge
+            elif snapping_type == 2:
+                snapping_type = QgsPointLocator.All
+            QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
+
+
     def manage_custom_forms(self):
         """ Set layer custom UI form and init function """
         
@@ -948,19 +956,23 @@ class Giswater(QObject):
             fieldname_node = "ymax"
             fieldname_connec = "connec_depth"
 
-        if Qgis.QGIS_VERSION_INT < 29900:
-            layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-            if layer_node:
-                display_field = 'depth : [% "' + fieldname_node + '" %]'
+        layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        if layer_node:
+            display_field = 'depth : [% "' + fieldname_node + '" %]'
+            if Qgis.QGIS_VERSION_INT < 29900:
                 layer_node.setDisplayField(display_field)
+            else:
+                layer_node.setMapTipTemplate(display_field)
+                layer_node.setDisplayExpression(display_field)
 
-            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
-            if layer_connec:
-                display_field = 'depth : [% "' + fieldname_connec + '" %]'
-                layer_connec.setDisplayField(display_field)
-        # TODO 3.x
-        else:
-            pass
+        layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+        if layer_connec:
+            display_field = 'depth : [% "' + fieldname_connec + '" %]'
+            if Qgis.QGIS_VERSION_INT < 29900:
+                layer_node.setDisplayField(display_field)
+            else:
+                layer_node.setMapTipTemplate(display_field)
+                layer_node.setDisplayExpression(display_field)
 
     
     def manage_map_tools(self):

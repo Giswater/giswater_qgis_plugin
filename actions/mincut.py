@@ -1979,7 +1979,6 @@ class MincutParent(ParentAction, MultipleSelection):
         # Get features
         layer = self.layers[layername]
         records = [(-1, '', '')]
-        # TODO 3.x
         if Qgis.QGIS_VERSION_INT < 29900:
             idx_field_code = layer.fieldNameIndex(self.params[field_code])
             idx_field_name = layer.fieldNameIndex(self.params[field_name])
@@ -2063,7 +2062,6 @@ class MincutParent(ParentAction, MultipleSelection):
         
         # Set filter expression
         layer = self.layers['portal_layer']
-        # TODO 3.x
         if Qgis.QGIS_VERSION_INT < 29900:
             idx_field_code = layer.fieldNameIndex(field_code)
             idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])
