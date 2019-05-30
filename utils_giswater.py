@@ -31,6 +31,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QT
 from functools import partial
 import os
 import operator
+
 from actions.HyperLinkLabel import HyperLinkLabel
 
 
