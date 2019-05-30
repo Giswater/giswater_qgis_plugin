@@ -622,9 +622,15 @@ class ApiParent(ParentAction):
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
         function_name = 'no_function_associated'
+        real_name = widget.objectName()[5:len(widget.objectName())]
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
+                exist = self.controller.check_python_function(self, function_name)
+                if not exist:
+                    msg = "widget {0} have associated function {1}, but {1} not exist".format(real_name, function_name)
+                    self.controller.show_message(msg, 2)
+                    return widget
             else:
                 msg = ("parameter button_function is null for button " + widget.objectName())
                 self.controller.show_message(msg, 2)
@@ -724,14 +730,17 @@ class ApiParent(ParentAction):
         if 'column_id' in field:
             widget.setProperty('column_id', field['column_id'])
         function_name = 'no_function_asociated'
+        real_name = widget.objectName()[5:len(widget.objectName())]
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
-                # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
-                widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
-        else:
-            # Call  def no_function_associated(self, widget=None, message_level=1)
-            widget.doubleClicked.connect(partial(getattr(self, function_name), widget, 2))
+                exist = self.controller.check_python_function(self, function_name)
+                if not exist:
+                    msg = "widget {0} have associated function {1}, but {1} not exist".format(real_name, function_name)
+                    self.controller.show_message(msg, 2)
+                    return widget
+        # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
+        widget.doubleClicked.connect(partial(getattr(self, function_name), widget, complet_result))
         return widget
 
 
@@ -885,11 +894,17 @@ class ApiParent(ParentAction):
         widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
         function_name = 'no_function_associated'
+        real_name = widget.objectName()[5:len(widget.objectName())]
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
-                function_name = field['widgetfunction']
+                func_name = field['widgetfunction']
+                exist = self.controller.check_python_function(self, function_name)
+                if not exist:
+                    msg = "widget {0} have associated function {1}, but {1} not exist".format(real_name, func_name)
+                    self.controller.show_message(msg, 2)
+                    return widget
             else:
-                msg = ("parameter widgetfunction is null for widget " + widget.objectName())
+                msg = ("parameter widgetfunction is null for widget " + real_name)
                 self.controller.show_message(msg, 2)
         else:
             msg = "parameter widgetfunction not found"
@@ -1473,14 +1488,13 @@ class ApiParent(ParentAction):
 
 
     def set_function_associated(self, dialog, widget, field):
-
         function_name = 'no_function_associated'
         if 'widgetfunction' in field:
             if field['widgetfunction'] is not None:
                 function_name = field['widgetfunction']
-            else:
-                msg = ("parameter button_function is null for button " + widget.objectName())
-                self.controller.show_message(msg, 2)
+                exist = self.controller.check_python_function(self, function_name)
+                if not exist:
+                    return widget
         else:
             msg = "parameter button_function not found"
             self.controller.show_message(msg, 2)
