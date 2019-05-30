@@ -35,7 +35,7 @@ import operator
 if 'nt' in sys.builtin_module_names:
     import winreg
 
-from giswater.actions.HyperLinkLabel import HyperLinkLabel
+from actions.HyperLinkLabel import HyperLinkLabel
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):

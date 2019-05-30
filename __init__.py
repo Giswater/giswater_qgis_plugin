@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import os
 import sys
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-sys.path.insert(0, plugin_path)
+sys.path.append(plugin_path)
 
 
 # noinspection PyPep8Naming
