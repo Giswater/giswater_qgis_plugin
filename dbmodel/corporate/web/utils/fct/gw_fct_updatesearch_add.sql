@@ -10,6 +10,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_updatesearch_add($${"tabName":"address","add_muni":{"id":1,"name":"Sant Boi del Llobregat"},"add_street":{"text":"Avenida del General Prim"},"add_postnumber":{"text":"1"}}$$)
+SELECT SCHEMA_NAME.gw_fct_updatesearch_add($${"tabName":"address","add_muni":{"id":8113,"name":"Manresa"},"add_street":{"text":"Carrer de Barcelona"},"add_postnumber":{"text":"3"}}$$)
 */
 
 DECLARE
@@ -47,6 +48,8 @@ DECLARE
     v_address_geom_id_field varchar;
     v_querytext text;
 
+    v_muni integer;
+
 BEGIN
 
 --    Set search path to local schema
@@ -57,7 +60,7 @@ BEGIN
         INTO api_version;
 
 --     get project type
-    SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+    SELECT SCHEMA_NAMEoftware INTO project_type_aux FROM version LIMIT 1;
 
 --    Get tab
     tab_arg := search_data->>'tabName';
@@ -82,6 +85,7 @@ IF tab_arg = 'address' THEN
     SELECT ((value::json)->>'sys_geom_field') INTO v_address_geom_id_field FROM config_param_system WHERE parameter='api_search_postnumber';
 
     --Text to search
+    v_muni := (search_data->>'add_muni')::json->>'id';
     combo1 := search_data->>'add_street';
     id_arg := combo1->>'text';
     edit1 := search_data->>'add_postnumber';
@@ -100,12 +104,15 @@ IF tab_arg = 'address' THEN
         FROM '||quote_ident(v_address_layer)||' a
         JOIN '||quote_ident(v_street_layer)||' b ON b.'||quote_ident(v_street_id_field)||' = a.'||quote_ident(v_address_street_id_field) ||'
         WHERE b.'||quote_ident(v_street_display_field)||' = $1 
-        AND a.'||quote_ident(v_address_display_field)||' ILIKE $2 ORDER BY regexp_replace('||quote_ident(v_address_display_field)||',''[^0-9]+'','''',''g'')::integer LIMIT 10 )a';
+        AND a.muni_id=$3
+        AND a.'||quote_ident(v_address_display_field)||' ILIKE $2
+        ORDER BY regexp_replace('||quote_ident(v_address_display_field)||',''[^0-9]+'','''',''g'')::integer 
+        LIMIT 10 )a';
 
         RAISE NOTICE ' v_querytext %',  v_querytext;
 
        EXECUTE v_querytext
-        USING id_arg, text_arg
+        USING id_arg, text_arg, v_muni
         INTO response_json;
 
 END IF;
@@ -126,4 +133,3 @@ END IF;
 
 END;$BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
-
