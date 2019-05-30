@@ -25,6 +25,7 @@ from qgis.core import QgsFeatureRequest
 from functools import partial
 
 from .. import utils_giswater
+from .tm_multiple_selection import TmMultipleSelection
 from .tm_parent import TmParentAction
 from ..ui_manager import PlaningUnit
 
@@ -181,7 +182,7 @@ class TmPlanningUnit(TmParentAction):
     def selection_init(self,  qtable):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
+        multiple_selection = TmMultipleSelection(self.iface, self.controller, self.layers['node'], parent_manage=self, table_object=qtable)
         self.canvas.setMapTool(multiple_selection)
         self.disconnect_signal_selection_changed()
         self.connect_signal_selection_changed(qtable)
@@ -267,14 +268,17 @@ class TmPlanningUnit(TmParentAction):
         campaign_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_campaign, 0)
         work_id = utils_giswater.get_item_data(self.dlg_unit, self.dlg_unit.cmb_work, 0)
         times = utils_giswater.getWidgetText(self.dlg_unit, self.dlg_unit.txt_times, return_string_null=False)
-        if times is None or times < 1 or times == "":
+        try:
+            if times is None or int(times) < 1 or times == "":
+                times = "1"
+        except:
             times = "1"
-
-        record.setValue("node_id", selected_id)
-        record.setValue("campaign_id", campaign_id)
-        record.setValue("work_id", work_id)
-        record.setValue("frequency", str(times))
-        model.insertRecord(-1, record)
+        finally:
+            record.setValue("node_id", selected_id)
+            record.setValue("campaign_id", campaign_id)
+            record.setValue("work_id", work_id)
+            record.setValue("frequency", str(times))
+            model.insertRecord(-1, record)
 
 
     def update_table(self, dialog, qtable, table_name, combo1, combo2):

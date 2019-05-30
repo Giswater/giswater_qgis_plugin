@@ -268,9 +268,9 @@ class TmBasic(TmParentAction):
         # Get data to fill combo from memory
         if self.rows_cmb_poda_type is None:
             self.update_cmb_poda_type()   
-                    
-        utils_giswater.set_item_data(dlg_selector.cmb_poda_type, self.rows_cmb_poda_type, 1)
-        
+
+        utils_giswater.set_item_data(dlg_selector.cmb_poda_type, self.rows_cmb_poda_type, 1, sort_combo=False)
+
         # Populate QTableView
         self.fill_table(dlg_selector, table_view, set_edit_triggers=QTableView.NoEditTriggers, update=True)
         if update:

@@ -12,9 +12,13 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsPoint as QgsPointXY
     from qgis.gui import QgsMapCanvasSnapper
+else:
+    from qgis.core import QgsWkbTypes, QgsPointXY
+    from qgis.gui import QgsMapCanvas
 
-from qgis.core import QgsFeatureRequest, QgsPoint, QgsRectangle
+from qgis.core import QgsFeatureRequest, QgsRectangle
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt, pyqtSignal, QPoint
 from qgis.PyQt.QtGui import QColor
@@ -38,7 +42,10 @@ class TmMultipleSelection(QgsMapTool):
         QgsMapTool.__init__(self, self.canvas)
 
         self.controller = controller
-        self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
+        if Qgis.QGIS_VERSION_INT < 29900:
+            self.rubber_band = QgsRubberBand(self.canvas, Qgis.Polygon)
+        else:
+            self.rubber_band = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)
@@ -47,11 +54,22 @@ class TmMultipleSelection(QgsMapTool):
         self.selected_features = []
 
 
+    def reset_rubber_band(self):
+
+        try:
+            if Qgis.QGIS_VERSION_INT < 29900:
+                self.rubber_band.reset(Qgis.Polygon)
+            else:
+                self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        except:
+            pass
+
+
     def reset(self):
         
         self.start_point = self.end_point = None
         self.is_emitting_point = False
-        self.rubber_band.reset(Qgis.Polygon)
+        self.reset_rubber_band()
 
 
     def canvasPressEvent(self, e):
@@ -126,13 +144,13 @@ class TmMultipleSelection(QgsMapTool):
 
     def show_rect(self, start_point, end_point):
         
-        self.rubber_band.reset(Qgis.Polygon)
+        self.reset_rubber_band()
         if start_point.x() == end_point.x() or start_point.y() == end_point.y():
             return
-        point1 = QgsPoint(start_point.x(), start_point.y())
-        point2 = QgsPoint(start_point.x(), end_point.y())
-        point3 = QgsPoint(end_point.x(), end_point.y())
-        point4 = QgsPoint(end_point.x(), start_point.y())
+        point1 = QgsPointXY(start_point.x(), start_point.y())
+        point2 = QgsPointXY(start_point.x(), end_point.y())
+        point3 = QgsPointXY(end_point.x(), end_point.y())
+        point4 = QgsPointXY(end_point.x(), start_point.y())
 
         self.rubber_band.addPoint(point1, False)
         self.rubber_band.addPoint(point2, False)
@@ -166,8 +184,7 @@ class TmMultipleSelection(QgsMapTool):
         if Qgis.QGIS_VERSION_INT < 29900:
             snapper = QgsMapCanvasSnapper(self.canvas)
         else:
-            # TODO: 3.x
-            snapper = QgsMapCanvas.snappingUtils()
+            snapper = QgsMapCanvas.snappingUtils(self.canvas)
 
         return snapper
 
