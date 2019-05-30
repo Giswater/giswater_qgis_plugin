@@ -42,13 +42,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				
 		
 			ELSIF review_status=2 THEN
-				UPDATE v_edit_arc SET the_geom=NEW.the_geom, y1=NEW.new_y1, y2=NEW.new_y2, arccat_id=NEW.new_arccat_id, arc_type=NEW.new_arc_type, annotation=NEW.annotation, 
-				observ=NEW.observ WHERE arc_id=NEW.arc_id;
+				UPDATE v_edit_arc SET the_geom=NEW.the_geom, y1=NEW.new_y1, y2=NEW.new_y2, arccat_id=NEW.new_arccat_id, arc_type=NEW.new_arc_type
+				WHERE arc_id=NEW.arc_id;
 					
 			ELSIF  review_status=3 THEN
 
-				UPDATE v_edit_arc SET y1=NEW.new_y1, y2=NEW.new_y2, arccat_id=NEW.new_arccat_id, arc_type=NEW.new_arc_type, annotation=NEW.annotation, 
-				observ=NEW.observ
+				UPDATE v_edit_arc SET y1=NEW.new_y1, y2=NEW.new_y2, arccat_id=NEW.new_arccat_id, arc_type=NEW.new_arc_type
 				WHERE arc_id=NEW.arc_id;
 	
 			END IF;	

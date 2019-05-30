@@ -17,3 +17,18 @@ UPDATE cat_feature SET shortcut_key = sys_feature_cat.shortcut_key FROM sys_feat
 UPDATE config_param_system SET value = '{"sys_table_id":"v_ui_workcat_polygon_all", "sys_id_field":"workcat_id", "sys_search_field":"workcat_id", "sys_geom_field":"the_geom", "filter_text":"code"}' WHERE parameter = 'api_search_workcat';
 
 UPDATE config_api_form_fields set layout_name = concat('data_',layout_id) WHERE layout_name IS NULL;
+
+
+-- 28/05/2019
+
+UPDATE cat_feature SET parent_layer = 'v_edit_node', child_layer = concat('v_edit_node_', lower(id)) where parent_layer = 've_node';
+UPDATE cat_feature SET parent_layer = 'v_edit_arc', child_layer = concat('v_edit_arc_', lower(id)) where parent_layer = 've_arc';
+UPDATE cat_feature SET parent_layer = 'v_edit_connec', child_layer = concat('v_edit_connec_', lower(id)) where parent_layer = 've_connec';
+
+
+UPDATE config_api_form_fields SET formname='unexpected_noinfra' WHERE formname='unspected_noinfra';
+UPDATE config_api_form_fields SET formname='unexpected_arc' WHERE formname= 'unspected_arc';
+
+UPDATE config_api_visit SET formname='unexpected_arc' WHERE formname= 'unspected_arc';
+UPDATE config_api_visit SET formname='unexpected_noinfra' WHERE formname= 'unspected_noinfra';
+
