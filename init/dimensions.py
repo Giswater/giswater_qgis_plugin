@@ -187,30 +187,22 @@ class Dimensions(ParentDialog):
     def create_map_tips(self):
         """ Create MapTips on the map """
         
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE cur_user = current_user AND parameter = 'dim_tooltip'")
+        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user "
+               "WHERE cur_user = current_user AND parameter = 'dim_tooltip'")
         row = self.controller.get_row(sql)
-        if not row:
+        if not row or row[0].lower() != 'true':
             return
-        
-        if row[0].lower() != 'true':
-            return
-        
+
         self.timer_map_tips = QTimer(self.canvas)
         self.map_tip_node = QgsMapTip()
         self.map_tip_connec = QgsMapTip()
 
         self.canvas.xyCoordinates.connect(self.map_tip_changed)
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT < 29900:
-            self.canvas.connect(self.timer_map_tips, SIGNAL("timeout()"), self.show_map_tip)
-            self.timer_map_tips_clear = QTimer(self.canvas)
-            #self.canvas.connect(self.timer_map_tips_clear, SIGNAL("timeout()"), self.clear_map_tip)
-        else:
-            self.timer_map_tips.timeout.connect(self.show_map_tip)
-            self.timer_map_tips_clear = QTimer(self.canvas)
-            self.timer_map_tips_clear.timeout.connect(self.clear_map_tip)
-            
+        self.timer_map_tips.timeout.connect(self.show_map_tip)
+        self.timer_map_tips_clear = QTimer(self.canvas)
+        self.timer_map_tips_clear.timeout.connect(self.clear_map_tip)
+
+
     def map_tip_changed(self, p):
         """ SLOT. Initialize the Timer to show MapTips on the map """
         

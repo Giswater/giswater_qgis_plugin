@@ -30,10 +30,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QT
 
 from functools import partial
 import os
-import sys
 import operator
-if 'nt' in sys.builtin_module_names:
-    import winreg
 
 from actions.HyperLinkLabel import HyperLinkLabel
 
@@ -78,13 +75,6 @@ def fillComboBoxList(dialog, widget, list_object, allow_nulls=True, clear_combo=
         widget.addItem('')
     for elem in list_object:
         widget.addItem(str(elem))
-
-
-def fillWidgets(rows, index_widget=0, index_text=1):
-
-    if rows:
-        for row in rows:
-            setWidgetText(str(row[index_widget]), str(row[index_text]))
 
 
 def getText(dialog, widget, return_string_null=True):
@@ -340,45 +330,9 @@ def fillWidget(dialog, widget, row):
         widget.setText("")
 
 
-def get_reg(reg_hkey, reg_path, reg_name):
-
-    if 'nt' in sys.builtin_module_names:
-        reg_root = None
-        if reg_hkey == "HKEY_LOCAL_MACHINE":
-            reg_root = winreg.HKEY_LOCAL_MACHINE
-        elif reg_hkey == "HKEY_CURRENT_USER":
-            reg_root = winreg.HKEY_CURRENT_USER
-
-        if reg_root is not None:
-            try:
-                registry_key = winreg.OpenKey(reg_root, reg_path)
-                value, regtype = winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
-                winreg.CloseKey(registry_key)
-                return value
-            except WindowsError:
-                return None
-    else:
-        return None
-
-
-def get_settings_value(settings, parameter):
-    """ Function that fix problem with network units in Windows """
-
-    file_aux = ""
-    try:
-        file_aux = settings.value(parameter)
-        if file_aux is not None:
-            unit = file_aux[:1]
-            if unit != '\\' and file_aux[1] != ':':
-                path = file_aux[1:]
-                file_aux = unit+":"+path
-    except IndexError:
-        pass
-    return file_aux
-
-
 def set_table_selection_behavior(dialog, widget):
     """ Set selection behavior of @widget """
+
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if not widget:

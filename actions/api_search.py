@@ -45,6 +45,7 @@ class ApiSearch(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class constructor """
+
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
@@ -63,17 +64,14 @@ class ApiSearch(ApiParent):
 
         # Make it dockable in left dock widget area
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
-        #self.dlg_search.setFixedHeight(180)
-
 
         body = self.create_body()
-        sql = ("SELECT " + self.schema_name + ".gw_api_getsearch($${" + body + "}$$)::text")
-        row = self.controller.get_row(sql, log_sql=True)
+        function_name = "gw_api_getsearch"
+        row = self.controller.execute_api_function(function_name, body)
         if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
+        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
         first_tab = None
@@ -105,23 +103,25 @@ class ApiSearch(ApiParent):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
 
-
         # Open dialog
         self.dlg_search.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_search.show()
 
 
     def set_completer(self, widget, completer=None):
-        """ Set completer and add listeners"""
+        """ Set completer and add listeners """
+
         if completer:
             model = QStringListModel()
             completer.highlighted.connect(partial(self.check_tab, completer))
             self.make_list(completer, model, widget)
             widget.textChanged.connect(partial(self.make_list, completer, model, widget))
+
         return widget
 
 
     def check_tab(self, completer):
+
         # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
         # Get all QLineEdit for activate or we cant write when tab have more than 1 QLineEdit
@@ -134,6 +134,7 @@ class ApiSearch(ApiParent):
         row = completer.popup().currentIndex().row()
         if row == -1:
             return
+
         # Get text from selected row
         _key = completer.completionModel().index(row, 0).data()
         # Search text into self.result_data
@@ -143,6 +144,7 @@ class ApiSearch(ApiParent):
             if _key == data['display_name']:
                 item = data
                 break
+
         # IF for zoom to tab network
         if self.dlg_search.main_tab.widget(index).objectName() == 'network':
             # layer = self.controller.get_layer_by_tablename(item['sys_table_id'])
@@ -158,9 +160,11 @@ class ApiSearch(ApiParent):
                 print("FAIL")
                 return
             self.draw(complet_result)
+
         elif self.dlg_search.main_tab.widget(index).objectName() == 'search':
             # TODO
             return
+
         # IF for zoom to tab address (streets)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
@@ -169,6 +173,7 @@ class ApiSearch(ApiParent):
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
             self.zoom_to_rectangle(x1, y1, x2, y2)
+
         # IF for zoom to tab address (postnumbers)
         elif self.dlg_search.main_tab.widget(index).objectName() == 'address' and 'sys_x' in item and 'sys_y' in item:
             x1 = item['sys_x']
@@ -227,15 +232,15 @@ class ApiSearch(ApiParent):
             self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             return
+
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 
 
-
     def make_list(self, completer, model, widget):
-        """ Create a list of ids and populate widget (QLineEdit)"""
-        # Create 2 json, one for first QLineEdit and other for second QLineEdit
+        """ Create a list of ids and populate widget (QLineEdit) """
 
+        # Create 2 json, one for first QLineEdit and other for second QLineEdit
         form_search = ''
         extras_search = ''
         form_search_add = ''
@@ -269,8 +274,9 @@ class ApiSearch(ApiParent):
             row = self.controller.get_row(sql, log_sql=True)
             if row:
                 self.result_data = row[0]
+
         # Set label visible
-        if row is not None:
+        if row:
             if self.result_data['data'] == {} and self.lbl_visible:
                 self.dlg_search.lbl_msg.setVisible(True)
                 if len(line_list) == 2:
@@ -307,7 +313,8 @@ class ApiSearch(ApiParent):
 
 
     def clear_line_edit_add(self, line_list):
-        """ Clear second line edit if exist"""
+        """ Clear second line edit if exist """
+
         line_edit_add = line_list[1]
         line_edit_add.setText('')
 
@@ -320,6 +327,7 @@ class ApiSearch(ApiParent):
         self.populate_combo(widget, field)
         if 'selectedId' in field:
             utils_giswater.set_combo_itemData(widget, field['selectedId'], 0)
+
         return widget
 
 
@@ -335,6 +343,7 @@ class ApiSearch(ApiParent):
                 elem = [field['comboIds'][i], field['comboNames'][i]]
                 combolist.append(elem)
         records_sorted = sorted(combolist, key=operator.itemgetter(1))
+
         # Populate combo
         for record in records_sorted:
             widget.addItem(record[1], record)
@@ -360,8 +369,10 @@ class ApiSearch(ApiParent):
 
         self.hydro_info_dlg.open()
 
+
     def workcat_open_table_items(self, item):
         """ Create the view and open the dialog with his content """
+
         workcat_id = item['sys_id']
         layer_name = item['sys_table_id']
         field_id = item['filter_text']
@@ -449,7 +460,7 @@ class ApiSearch(ApiParent):
 
 
     def update_selector_workcat(self, workcat_id):
-        """  Update table selector_workcat """
+        """ Update table selector_workcat """
 
         sql = ("DELETE FROM " + self.schema_name + ".selector_workcat "
                " WHERE cur_user = current_user;\n")
@@ -470,6 +481,7 @@ class ApiSearch(ApiParent):
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
+
         if 'nt' in sys.builtin_module_names:
             folder_path = os.path.expanduser("~\Documents")
         else:
@@ -488,13 +500,16 @@ class ApiSearch(ApiParent):
 
     def force_state(self, qbutton, state, qtable):
         """ Force selected state and set qtable enabled = True """
-        sql = ("SELECT state_id FROM " + self.schema_name + ".selector_state "
-               " WHERE cur_user=current_user AND state_id ='" + str(state) + "'")
+
+        sql = ("SELECT state_id "
+               "FROM " + self.schema_name + ".selector_state"
+               "WHERE cur_user = current_user AND state_id = '" + str(state) + "'")
         row = self.controller.get_row(sql)
-        if row is not None:
+        if row:
             return
+        
         sql = ("INSERT INTO " + self.schema_name + ".selector_state(state_id, cur_user) "
-               " VALUES('" + str(state) + "', current_user)")
+               "VALUES('" + str(state) + "', current_user)")
         self.controller.execute_sql(sql)
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
@@ -536,6 +551,7 @@ class ApiSearch(ApiParent):
                 for col in range(0, model_2.columnCount()):
                     row.append(str(model_2.data(model_2.index(rows, col))))
                 all_rows.append(row)
+
         # Write list into csv file
         try:
             if os.path.exists(folder_path):
@@ -552,7 +568,8 @@ class ApiSearch(ApiParent):
 
 
     def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
-        """ Filter list of workcats by workcat_id and field_id"""
+        """ Filter list of workcats by workcat_id and field_id """
+
         result_select = utils_giswater.getWidgetText(dialog, widget_txt)
         if result_select != 'null':
             expr = ("workcat_id = '" + str(workcat_id) + "'"
@@ -625,7 +642,6 @@ class ApiSearch(ApiParent):
         self.zoom_to_rectangle(max_x, max_y, min_x, min_y)
 
 
-
     def fill_label_data(self, workcat_id, table_name, extension=None):
 
         if workcat_id == "null":
@@ -666,26 +682,11 @@ class ApiSearch(ApiParent):
                         message = "Some data is missing. Check gis_length for arc"
                         self.controller.show_warning(message, parameter = arc_id)
                         return
-                if extension != None:
+                if extension is not  None:
                     widget = self.items_dialog.findChild(QLabel, "lbl_length" + str(extension))
                 else:
                     widget = self.items_dialog.findChild(QLabel, "lbl_length")
 
                 # Add data to workcat search form
                 widget.setText("Total arcs length: " + str(length))
-
-
-    # def gw_api_open_url(self, widget):
-    #     path = widget.text()
-    #
-    #     # Check if file exist
-    #     if os.path.exists(path):
-    #         # Open the document
-    #         if sys.platform == "win32":
-    #             os.startfile(path)
-    #         else:
-    #             opener = "open" if sys.platform == "darwin" else "xdg-open"
-    #             subprocess.call([opener, path])
-    #     else:
-    #         webbrowser.open(path)
 

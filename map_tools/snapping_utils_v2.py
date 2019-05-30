@@ -25,8 +25,6 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.gui import QgsMapCanvasSnapper
-else:
-    from qgis.gui import QgsMapCanvas
 
 from qgis.core import QgsProject
 
@@ -54,6 +52,7 @@ class SnappingConfigManager(object):
 
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
+
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man

@@ -19,11 +19,10 @@ class Basic(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'basic' """
-        self.minor_version = "3.0"
+
         self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         self.logged = False
-        self.login_file = os.path.join(self.plugin_dir, 'config', 'login.auth')        
         
 
     def set_giswater(self, giswater):
