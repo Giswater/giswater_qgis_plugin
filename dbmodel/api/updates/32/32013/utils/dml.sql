@@ -21,9 +21,9 @@ UPDATE config_api_form_fields set layout_name = concat('data_',layout_id) WHERE 
 
 -- 28/05/2019
 
-UPDATE cat_feature SET parent_layer = 'v_edit_node', child_layer = concat('v_edit_node_', lower(id)) where parent_layer = 've_node';
-UPDATE cat_feature SET parent_layer = 'v_edit_arc', child_layer = concat('v_edit_arc_', lower(id)) where parent_layer = 've_arc';
-UPDATE cat_feature SET parent_layer = 'v_edit_connec', child_layer = concat('v_edit_connec_', lower(id)) where parent_layer = 've_connec';
+UPDATE cat_feature SET parent_layer = 'v_edit_node' where parent_layer = 've_node';
+UPDATE cat_feature SET parent_layer = 'v_edit_arc' where parent_layer = 've_arc';
+UPDATE cat_feature SET parent_layer = 'v_edit_connec' where parent_layer = 've_connec';
 
 
 UPDATE config_api_form_fields SET formname='unexpected_noinfra' WHERE formname='unspected_noinfra';
