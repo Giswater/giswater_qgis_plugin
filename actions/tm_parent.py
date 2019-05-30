@@ -233,6 +233,8 @@ class TmParentAction(object):
                " FROM " + self.schema_name + "." + tablename + ""
                " ORDER BY " + field_search + "")
         rows = self.controller.get_rows(sql)
+        if not rows:
+            return
 
         for i in range(0, len(rows)):
             aux = rows[i]
