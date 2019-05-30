@@ -2302,56 +2302,56 @@ class MincutParent(ParentAction, MultipleSelection):
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            self.controller.show_warning(str(message))
+            self.controller.show_warning(message)
+            return
+
+        # Check if template file exists
+        template_path = self.settings.value('system_variables/composers_path/' + os.sep + str(self.template) + '.qpt')
+        if not os.path.exists(template_path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=template_path)
             return
 
         # Check if composer exist
-        index = 0
-        composers = self.iface.activeComposers()
-        num_comp = len(composers)
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
+        composers = self.get_composers_list()
+        index = self.get_composer_index(str(self.template))
 
-        if index == num_comp:
+        if index == len(composers):
             # Create new composer with template selected in combobox(self.template)
-            template_path = self.settings.value('system_variables/composers_path/' + os.sep + str(self.template) + '.qpt')
             template_file = file(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()
             document.setContent(template_content)
-            comp_view = self.iface.createNewComposer(str(self.template))
-            comp_view.composition().loadFromTemplate(document)
+            # TODO 3.x
+            if Qgis.QGIS_VERSION_INT < 29900:
+                comp_view = self.iface.createNewComposer(str(self.template))
+                comp_view.composition().loadFromTemplate(document)
             
-        index = 0
-        composers = self.iface.activeComposers()
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
-            
-        comp_view = self.iface.activeComposers()[index]
-        comp_view.composerWindow().setWindowFlags(Qt.WindowStaysOnTopHint)
-        composition = comp_view.composition()
-        comp_view.composerWindow().show()
+        index = self.get_composer_index(str(self.template))
+        comp_view = composers[index]
 
-        # Refresh map, zoom map to extent
-        map_item = composition.getComposerItemById('Mapa')
-        map_item.setMapCanvas(self.canvas)
-        map_item.zoomToExtent(self.canvas.extent())
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT < 29900:
+            comp_view.composerWindow().setWindowFlags(Qt.WindowStaysOnTopHint)
+            composition = comp_view.composition()
+            comp_view.composerWindow().show()
 
-        title = self.dlg_comp.title.text()
-        profile_title = composition.getComposerItemById('title')
-        profile_title.setText(str(title))
+            # Refresh map, zoom map to extent
+            map_item = composition.getComposerItemById('Mapa')
+            map_item.setMapCanvas(self.canvas)
+            map_item.zoomToExtent(self.canvas.extent())
 
-        composition.setAtlasMode(QgsComposition.PreviewAtlas)
-        rotation = float(self.dlg_comp.rotation.text())
-        map_item.setMapRotation(rotation)
+            title = self.dlg_comp.title.text()
+            profile_title = composition.getComposerItemById('title')
+            profile_title.setText(str(title))
 
-        composition.refreshItems()
-        composition.update()
+            composition.setAtlasMode(QgsComposition.PreviewAtlas)
+            rotation = float(self.dlg_comp.rotation.text())
+            map_item.setMapRotation(rotation)
+
+            composition.refreshItems()
+            composition.update()
 
         
     def enable_widgets(self, state):

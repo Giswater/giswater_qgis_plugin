@@ -96,7 +96,6 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_delete_additional_point.clicked.connect(self.delete_additional_point)
         self.dlg_draw_profile.btn_save_profile.clicked.connect(self.save_profile)
         self.dlg_draw_profile.btn_load_profile.clicked.connect(self.load_profile)
-
         self.dlg_draw_profile.btn_draw.clicked.connect(self.execute_profiles)
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
         self.dlg_draw_profile.btn_export_pdf.clicked.connect(self.export_pdf)
@@ -577,7 +576,7 @@ class DrawProfiles(ParentMapTool):
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # Change elev to sys_elev
             sql = ("SELECT sys_top_elev AS top_elev, sys_ymax AS ymax, sys_elev, nodecat_id, code"
-                   " FROM  " + self.schema_name + ".v_edit_node"
+                   " FROM " + self.schema_name + ".v_edit_node"
                    " WHERE node_id = '" + str(node_id) + "'")
             row = self.controller.get_row(sql)
             columns = ['top_elev', 'ymax', 'sys_elev', 'nodecat_id', 'code']
@@ -813,7 +812,6 @@ class DrawProfiles(ParentMapTool):
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
                  self.memory[indx][14], fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
-
 
         # Fill y_max and elevation
         # 1st node : y_max,y2 and top_elev, elev2
@@ -1266,79 +1264,76 @@ class DrawProfiles(ParentMapTool):
         if Qgis.QGIS_VERSION_INT > 29900:
             return
 
-        # Plugin path
-        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        composers = self.iface.activeComposers()
-
         # Check if template is selected
         if str(self.dlg_draw_profile.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            self.controller.show_warning(str(message))
+            self.controller.show_warning(message)
+            return
+
+        # Check if template file exists
+        plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
+        if not os.path.exists(template_path):
+            message = "File not found"
+            self.controller.show_warning(message, parameter=template_path)
             return
 
         # Check if title
         title = self.dlg_draw_profile.title.text()
 
         # Check if composer exist
-        index = 0
-        num_comp = len(composers)
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
-            
-        if index == num_comp:
+        composers = self.get_composers_list()
+        index = self.get_composer_index(str(self.template))
+
+        if index == len(composers):
             # Create new composer with template selected in combobox(self.template)
-            template_path = plugin_path + os.sep + "templates" + os.sep + str(self.template) + ".qpt"
             template_file = file(template_path, 'rt')
             template_content = template_file.read()
             template_file.close()
             document = QDomDocument()
             document.setContent(template_content)
-            comp_view = self.iface.createNewComposer(str(self.template))
-            comp_view.composition().loadFromTemplate(document)
-        index = 0
-        composers = self.iface.activeComposers()
-        for comp_view in composers:
-            if comp_view.composerWindow().windowTitle() == str(self.template):
-                break
-            index += 1
+            # TODO 3.x
+            if Qgis.QGIS_VERSION_INT < 29900:
+                comp_view = self.iface.createNewComposer(str(self.template))
+                comp_view.composition().loadFromTemplate(document)
 
-        comp_view = self.iface.activeComposers()[index]
-        composition = comp_view.composition()
-        comp_view.composerWindow().show()
+        index = self.get_composer_index(str(self.template))
+        comp_view = composers[index]
+
+        # TODO 3.x
+        if Qgis.QGIS_VERSION_INT < 29900:
+            composition = comp_view.composition()
+            comp_view.composerWindow().show()
         
-        # Set profile
-        picture_item = composition.getComposerItemById('profile')
-        profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
-        picture_item.setPictureFile(profile)
+            # Set profile
+            picture_item = composition.getComposerItemById('profile')
+            profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
+            picture_item.setPictureFile(profile)
 
-        # Refresh map, zoom map to extent
-        map_item = composition.getComposerItemById('Mapa')
-        map_item.setMapCanvas(self.canvas)
-        map_item.zoomToExtent(self.canvas.extent())
+            # Refresh map, zoom map to extent
+            map_item = composition.getComposerItemById('Mapa')
+            map_item.setMapCanvas(self.canvas)
+            map_item.zoomToExtent(self.canvas.extent())
 
-        first_node = self.dlg_draw_profile.start_point.text()
-        end_node = self.dlg_draw_profile.end_point.text()
+            first_node = self.dlg_draw_profile.start_point.text()
+            end_node = self.dlg_draw_profile.end_point.text()
 
-        # Fill data in composer template
-        first_node_item = composition.getComposerItemById('first_node')
-        first_node_item.setText(str(first_node))
-        end_node_item = composition.getComposerItemById('end_node')
-        end_node_item.setText(str(end_node))
-        length_item = composition.getComposerItemById('length')
-        length_item.setText(str(self.start_point[-1]))
-        profile_title = composition.getComposerItemById('title')
-        profile_title.setText(str(title))
+            # Fill data in composer template
+            first_node_item = composition.getComposerItemById('first_node')
+            first_node_item.setText(str(first_node))
+            end_node_item = composition.getComposerItemById('end_node')
+            end_node_item.setText(str(end_node))
+            length_item = composition.getComposerItemById('length')
+            length_item.setText(str(self.start_point[-1]))
+            profile_title = composition.getComposerItemById('title')
+            profile_title.setText(str(title))
 
-        composition.setAtlasMode(QgsComposition.PreviewAtlas)
-        # if self.dlg_draw_profile.rotation.text() == '':
+            composition.setAtlasMode(QgsComposition.PreviewAtlas)
+            rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
+            map_item.setMapRotation(rotation)
 
-        rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
-        map_item.setMapRotation(rotation)
-
-        composition.refreshItems()
-        composition.update()
+            composition.refreshItems()
+            composition.update()
 
 
     def set_template(self):
@@ -1616,7 +1611,6 @@ class DrawProfiles(ParentMapTool):
         self.dlg_draw_profile.btn_delete_additional_point.setDisabled(True)
         self.widget_additional_point.clear()
         self.start_end_node.pop(1)
-        # Reload path
         self.exec_path()
         
         

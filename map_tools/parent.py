@@ -25,9 +25,10 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.core import QgsMapLayerRegistry as QgsProject
     from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
-    from qgis.core import QgsWkbTypes
+    from qgis.core import QgsWkbTypes, QgsProject
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsPoint, QgsExpression
@@ -308,7 +309,41 @@ class ParentMapTool(QgsMapTool):
             self.controller.log_warning(message, parameter=expr_filter)      
             return (False, expr)
         return (True, expr)
-    
+
+
+    def get_composers_list(self):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            active_composers = self.iface.activeComposers()
+        else:
+            layour_manager = QgsProject.instance().layoutManager().layouts()
+            active_composers = [layout for layout in layour_manager]
+
+        return active_composers
+
+
+    def get_composer_name(self, composer):
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            composer_name = composer.composerWindow().windowTitle()
+        else:
+            composer_name = composer.name()
+
+        return composer_name
+
+
+    def get_composer_index(self, name):
+
+        index = 0
+        composers = self.get_composers_list()
+        for comp_view in composers:
+            composer_name = self.get_composer_name(comp_view)
+            if composer_name == name:
+                break
+            index += 1
+
+        return index
+
         
     def canvasMoveEvent(self, event):
         
