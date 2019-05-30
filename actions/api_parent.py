@@ -1276,6 +1276,7 @@ class ApiParent(ParentAction):
                 lbl.setText(field['label'])
                 lbl.setMinimumSize(160, 0)
                 lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                lbl.setToolTip(field['tooltip'])
                 chk = None
                 if put_chk is True:
                     chk = QCheckBox()
