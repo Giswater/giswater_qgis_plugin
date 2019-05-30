@@ -412,12 +412,10 @@ class ApiConfig(ApiParent):
         # TODO cambiar por gw_api_getchilds
         sql = ("SELECT " + self.schema_name + ".gw_api_get_combochilds('config" + "' ,'' ,'' ,'" + str(combo_parent) + "', '" + str(combo_id) + "','')")
         row = self.controller.get_row(sql, log_sql=True)
-        self.controller.log_info(str(sql))
-        self.controller.log_info(str(row))
         #TODO::Refactor input and output for function "gw_api_get_combochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:
-                self.populate_child(combo_child, row)
+                self.populate_child(combo_child)
 
 
     def populate_child(self, combo_child):

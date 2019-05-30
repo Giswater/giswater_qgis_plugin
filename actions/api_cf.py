@@ -664,8 +664,6 @@ class ApiCF(ApiParent):
         if "Accepted" in str(row[0]['status']):
             msg = "OK"
             self.controller.show_message(msg, message_level=3)
-
-            self.layer_new_feature.commitChanges()
         elif "Failed" in str(row[0]['status']):
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
