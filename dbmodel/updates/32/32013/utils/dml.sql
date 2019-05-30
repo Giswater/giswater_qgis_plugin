@@ -26,3 +26,16 @@ UPDATE sys_csv2pg_cat SET name='Import visit file', name_i18n='import visit file
 
 
 UPDATE om_visit_type SET idval='unexpected' WHERE idval ='unspected';
+
+--2019/05/30
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2690, 'gw_fct_admin_schema_manage_addfields', 'utils','function', 'Create addfields definition and related custom view','role_admin',FALSE, FALSE,FALSE);
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2692, 'gw_fct_utils_export_ui_xml', 'utils','function', 'Export UI xml in order to modify fields order in the custom form','role_admin',FALSE, FALSE,FALSE);
+
+INSERT INTO audit_cat_function(id, function_name, project_type, function_type, descript, sys_role_id, isdeprecated, istoolbox, isparametric)
+VALUES (2694, 'gw_fct_utils_import_ui_xml', 'utils','function', 'Import UI xml and update fields order in the custom form','role_admin',FALSE, FALSE,FALSE);
+
+INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
+VALUES (3016, 'New field overlaps the existing one', 'Modify the order value.', 2, TRUE, 'utils',FALSE);

@@ -4,7 +4,7 @@
 	This version of Giswater is provided by Giswater Association
 	*/
 
-	--FUNCTION CODE: XXXX
+	--FUNCTION CODE: 2692
 
 
 	CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_export_ui_xml(p_formname text)

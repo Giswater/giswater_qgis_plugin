@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2694
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_import_ui_xml(p_formname text)
   RETURNS json AS
