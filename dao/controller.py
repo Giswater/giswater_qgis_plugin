@@ -1369,11 +1369,16 @@ class DaoController(object):
     def get_values_from_dictionary(self, dictionary):
         """ Return values from @dictionary """
 
-        list_values = None
-        if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+        if Qgis.QGIS_VERSION_INT < 29900:
             list_values = dictionary.itervalues()
         else:
             list_values = iter(dictionary.values())
 
         return list_values
+
+
+    def check_python_function(self, object_, function_name):
+
+        object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
+        return function_name in object_functions
 
