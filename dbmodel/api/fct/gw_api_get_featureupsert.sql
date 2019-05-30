@@ -175,14 +175,14 @@ BEGIN
 		-- topology control (enabled without state topocontrol. Does not make sense to activate this because in this phase of workflow
 		IF v_topocontrol IS TRUE THEN 
 	
-			IF v_catfeature.type ='NODE' THEN
+			IF upper(v_catfeature.type) ='NODE' THEN
 			
 				v_numnodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(p_reduced_geometry, node.the_geom, v_node_proximity) AND node.node_id != p_id AND node.state!=0);		
 				IF (v_numnodes >1) AND (v_node_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1096]:',error_message, v_id,'. ',hint_message) FROM audit_cat_error WHERE id=1096);
 					v_status = false;
 				END IF;
-			ELSIF v_catfeature.type ='ARC' THEN
+			ELSIF upper(v_catfeature.type) ='ARC' THEN
 			
 				SELECT node_id INTO v_node1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
 				ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(p_reduced_geometry)) LIMIT 1;
@@ -206,14 +206,14 @@ BEGIN
 				--getting gis length
 				v_gislength = (SELECT st_length(p_reduced_geometry))::float;
 				
-			ELSIF v_catfeature.type ='CONNEC' THEN 
+			ELSIF upper(v_catfeature.type) ='CONNEC' THEN 
 				v_numnodes := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(p_reduced_geometry, connec.the_geom, v_connec_proximity) AND connec.connec_id != p_id AND connec.state!=0);		
 				IF (v_numnodes >1) AND (v_connec_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1044]:',error_message, v_id,'. ',hint_message) FROM audit_cat_error WHERE id=1044);
 					v_status = false;
 				END IF;
 				
-			ELSIF v_catfeature.type ='GULLY' THEN
+			ELSIF upper(v_catfeature.type) ='GULLY' THEN
 				v_numnodes := (SELECT COUNT(*) FROM gully WHERE ST_DWithin(p_reduced_geometry, gully.the_geom, v_gully_proximity) AND gully.gully_id != p_id AND gully.state!=0);		
 				IF (v_numnodes >1) AND (v_gully_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1045]:',error_message, v_id,'. ',hint_message) FROM audit_cat_error WHERE id=1045);
