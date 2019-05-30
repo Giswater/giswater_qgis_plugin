@@ -866,7 +866,7 @@ class Giswater(QObject):
                 if self.table_man_pgully == uri_table:
                     self.layer_man_pgully = cur_layer
 
-        if self.wsoftware in ('ud', 'ws'):
+        if self.wsoftware in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             layers = self.controller.get_layers()
             status = self.populate_audit_check_project(layers)
@@ -1020,19 +1020,20 @@ class Giswater(QObject):
         """ Manage map tools """
 
         self.set_map_tool('map_tool_api_info_data')
-        self.set_map_tool('map_tool_api_info_inp')
-        self.set_map_tool('map_tool_move_node')
-        self.set_map_tool('map_tool_delete_node')
-        self.set_map_tool('map_tool_flow_trace')
-        self.set_map_tool('map_tool_flow_exit')
-        self.set_map_tool('map_tool_connec_tool')
-        self.set_map_tool('map_tool_draw_profiles')
-        self.set_map_tool('map_tool_replace_node')
-        self.set_map_tool('map_tool_change_node_type')        
-        self.set_map_tool('map_tool_dimensioning')               
-        self.set_map_tool('cad_add_circle')        
-        self.set_map_tool('cad_add_point')
-        self.set_map_tool('map_tool_open_visit')
+        if self.controller.get_project_type() in ('ws', 'ud'):
+            self.set_map_tool('map_tool_api_info_inp')
+            self.set_map_tool('map_tool_move_node')
+            self.set_map_tool('map_tool_delete_node')
+            self.set_map_tool('map_tool_flow_trace')
+            self.set_map_tool('map_tool_flow_exit')
+            self.set_map_tool('map_tool_connec_tool')
+            self.set_map_tool('map_tool_draw_profiles')
+            self.set_map_tool('map_tool_replace_node')
+            self.set_map_tool('map_tool_change_node_type')
+            self.set_map_tool('map_tool_dimensioning')
+            self.set_map_tool('cad_add_circle')
+            self.set_map_tool('cad_add_point')
+            self.set_map_tool('map_tool_open_visit')
 
 
     def set_map_tool(self, map_tool_name):
@@ -1040,12 +1041,11 @@ class Giswater(QObject):
 
         if map_tool_name in self.map_tools:
             map_tool = self.map_tools[map_tool_name]
+            map_tool.set_controller(self.controller)
             if self.basic.project_type == 'ws':
                 map_tool.set_layers(self.layer_arc_man_ws, self.layer_connec_man_ws, self.layer_node_man_ws)
-                map_tool.set_controller(self.controller)
-            else:
+            elif self.basic.project_type == 'ud':
                 map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud, self.layer_gully_man_ud)
-                map_tool.set_controller(self.controller)
 
 
     def manage_actions_linux(self):
@@ -1223,6 +1223,9 @@ class Giswater(QObject):
 
         # Set actions to controller class for further management
         self.controller.set_actions(self.actions)
+
+        # Set objects for map tools classes
+        self.manage_map_tools()
 
         # Log it
         message = "Project read successfully ('tm')"
