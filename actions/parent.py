@@ -26,7 +26,7 @@ else:
     from builtins import object
 
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsRectangle
-from qgis.PyQt.QtCore import Qt, QSettings, QDate
+from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QApplication, QCompleter, QAction, QWidget
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QPushButton, QLineEdit, QDoubleSpinBox, QTextEdit
 from qgis.PyQt.QtGui import QIcon, QCursor, QPixmap
@@ -48,7 +48,6 @@ class ParentAction(object):
         """ Class constructor """
 
         # Initialize instance attributes
-        self.giswater_version = "3.1"
         self.iface = iface
         self.canvas = self.iface.mapCanvas()        
         self.settings = settings
@@ -57,240 +56,48 @@ class ParentAction(object):
         self.dao = self.controller.dao         
         self.schema_name = self.controller.schema_name
         self.project_type = None
-        self.file_gsw = None
-        self.gsw_settings = None        
-          
-        # Get files to execute giswater jar (only in Windows)
-        if 'nt' in sys.builtin_module_names: 
-            self.plugin_version = self.get_plugin_version()
-            self.java_exe = self.get_java_exe()              
-            (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
-    
+        self.plugin_version = self.get_plugin_version()
+
     
     def set_controller(self, controller):
         """ Set controller class """
         
         self.controller = controller
         self.schema_name = self.controller.schema_name       
-        
-    
-    def get_plugin_version(self):
-        """ Get plugin version from metadata.txt file """
-               
-        # Check if metadata file exists    
-        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
-        if not os.path.exists(metadata_file):
-            message = "Metadata file not found" + metadata_file
-            self.controller.show_warning(message, parameter=metadata_file)
-            return None
-          
-        metadata = configparser.ConfigParser()
-        metadata.read(metadata_file)
-        plugin_version = metadata.get('general', 'version')
-        if plugin_version is None:
-            message = "Plugin version not found"
-            self.controller.show_warning(message)
-        
-        return plugin_version
-               
-       
-    def get_giswater_jar(self):
-        """ Get executable Giswater file and build version from windows registry """
-             
-        reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\\Giswater\\"+self.giswater_version
-        reg_name = "InstallFolder"
-        giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if giswater_folder is None:
-            message = "Cannot get giswater folder from windows registry"
-            self.controller.log_info(message, parameter=reg_path)
-            return None, None
-            
-        # Check if giswater folder exists
-        if not os.path.exists(giswater_folder):
-            message = "Giswater folder not found"
-            self.controller.log_info(message, parameter=giswater_folder)
-            return None, None
-            
-        # Check if giswater executable file file exists
-        giswater_file_path = giswater_folder+"\giswater.jar"
-        if not os.path.exists(giswater_file_path):
-            message = "Giswater executable file not found"
-            self.controller.log_info(message, parameter=giswater_file_path)
-            return None, None
 
-        # Get giswater major version
-        reg_name = "MajorVersion"
-        major_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if major_version is None:
-            message = "Cannot get giswater major version from windows registry"
-            self.controller.log_info(message, parameter=reg_path)
-            return giswater_file_path, None
 
-        # Get giswater minor version
-        reg_name = "MinorVersion"
-        minor_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if minor_version is None:
-            message = "Cannot get giswater minor version from windows registry" + reg_path
-            self.controller.log_info(message, parameter=reg_path)
-            return giswater_file_path, None
-                        
-        # Get giswater build version
-        reg_name = "BuildVersion"
-        build_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if build_version is None:
-            message = "Cannot get giswater build version from windows registry"
-            self.controller.log_info(message, parameter=reg_path)
-            return giswater_file_path, None
-        
-        giswater_build_version = major_version + '.' + minor_version + '.' + build_version
-        
-        return giswater_file_path, giswater_build_version
-    
-           
-    def get_java_exe(self):
-        """ Get executable Java file from windows registry """
-
-        reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\\JavaSoft\\Java Runtime Environment"
-        reg_name = "CurrentVersion"
-        java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        
-        # Check if java version exists (64 bits)
-        if java_version is None:
-            reg_path = "SOFTWARE\\Wow6432Node\\JavaSoft\\Java Runtime Environment" 
-            java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)   
-            # Check if java version exists (32 bits)            
-            if java_version is None:
-                message = "Cannot get current Java version from windows registry"
-                self.controller.log_info(message, parameter=reg_path)
-                return None
-      
-        # Get java folder
-        reg_path+= "\\"+java_version
-        reg_name = "JavaHome"
-        java_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if java_folder is None:
-            message = "Cannot get Java folder from windows registry"
-            self.controller.log_info(message, parameter=reg_path)
-            return None         
-
-        # Check if java folder exists
-        if not os.path.exists(java_folder):
-            message = "Java folder not found"
-            self.controller.log_info(message, parameter=java_folder)
-            return None  
-
-        # Check if java executable file exists
-        java_exe = java_folder+"/bin/java.exe"
-        if not os.path.exists(java_exe):
-            message = "Java executable file not found"
-            self.controller.log_info(message, parameter=java_exe)
-            return None  
-                
-        return java_exe
-                        
-
-    def execute_giswater(self, parameter):
-        """ Executes giswater with selected parameter """
-
-        if self.giswater_file_path is None or self.java_exe is None:
-            return               
-        
-        # Save database connection parameters into GSW file
-        self.save_database_parameters()        
-        
-        # Check if gsw file exists. If not giswater will open with the last .gsw file
-        if self.file_gsw is None:
-            self.file_gsw = ""        
-        if self.file_gsw:
-            if self.file_gsw != "" and not os.path.exists(self.file_gsw):
-                message = "GSW file not found"
-                self.controller.show_info(message, parameter=self.file_gsw)
-                self.file_gsw = ""   
-        
-        # Start program     
-        aux = '"' + self.giswater_file_path + '"'
-        if self.file_gsw != "":
-            aux+= ' "' + self.file_gsw + '"'
-            program = [self.java_exe, "-jar", self.giswater_file_path, self.file_gsw, parameter]
-        else:
-            program = [self.java_exe, "-jar", self.giswater_file_path, "", parameter]
-
-        self.controller.start_program(program)               
-        
-        # Compare Java and Plugin versions
-        if self.plugin_version != self.giswater_build_version:
-            msg = ("Giswater and plugin versions are different. "
-                   "Giswater version: " + self.giswater_build_version + ""
-                   " - Plugin version: " + self.plugin_version)
-            self.controller.show_info(msg, 10)
-        # Show information message    
-        else:
-            message = "Executing..."
-            self.controller.show_info(message, parameter=aux)
-        
-
-    def set_java_settings(self, show_warning=True):
-                        
-        # Get giswater properties file
-        users_home = os.path.expanduser("~")
-        filename = "giswater_" + self.giswater_version + ".properties"
-        java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename    
-        if not os.path.exists(java_properties_path):
-            message = "Giswater properties file not found"
-            if show_warning:
-                self.controller.show_warning(message, parameter=str(java_properties_path))
-            return False
-                        
-        self.java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        self.java_settings.setIniCodec(sys.getfilesystemencoding())        
-        self.file_gsw = utils_giswater.get_settings_value(self.java_settings, 'FILE_GSW')   
-                
-            
-    def set_gsw_settings(self):
-                  
-        if not self.file_gsw:                   
-            self.set_java_settings(False)
-            
-        self.gsw_settings = QSettings(self.file_gsw, QSettings.IniFormat)        
-                    
-
-    def save_database_parameters(self):
-        """ Save database connection parameters into GSW file """
-        
-        if self.gsw_settings is None:
-            self.set_gsw_settings()
-        
-        # Get layer version
-        layer = self.controller.get_layer_by_tablename('version')
-        if not layer:
-            return
-
-        # Get database connection paramaters and save them into GSW file
-        layer_source = self.controller.get_layer_source_from_credentials()
-        if layer_source is None:
-            return
-                
-        self.gsw_settings.setValue('POSTGIS_DATABASE', layer_source['db'])
-        self.gsw_settings.setValue('POSTGIS_HOST', layer_source['host'])
-        self.gsw_settings.setValue('POSTGIS_PORT', layer_source['port'])
-        self.gsw_settings.setValue('POSTGIS_USER', layer_source['user'])
-        self.gsw_settings.setValue('POSTGIS_USESSL', 'false')               
-        
-        
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
         
         if widget is not None:           
             url = utils_giswater.getWidgetText(dialog, widget)
             if url == 'null':
-                url = 'www.giswater.org'
+                url = 'http://www.giswater.org'
         else:
-            url = 'www.giswater.org'
+            url = 'http://www.giswater.org'
                      
-        webbrowser.open(url)    
-        
+        webbrowser.open(url)
+
+
+    def get_plugin_version(self):
+        """ Get plugin version from metadata.txt file """
+
+        # Check if metadata file exists
+        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
+        if not os.path.exists(metadata_file):
+            message = "Metadata file not found"
+            self.controller.show_warning(message, parameter=metadata_file)
+            return None
+
+        metadata = configparser.ConfigParser()
+        metadata.read(metadata_file)
+        plugin_version = metadata.get('general', 'version')
+        if plugin_version is None:
+            message = "Plugin version not found"
+            self.controller.show_warning(message)
+
+        return plugin_version
+
 
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
@@ -970,6 +777,7 @@ class ParentAction(object):
 
 
     def set_dates_from_to(self, widget_to, widget_from, table_name, field_from, field_to):
+
         sql = ("SELECT MIN(" + field_from + "), MAX(" + field_to + ")"
                " FROM {}.{}".format(self.schema_name, table_name))
         row = self.controller.get_row(sql, log_sql=False)
@@ -984,3 +792,4 @@ class ParentAction(object):
             else:
                 current_date = QDate.currentDate()
                 widget_to.setDate(current_date)
+

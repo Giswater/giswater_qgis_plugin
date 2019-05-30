@@ -960,7 +960,6 @@ class ApiParent(ParentAction):
 
         coords = list_coord.group(1)
         polygon = coords.split(',')
-
         x, y = polygon[0].split(' ')
         min_x = x  # start with something much higher than expected min
         min_y = y
@@ -988,6 +987,7 @@ class ApiParent(ParentAction):
 
 
     def draw(self, complet_result, zoom=True):
+
         if complet_result[0]['body']['feature']['geometry'] is None:
             return
         if complet_result[0]['body']['feature']['geometry']['st_astext'] is None:
@@ -1024,6 +1024,7 @@ class ApiParent(ParentAction):
 
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
+
         rb = self.rubber_polygon
         rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
         rb.setColor(color)
@@ -1032,11 +1033,13 @@ class ApiParent(ParentAction):
         # wait to simulate a flashing effect
         if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
+
         return rb
 
 
     def draw_polygon(self, points, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
         """ Draw 'polygon' over canvas following list of points """
+
         rb = self.rubber_polygon
         rb.setToGeometry(QgsGeometry.fromPolygon([points]), None)
         rb.setColor(border)
@@ -1047,6 +1050,7 @@ class ApiParent(ParentAction):
         # wait to simulate a flashing effect
         if duration_time is not None:
             QTimer.singleShot(duration_time, self.resetRubberbands)
+
         return rb
 
 
@@ -1083,6 +1087,7 @@ class ApiParent(ParentAction):
 
         
     def populate_basic_info(self, dialog, result, field_id):
+
         fields = result[0]['body']['data']
         if 'fields' not in fields:
             return
@@ -1260,86 +1265,89 @@ class ApiParent(ParentAction):
                 self.controller.log_info(str(row[pos]['return_type']))
                 field_id = 'return_type'
         self.controller.log_info(str(field_id))
-        if field_id != '':
-            for field in row[pos][field_id]:
-                if field['label']:
-                    lbl = QLabel()
-                    lbl.setObjectName('lbl' + field['widgetname'])
-                    lbl.setText(field['label'])
-                    lbl.setMinimumSize(160, 0)
-                    lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-                    chk = None
-                    if put_chk is True:
-                        chk = QCheckBox()
-                        chk.setObjectName('chk_' + field['widgetname'])
-                        if field['checked'] == "True":
-                            chk.setChecked(True)
-                        elif field['checked'] == "False":
-                            chk.setChecked(False)
-                        chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        if field_id == '':
+            return
 
-                    if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
-                        widget = QLineEdit()
-                        widget.setText(field['value'])
-                        if 'reg_exp' in field:
-                            if field['reg_exp'] is not None:
-                                reg_exp = QRegExp(str(field['reg_exp']))
-                                widget.setValidator(QRegExpValidator(reg_exp))
-                        if Qgis.QGIS_VERSION_INT < 29900:
-                            widget.lostFocus.connect(
-                                partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                        else:
-                            widget.editingFinished.connect(
-                                partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+        for field in row[pos][field_id]:
 
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            if field['label']:
+                lbl = QLabel()
+                lbl.setObjectName('lbl' + field['widgetname'])
+                lbl.setText(field['label'])
+                lbl.setMinimumSize(160, 0)
+                lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                chk = None
+                if put_chk is True:
+                    chk = QCheckBox()
+                    chk.setObjectName('chk_' + field['widgetname'])
+                    if field['checked'] == "True":
+                        chk.setChecked(True)
+                    elif field['checked'] == "False":
+                        chk.setChecked(False)
+                    chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-                    elif field['widgettype'] == 'combo':
-                        widget = self.add_combobox(field)
-                        widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                    elif field['widgettype'] == 'check':
-                        widget = QCheckBox()
-                        if field['value'] is not None and field['value'].lower() == "true":
-                            widget.setChecked(True)
-                        else:
-                            widget.setChecked(False)
-                        widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                    elif field['widgettype'] == 'datepickertime':
-                        widget = QDateEdit()
-                        widget.setCalendarPopup(True)
-                        date = QDate.fromString(field['value'], 'yyyy/MM/dd')
-                        widget.setDate(date)
-                        widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                    elif field['widgettype'] == 'spinbox':
-                        widget = QDoubleSpinBox()
-                        if 'value' in field and field['value'] not in(None, ""):
-                            value = float(str(field['value']))
-                            widget.setValue(value)
-                        widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
+                    widget = QLineEdit()
+                    widget.setText(field['value'])
+                    if 'reg_exp' in field:
+                        if field['reg_exp'] is not None:
+                            reg_exp = QRegExp(str(field['reg_exp']))
+                            widget.setValidator(QRegExpValidator(reg_exp))
+                    if Qgis.QGIS_VERSION_INT < 29900:
+                        widget.lostFocus.connect(
+                            partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    else:
+                        widget.editingFinished.connect(
+                            partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
 
-                    # Set editable/readonly
-                    if type(widget) in (QLineEdit, QDoubleSpinBox):
-                        if 'iseditable' in field:
-                            if str(field['iseditable']) == "False":
-                                widget.setReadOnly(True)
-                                widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-                        if type(widget) == QLineEdit:
-                            if 'placeholder' in field:
-                                widget.setPlaceholderText(field['placeholder'])
-                    elif type(widget) in (QComboBox, QCheckBox):
-                        if 'iseditable' in field:
-                            if str(field['iseditable']) == "False":
-                                widget.setEnabled(False)
-                    widget.setObjectName(field['widgetname'])
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-                    # Set signals
-                    if put_chk is True:
-                        chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
-                    self.put_widgets(dialog, field, lbl, chk, widget)
+                elif field['widgettype'] == 'combo':
+                    widget = self.add_combobox(field)
+                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'check':
+                    widget = QCheckBox()
+                    if field['value'] is not None and field['value'].lower() == "true":
+                        widget.setChecked(True)
+                    else:
+                        widget.setChecked(False)
+                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'datepickertime':
+                    widget = QDateEdit()
+                    widget.setCalendarPopup(True)
+                    date = QDate.fromString(field['value'], 'yyyy/MM/dd')
+                    widget.setDate(date)
+                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'spinbox':
+                    widget = QDoubleSpinBox()
+                    if 'value' in field and field['value'] not in(None, ""):
+                        value = float(str(field['value']))
+                        widget.setValue(value)
+                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, dialog, chk, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+                # Set editable/readonly
+                if type(widget) in (QLineEdit, QDoubleSpinBox):
+                    if 'iseditable' in field:
+                        if str(field['iseditable']) == "False":
+                            widget.setReadOnly(True)
+                            widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                    if type(widget) == QLineEdit:
+                        if 'placeholder' in field:
+                            widget.setPlaceholderText(field['placeholder'])
+                elif type(widget) in (QComboBox, QCheckBox):
+                    if 'iseditable' in field:
+                        if str(field['iseditable']) == "False":
+                            widget.setEnabled(False)
+                widget.setObjectName(field['widgetname'])
+
+                # Set signals
+                if put_chk is True:
+                    chk.stateChanged.connect(partial(self.get_values_checked_param_user, dialog, chk, widget, field, _json))
+                self.put_widgets(dialog, field, lbl, chk, widget)
 
 
     def put_widgets(self, dialog, field,  lbl, chk, widget):
@@ -1519,6 +1527,7 @@ class ApiParent(ParentAction):
 
 
     def action_open_url(self, dialog, result):
+
         widget = None
         function_name = 'no_function_associated'
         for field in result['fields']:
@@ -1526,12 +1535,14 @@ class ApiParent(ParentAction):
                 function_name = field['widgetfunction']
                 widget = dialog.findChild(HyperLinkLabel, field['widgetname'])
                 break
+
         if widget:
             # Call def  def gw_api_open_url(self, widget)
             getattr(self, function_name)(widget)
 
 
     def gw_api_open_url(self, widget):
+
         path = widget.text()
         # Check if file exist
         if os.path.exists(path):

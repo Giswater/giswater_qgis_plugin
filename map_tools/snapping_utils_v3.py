@@ -28,8 +28,10 @@ from qgis.core import QgsProject, QgsSnappingUtils, QgsPointLocator, QgsToleranc
 
 
 class SnappingConfigManager(object):
+
     def __init__(self, iface):
         """ Class constructor """
+
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.layer_arc = None
@@ -43,14 +45,18 @@ class SnappingConfigManager(object):
         proj = QgsProject.instance()
         proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
 
+
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
+
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man
         self.layer_gully_man = layer_gully_man
 
+
     def get_snapping_options(self):
         """ Function that collects all the snapping options and put it in an array """
+
         globalSnappingConfig = QgsProject.instance().snappingConfig()
         return globalSnappingConfig
 
@@ -58,12 +64,14 @@ class SnappingConfigManager(object):
 
     def store_snapping_options(self):
         """ Store the project user snapping configuration """
+
         # Get an array containing the snapping options for all the layers
         self.previous_snapping = self.get_snapping_options()
 
 
     def clear_snapping(self):
         """ Removing snap """
+
         QgsProject.instance().blockSignals(True)
         layers = self.controller.get_layers()
         # Loop through all the layers in the project

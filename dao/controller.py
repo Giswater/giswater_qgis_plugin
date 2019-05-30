@@ -17,14 +17,12 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import QgsProject, QgsDataSourceUri
 
-
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget, QToolBox
 from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.core import QgsMessageLog, QgsCredentials, QgsExpressionContextUtils
 
 import os.path
-import subprocess
 from functools import partial
 
 from giswater.dao.pg_dao import PgDao
@@ -63,12 +61,15 @@ class DaoController(object):
     def set_giswater(self, giswater):
         self.giswater = giswater
                 
+
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
                 
+
     def set_qgis_settings(self, qgis_settings):
         self.qgis_settings = qgis_settings       
         
+
     def set_plugin_dir(self, plugin_dir):
         self.plugin_dir = plugin_dir
         
@@ -122,16 +123,6 @@ class DaoController(object):
     def check_actions(self, check=True):
         """ Utility to check/uncheck all actions """
         for action_index, action in self.actions.items():   #@UnusedVariable
-            action.setChecked(check)    
-                    
-                           
-    def check_action(self, check=True, index=1):
-        """ Check/Uncheck selected action """
-        key = index
-        if type(index) is int:
-            key = str(index).zfill(2)
-        if key in self.actions:
-            action = self.actions[key]
             action.setChecked(check)
     
     
@@ -275,9 +266,9 @@ class DaoController(object):
         if self.schema_name is None:
             return       
 
-        sql = ("SELECT error_message"
-               " FROM " + self.schema_name + ".audit_cat_error"
-               " WHERE id = " + str(log_code_id))
+        sql = ("SELECT error_message "
+               "FROM " + self.schema_name + ".audit_cat_error "
+               "WHERE id = " + str(log_code_id))
         result = self.dao.get_row(sql)  
         if result:
             self.log_codes[log_code_id] = result[0]    
@@ -323,6 +314,7 @@ class DaoController(object):
 
     def show_info(self, text, duration=5, context_name=None, parameter=None, logger_file=True):
         """ Show information message to the user """
+
         self.show_message(text, 0, duration, context_name, parameter)
         if self.logger and logger_file:
             self.logger.info(text)            
@@ -330,9 +322,18 @@ class DaoController(object):
 
     def show_warning(self, text, duration=5, context_name=None, parameter=None, logger_file=True):
         """ Show warning message to the user """
+
         self.show_message(text, 1, duration, context_name, parameter)
         if self.logger and logger_file:
             self.logger.warning(text)
+
+
+    def show_critical(self, text, duration=5, context_name=None, parameter=None, logger_file=True):
+        """ Show warning message to the user """
+
+        self.show_message(text, 2, duration, context_name, parameter)
+        if self.logger and logger_file:
+            self.logger.critical(text)
         
 
     def show_warning_detail(self, text, detail_text, context_name=None):
@@ -554,6 +555,7 @@ class DaoController(object):
                    " SET (" + sql_fields[:-2] + ") = (" + sql_values[:-2] + ")" 
                    " WHERE " + unique_field + " = " + unique_value)         
         sql = sql.replace("''","'")
+
         # Execute sql
         self.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit=commit)
@@ -618,7 +620,27 @@ class DaoController(object):
             return False
 
         return True
-    
+
+
+    def execute_api_function(self, function_name, body, format_return='::text'):
+        """ Manage execution API function """
+
+        # Check if function exists
+        row = self.check_function(function_name)
+        if not row:
+            self.show_warning("Function not found in database", parameter=function_name)
+            return None
+
+        sql = "SELECT " + self.schema_name + "." + function_name + "($${" + body + "}$$)"
+        if format_return:
+            sql += format_return
+        row = self.get_row(sql, log_sql=True)
+        if not row:
+            self.show_critical("NOT ROW FOR", parameter=sql)
+            return None
+
+        return row
+
     
     def get_error_from_audit(self, commit=True):
         """ Get last error from audit tables that has not been showed to the user """
@@ -716,16 +738,6 @@ class DaoController(object):
                         widget.setText(text)
         except:
             pass
-
-                        
-    def start_program(self, program):     
-        """ Start an external program (hidden) """
-           
-        SW_HIDE = 0
-        info = subprocess.STARTUPINFO()
-        info.dwFlags = subprocess.STARTF_USESHOWWINDOW
-        info.wShowWindow = SW_HIDE
-        subprocess.Popen(program, startupinfo=info)   
         
         
     def get_layer_by_layername(self, layername, log_info=False):
@@ -1052,8 +1064,8 @@ class DaoController(object):
             schemaname = self.schema_name
 
         schemaname = schemaname.replace('"', '')
-        sql = ("SELECT * FROM information_schema.columns"
-               " WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
+        sql = ("SELECT * FROM information_schema.columns "
+               "WHERE table_schema = %s AND table_name = %s AND column_name = %s ")
         params = [schemaname, tablename, columname]
         row = self.get_row(sql, log_info=False, commit=True, params=params)
         return row
@@ -1063,13 +1075,12 @@ class DaoController(object):
         """ Get layers of the group @geom_type """
         
         list_items = []        
-        sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat"
-               " WHERE type = '" + geom_type.upper() + "'")
+        sql = ("SELECT tablename FROM " + self.schema_name + ".sys_feature_cat "
+               "WHERE type = '" + geom_type.upper() + "' ")
         if union:
-            sql += (" UNION SELECT parent_layer FROM " + self.schema_name + ".cat_feature"
-                    " WHERE feature_type='" + geom_type.upper() + "'")
+            sql += ("UNION SELECT parent_layer FROM " + self.schema_name + ".cat_feature "
+                    "WHERE feature_type='" + geom_type.upper() + "'")
         rows = self.get_rows(sql)
-        print(sql)
         if rows:
             for row in rows:
                 layer = self.get_layer_by_tablename(row[0])
@@ -1137,6 +1148,7 @@ class DaoController(object):
     
     def get_rolenames(self):
         """ Get list of rolenames of current user """
+
         super_users = self.settings.value('system_variables/super_users')
         if self.user in super_users:
             roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
@@ -1221,43 +1233,9 @@ class DaoController(object):
             elif self.giswater.wsoftware == 'ud':
                 self.giswater.enable_toolbar("om_ud")
 
-    
-    def get_value_config_param_system(self, parameter, show_warning=True):
-        """ Get value of @parameter from table 'config_param_system' """
-        
-        value = None
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_system"
-               " WHERE parameter = '" + parameter + "'") 
-        row = self.get_row(sql)
-        if row:
-            value = row[0]
-        elif not row and show_warning:
-            message = "Parameter not found in table 'config_param_system'"
-            self.show_warning(message, parameter=parameter)
-            return value           
-        
-        return value
-
-
-    def get_value_config_param_user(self, parameter, show_warning=True):
-        """ Get value of @parameter from table 'config_param_user' """
-
-        value = None
-        sql = ("SELECT value FROM " + self.schema_name + ".config_param_user"
-               " WHERE parameter = '" + parameter + "' AND cur_user = current_user")
-        row = self.get_row(sql)
-        if row:
-            value = row[0]
-        elif not row and show_warning:
-            message = "Parameter not found in table 'config_param_user'"
-            self.show_warning(message, parameter=parameter)
-            return value
-
-        return value
-
 
     def get_columns_list(self, tablename, schemaname=None):
-        """  Return list of all columns in @tablename """
+        """ Return list of all columns in @tablename """
         
         if schemaname is None:
             schemaname = self.schema_name
@@ -1293,7 +1271,9 @@ class DaoController(object):
         return self.logger.log_folder
 
 
+
     """  Functions related with Qgis versions """
+
     def is_layer_visible(self, layer):
         """ Is layer visible """
 
@@ -1329,6 +1309,7 @@ class DaoController(object):
 
 
     def set_path_from_qfiledialog(self, qtextedit, path):
+
         if Qgis.QGIS_VERSION_INT < 29900:
             if path:
                 qtextedit.setText(path)
@@ -1337,8 +1318,8 @@ class DaoController(object):
                 qtextedit.setText(path[0])
 
 
-
     def get_restriction(self):
+
         # Get project variable 'project_role'
         project_role = None
         if Qgis.QGIS_VERSION_INT < 29900:
@@ -1395,3 +1376,4 @@ class DaoController(object):
             list_values = iter(dictionary.values())
 
         return list_values
+
