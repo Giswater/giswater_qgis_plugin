@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2696
 
 
 
@@ -42,6 +42,7 @@ v_parameter text;
 v_querytext text;
 rec_parameter_child record;
 result text;
+v_newclass integer;
 
 BEGIN
 
@@ -60,6 +61,9 @@ BEGIN
     
     IF v_parameter IS NOT NULL THEN
 
+	-- select simpleClass id
+    	SELECT ((param_options->>'paramDesmultiplier')::json->>'simpleClass')::integer INTO v_newclass FROM om_visit_class JOIN om_visit ON om_visit_class.id=class_id WHERE om_visit.id=visit_id_aux;
+
 	-- loop for those nodes that has the same attribute
 	FOR rec_node IN SELECT node_id, startdate_aux as startdate, node.the_geom FROM node WHERE mu_id=mu_id_aux AND node.node_id!=node_id_aux 
 	LOOP
@@ -67,7 +71,7 @@ BEGIN
        
 		-- insert visit
 		INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done,status, class_id)
-		SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, 4, 2
+		SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, 4, v_newclass
 		FROM om_visit WHERE id=visit_id_aux RETURNING id into id_last;
 
 		INSERT INTO om_visit_x_node (visit_id,node_id) VALUES (id_last, rec_node.node_id);
@@ -140,7 +144,11 @@ BEGIN
 	IF v_querytext IS NOT NULL THEN
 		EXECUTE v_querytext;
 	END IF;
-	ELSE
+
+	-- update class visit to multi to simple 
+	UPDATE om_visit SET class_id=v_newclass WHERE om_visit.id=visit_id_aux;
+	
+      ELSE
 		--check if the function was planned before by unit
 		PERFORM tm_fct_planned_visit(visit_id_aux,1);
       END IF;

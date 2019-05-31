@@ -57,18 +57,8 @@ CREATE TABLE value_type
 -- create new fields
 ----------------------
 
-ALTER TABLE om_visit_class ADD COLUMN isopenparam boolean;
-ALTER TABLE om_visit_class ADD COLUMN ismultiplierparam boolean;
+ALTER TABLE om_visit_class ADD COLUMN param_options json;
 
-
-ALTER TABLE cat_arc ADD COLUMN  dn integer;
-ALTER TABLE cat_arc ADD COLUMN  pn integer;
-
-ALTER TABLE cat_connec ADD COLUMN dn integer;
-ALTER TABLE cat_connec ADD COLUMN  pn integer;
-
-ALTER TABLE cat_node ADD COLUMN dn integer;
-ALTER TABLE cat_node ADD COLUMN  pn integer;
 
 ALTER TABLE cat_feature ADD COLUMN  type character varying(30);
 ALTER TABLE cat_feature ADD COLUMN shortcut_key character varying(100);
