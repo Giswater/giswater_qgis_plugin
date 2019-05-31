@@ -112,7 +112,8 @@ BEGIN
 		IF table_record.id NOT IN (SELECT parameter FROM config_param_user WHERE cur_user=current_user LIMIT 1) THEN
 			INSERT INTO config_param_user (parameter, value, cur_user) 
 			SELECT audit_cat_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN audit_cat_param_user ON audit_cat_param_user.id=parameter 
-			WHERE id= table_record.id;	
+			WHERE audit_cat_param_user.id = table_record.id;	
+		END IF;
 	END LOOP;
 		
 	
