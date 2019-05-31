@@ -11,25 +11,41 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_gully()  RETURNS trigger AS $BODY$
 DECLARE 
     v_sql varchar;
-	gully_geometry varchar;
-	gully_id_seq int8;
-	count_aux integer;
-	promixity_buffer_aux double precision;
-	code_autofill_bool boolean;
-	link_path_aux varchar;
+	v_gully_geometry varchar;
+	v_count integer;
+	v_promixity_buffer double precision;
+	v_code_autofill_bool boolean;
+	v_link_path varchar;
 	v_record_link record;
 	v_record_vnode record;
-	v_count integer;
+	v_customfeature text;
+	v_addfields record;
+	v_new_value_param text;
+	v_old_value_param text;
+	v_arg text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-	promixity_buffer_aux = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
-	IF promixity_buffer_aux IS NULL THEN promixity_buffer_aux=0.5; END IF;
+	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	
-	gully_geometry:= TG_ARGV[0];
-    
+    	--modify values for custom view inserts
+	FOREACH v_arg IN ARRAY TG_ARGV LOOP
+		IF v_arg='gully' OR v_arg='gully_pol' THEN
+			v_gully_geometry:=v_arg;
+		ELSIF v_arg IN (SELECT id FROM gully_type) THEN
+			v_customfeature:=v_arg;
+		END IF;
+	END LOOP;
+	
+	IF v_customfeature='parent' THEN
+		v_customfeature:=NULL;
+	END IF;
+
+
+RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfeature;
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
 
@@ -41,7 +57,9 @@ BEGIN
 
 		
 		-- gully type 
-		   IF (NEW.gully_type IS NULL) THEN
+		   IF (NEW.gully_type IS NULL) AND v_customfeature IS NOT NULL THEN
+		    	NEW.gully_type:= v_customfeature;
+		   ELSIF (NEW.gully_type IS NULL) THEN
 			   NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.gully_type IS NULL) THEN
 				NEW.gully_type:=(SELECT id FROM gully_type LIMIT 1);
@@ -68,11 +86,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(1008,1216);  
 			END IF;
-				SELECT count(*)into count_aux FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.sector_id = (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.sector_id =(SELECT sector_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;	
 			IF (NEW.sector_id IS NULL) THEN
@@ -88,11 +106,11 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(1012,1216);  
             END IF;
-				SELECT count(*)into count_aux FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
-			IF count_aux = 1 THEN
+				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+			IF v_count = 1 THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			ELSIF count_aux > 1 THEN
-				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, promixity_buffer_aux) 
+			ELSIF v_count > 1 THEN
+				NEW.dma_id =(SELECT dma_id FROM v_edit_node WHERE ST_DWithin(NEW.the_geom, v_edit_node.the_geom, v_promixity_buffer) 
 				order by ST_Distance (NEW.the_geom, v_edit_node.the_geom) LIMIT 1);
 			END IF;
 			IF (NEW.dma_id IS NULL) THEN
@@ -138,10 +156,10 @@ BEGIN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;  
 
-		SELECT code_autofill INTO code_autofill_bool FROM gully_type WHERE id=NEW.gully_type;
+		SELECT code_autofill INTO v_code_autofill_bool FROM gully_type WHERE id=NEW.gully_type;
 
 		--Copy id to code field
-		IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.gully_id;
 		END IF;
 
@@ -192,7 +210,7 @@ BEGIN
 	    END IF;
 	
         -- FEATURE INSERT
-	IF gully_geometry = 'gully' THEN
+	IF v_gully_geometry = 'gully' THEN
         INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id,
 					"state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id,
 					builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
@@ -205,7 +223,7 @@ BEGIN
 					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,  NEW.uncertain, NEW.num_value);
 
 
-        ELSIF gully_geometry = 'gully_pol' THEN
+        ELSIF v_gully_geometry = 'gully_pol' THEN
         INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state",
 					state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, 
 					enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
@@ -222,7 +240,22 @@ BEGIN
 		AND cur_user=current_user LIMIT 1) IS TRUE THEN
 			PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
 		END IF;
-		
+
+	-- man addfields insert
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN
+					EXECUTE 'INSERT INTO man_addfields_value (feature_id, parameter_id, value_param) VALUES ($1, $2, $3)'
+						USING NEW.gully_id, v_addfields.id, v_new_value_param;
+				END IF;	
+			END LOOP;
+		END IF;		
+
         RETURN NEW;
 
 
@@ -275,13 +308,13 @@ BEGIN
 		END IF;		
 		
 		--link_path
-		SELECT link_path INTO link_path_aux FROM gully_type WHERE id=NEW.gully_type;
-		IF link_path_aux IS NOT NULL THEN
-			NEW.link = replace(NEW.link, link_path_aux,'');
+		SELECT link_path INTO v_link_path FROM gully_type WHERE id=NEW.gully_type;
+		IF v_link_path IS NOT NULL THEN
+			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 
         -- UPDATE values
-		IF gully_geometry = 'gully' THEN
+		IF v_gully_geometry = 'gully' THEN
 			UPDATE gully 
 			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
 			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
@@ -293,7 +326,7 @@ BEGIN
 			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
 			WHERE gully_id = OLD.gully_id;
 
-        ELSIF gully_geometry = 'gully_pol' THEN
+        ELSIF v_gully_geometry = 'gully_pol' THEN
 			UPDATE gully 
 			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
 			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  
@@ -305,7 +338,36 @@ BEGIN
 			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
 			WHERE gully_id = OLD.gully_id;
         END IF;  
-                
+
+	-- man addfields update
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
+			LOOP
+
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+	 
+				EXECUTE 'SELECT $1."' || v_addfields.param_name||'"'
+					USING OLD
+					INTO v_old_value_param;
+
+				IF v_new_value_param IS NOT NULL THEN 
+
+					EXECUTE 'INSERT INTO man_addfields_value(feature_id, parameter_id, value_param) VALUES ($1, $2, $3) 
+						ON CONFLICT (feature_id, parameter_id)
+						DO UPDATE SET value_param=$3 WHERE man_addfields_value.feature_id=$1 AND man_addfields_value.parameter_id=$2'
+						USING NEW.gully_id , v_addfields.id, v_new_value_param;	
+
+				ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+
+					EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
+						USING NEW.gully_id , v_addfields.id;
+				END IF;
+			
+			END LOOP;
+	    END IF;    
+
         RETURN NEW;
     
 
