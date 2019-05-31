@@ -7,6 +7,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+
+DROP VIEW v_rtc_hydrometer_x_arc;
+
+
 drop view if exists v_rtc_hydrometer_period cascade;
 CREATE OR REPLACE VIEW v_rtc_period_hydrometer AS 
 SELECT ext_rtc_hydrometer.id AS hydrometer_id,

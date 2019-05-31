@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- todo: deprecate views rtc
 
 -- 2019/05/24
 ALTER TABLE sys_csv2pg_cat ADD COLUMN orderby integer;
@@ -33,4 +32,3 @@ CREATE TABLE ext_cat_period_type(
 ALTER TABLE ext_cat_period ADD column period_type integer;
 
 ALTER TABLE ext_rtc_hydrometer_x_data ADD pattern_id character varying (16);
-ALTER TABLE ext_rtc_hydrometer_x_data ADD custom_pattern_id character varying (16);

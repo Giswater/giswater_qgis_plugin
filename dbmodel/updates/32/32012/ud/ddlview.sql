@@ -5,43 +5,17 @@ This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
------------------------
--- remove all the views that are refactored in the v3.2
------------------------
-/*DROP VIEW IF EXISTS v_edit_inp_conduit;
-DROP VIEW IF EXISTS v_edit_inp_junction;
-DROP VIEW IF EXISTS v_edit_inp_divider;
-DROP VIEW IF EXISTS v_edit_inp_orifice;
-DROP VIEW IF EXISTS v_edit_inp_outfall;
-DROP VIEW IF EXISTS v_edit_inp_outlet;
-DROP VIEW IF EXISTS v_edit_inp_pump;
-DROP VIEW IF EXISTS v_edit_inp_storage;
-DROP VIEW IF EXISTS v_edit_inp_virtual;
-DROP VIEW IF EXISTS v_edit_inp_weir;
 
-DROP VIEW IF EXISTS v_edit_man_chamber;
-DROP VIEW IF EXISTS v_edit_man_chamber_pol;
-DROP VIEW IF EXISTS v_edit_man_conduit;
-DROP VIEW IF EXISTS v_edit_man_connec;
-DROP VIEW IF EXISTS v_edit_man_gully;
-DROP VIEW IF EXISTS v_edit_man_gully_pol;
-DROP VIEW IF EXISTS v_edit_man_junction;
-DROP VIEW IF EXISTS v_edit_man_manhole;
-DROP VIEW IF EXISTS v_edit_man_netelement;
-DROP VIEW IF EXISTS v_edit_man_netgully_pol;
-DROP VIEW IF EXISTS v_edit_man_netinit;
-DROP VIEW IF EXISTS v_edit_man_outfall;
-DROP VIEW IF EXISTS v_edit_man_siphon;
-DROP VIEW IF EXISTS v_edit_man_storage;
-DROP VIEW IF EXISTS v_edit_man_storage_pol;
-DROP VIEW IF EXISTS v_edit_man_valve;
-DROP VIEW IF EXISTS v_edit_man_varc;
-DROP VIEW IF EXISTS v_edit_man_waccel;
-DROP VIEW IF EXISTS v_edit_man_wjump;
-DROP VIEW IF EXISTS v_edit_man_wwtp;
-DROP VIEW IF EXISTS v_edit_man_wwtp_pol;
-*/
 
+DROP VIEW ve_inp_conduit;
+DROP VIEW ve_inp_pump;
+DROP VIEW ve_inp_orifice;
+DROP VIEW ve_inp_outlet;
+DROP VIEW ve_inp_weir;
+DROP VIEW ve_inp_storage;
+DROP VIEW ve_inp_junction;
+DROP VIEW ve_inp_divider;
+DROP VIEW ve_inp_outfall;
 
 
 DROP VIEW IF EXISTS vp_basic_arc;
@@ -71,453 +45,37 @@ CREATE OR REPLACE VIEW vp_basic_gully AS
     v_edit_arc.arc_type AS custom_type
    FROM v_edit_arc;
 
-	
-	
-DROP VIEW IF EXISTS ve_inp_junction;
-CREATE OR REPLACE VIEW ve_inp_junction AS 
- SELECT v_node.node_id,
-    v_node.top_elev,
-    v_node.custom_top_elev,
-    v_node.ymax,
-    v_node.custom_ymax,
-    v_node.elev,
-    v_node.custom_elev,
+   
+  
+CREATE OR REPLACE VIEW vp_epa_arc AS 
+ SELECT arc.arc_id AS nid,
+    arc.epa_type,
         CASE
-            WHEN v_node.sys_elev IS NOT NULL THEN v_node.sys_elev
-            ELSE (v_node.sys_top_elev - v_node.sys_ymax)::numeric(12,3)
-        END AS sys_elev,
-    v_node.nodecat_id,
-    v_node.sector_id,
-    v_node.macrosector_id,
-    v_node.state,
-    v_node.the_geom,
-    v_node.annotation,
-    inp_junction.y0,
-    inp_junction.ysur,
-    inp_junction.apond
-   FROM inp_selector_sector,
-    v_node
-     JOIN inp_junction ON inp_junction.node_id::text = v_node.node_id::text
-  WHERE v_node.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-	
-	
-DROP VIEW IF EXISTS ve_inp_storage;
-CREATE VIEW ve_inp_storage AS
-SELECT 
-v_node.node_id, 
-top_elev,
-custom_top_elev,
-ymax,
-custom_ymax,
-elev,
-custom_elev,
+            WHEN arc.epa_type::text = 'CONDUIT'::text THEN 'v_edit_inp_conduit'::text
+            WHEN arc.epa_type::text = 'PUMP'::text THEN 'v_edit_inp_pump'::text
+            WHEN arc.epa_type::text = 'ORIFICE'::text THEN 'v_edit_inp_orifice'::text
+            WHEN arc.epa_type::text = 'WEIR'::text THEN 'v_edit_inp_weir'::text
+            WHEN arc.epa_type::text = 'OUTLET'::text THEN 'v_edit_inp_outlet'::text
+            WHEN arc.epa_type::text = 'NOT DEFINED'::text THEN NULL::text
+            ELSE NULL::text
+        END AS epatable
+   FROM arc;
+
+
+CREATE OR REPLACE VIEW vp_epa_node AS 
+ SELECT node.node_id AS nid,
+    node.epa_type,
         CASE
-            WHEN v_node.sys_elev IS NOT NULL THEN v_node.sys_elev
-            ELSE (v_node.sys_top_elev - v_node.sys_ymax)::numeric(12,3)
-        END AS sys_elev,
-nodecat_id, 
-v_node.sector_id, 
-macrosector_id,"state", 
-the_geom,
-inp_storage.storage_type, 
-inp_storage.curve_id, 
-inp_storage.a1, 
-inp_storage.a2,
-inp_storage.a0, 
-inp_storage.fevap, 
-inp_storage.sh, 
-inp_storage.hc, 
-inp_storage.imd, 
-inp_storage.y0, 
-inp_storage.ysur
-FROM inp_selector_sector, v_node
-    JOIN inp_storage ON (((v_node.node_id) = (inp_storage.node_id)))
-    WHERE ((v_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
+            WHEN node.epa_type::text = 'JUNCTION'::text THEN 'v_edit_inp_junction'::text
+            WHEN node.epa_type::text = 'STORAGE'::text THEN 'v_edit_inp_storage'::text
+            WHEN node.epa_type::text = 'DIVIDER'::text THEN 'v_edit_inp_divider'::text
+            WHEN node.epa_type::text = 'OUTFALL'::text THEN 'v_edit_inp_outfall'::text
+            WHEN node.epa_type::text = 'NOT DEFINED'::text THEN NULL::text
+            ELSE NULL::text
+        END AS epatable
+   FROM node;
 
-
-
-CREATE OR REPLACE VIEW v_edit_inp_divider AS 
- SELECT v_node.node_id,
-    v_node.top_elev,
-    v_node.custom_top_elev,
-    v_node.ymax,
-    v_node.custom_ymax,
-    v_node.elev,
-    v_node.custom_elev,
-        CASE
-            WHEN v_node.sys_elev IS NOT NULL THEN v_node.sys_elev
-            ELSE (v_node.sys_top_elev - v_node.sys_ymax)::numeric(12,3)
-        END AS sys_elev,
-    v_node.nodecat_id,
-    v_node.sector_id,
-    v_node.macrosector_id,
-    v_node.state,
-    v_node.annotation,
-    v_node.the_geom,
-    inp_divider.divider_type,
-    inp_divider.arc_id,
-    inp_divider.curve_id,
-    inp_divider.qmin,
-    inp_divider.ht,
-    inp_divider.cd,
-    inp_divider.y0,
-    inp_divider.ysur,
-    inp_divider.apond
-   FROM inp_selector_sector,
-    v_node
-     JOIN inp_divider ON v_node.node_id::text = inp_divider.node_id::text
-  WHERE v_node.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
-
-
-DROP VIEW ve_inp_outfall;
-
-CREATE OR REPLACE VIEW ve_inp_outfall AS 
- SELECT v_node.node_id,
-    v_node.top_elev,
-    v_node.custom_top_elev,
-    v_node.ymax,
-    v_node.custom_ymax,
-    v_node.elev,
-    v_node.custom_elev,
-        CASE
-            WHEN v_node.sys_elev IS NOT NULL THEN v_node.sys_elev
-            ELSE (v_node.sys_top_elev - v_node.sys_ymax)::numeric(12,3)
-        END AS sys_elev,
-    v_node.nodecat_id,
-    v_node.sector_id,
-    v_node.macrosector_id,
-    v_node.state,
-    v_node.the_geom,
-    v_node.annotation,
-    inp_outfall.outfall_type,
-    inp_outfall.stage,
-    inp_outfall.curve_id,
-    inp_outfall.timser_id,
-    inp_outfall.gate
-   FROM inp_selector_sector,
-    v_node
-     JOIN inp_outfall ON v_node.node_id::text = inp_outfall.node_id::text
-  WHERE v_node.sector_id = inp_selector_sector.sector_id AND inp_selector_sector.cur_user = "current_user"()::text;
-
-
-
------------------------
--- create views ve
------------------------
-DROP VIEW IF EXISTS ve_arc;
-CREATE OR REPLACE VIEW ve_arc AS 
- SELECT v_arc_x_node.arc_id,
-    v_arc_x_node.code,
-    v_arc_x_node.node_1,
-    v_arc_x_node.node_2,
-    v_arc_x_node.y1,
-    v_arc_x_node.custom_y1,
-    v_arc_x_node.elev1,
-    v_arc_x_node.custom_elev1,
-    v_arc_x_node.sys_elev1,
-    v_arc_x_node.y2,
-    v_arc_x_node.custom_y2,
-    v_arc_x_node.elev2,
-    v_arc_x_node.custom_elev2,
-    v_arc_x_node.sys_elev2,
-    v_arc_x_node.z1,
-    v_arc_x_node.z2,
-    v_arc_x_node.r1,
-    v_arc_x_node.r2,
-    v_arc_x_node.slope,
-    v_arc_x_node.arc_type,
-    v_arc_x_node.sys_type,
-    v_arc_x_node.arccat_id,
-    v_arc_x_node.matcat_id AS cat_matcat_id,
-    v_arc_x_node.shape AS cat_shape,
-    v_arc_x_node.geom1 AS cat_geom1,
-    v_arc_x_node.geom2 AS cat_geom2,
-    v_arc_x_node.gis_length,
-    v_arc_x_node.epa_type,
-    v_arc_x_node.sector_id,
-    v_arc_x_node.macrosector_id,
-    v_arc_x_node.state,
-    v_arc_x_node.state_type,
-    v_arc_x_node.annotation,
-    v_arc_x_node.observ,
-    v_arc_x_node.comment,
-    v_arc_x_node.inverted_slope,
-    v_arc_x_node.custom_length,
-    v_arc_x_node.dma_id,
-    v_arc_x_node.soilcat_id,
-    v_arc_x_node.function_type,
-    v_arc_x_node.category_type,
-    v_arc_x_node.fluid_type,
-    v_arc_x_node.location_type,
-    v_arc_x_node.workcat_id,
-    v_arc_x_node.workcat_id_end,
-    v_arc_x_node.buildercat_id,
-    v_arc_x_node.builtdate,
-    v_arc_x_node.enddate,
-    v_arc_x_node.ownercat_id,
-    v_arc_x_node.muni_id,
-    v_arc_x_node.postcode,
-    v_arc_x_node.streetaxis_id,
-    v_arc_x_node.postnumber,
-    v_arc_x_node.postcomplement,
-    v_arc_x_node.postcomplement2,
-    v_arc_x_node.streetaxis2_id,
-    v_arc_x_node.postnumber2,
-    v_arc_x_node.descript,
-    v_arc_x_node.link,
-    v_arc_x_node.verified,
-    v_arc_x_node.the_geom,
-    v_arc_x_node.undelete,
-    v_arc_x_node.label_x,
-    v_arc_x_node.label_y,
-    v_arc_x_node.label_rotation,
-    v_arc_x_node.publish,
-    v_arc_x_node.inventory,
-    v_arc_x_node.uncertain,
-    v_arc_x_node.macrodma_id,
-    v_arc_x_node.expl_id,
-    v_arc_x_node.num_value
-   FROM v_arc_x_node;
-
-
-DROP VIEW IF EXISTS ve_node;
-CREATE OR REPLACE VIEW ve_node AS 
- SELECT v_node.node_id,
-    v_node.code,
-    v_node.top_elev,
-    v_node.custom_top_elev,
-    v_node.ymax,
-    v_node.custom_ymax,
-    v_node.elev,
-    v_node.custom_elev,
-    v_node.sys_elev,
-    v_node.node_type,
-    v_node.sys_type,
-    v_node.nodecat_id,
-    v_node.cat_matcat_id,
-    v_node.epa_type,
-    v_node.sector_id,
-    v_node.macrosector_id,
-    v_node.state,
-    v_node.state_type,
-    v_node.annotation,
-    v_node.observ,
-    v_node.comment,
-    v_node.dma_id,
-    v_node.soilcat_id,
-    v_node.function_type,
-    v_node.category_type,
-    v_node.fluid_type,
-    v_node.location_type,
-    v_node.workcat_id,
-    v_node.workcat_id_end,
-    v_node.buildercat_id,
-    v_node.builtdate,
-    v_node.enddate,
-    v_node.ownercat_id,
-    v_node.muni_id,
-    v_node.postcode,
-    v_node.streetaxis_id,
-    v_node.postnumber,
-    v_node.postcomplement,
-    v_node.postcomplement2,
-    v_node.streetaxis2_id,
-    v_node.postnumber2,
-    v_node.descript,
-    v_node.svg,
-    v_node.rotation,
-    v_node.link,
-    v_node.verified,
-    v_node.the_geom,
-    v_node.undelete,
-    v_node.label_x,
-    v_node.label_y,
-    v_node.label_rotation,
-    v_node.publish,
-    v_node.inventory,
-    v_node.uncertain,
-    v_node.xyz_date,
-    v_node.unconnected,
-    v_node.macrodma_id,
-    v_node.expl_id,
-    v_node.num_value
-   FROM v_node;
-
-
-DROP VIEW IF EXISTS ve_connec;
-CREATE OR REPLACE VIEW ve_connec AS 
- SELECT connec.connec_id,
-    connec.code,
-    connec.customer_code,
-    connec.top_elev,
-    connec.y1,
-    connec.y2,
-    connec.connecat_id,
-    connec.connec_type,
-    connec_type.type AS sys_type,
-    connec.private_connecat_id,
-    cat_connec.matcat_id AS cat_matcat_id,
-    connec.sector_id,
-    sector.macrosector_id,
-    connec.demand,
-    connec.state,
-    connec.state_type,
-    connec.connec_depth,
-    connec.connec_length,
-    connec.arc_id,
-    connec.annotation,
-    connec.observ,
-    connec.comment,
-    connec.dma_id,
-    connec.soilcat_id,
-    connec.function_type,
-    connec.category_type,
-    connec.fluid_type,
-    connec.location_type,
-    connec.workcat_id,
-    connec.workcat_id_end,
-    connec.buildercat_id,
-    connec.builtdate,
-    connec.enddate,
-    connec.ownercat_id,
-    connec.muni_id,
-    connec.postcode,
-    connec.streetaxis_id,
-    connec.postnumber,
-    connec.postcomplement,
-    connec.streetaxis2_id,
-    connec.postnumber2,
-    connec.postcomplement2,
-    connec.descript,
-    cat_connec.svg,
-    connec.rotation,
-    concat(connec_type.link_path, connec.link) AS link,
-    connec.verified,
-    connec.the_geom,
-    connec.undelete,
-    connec.featurecat_id,
-    connec.feature_id,
-    connec.label_x,
-    connec.label_y,
-    connec.label_rotation,
-    connec.accessibility,
-    connec.diagonal,
-    connec.publish,
-    connec.inventory,
-    connec.uncertain,
-    dma.macrodma_id,
-    connec.expl_id,
-    connec.num_value
-   FROM connec
-     JOIN v_state_connec ON connec.connec_id::text = v_state_connec.connec_id::text
-     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
-     LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN dma ON connec.dma_id = dma.dma_id
-     LEFT JOIN sector ON connec.sector_id = sector.sector_id
-     LEFT JOIN connec_type ON connec.connec_type::text = connec_type.id::text;
-
-
-DROP VIEW IF EXISTS ve_gully;
-CREATE OR REPLACE VIEW ve_gully AS 
- SELECT gully.gully_id,
-    gully.code,
-    gully.top_elev,
-    gully.ymax,
-    gully.sandbox,
-    gully.matcat_id,
-    gully.gully_type,
-    gully_type.type AS sys_type,
-    gully.gratecat_id,
-    cat_grate.matcat_id AS cat_grate_matcat,
-    gully.units,
-    gully.groove,
-    gully.siphon,
-    gully.connec_arccat_id,
-    gully.connec_length,
-    gully.connec_depth,
-    gully.arc_id,
-    gully.sector_id,
-    sector.macrosector_id,
-    gully.state,
-    gully.state_type,
-    gully.annotation,
-    gully.observ,
-    gully.comment,
-    gully.dma_id,
-    gully.soilcat_id,
-    gully.function_type,
-    gully.category_type,
-    gully.fluid_type,
-    gully.location_type,
-    gully.workcat_id,
-    gully.workcat_id_end,
-    gully.buildercat_id,
-    gully.builtdate,
-    gully.enddate,
-    gully.ownercat_id,
-    gully.muni_id,
-    gully.postcode,
-    gully.streetaxis_id,
-    gully.postnumber,
-    gully.postcomplement,
-    gully.streetaxis2_id,
-    gully.postnumber2,
-    gully.postcomplement2,
-    gully.descript,
-    cat_grate.svg,
-    gully.rotation,
-    concat(gully_type.link_path, gully.link) AS link,
-    gully.verified,
-    gully.the_geom,
-    gully.undelete,
-    gully.featurecat_id,
-    gully.feature_id,
-    gully.label_x,
-    gully.label_y,
-    gully.label_rotation,
-    gully.publish,
-    gully.inventory,
-    gully.expl_id,
-    dma.macrodma_id,
-    gully.uncertain,
-    gully.num_value
-   FROM gully
-     JOIN v_state_gully ON gully.gully_id::text = v_state_gully.gully_id::text
-     LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
-     LEFT JOIN ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN dma ON gully.dma_id = dma.dma_id
-     LEFT JOIN sector ON gully.sector_id = sector.sector_id
-     LEFT JOIN gully_type ON gully.gully_type::text = gully_type.id::text;
-
-
-
------------------------
--- create parent views
------------------------
-DROP VIEW IF EXISTS vp_arc;
-CREATE OR REPLACE VIEW vp_arc AS 
- SELECT ve_arc.arc_id AS nid,
-    ve_arc.arc_type AS custom_type
-   FROM ve_arc;
-
-DROP VIEW IF EXISTS vp_connec;
-CREATE OR REPLACE VIEW vp_connec AS 
- SELECT ve_connec.connec_id AS nid,
-    ve_connec.connec_type AS custom_type
-   FROM ve_connec;
-
-DROP VIEW IF EXISTS vp_node;
-CREATE OR REPLACE VIEW vp_node AS 
- SELECT ve_node.node_id AS nid,
-    ve_node.node_type AS custom_type
-   FROM ve_node;
-
-DROP VIEW IF EXISTS vp_gully;
-CREATE OR REPLACE VIEW vp_gully AS 
- SELECT ve_gully.arc_id AS nid,
-    ve_gully.gully_type AS custom_type
-   FROM ve_gully;
+  
 
 -----------------------
 -- create child views

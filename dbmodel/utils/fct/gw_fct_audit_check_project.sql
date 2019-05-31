@@ -109,10 +109,9 @@ BEGIN
 	-- set mandatory values of config_param_user in case of not exists (for news users or for updates)
 	FOR table_record IN SELECT * FROM audit_cat_param_user WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
 	LOOP
-		IF table_record.id NOT IN (SELECT parameter FROM config_param_user WHERE cur_user=current_user LIMIT 1) THEN
+		IF table_record.id NOT IN (SELECT parameter FROM config_param_user WHERE cur_user=current_user) THEN
 			INSERT INTO config_param_user (parameter, value, cur_user) 
-			SELECT audit_cat_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN audit_cat_param_user ON audit_cat_param_user.id=parameter 
-			WHERE audit_cat_param_user.id = table_record.id;	
+			SELECT audit_cat_param_user.id, vdefault, current_user FROM audit_cat_param_user WHERE audit_cat_param_user.id = table_record.id;	
 		END IF;
 	END LOOP;
 		

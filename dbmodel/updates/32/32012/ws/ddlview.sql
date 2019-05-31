@@ -7,47 +7,86 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+DROP VIEW ve_inp_pipe;
+DROP VIEW ve_inp_valve;
+DROP VIEW ve_inp_tank;
+DROP VIEW ve_inp_reservoir;
+DROP VIEW ve_inp_junction;
+DROP VIEW ve_inp_shortpipe;
+DROP VIEW ve_inp_pump;
 
-DROP VIEW v_rtc_hydrometer_x_node_period;
-CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
- SELECT a.hydrometer_id,
-    a.node_1 AS node_id,
-    a.arc_id,
-    b.dma_id,
-    b.period_id,
-    b.m3_total_period*0.5 AS m3_hydrometer_period,
-    b.lps_avg * 0.5::double precision AS lps_avg_real,
-    c.effc::numeric(5,4) AS losses,
-    b.lps_avg * 0.5::double precision / c.effc AS lps_avg,
-    c.minc AS cmin,
-    b.lps_avg * 0.5::double precision / c.effc * c.minc AS lps_min,
-    c.maxc AS cmax,
-    b.lps_avg * 0.5::double precision / c.effc * c.maxc AS lps_max,
-    c.pattern_id
-   FROM v_rtc_hydrometer_x_arc a
-     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::bigint = a.hydrometer_id::bigint
-     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text
-UNION
- SELECT a.hydrometer_id,
-    a.node_2 AS node_id,
-    a.arc_id,
-    b.dma_id,
-    b.period_id,
-    b.m3_total_period*0.5,
-    b.lps_avg * 0.5::double precision AS lps_avg_real,
-    c.effc::numeric(5,4) AS losses,
-    b.lps_avg * 0.5::double precision / c.effc AS lps_avg,
-    c.minc AS cmin,
-    b.lps_avg * 0.5::double precision / c.effc * c.minc AS lps_min,
-    c.maxc AS cmax,
-    b.lps_avg * 0.5::double precision / c.effc * c.maxc AS lps_max,
-    c.pattern_id
-   FROM v_rtc_hydrometer_x_arc a
-     JOIN v_rtc_hydrometer_period b ON b.hydrometer_id::bigint = a.hydrometer_id::bigint
-     JOIN ext_rtc_scada_dma_period c ON c.cat_period_id::text = b.period_id::text AND c.dma_id::text = b.dma_id::text;
+DROP VIEW IF EXISTS vp_basic_arc;
+CREATE OR REPLACE VIEW vp_basic_arc AS 
+ SELECT v_edit_arc.arc_id AS nid,
+    v_edit_arc.cat_arctype_id AS custom_type
+   FROM v_edit_arc;
+   
+  
+DROP VIEW IF EXISTS vp_basic_node;
+CREATE OR REPLACE VIEW vp_basic_node AS 
+ SELECT v_edit_node.node_id AS nid,
+    v_edit_node.nodetype_id AS custom_type
+   FROM v_edit_node;
+   
+   
+DROP VIEW IF EXISTS vp_basic_connec ;
+CREATE OR REPLACE VIEW vp_basic_connec AS 
+ SELECT connec_id AS nid,
+    v_edit_connec.connectype_id AS custom_type
+   FROM v_edit_connec;
+   
+   
+CREATE OR REPLACE VIEW vp_epa_arc AS 
+ SELECT arc.arc_id AS nid,
+    arc.epa_type,
+        CASE
+            WHEN arc.epa_type::text = 'PIPE'::text THEN 'v_edit_inp_pipe'::text
+            WHEN arc.epa_type::text = 'NOT DEFINED'::text THEN NULL::text
+            ELSE NULL::text
+        END AS epatable
+   FROM arc;
 
-	 
-	 
+
+CREATE OR REPLACE VIEW vp_epa_node AS 
+ SELECT node.node_id AS nid,
+    node.epa_type,
+        CASE
+            WHEN node.epa_type::text = 'JUNCTION'::text THEN 'v_edit_inp_junction'::text
+            WHEN node.epa_type::text = 'PUMP'::text THEN 'v_edit_inp_pump'::text
+            WHEN node.epa_type::text = 'RESERVOIR'::text THEN 'v_edit_inp_reservoir'::text
+            WHEN node.epa_type::text = 'TANK'::text THEN 'v_edit_inp_tank'::text
+            WHEN node.epa_type::text = 'VALVE'::text THEN 'v_edit_inp_valve'::text
+            WHEN node.epa_type::text = 'SHORTPIPE'::text THEN 'v_edit_inp_shortpipe'::text
+            WHEN node.epa_type::text = 'NOT DEFINED'::text THEN NULL::text
+            ELSE NULL::text
+        END AS epatable
+   FROM node;
+
+
+--old views with new fields
+DROP VIEW IF EXISTS v_anl_connec;
+CREATE VIEW v_anl_connec AS 
+ SELECT anl_connec.id,
+    anl_connec.connec_id,
+    anl_connec.connecat_id,
+    anl_connec.state,
+    anl_connec.connec_id_aux,
+    anl_connec.connecat_id_aux,
+    anl_connec.state_aux,
+    sys_fprocess_cat.fprocess_i18n AS fprocess,
+    exploitation.name AS expl_name,
+    anl_connec.the_geom
+   FROM selector_expl,
+    anl_connec
+     JOIN exploitation ON anl_connec.expl_id = exploitation.expl_id
+     JOIN sys_fprocess_cat ON anl_connec.fprocesscat_id = sys_fprocess_cat.id
+  WHERE anl_connec.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_connec.cur_user::name = "current_user"();
+
+
+   
+-----------------------
+-- create child views
+-----------------------
 
 DROP VIEW IF EXISTS ve_arc_pipe CASCADE;	
 CREATE OR REPLACE VIEW ve_arc_pipe AS
@@ -109,334 +148,6 @@ FROM v_arc
 	JOIN man_pipe ON man_pipe.arc_id=v_arc.arc_id;
 
 
-DROP VIEW IF EXISTS vp_basic_arc;
-CREATE OR REPLACE VIEW vp_basic_arc AS 
- SELECT v_edit_arc.arc_id AS nid,
-    v_edit_arc.cat_arctype_id AS custom_type
-   FROM v_edit_arc;
-   
-  
-DROP VIEW IF EXISTS vp_basic_node;
-CREATE OR REPLACE VIEW vp_basic_node AS 
- SELECT v_edit_node.node_id AS nid,
-    v_edit_node.nodetype_id AS custom_type
-   FROM v_edit_node;
-   
-   
-DROP VIEW IF EXISTS vp_basic_connec ;
-CREATE OR REPLACE VIEW vp_basic_connec AS 
- SELECT connec_id AS nid,
-    v_edit_connec.connectype_id AS custom_type
-   FROM v_edit_connec;
-   
-   
-CREATE OR REPLACE VIEW vp_epa_arc AS 
- SELECT arc.arc_id AS nid,
-    arc.epa_type,
-        CASE
-            WHEN arc.epa_type::text = 'PIPE'::text THEN 've_inp_pipe'::text
-            WHEN arc.epa_type::text = 'NOT DEFINED'::text THEN NULL::text
-            ELSE NULL::text
-        END AS epatable
-   FROM arc;
-
-
-CREATE OR REPLACE VIEW vp_epa_node AS 
- SELECT node.node_id AS nid,
-    node.epa_type,
-        CASE
-            WHEN node.epa_type::text = 'JUNCTION'::text THEN 've_inp_junction'::text
-            WHEN node.epa_type::text = 'PUMP'::text THEN 've_inp_pump'::text
-            WHEN node.epa_type::text = 'RESERVOIR'::text THEN 've_inp_reservoir'::text
-            WHEN node.epa_type::text = 'TANK'::text THEN 've_inp_tank'::text
-            WHEN node.epa_type::text = 'VALVE'::text THEN 've_inp_valve'::text
-            WHEN node.epa_type::text = 'SHORTPIPE'::text THEN 've_inp_shortpipe'::text
-            WHEN node.epa_type::text = 'NOT DEFINED'::text THEN NULL::text
-            ELSE NULL::text
-        END AS epatable
-   FROM node;
-
-
-
---old views with new fields
-DROP VIEW IF EXISTS v_anl_connec;
-CREATE VIEW v_anl_connec AS 
- SELECT anl_connec.id,
-    anl_connec.connec_id,
-    anl_connec.connecat_id,
-    anl_connec.state,
-    anl_connec.connec_id_aux,
-    anl_connec.connecat_id_aux,
-    anl_connec.state_aux,
-    sys_fprocess_cat.fprocess_i18n AS fprocess,
-    exploitation.name AS expl_name,
-    anl_connec.the_geom
-   FROM selector_expl,
-    anl_connec
-     JOIN exploitation ON anl_connec.expl_id = exploitation.expl_id
-     JOIN sys_fprocess_cat ON anl_connec.fprocesscat_id = sys_fprocess_cat.id
-  WHERE anl_connec.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text AND anl_connec.cur_user::name = "current_user"();
-
-/* drop view causes problems as many other views depends on it
-DROP VIEW IF EXISTS v_rtc_hydrometer;
-CREATE VIEW v_rtc_hydrometer AS 
- SELECT rtc_hydrometer.hydrometer_id,
-    rtc_hydrometer_x_connec.connec_id,
-    connec.customer_code AS connec_customer_code,
-    connec.expl_id,
-    connec.arc_id,
-    value_state.name AS state,
-    exploitation.name AS expl_name,
-    ext_rtc_hydrometer.code AS hydrometer_customer_code,
-    ext_rtc_hydrometer.hydrometer_category,
-    ext_rtc_hydrometer.house_number,
-    ext_rtc_hydrometer.id_number,
-    ext_rtc_hydrometer.cat_hydrometer_id,
-    ext_rtc_hydrometer.hydrometer_number,
-    ext_rtc_hydrometer.identif,
-    ext_cat_hydrometer.madeby,
-    ext_cat_hydrometer.class AS hydrometer_class,
-    ext_cat_hydrometer.ulmc,
-    ext_cat_hydrometer.voltman_flow,
-    ext_cat_hydrometer.multi_jet_flow,
-    ext_cat_hydrometer.dnom,
-        CASE
-            WHEN (( SELECT config_param_system.value
-               FROM config_param_system
-              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
-            ELSE concat(( SELECT config_param_system.value
-               FROM config_param_system
-              WHERE config_param_system.parameter::text = 'hydrometer_link_absolute_path'::text), rtc_hydrometer.link)
-        END AS hydrometer_link
-   FROM rtc_hydrometer
-     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
-     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
-     JOIN exploitation ON exploitation.expl_id = connec.expl_id
-     JOIN value_state ON value_state.id = connec.state;
-*/
-
------------------------
--- create views ve
------------------------
-
-DROP VIEW IF EXISTS  ve_arc;
-CREATE VIEW ve_arc AS 
- SELECT v_arc.arc_id,
-    v_arc.code,
-    v_arc.node_1,
-    v_arc.node_2,
-    v_arc.arccat_id,
-    v_arc.arctype_id AS arc_type,
-    v_arc.sys_type,
-    v_arc.matcat_id AS cat_matcat_id,
-    v_arc.pnom AS cat_pnom,
-    v_arc.dnom AS cat_dnom,
-    v_arc.epa_type,
-    v_arc.sector_id,
-    sector.macrosector_id,
-    v_arc.state,
-    v_arc.state_type,
-    v_arc.annotation,
-    v_arc.observ,
-    v_arc.comment,
-    v_arc.gis_length,
-    v_arc.custom_length,
-    v_arc.dma_id,
-    v_arc.presszonecat_id,
-    v_arc.soilcat_id,
-    v_arc.function_type,
-    v_arc.category_type,
-    v_arc.fluid_type,
-    v_arc.location_type,
-    v_arc.workcat_id,
-    v_arc.workcat_id_end,
-    v_arc.buildercat_id,
-    v_arc.builtdate,
-    v_arc.enddate,
-    v_arc.ownercat_id,
-    v_arc.muni_id,
-    v_arc.postcode,
-    v_arc.streetaxis_id,
-    v_arc.postnumber,
-    v_arc.postcomplement,
-    v_arc.postcomplement2,
-    v_arc.streetaxis2_id,
-    v_arc.postnumber2,
-    v_arc.descript,
-    v_arc.link,
-    v_arc.verified,
-    v_arc.the_geom,
-    v_arc.undelete,
-    v_arc.label_x,
-    v_arc.label_y,
-    v_arc.label_rotation,
-    v_arc.publish,
-    v_arc.inventory,
-    v_arc.macrodma_id,
-    v_arc.expl_id,
-    v_arc.num_value
-   FROM v_arc
-     LEFT JOIN sector ON v_arc.sector_id = sector.sector_id;
-
-DROP VIEW IF EXISTS  ve_connec;
-CREATE VIEW ve_connec AS 
- SELECT connec.connec_id,
-    connec.code,
-    connec.elevation,
-    connec.depth,
-    cat_connec.connectype_id AS connec_type,
-    connec_type.type AS sys_type,
-    connec.connecat_id,
-    connec.sector_id,
-    sector.macrosector_id,
-    connec.customer_code,
-    cat_connec.matcat_id AS cat_matcat_id,
-    cat_connec.pnom AS cat_pnom,
-    cat_connec.dnom AS cat_dnom,
-    connec.connec_length,
-    v_rtc_hydrometer_x_connec.n_hydrometer,
-    connec.state,
-    connec.state_type,
-    connec.annotation,
-    connec.observ,
-    connec.comment,
-    connec.dma_id,
-    connec.presszonecat_id,
-    connec.soilcat_id,
-    connec.function_type,
-    connec.category_type,
-    connec.fluid_type,
-    connec.location_type,
-    connec.workcat_id,
-    connec.workcat_id_end,
-    connec.buildercat_id,
-    connec.builtdate,
-    connec.enddate,
-    connec.ownercat_id,
-    connec.muni_id,
-    connec.postcode,
-    connec.streetaxis_id,
-    connec.postnumber,
-    connec.postcomplement,
-    connec.streetaxis2_id,
-    connec.postnumber2,
-    connec.postcomplement2,
-    connec.descript,
-    connec.arc_id,
-    cat_connec.svg,
-    connec.rotation,
-    concat(connec_type.link_path, connec.link) AS link,
-    connec.verified,
-    connec.the_geom,
-    connec.undelete,
-    connec.label_x,
-    connec.label_y,
-    connec.label_rotation,
-    connec.publish,
-    connec.inventory,
-    dma.macrodma_id,
-    connec.expl_id,
-    connec.num_value
-   FROM connec
-     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
-     JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text
-     JOIN v_state_connec ON v_state_connec.connec_id::text = connec.connec_id::text
-     LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
-     LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN dma ON connec.dma_id = dma.dma_id
-     LEFT JOIN sector ON connec.sector_id = sector.sector_id;
-
-
-DROP VIEW IF EXISTS ve_node;
-CREATE VIEW ve_node AS 
- SELECT v_node.node_id,
-    v_node.code,
-    v_node.elevation,
-    v_node.depth,
-    v_node.nodetype_id AS node_type,
-    v_node.sys_type,
-    v_node.nodecat_id,
-    v_node.cat_matcat_id,
-    v_node.cat_pnom,
-    v_node.cat_dnom,
-    v_node.epa_type,
-    v_node.sector_id,
-    sector.macrosector_id,
-    v_node.arc_id,
-    v_node.parent_id,
-    v_node.state,
-    v_node.state_type,
-    v_node.annotation,
-    v_node.observ,
-    v_node.comment,
-    v_node.dma_id,
-    v_node.presszonecat_id,
-    v_node.soilcat_id,
-    v_node.function_type,
-    v_node.category_type,
-    v_node.fluid_type,
-    v_node.location_type,
-    v_node.workcat_id,
-    v_node.buildercat_id,
-    v_node.workcat_id_end,
-    v_node.builtdate,
-    v_node.enddate,
-    v_node.ownercat_id,
-    v_node.muni_id,
-    v_node.postcode,
-    v_node.streetaxis_id,
-    v_node.postnumber,
-    v_node.postcomplement,
-    v_node.postcomplement2,
-    v_node.streetaxis2_id,
-    v_node.postnumber2,
-    v_node.descript,
-    v_node.svg,
-    v_node.rotation,
-    v_node.link,
-    v_node.verified,
-    v_node.the_geom,
-    v_node.undelete,
-    v_node.label_x,
-    v_node.label_y,
-    v_node.label_rotation,
-    v_node.publish,
-    v_node.inventory,
-    v_node.macrodma_id,
-    v_node.expl_id,
-    v_node.hemisphere,
-    v_node.num_value
-   FROM v_node
-     LEFT JOIN sector ON v_node.sector_id = sector.sector_id;
-
-
-
------------------------
--- create parent views
------------------------
-DROP VIEW IF EXISTS vp_arc;
-CREATE OR REPLACE VIEW vp_arc AS 
- SELECT ve_arc.arc_id AS nid,
-    ve_arc.arc_type AS custom_type
-   FROM ve_arc;
-
-DROP VIEW IF EXISTS vp_connec;
-CREATE OR REPLACE VIEW vp_connec AS 
- SELECT ve_connec.connec_id AS nid,
-    ve_connec.connec_type AS custom_type
-   FROM ve_connec;
-
-DROP VIEW IF EXISTS vp_node;
-CREATE OR REPLACE VIEW vp_node AS 
- SELECT ve_node.node_id AS nid,
-    ve_node.node_type AS custom_type
-   FROM ve_node;
-   
------------------------
--- create child views
------------------------
 DROP VIEW IF EXISTS  ve_arc_varc;
 CREATE VIEW ve_arc_varc AS 
  SELECT v_arc.arc_id,
