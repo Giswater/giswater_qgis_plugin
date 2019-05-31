@@ -1,4 +1,4 @@
-/*
+c/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -25,21 +25,23 @@ INSTRUCTIONS
 ------------
 CSV file may have four type of column data:
 
--- visit_id, visit_cat, visit_team, visit_date, visit_code,feature_type, feature_id, inventory1, inventory2......., inventoryn, parameter1, parameter2.... parametern
---   csv1      csv2         csv3       csv4        csv5        csv6          csv7    	csv8	    csv9	       csvn	  csvn+1      csvn+2          csvn+m
+-- visit_id, visit_cat, visit_type, visit_class, visit_team, visit_date, ext_code ,feature_type, feature_id, inventory1, inventory2......., inventoryn, parameter1, parameter2.... parametern
+--   csv1      csv2         csv3       csv4        csv5        csv6          csv7     csv8	    csv9	     csv10        csv11              csvn	  csvn+1      csvn+2          csvn+m
 	
 	Visit data: (csv1....csv5) - all mandatory
 		visit_id: Check all the news visit_id does not exists on om_visit table
 		visit_cat: Check the visicat_id is defined on om_visit_cat table
+		visit_type: Unexpected / plannified
+		visit_class: class of visit
 		visit_team: Check the visicat_id is defined on team's table
 		visit_date: Dates must have the format of date
-		visit_code: Not mandatory code to put things like workorder or any other info
+		ext_code: Not mandatory code to put things like workorder or any other info
 	
-	Feature values:  (csv6,csv7)  - all mandatory
+	Feature values:  (csv8,csv9)  - all mandatory
 		feature_type (ARC / NODE / CONNEC /GULLY)
 		feature_id
 		
-	Inventory values: (csv8....csvn) - not mandatory
+	Inventory values: (csv10....csvn) - not mandatory
 		This is a not mandatory values defined on config_param_system: The goal of this is use the visit work to improve the inventory data. 
 		Parameters defined must exists on table of inventory
 		System must be cofigured. 
@@ -139,8 +141,8 @@ BEGIN
 		IF v_isvisitexists IS FALSE OR v_isvisitexists IS NULL THEN
 		
 			-- Insert into visit table
-			INSERT INTO om_visit (id, visitcat_id, startdate, enddate, ext_code, user_name, descript) 
-			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv4::date, v_visit.csv4::date, v_visit.csv5, v_visit.csv3, v_visit_descript);
+			INSERT INTO om_visit (id, visitcat_id, visit_type, class_id, startdate, enddate, ext_code, user_name, descript) 
+			VALUES(v_visit.csv1::integer, v_visit.csv2::integer, v_visit.csv3::integer, v_visit.csv4::integer, v_visit.csv6::date, v_visit.csv6::date, v_visit.csv7, v_visit.csv5, v_visit_descript);
 	
 			-- Insert into feature table
 			EXECUTE 'UPDATE '||v_visittablename||' SET is_last=FALSE where '||v_visitcolumnname||'::text='||v_visit.csv7||'::text';
@@ -149,16 +151,12 @@ BEGIN
 		END IF;
 
 		-- feature columns
-		v_csv=8;
+		v_csv=10;
 			
 		FOR v_column IN SELECT json_array_elements(((value::json->>'feature')::json->>'columns')::json) 
 		FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
 		LOOP
 
-			IF v_csv = 8 THEN
-				v_value = v_visit.csv8;
-			ELSIF v_csv = 9 THEN
-				v_value = v_visit.csv9;
 			ELSIF v_csv = 10 THEN	
 				v_value = v_visit.csv10;
 			ELSIF v_csv = 11 THEN
@@ -197,10 +195,7 @@ BEGIN
 		LOOP			
 			raise notice 'v_parameters %', v_parameters;
 			-- parameters are defined from row csv10 to row csv20
-			IF v_csv = 8 THEN
-				v_value = v_visit.csv8;
-			ELSIF v_csv = 9 THEN
-				v_value = v_visit.csv9;
+
 			ELSIF v_csv = 10 THEN	
 				v_value = v_visit.csv10;
 			ELSIF v_csv = 11 THEN
