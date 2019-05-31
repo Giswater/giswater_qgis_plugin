@@ -104,16 +104,17 @@ BEGIN
 		IF max_aux IS NOT NULL THEN 
 			EXECUTE 'SELECT setval(''SCHEMA_NAME.'||table_record.sys_sequence||' '','||max_aux||', true)';
 		END IF;
-	END LOOP;		
+	END LOOP;
 
-	-- check if it's new user
-	IF (SELECT cur_user FROM config_param_user WHERE cur_user=current_user LIMIT 1) IS NULL THEN
-
-		-- Inserting mandatory values for user
-		INSERT INTO config_param_user (parameter, value, cur_user) 
-		SELECT audit_cat_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN audit_cat_param_user ON audit_cat_param_user.id=parameter 
-		WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'));
-	END IF;
+	-- set mandatory values of config_param_user in case of not exists (for news users or for updates)
+	FOR table_record IN SELECT * FROM audit_cat_param_user WHERE ismandatory IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
+	LOOP
+		IF table_record.id NOT IN (SELECT parameter FROM config_param_user WHERE cur_user=current_user LIMIT 1) THEN
+			INSERT INTO config_param_user (parameter, value, cur_user) 
+			SELECT audit_cat_param_user.id, vdefault, current_user FROM config_param_user RIGHT JOIN audit_cat_param_user ON audit_cat_param_user.id=parameter 
+			WHERE id= table_record.id;	
+	END LOOP;
+		
 	
 	-- check qgis project (1)
 	IF fprocesscat_id_aux=1 THEN
