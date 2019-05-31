@@ -31,9 +31,9 @@ UPDATE audit_cat_param_user SET isenabled=false WHERE id='inp_options_use_dma_pa
 UPDATE audit_cat_param_user SET label='Estimated unique pattern:', dv_querytext='SELECT pattern_id AS id, pattern_id AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL '
 								,layout_id = 9, layout_order = 1, layoutname='grl_crm_9', dv_parent_id='inp_options_demandtype', dv_isnullvalue=TRUE, editability='{"trueWhenParentIn":[1]}'								
 								WHERE id='inp_options_pattern';
-UPDATE audit_cat_param_user SET label='CRM period:',  layout_id = 10, layout_order = 1, layoutname='grl_crm_10',	dv_parent_id='inp_options_demandtype', editability='{"trueWhenParentIn":[2]}'
+UPDATE audit_cat_param_user SET label='CRM period:',  layout_id = 10, dv_isnullvalue=true, layout_order = 1, layoutname='grl_crm_10',	dv_parent_id='inp_options_demandtype', editability='{"trueWhenParentIn":[2]}'
 								WHERE id='inp_options_rtc_period_id';
-UPDATE audit_cat_param_user SET label='Overwrite demands:', layout_id = 2, layout_order = 3, layoutname='grl_general_2' WHERE id='inp_options_overwritedemands';
+UPDATE audit_cat_param_user SET label='Overwrite demands:', layout_id = 2, layout_order = 3, layoutname='grl_general_2' idval=null WHERE id='inp_options_overwritedemands';
 UPDATE audit_cat_param_user SET layout_order = 3 WHERE id='inp_options_demand_multiplier';
 
 INSERT INTO audit_cat_param_user VALUES ('inp_options_demandtype', 'epaoptions', 'Demand type to use on EPANET simulation', 'role_epa', NULL, NULL, 'Demand type:', 

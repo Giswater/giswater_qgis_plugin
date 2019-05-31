@@ -6,8 +6,23 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+drop view if exists v_rtc_period_dma;
+CREATE OR REPLACE VIEW v_rtc_period_dma AS 
+SELECT v_rtc_period_hydrometer.dma_id,
+    v_rtc_period_hydrometer.period_id,
+    (sum(v_rtc_period_hydrometer.m3_total_period))::numeric(12,3) AS m3_total_period
+       FROM v_rtc_period_hydrometer
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = v_rtc_period_hydrometer.hydrometer_id::bigint
+  GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id;
+
+
+drop view if exists v_rtc_period_nodepattern cascade;
 create or replace view v_rtc_period_nodepattern as           
-SELECT row_number() over (order by pattern_id) as id, pattern_id, 
+SELECT row_number() over (order by pattern_id, idrow) as id, 
+ (select value from SCHEMA_NAME.config_param_user WHERE cur_user=current_user AND parameter='inp_options_rtc_period_id') AS period_id,
+    idrow,
+	pattern_id, 
 	sum(factor_1)::numeric(10,8) as factor_1, sum(factor_2)::numeric(10,8) as factor_2,
 	sum(factor_3)::numeric(10,8) as factor_3, sum(factor_4)::numeric(10,8) as factor_4,
 	sum(factor_5)::numeric(10,8) as factor_5, sum(factor_6)::numeric(10,8) as factor_6,
@@ -39,9 +54,19 @@ CASE
 	WHEN b.id = ((SELECT min(sub.id)+16 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 17 				
 	WHEN b.id = ((SELECT min(sub.id)+17 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 18 				
 	WHEN b.id = ((SELECT min(sub.id)+18 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 19 				
-	WHEN b.id = ((SELECT min(sub.id)+19 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 20 				 				
+	WHEN b.id = ((SELECT min(sub.id)+19 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 20 
+	WHEN b.id = ((SELECT min(sub.id)+20 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 21
+	WHEN b.id = ((SELECT min(sub.id)+21 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 22 
+	WHEN b.id = ((SELECT min(sub.id)+22 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 23 
+	WHEN b.id = ((SELECT min(sub.id)+23 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 24
+	WHEN b.id = ((SELECT min(sub.id)+24 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 25 
+	WHEN b.id = ((SELECT min(sub.id)+25 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 26 
+	WHEN b.id = ((SELECT min(sub.id)+26 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 27 				
+	WHEN b.id = ((SELECT min(sub.id)+27 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 28 				
+	WHEN b.id = ((SELECT min(sub.id)+28 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 29 				
+	WHEN b.id = ((SELECT min(sub.id)+29 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 30 	
 END AS idrow,
-concat('pat_',node_1) as pattern_id,
+node_1 as pattern_id,
 sum(lps_avg*factor_1*0.5) as factor_1,
 sum(lps_avg*factor_2*0.5) as factor_2,
 sum(lps_avg*factor_3*0.5) as factor_3,
@@ -85,8 +110,18 @@ CASE
 	WHEN b.id = ((SELECT min(sub.id)+17 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 18 				
 	WHEN b.id = ((SELECT min(sub.id)+18 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 19 				
 	WHEN b.id = ((SELECT min(sub.id)+19 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 20 				 				
+	WHEN b.id = ((SELECT min(sub.id)+20 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 21
+	WHEN b.id = ((SELECT min(sub.id)+21 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 22 
+	WHEN b.id = ((SELECT min(sub.id)+22 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 23 
+	WHEN b.id = ((SELECT min(sub.id)+23 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 24
+	WHEN b.id = ((SELECT min(sub.id)+24 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 25 
+	WHEN b.id = ((SELECT min(sub.id)+25 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 26 
+	WHEN b.id = ((SELECT min(sub.id)+26 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 27 				
+	WHEN b.id = ((SELECT min(sub.id)+27 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 28 				
+	WHEN b.id = ((SELECT min(sub.id)+28 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 29 				
+	WHEN b.id = ((SELECT min(sub.id)+29 FROM inp_pattern_value sub WHERE sub.pattern_id = b.pattern_id)) THEN 30 
 END AS idrow,
-concat('pat_',node_2),
+node_2,
 sum(lps_avg*factor_1*0.5) as factor_1,
 sum(lps_avg*factor_2*0.5) as factor_2,
 sum(lps_avg*factor_3*0.5) as factor_3,
@@ -108,37 +143,30 @@ sum(lps_avg*factor_18*0.5) as factor_18
 FROM v_rtc_period_hydrometer a JOIN inp_pattern_value b USING (pattern_id) group by node_2, idrow order by pattern_id)a
 group by idrow, pattern_id;
 
-
-CREATE VIEW v_rtc_interval_nodepattern AS
+drop view if exists v_rtc_interval_nodepattern;
+CREATE OR REPLACE VIEW v_rtc_interval_nodepattern AS
 select * from v_rtc_period_nodepattern;
 
 
-
-DROP VIEW vi_patterns;
+DROP VIEW if exists vi_patterns;
 CREATE OR REPLACE VIEW vi_patterns AS 
- SELECT inp_pattern_value.id,
-    inp_pattern_value.pattern_id, inp_pattern_value.factor_1, inp_pattern_value.factor_2, inp_pattern_value.factor_3, inp_pattern_value.factor_4, inp_pattern_value.factor_5, inp_pattern_value.factor_6,    
-    inp_pattern_value.factor_7, inp_pattern_value.factor_8, inp_pattern_value.factor_9, inp_pattern_value.factor_10, inp_pattern_value.factor_11, inp_pattern_value.factor_12,    
-    inp_pattern_value.factor_13, inp_pattern_value.factor_14, inp_pattern_value.factor_15, inp_pattern_value.factor_16, inp_pattern_value.factor_17, inp_pattern_value.factor_18
-   FROM inp_pattern_value
-   JOIN rpt_inp_node b ON inp_pattern_value.pattern_id=b.pattern_id
-UNION
- SELECT inp_pattern_value.id,
-    inp_pattern_value.pattern_id, inp_pattern_value.factor_1, inp_pattern_value.factor_2, inp_pattern_value.factor_3, inp_pattern_value.factor_4, inp_pattern_value.factor_5, inp_pattern_value.factor_6,    
-    inp_pattern_value.factor_7, inp_pattern_value.factor_8, inp_pattern_value.factor_9, inp_pattern_value.factor_10, inp_pattern_value.factor_11, inp_pattern_value.factor_12,    
-    inp_pattern_value.factor_13, inp_pattern_value.factor_14, inp_pattern_value.factor_15, inp_pattern_value.factor_16, inp_pattern_value.factor_17, inp_pattern_value.factor_18
-   FROM inp_pattern_value
-JOIN inp_reservoir b ON inp_pattern_value.pattern_id=b.pattern_id
-UNION
-   SELECT inp_pattern_value.id,
-    inp_pattern_value.pattern_id, inp_pattern_value.factor_1, inp_pattern_value.factor_2, inp_pattern_value.factor_3, inp_pattern_value.factor_4, inp_pattern_value.factor_5, inp_pattern_value.factor_6,    
-    inp_pattern_value.factor_7, inp_pattern_value.factor_8, inp_pattern_value.factor_9, inp_pattern_value.factor_10, inp_pattern_value.factor_11, inp_pattern_value.factor_12,    
-    inp_pattern_value.factor_13, inp_pattern_value.factor_14, inp_pattern_value.factor_15, inp_pattern_value.factor_16, inp_pattern_value.factor_17, inp_pattern_value.factor_18
-   FROM inp_pattern_value
-   JOIN v_inp_demand b ON inp_pattern_value.pattern_id=b.pattern_id
-UNION 
-	SELECT * FROM v_rtc_period_nodepattern WHERE (SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_patternmethod' and cur_user=current_user)='23'
-UNION	
-	SELECT * FROM v_rtc_interval_nodepattern WHERE (SELECT value FROM SCHEMA_NAME.config_param_user WHERE parameter='inp_options_patternmethod' and cur_user=current_user)='25'
-ORDER BY 1;
+SELECT pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
+	FROM (
+		SELECT a.id, a.pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, 
+		factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
+		FROM inp_pattern_value a JOIN rpt_inp_node b ON a.pattern_id=b.pattern_id
+	UNION
+		SELECT a.id, a.pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, 
+		factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
+		FROM inp_pattern_value a JOIN inp_reservoir b ON a.pattern_id=b.pattern_id
+	UNION
+		SELECT a.id, a.pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, 
+		factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
+		FROM inp_pattern_value a JOIN v_inp_demand b ON a.pattern_id=b.pattern_id
+	UNION   
+		SELECT id+1000000, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, 
+		factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
+		FROM rpt_inp_pattern_value WHERE result_id= (select result_id from SCHEMA_NAME.inp_selector_result WHERE cur_user=current_user ) 	
+	ORDER BY 1)a
+
   
