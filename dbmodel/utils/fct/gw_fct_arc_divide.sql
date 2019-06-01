@@ -42,9 +42,13 @@ DECLARE
 	array_agg_gully varchar [];
 	v_arc_searchnodes float;
     rec_node record;
+    rec_event record;
     v_newarc varchar;
-
-
+    v_visitlocation float;
+    v_eventlocation float;
+    v_srid integer;
+    v_newvisit1 int8;
+    v_newvisit2 int8;
 
 	
 BEGIN
@@ -53,7 +57,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 	
 	-- Get project type
-	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	SELECT wsoftware, epsg INTO project_type_aux, v_srid FROM version LIMIT 1;
     
     -- Get node values
     SELECT the_geom INTO node_geom FROM node WHERE node_id = node_id_arg;
@@ -186,13 +190,69 @@ BEGIN
 				INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux2.arc_id);
 
 			END LOOP;
-		
-			-- Update visits from old arc to the new arcs
-			FOR rec_aux IN SELECT * FROM om_visit_x_arc WHERE arc_id=arc_id_aux  LOOP
-				DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
-				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux1.arc_id);
-				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux2.arc_id);
 
+			-- Update visits from old arc to the new arcs (only for state=1, state=1)
+			FOR rec_visit IN SELECT om_visit.* FROM om_visit_x_arc JOIN om_visit ON om_visit.id=visit_id WHERE arc_id=arc_id_aux LOOP
+
+				IF rec_visit.the_geom IS NULL THEN -- if visit does not has geometry, events may have. It's mandatory to distribute one by one
+
+					-- Get visit data into two new visits
+					INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id,expl_id,descript,is_done, lot_id, class_id, status, visit_type) 
+					SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
+					FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit1;
+
+					INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type) 
+					SELECT visitcat_id, ext_code, startdate, enddate, user_name, webclient_id, expl_id, descript, is_done, lot_id, class_id, status, visit_type 
+					FROM om_visit WHERE id=rec_visit.id RETURNING id INTO v_newvisit2;
+					
+					FOR rec_event IN SELECT * FROM om_visit_event WHERE visit_id=rec_visit.id LOOP
+	
+						IF rec_event.xcoord IS NOT NULL AND rec_event.ycoord IS NOT NULL THEN -- event must be related to one of the two new visits
+							
+							--  Locate position of the nearest point
+							v_eventlocation := ST_LineLocatePoint(arc_geom, ST_ClosestPoint(arc_geom, ST_setSrid(ST_MakePoint(rec_event.xcoord, rec_event.ycoord), v_srid)));
+							
+							IF v_eventlocation < intersect_loc THEN
+								UPDATE om_visit_event SET visit_id=v_newvisit1 WHERE id=rec_event.id;
+							ELSE
+								UPDATE om_visit_event SET visit_id=v_newvisit2 WHERE id=rec_event.id;
+							END IF;
+						ELSE 	-- event must be related on both new visits. As a result, new event must be created
+						
+							-- upate event to visit1
+							UPDATE om_visit_event SET visit_id=v_newvisit1 WHERE id=rec_event.id;
+							
+							-- insert new event related to new visit2
+							INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id,value, value1, value2,geom1, geom1, 
+							geom1,xcoord,ycoord,compass,text, index_val,is_last) 
+							SELECT event_code, v_newvisit2, position_id, position_value, parameter_id,value, value1, value2,geom1, geom1, 
+							geom1,xcoord,ycoord,compass,text, index_val,is_last FROM om_visit_event WHERE id=rec_event.id;
+						
+						END IF;
+	
+					END LOOP;
+												
+					INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),v_newvisit1, rec_aux1.arc_id);
+					INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),v_newvisit2, rec_aux2.arc_id);
+				
+					-- delete old visit
+					DELETE FROM om_visit WHERE id=rec_visit.id;
+					
+				ELSIF rec_visit.the_geom IS NOT NULL THEN -- if visit has geometry, events does not have geometry
+
+					--  Locate position of the nearest point
+					v_visitlocation := ST_LineLocatePoint(arc_geom, ST_ClosestPoint(arc_geom, rec_visit.the_geom));
+					
+					IF v_visitlocation < intersect_loc THEN
+						v_newarc = rec_aux1.arc_id;
+					ELSE
+						v_newarc = rec_aux2.arc_id;
+					END IF;
+				
+					-- distribute visit to new arc
+					INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_visit.id, v_newarc);
+					DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
+				END IF;
 			END LOOP;
 
 			-- Update arc_id on node
@@ -216,7 +276,7 @@ BEGIN
 			DELETE FROM arc WHERE arc_id=arc_id_aux;
 					
 	
-		ELSIF (state_aux=1 AND state_node_arg=2) THEN-- AND plan_arc_vdivision_dsbl_aux IS NOT TRUE) THEN 
+		ELSIF (state_aux=1 AND state_node_arg=2) THEN
 			rec_aux1.state=2;
 			rec_aux1.state_type=(SELECT value::smallint FROM config_param_system WHERE parameter='plan_statetype_ficticius');
 			
@@ -241,9 +301,6 @@ BEGIN
 			INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (
 			(SELECT value::smallint FROM config_param_user WHERE "parameter"='psector_vdefault' AND cur_user=current_user), arc_id_aux, 0, FALSE);
 
-		-- deprecated
-		--ELSIF (state_aux=1 AND state_node_arg=2) AND plan_arc_vdivision_dsbl_aux IS TRUE THEN
-		--	PERFORM audit_function(1054,2114);
 				
 		ELSIF (state_aux=2 AND state_node_arg=2) THEN 
 		
@@ -299,14 +356,8 @@ BEGIN
 
 			END LOOP;
 		
-			-- Update visits from old arc to the new arcs
-			FOR rec_aux IN SELECT * FROM om_visit_x_arc WHERE arc_id=arc_id_aux  LOOP
-				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux1.arc_id);
-				INSERT INTO om_visit_x_arc (id, visit_id, arc_id) VALUES (nextval('om_visit_x_arc_id_seq'),rec_aux.visit_id, rec_aux2.arc_id);
-				DELETE FROM om_visit_x_arc WHERE arc_id=arc_id_aux;
-
-			END LOOP;
-
+			-- Visits are not updatable because it's impossible to have visits on arc with state=2
+			
 			-- Update arc_id on node
 			FOR rec_aux IN SELECT * FROM node WHERE arc_id=arc_id_aux  LOOP
 
