@@ -2213,7 +2213,7 @@ class ApiCF(ApiParent):
         feature_id = utils_giswater.getWidgetText(dialog, widget)
 
         self.ApiCF = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
-        complet_result, dialog = self.ApiCF.open_form(table_name='ve_node', feature_id=feature_id, tab_type=self.tab_type)
+        complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             print("FAIL open_node")
             return
