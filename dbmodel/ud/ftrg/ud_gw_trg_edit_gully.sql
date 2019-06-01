@@ -1,4 +1,4 @@
-/*
+ /*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -23,12 +23,39 @@ DECLARE
 	v_new_value_param text;
 	v_old_value_param text;
 	v_arg text;
-
+	v_doublegeometry boolean;
+	v_length float;
+	v_width float;
+	v_rotation float;
+	v_unitsfactor float;
+	v_linelocatepoint float;
+	v_thegeom public.geometry;
+	v_the_geom_pol public.geometry;
+	p21x float; 
+	p02x float;
+	p21y float; 
+	p02y float;
+	p22x float;
+	p22y float;
+	p01x float;
+	p01y float;
+	dx float;
+	dy float;
+    v_x float;
+    v_y float;
+    v_new_pol_id varchar(16);
+    v_codeautofill boolean;
+    v_srid integer;
+	
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	
+
+	-- get values
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
+	v_doublegeometry = (SELECT value FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
+	v_srid = (SELECT epsg FROM version limit 1);
+	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	
     	--modify values for custom view inserts
@@ -44,47 +71,50 @@ BEGIN
 		v_customfeature:=NULL;
 	END IF;
 
+	RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfeature;
+	
+	-- Control insertions ID
+	IF TG_OP = 'INSERT' THEN
 
-RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfeature;
-    -- Control insertions ID
-    IF TG_OP = 'INSERT' THEN
-
-        -- gully ID
-        IF (NEW.gully_id IS NULL) THEN
+		-- gully ID
+		IF (NEW.gully_id IS NULL) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-            NEW.gully_id:= (SELECT nextval('urn_id_seq'));
-        END IF;
-
+			NEW.gully_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
 		
 		-- gully type 
-		   IF (NEW.gully_type IS NULL) AND v_customfeature IS NOT NULL THEN
-		    	NEW.gully_type:= v_customfeature;
-		   ELSIF (NEW.gully_type IS NULL) THEN
-			   NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		IF (NEW.gully_type IS NULL) AND v_customfeature IS NOT NULL THEN
+			NEW.gully_type:= v_customfeature;
+		ELSIF (NEW.gully_type IS NULL) THEN
+			NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.gully_type IS NULL) THEN
 				NEW.gully_type:=(SELECT id FROM gully_type LIMIT 1);
 			END IF;
-        END IF;
-		
-		
-        -- grate Catalog ID
-        IF (NEW.gratecat_id IS NULL) THEN
+		END IF;
+
+		--Copy id to code field
+		v_codeautofill = (SELECT code_autofill FROM node_type WHERE id=NEW.gully_type);
+		IF (NEW.code IS NULL AND v_codeautofill) THEN 
+			NEW.code=NEW.gully_id;
+		END IF;
+				
+		-- grate Catalog ID
+		IF (NEW.gratecat_id IS NULL) THEN
 				NEW.gratecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='gratecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-							IF (NEW.gratecat_id IS NULL) THEN
+			IF (NEW.gratecat_id IS NULL) THEN
 				NEW.gratecat_id:=(SELECT id FROM cat_grate LIMIT 1);
 			END IF;
-        END IF;
+		END IF;
 
-        
-        -- Arc Catalog ID
-        IF (NEW.connec_arccat_id IS NULL) THEN
-				NEW.connec_arccat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='connecarccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		-- Arc Catalog ID
+		IF (NEW.connec_arccat_id IS NULL) THEN
+			NEW.connec_arccat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='connecarccat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
-        -- Sector ID
-        IF (NEW.sector_id IS NULL) THEN
+		-- Sector ID
+		IF (NEW.sector_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(1008,1216);  
+				RETURN audit_function(1008,1216);  
 			END IF;
 				SELECT count(*)into v_count FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001);
 			IF v_count = 1 THEN
@@ -97,16 +127,16 @@ RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfe
 				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='sector_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 			IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(1010,1216,NEW.gully_id);          
-            END IF;            
-        END IF;
+				RETURN audit_function(1010,1216,NEW.gully_id);          
+			END IF;            
+		END IF;
         
-	-- Dma ID
-        IF (NEW.dma_id IS NULL) THEN
+		-- Dma ID
+		IF (NEW.dma_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(1012,1216);  
-            END IF;
-				SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
+				RETURN audit_function(1012,1216);  
+			END IF;
+			SELECT count(*)into v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001);
 			IF v_count = 1 THEN
 				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
 			ELSIF v_count > 1 THEN
@@ -116,20 +146,20 @@ RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfe
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF; 
-            IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(1014,1216,NEW.gully_id);  
-            END IF;            
-        END IF;
+			IF (NEW.dma_id IS NULL) THEN
+				RETURN audit_function(1014,1216,NEW.gully_id);  
+			END IF;            
+		END IF;
 
-  	    -- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		-- Verified
+		IF (NEW.verified IS NULL) THEN
+			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 
 		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.state IS NULL) THEN
+			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- State_type
 		IF (NEW.state_type IS NULL) THEN
@@ -137,19 +167,19 @@ RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfe
 		END IF;
 		
 		-- Workcat_id
-        IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.workcat_id IS NULL) THEN
+			NEW.workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- Ownercat_id
-        IF (NEW.ownercat_id IS NULL) THEN
-            NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.ownercat_id IS NULL) THEN
+			NEW.ownercat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='ownercat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 		
 		-- Soilcat_id
-        IF (NEW.soilcat_id IS NULL) THEN
-            NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-        END IF;
+		IF (NEW.soilcat_id IS NULL) THEN
+			NEW.soilcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='soilcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		END IF;
 	
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
@@ -204,44 +234,84 @@ RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfe
 			NEW.inventory :='TRUE';
 		END IF; 
 		
-	    -- LINK
-	    IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
-	       NEW.link=NEW.gully_id;
-	    END IF;
+		-- link
+		IF (SELECT "value" FROM config_param_system WHERE "parameter"='edit_automatic_insert_link')::boolean=TRUE THEN
+			NEW.link=NEW.gully_id;
+		END IF;
+
+		-- double geometry
+		IF v_doublegeometry THEN
+
+			-- get grate dimensions
+			v_unitsfactor = 0.01;
+			v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
+			v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
+
+			-- get arc direction
+			WITH index_query AS(
+			SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
+			SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
+			IF v_linelocatepoint < 0.01 THEN
+				v_rotation = st_azimuth (st_startpoint(v_thegeom), st_lineinterpolatepoint(v_thegeom,0.01));
+			ELSIF v_linelocatepoint > 0.99 THEN
+				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,0.98), st_lineinterpolatepoint(v_thegeom,0.99));
+			ELSE
+				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
+			END IF;
+
+			--set grate rotation
+			v_rotation = -(v_rotation - pi()/2);
+
+			-- calculate center coordinates
+			v_x = st_x(NEW.the_geom);
+			v_y = st_y(NEW.the_geom);
+    
+			-- calculate dx & dy to fix extend from center
+			dx = v_length/2;
+			dy = v_width/2;
+
+			-- calculate the extend polygon
+			p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
+			p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
 	
-        -- FEATURE INSERT
-	IF v_gully_geometry = 'gully' THEN
-        INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id,
-					"state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id,
-					builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
-					descript,rotation, link,verified, the_geom,	undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value)
-					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length,
-					NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type,
-					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
-					NEW.muni_id, NEW.postcode, NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2,
-					NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,
-					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,  NEW.uncertain, NEW.num_value);
+			p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
+			p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
 
+			p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
+			p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
 
-        ELSIF v_gully_geometry = 'gully_pol' THEN
-        INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state",
-					state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, 
-					enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
-					descript,rotation, link,verified, the_geom_pol,	undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, uncertain, num_value)
-					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length,
-					NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type,
-					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode,
-					NEW.streetaxis_id, NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom_pol,
-					NEW.undelete,NEW.featurecat_id, NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
-        END IF;  
+			p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
+			p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
+			
+
+			-- generating the geometry
+			EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
+				p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
+				INTO v_the_geom_pol;
+			--EXECUTE 'SELECT (ST_makePolygon(St_setsrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' || p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||'))'
+			--	INTO v_the_geom_pol;
+			
+			INSERT INTO polygon(sys_type, the_geom) VALUES ('GULLY', v_the_geom_pol) RETURNING pol_id INTO v_new_pol_id;
+		END IF;
+
+		INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, pol_id, sector_id,
+			"state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id,
+			builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2,
+			descript,rotation, link,verified, the_geom, undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value)
+		VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, 
+			NEW.siphon, NEW.arc_id, v_new_pol_id, NEW.sector_id, NEW."state", NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, 
+			NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.streetaxis_id, 
+			NEW.postnumber, NEW.postcomplement, NEW.streetaxis2_id, NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, 
+			NEW.featurecat_id, NEW.feature_id,NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,  NEW.uncertain, NEW.num_value);
+
 
 		-- Control of automatic insert of link and vnode
-		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_force_automatic_connect2network' 
+		IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_force_automatic_connect2network' 
 		AND cur_user=current_user LIMIT 1) IS TRUE THEN
 			PERFORM gw_fct_connect_to_network((select array_agg(NEW.gully_id)), 'GULLY');
 		END IF;
 
-	-- man addfields insert
+		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
 			LOOP
@@ -256,15 +326,15 @@ RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfe
 			END LOOP;
 		END IF;		
 
-        RETURN NEW;
+		RETURN NEW;
 
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE geom
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+		-- UPDATE geom
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
 			UPDATE gully SET the_geom=NEW.the_geom WHERE gully_id = OLD.gully_id;		
-        END IF;
+		END IF;	
 		
 		-- Reconnect arc_id
 		IF (NEW.arc_id != OLD.arc_id OR OLD.arc_id IS NULL) AND NEW.arc_id IS NOT NULL THEN
@@ -297,9 +367,9 @@ RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfe
 			END IF;
 		END IF;
 
-        -- Looking for state control
-        IF (NEW.state != OLD.state) THEN   
-		PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);	
+		-- Looking for state control
+		IF (NEW.state != OLD.state) THEN   	
+			PERFORM gw_fct_state_control('GULLY', NEW.gully_id, NEW.state, TG_OP);	
 		END IF;
 
 		-- rotation
@@ -313,33 +383,33 @@ RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfe
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 
-        -- UPDATE values
+		-- UPDATE values
 		IF v_gully_geometry = 'gully' THEN
 			UPDATE gully 
 			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
 			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
 			annotation=NEW.annotation, "observ"=NEW."observ", 	"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
-            fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-            ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, arc_id=NEW.arc_id,
+			fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
+			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
+			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, arc_id=NEW.arc_id,
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
 			WHERE gully_id = OLD.gully_id;
 
-        ELSIF v_gully_geometry = 'gully_pol' THEN
+		ELSIF v_gully_geometry = 'gully_pol' THEN
 			UPDATE gully 
 			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
 			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  
 			state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
-            fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-            ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom_pol,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id,
+			fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
+			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
+			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom_pol,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id,
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
 			WHERE gully_id = OLD.gully_id;
-        END IF;  
+		END IF; 	 
 
-	-- man addfields update
+		-- man addfields update
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM man_addfields_parameter WHERE cat_feature_id = v_customfeature OR cat_feature_id is null
 			LOOP

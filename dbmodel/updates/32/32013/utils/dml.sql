@@ -8,6 +8,15 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+UPDATE audit_cat_param_user SET label='Automatic insert connec double geometry:'
+			WHERE id='edit_connect_force_automatic_connect2network';
+
+UPDATE audit_cat_param_user SET formname=null
+			WHERE id='edit_arc_division_dsbl';
+			
+UPDATE audit_cat_param_user SET formname=null
+			WHERE id='edit_connect_force_downgrade_linkvnode';
+
 UPDATE sys_csv2pg_cat SET isheader=true, orderby=1 WHERE id=1;
 UPDATE sys_csv2pg_cat SET isheader=true, orderby=1 WHERE id=1;
 UPDATE sys_csv2pg_cat SET isheader=true, orderby=2 WHERE id=3;

@@ -32,3 +32,6 @@ CREATE TABLE ext_cat_period_type(
 ALTER TABLE ext_cat_period ADD column period_type integer;
 
 ALTER TABLE ext_rtc_hydrometer_x_data ADD pattern_id character varying (16);
+
+ALTER TABLE polygon ALTER COLUMN pol_id SET DEFAULT nextval('SCHEMA_NAME.urn_id_seq'::regclass);
+
