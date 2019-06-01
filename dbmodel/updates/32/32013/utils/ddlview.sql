@@ -8,7 +8,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
-DROP VIEW v_rtc_hydrometer_x_arc;
+DROP VIEW v_rtc_hydrometer_x_arc CASCADE;
 
 
 drop view if exists v_rtc_hydrometer_period cascade;

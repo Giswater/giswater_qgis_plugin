@@ -7,13 +7,48 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DROP VIEW ve_inp_pipe;
-DROP VIEW ve_inp_valve;
-DROP VIEW ve_inp_tank;
-DROP VIEW ve_inp_reservoir;
-DROP VIEW ve_inp_junction;
-DROP VIEW ve_inp_shortpipe;
-DROP VIEW ve_inp_pump;
+DROP VIEW IF EXISTS ve_inp_pipe;
+DROP VIEW IF EXISTS ve_inp_valve;
+DROP VIEW IF EXISTS ve_inp_tank;
+DROP VIEW IF EXISTS ve_inp_reservoir;
+DROP VIEW IF EXISTS ve_inp_junction;
+DROP VIEW IF EXISTS ve_inp_shortpipe;
+DROP VIEW IF EXISTS ve_inp_pump;
+DROP VIEW IF EXISTS ve_inp_demand;
+
+DROP VIEW IF EXISTS v_inp_backdrop;
+DROP VIEW IF EXISTS v_inp_controls;
+DROP VIEW IF EXISTS v_inp_curve;
+DROP VIEW IF EXISTS v_inp_demand;
+DROP VIEW IF EXISTS v_inp_emitter;
+DROP VIEW IF EXISTS v_inp_energy_el;
+DROP VIEW IF EXISTS v_inp_energy_gl;
+DROP VIEW IF EXISTS v_inp_junction;
+DROP VIEW IF EXISTS v_inp_label;
+DROP VIEW IF EXISTS v_inp_mixing;
+DROP VIEW IF EXISTS v_inp_options;
+DROP VIEW IF EXISTS v_inp_pattern;
+DROP VIEW IF EXISTS v_inp_pipe;
+DROP VIEW IF EXISTS v_inp_project_id;
+DROP VIEW IF EXISTS v_inp_pump;
+DROP VIEW IF EXISTS v_inp_quality;
+DROP VIEW IF EXISTS v_inp_reactions_el;
+DROP VIEW IF EXISTS v_inp_reactions_gl;
+DROP VIEW IF EXISTS v_inp_report;
+DROP VIEW IF EXISTS v_inp_reservoir;
+DROP VIEW IF EXISTS v_inp_rules;
+DROP VIEW IF EXISTS v_inp_source;
+DROP VIEW IF EXISTS v_inp_status;
+DROP VIEW IF EXISTS v_inp_tags;
+DROP VIEW IF EXISTS v_inp_tank;
+DROP VIEW IF EXISTS v_inp_times;
+DROP VIEW IF EXISTS v_inp_valve_cu;
+DROP VIEW IF EXISTS v_inp_valve_fl;
+DROP VIEW IF EXISTS v_inp_valve_lc;
+DROP VIEW IF EXISTS v_inp_valve_pr;
+DROP VIEW IF EXISTS v_inp_vertice;
+
+
 
 DROP VIEW IF EXISTS vp_basic_arc;
 CREATE OR REPLACE VIEW vp_basic_arc AS 
@@ -3282,33 +3317,3 @@ UNION
   GROUP BY connec.arc_id
   ORDER BY 1, 2;
 
------------------------
--- rpt edit views
------------------------
-DROP VIEW IF EXISTS ve_ui_rpt_result_cat;
-CREATE OR REPLACE VIEW ve_ui_rpt_result_cat AS 
- SELECT rpt_cat_result.id,
-    rpt_cat_result.result_id,
-    rpt_cat_result.n_junction,
-    rpt_cat_result.n_reservoir,
-    rpt_cat_result.n_tank,
-    rpt_cat_result.n_pipe,
-    rpt_cat_result.n_pump,
-    rpt_cat_result.n_valve,
-    rpt_cat_result.head_form,
-    rpt_cat_result.hydra_time,
-    rpt_cat_result.hydra_acc,
-    rpt_cat_result.st_ch_freq,
-    rpt_cat_result.max_tr_ch,
-    rpt_cat_result.dam_li_thr,
-    rpt_cat_result.max_trials,
-    rpt_cat_result.q_analysis,
-    rpt_cat_result.spec_grav,
-    rpt_cat_result.r_kin_visc,
-    rpt_cat_result.r_che_diff,
-    rpt_cat_result.dem_multi,
-    rpt_cat_result.total_dura,
-    rpt_cat_result.exec_date,
-    rpt_cat_result.q_timestep,
-    rpt_cat_result.q_tolerance
-   FROM rpt_cat_result;

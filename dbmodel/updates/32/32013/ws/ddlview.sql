@@ -162,11 +162,11 @@ SELECT pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, f
 	UNION
 		SELECT a.id, a.pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, 
 		factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-		FROM inp_pattern_value a JOIN v_inp_demand b ON a.pattern_id=b.pattern_id
+		FROM inp_pattern_value a JOIN vi_demands b ON a.pattern_id=b.pattern_id
 	UNION   
 		SELECT id+1000000, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, 
 		factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
-		FROM rpt_inp_pattern_value WHERE result_id= (select result_id from SCHEMA_NAME.inp_selector_result WHERE cur_user=current_user ) 	
+		FROM rpt_inp_pattern_value WHERE result_id= (select result_id from inp_selector_result WHERE cur_user=current_user ) 	
 	ORDER BY 1)a
 
   
