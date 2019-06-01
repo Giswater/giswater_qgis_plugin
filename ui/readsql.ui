@@ -47,7 +47,7 @@
        <string/>
       </property>
       <property name="pixmap">
-       <pixmap>../../../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
+       <pixmap>../../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
       </property>
       <property name="scaledContents">
        <bool>false</bool>
@@ -273,7 +273,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Create PostgreSQL project schema</string>
+           <string>Create DB project schema</string>
           </property>
          </widget>
         </item>
