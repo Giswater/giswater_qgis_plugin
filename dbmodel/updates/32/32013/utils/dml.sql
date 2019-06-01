@@ -8,6 +8,13 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+UPDATE audit_cat_param_user SET feature_field_id ='state' WHERE id='state_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id ='builtdate' WHERE id='builtdate_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id ='enddate' WHERE id='enddate_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id ='workcat_id' WHERE id='workcat_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id ='workcat_id_end' WHERE id='workcat_id_end_vdefault';
+UPDATE audit_cat_param_user SET feature_field_id ='soilcat_id' WHERE id='soilcat_vdefault';
+			
 UPDATE audit_cat_param_user SET label='Automatic insert connec double geometry:'
 			WHERE id='edit_connect_force_automatic_connect2network';
 

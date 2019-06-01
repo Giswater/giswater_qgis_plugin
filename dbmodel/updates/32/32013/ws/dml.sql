@@ -51,4 +51,23 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_interval_to', 'epaoptions'
 			NULL, NULL, 'grl_crm_10', NULL, NULL, NULL, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');	
 			
 		
-			
+
+
+UPDATE cat_feature SET orderby = rownumber() over (order by id) , active=true, code_autofill=true;
+
+UPDATE cat_feature SET child_layer='ve_node_throttlevalve' WHERE id='THROTTLE-VALVE';
+UPDATE cat_feature SET child_layer='ve_node_valveregister' WHERE id='VALVE-REGISTER';
+UPDATE cat_feature SET child_layer='ve_node_waterconnection' WHERE id='WATER-CONNECTION';
+UPDATE cat_feature SET child_layer='ve_node_flcontrvalve' WHERE id='FL-CONTR.VALVE';
+UPDATE cat_feature SET child_layer='ve_node_prbkvalve' WHERE id='PR-BREAK.VALVE';
+UPDATE cat_feature SET child_layer='ve_node_airvalve' WHERE id='AIR-VALVE';
+UPDATE cat_feature SET child_layer='ve_node_bypassregister' WHERE id='BYPASS-REGISTER';
+UPDATE cat_feature SET child_layer='ve_node_checkvalve' WHERE id='CHECK-VALVE';
+UPDATE cat_feature SET child_layer='ve_node_controlregister' WHERE id='CONTROL-REGISTER';
+UPDATE cat_feature SET child_layer='ve_node_genpurpvalve' WHERE id='GEN-PURP.VALVE';
+UPDATE cat_feature SET child_layer='ve_node_greenvalve' WHERE id='GREEN-VALVE';
+UPDATE cat_feature SET child_layer='ve_node_outfallvalve' WHERE id='OUTFALL-VALVE';
+UPDATE cat_feature SET child_layer='ve_node_greenvalve' WHERE id='PR-REDUC.VALVE';
+UPDATE cat_feature SET child_layer='ve_node_prsustavalve' WHERE id='PR-SUSTA.VALVE';
+UPDATE cat_feature SET child_layer='ve_node_pressuremeter' WHERE id='PRESSURE-METER';
+UPDATE cat_feature SET child_layer='ve_node_shutoffvalve' WHERE id='SHUTOFF-VALVE';

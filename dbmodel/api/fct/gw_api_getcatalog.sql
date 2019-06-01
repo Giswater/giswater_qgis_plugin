@@ -15,7 +15,7 @@ SELECT SCHEMA_NAME.gw_api_getcatalog($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "form":{"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "id":"2001"},
-"data":{"fields":{"matcat_id":"PVC", "pn":"16", "dn":"160"}}}$$)
+"data":{"fields":{"matcat_id":"PVC", "pnom":"16", "dnom":"160"}}}$$)
 */
 
 DECLARE

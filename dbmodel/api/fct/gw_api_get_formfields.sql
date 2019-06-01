@@ -112,8 +112,6 @@ BEGIN
 				INTO fields_array
 				USING p_formname, p_id ;
 	END IF;
-
-	raise notice'aghsarghrasfgh';
 	
 	fields_array := COALESCE(fields_array, '{}');  
 

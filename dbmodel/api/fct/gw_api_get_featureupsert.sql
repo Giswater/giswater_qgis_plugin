@@ -303,11 +303,11 @@ BEGIN
 			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'connecat_id' OR (a->>'param') = 'gratecat_id';
 
 		IF v_project_type ='WS' THEN 
-			EXECUTE 'SELECT pn, dn, matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
+			EXECUTE 'SELECT pnom::integer, dnom::integer, matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
 				USING v_catalog
 				INTO v_pnom, v_dnom, v_matcat_id;
 				
-		ELSIF v_projecttype ='UD' THEN 
+		ELSIF v_project_type ='UD' THEN 
 			IF v_catfeature.type ='GULLY' THEN
 				EXECUTE 'SELECT matcat_id FROM cat_'||lower(v_catfeature.type)||' WHERE id=$1'
 					USING v_catalog
@@ -330,6 +330,7 @@ BEGIN
 			RAISE NOTICE 'UPDATE 222 %',v_values_array;
 	END IF;
 
+	
 	
 	-- setting values
 	FOREACH aux_json IN ARRAY v_fields_array 
@@ -384,6 +385,8 @@ BEGIN
 			-- rest of vaules
 			ELSE
 				SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'column_id');
+
+				raise notice 'field_value %', field_value;
 			END IF;
 				
 		ELSIF  p_tg_op ='UPDATE' THEN 
