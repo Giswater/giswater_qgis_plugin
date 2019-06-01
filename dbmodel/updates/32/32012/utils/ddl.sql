@@ -13,24 +13,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- create om tables
 -----------------------
 
-/*
-CREATE TABLE om_visit_typevalue
-( typevalue character varying(50) NOT NULL,
-  id character varying(30) NOT NULL,
-  idval character varying(30),
-  descript text,
-  CONSTRAINT om_visit_typevalue_pkey PRIMARY KEY (typevalue, id)
-);
-
-
-CREATE TABLE rpt_selector_hourly_compare
-( id serial NOT NULL,
-  "time" character varying(100) NOT NULL,
-  cur_user text NOT NULL,
-  CONSTRAINT rpt_selector_result_hourly_compare_pkey PRIMARY KEY (id)
-);
-
-*/
 CREATE TABLE audit_cat_table_x_column
 ( id text,
   table_id text NOT NULL,
@@ -59,8 +41,9 @@ CREATE TABLE value_type
 
 ALTER TABLE om_visit_class ADD COLUMN param_options json;
 
+ALTER TABLE om_visit ADD COLUMN visit_type integer;
 
-ALTER TABLE cat_feature ADD COLUMN  type character varying(30);
+ALTER TABLE cat_feature ADD COLUMN type character varying(30);
 ALTER TABLE cat_feature ADD COLUMN shortcut_key character varying(100);
 ALTER TABLE cat_feature ADD COLUMN parent_layer character varying(100);
 ALTER TABLE cat_feature ADD COLUMN child_layer character varying(100);
@@ -82,7 +65,6 @@ ALTER TABLE om_visit_cat ADD COLUMN duration text;
 
 ALTER TABLE sys_feature_type ADD COLUMN  icon character varying(30);
 
---table v_project_type???
 
 --21/05/2019
 ALTER TABLE sys_csv2pg_cat ADD COLUMN  isheader boolean NOT NULL DEFAULT false;
