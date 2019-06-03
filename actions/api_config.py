@@ -287,6 +287,7 @@ class ApiConfig(ApiParent):
                 lbl.setText(field['label'])
                 lbl.setMinimumSize(160, 0)
                 lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                lbl.setToolTip(field['tooltip'])
 
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
