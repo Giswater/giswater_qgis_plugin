@@ -481,9 +481,8 @@ class Giswater(QObject):
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
         self.feature_cat = {}
-        # TODO ya no es sys_feature_cat
-        sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
-        sql = "SELECT * FROM " + self.schema_name + ".cat_feature"
+        sql = ("SELECT * FROM " + self.schema_name + ".cat_feature"
+               " WHERE active is True order by orderby")
         rows = self.controller.dao.get_rows(sql)
 
         if not rows:
