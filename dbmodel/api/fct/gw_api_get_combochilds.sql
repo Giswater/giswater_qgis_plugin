@@ -51,7 +51,7 @@ BEGIN
             USING schemas_array[1], p_idname
             INTO v_column_type;
 
-	IF (p_table_id = 'config') THEN
+	IF (p_table_id = 'config') OR (p_table_id = 'epaoptions') THEN
 
 	--  Combo rows child CONFIG
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id as column_id, widgettype, datatype, id as widgetname,
