@@ -224,15 +224,12 @@ class ApiCF(ApiParent):
             extras = '"toolBar":"basic"'
         role = self.controller.get_restriction()
         extras += ', "rolePermissions":"' + role + '"'
+
         # IF insert new feature
         if point and feature_cat:
             self.new_feature_id = new_feature_id
             self.layer_new_feature = layer_new_feature
-
             self.iface.actionPan().trigger()
-            self.layer_new_feature.featureAdded.disconnect()
-
-
             feature = '"tableName":"' + str(feature_cat.child_layer.lower()) + '"'
             extras += ', "coordinates":{'+str(point) + '}'
             body = self.create_body(feature=feature, extras=extras)

@@ -40,8 +40,8 @@ class Edit(ParentAction):
         if layer:
             self.iface.setActiveLayer(layer)
             layer.startEditing()
-            layer.featureAdded.connect(partial(self.open_new_feature, layer, feature_cat))
             self.iface.actionAddFeature().trigger()
+            layer.featureAdded.connect(partial(self.open_new_feature, layer, feature_cat))
         else:
             message = "Selected layer name not found"
             self.controller.show_warning(message, parameter=feature_cat.parent_layer)
