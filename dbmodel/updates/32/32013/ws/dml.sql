@@ -53,7 +53,7 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_interval_to', 'epaoptions'
 		
 
 
-UPDATE cat_feature SET orderby = rownumber() over (order by id) , active=true, code_autofill=true;
+--UPDATE cat_feature SET orderby = row_number() over (order by id) , active=true, code_autofill=true;
 
 UPDATE cat_feature SET child_layer='ve_node_throttlevalve' WHERE id='THROTTLE-VALVE';
 UPDATE cat_feature SET child_layer='ve_node_valveregister' WHERE id='VALVE-REGISTER';

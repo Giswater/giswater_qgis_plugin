@@ -15,9 +15,6 @@ UPDATE cat_feature SET shortcut_key = concat('Ctrl+',sys_feature_cat.shortcut_ke
 UPDATE cat_feature SET shortcut_key = sys_feature_cat.shortcut_key FROM sys_feature_cat WHERE sys_feature_cat.id = cat_feature.id and cat_feature.feature_type = 'ARC';
 
 
-{"fieldToSearch": "id", "threshold": 3, "noresultsMsg": "No results", "loadingMsg": "Searching"}
-
-
 UPDATE config_param_system SET value = '{"sys_table_id":"v_ui_workcat_polygon_all", "sys_id_field":"workcat_id", "sys_search_field":"workcat_id", "sys_geom_field":"the_geom", "filter_text":"code"}' 
 	WHERE parameter = 'api_search_workcat';
 
