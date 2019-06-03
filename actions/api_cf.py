@@ -689,10 +689,12 @@ class ApiCF(ApiParent):
                 if widget.objectName() == field['widgetname']:
                     if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
                         widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
-                                             " color: rgb(100, 100, 100)}")
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                     elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
                         widget.setEnabled(enable)
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+
+
         self.new_feature_id = None
         self.close_dialog(dialog)
 
@@ -706,12 +708,10 @@ class ApiCF(ApiParent):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242);"
-                                                 " color: rgb(100, 100, 100)}")
+                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255);"
-                                                 " color: rgb(0, 0, 0)}")
+                            widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
                     elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
                         widget.setEnabled(field['iseditable'])
                         widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
