@@ -194,12 +194,12 @@ BEGIN
 
 					-- Control of same node initial and final
 					IF (v_node1 = v_node2) AND (v_samenode_init_end_control IS TRUE) THEN
-						v_message = (SELECT concat('Error[1041]:',error_message, v_node1,'. ',hint_message) FROM audit_cat_error WHERE id=1041);
+						v_message = (SELECT concat('Error[1040]:',error_message, v_node1,'. ',hint_message) FROM audit_cat_error WHERE id=1040);
 						v_status = false;
 					END IF;
 				--Error, no existing nodes
 				ELSIF ((v_node1 IS NULL) OR (v_node2 IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1043]:',error_message, '[node_1]:',v_node1,'[node_2]:',v_node2,'. ',hint_message) FROM audit_cat_error WHERE id=1043);
+					v_message = (SELECT concat('Error[1042]:',error_message, '[node_1]:',v_node1,'[node_2]:',v_node2,'. ',hint_message) FROM audit_cat_error WHERE id=1042);
 					v_status = false;
 				END IF;
 	
@@ -410,6 +410,8 @@ BEGIN
 --    Control NULL's
       v_apiversion := COALESCE(v_apiversion, '[]');
       v_fields := COALESCE(v_fields, '[]');    
+      v_message := COALESCE(v_message, '[]');    
+
     
 --    Return
       IF v_status IS TRUE THEN

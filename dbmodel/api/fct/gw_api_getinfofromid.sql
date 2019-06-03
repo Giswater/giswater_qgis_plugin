@@ -495,14 +495,19 @@ BEGIN
 
 	-- call fields function
 	-------------------
-	/*
-	to do: Use gw_api_get_featureinfo when v_editable is false because it has more performance......
+
 	IF v_editable THEN
 		RAISE NOTICE 'User has permissions to edit table and table';
 		-- call edit form function
 		EXECUTE 'SELECT gw_api_get_featureupsert($1, $2, $3, $4, $5, $6, $7)'
 		INTO v_fields
 		USING v_tablename, v_id, v_inputgeometry, v_device, v_infotype, v_tg_op, v_configtabledefined;
+
+		-- in case of insert status must be failed when topocontrol fails
+		IF (v_fields->>'status')='Failed' THEN
+			v_message = (v_fields->>'message');
+		END IF;
+					
 	ELSE 
 		RAISE NOTICE 'User has NOT permissions to edit table';
 		-- call info form function
@@ -510,10 +515,6 @@ BEGIN
 		INTO v_fields
 		USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined;
 	END IF;*/
-	
-	EXECUTE 'SELECT gw_api_get_featureupsert($1, $2, $3, $4, $5, $6, $7)'
-	INTO v_fields
-	USING v_tablename, v_id, v_inputgeometry, v_device, v_infotype, v_tg_op, v_configtabledefined;
 
     END IF;
 
