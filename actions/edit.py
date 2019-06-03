@@ -35,31 +35,31 @@ class Edit(ParentAction):
 
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
-
-        layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
-        if layer:
-            self.iface.setActiveLayer(layer)
-            layer.startEditing()
+        self.feature_cat = feature_cat
+        self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
+        if self.layer:
+            self.iface.setActiveLayer(self.layer)
+            self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
-            layer.featureAdded.connect(partial(self.open_new_feature, layer, feature_cat))
+            self.layer.featureAdded.connect(self.open_new_feature)
         else:
             message = "Selected layer name not found"
             self.controller.show_warning(message, parameter=feature_cat.parent_layer)
 
 
-    def open_new_feature(self, layer, feature_cat, feature_id):
-
-        feature = self.get_feature_by_id(layer, feature_id)
+    def open_new_feature(self, feature_id):
+        self.layer.featureAdded.disconnect(self.open_new_feature)
+        feature = self.get_feature_by_id(self.layer, feature_id)
         # feature.setAttribute('state', '2')
         # feature.setAttribute('state_type', '5')
         # layer.updateFeature(feature)
 
         geom = feature.geometry()
         list_points = None
-        if layer.geometryType() == Qgis.Point:
+        if self.layer.geometryType() == Qgis.Point:
             points = geom.asPoint()
             list_points = '"x1":' + str(points.x()) + ', "y1":' + str(points.y())
-        elif layer.geometryType() in(Qgis.Line, Qgis.Polygon):
+        elif self.layer.geometryType() in(Qgis.Line, Qgis.Polygon):
             points = geom.asPolyline()
             init_point = points[0]
             last_point = points[-1]
@@ -70,10 +70,10 @@ class Edit(ParentAction):
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
-        result, dialog = self.api_cf.open_form(point=list_points, feature_cat=feature_cat, new_feature_id=feature_id, layer_new_feature=layer, tab_type='data', new_feature=feature)
+        result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat, new_feature_id=feature_id, layer_new_feature=self.layer, tab_type='data', new_feature=feature)
 
         if result is False:
-            layer.deleteFeature(feature.id())
+            self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
 
         #self.iface.actionPan().trigger()
