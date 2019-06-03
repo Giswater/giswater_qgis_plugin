@@ -58,3 +58,8 @@ VALUES (2696, 'gw_fct_om_visit_event_manager', 'utils','function', 'Manager to w
 
 INSERT INTO audit_cat_error(id, error_message, hint_message, log_level, show_user, project_type, isdeprecated)
 VALUES (3016, 'New field overlaps the existing one', 'Modify the order value.', 2, TRUE, 'utils',FALSE);
+
+--03/06/2019
+UPDATE config_param_system SET value='{"status":"TRUE" , "field":"code"}' WHERE parameter='customer_code_autofill';
+UPDATE config_param_system SET descript='If status is TRUE, when insert a new connec, customer_code will be the same as field (connec_id or code)' WHERE parameter='customer_code_autofill';
+
