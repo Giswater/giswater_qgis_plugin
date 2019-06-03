@@ -16,7 +16,7 @@ arc no nodes extremals
 SELECT SCHEMA_NAME.gw_api_getinfofromid($${
 		"client":{"device":9, "infoType":100, "lang":"ES"},
 		"form":{"editable":"True"},
-		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E764000002000000000000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
+		"feature":{"tableName":"ve_arc_pipe", "inputGeometry":"0102000020E7640000020000000056560000A083198641000000669A33C041000000E829D880410000D0AE90F0F341" },
 		"data":{}}$$)
 arc with nodes extremals
 SELECT SCHEMA_NAME.gw_api_getinfofromid($${
@@ -122,6 +122,7 @@ DECLARE
 	v_layermanager json;
 	v_role text;
 	v_parentfields text;
+	v_status text ='Accepted';
    
 BEGIN
 
@@ -466,7 +467,7 @@ BEGIN
 	--   Get editability
 	------------------------
 	IF v_editable THEN 
-		EXECUTE 'SELECT gw_api_getpermissions($${"tableName":"'||quote_literal(v_tablename)||'"}$$::json)'
+		EXECUTE 'SELECT gw_api_getpermissions($${"tableName":"'||quote_ident(v_tablename)||'"}$$::json)'
 			INTO v_permissions;
 			v_editable := v_permissions->>'isEditable';
 	ELSE
@@ -506,6 +507,7 @@ BEGIN
 		-- in case of insert status must be failed when topocontrol fails
 		IF (v_fields->>'status')='Failed' THEN
 			v_message = (v_fields->>'message');
+			v_status = 'Failed';
 		END IF;
 					
 	ELSE 
@@ -545,7 +547,7 @@ BEGIN
 
 --    Return
 -----------------------
-     RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":' || v_apiversion ||
+     RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_apiversion ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
