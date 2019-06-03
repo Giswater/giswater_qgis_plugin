@@ -157,7 +157,7 @@ BEGIN
 		FROM config_param_system WHERE parameter = concat('utils_csv2pg_om_visit_parameters_',v_csv2pgcat_id)
 		LOOP
 
-			ELSIF v_csv = 10 THEN	
+			IF v_csv = 10 THEN	
 				v_value = v_visit.csv10;
 			ELSIF v_csv = 11 THEN
 				v_value = v_visit.csv11;
@@ -196,7 +196,7 @@ BEGIN
 			raise notice 'v_parameters %', v_parameters;
 			-- parameters are defined from row csv10 to row csv20
 
-			ELSIF v_csv = 10 THEN	
+			IF v_csv = 10 THEN	
 				v_value = v_visit.csv10;
 			ELSIF v_csv = 11 THEN
 				v_value = v_visit.csv11;
