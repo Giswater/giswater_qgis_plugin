@@ -18,7 +18,7 @@ else:
     from qgis.core import QgsPointXY
 
 from qgis.PyQt.QtCore import QDate, QPoint, Qt
-from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
+from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
 from qgis.PyQt.QtWidgets import QFrame, QGridLayout, QGroupBox, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
@@ -2133,13 +2133,14 @@ class ApiCF(ApiParent):
                 if row is None :
                     sql = ("INSERT INTO " + self.schema_name + ".cat_work (" + fields + ") VALUES (" + values + ")")
                     self.controller.execute_sql(sql)
-
                     sql = ("SELECT id, id FROM " + self.schema_name + ".cat_work ORDER BY id")
                     rows = self.controller.get_rows(sql, commit=True)
                     if rows:
-                        cmb_workcat_id = self.dlg_cf.findChild(QComboBox, tab_type + "_workcat_id")
-                        utils_giswater.set_item_data(cmb_workcat_id, rows, index_to_show=1, combo_clear=True)
-                        utils_giswater.set_combo_itemData(cmb_workcat_id, cat_work_id, 1)
+                        cmb_workcat_id = self.dlg_cf.findChild(QWidget, tab_type + "_workcat_id")
+                        model = QStringListModel()
+                        completer = QCompleter()
+                        self.set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
+                        utils_giswater.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
                     self.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "Este Workcat ya existe"
