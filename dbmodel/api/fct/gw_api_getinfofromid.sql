@@ -514,7 +514,7 @@ BEGIN
 		EXECUTE 'SELECT gw_api_get_featureinfo($1, $2, $3, $4, $5)'
 		INTO v_fields
 		USING v_tablename, v_id, v_device, v_infotype, v_configtabledefined;
-	END IF;*/
+	END IF;
 
     END IF;
 
