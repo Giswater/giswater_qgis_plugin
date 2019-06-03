@@ -239,6 +239,22 @@ BEGIN
 			NEW.link=NEW.gully_id;
 		END IF;
 
+
+		--set rotation field
+		WITH index_query AS(
+		SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
+		SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
+		IF v_linelocatepoint < 0.01 THEN
+			v_rotation = st_azimuth (st_startpoint(v_thegeom), st_lineinterpolatepoint(v_thegeom,0.01));
+		ELSIF v_linelocatepoint > 0.99 THEN
+			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,0.98), st_lineinterpolatepoint(v_thegeom,0.99));
+		ELSE
+			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
+		END IF;
+
+		NEW.rotation = v_rotation*180/pi();
+		v_rotation = -(v_rotation - pi()/2);
+
 		-- double geometry
 		IF v_doublegeometry THEN
 
@@ -247,20 +263,7 @@ BEGIN
 			v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
 			v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id)*v_unitsfactor;
 
-			-- get arc direction
-			WITH index_query AS(
-			SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
-			SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
-			IF v_linelocatepoint < 0.01 THEN
-				v_rotation = st_azimuth (st_startpoint(v_thegeom), st_lineinterpolatepoint(v_thegeom,0.01));
-			ELSIF v_linelocatepoint > 0.99 THEN
-				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,0.98), st_lineinterpolatepoint(v_thegeom,0.99));
-			ELSE
-				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
-			END IF;
-
-			--set grate rotation
-			v_rotation = -(v_rotation - pi()/2);
+			
 
 			-- calculate center coordinates
 			v_x = st_x(NEW.the_geom);

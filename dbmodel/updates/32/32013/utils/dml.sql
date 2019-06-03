@@ -8,6 +8,23 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+UPDATE config_param_system SET label = 'Force arc direction using slope direction:', layout_order=8 WHERE parameter='geom_slp_direction';
+
+UPDATE config_param_system SET label = 'Change topocontrol error by log message:', layout_order=5,
+descript='If TRUE, topocontrol function is used but the elements which violates topology also can get inside the network. As a result log message of errors it is inserted on audit_log_data table (fprocesscat_id=3). Be careful, this function can lead to errors'
+WHERE parameter='edit_topocontrol_dsbl_error';
+
+
+UPDATE config_param_system SET label = 'Arc topology:', layout_order=9 WHERE parameter='arc_searchnodes';
+UPDATE config_param_system SET label = 'Node topology:', layout_order=10 WHERE parameter='node_proximity';
+UPDATE config_param_system SET label = 'Connec topology:', layout_order=11 WHERE parameter='connec_proximity';
+UPDATE config_param_system SET label = 'Gully topology:', isenabled=true, layout_id=13, layout_order=12, iseditable=true WHERE parameter='gully_proximity';
+UPDATE config_param_system SET label = 'Node double geometry enabled:', layout_order=16 WHERE parameter='insert_double_geometry';
+
+UPDATE config_param_system SET isenabled=false, isdeprecated=true WHERE parameter='node_duplicated_tolerance';
+UPDATE config_param_system SET isenabled=false, isdeprecated=true WHERE parameter='connec_duplicated_tolerance';
+
+
 UPDATE audit_cat_param_user SET feature_field_id ='state' WHERE id='state_vdefault';
 UPDATE audit_cat_param_user SET feature_field_id ='builtdate' WHERE id='builtdate_vdefault';
 UPDATE audit_cat_param_user SET feature_field_id ='enddate' WHERE id='enddate_vdefault';
