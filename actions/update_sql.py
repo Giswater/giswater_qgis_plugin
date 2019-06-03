@@ -1634,6 +1634,10 @@ class UpdateSQL(ApiParent):
                     elem = [row[0], row[0]]
                     result_list.append(elem)
 
+        if result_list == []:
+            self.dlg_readsql.project_schema_name.clear()
+            return
+
         utils_giswater.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
 
 
