@@ -31,7 +31,7 @@ import utils_giswater
 from .manage_visit import ManageVisit
 from .parent_manage import ParentManage
 from ..ui_manager import AddLot
-from ..ui_manager import VisitManagement
+from ..ui_manager import LotManagement
 
 
 class AddNewLot(ParentManage):
@@ -914,12 +914,9 @@ class AddNewLot(ParentManage):
         """ Button 75: Lot manager """
 
         # Create the dialog
-        self.dlg_lot_man = VisitManagement()
+        self.dlg_lot_man = LotManagement()
         self.load_settings(self.dlg_lot_man)
-        self.dlg_lot_man.setWindowTitle("Lot management")
-        self.dlg_lot_man.lbl_filter.setText('Filter by idval: ')
-        self.dlg_lot_man.btn_open.setText('Open lot')
-        self.dlg_lot_man.btn_delete.setText('Delete lot')
+
         # save previous dialog and set new one.
         # previous dialog will be set exiting the current one
         # self.previous_dialog = utils_giswater.dialog()

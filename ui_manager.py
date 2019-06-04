@@ -289,6 +289,13 @@ class LoadProfiles(QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('lot_management.ui')
+class LotManagement(QDialog, FORM_CLASS):
+    def __init__(self):
+        super(LotManagement, self).__init__()
+        self.setupUi(self)
+
+        
 FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(QMainWindow, FORM_CLASS):
     dlg_rejected = QtCore.pyqtSignal()
