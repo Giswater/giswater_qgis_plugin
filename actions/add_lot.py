@@ -28,10 +28,10 @@ import re
 from functools import partial
 
 import utils_giswater
-from giswater.actions.manage_visit import ManageVisit
-from giswater.actions.parent_manage import ParentManage
-from giswater.ui_manager import AddLot
-from giswater.ui_manager import VisitManagement
+from .manage_visit import ManageVisit
+from .parent_manage import ParentManage
+from ..ui_manager import AddLot
+from ..ui_manager import VisitManagement
 
 
 class AddNewLot(ParentManage):
@@ -80,8 +80,12 @@ class AddNewLot(ParentManage):
         self.set_icon(self.dlg_lot.btn_feature_delete, "112")
         self.set_icon(self.dlg_lot.btn_feature_snapping, "137")
 
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.startdate, self.dlg_lot.btn_accept)
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.enddate, self.dlg_lot.btn_accept)
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.real_init_date, self.dlg_lot.btn_accept)
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.real_end_date, self.dlg_lot.btn_accept)
+
         self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
-        self.id_val = self.dlg_lot.findChild(QLineEdit, "txt_idval")
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
         self.visit_class = self.dlg_lot.findChild(QComboBox, "cmb_visit_class")
 
@@ -122,7 +126,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_to.dateChanged.connect(partial(self.reload_table_visit))
 
-        self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature,self.dlg_lot.tbl_relation))
+        self.dlg_lot.tbl_relation.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_relation))
         self.dlg_lot.tbl_visit.doubleClicked.connect(partial(self.zoom_to_feature, self.dlg_lot.tbl_visit))
         self.dlg_lot.btn_open_visit.clicked.connect(partial(self.open_visit, self.dlg_lot.tbl_visit))
         # TODO pending to make function delete_visit
@@ -133,7 +137,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
 
         self.set_headers(self.tbl_relation)
-
+        self.set_active_layer()
         if lot_id is not None:
             utils_giswater.set_combo_itemData(self.visit_class, str(visitclass_id), 0)
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
@@ -209,8 +213,8 @@ class AddNewLot(ParentManage):
         # Visit tab
         # Set current date and time
         current_date = QDate.currentDate()
-        self.dlg_lot.startdate.setDate(current_date)
-        self.dlg_lot.enddate.setDate(current_date)
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, current_date.toString('yyyy-MM-dd'))
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, current_date.toString('yyyy-MM-dd'))
 
         # Set current user
         sql = "SELECT current_user"
@@ -332,9 +336,11 @@ class AddNewLot(ParentManage):
                " WHERE id ='"+str(lot_id)+"'")
         lot = self.controller.get_row(sql, log_sql=False)
         if lot:
-            utils_giswater.setWidgetText(self.dlg_lot, 'txt_idval', lot['idval'])
-            utils_giswater.setCalendarDate(self.dlg_lot, 'startdate', lot['startdate'])
-            utils_giswater.setCalendarDate(self.dlg_lot, 'enddate', lot['enddate'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, lot['enddate'])
+            # TODO necesito estos dos campos en la tabla om_visit_lot (real_init_date y real_end_date)
+            # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, lot['real_init_date'])
+            # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, lot['real_end_date'])
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, lot['visitclass_id'], 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['team_id'], 0)
             utils_giswater.setWidgetText(self.dlg_lot, 'descript', lot['descript'])
@@ -406,7 +412,6 @@ class AddNewLot(ParentManage):
 
         # Attach model to table view
         widget.setModel(model)
-
 
 
     def update_id_list(self):
@@ -696,9 +701,11 @@ class AddNewLot(ParentManage):
     def save_lot(self):
 
         lot = {}
-        lot['idval'] = utils_giswater.getWidgetText(self.dlg_lot, 'txt_idval', False, False)
-        lot['startdate'] = utils_giswater.getCalendarDate(self.dlg_lot, 'startdate')
-        lot['enddate'] = utils_giswater.getCalendarDate(self.dlg_lot, 'enddate')
+        lot['startdate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate)
+        lot['enddate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate)
+        # TODO necesito estos dos campos en la tabla om_visit_lot (real_init_date y real_end_date)
+        # lot['real_init_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_init_date)
+        # lot['real_end_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_end_date)
         lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
         lot['descript'] = utils_giswater.getWidgetText(self.dlg_lot, 'descript', False, False)
         lot['status'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)

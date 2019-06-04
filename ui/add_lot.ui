@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
-    <height>572</height>
+    <width>654</width>
+    <height>695</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
          <attribute name="title">
           <string>Lot</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0,0">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
             <item>
@@ -71,7 +71,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>70</width>
+                <width>79</width>
                 <height>20</height>
                </size>
               </property>
@@ -97,67 +97,18 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0">
-            <item>
-             <widget class="QLabel" name="label_node_type_4">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>50</weight>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>Id val:</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::AutoText</enum>
-              </property>
-              <property name="scaledContents">
-               <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>50</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="txt_idval"/>
-            </item>
-           </layout>
-          </item>
-          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
             <item>
              <widget class="QLabel" name="label_node_type_3">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
-                <width>66</width>
+                <width>0</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -175,7 +126,7 @@
                <enum>QFrame::Plain</enum>
               </property>
               <property name="text">
-               <string>Start date:* </string>
+               <string>Inici planificat:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -201,31 +152,14 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>22</width>
+                <width>19</width>
                 <height>20</height>
                </size>
               </property>
              </spacer>
             </item>
             <item>
-             <widget class="QDateEdit" name="startdate">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="date">
-               <date>
-                <year>2016</year>
-                <month>1</month>
-                <day>1</day>
-               </date>
-              </property>
-              <property name="displayFormat">
-               <string>dd/MM/yyyy</string>
-              </property>
-              <property name="calendarPopup">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <widget class="QLineEdit" name="startdate"/>
             </item>
            </layout>
           </item>
@@ -233,9 +167,15 @@
            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
             <item>
              <widget class="QLabel" name="label_node_type_2">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
-                <width>59</width>
+                <width>0</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -253,7 +193,7 @@
                <enum>QFrame::Plain</enum>
               </property>
               <property name="text">
-               <string>End date:*</string>
+               <string>Final planificat:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -279,31 +219,74 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>30</width>
+                <width>19</width>
                 <height>20</height>
                </size>
               </property>
              </spacer>
             </item>
             <item>
-             <widget class="QDateEdit" name="enddate">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="date">
-               <date>
-                <year>2016</year>
-                <month>1</month>
-                <day>1</day>
-               </date>
-              </property>
-              <property name="displayFormat">
-               <string>dd/MM/yyyy</string>
-              </property>
-              <property name="calendarPopup">
-               <bool>true</bool>
+             <widget class="QLineEdit" name="enddate"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_15">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Inici real:</string>
               </property>
              </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>55</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="real_init_date"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_16">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Fi real:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>66</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="real_end_date"/>
             </item>
            </layout>
           </item>
@@ -351,7 +334,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>27</width>
+                <width>38</width>
                 <height>20</height>
                </size>
               </property>
@@ -418,7 +401,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>27</width>
+                <width>38</width>
                 <height>20</height>
                </size>
               </property>
@@ -447,7 +430,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Assigned to:</string>
+               <string>Equip:</string>
               </property>
               <property name="margin">
                <number>3</number>
@@ -464,7 +447,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>22</width>
+                <width>63</width>
                 <height>20</height>
                </size>
               </property>
@@ -504,7 +487,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>55</width>
                 <height>20</height>
                </size>
               </property>
@@ -832,8 +815,6 @@
  <tabstops>
   <tabstop>tab_widget</tabstop>
   <tabstop>lot_id</tabstop>
-  <tabstop>startdate</tabstop>
-  <tabstop>enddate</tabstop>
   <tabstop>user_name</tabstop>
   <tabstop>cmb_visit_class</tabstop>
   <tabstop>descript</tabstop>
