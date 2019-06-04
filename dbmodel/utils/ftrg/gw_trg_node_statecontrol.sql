@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_trg_node_statecontrol()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_statecontrol()
   RETURNS trigger AS
 $BODY$
 DECLARE 
