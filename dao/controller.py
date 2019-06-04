@@ -1190,33 +1190,6 @@ class DaoController(object):
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
         
-        # role_admin = False
-        # role_master = self.check_role_user("role_master")
-        # role_epa = self.check_role_user("role_epa")
-        # role_edit = self.check_role_user("role_edit")
-        # role_om = self.check_role_user("role_om")
-        # role_basic = self.check_role_user("role_basic")
-        # super_users = self.settings.value('system_variables/super_users')
-        #
-        # # Manage user 'postgres'
-        # if self.user == 'postgres' or self.user == 'gisadmin':
-        #     role_master = True
-        #
-        # # Manage super_user
-        # if super_users is not None:
-        #     if self.user in super_users:
-        #         role_master = True
-        #
-        #
-        #
-        # project_role = None
-        # if Qgis.QGIS_VERSION_INT < 29900:
-        #     project_role = QgsExpressionContextUtils.projectScope().variable('project_role')
-        # else:
-        #     project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('project_role')
-        # self.log_info(str(role_basic))
-        # self.log_info(str(project_role))
-
         restriction = self.get_restriction()
 
         if restriction == 'role_basic':
