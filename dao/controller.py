@@ -1261,10 +1261,9 @@ class DaoController(object):
 
         schemaname = schemaname.replace('"', '')
         sql = ("SELECT column_name FROM information_schema.columns "
-               "WHERE table_schema = %s AND table_name = %s "
-               "ORDER BY ordinal_position")
-        params = [schemaname, tablename]
-        column_names = self.get_rows(sql, params=params)
+               "WHERE table_schema = '{}' AND table_name = '{}' "
+               "ORDER BY ordinal_position".format(schemaname, tablename))
+        column_names = self.get_rows(sql)
         return column_names
     
     
