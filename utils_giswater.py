@@ -376,10 +376,12 @@ def set_model_by_list(string_list, widget, proxy_model):
     widget.setCompleter(completer)
 
 
-def get_item_data(dialog, widget, index=0):
+def get_item_data(dialog, widget, index=0, add_quote=False):
     """ Get item data of current index of the @widget """
 
     code = -1
+    if add_quote:
+        code = ''
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if widget:
