@@ -991,7 +991,7 @@ class DaoController(object):
             sql = ("SELECT lower(wsoftware) "
                    "FROM " + schemaname + "." + tablename + " "
                    "ORDER BY id ASC LIMIT 1")
-            row = self.get_row(sql)
+            row = self.get_row(sql, commit=True)
             if row:
                 project_type = row[0]
         else:
