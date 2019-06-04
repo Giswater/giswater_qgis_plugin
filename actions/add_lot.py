@@ -795,7 +795,7 @@ class AddNewLot(ParentManage):
 
 
     def reset_rb_list(self, rb_list):
-        
+        self.rb_red.reset()
         for rb in rb_list:
             rb.reset()
 
@@ -804,13 +804,15 @@ class AddNewLot(ParentManage):
         self.reset_rb_list(rb_list)
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
         layer = self.iface.activeLayer()
+        if not layer:
+            return
         field_id = feature_type + "_id"
         for _id in self.ids:
             feature = self.get_feature_by_id(layer, _id, field_id)
             geometry = feature.geometry()
             rb = QgsRubberBand(self.canvas)
             rb.setToGeometry(geometry, None)
-            rb.setColor(QColor(0, 0, 150, 100))
+            rb.setColor(QColor(0, 0, 240, 50))
             rb.setWidth(5)
             rb.show()
             rb_list.append(rb)
