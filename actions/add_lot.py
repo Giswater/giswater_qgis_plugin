@@ -714,11 +714,11 @@ class AddNewLot(ParentManage):
         # TODO necesito estos dos campos en la tabla om_visit_lot (real_init_date y real_end_date)
         lot['real_init_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, False, False)
         lot['real_end_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, False, False)
-        lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
+        lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0, True)
         lot['descript'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.descript, False, False)
         lot['status'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
         lot['feature_type'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
-        lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
+        lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0, True)
         keys = ""
         values = ""
         update = ""
