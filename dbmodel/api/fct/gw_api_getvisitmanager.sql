@@ -106,6 +106,7 @@ DECLARE
 	v_filterfeature json;
 	v_isfeaturemanager boolean;
 	v_isusermanager boolean;
+	v_disable_widget_name text;
 
 BEGIN
 
@@ -142,9 +143,10 @@ BEGIN
 	v_addfile = ((p_data ->>'data')::json->>'newFile')::json;
 	v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
 	v_currentactivetab = (((p_data ->>'form')::json->>'navigation')::json->>'currentActiveTab')::text;
-	v_team = ((p_data ->>'data')::json->>'fields')::json->>'team'::text;
+	v_team = ((p_data ->>'data')::json->>'fields')::json->>'team_id'::text;
 	v_vehicle = ((p_data ->>'data')::json->>'fields')::json->>'vehicle'::text;
 	v_message = ((p_data ->>'data')::json->>'message');
+	v_disable_widget_name = (((p_data ->>'data')::json->>'widget_actions')::json->>'widget_disabled');
 
 	-- forcing idname in case not exists
 	IF v_idname IS NULL THEN
@@ -155,7 +157,7 @@ BEGIN
 		v_featureidname = concat(v_featuretype, '_id');
 	END IF;	
 	
-	raise notice ' v_featuretype % v_idname %',v_featuretype, v_featureidname;
+	raise notice ' 111 v_featuretype % v_idname % v_team %',v_featuretype, v_featureidname, v_team;
 
 	-- setting values
 	v_tablename := 'v_visit_lot_user';
@@ -191,7 +193,7 @@ BEGIN
 	END IF;
 
 
-       raise notice 'v_isusermanager % v_isfeaturemanager % v_currentactivetab % ', v_isusermanager, v_isfeaturemanager, v_currentactivetab;
+       raise notice '222 v_isusermanager % v_isfeaturemanager % v_currentactivetab % ', v_isusermanager, v_isfeaturemanager, v_currentactivetab;
 
 	-- Set calling visits from feature id
 
@@ -211,12 +213,12 @@ BEGIN
 		IF v_isusermanager THEN 
 		
 			IF v_activedatatab THEN
-		
+				raise notice '------- % -------', v_team;
 				SELECT gw_api_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				-- getting values from feature
-				EXECUTE ('SELECT (row_to_json(a)) FROM 
-					(SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_user_id) || ' = CAST($1 AS ' || quote_literal(v_columntype) || '))a')
+				EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM 
+					(SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_user_id, v_columntype)
 					INTO v_values
 					USING current_user;
 		
@@ -227,7 +229,11 @@ BEGIN
 				LOOP          
 					array_index := array_index + 1;
 					v_fieldvalue := (v_values->>(aux_json->>'column_id'));
-			
+					raise notice 'aux_json --->>> %',aux_json;
+					raise notice 'v_fieldvalue --->>> %',v_fieldvalue;
+					IF (aux_json->>'widgetname') = v_disable_widget_name THEN
+						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', True);
+					END IF;
 					IF (aux_json->>'widgettype')='combo' THEN 
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
 					ELSE 
@@ -332,7 +338,7 @@ BEGIN
 				--refactor tabNames
 				p_data := replace (p_data::text, 'tabFeature', 'feature');
 			
-				RAISE NOTICE '--- CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
+				RAISE NOTICE '--- 333 CALLING gw_api_getlist - VISITS p_data: % ---', p_data;
 				SELECT gw_api_getlist (p_data) INTO v_fields_json;
 
 				-- getting pageinfo and list values
@@ -361,7 +367,7 @@ BEGIN
 		--closing tabs array
 		v_formtabs := (v_formtabs ||']');
 
-		RAISE NOTICE 'v_formtabs %', v_formtabs;
+		RAISE NOTICE '999 v_formtabs %', v_formtabs;
 
 		-- header form
 		IF v_isusermanager THEN
@@ -371,7 +377,7 @@ BEGIN
 		END IF;
 	
 		-- actions and layermanager
-		EXECUTE ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''visitManager'' AND (projecttype = ' || quote_literal(LOWER(v_projecttype)) || ' OR projecttype = ''utils'')')
+		EXECUTE FORMAT ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''visitManager'' AND (projecttype = %s OR projecttype = ''utils'')', quote_literal(LOWER(v_projecttype)))
 			INTO v_formactions, v_layermanager;
 
 		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
