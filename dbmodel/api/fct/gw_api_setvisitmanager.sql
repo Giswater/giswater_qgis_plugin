@@ -65,7 +65,10 @@ BEGIN
 	-- getting message
 	SELECT gw_api_getmessage(v_feature, 50) INTO v_message;
 
-				  
+	v_message := COALESCE(v_message, '[]');    
+	v_apiversion := COALESCE(v_apiversion, '[]');    
+	v_id := COALESCE(v_id, '[]');    
+			  
 --    Return
     RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||
     	    ', "body": {"feature":{"id":"'||v_id||'"}}}')::json;    

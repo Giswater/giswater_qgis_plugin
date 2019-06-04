@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2640
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getvisitmanager(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getvisitmanager(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- calling button from feature
-SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
+SELECT ws_sample.gw_api_getvisitmanager($${
 "client":{"device":3,"infoType":100,"lang":"es"},
 "form":{},
 "data":{"relatedFeature":{"type":"arc", "idName":"arc_id", "id":"2074"},"fields":{},"pageInfo":null}}$$)
@@ -21,25 +21,25 @@ SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
 
 -- calling without previous info
 --new call
-SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
+SELECT ws_sample.gw_api_getvisitmanager($${
 "client":{"device":3,"infoType":100,"lang":"es"},
 "form":{},
 "data":{}}$$)
 
-SELECT SCHEMA_NAME.gw_api_getvisitmanager($${"client":{"device":3,"infoType":100,"lang":"es"},
+SELECT ws_sample.gw_api_getvisitmanager($${"client":{"device":3,"infoType":100,"lang":"es"},
      "feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"xtorret"},"form":{"tabData":{"active":false},"tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
        "data":{"relatedFeature":{"type":"arc", "id":"2079"},"fields":{"user_id":"xtorret","date":"2019-01-28","team_id":"1","vehicle_id":"3"},"pageInfo":null}}$$) AS result
 
 
 -- change from tab data to tab files (upserting data on tabData)
-SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
+SELECT ws_sample.gw_api_getvisitmanager($${
 "client":{"device":3,"infoType":100,"lang":"es"},
 "feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"xtorret"},
 "form":{"tabData":{"active":false}, "tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
 "data":{"fields":{"user_id":"xtorret","team_id":1,"vehicle_id":1,"date":"2019-01-01"}}}$$)
 
 --tab activelots
-SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
+SELECT ws_sample.gw_api_getvisitmanager($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
 "form":{"tabData":{"active":false}, "tabLots":{"active":true}}, "navigation":{"currentActiveTab":"tabLots"}, 
@@ -100,18 +100,21 @@ DECLARE
 	v_disabled boolean = true;
 	v_firstcall boolean = false;
 	v_team text;
+	v_lot text;
 	v_vehicle integer;
 	v_user_id text;
 	v_featureidname text;
 	v_filterfeature json;
 	v_isfeaturemanager boolean;
 	v_isusermanager boolean;
+	v_disable_widget_name text;
+
 
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname := 'SCHEMA_NAME';
+	SET search_path = "ws_sample", public;
+	v_schemaname := 'ws_sample';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -142,9 +145,11 @@ BEGIN
 	v_addfile = ((p_data ->>'data')::json->>'newFile')::json;
 	v_deletefile = ((p_data ->>'data')::json->>'deleteFile')::json;
 	v_currentactivetab = (((p_data ->>'form')::json->>'navigation')::json->>'currentActiveTab')::text;
-	v_team = ((p_data ->>'data')::json->>'fields')::json->>'team'::text;
+	v_team = ((p_data ->>'data')::json->>'fields')::json->>'team_id'::text;
+	v_lot = ((p_data ->>'data')::json->>'fields')::json->>'lot_id'::text;
 	v_vehicle = ((p_data ->>'data')::json->>'fields')::json->>'vehicle'::text;
 	v_message = ((p_data ->>'data')::json->>'message');
+	v_disable_widget_name = (((p_data ->>'data')::json->>'widget_actions')::json->>'widget_disabled');
 
 	-- forcing idname in case not exists
 	IF v_idname IS NULL THEN
@@ -155,7 +160,7 @@ BEGIN
 		v_featureidname = concat(v_featuretype, '_id');
 	END IF;	
 	
-	raise notice ' v_featuretype % v_idname %',v_featuretype, v_featureidname;
+	raise notice 'v_featuretype % v_idname % v_team %',v_featuretype, v_featureidname, v_team;
 
 	-- setting values
 	v_tablename := 'v_visit_lot_user';
@@ -211,25 +216,32 @@ BEGIN
 		IF v_isusermanager THEN 
 		
 			IF v_activedatatab THEN
-		
+
 				SELECT gw_api_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 
 				-- getting values from feature
-				EXECUTE ('SELECT (row_to_json(a)) FROM 
-					(SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_user_id) || ' = CAST($1 AS ' || quote_literal(v_columntype) || '))a')
+				EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM 
+					(SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_user_id, v_columntype)
 					INTO v_values
 					USING current_user;
-		
-				raise notice 'v_values %', v_values;
-				
+						
 				-- setting values
 				FOREACH aux_json IN ARRAY v_fields 
 				LOOP          
 					array_index := array_index + 1;
 					v_fieldvalue := (v_values->>(aux_json->>'column_id'));
-			
+
+					IF (aux_json->>'widgetname') = v_disable_widget_name THEN
+						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'disabled', True);
+					END IF;
 					IF (aux_json->>'widgettype')='combo' THEN 
-						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
+						IF (aux_json->>'column_id')='team_id' AND v_team IS NOT NULL THEN 
+							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_team, ''));
+						ELSIF (aux_json->>'column_id')='lot_id' AND v_lot IS NOT NULL THEN
+							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_lot, ''));
+						ELSE
+							v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
+						END IF;
 					ELSE 
 						v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_fieldvalue, ''));
 					END IF;
@@ -361,8 +373,6 @@ BEGIN
 		--closing tabs array
 		v_formtabs := (v_formtabs ||']');
 
-		RAISE NOTICE 'v_formtabs %', v_formtabs;
-
 		-- header form
 		IF v_isusermanager THEN
 			v_formheader :=concat('VISIT MANAGER - ',UPPER(current_user));	
@@ -371,7 +381,7 @@ BEGIN
 		END IF;
 	
 		-- actions and layermanager
-		EXECUTE ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''visitManager'' AND (projecttype = ' || quote_literal(LOWER(v_projecttype)) || ' OR projecttype = ''utils'')')
+		EXECUTE FORMAT ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''visitManager'' AND (projecttype = %s OR projecttype = ''utils'')', quote_literal(LOWER(v_projecttype)))
 			INTO v_formactions, v_layermanager;
 
 		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
