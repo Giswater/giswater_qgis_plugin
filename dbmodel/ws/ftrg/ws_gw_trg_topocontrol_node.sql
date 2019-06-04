@@ -49,9 +49,6 @@ BEGIN
 	RETURN NEW;
 
     ELSE 
-
-	-- State control (permissions to work with state=2 and possibility to downgrade feature to state=0)
-	PERFORM gw_fct_state_control('NODE', NEW.node_id, NEW.state, TG_OP);
     	
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE ' THEN
 

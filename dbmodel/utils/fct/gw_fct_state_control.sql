@@ -224,6 +224,9 @@ BEGIN
 				PERFORM audit_function(1083,2130);
 			END IF;
 
+			-- TODO: check for nodes in order to disconnect arcs
+			-- TODO: check for arcs in order to disconnect links and vnodes
+
 			
 		ELSIF state_aux<2 AND old_state_aux=2 THEN
 
