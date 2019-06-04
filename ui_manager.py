@@ -528,14 +528,14 @@ class WorkcatEndList(QDialog, FORM_CLASS):
 
 """ Tree Manage forms """
 FORM_CLASS = get_ui_class('add_visit.ui', 'tm')
-class AddVisit(QDialog, FORM_CLASS):
+class AddVisitLot(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
 
 
 FORM_CLASS = get_ui_class('event_standard.ui', 'tm')
-class EventStandard(QDialog, FORM_CLASS):
+class EventStandardLot(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
