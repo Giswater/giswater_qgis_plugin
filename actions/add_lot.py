@@ -232,7 +232,7 @@ class AddNewLot(ParentManage):
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT id, idval, feature_type"
                " FROM " + self.schema_name + ".om_visit_class "
-               " WHERE ismultifeature is False"
+               " WHERE ismultifeature is False AND feature_type IS NOT null"
                " ORDER BY idval")
         visitclass_ids = self.controller.get_rows(sql, commit=self.autocommit)
         if visitclass_ids:
@@ -347,8 +347,8 @@ class AddNewLot(ParentManage):
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'])
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, lot['enddate'])
             # TODO necesito estos dos campos en la tabla om_visit_lot (real_init_date y real_end_date)
-            # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, lot['real_init_date'])
-            # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, lot['real_end_date'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, lot['real_init_date'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, lot['real_end_date'])
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, lot['visitclass_id'], 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['team_id'], 0)
             utils_giswater.setWidgetText(self.dlg_lot, 'descript', lot['descript'])
@@ -709,13 +709,13 @@ class AddNewLot(ParentManage):
     def save_lot(self):
 
         lot = {}
-        lot['startdate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate)
-        lot['enddate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate)
+        lot['startdate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate, False, False)
+        lot['enddate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
         # TODO necesito estos dos campos en la tabla om_visit_lot (real_init_date y real_end_date)
-        # lot['real_init_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_init_date)
-        # lot['real_end_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_end_date)
+        lot['real_init_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, False, False)
+        lot['real_end_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, False, False)
         lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
-        lot['descript'] = utils_giswater.getWidgetText(self.dlg_lot, 'descript', False, False)
+        lot['descript'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.descript, False, False)
         lot['status'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
         lot['feature_type'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
@@ -723,14 +723,17 @@ class AddNewLot(ParentManage):
         values = ""
         update = ""
         for key, value in list(lot.items()):
+            keys += "" + key + ", "
             if value != '':
-                keys += ""+key+", "
                 if type(value) in (int, bool):
                     values += "$$"+str(value)+"$$, "
                     update += str(key) + "=$$" + str(value) + "$$, "
                 else:
                     values += "$$" + value + "$$, "
                     update += str(key) + "=$$" + value + "$$, "
+            else:
+                values += "null, "
+                update += str(key) + "=null, "
 
         keys = keys[:-2]
         values = values[:-2]
