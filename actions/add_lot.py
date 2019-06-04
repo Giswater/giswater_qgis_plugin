@@ -40,6 +40,10 @@ class AddNewLot(ParentManage):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         self.ids = []
+        self.rb_red = QgsRubberBand(self.canvas)
+        self.rb_red.setColor(Qt.darkRed)
+        self.rb_red.setIconSize(20)
+        self.rb_list = []
 
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
@@ -134,6 +138,7 @@ class AddNewLot(ParentManage):
 
         self.dlg_lot.btn_cancel.clicked.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
+        self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
 
         self.set_headers(self.tbl_relation)
@@ -160,9 +165,12 @@ class AddNewLot(ParentManage):
         # Set model signals
         self.tbl_relation.model().rowsInserted.connect(self.set_dates)
         self.tbl_relation.model().rowsInserted.connect(self.reload_table_visit)
+        self.tbl_relation.model().rowsInserted.connect(partial(self.hilight_features, self.rb_list))
+
         self.tbl_relation.model().rowsRemoved.connect(self.set_dates)
         self.tbl_relation.model().rowsRemoved.connect(self.reload_table_visit)
-
+        self.tbl_relation.model().rowsRemoved.connect(partial(self.hilight_features, self.rb_list))
+        self.hilight_features(self.rb_list)
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
@@ -783,6 +791,28 @@ class AddNewLot(ParentManage):
         self.completer.setModel(model)
 
 
+    def reset_rb_list(self, rb_list):
+        
+        for rb in rb_list:
+            rb.reset()
+
+
+    def hilight_features(self, rb_list):
+        self.reset_rb_list(rb_list)
+        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
+        layer = self.iface.activeLayer()
+        field_id = feature_type + "_id"
+        for _id in self.ids:
+            feature = self.get_feature_by_id(layer, _id, field_id)
+            geometry = feature.geometry()
+            rb = QgsRubberBand(self.canvas)
+            rb.setToGeometry(geometry, None)
+            rb.setColor(QColor(0, 0, 150, 100))
+            rb.setWidth(5)
+            rb.show()
+            rb_list.append(rb)
+
+
     def zoom_to_feature(self, qtable):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
@@ -827,11 +857,8 @@ class AddNewLot(ParentManage):
     # TODO delete function draw_polyline(*args) when api_parent.py is integrated into giswater proyect
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
-
-        self.rubber_polygon = QgsRubberBand(self.canvas)
-        self.rubber_polygon.setColor(Qt.darkRed)
-        self.rubber_polygon.setIconSize(20)
-        rb = self.rubber_polygon
+        self.rb_red.reset()
+        rb = self.rb_red
         rb.setToGeometry(QgsGeometry.fromPolyline(points), None)
         rb.setColor(color)
         rb.setWidth(width)
