@@ -197,6 +197,7 @@ class ApiCF(ApiParent):
         self.tab_hydrometer_val_loaded = False
         self.tab_om_loaded = False
         self.tab_document_loaded = False
+        self.tab_rpt_loaded = False
         self.tab_plan_loaded = False
         self.dlg_is_destroyed = False
         self.layer = None
@@ -913,8 +914,9 @@ class ApiCF(ApiParent):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self.fill_tab_document()
             self.tab_document_loaded = True
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt':
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
             result = self.fill_tab_rpt(self.complet_result)
+            self.tab_rpt_loaded = True
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self.fill_tab_plan(self.complet_result)
