@@ -517,6 +517,11 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 							v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', true);
 						END IF;
 					END IF;									
+					
+					-- Disable class_id
+					IF (aux_json->>'column_id') = 'class_id' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
+					END IF;										
 				END LOOP;			
 			END IF;	
 
