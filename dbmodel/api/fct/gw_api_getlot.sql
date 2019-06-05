@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2640
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlot(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlot(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- calling form
-SELECT ws_sample.gw_api_getlot($${"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"om_visit_lot", "idName":"id", "id":"1"}}$$)
+SELECT SCHEMA_NAME.gw_api_getlot($${"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"om_visit_lot", "idName":"id", "id":"1"}}$$)
 */
 
 DECLARE
@@ -48,7 +48,7 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname := '';
 
 	--  get api version
@@ -58,7 +58,7 @@ BEGIN
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
-	p_data = REPLACE (p_data::text, '"ws_sample"', 'null');
+	p_data = REPLACE (p_data::text, '"SCHEMA_NAME"', 'null');
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -115,7 +115,7 @@ BEGIN
 
 		ELSE
 			-- getting new id from sequence of lots
-			v_id= (SELECT nextval('ws_sample.om_visit_lot_id_seq'::regclass));
+			v_id= (SELECT nextval('SCHEMA_NAME.om_visit_lot_id_seq'::regclass));
 
 			-- building header
 			v_formheader :=concat('NOVA ORDRE TREBALL - ', v_id);							
