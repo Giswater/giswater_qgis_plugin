@@ -2,3 +2,5 @@
 ********
 - Enhance go2epa capabilities
 - Change customer_code_autofill functionality
+- New function gw_fct_pg2epa_hydrant to calculate firetap analysis full network
+- Add dattrib_type=6. Firetap capacity of network (H1, H2, H3, H4)

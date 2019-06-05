@@ -13,12 +13,18 @@ $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
-"data":{"status":1, "result_id":"test1"}}$$)
+"data":{"status":"start", "result_id":"test1"}}$$)
+
+SELECT SCHEMA_NAME.gw_fct_pg2epa_recursive($${
+"client":{"device":3, "infoType":100, "lang":"ES"},
+"data":{"status":"ongoing", "result_id":"test1"}}$$)
 */
 
 DECLARE
-v_status integer;
-v_result_id text;
+v_status text;
+v_result text;
+v_id integer;
+v_data json;
 
 BEGIN
 
@@ -28,24 +34,40 @@ BEGIN
 
 --  Get input data
 	v_status = (p_data->>'data')::json->>'status';
-	v_result_id =  (p_data->>'data')::json->>'result_id';
+	v_result =  (p_data->>'data')::json->>'result_id';
+	v_recursive_function = (SELECT value FROM config_param_user WHERE parameter='inp_options_recursive' AND cur_user=current_user);
 
-	IF v_status=1 THEN
+	IF v_status='start' THEN
 	
-		RAISE NOTICE 'Starting pg2epa recursive process.';
-				
-		-- test recursive
-		INSERT INTO temp_table (fprocesscat_id, text_column) 
-		SELECT 35, concat('{','"result_id":"',v_result_id,'", "id":"',row_number() over (order by arc_id),'", "arc_id":"', arc_id, '"}') FROM arc;
-		RETURN (SELECT count(*) FROM arc);
-	ELSE
-		RAISE NOTICE 'Finishing pg2epa recursive process.';
-
-		-- test recursive
-		DELETE FROM temp_table WHERE id IN (SELECT id FROM temp_table WHERE fprocesscat_id=35 AND text_column::json->>'result_id'=v_result_id); 
-		RETURN 0;
-	END IF;
+		IF v_recursive_function = 'gw_fct_pg2epa_hydrant' THEN
+		
+			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35,concat('"data":{"step":0, "resultId":"',v_result,'"}');
+			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35,concat('"data":{"step":1, "resultId":"',v_result,'"}');
+			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35,concat('"data":{"step":2, "resultId":"',v_result,'"}');
+			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35,concat('"data":{"step":3, "resultId":"',v_result,'"}');
+			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35,concat('"data":{"step":4, "resultId":"',v_result,'"}');
+			
+			RETURN 4;
+			
+		END IF;
+		
+	ELSIF v_status='ongoing' THEN
 	
+		IF v_recursive_function = 'gw_fct_pg2epa_hydrant' THEN
+	
+			-- setting recursive function
+			v_data = SELECT text_column FROM temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1;
+			PERFORM gw_fct_pg2epa_hydrant(v_data);
+			
+		END IF;	
+		
+		-- deleting row
+		DELETE FROM temp_table WHERE fprocesscat_id=35 AND user_name=current_user  order by id asc LIMIT 1;
+			
+		-- couting rows to show user
+		SELECT count(*) INTO v_count FROM temp_table WHERE fprocesscat_id=35 AND user_name=current_user;
+			
+		RETURN v_count; -- WHEN v_count is 0 python client stop the process
 	
 END;
 $BODY$

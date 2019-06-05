@@ -8,6 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+INSERT INTO dattrib_type VALUES (6, 'hdyrantcapacity', 'Firetap capacity of network (H1, H2, H3, H4) in terms of support hydrants using spanish official method of firetap network analisys', 'ws');
+
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','1','NODE ESTIMATED');
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','2','CRM PERIOD');
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','3','CRM INTERVAL');
@@ -50,10 +52,8 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_interval_to', 'epaoptions'
 			NULL, NULL, FALSE, 10, 2, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'float', 'text', true,
 			NULL, NULL, 'grl_crm_10', NULL, NULL, NULL, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');	
 			
-		
 
-
---UPDATE cat_feature SET orderby = row_number() over (order by id) , active=true, code_autofill=true;
+UPDATE cat_feature SET active=true, code_autofill=true;
 
 UPDATE cat_feature SET child_layer='ve_node_throttlevalve' WHERE id='THROTTLE-VALVE';
 UPDATE cat_feature SET child_layer='ve_node_valveregister' WHERE id='VALVE-REGISTER';
