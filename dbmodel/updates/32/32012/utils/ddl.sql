@@ -13,16 +13,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- create om tables
 -----------------------
 
-CREATE TABLE audit_cat_table_x_column
-( id text,
-  table_id text NOT NULL,
-  column_id text NOT NULL,
-  column_type text,
-  ordinal_position smallint,
-  description text,
-  sys_role_id character varying(30),
-  CONSTRAINT audit_cat_table_x_column_pkey PRIMARY KEY (table_id, column_id)
-);
+CREATE TABLE audit_cat_column
+( column_id text NOT NULL,
+  descript text);
 
 
 CREATE TABLE value_type
@@ -47,7 +40,6 @@ ALTER TABLE cat_feature ADD COLUMN type character varying(30);
 ALTER TABLE cat_feature ADD COLUMN shortcut_key character varying(100);
 ALTER TABLE cat_feature ADD COLUMN parent_layer character varying(100);
 ALTER TABLE cat_feature ADD COLUMN child_layer character varying(100);
-ALTER TABLE cat_feature ADD COLUMN orderby integer;
 ALTER TABLE cat_feature ADD COLUMN active boolean;
 ALTER TABLE cat_feature ADD COLUMN code_autofill boolean;
 

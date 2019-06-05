@@ -1,0 +1,5 @@
+3.2.014
+********
+- Add plan_typevalue table
+- Deprecate nodeorphandelete function
+- Drop sequence for catalog tables of arc & node

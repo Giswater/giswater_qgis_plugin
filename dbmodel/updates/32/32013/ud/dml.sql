@@ -13,3 +13,7 @@ INSERT INTO audit_cat_param_user VALUES ('edit_gully_force_automatic_connect2net
 INSERT INTO audit_cat_param_user VALUES ('edit_gully_doublegeom', 'config', 'Parameter to configure automatic insert of polygon geometry for gully', 'role_edit', NULL, NULL, 
 			'Automatic insert gully double geometry:', NULL, NULL, true, 8, 10, 'ud', false, NULL, NULL, NULL, false, 'boolean', 'check', false, NULL, NULL, NULL, NULL, NULL, NULL, 
 			NULL, NULL, NULL, false, NULL, NULL);
+
+
+UPDATE inp_typevalue SET id='FROUDE', idval='FROUDE' WHERE id='FROUD;
+

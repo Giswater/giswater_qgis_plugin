@@ -7,6 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+UPDATE audit_cat_error SET error_message='It is impossible to use the node to fusion two arcs' WHERE id=2004;
+UPDATE audit_cat_error SET error_message='It is impossible to use the node to fusion two arcs' WHERE id=2006;
 
 UPDATE config_param_system SET label = 'Force arc direction using slope direction:', layout_order=8 WHERE parameter='geom_slp_direction';
 
