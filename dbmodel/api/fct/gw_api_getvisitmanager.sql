@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2640
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_api_getvisitmanager(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getvisitmanager(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- calling button from feature
-SELECT ws_sample.gw_api_getvisitmanager($${
+SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
 "client":{"device":3,"infoType":100,"lang":"es"},
 "form":{},
 "data":{"relatedFeature":{"type":"arc", "idName":"arc_id", "id":"2074"},"fields":{},"pageInfo":null}}$$)
@@ -21,25 +21,25 @@ SELECT ws_sample.gw_api_getvisitmanager($${
 
 -- calling without previous info
 --new call
-SELECT ws_sample.gw_api_getvisitmanager($${
+SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
 "client":{"device":3,"infoType":100,"lang":"es"},
 "form":{},
 "data":{}}$$)
 
-SELECT ws_sample.gw_api_getvisitmanager($${"client":{"device":3,"infoType":100,"lang":"es"},
+SELECT SCHEMA_NAME.gw_api_getvisitmanager($${"client":{"device":3,"infoType":100,"lang":"es"},
      "feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"xtorret"},"form":{"tabData":{"active":false},"tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
        "data":{"relatedFeature":{"type":"arc", "id":"2079"},"fields":{"user_id":"xtorret","date":"2019-01-28","team_id":"1","vehicle_id":"3"},"pageInfo":null}}$$) AS result
 
 
 -- change from tab data to tab files (upserting data on tabData)
-SELECT ws_sample.gw_api_getvisitmanager($${
+SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
 "client":{"device":3,"infoType":100,"lang":"es"},
 "feature":{"featureType":"visit","tableName":"v_visit_lot_user","idName":"user_id","id":"xtorret"},
 "form":{"tabData":{"active":false}, "tabLots":{"active":true},"navigation":{"currentActiveTab":"tabData"}},
 "data":{"fields":{"user_id":"xtorret","team_id":1,"vehicle_id":1,"date":"2019-01-01"}}}$$)
 
 --tab activelots
-SELECT ws_sample.gw_api_getvisitmanager($${
+SELECT SCHEMA_NAME.gw_api_getvisitmanager($${
 "client":{"device":3, "infoType":100, "lang":"ES"},
 "feature":{},
 "form":{"tabData":{"active":false}, "tabLots":{"active":true}}, "navigation":{"currentActiveTab":"tabLots"}, 
@@ -113,8 +113,8 @@ DECLARE
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
-	v_schemaname := 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname := 'SCHEMA_NAME';
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
