@@ -26,8 +26,8 @@ from ..dao.om_visit import OmVisit
 from ..dao.om_visit_event import OmVisitEvent
 from ..dao.om_visit_parameter import OmVisitParameter
 from ..dao.om_visit_x_node import OmVisitXNode
-from ..ui_manager import AddVisitLot
-from ..ui_manager import EventStandardLot
+from ..ui_manager import AddVisitTm
+from ..ui_manager import EventStandardTm
 
 
 class TmManageVisit(TmParentManage, QObject):
@@ -64,7 +64,7 @@ class TmManageVisit(TmParentManage, QObject):
 
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = OmVisit(self.controller)
-        self.dlg_add_visit = AddVisitLot()
+        self.dlg_add_visit = AddVisitTm()
         self.load_settings(self.dlg_add_visit)
 
         # Get expl_id from previous dialog
@@ -576,7 +576,7 @@ class TmManageVisit(TmParentManage, QObject):
         form_type = str(row[0])
 
         if form_type == 'event_standard':
-            self.dlg_event = EventStandardLot()
+            self.dlg_event = EventStandardTm()
             self.load_settings(self.dlg_event)
         else:
             message = "Unrecognised form type"
@@ -663,7 +663,7 @@ class TmManageVisit(TmParentManage, QObject):
             return
 
         if om_event_parameter.form_type == 'event_standard':
-            self.dlg_event_standard = EventStandardLot()
+            self.dlg_event_standard = EventStandardTm()
             self.load_settings(self.dlg_event_standard)
 
         # because of multiple view disable add picture and view gallery
