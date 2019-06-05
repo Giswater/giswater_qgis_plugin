@@ -26,11 +26,7 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QLabel, QLineEdit
 from qgis.PyQt.QtWidgets import QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
-import json
-import operator
-import os
-import re
-import sys
+import csv, json, operator, os, re, sys
 from functools import partial
 
 import utils_giswater
@@ -553,20 +549,28 @@ class ApiSearch(ApiParent):
                 all_rows.append(row)
 
         # Write list into csv file
+
         try:
             if os.path.exists(folder_path):
                 msg = "Are you sure you want to overwrite this file?"
                 answer = self.controller.ask_question(msg, "Overwrite")
                 if answer:
-                    self.write_csv(dialog, folder_path, all_rows)
+                    self.write_to_csv(dialog, folder_path, all_rows)
             else:
-                self.write_csv(dialog, folder_path, all_rows)
+                self.write_to_csv(dialog, folder_path, all_rows)
         except:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             self.controller.show_warning(msg)
             pass
 
+    def write_to_csv(self, dialog, folder_path=None, all_rows=None):
 
+        with open(folder_path, "w") as output:
+            writer = csv.writer(output, lineterminator='\n')
+            writer.writerows(all_rows)
+        self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText(dialog, 'txt_path'))
+        message = "Values has been updated"
+        self.controller.show_info(message)
     def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """ Filter list of workcats by workcat_id and field_id """
 
