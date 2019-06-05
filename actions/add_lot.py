@@ -950,10 +950,11 @@ class AddNewLot(ParentManage):
         self.fill_table_object(self.dlg_lot_man.tbl_lots, self.schema_name + "." + table_object)
         self.set_table_columns(self.dlg_lot_man, self.dlg_lot_man.tbl_lots, table_object)
 
-        # manage save and rollback when closing the dialog
-        self.dlg_lot_man.rejected.connect(partial(self.close_dialog, self.dlg_lot_man))
+        # manage open and close the dialog
         self.dlg_lot_man.rejected.connect(self.save_user_values)
-        self.dlg_lot_man.accepted.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots, table_object))
+        self.dlg_lot_man.btn_accept.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot_man))
+
 
         # Set signals
         self.dlg_lot_man.btn_path.clicked.connect(self.select_path)
