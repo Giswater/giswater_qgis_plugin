@@ -16,6 +16,15 @@ CREATE TABLE plan_typevalue(
   id integer NOT NULL,
   idval text,
   descript text,
+  addparam json
+  CONSTRAINT om_visit_typevalue_pkey PRIMARY KEY (typevalue, id));
+
+CREATE TABLE om_typevalue(
+  typevalue text NOT NULL,
+  id integer NOT NULL,
+  idval text,
+  descript text,
+  addparam json
   CONSTRAINT om_visit_typevalue_pkey PRIMARY KEY (typevalue, id));
   
  

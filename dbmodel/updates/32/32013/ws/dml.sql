@@ -15,15 +15,19 @@ INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','2','CRM PERIOD');
 INSERT INTO inp_typevalue VALUES ('inp_value_demandtype','3','CRM INTERVAL');
 
 
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','11','ESTIMATED UNIQUE', '1');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','ESTIMATED DMA', '1');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','13','ESTIMATED NODE', '1');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','21','MIN PERIOD VALUE', '2');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','22','MAX PERIOD VALUE', '2');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','23','HYDRO PERIOD', '2');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','24','DMA INTERVAL', '2');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','25','HYDRO-DMA HYBRID', '2');
-INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','31','HYDRO-DMA INTERVAL', '3');
+INSERT INTO inp_typevalue VALUES ('inp_value_recursivefunction','1','HYDRANT CAPACITY');
+INSERT INTO inp_typevalue VALUES ('inp_value_recursivefunction','2','GA OPTIMISATION');
+
+
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','11','ESTIMATED UNIQUE', null,'{"DemandType":1}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','12','ESTIMATED DMA', null,'{"DemandType":1}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','13','ESTIMATED NODE', null,'{"DemandType":1}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','21','MIN PERIOD VALUE', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','22','MAX PERIOD VALUE', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','23','HYDRO PERIOD', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','24','DMA INTERVAL', null,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','25','HYDRO-DMA HYBRID',null  ,'{"DemandType":2}');
+INSERT INTO inp_typevalue VALUES ('inp_value_patternmethod','31','HYDRO-DMA INTERVAL', null ,'{"DemandType":3}');
 
 UPDATE audit_cat_param_user SET isenabled=false WHERE id='inp_options_rtc_enabled';
 UPDATE audit_cat_param_user SET isenabled=false WHERE id='inp_options_rtc_coefficient';
@@ -43,7 +47,7 @@ INSERT INTO audit_cat_param_user VALUES ('inp_options_demandtype', 'epaoptions',
 			'SELECT id,idval FROM inp_typevalue WHERE  typevalue=''inp_value_demandtype''', NULL, true, 1, 2, 'ws', TRUE, NULL, NULL, NULL, FALSE, NULL, 'combo', true, 
 			NULL, '1', 'grl_general_1', NULL, TRUE, TRUE, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
 INSERT INTO audit_cat_param_user VALUES ('inp_options_patternmethod', 'epaoptions', 'Pattern method used on EPANET simulation', 'role_epa', NULL, NULL, 'Pattern method:', 
-			'SELECT id,idval FROM inp_typevalue WHERE  typevalue=''inp_value_patternmethod''', 'inp_options_demandtype', true, 2, 2, 'ws', FALSE, ' AND descript = ', NULL, NULL, FALSE, NULL, 'combo', true, 
+			'SELECT id,idval FROM inp_typevalue WHERE  typevalue=''inp_value_patternmethod''', 'inp_options_demandtype', true, 2, 2, 'ws', FALSE, ' AND addparam->>''demandType''=', NULL, NULL, FALSE, NULL, 'combo', true, 
 			NULL, '1', 'grl_general_2', NULL, TRUE, TRUE, NULL, NULL, NULL, FALSE, '{"from":"2.0.12", "to":null, "language":"english"}');
 INSERT INTO audit_cat_param_user VALUES ('inp_options_interval_from', 'epaoptions', 'CRM interval used on EPANET simulation', 'role_epa', NULL, NULL, 'From CRM interval:', 
 			NULL, NULL, FALSE, 9, 2, 'ws', FALSE, NULL, NULL, NULL, FALSE, 'float', 'text', true,

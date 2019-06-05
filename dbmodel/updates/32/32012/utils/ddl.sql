@@ -18,14 +18,14 @@ CREATE TABLE audit_cat_column
   descript text);
 
 
-CREATE TABLE value_type
-(  typevalue character varying(50) NOT NULL,
+CREATE TABLE edit_typevalue
+( typevalue character varying(50) NOT NULL,
   id character varying(30) NOT NULL,
   idval character varying(100),
   descript text,
+  addparam json
   CONSTRAINT value_type_pkey PRIMARY KEY (typevalue, id)
 );
-
 
 
 -----------------------

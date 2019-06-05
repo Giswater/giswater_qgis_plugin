@@ -39,7 +39,7 @@ BEGIN
 
 	IF v_status='start' THEN
 	
-		IF v_recursive_function = 'gw_fct_pg2epa_hydrant' THEN
+		IF v_recursive_function = '1' THEN -- hydrant analysis
 		
 			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35,concat('"data":{"step":0, "resultId":"',v_result,'"}');
 			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35,concat('"data":{"step":1, "resultId":"',v_result,'"}');
@@ -48,16 +48,20 @@ BEGIN
 			INSERT INTO temp_table (fprocesscat_id, text_column) VALUES (35,concat('"data":{"step":4, "resultId":"',v_result,'"}');
 			
 			RETURN 4;
+		
+		IF v_recursive_function = '2' THEN -- hydrant analysis
 			
 		END IF;
 		
 	ELSIF v_status='ongoing' THEN
 	
-		IF v_recursive_function = 'gw_fct_pg2epa_hydrant' THEN
+		IF v_recursive_function = '1' THEN
 	
 			-- setting recursive function
 			v_data = SELECT text_column FROM temp_table WHERE fprocesscat_id=35 AND user_name=current_user order by id asc LIMIT 1;
 			PERFORM gw_fct_pg2epa_hydrant(v_data);
+		
+		IF v_recursive_function = '2' THEN -- ga optimisation todo
 			
 		END IF;	
 		

@@ -35,3 +35,4 @@ ALTER TABLE ext_rtc_hydrometer_x_data ADD pattern_id character varying (16);
 
 ALTER TABLE polygon ALTER COLUMN pol_id SET DEFAULT nextval('SCHEMA_NAME.urn_id_seq'::regclass);
 
+ALTER TABLE inp_typevalue ADD COLUMN addparam json;
