@@ -319,7 +319,7 @@ class MincutConfig(ParentAction):
         expr = ""
         id_ = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
         state = utils_giswater.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.state_edit, False, False)
-        expl = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
+        expl = utils_giswater.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 0)
         dates_filter = ""
         if state == '':
             self.dlg_min_edit.date_from.setEnabled(False)
@@ -359,8 +359,8 @@ class MincutConfig(ParentAction):
         expr += " " + dates_filter + ""
         if state != '':
             expr += " AND state::text ILIKE '%" + state + "%'"
-        expr += " AND exp_name::text ILIKE '%" + expl + "%'"
-        
+        expr += " AND expl_id::text ILIKE '%" + str(expl) + "%'"
+
         # Refresh model with selected filter
         qtable.model().setFilter(expr)
         qtable.model().select()
