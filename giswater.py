@@ -482,7 +482,7 @@ class Giswater(QObject):
         # Value: Object of the class SysFeatureCat
         self.feature_cat = {}
         sql = ("SELECT * FROM " + self.schema_name + ".cat_feature"
-               " WHERE active is True order by orderby")
+               " WHERE active is True")
         rows = self.controller.dao.get_rows(sql)
 
         if not rows:
@@ -491,8 +491,8 @@ class Giswater(QObject):
         for row in rows:
             tablename = row['child_layer']
             # elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
-            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'], row['parent_layer'],
-                                 row['child_layer'], row['orderby'], row['active'])
+            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
+                                 row['parent_layer'], row['child_layer'], row['active'])
             self.feature_cat[tablename] = elem
 
         self.feature_cat = OrderedDict(sorted(self.feature_cat.items(), key=lambda t: t[0]))

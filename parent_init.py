@@ -1768,8 +1768,8 @@ class ParentDialog(QDialog):
 
         for row in rows:
             tablename = row['child_layer']
-            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'], row['parent_layer'],
-                                 row['child_layer'], row['orderby'], row['active'])
+            elem = SysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['type'], row['shortcut_key'],
+                                 row['parent_layer'], row['child_layer'], row['active'])
             self.feature_cat[tablename] = elem
 
 
