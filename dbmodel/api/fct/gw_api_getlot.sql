@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2640
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_getlot(p_data json)
+CREATE OR REPLACE FUNCTION ws_sample.gw_api_getlot(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE:
 
 -- calling form
-SELECT SCHEMA_NAME.gw_api_getlot($${"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"om_visit_lot", "idName":"id", "id":"1"}}$$)
+SELECT ws_sample.gw_api_getlot($${"client":{"device":3,"infoType":100,"lang":"es"}, "feature":{"tableName":"om_visit_lot", "idName":"id", "id":"1"}}$$)
 */
 
 DECLARE
@@ -43,11 +43,12 @@ DECLARE
 	array_index integer DEFAULT 0;
 	v_fieldvalue text;
 	v_geometry json;
+	v_value text;
 
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_sample", public;
 	v_schemaname := '';
 
 	--  get api version
@@ -57,8 +58,7 @@ BEGIN
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
-	p_data = REPLACE (p_data::text, '"SCHEMA_NAME"', 'null');
-    p_data = REPLACE (p_data::text, '''''', 'null');
+	p_data = REPLACE (p_data::text, '"ws_sample"', 'null');
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -71,7 +71,7 @@ BEGIN
 	v_idname = ((p_data ->>'feature')::json->>'idName')::text;
 	v_tablename = (p_data ->>'feature')::json->>'tableName'::text;
 	v_message = ((p_data ->>'data')::json->>'message');
-
+	--v_active:= TRUE;
 
 	v_columntype = 'integer';
 	
@@ -81,26 +81,45 @@ BEGIN
 		-- Data tab
 		-----------
 		SELECT gw_api_get_formfields( 'lot', 'lot', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
-
+		raise notice '-> %', v_idname;
 		-- getting values from feature
-		EXECUTE ('SELECT (row_to_json(a)) FROM (SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_idname) || ' = CAST($1 AS ' || (v_columntype) || '))a')
-			INTO v_values
-			USING v_id;
-		
-		raise notice 'v_values %', v_values;
+		IF v_id IS NOT NULL THEN
+			EXECUTE FORMAT ('SELECT (row_to_json(a)) FROM (SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_idname, v_columntype)
+				INTO v_values
+				USING v_id;
 				
-		-- setting values
-		FOREACH aux_json IN ARRAY v_fields 
-		LOOP          
-			array_index := array_index + 1;
-			v_fieldvalue := (v_values->>(aux_json->>'column_id'));
-	
-			IF (aux_json->>'widgettype')='combo' THEN 
-				v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
-			ELSE 
-				v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_fieldvalue, ''));
-			END IF;
-		END LOOP;			
+			
+
+			-- setting values
+			FOREACH aux_json IN ARRAY v_fields 
+			LOOP          
+				array_index := array_index + 1;
+				v_fieldvalue := (v_values->>(aux_json->>'column_id'));
+				IF (aux_json->>'column_id') = 'lot_id' THEN
+					v_fieldvalue = (v_values->>('idval'));
+				END IF;
+				raise notice 'v_fieldvalue --> %',v_fieldvalue;
+				IF (aux_json->>'widgettype')='combo' THEN 
+					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'selectedId', COALESCE(v_fieldvalue, ''));
+				ELSE 
+					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_fieldvalue, ''));
+				END IF;
+			END LOOP;	
+
+			-- getting geometry
+			EXECUTE 'SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit_lot WHERE id='||v_id||')a'
+				INTO v_geometry;
+
+			-- building header
+			v_formheader :=concat('ORDRE TREBALL - ',v_id);		
+
+		ELSE
+			-- getting new id from sequence of lots
+			v_id= (SELECT nextval('ws_sample.om_visit_lot_id_seq'::regclass));
+
+			-- building header
+			v_formheader :=concat('NOVA ORDRE TREBALL - ', v_id);							
+		END IF;	
 	
 		v_fields_json = array_to_json (v_fields);
 		v_fields_json := COALESCE(v_fields_json, '{}');	
@@ -110,31 +129,24 @@ BEGIN
 		IF v_tab IS NULL THEN 
 			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='lot' AND tabname='tabData' LIMIT 1;			
 		END IF;
-		
 		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
 		'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);
+
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		v_formtabs := v_formtabs || v_tabaux::text;
 
 	--closing tabs array
 	v_formtabs := (v_formtabs ||']');
 
-	RAISE NOTICE 'v_formtabs %', v_formtabs;
 
-	-- header form
-	v_formheader :=concat('ORDRE TREBALL - ',v_id);	
-		
 	-- actions and layermanager
-	EXECUTE ('SELECT actions, layermanager FROM config_api_form WHERE formname = ''lot'' AND (projecttype = ' || quote_literal(LOWER(v_projecttype)) || ' OR projecttype = ''utils'')')
+	EXECUTE 'SELECT actions, layermanager FROM config_api_form WHERE formname = ''lot'' AND (projecttype ='||quote_literal(LOWER(v_projecttype))||' OR projecttype = ''utils'')'
 		INTO v_formactions, v_layermanager;
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
+           
 
-	-- getting geometry
-	EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit_lot WHERE id=' || quote_literal(v_id) || ')a')
-            INTO v_geometry;
-            
- 		
+
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
@@ -149,6 +161,7 @@ BEGIN
 	v_layermanager := COALESCE(v_layermanager, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 
+	raise notice' 1 % 2 % 3 % 4 % 5 % 6 % ', v_message, v_apiversion, v_tablename, v_id, v_layermanager, v_geometry;
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
