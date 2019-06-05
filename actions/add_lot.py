@@ -360,11 +360,11 @@ class AddNewLot(ParentManage):
                " WHERE id ='"+str(lot_id)+"'")
         lot = self.controller.get_row(sql, log_sql=False)
         if lot:
-            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'].toString('yyyy-MM-dd'))
-            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, lot['enddate'].toString('yyyy-MM-dd'))
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, lot['enddate'])
             # TODO necesito estos dos campos en la tabla om_visit_lot (real_init_date y real_end_date)
-            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, lot['real_init_date'].toString('yyyy-MM-dd'))
-            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, lot['real_end_date'].toString('yyyy-MM-dd'))
+            # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, lot['real_init_date'])
+            # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, lot['real_end_date'])
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, lot['visitclass_id'], 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['team_id'], 0)
             utils_giswater.setWidgetText(self.dlg_lot, 'descript', lot['descript'])
@@ -1036,7 +1036,6 @@ class AddNewLot(ParentManage):
             row = []
             for col in range(0, self.dlg_lot_man.tbl_lots.model().columnCount()):
                 value = self.dlg_lot_man.tbl_lots.model().data(self.dlg_lot_man.tbl_lots.model().index(rows, col))
-                self.controller.log_info(str(type(value)))
                 if str(value) == 'NULL':
                     value = ''
                 elif type(value) == QDate:
@@ -1094,10 +1093,10 @@ class AddNewLot(ParentManage):
         self.filter_lot()
 
 
-    def open_lot(self, dialog, widget):
+    def open_lot(self, dialog, qtable):
         """ Open object form with selected record of the table """
 
-        selected_list = widget.selectionModel().selectedRows()
+        selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message)
@@ -1106,8 +1105,8 @@ class AddNewLot(ParentManage):
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        selected_object_id = widget.model().record(row).value('id')
-        visitclass_id = widget.model().record(row).value('visitclass_id')
+        selected_object_id = qtable.model().record(row).value('id')
+        visitclass_id = qtable.model().record(row).value('visitclass_id')
 
         # Close this dialog and open selected object
         dialog.close()
