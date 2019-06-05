@@ -1,14 +1,17 @@
 ﻿--With this file patterns are imported to database. Two types of pattern must be imported:
---period-dma pattern (related to one or more dma's on determinated period) and non period-dma pattern (normal patterns)
+--period-dma pattern (related to one dma on determinated period) and non period-dma pattern (normal patterns)
 --WARNING: CODIFICATION OF CSV FILE MUST BE UTF-8 WITHOUT BOM
 --Volume patterns must be indicated using m3. Using tsep seconds pattern will be moved from volume expressed on m3 to flow expressed on l/s
+--Recommended to use timestep: 900 seconds (15  minutes). But others timesteps value are enabled
 
-id; 201711150000V000  				-- the pattern_id composed by YYYYMMDDHHMMSSSS.  SSSS it means the name of the source
-pattern_type; volume				-- pattern must be unitary or volume. In case of unitary the sumatory of all timestep must be 1. In case of volume, values must be expressed on m3
-source; V000   						-- identifies de number of the flowmeter
-descript; Sample serie				-- description
-tstep_number; 96					-- number of timesteps of pattern
-tstep_seconds; 900					-- seconds of defined timestep
+id; 201711150000V000  				-- Recommended to standarize the pattern id. In case of volume should be composed by YYYYMMDDHHMMSSSS.  SSSS it means the name of the source. In case of unitary feel free...
+pattern_type; VOLUME				-- Pattern must be UNITARY or VOLUME. In case of unitary the sumatory of all timestep must be 1. In case of volume, values must be expressed on m3
+source; VDMA840102 					-- Identifies de number of the flowmeter (SCADA id, GIS id...). 
+									-- For unitary there is no source. For volume, may be real or virtual. Virtual when pattern it's a result of the whole entrys/exits from specific dma. 
+									-- In this case recommended VDMAXXXXX WHERE XXXX it is the dma number. Real is when pattern comes from real flowmeter
+descript; Sample serie				-- Free text description about information of the pattern
+tstep_number; 96					-- Number of timesteps of pattern
+tstep_seconds; 900					-- Seconds of the timestep
 dma_id;{840102, 84106, 85124} 		-- Null values are mandatory for unitary pattern. In case of volume same pattern must be assigned to more than one dma's but does not make sense. It's possible two dma's with same flow pattern???
 period_id; 201705			   		-- Null values are mandatory for unitary patterns. Only one period must be related
 201711150000V000;48.1176;51.8873;51.6861;48.9647;49.2083;47.2704;45.5338;45.1632;44.5172;41.8170;41.8805;41.7746;40.5251;40.5780;39.7838;39.4238 -- max 18 colums.
