@@ -239,7 +239,7 @@ class AddNewLot(ParentManage):
         # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, current_date.toString('yyyy-MM-dd'))
 
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, current_date.toString('yyyy-MM-dd'))
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, current_date.toString('yyyy-MM-dd'))
+        # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, current_date.toString('yyyy-MM-dd'))
         # Set current user
         sql = "SELECT current_user"
         row = self.controller.get_row(sql, commit=self.autocommit)
@@ -370,7 +370,7 @@ class AddNewLot(ParentManage):
             utils_giswater.setWidgetText(self.dlg_lot, 'descript', lot['descript'])
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, lot['status'], 0)
             self.controller.log_info(str(lot['status']))
-            if lot['status'] not in (0, None):
+            if lot['status'] not in (1, 2,3, None):
                 self.dlg_lot.cmb_status.setEnabled(False)
             utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
@@ -877,7 +877,6 @@ class AddNewLot(ParentManage):
         self.close_dialog(self.dlg_lot)
 
 
-    # TODO delete function draw_polyline(*args) when api_parent.py is integrated into giswater proyect
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points """
         self.rb_red.reset()
@@ -888,7 +887,6 @@ class AddNewLot(ParentManage):
         rb.show()
 
 
-    # TODO delete function get_points(*args) when api_parent.py is integrated into giswater proyect
     def get_points(self, list_coord=None):
         """ Return list of QgsPoints taken from geometry
         :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
@@ -942,8 +940,6 @@ class AddNewLot(ParentManage):
         # self.previous_dialog = utils_giswater.dialog()
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'om_visit_class')
-
-
 
         # Set a model with selected filter. Attach that model to selected table
         table_object = "om_visit_lot"
@@ -1063,7 +1059,7 @@ class AddNewLot(ParentManage):
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        message = "Values has been updated"
+        message = "El fitxer csv ha estat importat correctament"
         self.controller.show_info(message)
 
     def populate_combo_filters(self, combo, table_name, fields="id, idval"):
