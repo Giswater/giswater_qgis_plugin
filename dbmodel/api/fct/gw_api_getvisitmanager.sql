@@ -108,6 +108,7 @@ DECLARE
 	v_isfeaturemanager boolean;
 	v_isusermanager boolean;
 	v_disable_widget_name text;
+	v_result text;
 
 
 BEGIN
@@ -148,8 +149,7 @@ BEGIN
 	v_team = ((p_data ->>'data')::json->>'fields')::json->>'team_id'::text;
 	v_lot = ((p_data ->>'data')::json->>'fields')::json->>'lot_id'::text;
 	v_vehicle = ((p_data ->>'data')::json->>'fields')::json->>'vehicle'::text;
-	v_message = ((p_data ->>'data')::json->>'message');
-	v_disable_widget_name = (((p_data ->>'data')::json->>'widget_actions')::json->>'widget_disabled');
+	v_message = ((p_data ->>'data')::json->>'message');	
 
 	-- forcing idname in case not exists
 	IF v_idname IS NULL THEN
@@ -216,6 +216,15 @@ BEGIN
 		IF v_isusermanager THEN 
 		
 			IF v_activedatatab THEN
+
+				-- Check if exist some other workday opened, and close
+				EXECUTE 'SELECT endtime FROM (SELECT * FROM ws_sample.om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_result;
+				
+				IF v_result IS NULL THEN
+					v_disable_widget_name = 'data_startbutton';
+				ELSE
+					v_disable_widget_name = 'data_endbutton';
+				END IF;
 
 				SELECT gw_api_get_formfields( 'visitManager', 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
 

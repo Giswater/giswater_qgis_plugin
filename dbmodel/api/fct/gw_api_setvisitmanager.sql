@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2642
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_api_setvisitmanager(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_api_setvisitmanager(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -32,6 +32,10 @@ DECLARE
 	v_thegeom public.geometry;
 	v_x float;
 	v_y float;
+	v_user text;
+	v_date text;
+	v_result text;
+	v_data json;
 	
 
 BEGIN
@@ -47,31 +51,47 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-    p_data = REPLACE (p_data::text, '''''', 'null');
+	p_data = REPLACE (p_data::text, '''''', 'null');
 
 	
 --  get input values
+    v_user := (((p_data ->>'data')::json->>'fields')::json->>'user_id');
+    v_date := (((p_data ->>'data')::json->>'fields')::json->>'date');
     v_team = (((p_data ->>'data')::json->>'fields')::json->>'team_id')::integer;
     v_lot = (((p_data ->>'data')::json->>'fields')::json->>'lot_id')::integer;
     v_x = (((p_data ->>'data')::json->>'deviceTrace')::json->>'xcoord')::float;
     v_y = (((p_data ->>'data')::json->>'deviceTrace')::json->>'ycoord')::float;
     v_thegeom = ST_SetSRID(ST_MakePoint(v_x, v_y), (SELECT st_srid(the_geom) from arc limit 1));
 
- 
-    INSERT INTO om_visit_lot_x_user (team_id, lot_id , the_geom) VALUES (v_team, v_lot, v_thegeom);
-    UPDATE om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone
-	WHERE id = (SELECT id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=current_user ORDER BY id DESC) a LIMIT 1 OFFSET 1);
+ 	
 
-	-- getting message
-	SELECT gw_api_getmessage(v_feature, 50) INTO v_message;
+    -- Check if exist some other workday opened, and close
+	EXECUTE 'SELECT endtime FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_result;
+	
+	IF v_result IS NOT NULL THEN
+	
+		-- Insert start work day
+		INSERT INTO om_visit_lot_x_user (team_id, lot_id , the_geom) VALUES (v_team, v_lot, v_thegeom);
+		
+		-- message
+		SELECT gw_api_getmessage(null, 70) INTO v_message;
+		v_data = p_data->>'data';
+		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
+		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
+	ELSE
+		UPDATE om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone 
+		WHERE id = (SELECT id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=v_user ORDER BY id DESC) a LIMIT 1); 
 
-	v_message := COALESCE(v_message, '[]');    
-	v_apiversion := COALESCE(v_apiversion, '[]');    
-	v_id := COALESCE(v_id, '[]');    
-			  
---    Return
-    RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_apiversion ||
-    	    ', "body": {"feature":{"id":"'||v_id||'"}}}')::json;    
+		-- message
+		SELECT gw_api_getmessage(null, 80) INTO v_message;
+		v_data = p_data->>'data';
+		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
+		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
+	END IF;
+
+	
+	-- Return
+	RETURN gw_api_getvisitmanager(p_data); 
 
 --    Exception handling
    -- EXCEPTION WHEN OTHERS THEN 
