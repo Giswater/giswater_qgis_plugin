@@ -141,6 +141,9 @@ DECLARE
 	v_sign text;
 	v_data json;
 	v_default json;
+	v_startdate text;
+	v_columntype text;
+
 BEGIN
 
 -- Set search path to local schema
@@ -155,7 +158,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-    p_data = REPLACE (p_data::text, '''''', 'null');
+	p_data = REPLACE (p_data::text, '''''', 'null');
 
 
     SELECT epsg INTO v_srid FROM version LIMIT 1;
@@ -174,6 +177,9 @@ BEGIN
 	v_ordertype := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'orderType';
 	v_currentpage := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'currentPage';
 	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
+	v_startdate = ((p_data ->>'data')::json->>'fields')::json->>'startdate'::text;
+	v_limit = ((p_data ->>'data')::json->>'fields')::json->>'limit'::text;
+
 
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
@@ -297,13 +303,27 @@ BEGIN
 			IF v_sign IS NULL THEN
 				v_sign = '=';
 			END IF;
+
+			
+		    -- Get column type
+		    
+		    EXECUTE FORMAT ('SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = %s AND column_name = $2', quote_literal(v_tablename))
+			USING v_schemaname, v_field
+			INTO v_columntype;
+
 			
 			-- creating the query_text
 			IF v_value IS NOT NULL AND v_field != 'limit' THEN
-				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_value) ||'::text';
+				IF v_startdate IS NOT NULL THEN
+					v_query_result := v_query_result || ' AND '||v_field||'::'||v_columntype||' '||v_sign||' '||quote_literal(v_startdate) ||'::'||v_columntype;
+				ELSE
+					v_query_result := v_query_result || ' AND '||v_field||'::'||v_columntype||' '||v_sign||' '||quote_literal(v_value) ||'::'||v_columntype;
+				END IF;
+
 			ELSIF v_field='limit' THEN
-				v_query_result := v_query_result;
-				v_limit := v_value;
+				IF v_limit IS NULL THEN
+					v_limit := v_value;
+				END IF;
 			END IF;
 		END LOOP;
 	END IF;
@@ -357,13 +377,15 @@ BEGIN
 
 	-- add limit
 	IF v_limit IS NULL THEN
-		v_query_result := v_query_result;
-	ELSE
-		-- calculating last page
-		EXECUTE 'SELECT count(*)/'||quote_literal(v_limit)||' FROM (' || v_query_result || ') a'
-		INTO v_lastpage;
-		v_query_result := v_query_result || ' LIMIT '|| v_limit;
+		v_limit = 15;
 	END IF;
+
+	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
+        INTO v_lastpage;
+    
+	    -- add limit
+	    v_query_result := v_query_result || ' LIMIT '|| v_limit;
+
 
 	-- calculating current page
 	IF v_currentpage IS NULL THEN 
@@ -406,6 +428,10 @@ BEGIN
 					
 					IF (v_filter_fields[i]->>'widgettype')='combo' THEN
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
+					ELSIF (v_filter_fields[i]->>'column_id')='limit' AND v_limit IS NOT NULL THEN
+						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', COALESCE(v_limit));
+					ELSIF (v_filter_fields[i]->>'column_id')='startdate' AND v_startdate IS NOT NULL THEN
+						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', COALESCE(v_startdate));
 					ELSE
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
 					END IF;
@@ -444,6 +470,7 @@ BEGIN
 	LOOP
 		v_filter_fields[v_i+2] := json_build_object('type','button','label', aux_json->>'label' ,'widgetAction',  aux_json->>'widgetfunction', 'position','footer');
 		v_i=v_i+1;
+
 	END LOOP;
 
 
