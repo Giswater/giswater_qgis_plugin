@@ -84,4 +84,36 @@ UNION
    FROM v_rtc_period_hydrometer
   GROUP BY v_rtc_period_hydrometer.node_2, v_rtc_period_hydrometer.period_id, v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.effc, v_rtc_period_hydrometer.minc, v_rtc_period_hydrometer.maxc;
 
-   
+--05/06/2019
+CREATE OR REPLACE VIEW ve_visit_arc_insp AS 
+ SELECT om_visit_x_arc.visit_id,
+    om_visit_x_arc.arc_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.lot_id,
+    om_visit.status,
+    a.param_1 AS sediments_arc,
+    a.param_2 AS desperfectes_arc,
+    a.param_3 AS neteja_arc
+   FROM om_visit
+     JOIN om_visit_class ON om_visit_class.id = om_visit.class_id
+     JOIN om_visit_x_arc ON om_visit.id = om_visit_x_arc.visit_id
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.param_1,
+            ct.param_2,
+            ct.param_3
+           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value 
+			FROM SCHEMA_NAME.om_visit JOIN SCHEMA_NAME.om_visit_event ON om_visit.id= om_visit_event.visit_id 
+			JOIN SCHEMA_NAME.om_visit_class on om_visit_class.id=om_visit.class_id
+			JOIN SCHEMA_NAME.om_visit_class_x_parameter on om_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id 
+			where om_visit_class.ismultievent = TRUE ORDER  BY 1,2'::text, ' VALUES (''sediments_arc''),(''desperfectes_arc''),(''neteja_arc'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text)) a ON a.visit_id = om_visit.id
+  WHERE om_visit_class.ismultievent = true;   
