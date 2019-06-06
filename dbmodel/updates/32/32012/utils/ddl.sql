@@ -23,7 +23,7 @@ CREATE TABLE edit_typevalue
   id character varying(30) NOT NULL,
   idval character varying(100),
   descript text,
-  addparam json
+  addparam json,
   CONSTRAINT value_type_pkey PRIMARY KEY (typevalue, id)
 );
 
