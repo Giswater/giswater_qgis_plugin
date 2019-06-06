@@ -70,9 +70,8 @@ DECLARE
 
 	v_anl_mincut_cat_type_idval text;
 	v_anl_mincut_cat_cause_idval text;
-
+	v_visible_layers text;
 	
-
 BEGIN
 
 --	Set search path to local schema
@@ -159,6 +158,9 @@ BEGIN
 			INTO address_array
 			USING point_geom;
 	END IF;
+
+--     Get visible layers
+       v_visible_layers := (SELECT value FROM config_param_system WHERE parameter='api_mincut_visible_layers');
 
 --	Get municipality
 	EXECUTE 'SELECT array_agg(row.muni_id) FROM (SELECT DISTINCT ext_municipality.muni_id FROM ext_address JOIN ext_municipality USING (muni_id) WHERE id = ANY($1)) row'
@@ -428,6 +430,7 @@ BEGIN
 		', "formTabs":' || formTabs ||
 		', "geometry":' || v_geometry ||
 		', "mincut_id":"' || v_mincut_id ||'"'||
+		', "visibleLayers":' || v_visible_layers ||
 		', "mincutValveLayer": ' ||v_mincut_valve_layer_json ||
 		'}')::json;
 
