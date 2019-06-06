@@ -165,7 +165,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="real_init_date"/>
+                <widget class="QLineEdit" name="real_startdate"/>
                </item>
               </layout>
              </item>
@@ -195,7 +195,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="real_end_date"/>
+                <widget class="QLineEdit" name="real_enddate"/>
                </item>
               </layout>
              </item>
@@ -618,7 +618,6 @@
               </layout>
              </item>
             </layout>
-            <zorder></zorder>
             <zorder></zorder>
             <zorder></zorder>
             <zorder></zorder>

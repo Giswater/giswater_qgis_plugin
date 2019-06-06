@@ -86,11 +86,11 @@ class AddNewLot(ParentManage):
 
         utils_giswater.set_regexp_date_validator(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
         utils_giswater.set_regexp_date_validator(self.dlg_lot.enddate, self.dlg_lot.btn_accept, 1)
-        utils_giswater.set_regexp_date_validator(self.dlg_lot.real_init_date, self.dlg_lot.btn_accept, 1)
-        utils_giswater.set_regexp_date_validator(self.dlg_lot.real_end_date, self.dlg_lot.btn_accept, 1)
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.real_startdate, self.dlg_lot.btn_accept, 1)
+        utils_giswater.set_regexp_date_validator(self.dlg_lot.real_enddate, self.dlg_lot.btn_accept, 1)
 
-        self.dlg_lot.real_init_date.setReadOnly(True)
-        self.dlg_lot.real_end_date.setReadOnly(True)
+        self.dlg_lot.real_startdate.setReadOnly(True)
+        self.dlg_lot.real_enddate.setReadOnly(True)
 
 
         self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
@@ -122,6 +122,7 @@ class AddNewLot(ParentManage):
         action_by_polygon.triggered.connect(partial(self.activate_selection, self.dlg_lot, action_by_polygon, 'mActionSelectPolygon'))
 
         # Set widgets signals
+        self.dlg_lot.cmb_ot.currentIndexChanged.connect(self.fill_ot_fields)
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_row))
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer))
@@ -162,7 +163,7 @@ class AddNewLot(ParentManage):
             self.reload_table_visit()
 
         self.enable_feature_type(self.dlg_lot)
-
+        self.fill_ot_fields()
         self.set_feature_type_cmb()
         # Set autocompleters of the form
         self.set_completers()
@@ -178,6 +179,15 @@ class AddNewLot(ParentManage):
         self.hilight_features(self.rb_list)
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+
+
+    def fill_ot_fields(self):
+        item = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, -1)
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[1])
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[2])
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[3])
+        utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, item[1], 1)
+
 
     def disbale_actions(self):
         class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
@@ -235,22 +245,28 @@ class AddNewLot(ParentManage):
         # Visit tab
         # Set current date and time
         current_date = QDate.currentDate()
-        # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, current_date.toString('yyyy-MM-dd'))
-        # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, current_date.toString('yyyy-MM-dd'))
-
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, current_date.toString('yyyy-MM-dd'))
-        # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, current_date.toString('yyyy-MM-dd'))
+
+
+
         # Set current user
         sql = "SELECT current_user"
         row = self.controller.get_row(sql, commit=self.autocommit)
         utils_giswater.setWidgetText(self.dlg_lot, self.user_name, row[0])
+
+        # Fill ComboBox cmb_ot
+        # TODO cambiar el nombre de esta tabla cuando sepamos el nombre real
+        sql = ("SELECT id::text, tipus, adreca, feina FROM " + self.schema_name + ".temp_ot order by feina")
+        rows = self.controller.get_rows(sql, commit=True)
+        if rows:
+            utils_giswater.set_item_data(self.dlg_lot.cmb_ot, rows, 0)
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT id, idval, feature_type"
                " FROM " + self.schema_name + ".om_visit_class "
                " WHERE ismultifeature is False AND feature_type IS NOT null"
                " ORDER BY idval")
-        visitclass_ids = self.controller.get_rows(sql, commit=self.autocommit)
+        visitclass_ids = self.controller.get_rows(sql, commit=True)
         if visitclass_ids:
             utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
 
@@ -259,7 +275,7 @@ class AddNewLot(ParentManage):
                " FROM " + self.schema_name + ".cat_team "
                " WHERE active is True "
                " ORDER BY idval")
-        users = self.controller.get_rows(sql, commit=self.autocommit)
+        users = self.controller.get_rows(sql, commit=True)
         if users:
             utils_giswater.set_item_data(self.dlg_lot.cmb_assigned_to, users, 1)
 
@@ -268,11 +284,16 @@ class AddNewLot(ParentManage):
         sql = ("SELECT id, idval"
                " FROM " + self.schema_name + ".om_visit_class "
                " ORDER BY idval")
-        status = self.controller.get_rows(sql, commit=self.autocommit)
+        status = self.controller.get_rows(sql, commit=True)
         status = [(1, 'PLANIFICANT'), (2, 'PLANIFICAT'), (3, 'ASSIGNAT'), (4, 'EN CURS'), (5, 'EXECUTAT'), (6, 'REVISAT'), (7, 'CANCEL.LAT')]
         if status:
             utils_giswater.set_item_data(self.dlg_lot.cmb_status, status, 1, sort_combo=False)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, 'PLANIFICANT', 1)
+            utils_giswater.set_combo_item_unselectable_by_id(self.dlg_lot.cmb_status, [4, 5])
+
+
+
+
         # Relations tab
         # fill feature_type
         sql = ("SELECT id, id"
@@ -362,12 +383,10 @@ class AddNewLot(ParentManage):
         if lot:
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'])
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, lot['enddate'])
-            # TODO necesito estos dos campos en la tabla om_visit_lot (real_init_date y real_end_date)
-            # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, lot['real_init_date'])
-            # utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, lot['real_end_date'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_startdate, lot['real_startdate'])
+            utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_enddate, lot['real_enddate'])
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, lot['visitclass_id'], 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['team_id'], 0)
-            utils_giswater.setWidgetText(self.dlg_lot, 'descript', lot['descript'])
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, lot['status'], 0)
             self.controller.log_info(str(lot['status']))
             if lot['status'] not in (1, 2,3, None):
@@ -727,15 +746,11 @@ class AddNewLot(ParentManage):
         lot = {}
         lot['startdate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate, False, False)
         lot['enddate'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
-        # TODO necesito estos dos campos en la tabla om_visit_lot (real_init_date y real_end_date)
-        # lot['real_init_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_init_date, False, False)
-        # lot['real_end_date'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.real_end_date, False, False)
         lot['visitclass_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0, True)
-        lot['descript'] = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.descript, False, False)
         lot['status'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
         lot['feature_type'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0, True)
-
+        lot['id_ot'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 0, True)
         # if lot['status'] == 6 and
         keys = ""
         values = ""
