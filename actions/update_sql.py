@@ -513,7 +513,6 @@ class UpdateSQL(ApiParent):
                                         return False
                                     
                         else:
-                            self.controller.log_info(str("TEST1 ----> 1"))
                             if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
@@ -1417,9 +1416,7 @@ class UpdateSQL(ApiParent):
         self.set_wait_cursor()
         self.load_fct_ftrg(project_type=project_type)
         self.update_30to31(project_type=project_type)
-        print(str("TEST11"))
         self.update_31to39(project_type=project_type)
-        print(str("TEST22"))
         self.api(project_type=project_type)
         self.execute_last_process(schema_name=schema_name, locale=True)
         self.set_arrow_cursor()
