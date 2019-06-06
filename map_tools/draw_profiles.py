@@ -249,7 +249,7 @@ class DrawProfiles(ParentMapTool):
 
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            self.layer_feature.selectByIds([a.id() for a in selection])
 
         node_id = []
         for element_id in arc_id:
@@ -289,7 +289,7 @@ class DrawProfiles(ParentMapTool):
 
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            self.layer_feature.selectByIds([a.id() for a in selection])
 
         # Select arcs of shortest path on v_edit_arc for ZOOM SELECTION
         expr_filter = "\"arc_id\" IN ("
@@ -450,7 +450,7 @@ class DrawProfiles(ParentMapTool):
 
         # Select snapped features
         selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-        self.layer_feature.setSelectedFeatures([k.id() for k in selection])
+        self.layer_feature.selectByIds([k.id() for k in selection])
 
         self.exec_path()
 
@@ -1147,7 +1147,7 @@ class DrawProfiles(ParentMapTool):
 
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            self.layer_feature.selectByIds([a.id() for a in selection])
 
         # Select nodes of shortest path on layers v_edit_man_|feature
         for element_id in self.node_id:
@@ -1169,7 +1169,7 @@ class DrawProfiles(ParentMapTool):
 
             # Select snapped features
             selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-            self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+            self.layer_feature.selectByIds([a.id() for a in selection])
 
         # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
         expr_filter = "\"arc_id\" IN ("
@@ -1475,7 +1475,7 @@ class DrawProfiles(ParentMapTool):
 
                 # Select snapped features
                 selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-                self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+                self.layer_feature.selectByIds([a.id() for a in selection])
 
             # Select nodes of shortest path on layers v_edit_man_|feature
             for element_id in self.node_id:
@@ -1497,7 +1497,7 @@ class DrawProfiles(ParentMapTool):
 
                 # Select snapped features
                 selection = self.layer_feature.getFeatures(QgsFeatureRequest().setFilterExpression(aux))
-                self.layer_feature.setSelectedFeatures([a.id() for a in selection])
+                self.layer_feature.selectByIds([a.id() for a in selection])
 
             # Select nodes of shortest path on v_edit_arc for ZOOM SELECTION
             expr_filter = "\"arc_id\" IN ("

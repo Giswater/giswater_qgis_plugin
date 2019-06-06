@@ -123,6 +123,7 @@ class ParentMapTool(QgsMapTool):
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man, layer_gully_man=None):
         """ Sets layers involved in Map Tools functions
             Sets Snapper Manager """
+
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man
@@ -131,6 +132,7 @@ class ParentMapTool(QgsMapTool):
 
 
     def set_controller(self, controller):
+
         self.controller = controller
         self.schema_name = controller.schema_name
         self.plugin_dir = self.controller.plugin_dir 
@@ -138,6 +140,7 @@ class ParentMapTool(QgsMapTool):
         
         
     def deactivate(self):
+
         # Uncheck button
         self.action().setChecked(False)
 
@@ -307,8 +310,9 @@ class ParentMapTool(QgsMapTool):
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)      
-            return (False, expr)
-        return (True, expr)
+            return False, expr
+
+        return True, expr
 
 
     def get_composers_list(self):

@@ -69,10 +69,7 @@ class CadAddCircle(ParentMapTool):
             self.close_dialog(self.dlg_create_circle)
             if self.delete_prev:
                 selection = self.layer_circle.getFeatures()
-                if Qgis.QGIS_VERSION_INT < 29900:
-                    self.layer_circle.setSelectedFeatures([f.id() for f in selection])
-                else:
-                    self.layer_circle.select([f.id() for f in selection])
+                self.layer_circle.selectByIds([f.id() for f in selection])
                 if self.layer_circle.selectedFeatureCount() > 0:
                     features = self.layer_circle.selectedFeatures()
                     for feature in features:
@@ -164,7 +161,6 @@ class CadAddCircle(ParentMapTool):
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-
             try:
                 event_point = QPoint(x, y)
             except(TypeError, KeyError):
@@ -180,7 +176,6 @@ class CadAddCircle(ParentMapTool):
                 else:
                     point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
             else:
-
                 result = self.snapper.snapToMap(event_point)
                 # Create point with snap reference
                 point = QgsPointXY(result.point())
@@ -201,6 +196,7 @@ class CadAddCircle(ParentMapTool):
 
 
     def activate(self):
+
         # Check button
         self.action().setChecked(True)
 
@@ -222,6 +218,7 @@ class CadAddCircle(ParentMapTool):
         if self.layer_circle is None:
             self.controller.show_warning("Layer not found", parameter=self.layer_circle)
             return
+
         self.iface.setActiveLayer(self.layer_circle)
 
         # Check for default base layer
