@@ -388,6 +388,8 @@ def get_item_data(dialog, widget, index=0, add_quote=False):
         if type(widget) is QComboBox:
             current_index = widget.currentIndex()     
             elem = widget.itemData(current_index)
+            if index == -1:
+                return elem
             code = elem[index]            
 
     return code
@@ -434,20 +436,28 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
         combo.blockSignals(False)
 
 
-def set_combo_item_unselectable(qcombo, list_items=[]):
+def set_combo_item_unselectable_by_id(qcombo, list_id=[]):
     """ Make items of QComboBox visibles but not selectable"""
-    for i in list_items:
-        index = qcombo.model().index(i, 0)
-        qcombo.model().setData(index, 0, Qt.UserRole - 1)
+    for x in range(0, qcombo.count()):
+        if x in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, 0, Qt.UserRole - 1)
 
 
-def set_combo_item_selectable(qcombo, list_items=[]):
-    """ Make items of QComboBox visibles but and selectable"""
-    for i in list_items:
-        index = qcombo.model().index(i, 0)
-        qcombo.model().setData(index, (1 | 32), Qt.UserRole - 1)
+def set_combo_item_selectable_by_id(qcombo, list_id=[]):
+    """ Make items of QComboBox selectable """
+    for x in range(0, qcombo.count()):
+        if x in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, (1 | 32), Qt.UserRole - 1)
 
-
+# def set_combo_item_unselectable(qcombo, list_id=[], column=0):
+#     """ Make items of QComboBox visibles but not selectable"""
+#     for x in range(0, qcombo.count()):
+#         elem = qcombo.itemData(x)
+#         if str(elem[column]) in list_id:
+#             index = qcombo.model().index(x, 0)
+#             qcombo.model().setData(index, 0, Qt.UserRole - 1)
 def remove_tab_by_tabName(tab_widget, tab_name):
     """ Look in @tab_widget for a tab with @tab_name and remove it """
     
