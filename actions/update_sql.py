@@ -487,7 +487,7 @@ class UpdateSQL(ApiParent):
 
                     else:
                         if self.read_all_updates == 'TRUE':
-                            if str(sub_folder) > str(self.project_data_language).replace('.', '') and str(sub_folder) > '31100':
+                            if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
@@ -513,7 +513,8 @@ class UpdateSQL(ApiParent):
                                         return False
                                     
                         else:
-                            if str(sub_folder) > str(self.project_data_language).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
+                            self.controller.log_info(str("TEST1 ----> 1"))
+                            if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
@@ -573,7 +574,7 @@ class UpdateSQL(ApiParent):
 
                     else:
                         if self.read_all_updates == 'TRUE':
-                            if str(sub_folder) > str(self.project_data_language).replace('.', '') and str(sub_folder) > '31100':
+                            if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
@@ -597,7 +598,7 @@ class UpdateSQL(ApiParent):
                                         return False
 
                         else:
-                            if str(sub_folder) > str(self.project_data_language).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
+                            if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.version_metadata).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
@@ -683,7 +684,7 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                     else:
-                        if str(sub_folder) > str(self.project_data_language).replace('.', '') and str(sub_folder) <= '31100':
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                 status = self.load_sql(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep)
                                 if status is False:
@@ -737,7 +738,7 @@ class UpdateSQL(ApiParent):
                                     return False
 
                     else:
-                        if str(sub_folder) > str(self.project_data_language).replace('.', '') and str(sub_folder) <= '31100':
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
                                 status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
                                 if status is False:
@@ -972,7 +973,7 @@ class UpdateSQL(ApiParent):
 
                 else:
                     if self.read_all_updates == 'TRUE':
-                        if str(sub_folder) > str(self.project_data_language).replace('.', ''):
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
@@ -1005,7 +1006,7 @@ class UpdateSQL(ApiParent):
                                 if status is False:
                                     return False
                     else:
-                        if str(sub_folder) > str(self.project_data_language).replace('.', '') and str(sub_folder) <= str(self.version_metadata).replace('.',''):
+                        if str(sub_folder) > str(self.project_data_schema_version).replace('.', '') and str(sub_folder) <= str(self.version_metadata).replace('.',''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
@@ -1416,7 +1417,9 @@ class UpdateSQL(ApiParent):
         self.set_wait_cursor()
         self.load_fct_ftrg(project_type=project_type)
         self.update_30to31(project_type=project_type)
+        print(str("TEST11"))
         self.update_31to39(project_type=project_type)
+        print(str("TEST22"))
         self.api(project_type=project_type)
         self.execute_last_process(schema_name=schema_name, locale=True)
         self.set_arrow_cursor()
