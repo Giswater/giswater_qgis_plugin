@@ -22,22 +22,70 @@ SELECT SCHEMA_NAME.gw_api_setlot($${
 DECLARE
 	v_message json;
 	v_data json;
+	v_apiversion text;
+	v_id text;
+	v_idname text;
+	v_device integer;
+	v_tablename text;
+	v_client json;
+	v_lot_id text;
+	v_descript text;
+	v_status text;
+	v_result text;
 
 BEGIN
 
 	-- search_path
 	SET search_path='SCHEMA_NAME';
-	
+
+	-- fix diferent ways to say null on client
+	p_data = REPLACE (p_data::text, '"NULL"', 'null');
+	p_data = REPLACE (p_data::text, '"null"', 'null');
+	p_data = REPLACE (p_data::text, '"SCHEMA_NAME"', 'null');
+
+	--  get parameters from input
+	v_client = (p_data ->>'client')::json;
+	v_device = ((p_data ->>'client')::json->>'device')::integer;
+	v_id = ((p_data ->>'feature')::json->>'id')::text;
+	v_idname = ((p_data ->>'feature')::json->>'idName')::text;
+	v_tablename = (p_data ->>'feature')::json->>'tableName'::text;
+	v_message = ((p_data ->>'data')::json->>'message');
+	v_lot_id = ((p_data ->>'data')::json->>'fields')::json->>'lot_id'::text;
+	v_descript = ((p_data ->>'data')::json->>'fields')::json->>'descript'::text;
+	v_status = ((p_data ->>'data')::json->>'fields')::json->>'status'::text;
+
 	-- setting values on table om_visit_lot_x_user 
 	-- TOD DO: set lot
 	
+	-- Check if is new lot
+	EXECUTE 'SELECT * FROM om_visit_lot WHERE id =' || v_id ||'' INTO v_result;
+
+	IF v_result IS NOT NULL THEN
+		EXECUTE 'UPDATE ' || quote_ident(v_tablename) ||' SET idval = ' || quote_literal(v_lot_id) ||', descript = ' || quote_literal(v_descript) ||', status = ' || quote_literal(v_status) ||' WHERE id = ' || quote_literal(v_id) ||'' ;
+
+		-- message
+		SELECT gw_api_getmessage(null, 50) INTO v_message;
+		v_data = p_data->>'data';
+		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
+		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
+	ELSE
+		EXECUTE 'INSERT INTO ' || quote_ident(v_tablename) ||' (id, idval, descript, status) VALUES (' || quote_literal(v_id) ||', ' || quote_literal(v_lot_id) ||', ' || quote_literal(v_descript) ||', ' || quote_literal(v_status) ||')';
+
+		-- message
+		SELECT gw_api_getmessage(null, 40) INTO v_message;
+		v_data = p_data->>'data';
+		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
+		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
 	
-	-- message
-	SELECT gw_api_getmessage(null, 90) INTO v_message;
-	v_data = p_data->>'data';
-	v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
-	p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);	
-  
+	END IF;
+	
+	
+		
+
+	raise notice 'RETURN => %','SELECT SCHEMA_NAME.gw_api_getlot('|| p_data || ')';
+	
+	-- TODO:: Remove this return when send correct 'id' and not 'lot_id'
+	RETURN null;
 	-- Return
 	RETURN gw_api_getlot(p_data);
 
