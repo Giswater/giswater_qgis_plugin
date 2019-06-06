@@ -80,7 +80,7 @@ class CadAddCircle(ParentMapTool):
                 if Qgis.QGIS_VERSION_INT < 29900:
                     feature.setGeometry(QgsGeometry.fromPoint(point).buffer(float(self.radius), 100))
                 else:
-                      feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
+                    feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
                 provider = self.layer_circle.dataProvider()
                 provider.addFeatures([feature])
 
@@ -130,28 +130,10 @@ class CadAddCircle(ParentMapTool):
             return
 
         # Snapping
-        if Qgis.QGIS_VERSION_INT < 29900:
-            if self.snap_to_selected_layer:
-                (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
-            else:
-                (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
-            # That's the snapped features
-            if result:
-                point = QgsPoint(result[0].snappedVertex)
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+        if self.snap_to_selected_layer:
+            self.snapper_manager.snap_to_current_layer(event_point, self.vertex)
         else:
-            if self.snap_to_selected_layer:
-                result = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
-            else:
-                result = self.snapper.snapToMap(event_point)  # @UnusedVariable
-
-            # That's the snapped features
-            if result:
-                # Get the point and add marker on it
-                point = QgsPointXY(result.point())
-                self.vertex_marker.setCenter(point)
-                self.vertex_marker.show()
+            self.snapper_manager.snap_to_background_layers(event_point, self.vertex)
 
 
     def canvasReleaseEvent(self, event):

@@ -65,7 +65,6 @@ class SnappingConfigManager(object):
         snapping_layers_options = []
         layers = self.controller.get_layers()
         for layer in layers:
-
             options = QgsProject.instance().snapSettingsForLayer(layer.id())
             snapping_layers_options.append(
                 {'layerid': layer.id(), 'enabled': options[1], 'snapType': options[2], 'unitType': options[3],
@@ -76,6 +75,7 @@ class SnappingConfigManager(object):
 
     def store_snapping_options(self):
         """ Store the project user snapping configuration """
+
         # Get an array containing the snapping options for all the layers
         self.previous_snapping = self.get_snapping_options()
 
@@ -165,13 +165,32 @@ class SnappingConfigManager(object):
 
     def get_snapper(self):
         """ Return snapper """
+        snapper = QgsMapCanvasSnapper(self.canvas)
+        return snapper
 
-        try:
-            snapper = None
-            if Qgis.QGIS_VERSION_INT < 29900:
-                snapper = QgsMapCanvasSnapper(self.canvas)
-        except Exception:
-            pass
-        finally:
-            return snapper
+
+    def snap_to_current_layer(self, event_point, vertex_marker=None):
+
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)
+        if vertex_marker:
+            if result:
+                # Get the point and add marker on it
+                point = QgsPoint(result[0].snappedVertex)
+                vertex_marker.setCenter(point)
+                vertex_marker.show()
+
+        return retval, result
+
+
+    def snap_to_background_layers(self, event_point, vertex_marker=None):
+
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)
+        if vertex_marker:
+            if result:
+                # Get the point and add marker on it
+                point = QgsPointXY(result.point())
+                vertex_marker.setCenter(point)
+                vertex_marker.show()
+
+        return retval, result
 

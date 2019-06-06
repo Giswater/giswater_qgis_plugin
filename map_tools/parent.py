@@ -369,12 +369,5 @@ class ParentMapTool(QgsMapTool):
             return
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-  
-        # That's the snapped features
-        if result:          
-            # Get the point and add marker on it
-            point = QgsPoint(result[0].snappedVertex)
-            self.vertex_marker.setCenter(point)
-            self.vertex_marker.show()           
-                             
+        self.snapper_manager.snap_to_current_layer(event_point, self.vertex)
+

@@ -61,7 +61,6 @@ class SnappingConfigManager(object):
         return globalSnappingConfig
 
 
-
     def store_snapping_options(self):
         """ Store the project user snapping configuration """
 
@@ -152,4 +151,30 @@ class SnappingConfigManager(object):
         snapper = QgsMapCanvas.snappingUtils(self.canvas)
 
         return snapper
+
+
+    def snap_to_current_layer(self, event_point, vertex_marker=None):
+
+        (retval, result) = self.snapper.snapToCurrentLayer(event_point, QgsPointLocator.All)
+        if vertex_marker:
+            if result:
+                # Get the point and add marker on it
+                point = QgsPointXY(result.point())
+                vertex_marker.setCenter(point)
+                vertex_marker.show()
+
+        return retval, result
+
+
+    def snap_to_background_layers(self, event_point, vertex_marker=None):
+
+        (retval, result) = self.snapper.snapToMap(event_point)
+        if vertex_marker:
+            if result:
+                # Get the point and add marker on it
+                point = QgsPointXY(result.point())
+                vertex_marker.setCenter(point)
+                vertex_marker.show()
+
+        return retval, result
 

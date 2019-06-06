@@ -551,7 +551,6 @@ class Giswater(QObject):
         
         # Enable/Disable actions
         self.enable_actions(visible)
-        
         try:
             for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:                
@@ -658,7 +657,6 @@ class Giswater(QObject):
         
         # Set objects for map tools classes
         self.manage_map_tools()
-
 
         # Set layer custom UI forms and init function for layers 'arc', 'node', and 'connec' and 'gully'  
         self.manage_custom_forms()
@@ -977,6 +975,7 @@ class Giswater(QObject):
     
     def manage_map_tools(self):
         """ Manage map tools """
+
         self.set_map_tool('map_tool_api_info_data')
         self.set_map_tool('map_tool_api_info_inp')
         self.set_map_tool('map_tool_move_node')
