@@ -53,7 +53,7 @@ BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-
+/*
 	-- Getting user parameteres
 	-- get input data
 	v_step := (((p_data ->>'data')::json->>'parameters')::json->>'step')::boolean;
@@ -137,7 +137,7 @@ BEGIN
 	END IF;
 	
 	v_return = replace(v_return::text, '"message":{"priority":1, "text":"Data quality analysis done succesfully"}', '"message":{"priority":1, "text":"Hydrant analysis done succesfully"}')::json;
-	
+	*/
 RETURN v_return;
 	
 END;

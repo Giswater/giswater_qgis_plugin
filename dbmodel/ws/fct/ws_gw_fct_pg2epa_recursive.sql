@@ -30,7 +30,7 @@ BEGIN
 
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
-
+/*
 
 --  Get input data
 	v_status = (p_data->>'data')::json->>'status';
@@ -70,7 +70,7 @@ BEGIN
 			
 		-- couting rows to show user
 		SELECT count(*) INTO v_count FROM temp_table WHERE fprocesscat_id=35 AND user_name=current_user;
-			
+			*/
 		RETURN v_count; -- WHEN v_count is 0 python client stop the process
 	
 END;
