@@ -4,8 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME"."gw_fct_getinfoelements"(varchar, varchar, varchar, int4);
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoelements"(element_type varchar, tab_type varchar, id varchar, device int4) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_getinfoelements"(element_type varchar, tab_type varchar, id varchar, p_device int4) RETURNS pg_catalog.json AS $BODY$
 DECLARE
 
 --    Variables
@@ -13,11 +14,20 @@ DECLARE
     query_result_elements json;
     type_element_arg json;
     api_version json;
+    v_key text;
+    v_keyquerytext text;
+    v_querytext text;
+    v_idname text;
 
 BEGIN
 
 --    Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+
+	v_key = (SELECT value::json->>'key' FROM config_param_system WHERE parameter='api_getinfoelements');
+	v_keyquerytext = (SELECT value::json->>'queryText' FROM config_param_system WHERE parameter='api_getinfoelements');
+	v_idname = (SELECT value::json->>'idName' FROM config_param_system WHERE parameter='api_getinfoelements');
+	
 
 --  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
@@ -27,19 +37,25 @@ BEGIN
     element_type := lower (element_type);
     IF RIGHT (element_type,1)=':' THEN
         element_type := reverse(substring(reverse(element_type) from 2 for 99));
-    END IF;
+    END IF;   
 
---    Get query for elements
-    EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_'', substring(lower($2) from 4 for 99)) AND device = $3'
-        INTO query_result
-        USING element_type, tab_type, device;
+     SELECT query_text INTO v_querytext FROM config_web_forms WHERE table_id = concat(element_type,'_x_', substring(lower(tab_type) from 4 for 99)) AND device = p_device;
 
-    raise notice 'query_result %', query_result;
+     IF v_querytext IS NOT NULL THEN
+	--EXECUTE v_querytext INTO query_result;
 
---    Get elements
-    EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || quote_literal(query_result) || ' WHERE ' || quote_ident(element_type) || '_id' || '::text = $1) a'
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || (v_querytext) || ' WHERE ' || quote_ident(element_type) || '_id' || '::text = $1) a'
         INTO query_result_elements
         USING id;
+	
+     ELSE 
+
+	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || (v_keyquerytext) || ' AND ' || quote_ident(v_idname) || '::text = $1) a'
+        INTO query_result_elements
+        USING id;
+
+     END IF;
+        
 
     raise notice 'query_result_elements %', query_result_elements;
 
@@ -59,4 +75,5 @@ BEGIN
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
+
 
