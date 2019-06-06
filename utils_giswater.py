@@ -434,6 +434,20 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
         combo.blockSignals(False)
 
 
+def set_combo_item_unselectable(qcombo, list_items=[]):
+    """ Make items of QComboBox visibles but not selectable"""
+    for i in list_items:
+        index = qcombo.model().index(i, 0)
+        qcombo.model().setData(index, 0, Qt.UserRole - 1)
+
+
+def set_combo_item_selectable(qcombo, list_items=[]):
+    """ Make items of QComboBox visibles but and selectable"""
+    for i in list_items:
+        index = qcombo.model().index(i, 0)
+        qcombo.model().setData(index, (1 | 32), Qt.UserRole - 1)
+
+
 def remove_tab_by_tabName(tab_widget, tab_name):
     """ Look in @tab_widget for a tab with @tab_name and remove it """
     
