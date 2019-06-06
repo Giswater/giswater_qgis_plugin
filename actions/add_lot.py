@@ -106,6 +106,7 @@ class AddNewLot(ParentManage):
 
         # Fill QWidgets of the form
         self.fill_fields()
+        # self.set_ot_fields()
 
         new_lot_id = lot_id
         if lot_id is None:
@@ -122,7 +123,7 @@ class AddNewLot(ParentManage):
         action_by_polygon.triggered.connect(partial(self.activate_selection, self.dlg_lot, action_by_polygon, 'mActionSelectPolygon'))
 
         # Set widgets signals
-        self.dlg_lot.cmb_ot.currentIndexChanged.connect(self.fill_ot_fields)
+        self.dlg_lot.cmb_ot.currentIndexChanged.connect(self.set_ot_fields)
         self.dlg_lot.btn_feature_insert.clicked.connect(partial(self.insert_row))
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer))
@@ -150,9 +151,10 @@ class AddNewLot(ParentManage):
         self.set_headers(self.tbl_relation)
         self.set_active_layer()
         if lot_id is not None:
-            utils_giswater.set_combo_itemData(self.visit_class, str(visitclass_id), 0)
+            # utils_giswater.set_combo_itemData(self.visit_class, str(visitclass_id), 0)
             self.geom_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
             self.set_values(lot_id)
+
             self.populate_table_relations(lot_id)
             self.update_id_list()
             sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot_x_" + str(self.geom_type) + ""
@@ -162,9 +164,16 @@ class AddNewLot(ParentManage):
             self.set_dates()
             self.reload_table_visit()
 
+        # Enable or disable QWidgets
+        self.dlg_lot.txt_ot_type.setReadOnly(True)
+        self.dlg_lot.txt_ot_address.setReadOnly(True)
+        self.dlg_lot.cmb_visit_class.setEnabled(False)
+
+        # Enable or disable QComboBox feature_type of tab relations
         self.enable_feature_type(self.dlg_lot)
-        self.fill_ot_fields()
+
         self.set_feature_type_cmb()
+
         # Set autocompleters of the form
         self.set_completers()
 
@@ -181,7 +190,7 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
 
-    def fill_ot_fields(self):
+    def set_ot_fields(self):
         item = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, -1)
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[1])
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[2])
@@ -247,8 +256,6 @@ class AddNewLot(ParentManage):
         current_date = QDate.currentDate()
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, current_date.toString('yyyy-MM-dd'))
 
-
-
         # Set current user
         sql = "SELECT current_user"
         row = self.controller.get_row(sql, commit=self.autocommit)
@@ -256,10 +263,11 @@ class AddNewLot(ParentManage):
 
         # Fill ComboBox cmb_ot
         # TODO cambiar el nombre de esta tabla cuando sepamos el nombre real
-        sql = ("SELECT id::text, tipus, adreca, feina FROM " + self.schema_name + ".temp_ot order by feina")
+        sql = ("SELECT id, tipus, adreca, feina FROM " + self.schema_name + ".temp_ot order by feina")
         rows = self.controller.get_rows(sql, commit=True)
+        rows.append(['', '', '', ''])
         if rows:
-            utils_giswater.set_item_data(self.dlg_lot.cmb_ot, rows, 0)
+            utils_giswater.set_item_data(self.dlg_lot.cmb_ot, rows, 1)
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT id, idval, feature_type"
@@ -288,11 +296,8 @@ class AddNewLot(ParentManage):
         status = [(1, 'PLANIFICANT'), (2, 'PLANIFICAT'), (3, 'ASSIGNAT'), (4, 'EN CURS'), (5, 'EXECUTAT'), (6, 'REVISAT'), (7, 'CANCEL.LAT')]
         if status:
             utils_giswater.set_item_data(self.dlg_lot.cmb_status, status, 1, sort_combo=False)
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, 'PLANIFICANT', 1)
-            utils_giswater.set_combo_item_unselectable_by_id(self.dlg_lot.cmb_status, [4, 5])
-
-
-
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, 'ASSIGNAT', 1)
+            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['3', '4'], 0)
 
         # Relations tab
         # fill feature_type
@@ -379,17 +384,20 @@ class AddNewLot(ParentManage):
 
         sql = ("SELECT * FROM " + self.schema_name + ".om_visit_lot "
                " WHERE id ='"+str(lot_id)+"'")
-        lot = self.controller.get_row(sql, log_sql=False)
+        lot = self.controller.get_row(sql, log_sql=True)
         if lot:
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_ot, str(lot['id_ot']), 0)
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'])
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, lot['enddate'])
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_startdate, lot['real_startdate'])
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_enddate, lot['real_enddate'])
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, lot['visitclass_id'], 0)
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, lot['team_id'], 0)
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, lot['status'], 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(lot['visitclass_id']), 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, str(lot['team_id']), 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, str(lot['status']), 0)
             self.controller.log_info(str(lot['status']))
-            if lot['status'] not in (1, 2,3, None):
+            if lot['status'] not in ('1', '7', '5', None):
+                self.controller.log_info(str("TEST"))
+                self.dlg_lot.cmb_assigned_to.setEnabled(False)
                 self.dlg_lot.cmb_status.setEnabled(False)
             utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
@@ -504,19 +512,7 @@ class AddNewLot(ParentManage):
                 if selected_id not in self.ids:
                     self.ids.append(selected_id)
         self.reload_table_relations()
-        self.enable_combos(dialog)
 
-
-    def enable_combos(self, dialog):
-
-        assigned_to = dialog.findChild(QComboBox, 'cmb_assigned_to')
-        visit_class = dialog.findChild(QComboBox, 'cmb_visit_class')
-        if len(self.ids) > 0:
-            assigned_to.setEnabled(False)
-            visit_class.setEnabled(False)
-        else:
-            assigned_to.setEnabled(True)
-            visit_class.setEnabled(True)
 
 
     def reload_table_relations(self):
@@ -618,8 +614,6 @@ class AddNewLot(ParentManage):
             feature_id = index.sibling(row, column_index).data()
             self.ids.remove(feature_id)
             model.takeRow(row)
-
-        self.enable_combos(dialog)
 
 
     def set_active_layer(self):
