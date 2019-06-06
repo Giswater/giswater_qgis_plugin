@@ -451,13 +451,20 @@ def set_combo_item_selectable_by_id(qcombo, list_id=[]):
             index = qcombo.model().index(x, 0)
             qcombo.model().setData(index, (1 | 32), Qt.UserRole - 1)
 
-# def set_combo_item_unselectable(qcombo, list_id=[], column=0):
-#     """ Make items of QComboBox visibles but not selectable"""
-#     for x in range(0, qcombo.count()):
-#         elem = qcombo.itemData(x)
-#         if str(elem[column]) in list_id:
-#             index = qcombo.model().index(x, 0)
-#             qcombo.model().setData(index, 0, Qt.UserRole - 1)
+def set_combo_item_select_unselectable(qcombo, opt=0, list_id=[], column=0):
+    """ Make items of QComboBox visibles but not selectable
+        :param qcombo: QComboBox widget to manage
+        :param opt: 0 to set item not selectable
+        :param opt: (1 | 32 ) to set item selectable
+        :param list_id: list of strings to manage ex. ['1','3','...'] or ['word1', 'word3','...']
+        :param column: column where to look up the values in the list
+    """
+    for x in range(0, qcombo.count()):
+        elem = qcombo.itemData(x)
+        if str(elem[column]) in list_id:
+            index = qcombo.model().index(x, 0)
+            qcombo.model().setData(index, opt, Qt.UserRole - 1)
+
 def remove_tab_by_tabName(tab_widget, tab_name):
     """ Look in @tab_widget for a tab with @tab_name and remove it """
     
