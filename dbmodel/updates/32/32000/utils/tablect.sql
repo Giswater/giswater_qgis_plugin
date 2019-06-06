@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2019/02/20
-ALTER TABLE config_param_system ADD CONSTRAINT config_param_system_parameter_unique UNIQUE (parameter);
+

@@ -45,4 +45,4 @@ INSERT INTO audit_cat_param_user VALUES ('visitclass_vdefault_node', 'config', '
 INSERT INTO audit_cat_param_user VALUES ('visitclass_vdefault_arc', 'config', 'Default value of visit class for arc', 'role_om', NULL, NULL, 'Visit class of arc:', 'SELECT id, idval FROM om_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, true, 2, 2, 'utils', false, NULL, NULL, NULL, false, 'integer', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
 INSERT INTO audit_cat_param_user VALUES ('visitcat_vdefault', 'dynamic_param', 'Default value of visit catalog', 'role_om', NULL, NULL, 'Visit catalog:', 'SELECT id AS id, name as idval  FROM om_visit_cat WHERE id IS NOT NULL', NULL, true, NULL, NULL, 'utils', false, NULL, NULL, NULL, false, 'string', 'combo', false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false);
 
-INSERT INTO value_state_type VALUES (99, 2, 'Ficticius', true, true);
+INSERT INTO value_state_type VALUES (99, 2, 'Ficticius', true, true) ON CONFLICT (id) DO NOTHING;

@@ -45,12 +45,14 @@ ALTER TABLE cat_feature ADD COLUMN code_autofill boolean;
 
 
 --rename instead of add column?
+/*
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydrometer_id character varying(16);
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN client_name text;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN instalation_date date;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN hydrometer_number integer;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN state smallint;
 ALTER TABLE ext_rtc_hydrometer ADD COLUMN connec_customer_code character varying(30);
+*/
 
 ALTER TABLE om_visit_cat ADD COLUMN extusercat_id integer;
 ALTER TABLE om_visit_cat ADD COLUMN duration text;
@@ -65,4 +67,4 @@ ALTER TABLE sys_csv2pg_cat ADD COLUMN  isheader boolean NOT NULL DEFAULT false;
 ALTER TABLE man_addfields_parameter ADD COLUMN  orderby integer;
 ALTER TABLE man_addfields_parameter ADD COLUMN  active boolean;
 
-ALTER TABLE ext_municipality ADD COLUMN active boolean;
+--ALTER TABLE ext_municipality ADD COLUMN active boolean;

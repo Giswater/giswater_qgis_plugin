@@ -304,12 +304,12 @@ CREATE OR REPLACE VIEW vi_title AS
   ORDER BY inp_project_id.title;
 
 
- CREATE OR REPLACE VIEW vi_junctions AS 
+CREATE OR REPLACE VIEW vi_junctions AS 
 SELECT 
 rpt_inp_node.node_id, 
 elev as elevation, 
 rpt_inp_node.demand, 
-pattern_id
+rpt_inp_node.pattern_id
 FROM inp_selector_result, rpt_inp_node
    LEFT JOIN inp_junction ON inp_junction.node_id = rpt_inp_node.node_id
    WHERE epa_type IN ('JUNCTION', 'SHORTPIPE') AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()

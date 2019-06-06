@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-DROP TRIGGER gw_trg_node_update ON node;
+DROP TRIGGER IF EXISTS gw_trg_node_update ON node;
 
 
 CREATE TRIGGER gw_trg_edit_dimensions  INSTEAD OF INSERT OR UPDATE OR DELETE ON SCHEMA_NAME.v_edit_dimensions

@@ -35,3 +35,6 @@ CREATE TABLE inp_pump_importinp
   status character varying(12)
 );
 
+
+--ALTER TABLE rpt_inp_node ADD column pattern_id varchar(16);
+

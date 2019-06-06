@@ -9,7 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2019/03/29
-ALTER TABLE rpt_inp_node ADD column pattern_id varchar(16);
 
 
 ALTER TABLE inp_pattern_value ALTER COLUMN factor_2 DROP DEFAULT;

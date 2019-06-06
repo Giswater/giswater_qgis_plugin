@@ -33,9 +33,9 @@ UPDATE sys_csv2pg_cat SET csv_structure=replace (csv_structure, '- Be careful, c
 UPDATE sys_csv2pg_cat SET csv_structure=replace (csv_structure, '- Be careful, csv file needs a header line', '') WHERE id=3;
 UPDATE sys_csv2pg_cat SET csv_structure=replace (csv_structure, '- Be careful, csv file needs a header line', '') WHERE id=4;
 
-INSERT INTO audit_cat_error VALUES (1081,'There are not psectors defined on the project','Define at least one to start to work with', 2, TRUE);
-INSERT INTO audit_cat_error VALUES (1083,'Please configure your own psector vdefault variable','To work with planified elements it is mandatory to have always defined the work psector using the psector vdefault variable', 2, TRUE);
-INSERT INTO audit_cat_error VALUES (1097,'It is not allowed to insert/update one node with state(1) over another one with state (1) also. The node is:','Please ckeck it', 2, TRUE);
+INSERT INTO audit_cat_error VALUES (1081,'There are not psectors defined on the project','Define at least one to start to work with', 2, TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_error VALUES (1083,'Please configure your own psector vdefault variable','To work with planified elements it is mandatory to have always defined the work psector using the psector vdefault variable', 2, TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO audit_cat_error VALUES (1097,'It is not allowed to insert/update one node with state(1) over another one with state (1) also. The node is:','Please ckeck it', 2, TRUE) ON CONFLICT (id) DO NOTHING;
 UPDATE audit_cat_error SET error_message = 'There are one node with state (1) and one node with state (2) on the same position. It is not allowed to insert/update more nodes with state >(0) node on same position. The node is:' WHERE id=1096;
 UPDATE audit_cat_error SET isdeprecated=TRUE WHERE id=1098;
 UPDATE audit_cat_error SET error_message = 'It is not allowed to insert/update one node with state (2) over another one with state (2). The node is:' WHERE id=1100;

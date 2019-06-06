@@ -17,7 +17,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --todo: UPDATE audit_cat_functions SET isdeprecated=TRUE where id='config';
 
 
-INSERT INTO config_param_system VALUES (1000,'api_search_muni','{"sys_table_id":"ext_municipality", "sys_id_field":"muni_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}',NULL, 'api_search_adress');
+INSERT INTO config_param_system VALUES (1000,'api_search_muni','{"sys_table_id":"ext_municipality", "sys_id_field":"muni_id", "sys_search_field":"name", "sys_geom_field":"the_geom"}',NULL, 'api_search_adress') ON CONFLICT (parameter) DO NOTHING;
 
 -----------------------
 -- config_param_system
