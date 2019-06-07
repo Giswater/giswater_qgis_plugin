@@ -165,7 +165,14 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="real_startdate"/>
+                <widget class="QLineEdit" name="real_startdate">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -195,7 +202,14 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="real_enddate"/>
+                <widget class="QLineEdit" name="real_enddate">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
@@ -312,12 +326,9 @@
                <item>
                 <widget class="QLineEdit" name="user_name">
                  <property name="enabled">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">background: rgb(242, 242, 242);
-                                                 color: rgb(100, 100, 100)</string>
-                 </property>
+
                  <property name="frame">
                   <bool>true</bool>
                  </property>

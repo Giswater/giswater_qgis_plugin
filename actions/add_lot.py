@@ -44,7 +44,7 @@ class AddNewLot(ParentManage):
         self.rb_red.setColor(Qt.darkRed)
         self.rb_red.setIconSize(20)
         self.rb_list = []
-
+        self.lot_date_format = 'yyyy-MM-dd'
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
 
@@ -88,10 +88,7 @@ class AddNewLot(ParentManage):
         utils_giswater.set_regexp_date_validator(self.dlg_lot.enddate, self.dlg_lot.btn_accept, 1)
         utils_giswater.set_regexp_date_validator(self.dlg_lot.real_startdate, self.dlg_lot.btn_accept, 1)
         utils_giswater.set_regexp_date_validator(self.dlg_lot.real_enddate, self.dlg_lot.btn_accept, 1)
-
-        self.dlg_lot.real_startdate.setReadOnly(True)
-        self.dlg_lot.real_enddate.setReadOnly(True)
-
+        self.dlg_lot.enddate.textChanged.connect(self.check_dates_consistency)
 
         self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
@@ -190,6 +187,28 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
 
+    def check_dates_consistency(self):
+        # Get dates as text
+        startdate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate)
+        enddate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)
+
+        if enddate == '':
+            self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
+            self.dlg_lot.enddate.setStyleSheet("border: 1px solid gray")
+            return
+
+        # Transform text dates as QDate
+        startdate = QDate.fromString(startdate, self.lot_date_format)
+        enddate = QDate.fromString(enddate, self.lot_date_format)
+
+        if startdate <= enddate:
+            self.dlg_lot.startdate.setStyleSheet("border: 1px solid gray")
+            self.dlg_lot.enddate.setStyleSheet("border: 1px solid gray")
+        else:
+            self.dlg_lot.startdate.setStyleSheet("border: 1px solid red")
+            self.dlg_lot.enddate.setStyleSheet("border: 1px solid red")
+
+
     def set_ot_fields(self):
         item = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, -1)
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[1])
@@ -254,7 +273,7 @@ class AddNewLot(ParentManage):
         # Visit tab
         # Set current date and time
         current_date = QDate.currentDate()
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, current_date.toString('yyyy-MM-dd'))
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, current_date.toString(self.lot_date_format))
 
         # Set current user
         sql = "SELECT current_user"
@@ -695,8 +714,8 @@ class AddNewLot(ParentManage):
             table_name = self.schema_name + "." + table_name
 
         # Create interval dates
-        format_low = 'yyyy-MM-dd 00:00:00.000'
-        format_high = 'yyyy-MM-dd 23:59:59.999'
+        format_low = self.lot_date_format + ' 00:00:00.000'
+        format_high = self.lot_date_format + ' 23:59:59.999'
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
@@ -1044,7 +1063,7 @@ class AddNewLot(ParentManage):
                 if str(value) == 'NULL':
                     value = ''
                 elif type(value) == QDate:
-                    value = value.toString('yyyy-MM-dd')
+                    value = value.toString(self.lot_date_format)
                 row.append(value)
             all_rows.append(row)
 
@@ -1138,8 +1157,8 @@ class AddNewLot(ParentManage):
             return
 
         # Create interval dates
-        format_low = 'yyyy-MM-dd 00:00:00.000'
-        format_high = 'yyyy-MM-dd 23:59:59.999'
+        format_low = self.lot_date_format + ' 00:00:00.000'
+        format_high = self.lot_date_format + ' 23:59:59.999'
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
