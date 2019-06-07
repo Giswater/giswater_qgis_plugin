@@ -119,6 +119,16 @@ BEGIN
 
 			-- building header
 			v_formheader :=concat('NOVA ORDRE TREBALL - ', v_id);							
+
+			-- setting values
+			FOREACH aux_json IN ARRAY v_fields 
+			LOOP          
+				array_index := array_index + 1;
+				IF (aux_json->>'column_id') = 'id' THEN
+					v_fields[array_index] := gw_fct_json_object_set_key(v_fields[array_index], 'value', COALESCE(v_id, ''));
+				END IF;
+			END LOOP;
+										
 		END IF;	
 	
 		v_fields_json = array_to_json (v_fields);
@@ -165,7 +175,7 @@ BEGIN
   
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_apiversion||
-             ',"body":{"feature":{"featureType":"lot", "tableName":"'||v_tablename||'", "idName":"lot_id", "id":"'||v_id||'"}'||
+             ',"body":{"feature":{"featureType":"lot", "tableName":"'||v_tablename||'", "idName":"id", "id":"'||v_id||'"}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||
 		               ',"geometry":'|| v_geometry ||'}}'||
