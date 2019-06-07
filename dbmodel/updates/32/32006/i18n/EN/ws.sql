@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-INSERT INTO cat_feature VALUES ('VCONNEC', 'WJOIN', 'CONNEC');
-INSERT INTO connec_type VALUES ('VCONNEC', 'WJOIN', 'man_wjoin', TRUE, TRUE, 'Virtual connec');
+INSERT INTO cat_feature VALUES ('VCONNEC', 'WJOIN', 'CONNEC') ON CONFLICT (id) DO NOTHING;
+INSERT INTO connec_type VALUES ('VCONNEC', 'WJOIN', 'man_wjoin', TRUE, TRUE, 'Virtual connec') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO anl_mincut_cat_state VALUES (3, 'Canceled', NULL) ON CONFLICT (id) DO UPDATE SET name='Canceled';
 

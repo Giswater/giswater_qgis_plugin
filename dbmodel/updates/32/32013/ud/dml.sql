@@ -15,5 +15,5 @@ INSERT INTO audit_cat_param_user VALUES ('edit_gully_doublegeom', 'config', 'Par
 			NULL, NULL, NULL, false, NULL, NULL);
 
 
-UPDATE inp_typevalue SET id='FROUDE', idval='FROUDE' WHERE id='FROUD;
+UPDATE inp_typevalue SET id='FROUDE', idval='FROUDE' WHERE id='FROUD';
 
