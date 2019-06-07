@@ -54,7 +54,8 @@ BEGIN
     IF visit_end IS NOT NULL THEN
         query_result := query_result || ' AND visit_end < ' || quote_literal(visit_end::TIMESTAMP(6));
     END IF;
-
+--    Set orderby
+	query_result := query_result || ' ORDER by sys_date desc';
 --    Get visits
     IF query_result IS NOT NULL THEN
     EXECUTE ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( ' || (query_result) || ' ) a')
