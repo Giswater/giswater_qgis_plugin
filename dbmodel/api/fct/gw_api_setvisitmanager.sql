@@ -36,6 +36,8 @@ DECLARE
 	v_date text;
 	v_result text;
 	v_data json;
+	v_team_result text;
+	v_lot_result text;
 	
 
 BEGIN
@@ -79,14 +81,32 @@ BEGIN
 		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
 	ELSE
-		UPDATE om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone 
-		WHERE id = (SELECT id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=v_user ORDER BY id DESC) a LIMIT 1); 
+	
+		EXECUTE 'SELECT team_id FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_team_result;
+		EXECUTE 'SELECT lot_id FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_lot_result;
 
-		-- message
-		SELECT gw_api_getmessage(null, 80) INTO v_message;
-		v_data = p_data->>'data';
-		v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
-		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
+		IF v_team_result != v_team::text OR v_lot_result != v_lot::text THEN
+
+			UPDATE om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone 
+			WHERE id = (SELECT id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=v_user ORDER BY id DESC) a LIMIT 1); 
+
+			-- Insert start work day
+			INSERT INTO om_visit_lot_x_user (team_id, lot_id , the_geom) VALUES (v_team, v_lot, v_thegeom);
+			
+			-- message
+			SELECT gw_api_getmessage(null, 70) INTO v_message;
+			v_data = p_data->>'data';
+			v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
+			p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
+		ELSE
+			UPDATE om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone 
+			WHERE id = (SELECT id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=v_user ORDER BY id DESC) a LIMIT 1); 
+			-- message
+			SELECT gw_api_getmessage(null, 80) INTO v_message;
+			v_data = p_data->>'data';
+			v_data = gw_fct_json_object_set_key (v_data, 'message', v_message);
+			p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
+		END IF;	
 	END IF;
 
 	
