@@ -36,5 +36,5 @@ CREATE TABLE inp_pump_importinp
 );
 
 
---ALTER TABLE rpt_inp_node ADD column pattern_id varchar(16);
+ALTER TABLE rpt_inp_node ADD column pattern_id varchar(16);
 
