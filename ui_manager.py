@@ -30,14 +30,22 @@ class ApiCatalogUi(QMainWindow, FORM_CLASS):
 FORM_CLASS = get_ui_class('api_cf.ui')
 class ApiCfUi(QMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
+    key_pressed = QtCore.pyqtSignal()
+
     def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            print('event: {0}'.format(event))
+            self.key_pressed.emit()
+            return super(ApiCfUi, self).keyPressEvent(event)
+
     def closeEvent(self, event):
-        print('event: {0}'.format(event))
         self.dlg_closed.emit()
         return super(ApiCfUi, self).closeEvent(event)
+
 
 FORM_CLASS = get_ui_class('api_search.ui')
 class ApiSearchUi(QDockWidget, FORM_CLASS):
