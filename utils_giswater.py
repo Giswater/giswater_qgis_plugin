@@ -404,7 +404,8 @@ def set_combo_itemData(combo, value, item1):
         elem = combo.itemData(i)
         if value == str(elem[item1]):
             combo.setCurrentIndex(i)
-
+            return True
+    return False
 
 def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1):
     """ Populate @combo with list @rows and show field @index_to_show

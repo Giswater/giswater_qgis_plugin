@@ -102,8 +102,7 @@ class AddNewLot(ParentManage):
         self.feature_type.setEnabled(False)
 
         # Fill QWidgets of the form
-        self.fill_fields()
-        # self.set_ot_fields()
+        self.fill_fields(lot_id)
 
         new_lot_id = lot_id
         if lot_id is None:
@@ -114,6 +113,8 @@ class AddNewLot(ParentManage):
         if self.geom_type != '':
             viewname = "v_edit_" + self.geom_type
             self.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
+        else:
+            self.geom_type = 'arc'
         self.clear_selection()
 
         # Set actions signals
@@ -172,7 +173,7 @@ class AddNewLot(ParentManage):
 
         # Set autocompleters of the form
         self.set_completers()
-
+        self.hilight_features(self.rb_list)
         # Set model signals
         self.tbl_relation.model().rowsInserted.connect(self.set_dates)
         self.tbl_relation.model().rowsInserted.connect(self.reload_table_visit)
@@ -181,7 +182,7 @@ class AddNewLot(ParentManage):
         self.tbl_relation.model().rowsRemoved.connect(self.set_dates)
         self.tbl_relation.model().rowsRemoved.connect(self.reload_table_visit)
         self.tbl_relation.model().rowsRemoved.connect(partial(self.hilight_features, self.rb_list))
-        self.hilight_features(self.rb_list)
+        self.controller.log_info(str(self.tbl_relation.model()))
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
@@ -210,10 +211,19 @@ class AddNewLot(ParentManage):
 
     def set_ot_fields(self):
         item = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, -1)
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[1])
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[2])
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[3])
-        utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, item[1], 1)
+        self.controller.log_info("ITEM: " + str(item))
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0]) # v_amsa_ot.tipus
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[1]) #v_amsa_ot.exercici
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[2]) #v_amsa_ot.serie
+        value = utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, item[3], 1) #v_amsa_ot.numero
+        self.controller.log_info("VALUE:" + str(value))
+
+        for x in range(0, self.dlg_lot.tab_widget.count()):
+            if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab':
+                self.dlg_lot.tab_widget.setTabEnabled(x, value)
+                break
+
+
 
 
     def disbale_actions(self):
@@ -266,7 +276,7 @@ class AddNewLot(ParentManage):
         return rows
 
 
-    def fill_fields(self):
+    def fill_fields(self, lot_id):
         """ Fill combo boxes of the form """
 
         # Visit tab
@@ -280,15 +290,28 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot, self.user_name, row[0])
 
         # Fill ComboBox cmb_ot
-        # TODO cambiar el nombre de esta tabla cuando sepamos el nombre real
-        sql = ("SELECT temp_ot.id, temp_ot.tipus, temp_ot.serie, temp_ot.exercici FROM " + self.schema_name + ".v_amsa_ot "
-               " LEFT JOIN " + self.schema_name + ".om_visit_lot ON om_visit_lot.id_ot = temp_ot.id"
-               " WHERE om_visit_lot.id_ot IS NULL"
-               " order by feina")
+        # TODO añadir campos adreca y descricion cuando el tema ut-8 este solucionado
+        # TODO y corregir la funcion def set_ot_fields()
+        sql = ("SELECT v_amsa_ot.tipus, v_amsa_ot.exercici, v_amsa_ot.serie, v_amsa_ot.numero, "
+               " CONCAT(v_amsa_ot.tipus,' ',v_amsa_ot.exercici,' ', v_amsa_ot.serie,' ', v_amsa_ot.numero) as ct "
+               " FROM " + self.schema_name + ".v_amsa_ot "
+               " LEFT JOIN " + self.schema_name + ".om_visit_lot ON om_visit_lot.tipus = v_amsa_ot.tipus "
+               " AND om_visit_lot.exercici = v_amsa_ot.exercici "
+               " AND om_visit_lot.serie = v_amsa_ot.serie "
+               " AND om_visit_lot.numero = v_amsa_ot.numero "
+               " WHERE om_visit_lot.tipus IS NULL")
+        if lot_id:
+            _sql = ("SELECT concat(om_visit_lot.tipus, om_visit_lot.exercici, om_visit_lot.serie, om_visit_lot.numero)"
+                    " FROM " + self.schema_name + ".om_visit_lot "
+                    " WHERE id = '"+str(lot_id)+"'")
+            ct = self.controller.get_row(_sql, commit=True)
+            sql += " OR CONCAT(v_amsa_ot.tipus,' ',v_amsa_ot.exercici,' ', v_amsa_ot.serie,' ', v_amsa_ot.numero) = '"+str(ct[0])+"'"
+        sql += " order by ct"
+
         rows = self.controller.get_rows(sql, commit=True, log_sql=True)
-        rows.append(['', '', '', ''])
         if rows:
-            utils_giswater.set_item_data(self.dlg_lot.cmb_ot, rows, 1)
+            rows.append(['', '', '', '', ''])
+            utils_giswater.set_item_data(self.dlg_lot.cmb_ot, rows, 4)
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT id, idval, feature_type"
@@ -296,8 +319,8 @@ class AddNewLot(ParentManage):
                " WHERE ismultifeature is False AND feature_type IS NOT null "
                " ORDER BY idval")
         visitclass_ids = self.controller.get_rows(sql, log_sql=True, commit=True)
-        visitclass_ids.append(['', '', ''])
         if visitclass_ids:
+            visitclass_ids.append(['', '', ''])
             utils_giswater.set_item_data(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
 
         # Fill ComboBox cmb_assigned_to
@@ -318,8 +341,8 @@ class AddNewLot(ParentManage):
         status = [(1, 'PLANIFICANT'), (2, 'PLANIFICAT'), (3, 'ASSIGNAT'), (4, 'EN CURS'), (5, 'EXECUTAT'), (6, 'REVISAT'), (7, 'CANCEL.LAT')]
         if status:
             utils_giswater.set_item_data(self.dlg_lot.cmb_status, status, 1, sort_combo=False)
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, 'ASSIGNAT', 1)
-            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['3', '4'], 0)
+            utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5'], 0)
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, 'PLANIFICANT', 1)
 
         # Relations tab
         # fill feature_type
@@ -408,7 +431,8 @@ class AddNewLot(ParentManage):
                " WHERE id ='"+str(lot_id)+"'")
         lot = self.controller.get_row(sql, log_sql=True)
         if lot:
-            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_ot, str(lot['id_ot']), 0)
+            value = str(lot['tipus']) + " " + str(lot['exercici']) + " " + str(lot['serie']) + " " + str(lot['numero'])
+            utils_giswater.set_combo_itemData(self.dlg_lot.cmb_ot, value,  4)
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.startdate, lot['startdate'])
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.enddate, lot['enddate'])
             utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.real_startdate, lot['real_startdate'])
@@ -416,9 +440,8 @@ class AddNewLot(ParentManage):
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, str(lot['visitclass_id']), 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, str(lot['team_id']), 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, str(lot['status']), 0)
-            self.controller.log_info(str(lot['status']))
+
             if lot['status'] not in ('1', '7', '5', None):
-                self.controller.log_info(str("TEST"))
                 self.dlg_lot.cmb_assigned_to.setEnabled(False)
                 self.dlg_lot.cmb_status.setEnabled(False)
             utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
@@ -432,6 +455,7 @@ class AddNewLot(ParentManage):
     def set_headers(self, qtable):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
+        self.controller.log_info("FEATURE_TYPE:" + str(feature_type))
         columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
         columns_name.append(['validate'])
         standard_model = QStandardItemModel()
@@ -666,7 +690,8 @@ class AddNewLot(ParentManage):
 
 
     def set_tab_dis_enabled(self):
-        #
+        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, -1)
+        print("FT: "+str(feature_type))
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         index = 0
         for x in range(0, self.dlg_lot.tab_widget.count()):
@@ -721,6 +746,7 @@ class AddNewLot(ParentManage):
             return
 
         visit_class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
+
         sql = ("SELECT visitclass_id, formname, tablename FROM " + self.schema_name + ".config_api_visit "
                " WHERE visitclass_id ='" + str(visit_class_id) + "'")
         row = self.controller.get_row(sql, log_sql=True)
@@ -779,7 +805,10 @@ class AddNewLot(ParentManage):
         lot['status'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
         lot['feature_type'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         lot['team_id'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0, True)
-        lot['id_ot'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 0, True)
+        lot['tipus'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 0, True)
+        lot['exercici'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 1, True)
+        lot['serie'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 2, True)
+        lot['numero'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 3, True)
         # if lot['status'] == 6 and
         keys = ""
         values = ""
@@ -863,6 +892,7 @@ class AddNewLot(ParentManage):
 
 
     def hilight_features(self, rb_list):
+        self.controller.log_info(str("TEST"))
         self.reset_rb_list(rb_list)
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
         layer = self.iface.activeLayer()
@@ -870,6 +900,7 @@ class AddNewLot(ParentManage):
             return
         field_id = feature_type + "_id"
         for _id in self.ids:
+            print("_id: " + str(_id))
             feature = self.get_feature_by_id(layer, _id, field_id)
             geometry = feature.geometry()
             rb = QgsRubberBand(self.canvas)
