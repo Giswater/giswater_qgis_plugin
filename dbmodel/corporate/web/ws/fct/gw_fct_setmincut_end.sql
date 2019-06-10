@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_setmincut_end"(p_mincut_id int4, p_insert_data json, p_element_type varchar, p_id varchar, p_device int4) RETURNS pg_catalog.json AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_setmincut_end"(p_mincut_id int4, p_insert_data json, p_element_type varchar, p_id varchar, p_device int4) RETURNS pg_catalog.json AS $BODY$
 
 DECLARE
 api_version json;

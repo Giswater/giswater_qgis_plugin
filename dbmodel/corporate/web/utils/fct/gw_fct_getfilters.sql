@@ -316,10 +316,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-  GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO postgres;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO role_basic;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO qgisserver;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO xtorret;
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getfilters(boolean, integer, character varying) TO jlsala;
