@@ -301,7 +301,7 @@ class AddNewLot(ParentManage):
                " AND om_visit_lot.numero = v_amsa_ot.numero "
                " WHERE om_visit_lot.tipus IS NULL")
         if lot_id:
-            _sql = ("SELECT concat(om_visit_lot.tipus, om_visit_lot.exercici, om_visit_lot.serie, om_visit_lot.numero)"
+            _sql = ("SELECT concat(om_visit_lot.tipus, ' ', om_visit_lot.exercici, ' ', om_visit_lot.serie, ' ', om_visit_lot.numero)"
                     " FROM " + self.schema_name + ".om_visit_lot "
                     " WHERE id = '"+str(lot_id)+"'")
             ct = self.controller.get_row(_sql, commit=True)
@@ -455,7 +455,6 @@ class AddNewLot(ParentManage):
     def set_headers(self, qtable):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
-        self.controller.log_info("FEATURE_TYPE:" + str(feature_type))
         columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
         columns_name.append(['validate'])
         standard_model = QStandardItemModel()
@@ -690,8 +689,6 @@ class AddNewLot(ParentManage):
 
 
     def set_tab_dis_enabled(self):
-        feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, -1)
-        print("FT: "+str(feature_type))
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         index = 0
         for x in range(0, self.dlg_lot.tab_widget.count()):
@@ -892,7 +889,6 @@ class AddNewLot(ParentManage):
 
 
     def hilight_features(self, rb_list):
-        self.controller.log_info(str("TEST"))
         self.reset_rb_list(rb_list)
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.visit_class, 2).lower()
         layer = self.iface.activeLayer()
@@ -900,7 +896,6 @@ class AddNewLot(ParentManage):
             return
         field_id = feature_type + "_id"
         for _id in self.ids:
-            print("_id: " + str(_id))
             feature = self.get_feature_by_id(layer, _id, field_id)
             geometry = feature.geometry()
             rb = QgsRubberBand(self.canvas)
