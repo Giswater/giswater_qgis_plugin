@@ -25,7 +25,6 @@ class Go2EpaOptions(ApiParent):
         """ Class to control toolbar 'go2epa' """
 
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.epa_options_json = {}
         self.epa_options_list = []
 
 
@@ -36,6 +35,9 @@ class Go2EpaOptions(ApiParent):
     def go2epa_options(self):
         """ Button 23: Open form to set INP, RPT and project """
 
+        # Clear list
+        self.epa_options_list = []
+        
         # Create dialog
         self.dlg_options = ApiEpaOptions()
         self.load_settings(self.dlg_options)
