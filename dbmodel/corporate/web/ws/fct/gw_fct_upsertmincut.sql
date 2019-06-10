@@ -185,14 +185,6 @@ BEGIN
 --    Get columns names
     SELECT string_agg(quote_ident(key),',') INTO inputstring FROM json_object_keys(insert_data) AS X (key);
 
---    Perform UPDATE (<9.5)
-    FOR column_name_var, column_type_var IN SELECT column_name, data_type FROM information_schema.Columns WHERE table_schema = schemas_array[1]::TEXT AND table_name = 'anl_mincut_result_cat' LOOP
-        IF (insert_data->>column_name_var) IS NOT NULL THEN
-            EXECUTE 'UPDATE anl_mincut_result_cat SET ' || quote_ident(column_name_var) || ' = $1::' || (column_type_var) || ' WHERE anl_mincut_result_cat.id = $2'
-            USING insert_data->>column_name_var, v_mincut_id;
-        END IF;
-    END LOOP;
-
 
 --    specific tasks
     IF mincut_id_arg ISNULL THEN
@@ -222,6 +214,14 @@ BEGIN
         END IF;
     
     END IF;
+	
+	--    Perform UPDATE
+    FOR column_name_var, column_type_var IN SELECT column_name, data_type FROM information_schema.Columns WHERE table_schema = schemas_array[1]::TEXT AND table_name = 'anl_mincut_result_cat' LOOP
+        IF (insert_data->>column_name_var) IS NOT NULL THEN
+            EXECUTE 'UPDATE anl_mincut_result_cat SET ' || quote_ident(column_name_var) || ' = $1::' || (column_type_var) || ' WHERE anl_mincut_result_cat.id = $2'
+            USING insert_data->>column_name_var, v_mincut_id;
+        END IF;
+    END LOOP;
 
     v_geometry_return = (v_mincut_return->>'geometry')::text;
     
