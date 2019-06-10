@@ -215,7 +215,7 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0]) # v_amsa_ot.tipus
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[1]) #v_amsa_ot.exercici
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[2]) #v_amsa_ot.serie
-        value = utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, item[3], 1) #v_amsa_ot.numero
+        value = utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, item[0], 1)
         self.controller.log_info("VALUE:" + str(value))
 
         for x in range(0, self.dlg_lot.tab_widget.count()):
