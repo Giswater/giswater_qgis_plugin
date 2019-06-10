@@ -57,3 +57,15 @@ UPDATE config_api_form_fields SET formname='unexpected_arc' WHERE formname= 'uns
 UPDATE config_api_visit SET formname='unexpected_arc' WHERE formname= 'unspected_arc';
 UPDATE config_api_visit SET formname='unexpected_noinfra' WHERE formname= 'unspected_noinfra';
 
+-- 10/06/2019
+
+UPDATE config_api_form_fields SET dv_querytext = 'SELECT id, id as idval FROM om_visit_lot WHERE active IS TRUE' WHERE id = 28490;
+UPDATE config_api_form_fields SET dv_querytext = 'SELECT id, id as idval FROM om_visit_lot WHERE active IS TRUE' WHERE id = 28240;
+
+UPDATE config_api_list SET query_text = 'SELECT DISTINCT ON (a.id) a.id AS sys_id, a.id AS lot_id, ''om_visit_lot'' as sys_table_id, ''id'' as sys_idname FROM ws_sample.om_visit_lot a' WHERE id = 28240;
+
+UPDATE config_api_form_fields SET layout_order = 6 WHERE id = 30040;
+UPDATE config_api_form_fields SET layout_order = 7 WHERE id = 30050;
+INSERT INTO config_api_form_fields VALUES(30045, 'lot', 'lot','visitclass_id', 1, 5, TRUE, 'string', 'combo', 'Classe visita:', NULL, NULL, NULL, NULL, NULL, FALSE, NULL, TRUE, NULL, 'SELECT id, idval FROM om_visit_class WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)
+
+

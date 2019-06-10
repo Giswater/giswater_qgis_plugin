@@ -110,7 +110,6 @@ DECLARE
 	v_disable_widget_name text;
 	v_result text;
 
-
 BEGIN
 
 	-- Set search path to local schema
@@ -125,7 +124,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
-    p_data = REPLACE (p_data::text, '''''', 'null');
+	p_data = REPLACE (p_data::text, '''''', 'null');
 
 	-- get project type
 	SELECT wsoftware INTO v_projecttype FROM version LIMIT 1;
@@ -208,6 +207,9 @@ BEGIN
 		RAISE NOTICE '--- UPSERT USER MANAGER CALLING gw_api_setvisitmnager WITH MESSAGE: % ---', v_message;
 	END IF;
 
+	-- Check if exist some other workday opened, and close
+	EXECUTE 'SELECT endtime FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_result;
+
 	--  Create tabs array	
 	v_formtabs := '[';
        
@@ -217,8 +219,7 @@ BEGIN
 		
 			IF v_activedatatab THEN
 
-				-- Check if exist some other workday opened, and close
-				EXECUTE 'SELECT endtime FROM (SELECT * FROM ws_sample.om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_result;
+				
 				
 				IF v_result IS NULL THEN
 					v_disable_widget_name = 'data_startbutton';
@@ -233,7 +234,6 @@ BEGIN
 					(SELECT * FROM %s WHERE %s = CAST($1 AS %s))a', v_tablename, v_user_id, v_columntype)
 					INTO v_values
 					USING current_user;
-						
 				-- setting values
 				FOREACH aux_json IN ARRAY v_fields 
 				LOOP          
@@ -274,39 +274,42 @@ BEGIN
 	
 			-- Active lots tab
 			------------------
-			   IF v_activelotstab THEN
+			IF v_result IS NULL THEN
 
-				-- setting table feature
-				v_feature := '{"tableName":"om_visit_lot"}';		
-				
-				-- setting feature
-				p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
+				IF v_activelotstab THEN
 
-				--refactor tabNames
-				p_data := replace (p_data::text, 'tabFeature', 'feature');
-				
-				RAISE NOTICE '--- CALLING gw_api_getlist ON LOTS TAB USING p_data: % ---', p_data;
-				SELECT gw_api_getlist (p_data) INTO v_fields_json;
+					-- setting table feature
+					v_feature := '{"tableName":"om_visit_lot"}';		
+					
+					-- setting feature
+					p_data := gw_fct_json_object_set_key(p_data, 'feature', v_feature);
 
-				-- getting pageinfo and list values
-				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
-				v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
+					--refactor tabNames
+					p_data := replace (p_data::text, 'tabFeature', 'feature');
+					
+					RAISE NOTICE '--- CALLING gw_api_getlist ON LOTS TAB USING p_data: % ---', p_data;
+					SELECT gw_api_getlist (p_data) INTO v_fields_json;
+					-- getting pageinfo and list values
+					v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
+					v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
+					
+					v_fields_json := COALESCE(v_fields_json, '{}');
+				END IF;
+
+				-- building
+				SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' and device = v_device LIMIT 1;
+
+				IF v_tab IS NULL THEN 
+					SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' LIMIT 1;			
+				END IF;
 				
-				v_fields_json := COALESCE(v_fields_json, '{}');
+				v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
+				'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activelotstab);
 				
+
+				v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+				v_formtabs := v_formtabs || ',' || v_tabaux::text;
 			END IF;
-
-			-- building
-			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' and device = v_device LIMIT 1;
-
-			IF v_tab IS NULL THEN 
-				SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visitManager' AND tabname='tabLots' LIMIT 1;			
-			END IF;
-
-			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 
-			'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activelotstab);
-			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
-			v_formtabs := v_formtabs || ',' || v_tabaux::text;
 
 		END IF;
 				

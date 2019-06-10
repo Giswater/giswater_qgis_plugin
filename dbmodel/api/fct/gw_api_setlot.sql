@@ -31,6 +31,8 @@ DECLARE
 	v_descript text;
 	v_status text;
 	v_result text;
+	v_visitclass_id text;
+	v_team text;
 
 BEGIN
 
@@ -51,6 +53,7 @@ BEGIN
 	v_message = ((p_data ->>'data')::json->>'message');
 	v_descript = ((p_data ->>'data')::json->>'fields')::json->>'descript'::text;
 	v_status = ((p_data ->>'data')::json->>'fields')::json->>'status'::text;
+	v_visitclass_id = ((p_data ->>'data')::json->>'fields')::json->>'visitclass_id'::text;
 
 	-- setting values on table om_visit_lot_x_user 
 	-- TOD DO: set lot
@@ -58,10 +61,14 @@ BEGIN
 	-- Check if is new lot
 	EXECUTE 'SELECT * FROM om_visit_lot WHERE id =' || v_id ||'' INTO v_result;
 
+	-- Get current user team id
+	EXECUTE 'SELECT team_id FROM om_visit_lot_x_user WHERE user_id = current_user ORDER BY starttime DESC' INTO v_team;
+	
+
 	IF v_result IS NOT NULL THEN
 
 		--EXECUTE 'UPDATE ' || quote_ident(v_tablename) ||' SET idval = ' || quote_literal(v_lot_id) ||', descript = ' || quote_literal(v_descript) ||', status = ' || quote_literal(v_status) ||' WHERE id = ' || quote_literal(v_id) ||'' ;
-		EXECUTE 'UPDATE ' || quote_ident(v_tablename) ||' SET descript = ' || quote_literal(v_descript) ||', status = ' || quote_literal(v_status) ||' WHERE id = ' || quote_literal(v_id) ||'' ;
+		EXECUTE 'UPDATE ' || quote_ident(v_tablename) ||' SET descript = ' || quote_literal(v_descript) ||', status = ' || quote_literal(v_status) ||', visitclass_id = ' || quote_literal(v_visitclass_id) ||' WHERE id = ' || quote_literal(v_id) ||'' ;
 
 		-- message
 		SELECT gw_api_getmessage(null, 50) INTO v_message;
@@ -70,7 +77,7 @@ BEGIN
 		p_data = gw_fct_json_object_set_key (p_data, 'data', v_data);
 	ELSE
 		--EXECUTE 'INSERT INTO ' || quote_ident(v_tablename) ||' (id, idval, descript, status) VALUES (' || quote_literal(v_id) ||', ' || quote_literal(v_lot_id) ||', ' || quote_literal(v_descript) ||', ' || quote_literal(v_status) ||')';
-		EXECUTE 'INSERT INTO ' || quote_ident(v_tablename) ||' (id, descript, status) VALUES (' || quote_literal(v_id) ||', ' || quote_literal(v_descript) ||', ' || quote_literal(v_status) ||')';
+		EXECUTE 'INSERT INTO ' || quote_ident(v_tablename) ||' (id, descript, status, visitclass_id, team_id) VALUES (' || quote_literal(v_id) ||', ' || quote_literal(v_descript) ||', ' || quote_literal(v_status) ||', ' || quote_literal(v_visitclass_id) ||', ' || quote_literal(v_team) ||')';
 
 		-- message
 		SELECT gw_api_getmessage(null, 40) INTO v_message;
