@@ -27,6 +27,7 @@ class Edit(ParentAction):
         self.manage_document = ManageDocument(iface, settings, controller, plugin_dir)
         self.manage_element = ManageElement(iface, settings, controller, plugin_dir)
         self.manage_workcat_end = ManageWorkcatEnd(iface, settings, controller, plugin_dir)
+        self.suppres_form = None
 
 
     def set_project_type(self, project_type):
@@ -38,6 +39,8 @@ class Edit(ParentAction):
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
+            self.suppres_form = self.layer.featureFormSuppress()
+            self.layer.setFeatureFormSuppress(1)
             self.iface.setActiveLayer(self.layer)
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
@@ -50,9 +53,6 @@ class Edit(ParentAction):
     def open_new_feature(self, feature_id):
         self.layer.featureAdded.disconnect(self.open_new_feature)
         feature = self.get_feature_by_id(self.layer, feature_id)
-        # feature.setAttribute('state', '2')
-        # feature.setAttribute('state_type', '5')
-        # layer.updateFeature(feature)
 
         geom = feature.geometry()
         list_points = None
@@ -71,6 +71,8 @@ class Edit(ParentAction):
 
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat, new_feature_id=feature_id, layer_new_feature=self.layer, tab_type='data', new_feature=feature)
+
+        self.layer.setFeatureFormSuppress(self.suppres_form)
 
         if result is False:
             self.layer.deleteFeature(feature.id())
