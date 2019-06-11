@@ -108,7 +108,7 @@ DECLARE
 	v_isfeaturemanager boolean;
 	v_isusermanager boolean;
 	v_disable_widget_name text;
-	v_result text;
+	v_result record;
 
 BEGIN
 
@@ -208,7 +208,7 @@ BEGIN
 	END IF;
 
 	-- Check if exist some other workday opened, and close
-	EXECUTE 'SELECT endtime FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_result;
+	EXECUTE 'SELECT user_id, endtime FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id = current_user ORDER BY id DESC) a LIMIT 1' INTO v_result;
 
 	--  Create tabs array	
 	v_formtabs := '[';
@@ -221,7 +221,7 @@ BEGIN
 
 				
 				
-				IF v_result IS NULL THEN
+				IF v_result.user_id IS NOT NULL AND v_result.endtime IS NULL THEN
 					v_disable_widget_name = 'data_startbutton';
 				ELSE
 					v_disable_widget_name = 'data_endbutton';
@@ -274,7 +274,7 @@ BEGIN
 	
 			-- Active lots tab
 			------------------
-			IF v_result IS NULL THEN
+			IF v_result.user_id IS NOT NULL AND v_result.endtime IS NULL THEN
 
 				IF v_activelotstab THEN
 
