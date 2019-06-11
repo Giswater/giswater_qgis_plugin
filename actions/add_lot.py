@@ -147,7 +147,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
 
-        self.set_headers(self.tbl_relation)
+        self.set_headers()
         self.set_active_layer()
         if lot_id is not None:
             # utils_giswater.set_combo_itemData(self.visit_class, str(visitclass_id), 0)
@@ -174,7 +174,12 @@ class AddNewLot(ParentManage):
         # Set autocompleters of the form
         self.set_completers()
         self.hilight_features(self.rb_list)
-        # Set model signals
+
+        # Open the dialog
+        self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+
+
+    def set_model_listeners(self):
         self.tbl_relation.model().rowsInserted.connect(self.set_dates)
         self.tbl_relation.model().rowsInserted.connect(self.reload_table_visit)
         self.tbl_relation.model().rowsInserted.connect(partial(self.hilight_features, self.rb_list))
@@ -182,9 +187,6 @@ class AddNewLot(ParentManage):
         self.tbl_relation.model().rowsRemoved.connect(self.set_dates)
         self.tbl_relation.model().rowsRemoved.connect(self.reload_table_visit)
         self.tbl_relation.model().rowsRemoved.connect(partial(self.hilight_features, self.rb_list))
-        self.controller.log_info(str(self.tbl_relation.model()))
-        # Open the dialog
-        self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
 
     def check_dates_consistency(self):
@@ -211,20 +213,15 @@ class AddNewLot(ParentManage):
 
     def set_ot_fields(self):
         item = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, -1)
-        self.controller.log_info("ITEM: " + str(item))
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0]) # v_amsa_ot.tipus
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[1]) #v_amsa_ot.exercici
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[2]) #v_amsa_ot.serie
         value = utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, item[0], 1)
-        self.controller.log_info("VALUE:" + str(value))
 
         for x in range(0, self.dlg_lot.tab_widget.count()):
             if self.dlg_lot.tab_widget.widget(x).objectName() == 'RelationsTab':
                 self.dlg_lot.tab_widget.setTabEnabled(x, value)
                 break
-
-
-
 
     def disbale_actions(self):
         class_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_status, 0)
@@ -383,7 +380,7 @@ class AddNewLot(ParentManage):
         # fake_filter = '{}_id IN ("-1")'.format(self.geom_type)
         # self.set_table_model(dialog, self.tbl_relation, self.geom_type, fake_filter)
 
-        self.set_headers(self.tbl_relation)
+        self.set_headers()
 
 
     def clear_selection(self, remove_groups=True):
@@ -448,18 +445,18 @@ class AddNewLot(ParentManage):
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         table_name = "v_edit_" + str(feature_type)
 
-        self.set_headers(self.tbl_relation)
+        self.set_headers()
         self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_relation, table_name)
 
 
-    def set_headers(self, qtable):
+    def set_headers(self):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2).lower()
         columns_name = self.controller.get_columns_list('om_visit_lot_x_' + str(feature_type))
         columns_name.append(['validate'])
         standard_model = QStandardItemModel()
-        qtable.setModel(standard_model)
-        qtable.horizontalHeader().setStretchLastSection(True)
+        self.tbl_relation.setModel(standard_model)
+        self.tbl_relation.horizontalHeader().setStretchLastSection(True)
 
         # # Get headers
         headers = []
@@ -467,7 +464,7 @@ class AddNewLot(ParentManage):
             headers.append(x[0])
         # Set headers
         standard_model.setHorizontalHeaderLabels(headers)
-
+        self.set_model_listeners()
 
     def populate_table_relations(self, lot_id):
 
