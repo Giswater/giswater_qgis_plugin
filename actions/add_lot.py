@@ -21,7 +21,7 @@ from qgis.PyQt.QtWidgets import QCompleter, QLineEdit, QTableView, QComboBox, QA
 from qgis.PyQt.QtWidgets import QCheckBox, QHBoxLayout, QWidget, QFileDialog
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel, QColor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsPoint, QgsGeometry
+from qgis.core import QgsPoint, QgsGeometry, QgsFeatureRequest
 from qgis.gui import QgsRubberBand
 
 import csv, os, re
@@ -178,15 +178,6 @@ class AddNewLot(ParentManage):
         # Open the dialog
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
-
-    def set_model_listeners(self):
-        self.tbl_relation.model().rowsInserted.connect(self.set_dates)
-        self.tbl_relation.model().rowsInserted.connect(self.reload_table_visit)
-        self.tbl_relation.model().rowsInserted.connect(partial(self.hilight_features, self.rb_list))
-
-        self.tbl_relation.model().rowsRemoved.connect(self.set_dates)
-        self.tbl_relation.model().rowsRemoved.connect(self.reload_table_visit)
-        self.tbl_relation.model().rowsRemoved.connect(partial(self.hilight_features, self.rb_list))
 
 
     def check_dates_consistency(self):
@@ -464,7 +455,7 @@ class AddNewLot(ParentManage):
             headers.append(x[0])
         # Set headers
         standard_model.setHorizontalHeaderLabels(headers)
-        self.set_model_listeners()
+
 
     def populate_table_relations(self, lot_id):
 
@@ -568,22 +559,24 @@ class AddNewLot(ParentManage):
         layer_name = 'v_edit_' + utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
         field_id = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.feature_type, 0).lower() + str('_id')
         layer = self.controller.get_layer_by_tablename(layer_name)
-
         for feature_id in self.ids:
-            feature = self.get_feature_by_id(layer, feature_id, field_id)
             item = []
             if feature_id not in id_list:
+                feature = self.get_feature_by_id(layer, feature_id, field_id)
                 row = []
                 item.append(lot_id)
                 item.append(feature_id)
                 item.append(feature.attribute('code'))
                 item.append(0)
+
                 for value in item:
                     row.append(QStandardItem(str(value)))
                 if len(row) > 0:
                     standard_model.appendRow(row)
                     self.insert_single_checkbox(self.tbl_relation)
-
+        self.hilight_features(self.rb_list)
+        self.set_dates()
+        self.reload_table_visit()
 
     def insert_row(self):
         """ Inser single row into QStandardItemModel """
@@ -611,11 +604,13 @@ class AddNewLot(ParentManage):
                 standard_model.appendRow(row)
                 self.ids.append(feature_id)
                 self.insert_single_checkbox(self.tbl_relation)
-
+        self.hilight_features(self.rb_list)
+        self.set_dates()
+        self.reload_table_visit()
 
     def get_feature_by_id(self, layer, id_, field_id):
-
-        features = layer.getFeatures()
+        expr = ""+str(field_id) + "='" + str(id_) + "'"
+        features = layer.getFeatures(QgsFeatureRequest().setFilterExpression(expr))
         for feature in features:
             if feature[field_id] == id_:
                 return feature
@@ -624,7 +619,6 @@ class AddNewLot(ParentManage):
 
     def insert_single_checkbox(self, qtable):
         """ Create one QCheckBox and put into QTableView at position @self.chk_position """
-
         cell_widget = QWidget()
         chk = QCheckBox()
         lay_out = QHBoxLayout(cell_widget)
@@ -656,7 +650,9 @@ class AddNewLot(ParentManage):
             feature_id = index.sibling(row, column_index).data()
             self.ids.remove(feature_id)
             model.takeRow(row)
-
+        self.hilight_features(self.rb_list)
+        self.set_dates()
+        self.reload_table_visit()
 
     def set_active_layer(self):
 
@@ -671,7 +667,6 @@ class AddNewLot(ParentManage):
 
     def selection_init(self, dialog):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
         self.disconnect_signal_selection_changed()
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed(dialog)
