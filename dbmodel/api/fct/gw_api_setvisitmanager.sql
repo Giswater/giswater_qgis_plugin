@@ -83,7 +83,7 @@ BEGIN
 
 		EXECUTE 'SELECT team_id, lot_id FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_record;
 
-		IF v_record.team_id != v_team::text OR v_record.lot_id != v_lot::text THEN
+		IF v_record.team_id::text != v_team::text OR v_record.lot_id::text != v_lot::text THEN
 
 			UPDATE om_visit_lot_x_user SET endtime = ("left"((date_trunc('second'::text, now()))::text, 19))::timestamp without time zone 
 			WHERE id = (SELECT id FROM (SELECT * FROM om_visit_lot_x_user WHERE user_id=v_user ORDER BY id DESC) a LIMIT 1); 
