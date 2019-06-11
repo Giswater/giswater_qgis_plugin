@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>658</width>
+    <width>595</width>
     <height>171</height>
    </rect>
   </property>
@@ -170,16 +170,16 @@
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QCheckBox" name="import_ui">
+         <widget class="QCheckBox" name="export_ui">
           <property name="text">
-           <string>Import UI</string>
+           <string>Export UI</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="export_ui">
+         <widget class="QCheckBox" name="import_ui">
           <property name="text">
-           <string>Export UI</string>
+           <string>Import UI</string>
           </property>
          </widget>
         </item>
