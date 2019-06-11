@@ -34,7 +34,6 @@ DECLARE
 	v_y float;
 	v_user text;
 	v_date text;
-	v_result text;
 	v_data json;
 	v_record record;
 	
@@ -67,9 +66,9 @@ BEGIN
  	
 
     -- Check if exist some other workday opened, and close
-	EXECUTE 'SELECT endtime FROM (SELECT * FROM SCHEMA_NAME.om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_result;
+	EXECUTE 'SELECT team_id, lot_id, endtime, user_id FROM (SELECT * FROM ud.om_visit_lot_x_user WHERE user_id=''' || v_user ||''' ORDER BY id DESC) a LIMIT 1' INTO v_record;
 	
-	IF v_result IS NOT NULL THEN
+	IF v_record.user_id IS NULL OR v_record.endtime IS NOT NULL THEN
 	
 		-- Insert start work day
 		INSERT INTO om_visit_lot_x_user (team_id, lot_id , the_geom) VALUES (v_team, v_lot, v_thegeom);
