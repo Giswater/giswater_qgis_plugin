@@ -204,9 +204,10 @@ class AddNewLot(ParentManage):
 
     def set_ot_fields(self):
         item = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, -1)
+
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_type, item[0]) # v_amsa_ot.tipus
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[1]) #v_amsa_ot.exercici
-        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[2]) #v_amsa_ot.serie
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_ot_address, item[2]) #v_amsa_ot.adreca
+        utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.descript,  item[3]) #v_amsa_ot.serie
         value = utils_giswater.set_combo_itemData(self.dlg_lot.cmb_visit_class, item[0], 1)
 
         for x in range(0, self.dlg_lot.tab_widget.count()):
@@ -280,8 +281,8 @@ class AddNewLot(ParentManage):
         # Fill ComboBox cmb_ot
         # TODO añadir campos adreca y descricion cuando el tema ut-8 este solucionado
         # TODO y corregir la funcion def set_ot_fields()
-        sql = ("SELECT v_amsa_ot.tipus, v_amsa_ot.exercici, v_amsa_ot.serie, v_amsa_ot.numero, "
-               " CONCAT(v_amsa_ot.tipus,' ',v_amsa_ot.exercici,' ', v_amsa_ot.serie,' ', v_amsa_ot.numero) as ct "
+
+        sql = ("SELECT v_amsa_ot.tipus, v_amsa_ot.exercici, v_amsa_ot.serie, v_amsa_ot.numero, v_amsa_ot.ct"
                " FROM " + self.schema_name + ".v_amsa_ot "
                " LEFT JOIN " + self.schema_name + ".om_visit_lot ON om_visit_lot.tipus = v_amsa_ot.tipus "
                " AND om_visit_lot.exercici = v_amsa_ot.exercici "
@@ -293,7 +294,7 @@ class AddNewLot(ParentManage):
                     " FROM " + self.schema_name + ".om_visit_lot "
                     " WHERE id = '"+str(lot_id)+"'")
             ct = self.controller.get_row(_sql, commit=True)
-            sql += " OR CONCAT(v_amsa_ot.tipus,' ',v_amsa_ot.exercici,' ', v_amsa_ot.serie,' ', v_amsa_ot.numero) = '"+str(ct[0])+"'"
+            sql += " OR ct = '"+str(ct[0])+"'"
         sql += " order by ct"
 
         rows = self.controller.get_rows(sql, commit=True, log_sql=True)
@@ -799,7 +800,7 @@ class AddNewLot(ParentManage):
         lot['exercici'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 1, True)
         lot['serie'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 2, True)
         lot['numero'] = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_ot, 3, True)
-        # if lot['status'] == 6 and
+
         keys = ""
         values = ""
         update = ""
