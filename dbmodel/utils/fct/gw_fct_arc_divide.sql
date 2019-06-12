@@ -223,10 +223,10 @@ BEGIN
 							UPDATE om_visit_event SET visit_id=v_newvisit1 WHERE id=rec_event.id;
 							
 							-- insert new event related to new visit2
-							INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id,value, value1, value2,geom1, geom1, 
-							geom1,xcoord,ycoord,compass,text, index_val,is_last) 
-							SELECT event_code, v_newvisit2, position_id, position_value, parameter_id,value, value1, value2,geom1, geom1, 
-							geom1,xcoord,ycoord,compass,text, index_val,is_last FROM om_visit_event WHERE id=rec_event.id;
+							INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
+							geom3,xcoord,ycoord,compass,text, index_val,is_last) 
+							SELECT event_code, v_newvisit2, position_id, position_value, parameter_id,value, value1, value2,geom1, geom2, 
+							geom3,xcoord,ycoord,compass,text, index_val,is_last FROM om_visit_event WHERE id=rec_event.id;
 						
 						END IF;
 	

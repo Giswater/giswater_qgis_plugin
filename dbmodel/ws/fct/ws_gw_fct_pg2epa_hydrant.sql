@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_utils_csv2pg_import_epanet_inp($${
 
 PREVIOUS
 - ResultId must exists on database with as well calibrated as posible
-- First version of function must be called separately (four steps). 
+- First version of function must be called separately (five steps). 
 - Advanced versions of function will incorporate recursive epanet calls using:
 	- enabling recursive mode setting variable on giswater.config plugin file
 	- configuring the defined function to be called (gw_fct_pg2epa_hydrant) on the config_param_user variable (inp_options_other_recursvive)
@@ -28,10 +28,10 @@ PREVIOUS
 GENERAL ISSUES
 - This function must be called 5 times
 - It's supposed unlimited number of patterns
-step 0: put in order result and check it. Identify water pipes bigger than 73.6 of dint. 
+step 0: put in order result and check it. Identify water pipes bigger than 73.6 of dint. (parametrized) 
 		Result nodes on that network are saved as x0 nodes
 step 1: all x0 nodes are setted with demand=60m3/h and with individual patterns using any diferent pattern for each node (1000000, 0100000, 00100000) 
-		Result nodes with EPANET result pressure => 1.5 are saved as x1
+		Result nodes with EPANET result pressure => (1.5 parametrized) are saved as x1
 step 2: all x1 nodes are setted with demand=120m3/h and with individual patterns using any diferent pattern for each node (1000000, 0100000, 00100000) 
 		Result nodes with EPANET result pressure => 1.5 are saved as x2 nodes
 		Result nodes in x1 and not in x2 are saved as x3 nodes
@@ -40,7 +40,7 @@ step 3: all x3 nodes are coupled two by two using proximity criteria (as node_1 
 step 4: Materialze results on dattrib table
 			
 ars within x2 nodes are classified as DOUBLE HYDRANT (H1) arcs
-ars within x4 nodes and not within x2 nodes are classified as COUPLED HDYRANT (H2) arcs
+ars within x4 nodes and not within x2 nodes (x3 nodes) and x2 are classified as COUPLED HDYRANT (H2) arcs
 ars within x1 nodes and not withn x4 nodes are classified as SINGLE HYDRANT (H3) arcs
 Rest of arcs are clasified as NON HYDRANT (H4) arcs
 */
