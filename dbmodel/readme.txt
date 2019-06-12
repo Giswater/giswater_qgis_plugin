@@ -105,17 +105,15 @@ subfolder structure of ud/ws/utils folder
 	- If we need to drop whitout cascade some view, changelog has two parts in order to identify as best as possible that special AND UNIQUE CASE OF DROPS
 	
 	
--- Rules to update two current branches
----------------------------------------
-	- On lastest branch use delta folders 3.X.XX5. Always will be one operative
-	- Use that folders only to propagate changes from old branch
-	- This propagation must be done as maximum carefully as posible using following rules:
+-- Rules to prevent conflits on update files
+--------------------------------------------
 		- For ct and trg use DROP...IF EXISTS......CASCADE
 		- For tables and sequences use CREATE....IF NOT EXISTS
 		- For views use CREATE OR REPLACE VIEW
 		- For insert on system tables use ON CONFLICT (pk_field) DO NOTHING
-		- For new fields, be carefully
-		
+		- For new fields, USE THE FUNCTION gw_fct_admin_manage_fields (see below an example of new field)
+						SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_web_fields", "column":"table_type", "dataType":"text"}}$$)
+						
 	
 	
 -- Workflows
