@@ -1,7 +1,0 @@
-31103-utils (api)
------------------
-New fields on the config_web_fields, #issue571
-Add samplepoint layer as searchable layer on API, #issue578
-New system parameter api_bmaps_client;
-
-
