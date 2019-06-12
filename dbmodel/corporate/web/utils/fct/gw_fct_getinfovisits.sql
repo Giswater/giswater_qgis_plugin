@@ -47,17 +47,13 @@ BEGIN
     END IF;
 
 --  get parameter vdefault
-        IF p_parameter_type ISNULL THEN
-            SELECT value INTO p_parameter_type FROM config_param_user WHERE parameter='om_param_type_vdefault' and cur_user=current_user AND parameter IN 
-        (SELECT parameter_type FROM om_visit_parameter WHERE p_element_type=lower(feature_type)) LIMIT 1;
-            IF p_parameter_type IS NULL THEN
-             SELECT parameter_type INTO p_parameter_type FROM om_visit_parameter WHERE p_element_type=lower(feature_type) LIMIT 1;
-          END IF;
-        END IF;
-
-
-raise notice 'p_parameter_type %', p_parameter_type;
-
+       -- IF p_parameter_type ISNULL THEN
+        --    SELECT value INTO p_parameter_type FROM config_param_user WHERE parameter='om_param_type_vdefault' and cur_user=current_user AND parameter IN 
+        --(SELECT parameter_type FROM om_visit_parameter WHERE p_element_type=lower(feature_type)) LIMIT 1;
+        --    IF p_parameter_type IS NULL THEN
+         --    SELECT parameter_type INTO p_parameter_type FROM om_visit_parameter WHERE p_element_type=lower(feature_type) LIMIT 1;
+         -- END IF;
+        --END IF;
 
 --    Get query for visits
     EXECUTE 'SELECT query_text FROM config_web_forms WHERE table_id = concat($1,''_x_visit'') AND device = $2'
@@ -88,8 +84,10 @@ raise notice 'p_parameter_type %', p_parameter_type;
 
 --    Make consistency against parameter_type and parameter_id
    IF p_parameter_type IS NOT NULL AND p_parameter_id IS NOT NULL AND 
-   (SELECT om_visit_parameter.id FROM om_visit_parameter WHERE parameter_type=p_parameter_type AND om_visit_parameter.id=p_parameter_id) IS NULL THEN
-    p_parameter_id=null;
+	(SELECT om_visit_parameter.id FROM om_visit_parameter WHERE parameter_type=p_parameter_type AND om_visit_parameter.id=p_parameter_id) IS NULL THEN
+	p_parameter_id=null;
+   ELSIF p_parameter_type is null  then 
+	p_parameter_id=null;
    END IF;
 
 --    Add parameter_id filter
@@ -101,6 +99,8 @@ raise notice 'p_parameter_type %', p_parameter_type;
     IF visit_id IS NOT NULL THEN
         query_result := query_result || ' AND sys_visit_id = ' || visit_id;
     END IF;
+
+raise notice 'applied filters p_parameter_type % p_parameter_id %', p_parameter_type, p_parameter_id;
 
 
 --    Get visits with all the filters

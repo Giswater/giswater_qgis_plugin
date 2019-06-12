@@ -29,8 +29,9 @@ BEGIN
 	SELECT count(*) INTO v_new_hydrometer FROM crm.hydrometer except (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer);
 
 	-- insert into rtc_hydrometer
+	DELETE FROM ws.rtc_hydrometer;
 	INSERT INTO ws.rtc_hydrometer (hydrometer_id)
-	SELECT id FROM crm.hydrometer except (SELECT hydrometer_id::int8 FROM ws.rtc_hydrometer);
+	SELECT id FROM crm.hydrometer;
 
 	-- count new hydrometer_x_connec
 	SELECT count(*) INTO v_new_hydrometer_x_connec

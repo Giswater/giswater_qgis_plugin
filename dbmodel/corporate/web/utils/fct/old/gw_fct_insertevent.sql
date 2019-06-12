@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_insertevent"(value_arg varchar,
 DECLARE
 
 --    Variables
-    event_id integer;
+    v_event_id integer;
     api_version json;
 
 
@@ -24,13 +24,17 @@ BEGIN
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
         INTO api_version;
 
+   -- set value of sequence
+   PERFORM setval('urn_id_seq', (SELECT max(id) FROM om_visit_event),true);
+   
 --    Event insert
-    INSERT INTO om_visit_event (visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, text) VALUES (visit_id, position_id, position_value, parameter_id, value_arg, value1, value2, geom1, geom2, geom3, text_arg) RETURNING id INTO event_id;
+    INSERT INTO om_visit_event (visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, text) 
+    VALUES (visit_id, position_id, position_value, parameter_id, value_arg, value1, value2, geom1, geom2, geom3, text_arg) RETURNING id INTO v_event_id;
 
 --    Return
     RETURN ('{"status":"Accepted"' ||
         ', "apiVersion":'|| api_version ||
-        ', "id":"' || event_id || '"}')::json;    
+        ', "id":"' || v_event_id || '"}')::json;    
 
 --    Exception handling
     EXCEPTION WHEN OTHERS THEN 
@@ -40,4 +44,3 @@ BEGIN
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
-
