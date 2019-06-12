@@ -29,7 +29,6 @@ SET search_path=SCHEMA_NAME, public;
 
 --Loop in order to extract parts of xml related to layout_data_1,2,3
 FOR rec IN 1..3 LOOP
-
 	EXECUTE 'select unnest(xpath(''//layout[@name="layout_data_'||rec||'"]'', csv1::xml)) from temp_csv2pg where csv2pgcat_id=20 AND user_name=current_user
 	AND source='''||p_formname||''';'
 	INTO  layout_xml;
@@ -44,22 +43,24 @@ FOR rec IN 1..3 LOOP
 	unnest(xpath('..//item/widget/property/string/text()', layout_xml))  as label_name)a
 	INTO v_fields_array;
 	
+	IF v_fields_array IS NOT NULL THEN
+		--select and save into variables values of attributes related to widget and label location
+		FOREACH v_json_aux IN ARRAY v_fields_array LOOP
+			SELECT quote_literal((v_json_aux)->>'layout')::TEXT INTO v_layout;
+			SELECT ((v_json_aux)->>'item_row') INTO v_item_row;
+			SELECT ((v_json_aux)->>'item_column') INTO v_item_column;
+			SELECT quote_literal((v_json_aux)->>'widget_type')::TEXT INTO v_widget_type;
+			SELECT quote_literal((v_json_aux)->>'field_name')::TEXT INTO v_field_name;
+			SELECT quote_literal((v_json_aux)->>'label_name')::TEXT INTO v_label_name;
 
-	--select and save into variables values of attributes related to widget and label location
-	FOREACH v_json_aux IN ARRAY v_fields_array LOOP
-		SELECT quote_literal((v_json_aux)->>'layout')::TEXT INTO v_layout;
-		SELECT ((v_json_aux)->>'item_row') INTO v_item_row;
-		SELECT ((v_json_aux)->>'item_column') INTO v_item_column;
-		SELECT quote_literal((v_json_aux)->>'widget_type')::TEXT INTO v_widget_type;
-		SELECT quote_literal((v_json_aux)->>'field_name')::TEXT INTO v_field_name;
-		SELECT quote_literal((v_json_aux)->>'label_name')::TEXT INTO v_label_name;
+		--update config_api_form_fields with values from new ui
+			EXECUTE 'UPDATE config_api_form_fields SET layout_name='||v_layout||', layout_order='||v_item_row||', label='||v_label_name||'
+			WHERE formname='''||p_formname||''' and column_id='||v_field_name||';';
 
-	--update config_api_form_fields with values from new ui
-		EXECUTE 'UPDATE config_api_form_fields SET layout_name='||v_layout||', layout_order='||v_item_row||', label='||v_label_name||'
-		WHERE formname='''||p_formname||''' and column_id='||v_field_name||';';
+	--		widgettype='||v_widget_type||'
 
---		widgettype='||v_widget_type||'
-	END LOOP;
+		END LOOP;
+	END IF;
 END LOOP;
 
 	

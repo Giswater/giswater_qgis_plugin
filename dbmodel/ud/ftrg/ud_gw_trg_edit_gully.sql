@@ -11,7 +11,6 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_gully()  RETURNS trigger AS $BODY$
 DECLARE 
     v_sql varchar;
-	v_gully_geometry varchar;
 	v_count integer;
 	v_promixity_buffer double precision;
 	v_code_autofill_bool boolean;
@@ -46,10 +45,16 @@ DECLARE
     v_new_pol_id varchar(16);
     v_codeautofill boolean;
     v_srid integer;
-	
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	-- get custom gully type
+	v_customfeature:= TG_ARGV[0];
+
+	IF v_customfeature='parent' THEN
+		v_customfeature:=NULL;
+	END IF;
 
 	-- get values
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='proximity_buffer');
@@ -58,20 +63,6 @@ BEGIN
 	
 	IF v_promixity_buffer IS NULL THEN v_promixity_buffer=0.5; END IF;
 	
-    	--modify values for custom view inserts
-	FOREACH v_arg IN ARRAY TG_ARGV LOOP
-		IF v_arg='gully' OR v_arg='gully_pol' THEN
-			v_gully_geometry:=v_arg;
-		ELSIF v_arg IN (SELECT id FROM gully_type) THEN
-			v_customfeature:=v_arg;
-		END IF;
-	END LOOP;
-	
-	IF v_customfeature='parent' THEN
-		v_customfeature:=NULL;
-	END IF;
-
-	RAISE NOTICE 'v_gully_geometry,v_customfeature,%,%', v_gully_geometry,v_customfeature;
 	
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
@@ -85,12 +76,13 @@ BEGIN
 		-- gully type 
 		IF (NEW.gully_type IS NULL) AND v_customfeature IS NOT NULL THEN
 			NEW.gully_type:= v_customfeature;
-		ELSIF (NEW.gully_type IS NULL) THEN
-			NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		ELSIF (NEW.gully_type IS NULL and v_customfeature IS NULL) THEN
+			NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);		
 			IF (NEW.gully_type IS NULL) THEN
 				NEW.gully_type:=(SELECT id FROM gully_type LIMIT 1);
 			END IF;
 		END IF;
+
 
 		--Copy id to code field
 		v_codeautofill = (SELECT code_autofill FROM node_type WHERE id=NEW.gully_type);
@@ -293,8 +285,10 @@ BEGIN
 				INTO v_the_geom_pol;
 			--EXECUTE 'SELECT (ST_makePolygon(St_setsrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' || p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||'))'
 			--	INTO v_the_geom_pol;
-			
-			INSERT INTO polygon(sys_type, the_geom) VALUES ('GULLY', v_the_geom_pol) RETURNING pol_id INTO v_new_pol_id;
+			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+			v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+
+			INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('GULLY', v_the_geom_pol,v_new_pol_id);-- RETURNING pol_id INTO v_new_pol_id;
 		END IF;
 
 		INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, pol_id, sector_id,
@@ -387,30 +381,18 @@ BEGIN
 		END IF;
 
 		-- UPDATE values
-		IF v_gully_geometry = 'gully' THEN
-			UPDATE gully 
-			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
-			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
-			annotation=NEW.annotation, "observ"=NEW."observ", 	"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
-			fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
-			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, arc_id=NEW.arc_id,
-			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
-			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
-			WHERE gully_id = OLD.gully_id;
 
-		ELSIF v_gully_geometry = 'gully_pol' THEN
-			UPDATE gully 
-			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
-			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  
-			state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
-			fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
-			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
-			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom_pol,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id,
-			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
-			muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
-			WHERE gully_id = OLD.gully_id;
-		END IF; 	 
+		UPDATE gully 
+		SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
+		connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
+		annotation=NEW.annotation, "observ"=NEW."observ", 	"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
+		fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
+		ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, streetaxis2_id=NEW.streetaxis2_id, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
+		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, arc_id=NEW.arc_id,
+		label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
+		muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
+		WHERE gully_id = OLD.gully_id;
+
 
 		-- man addfields update
 		IF v_customfeature IS NOT NULL THEN
