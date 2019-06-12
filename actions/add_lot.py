@@ -326,7 +326,8 @@ class AddNewLot(ParentManage):
                " FROM " + self.schema_name + ".om_visit_class "
                " ORDER BY idval")
         status = self.controller.get_rows(sql, commit=True)
-        status = [(1, 'PLANIFICANT'), (2, 'PLANIFICAT'), (3, 'ASSIGNAT'), (4, 'EN CURS'), (5, 'EXECUTAT'), (6, 'REVISAT'), (7, 'CANCEL.LAT')]
+        status = [[1, 'PLANIFICANT'], [2, 'PLANIFICAT'], [3, 'ASSIGNAT'], [4, 'EN CURS'], [5, 'EXECUTAT'],
+                  [6, 'REVISAT'], [7, 'CANCEL.LAT']]
         if status:
             utils_giswater.set_item_data(self.dlg_lot.cmb_status, status, 1, sort_combo=False)
             utils_giswater.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5'], 0)
@@ -429,7 +430,7 @@ class AddNewLot(ParentManage):
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_assigned_to, str(lot['team_id']), 0)
             utils_giswater.set_combo_itemData(self.dlg_lot.cmb_status, str(lot['status']), 0)
 
-            if lot['status'] not in ('1', '7', '5', None):
+            if lot['status'] not in (1, 2, 3, 4, 6, None):
                 self.dlg_lot.cmb_assigned_to.setEnabled(False)
                 self.dlg_lot.cmb_status.setEnabled(False)
             utils_giswater.set_combo_itemData(self.dlg_lot.feature_type, lot['feature_type'], 0)
@@ -1003,27 +1004,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'om_visit_class')
 
-        # Set a model with selected filter. Attach that model to selected table
         table_object = "om_visit_lot"
-        self.fill_table_object(self.dlg_lot_man.tbl_lots, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_lot_man, self.dlg_lot_man.tbl_lots, table_object)
-
-        # manage open and close the dialog
-        self.dlg_lot_man.rejected.connect(self.save_user_values)
-        self.dlg_lot_man.btn_accept.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
-        self.dlg_lot_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot_man))
-
-
-        # Set signals
-        self.dlg_lot_man.btn_path.clicked.connect(self.select_path)
-        self.dlg_lot_man.btn_import.clicked.connect(self.import_to_csv)
-        self.dlg_lot_man.tbl_lots.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
-        self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
-        self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
-        self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
-        self.dlg_lot_man.cmb_actuacio.currentIndexChanged.connect(self.filter_lot)
-        self.dlg_lot_man.chk_assignacio.stateChanged.connect(self.filter_lot)
-
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
         sql = ("SELECT MIN(startdate), MAX(enddate)"
@@ -1037,7 +1018,27 @@ class AddNewLot(ParentManage):
             else:
                 self.dlg_lot_man.date_event_to.setDate(current_date)
 
-        # set date events
+        # Set a model with selected filter. Attach that model to selected table
+        self.fill_table_object(self.dlg_lot_man.tbl_lots, self.schema_name + "." + table_object)
+        self.set_table_columns(self.dlg_lot_man, self.dlg_lot_man.tbl_lots, table_object)
+
+        # manage open and close the dialog
+        self.dlg_lot_man.rejected.connect(self.save_user_values)
+        self.dlg_lot_man.btn_accept.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot_man))
+
+        # Set signals
+        self.dlg_lot_man.btn_path.clicked.connect(self.select_path)
+        self.dlg_lot_man.btn_import.clicked.connect(self.import_to_csv)
+        self.dlg_lot_man.tbl_lots.doubleClicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
+        self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
+
+        # Set filter events
+        self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
+        self.dlg_lot_man.cmb_actuacio.currentIndexChanged.connect(self.filter_lot)
+        self.dlg_lot_man.cmb_estat.currentIndexChanged.connect(self.filter_lot)
+        self.dlg_lot_man.chk_assignacio.stateChanged.connect(self.filter_lot)
         self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
         self.dlg_lot_man.date_event_to.dateChanged.connect(self.filter_lot)
 
@@ -1124,6 +1125,7 @@ class AddNewLot(ParentManage):
         message = "El fitxer csv ha estat importat correctament"
         self.controller.show_info(message)
 
+
     def populate_combo_filters(self, combo, table_name, fields="id, idval"):
         sql = ("SELECT " + str(fields) + ""
                " FROM " + self.schema_name + "." + str(table_name) + ""
@@ -1132,8 +1134,19 @@ class AddNewLot(ParentManage):
         rows.append(['', ''])
         utils_giswater.set_item_data(combo, rows, 1)
 
-    def delete_lot(self, qtable):
+        # TODO fill combo with correct table
+        # Fill ComboBox cmb_status
+        sql = ("SELECT id, idval"
+               " FROM " + self.schema_name + ".om_visit_class "
+               " ORDER BY idval")
+        stats = self.controller.get_rows(sql, commit=True)
+        stats = [['', ''], [1, 'PLANIFICANT'], [2, 'PLANIFICAT'], [3, 'ASSIGNAT'], [4, 'EN CURS'], [5, 'EXECUTAT'],
+                 [6, 'REVISAT'], [7, 'CANCEL.LAT']]
+        if stats:
+            utils_giswater.set_item_data(self.dlg_lot_man.cmb_estat, stats, 1)
 
+
+    def delete_lot(self, qtable):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -1179,7 +1192,8 @@ class AddNewLot(ParentManage):
 
         object_id = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_codi_ot)
         actuacio = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_actuacio)
-        tipus_ot = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_tipus_ot, add_quote=True)
+        status = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_estat)
+        tipus = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_actuacio, add_quote=True)
         assignat = utils_giswater.isChecked(self.dlg_lot_man, self.dlg_lot_man.chk_assignacio)
 
         visit_start = self.dlg_lot_man.date_event_from.date()
@@ -1196,13 +1210,16 @@ class AddNewLot(ParentManage):
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
-        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0} or enddate is null)".format(interval))
+        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0} or enddate IS NULL)".format(interval))
         if object_id != 'null':
             expr_filter += " AND id::TEXT ILIKE '%" + str(object_id) + "%'"
-        expr_filter += " AND visitclass_id::TEXT ILIKE '%" + str(actuacio) + "%'"
-        #expr_filter += " AND tipus_ot::TEXT ILIKE '%" + str(tipus_ot) + "%'"
+        expr_filter += " AND (visitclass_id::TEXT ILIKE '%" + str(actuacio) + "%' OR visitclass_id IS NULL)"
+        expr_filter += " AND (tipus::TEXT ILIKE '%" + str(tipus) + "%' OR tipus IS NULL)"
+        expr_filter += " AND (status::TEXT ILIKE '%" + str(status) + "%' OR status IS NULL)"
         if assignat:
-            expr_filter += " AND team_id is null "
+            expr_filter += " AND team_id IS NULL "
+        print(expr_filter)
+        self.controller.log_info(str(expr_filter))
         # Refresh model with selected filter
         self.dlg_lot_man.tbl_lots.model().setFilter(expr_filter)
         self.dlg_lot_man.tbl_lots.model().select()
