@@ -421,6 +421,7 @@ BEGIN
 	api_version := COALESCE(api_version, '{}');
 	form_info := COALESCE(form_info, '{}');
  	v_geometry := COALESCE(v_geometry, '{}');
+ 	v_visible_layers := COALESCE(v_visible_layers, '{}');
  	v_mincut_valve_layer_json := COALESCE(v_mincut_valve_layer_json, '{}');
   
 --	Return
