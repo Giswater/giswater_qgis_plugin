@@ -7,17 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2700
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_manage_fields();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_fields() RETURNS void AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_fields(p_data json) RETURNS void AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${
-"client":{"lang":"ES"}, 
-"data":{"action":"ADD","table":"arc", "column":"addvalue", "dataType":"varchar(16)", "isUtils":True}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"addvalue", "dataType":"varchar(16)", "isUtils":"True"}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${
-"client":{"lang":"ES"}, 
-"data":{"action":"RENAME","table":"arc", "column":"addvalue", "newName":"_addvalue"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"addvalue", "newName":"_addvalue_"}}$$)
 */
 
 
@@ -31,6 +27,8 @@ DECLARE
 	v_datatype text;
 	v_isutils boolean;
 	v_newname text;
+	v_querytext text;
+	v_currentcolumn text;
 
 BEGIN 
 
@@ -40,7 +38,7 @@ BEGIN
 	-- Looking for project type
 	SELECT wsoftware INTO v_project_type FROM version LIMIT 1;
 	
-	v_schemaname := "SCHEMA_NAME";
+	v_schemaname := 'SCHEMA_NAME';
 	
 	v_action = (p_data->>'data')::json->>'action';
 	v_table = (p_data->>'data')::json->>'table';
@@ -50,19 +48,23 @@ BEGIN
 	v_newname = (p_data->>'data')::json->>'newName';
 
 	IF v_isutils THEN
-	
 		v_schemautils = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_schema_utils');
-	
 	END IF;
-	
-	IF v_action='ADD' THEN
-	
-		EXECUTE 'ALTER TABLE '|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
-		
-	ELSIF v_action='RENAME' THEN
-	
-		EXECUTE 'ALTER TABLE '|| quote_ident(v_table) ||' RENAME COLUMN '||quote_ident(v_column)||' TO '||quote_ident(v_newname);
 
+	-- check if column not exists
+	IF v_action='ADD' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NULL THEN
+
+		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
+		EXECUTE v_querytext;
+		
+	ELSIF v_action='RENAME' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL  
+				AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_newname) IS NULL THEN
+
+		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' RENAME COLUMN '||quote_ident(v_column)||' TO '||quote_ident(v_newname);
+		EXECUTE v_querytext;
+
+	ELSE 
+		RAISE NOTICE 'Process not executed. Check data';
 	END IF;
 
 RETURN ;
