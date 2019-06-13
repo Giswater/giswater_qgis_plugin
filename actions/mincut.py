@@ -301,13 +301,13 @@ class MincutParent(ParentAction, MultipleSelection):
         # Manage address
         self.adress_init_config(self.dlg_fin)
         municipality_current = str(self.dlg_mincut.address_exploitation.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_exploitation, str(municipality_current))
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_exploitation, municipality_current)
         address_postal_code_current = str(self.dlg_mincut.address_postal_code.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_postal_code, str(address_postal_code_current))
-        address_street_current = str(self.dlg_mincut.address_street.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_street, str(address_street_current))
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_postal_code, address_postal_code_current)
+        address_street_current = self.dlg_mincut.address_street.currentText()
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_street, address_street_current)
         address_number_current = str(self.dlg_mincut.address_number.currentText())
-        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_number, str(address_number_current))
+        utils_giswater.setWidgetText(self.dlg_fin, self.dlg_fin.address_number, address_number_current)
 
         # Fill ComboBox exec_user
         sql = ("SELECT name"
