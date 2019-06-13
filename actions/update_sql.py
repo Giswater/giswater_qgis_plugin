@@ -15,18 +15,21 @@ from qgis.PyQt.QtWidgets import QLineEdit, QWidget, QComboBox, QLabel, QCheckBox
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import QSettings, Qt
 
+
 import os
 import sys
 import re
 import json
 from functools import partial
 from collections import OrderedDict
+import xml.etree.cElementTree as ET
 
 import utils_giswater
 
 from giswater.actions.api_parent import ApiParent
-from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ReadsqlCreateGisProject, ApiImportInp
+from giswater.ui_manager import Readsql, InfoShowInfo, ReadsqlCreateProject, ReadsqlRename, ReadsqlShowInfo, ReadsqlCreateGisProject, ApiImportInp, ManageFields
 from giswater.actions.create_gis_project import CreateGisProject
+
 
 
 class UpdateSQL(ApiParent):
@@ -104,6 +107,9 @@ class UpdateSQL(ApiParent):
 
         self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
 
+        # TODO:: remove this harcorded
+        utils_giswater.setWidgetText(self.dlg_readsql, 'tpath', 'C:/Users/Usuari/Desktop/test.ui')
+
         self.message_update = ''
 
         # Error counter variable
@@ -125,7 +131,6 @@ class UpdateSQL(ApiParent):
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
             utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
-            utils_giswater.remove_tab_by_tabName(self.dlg_readsql.tab_main, "others")
             self.project_types = self.settings.value('system_variables/project_types')
         else:
             self.project_types = self.settings.value('system_variables/project_types_dev')
@@ -188,6 +193,7 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_api_file_to_db.clicked.connect(partial(self.api_file_to_db))
         btn_info.clicked.connect(partial(self.show_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.update_manage_ui, parent=False))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.populate_data_schema_name, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.change_project_type, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
@@ -199,6 +205,15 @@ class UpdateSQL(ApiParent):
         self.dlg_readsql.btn_constrains.clicked.connect(partial(self.btn_constrains_changed, self.btn_constrains, True))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self.create_qgis_template))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self.open_form_create_gis_project))
+        self.dlg_readsql.btn_path.clicked.connect(partial(self.select_file_ui))
+        self.dlg_readsql.btn_import_ui.clicked.connect(partial(self.execute_import_ui))
+        self.dlg_readsql.btn_export_ui.clicked.connect(partial(self.execute_export_ui))
+
+        self.dlg_readsql.btn_create_field.clicked.connect(partial(self.open_manage_field, 'Create'))
+        self.dlg_readsql.btn_update_field.clicked.connect(partial(self.open_manage_field, 'Update'))
+        self.dlg_readsql.btn_delete_field.clicked.connect(partial(self.open_manage_field, 'Delete'))
+        self.dlg_readsql.chk_parent.stateChanged.connect(partial(self.update_manage_ui, parent=True))
+
 
         # Set last connection for default
         utils_giswater.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
@@ -207,6 +222,7 @@ class UpdateSQL(ApiParent):
         connection = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = 'Giswater (' + str(connection) + ' - ' + str(self.plugin_version) + ')'
         self.dlg_readsql.setWindowTitle(window_title)
+
         self.dlg_readsql.show()
 
         if connection_status is False:
@@ -232,6 +248,7 @@ class UpdateSQL(ApiParent):
 
         self.populate_data_schema_name(self.cmb_project_type)
         self.set_info_project()
+        self.update_manage_ui(parent=False)
 
 
     def gis_create_project(self):
@@ -2099,6 +2116,144 @@ class UpdateSQL(ApiParent):
         # Finish proces
         msg = "The QGIS Projects templates was correctly created."
         self.controller.show_info_box(msg, "Info")
+
+    """ Import / Export UI and manage fields """
+
+    def execute_import_ui(self):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        form_name = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname')
+        # Control if ui path is invalid or null
+        if ui_path is None:
+            msg = "Please, select a valid UI Path."
+            self.controller.show_info_box(msg, "Info")
+            return
+
+        with open(str(ui_path)) as f:
+            content = f.read()
+        sql = ("INSERT INTO " + schema_name + ".temp_csv2pg(source, csv1, csv2pgcat_id) VALUES('" +
+               str(form_name) + "', '" + str(content) + "', 20);")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+
+        # Import xml to database
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_import_ui_xml('" + str(form_name) + "')::text")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+        if status:
+            msg = "Imported data into 'config_api_form_fields' successfully."
+            self.controller.show_info_box(msg, "Info")
+        else:
+            msg = "Some error ocurred when import data into 'config_api_form_fields'."
+            self.controller.show_info_box(msg, "Info")
+
+        # Clear temp_csv2pg
+        self.clear_temp_table()
+
+
+    def execute_export_ui(self):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        ui_path = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        form_name = utils_giswater.getWidgetText(self.dlg_readsql, 'cmb_formname')
+
+        # Control if ui path is invalid or null
+        if ui_path is None:
+            msg = "Please, select a valid UI Path."
+            self.controller.show_info_box(msg, "Info")
+            return
+
+        # Export xml from database
+        sql = ("SELECT " + schema_name + ".gw_fct_utils_export_ui_xml('" + str(form_name) + "')::text")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+
+        # Check status
+        if status is False:
+            msg = "Error on import/export call."
+            self.controller.show_info_box(msg, "Info")
+            return
+
+        # Populate UI file
+        sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv2pg WHERE user_name = current_user AND source = '" +
+               str(form_name) + "' ORDER BY id DESC")
+        row = self.controller.get_row(sql, log_sql=True, commit=True)
+
+        data = ET.Element(str(row[0]))
+        data = ET.tostring(data)
+        file_ui = open(ui_path, "w")
+        # TODO:: dont use replace for remove invalid characters
+        data = data.replace(' />', '').replace('<<', '<')
+        file_ui.write(data)
+
+        msg = "Imported data into '" + str(ui_path) + "' successfully."
+        self.controller.show_info_box(msg, "Info")
+
+        # Clear temp_csv2pg
+        self.clear_temp_table()
+
+
+    def clear_temp_table(self):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        # Clear temp_csv2pg
+        sql = ("DELETE FROM " + schema_name + ".temp_csv2pg WHERE user_name = current_user")
+        status = self.controller.execute_sql(sql, log_sql=True, commit=True)
+
+
+    def select_file_ui(self):
+        """ Select UI file """
+
+        file_ui = utils_giswater.getWidgetText(self.dlg_readsql, 'tpath')
+        # Set default value if necessary
+        if file_ui is None or file_ui == '':
+            file_ui = self.plugin_dir
+
+        # Get directory of that file
+        folder_path = os.path.dirname(file_ui)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        message = self.controller.tr("Select UI file")
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+            file_ui = QFileDialog.getOpenFileName(None, message, "", '*.ui')
+        else:
+            file_ui, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.ui')
+
+        self.dlg_readsql.tpath.setText(file_ui)
+
+
+    def update_manage_ui(self, parent=False):
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        if parent and self.dlg_readsql.chk_parent.isChecked():
+
+            sql = ("SELECT DISTINCT(parent_layer), parent_layer FROM " + str(schema_name) + ".cat_feature")
+            rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+            utils_giswater.set_item_data(self.dlg_readsql.cmb_formname, rows, 1)
+
+            return
+
+        sql = ("SELECT DISTINCT(formname), formname FROM " + str(schema_name) + ".config_api_form_fields")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_readsql.cmb_formname, rows, 1)
+
+
+    def open_manage_field(self, action):
+        # Create the dialog and signals
+        self.dlg_manage_fields = ManageFields()
+        self.load_settings(self.dlg_manage_fields)
+
+        # Remove unused tabs
+        for x in range(self.dlg_manage_fields.tab_add_fields.count()):
+            print(str(x))
+            print(str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()))
+            print(str(action))
+            if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str(action):
+                utils_giswater.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
+
+
+        # Set listeners
+        # self.dlg_manage_fields.btn_accept.clicked.connect(partial(self.gis_create_project))
+        self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_fields))
+
+        self.dlg_manage_fields.show()
 
 
     """ Take current project type changed """

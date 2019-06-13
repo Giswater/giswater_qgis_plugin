@@ -303,7 +303,14 @@ class LotManagement(QDialog, FORM_CLASS):
         super(LotManagement, self).__init__()
         self.setupUi(self)
 
-        
+
+FORM_CLASS = get_ui_class('manage_addfields.ui')
+class ManageFields(QDialog, FORM_CLASS):
+    def __init__(self):
+        super(ManageFields, self).__init__()
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('mincut.ui')
 class Mincut(QMainWindow, FORM_CLASS):
     dlg_rejected = QtCore.pyqtSignal()
