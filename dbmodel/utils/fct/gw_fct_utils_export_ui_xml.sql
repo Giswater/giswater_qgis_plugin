@@ -7,7 +7,7 @@
 	--FUNCTION CODE: 2692
 
 
-	CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_export_ui_xml(p_formname text)
+	CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_utils_export_ui_xml(p_formname text, p_parent boolean)
 	  RETURNS json AS
 	$BODY$
 
@@ -22,13 +22,24 @@
 		v_sql_layout_1 text;
 		v_sql_layout_2 text;
 		v_sql_layout_3 text;
-		
+
 	BEGIN
 	SET search_path=SCHEMA_NAME;
 
 	--iterate over fields defined for the selected form
 		FOR rec IN (SELECT * FROM config_api_form_fields where formname=p_formname order by layout_order) LOOP
-			
+
+			IF p_parent IS TRUE THEN
+				IF (SELECT param_name FROM man_addfields_parameter 
+					JOIN cat_feature ON cat_feature.id=man_addfields_parameter.cat_feature_id 
+					WHERE child_layer=p_formname AND man_addfields_parameter.param_name=rec.column_id) IS NOT NULL THEN
+
+					CONTINUE;
+								
+				END IF;
+			END IF;
+
+
 	--changing defined widget types into Qt widgets types, set the label_name location for xml
 			IF rec.widgettype='combo' THEN
 				v_widget_type='QComboBox';
