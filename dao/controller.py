@@ -491,12 +491,12 @@ class DaoController(object):
         return True
 
 
-    def execute_returning(self, sql, search_audit=False, log_sql=False, log_error=False):
+    def execute_returning(self, sql, search_audit=False, log_sql=False, log_error=False, commit=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
             self.log_info(sql, stack_level_increase=1)
-        value = self.dao.execute_returning(sql)
+        value = self.dao.execute_returning(sql, autocommit=commit)
         self.last_error = self.dao.last_error
         if not value:
             if log_error:
