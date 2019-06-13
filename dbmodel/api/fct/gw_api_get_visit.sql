@@ -17,10 +17,12 @@ $BODY$
 /*EXAMPLE:
 
 -- unexpected first call
-SELECT SCHEMA_NAME.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT SCHEMA_NAME.gw_api_get_visit('unexpected', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"isOffline":"true", "relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
 -- planned first call
-SELECT SCHEMA_NAME.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},"data":{"relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
+SELECT SCHEMA_NAME.gw_api_get_visit('planned', $${"client":{"device":3,"infoType":100,"lang":"es"},"form":{},
+"data":{"isOffline":"true","relatedFeature":{"type":"node", "id":"2074"},"fields":{},"pageInfo":null}}$$)
 
 
 	
@@ -115,6 +117,8 @@ DECLARE
 	v_existvisit_id integer;
 	v_value text;
 	v_tab_data boolean;
+	v_offline boolean;
+	
 
 BEGIN
 
@@ -149,7 +153,8 @@ BEGIN
 	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
 	v_inputtablename = ((p_data ->>'feature')::json->>'tableName');
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
-
+	v_offline = (((p_data ->>'data')::json->>'isOffline')::boolean;
+	
 	--  get visitclass
 	IF v_visitclass IS NULL THEN
 	
@@ -162,20 +167,27 @@ BEGIN
 
 				IF p_visittype='planned' THEN
 				
-					--IF ((SELECT visit_type FROM om_visit_class WHERE id=v_visitclass) = 1 AND (SELECT feature_type FROM om_visit_class WHERE id=v_visitclass) = upper(v_featuretype)) THEN
-						-- planned visitclass is acording feature type and visit type
-					--ELSE
-					v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
-					--END IF;
+					IF v_offline THEN
+						-- in case offline project client get value from system (feature has one vdefault planned visitclass defined on om_visit_class table	)
+						-- TODO
+				
+					ELSE
+						-- in case of online project client get value from config_param_user (feature has one vdefault visitclas defined for user
+						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
+					
+					END IF;
 
 					IF v_visitclass IS NULL THEN
-						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
+						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
 					END IF;
 					
 				ELSE
-					IF (SELECT visit_type FROM om_visit_class WHERE id=v_visitclass) = 2 AND (SELECT feature_type FROM om_visit_class WHERE id=v_visitclass) = upper(v_featuretype) THEN
-						-- unexpected visitclass is acording feature type and visit type
-					ELSE
+					IF v_offline THEN
+						-- in case offline project client get value from system (feature has one vdefault unexpected visitclass defined on om_visit_class table	)
+						-- TODO
+					END IF;
+
+					IF v_visitclass IS NULL THEN
 						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type = upper(v_featuretype) AND visit_type=2 LIMIT 1);	
 					END IF;
 
@@ -240,7 +252,7 @@ BEGIN
 		v_noinfra = TRUE;
 	END IF;
 	
-	-- Check if exists some open visit on related feature with the class configured as vdefault for user
+	-- Check if exists some open visit on related feature with the class configured as vdefault for user  (0 for finished visits and 4 for suspended visit)
 	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL AND v_visitclass IS NOT NULL THEN
 		EXECUTE ('SELECT v.id FROM om_visit_x_'|| (v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
 			' WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0) ' ||
