@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2690
 
-
+--drop function SCHEMA_NAME.gw_fct_admin_manage_addfields(json)
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_addfields(p_data json)
   RETURNS void AS
 $BODY$
@@ -14,7 +14,7 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SOURCE"},
+SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP"},
 "data":{"action":"CREATE", "field":"source_3", "datatype":"text", "widgettype":"QLineEdit", "label":"source_3","isMandatory":"False",
 "fieldLength":"50", "numDecimals" :null, "defaultValue":null, "orderby":"2", "active":"True"}}$$);
 
@@ -26,7 +26,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "client":{"lang":"ES"}, 
-"feature":{"catFeature":"SOURCE"},
+"feature":{"catFeature":"PUMP"},
 "data":{"action":"DELETE", "field":"source_3"}}$$)
 */
 
@@ -54,8 +54,10 @@ DECLARE
 	v_action text;
 	v_layout_order integer;
 	v_form_fields_id integer;
+	v_feature_system_id text;
+	v_man_fields text;
+	rec record;
 
-	
 BEGIN
 
 	
@@ -103,6 +105,12 @@ BEGIN
 	IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
 		UPDATE cat_feature SET child_layer=concat('ve_',type,'_',lower(id)) WHERE id=v_cat_feature;
 	END IF;
+
+	--remove spaces and dashs from view name
+	IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0  
+		OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
+		UPDATE cat_feature SET child_layer=replace(replace(replace(child_layer, ' ','_'),'-','_'),'.','_') WHERE id=v_cat_feature;
+	END IF;
 	
 	v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
 
@@ -112,8 +120,9 @@ BEGIN
 		INTO v_definition;
 	END IF;
 	
-	--get the system type of the feature
+	--get the system type and system_id of the feature
 	v_feature_type = (SELECT type FROM cat_feature where id=v_cat_feature);
+	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
 
 	--get old values of addfields
 	IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) != 0 THEN
@@ -153,8 +162,9 @@ BEGIN
 			
 	ELSIF v_action = 'DELETE' THEN
 		EXECUTE 'DELETE FROM man_addfields_parameter WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
-		
+
 		DELETE FROM config_api_form_fields WHERE formname=v_viewname AND column_id=v_param_name;
+
 	END IF;
 
 		--get new values of addfields
@@ -164,24 +174,68 @@ BEGIN
 		string_agg(concat(param_name,' ', datatype_id),', ' order by orderby) as datatype
 		INTO v_new_parameters
 		FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature AND active IS TRUE;
+		
+
+		--select columns from man_* table without repeating the identifier
+		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
+		FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+		and column_name!='''||v_feature_type||'_id'''
+		INTO v_man_fields;
 
 		--CREATE VIEW when the addfield is the 1st one for the  defined cat feature
-	IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) = 1 THEN
-	
-		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
-		SELECT v_'||v_feature_type||'.*,
-		--man_'||lower(v_cat_feature)||',*
-		a.'||v_param_name||'
-		FROM '||v_schemaname||'.v_'||v_feature_type||'
-		LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
-                FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
-                WHERE cat_feature_id='''''||v_cat_feature||''''' ORDER BY 1,2''::text, 
-                ''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
-                ON a.feature_id::text=v_'||v_feature_type||'.'||v_feature_type||'_id;';
+	IF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) = 1 AND v_action = 'CREATE' THEN
+		
+		IF v_man_fields IS NULL THEN
+			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
+			SELECT v_'||v_feature_type||'.*,
+			a.'||v_param_name||'
+			FROM '||v_schemaname||'.v_'||v_feature_type||'
+			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = v_'||v_feature_type||'.'||v_feature_type||'_id
+			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
+			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
+			WHERE cat_feature_id='''''||v_cat_feature||''''' ORDER BY 1,2''::text, 
+			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
+			ON a.feature_id::text=v_'||v_feature_type||'.'||v_feature_type||'_id;';
+		
+		ELSE
+		
+			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
+			SELECT v_'||v_feature_type||'.*,
+			'||v_man_fields||',
+			a.'||v_param_name||'
+			FROM '||v_schemaname||'.v_'||v_feature_type||'
+			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
+			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = v_'||v_feature_type||'.'||v_feature_type||'_id
+			LEFT JOIN (SELECT ct.feature_id, ct.'||v_param_name||' FROM crosstab (''SELECT feature_id, parameter_id, value_param
+			FROM '||v_schemaname||'.man_addfields_value JOIN '||v_schemaname||'.man_addfields_parameter ON man_addfields_parameter.id=parameter_id
+			WHERE cat_feature_id='''''||v_cat_feature||''''' ORDER BY 1,2''::text, 
+			''VALUES ('''''||v_id||''''')''::text) ct(feature_id character varying,'||v_param_name||' '||v_datatype||' )) a 
+			ON a.feature_id::text=v_'||v_feature_type||'.'||v_feature_type||'_id;';
+		
+		END IF;
+	--CREATE VIEW when the addfields don't exist (after delete)
+	ELSIF (SELECT count(id) FROM man_addfields_parameter WHERE cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) = 0 THEN 
+		IF v_man_fields IS NULL THEN
+		
+			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
+			SELECT v_'||v_feature_type||'.*
+			FROM '||v_schemaname||'.v_'||v_feature_type||'
+			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
+			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = v_'||v_feature_type||'.'||v_feature_type||'_id;';
 
-		EXECUTE 'SELECT max(layout_order) + 1 FROM config_api_form_fields WHERE formname='''||v_viewname||'''
-		AND layout_name = ''layout_data_1'';'
-		INTO v_layout_order;
+		ELSE
+		
+			EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+			EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS
+			SELECT v_'||v_feature_type||'.*,
+			'||v_man_fields||'
+			FROM '||v_schemaname||'.v_'||v_feature_type||'
+			JOIN '||v_schemaname||'.man_'||v_feature_system_id||' 
+			ON man_'||v_feature_system_id||'.'||v_feature_type||'_id = v_'||v_feature_type||'.'||v_feature_type||'_id;';
+
+		END IF;
+
 	ELSE	
 		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
 			EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
@@ -200,7 +254,9 @@ BEGIN
 	END IF;
 	
 	--create trigger on view 
-	EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(v_cat_feature)||'
+	EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||v_schemaname||'.'||v_viewname||';';
+
+	EXECUTE 'CREATE TRIGGER gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||'
 	INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
 
