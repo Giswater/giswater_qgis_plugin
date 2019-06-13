@@ -159,16 +159,14 @@ BEGIN
 			--new visit
 			IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
 
-				-- getting dynamic value
-				v_visitclass := (SELECT value FROM config_param_user WHERE parameter = 'visitclass_vdefault' AND cur_user=current_user)::integer;	
 
 				IF p_visittype='planned' THEN
 				
-					IF ((SELECT visit_type FROM om_visit_class WHERE id=v_visitclass) = 1 AND (SELECT feature_type FROM om_visit_class WHERE id=v_visitclass) = upper(v_featuretype)) THEN
+					--IF ((SELECT visit_type FROM om_visit_class WHERE id=v_visitclass) = 1 AND (SELECT feature_type FROM om_visit_class WHERE id=v_visitclass) = upper(v_featuretype)) THEN
 						-- planned visitclass is acording feature type and visit type
-					ELSE
-						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
-					END IF;
+					--ELSE
+					v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
+					--END IF;
 
 					IF v_visitclass IS NULL THEN
 						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type=upper(v_featuretype) LIMIT 1);
@@ -245,7 +243,7 @@ BEGIN
 	-- Check if exists some open visit on related feature with the class configured as vdefault for user
 	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL AND v_visitclass IS NOT NULL THEN
 		EXECUTE ('SELECT v.id FROM om_visit_x_'|| (v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
-			' WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0 OR status = 0 AND (now()- enddate) < ''8 hours'') ' ||
+			' WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0) ' ||
 			' AND status != 4 AND class_id = ' || quote_literal(v_visitclass) || 
 			' ORDER BY startdate DESC LIMIT 1')
 			INTO v_existvisit_id;
