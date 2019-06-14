@@ -221,7 +221,7 @@
         <item>
          <widget class="QPushButton" name="btn_import">
           <property name="text">
-           <string>Importar a csv</string>
+           <string>Exportar a csv</string>
           </property>
          </widget>
         </item>

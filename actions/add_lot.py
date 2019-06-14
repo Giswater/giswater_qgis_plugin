@@ -125,7 +125,6 @@ class AddNewLot(ParentManage):
         action_by_polygon.triggered.connect(partial(self.activate_selection, self.dlg_lot, action_by_polygon, 'mActionSelectPolygon'))
 
         # Set widgets signals
-        #self.dlg_lot.cmb_ot.currentIndexChanged.connect(self.set_ot_fields)
         self.dlg_lot.cmb_ot.activated.connect(partial(self.set_ot_fields))
         self.dlg_lot.cmb_ot.editTextChanged.connect(partial(self.filter_by_list, self.dlg_lot.cmb_ot))
 
@@ -1100,6 +1099,7 @@ class AddNewLot(ParentManage):
         # Set filter events
         self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
         self.dlg_lot_man.cmb_actuacio.currentIndexChanged.connect(self.filter_lot)
+        self.dlg_lot_man.txt_address.textChanged.connect(self.filter_lot)
         self.dlg_lot_man.cmb_estat.currentIndexChanged.connect(self.filter_lot)
         self.dlg_lot_man.chk_assignacio.stateChanged.connect(self.filter_lot)
         self.dlg_lot_man.date_event_from.dateChanged.connect(self.filter_lot)
@@ -1244,9 +1244,9 @@ class AddNewLot(ParentManage):
         """ Filter om_visit in self.dlg_lot_man.tbl_lots based on (id AND text AND between dates) """
 
         serie = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_codi_ot)
-        actuacio = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_actuacio)
-        status = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_estat)
-        tipus = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_actuacio, add_quote=True)
+        actuacio = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_actuacio, 0)
+        adreca = utils_giswater.getWidgetText(self.dlg_lot_man, self.dlg_lot_man.txt_address, False, False)
+        status = utils_giswater.get_item_data(self.dlg_lot_man, self.dlg_lot_man.cmb_estat, 1, add_quote=True)
         assignat = utils_giswater.isChecked(self.dlg_lot_man, self.dlg_lot_man.chk_assignacio)
 
         visit_start = self.dlg_lot_man.date_event_from.date()
@@ -1263,14 +1263,18 @@ class AddNewLot(ParentManage):
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
-        expr_filter = ("('Data inici planificada' BETWEEN {0}) AND ('Data final planificada' BETWEEN {0} or 'Data final planificada' IS NULL)".format(interval))
+        expr_filter = ("(\"Data inici planificada\" BETWEEN {0}) AND (\"Data final planificada\" BETWEEN {0} "
+                       " OR \"Data final planificada\" IS NULL)".format(interval))
         if serie != 'null':
-            expr_filter += " AND serie::TEXT ILIKE '%" + str(serie) + "%'"
-        expr_filter += " AND (visitclass_id::TEXT ILIKE '%" + str(actuacio) + "%' OR visitclass_id IS NULL)"
-        expr_filter += " AND (tipus::TEXT ILIKE '%" + str(tipus) + "%' OR tipus IS NULL)"
-        expr_filter += " AND (status::TEXT ILIKE '%" + str(status) + "%' OR status IS NULL)"
+            expr_filter += " AND \"Serie\" ILIKE '%" + str(serie) + "%'"
+        if actuacio != '':
+            expr_filter += " AND \"Tipus actuacio\" ILIKE '%" + str(actuacio) + "%' "
+        if adreca != '':
+            expr_filter += " AND adreca ILIKE '%" + str(adreca) + "%' "
+        if status != '':
+            expr_filter += " AND (\"Estat\"::TEXT ILIKE '%" + str(status) + "%' OR \"Estat\" IS NULL)"
         if assignat:
-            expr_filter += " AND team_id IS NULL "
+            expr_filter += " AND \"Equip\" IS NULL "
 
         # Refresh model with selected filter
         self.dlg_lot_man.tbl_lots.model().setFilter(expr_filter)
