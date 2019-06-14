@@ -308,7 +308,7 @@ BEGIN
 		END IF;
 			
 		-- The geom
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
 
@@ -340,7 +340,7 @@ BEGIN
 				category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
 				buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=NEW.streetaxis_id, 
 				streetaxis2_id=NEW.streetaxis2_id,postcode=NEW.postcode, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,descript=NEW.descript, verified=NEW.verified, 
-				undelete=NEW.undelete, label_x=NEW.label_x, the_geom=NEW.the_geom, 
+				undelete=NEW.undelete, label_x=NEW.label_x,
 				postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2,label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 				expl_id=NEW.expl_id,num_value=NEW.num_value, link=NEW.link
 			WHERE arc_id=OLD.arc_id;
