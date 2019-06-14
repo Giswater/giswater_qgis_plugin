@@ -30,14 +30,14 @@ BEGIN
 		END IF;
 			
 		-- The geom
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
 	
 	
         UPDATE arc 
         SET arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
-            custom_length=NEW.custom_length, the_geom=NEW.the_geom 
+            custom_length=NEW.custom_length
         WHERE arc_id = OLD.arc_id;
 
         IF arc_table = 'inp_pipe' THEN   

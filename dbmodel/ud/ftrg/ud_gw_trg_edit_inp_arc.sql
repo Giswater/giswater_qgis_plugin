@@ -34,14 +34,26 @@ BEGIN
 		END IF;
 			
 		-- The geom
-		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
 			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
 		END IF;
+		
 	
 		IF (epa_type != 'VIRTUAL') THEN 
-			UPDATE arc 
-			SET y1=NEW.y1, custom_y1=NEW.custom_y1, elev1=NEW.elev1, y2=NEW.y2, custom_y2=NEW.custom_y2, elev2=NEW.elev2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
-			arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
+			-- depth fields
+			IF (NEW.y1 <> OLD.y1) OR (NEW.y2 <> OLD.y2) THEN
+				UPDATE arc SET y1=NEW.y1, y2=NEW.y2 WHERE arc_id=NEW.arc_id;
+			END IF;
+		
+			IF (NEW.elev1 <> OLD.elev1) OR (NEW.elev2 <> OLD.elev2) THEN
+				UPDATE arc SET elev1=NEW.elev1, elev2=NEW.elev2 WHERE arc_id=NEW.arc_id;
+			END IF;
+
+			IF (NEW.custom_y1 <> OLD.custom_y1) OR (NEW.custom_y2 <> OLD.custom_y2) THEN
+				UPDATE arc SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2 WHERE arc_id=NEW.arc_id;
+			END IF:		
+		
+			UPDATE arc SET 	arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
 			custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
 			WHERE arc_id = OLD.arc_id;
 		END IF;
