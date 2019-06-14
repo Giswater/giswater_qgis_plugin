@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tab_add_fields">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="Create">
       <attribute name="title">
@@ -43,14 +43,14 @@
             <widget class="QLineEdit" name="column_id"/>
            </item>
            <item row="16" column="1">
-            <widget class="QCheckBox" name="isautoupdate_3">
+            <widget class="QCheckBox" name="isautoupdate">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
            <item row="6" column="1">
-            <widget class="QComboBox" name="widgettype_3"/>
+            <widget class="QComboBox" name="widgettype"/>
            </item>
            <item row="13" column="0">
             <widget class="QLabel" name="lbl_59">
@@ -67,7 +67,7 @@
             </widget>
            </item>
            <item row="8" column="1">
-            <widget class="QSpinBox" name="widgetdim_3"/>
+            <widget class="QSpinBox" name="widgetdim"/>
            </item>
            <item row="11" column="0">
             <widget class="QLabel" name="lbl_60">
@@ -77,16 +77,16 @@
             </widget>
            </item>
            <item row="10" column="1">
-            <widget class="QLineEdit" name="placeholder_3"/>
+            <widget class="QLineEdit" name="placeholder"/>
            </item>
            <item row="11" column="1">
-            <widget class="QSpinBox" name="field_length_3"/>
+            <widget class="QSpinBox" name="field_length"/>
            </item>
            <item row="20" column="1">
-            <widget class="QLineEdit" name="dv_querytext_filterc_3"/>
+            <widget class="QLineEdit" name="dv_querytext_filterc"/>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="formtype_3"/>
+            <widget class="QLineEdit" name="formtype"/>
            </item>
            <item row="8" column="0">
             <widget class="QLabel" name="lbl_61">
@@ -96,10 +96,10 @@
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QLineEdit" name="datatype_3"/>
+            <widget class="QLineEdit" name="datatype"/>
            </item>
            <item row="23" column="1">
-            <widget class="QLineEdit" name="action_function_3"/>
+            <widget class="QLineEdit" name="action_function"/>
            </item>
            <item row="24" column="0">
             <widget class="QLabel" name="lbl_75">
@@ -116,7 +116,7 @@
             </widget>
            </item>
            <item row="21" column="1">
-            <widget class="QLineEdit" name="widgetfunction_3"/>
+            <widget class="QLineEdit" name="widgetfunction"/>
            </item>
            <item row="4" column="0">
             <widget class="QLabel" name="lbl_73">
@@ -133,14 +133,14 @@
             </widget>
            </item>
            <item row="18" column="1">
-            <widget class="QCheckBox" name="dv_isnullvalue_3">
+            <widget class="QCheckBox" name="dv_isnullvalue">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
            <item row="12" column="1">
-            <widget class="QSpinBox" name="spinBox_5"/>
+            <widget class="QSpinBox" name="spinBox"/>
            </item>
            <item row="28" column="0">
             <widget class="QLabel" name="lbl_79">
@@ -157,7 +157,7 @@
             </widget>
            </item>
            <item row="26" column="1">
-            <widget class="QCheckBox" name="isnotupdate_3">
+            <widget class="QCheckBox" name="isnotupdate">
              <property name="text">
               <string/>
              </property>
@@ -185,7 +185,7 @@
             </widget>
            </item>
            <item row="7" column="1">
-            <widget class="QLineEdit" name="label_5"/>
+            <widget class="QLineEdit" name="label"/>
            </item>
            <item row="12" column="0">
             <widget class="QLabel" name="lbl_58">
@@ -223,20 +223,20 @@
             </widget>
            </item>
            <item row="9" column="1">
-            <widget class="QLineEdit" name="tooltip_3"/>
+            <widget class="QLineEdit" name="tooltip"/>
            </item>
            <item row="27" column="1">
-            <widget class="QLineEdit" name="typeahead_3"/>
+            <widget class="QLineEdit" name="typeahead"/>
            </item>
            <item row="13" column="1">
-            <widget class="QCheckBox" name="ismandatory_3">
+            <widget class="QCheckBox" name="ismandatory">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
            <item row="17" column="1">
-            <widget class="QLineEdit" name="dv_querytext_3"/>
+            <widget class="QLineEdit" name="dv_querytext"/>
            </item>
            <item row="25" column="0">
             <widget class="QLabel" name="lbl_78">
@@ -253,7 +253,7 @@
             </widget>
            </item>
            <item row="24" column="1">
-            <widget class="QCheckBox" name="isreload_3">
+            <widget class="QCheckBox" name="isreload">
              <property name="text">
               <string/>
              </property>
@@ -274,20 +274,20 @@
             </widget>
            </item>
            <item row="19" column="1">
-            <widget class="QLineEdit" name="dv_parent_id_3"/>
+            <widget class="QLineEdit" name="dv_parent_id"/>
            </item>
            <item row="28" column="1">
-            <widget class="QLineEdit" name="listfilterparam_3"/>
+            <widget class="QLineEdit" name="listfilterparam"/>
            </item>
            <item row="14" column="1">
-            <widget class="QCheckBox" name="isparent_3">
+            <widget class="QCheckBox" name="isparent">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
            <item row="15" column="1">
-            <widget class="QCheckBox" name="iseditable_3">
+            <widget class="QCheckBox" name="iseditable">
              <property name="text">
               <string/>
              </property>
@@ -301,7 +301,7 @@
             </widget>
            </item>
            <item row="29" column="1">
-            <widget class="QLineEdit" name="editability_3"/>
+            <widget class="QLineEdit" name="editability"/>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="lbl_2">
@@ -325,7 +325,7 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="QCheckBox" name="isenabled_3">
+            <widget class="QCheckBox" name="isenabled">
              <property name="text">
               <string/>
              </property>
@@ -339,7 +339,7 @@
             </widget>
            </item>
            <item row="25" column="1">
-            <widget class="QLineEdit" name="stylesheet_3"/>
+            <widget class="QLineEdit" name="stylesheet"/>
            </item>
            <item row="30" column="0" colspan="2">
             <widget class="QGroupBox" name="group_current_addfields">
@@ -365,46 +365,9 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_14">
-         <item>
-          <widget class="QLabel" name="label_update_cat_feature_id">
-           <property name="text">
-            <string>Feature name:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_12">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>39</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QComboBox" name="update_cat_feature_id">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_15">
          <item>
-          <widget class="QTableWidget" name="tableWidget"/>
+          <widget class="QTableWidget" name="tbl_update"/>
          </item>
         </layout>
        </item>
@@ -418,7 +381,7 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_16">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lbl_3">
            <property name="text">
             <string>Feature name:</string>
            </property>
@@ -455,7 +418,7 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_17">
          <item>
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="lbl_4">
            <property name="text">
             <string>Field name:</string>
            </property>

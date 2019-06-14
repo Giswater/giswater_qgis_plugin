@@ -10,11 +10,18 @@ try:
 except ImportError:
     from qgis.core import QGis as Qgis
 
+if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
+else:
+    from qgis.PyQt.QtCore import QStringListModel
+
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QTableView, QAbstractItemView, QTextEdit, QFileDialog
-from qgis.PyQt.QtWidgets import QLineEdit, QWidget, QComboBox, QLabel, QCheckBox
+from qgis.PyQt.QtWidgets import QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QCompleter, QScrollArea, QSpinBox
+from qgis.PyQt.QtWidgets import QAbstractButton, QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import QSettings, Qt
-
+from qgis.gui import QgsDateTimeEdit
+from qgis.PyQt.QtSql import QSqlQueryModel
 
 import os
 import sys
@@ -2241,20 +2248,112 @@ class UpdateSQL(ApiParent):
         self.load_settings(self.dlg_manage_fields)
 
         # Remove unused tabs
-        for x in range(self.dlg_manage_fields.tab_add_fields.count()):
-            print(str(x))
-            print(str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()))
-            print(str(action))
+        for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str(action):
                 utils_giswater.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
+        form_name = utils_giswater.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname)
+
+        if action == 'Create':
+            window_title = 'Create field on "' + str(form_name) + '"'
+            self.dlg_manage_fields.setWindowTitle(window_title)
+            self.manage_create_field(form_name)
+        elif action == 'Update':
+            window_title = 'Create field on "' + str(form_name) + '"'
+            self.dlg_manage_fields.setWindowTitle(window_title)
+            self.manage_update_field(form_name)
+        elif action == 'Delete':
+            window_title = 'Delete field on "' + str(form_name) + '"'
+            self.dlg_manage_fields.setWindowTitle(window_title)
+            self.manage_delete_field(form_name)
 
         # Set listeners
-        # self.dlg_manage_fields.btn_accept.clicked.connect(partial(self.gis_create_project))
+        self.dlg_manage_fields.btn_accept.clicked.connect(partial(self.manage_accept, action, form_name))
         self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_fields))
 
         self.dlg_manage_fields.show()
 
+
+    def manage_create_field(self, form_name):
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        # Populate widgettype combo
+        sql = ("SELECT DISTINCT(widgettype), widgettype FROM " + schema_name + ".config_api_form_fields")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
+
+        # Configure column_id as typeahead
+        completer = QCompleter()
+        model = QStringListModel()
+        self.filter_typeahead(schema_name, form_name, self.dlg_manage_fields.column_id, completer, model)
+
+        # Set listeners
+        self.dlg_manage_fields.column_id.textChanged.connect(partial(self.filter_typeahead,schema_name, form_name, self.dlg_manage_fields.column_id, completer, model))
+
+
+    def manage_update_field(self, form_name):
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        print(str("aaaaa"))
+        query = "SELECT * FROM " + schema_name + ".config_api_form_fields WHERE formname = '" + form_name + "'"
+        qtable = self.dlg_manage_fields.tbl_update
+
+        # self.fill_table_by_query(qtable, query)
+
+
+    def manage_delete_field(self, form_name):
+        return
+
+
+    def manage_accept(self, action, form_name):
+
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        if action == 'Create':
+            list_widgets = self.dlg_manage_fields.Create.findChildren(QWidget)
+            _json = {}
+            for widget in list_widgets:
+                if type(widget) not in (QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView):
+
+                    if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
+                        value = utils_giswater.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
+                    elif type(widget) is QComboBox and widget.isEnabled():
+                        value = utils_giswater.get_item_data(self.dlg_manage_fields, widget, 0)
+                    elif type(widget) is QCheckBox and widget.isEnabled():
+                        value = utils_giswater.isChecked(self.dlg_manage_fields, widget)
+                    elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+                        value = utils_giswater.getCalendarDate(self.dlg_manage_fields, widget)
+
+                    if str(widget.objectName()) not in (None, 'null', '', ""):
+                        _json[str(widget.objectName())] = value
+                        result_json = json.dumps(_json)
+
+            self.controller.log_info(str(result_json))
+
+        elif action == 'Update':
+            return
+        elif action == 'Delete':
+            return
+
+
+    def filter_typeahead(self, schema_name, form_name, widget, completer, model):
+
+        filter = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id)
+        if filter == 'null':
+            filter = ''
+        # Get layers under mouse clicked
+        sql = ("SELECT DISTINCT(column_id) FROM " + schema_name + ".config_api_form_fields WHERE formname = '" + form_name + "'"
+               " AND column_id LIKE '%" + filter + "%'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        # print(str(rows))
+
+        # if not rows:
+        #     self.controller.show_message("NOT ROW FOR: " + sql, 2)
+        #     return False
+
+        # self.set_completer_object_api(completer, model, widget, rows)
 
     """ Take current project type changed """
 
