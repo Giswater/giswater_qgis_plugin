@@ -81,7 +81,6 @@ class AddNewLot(ParentManage):
         self.dropdown.addAction(action_by_polygon)
         self.dropdown.setDefaultAction(action_by_expression)
 
-        self.dlg_lot.open()
 
         # Set icons
         self.set_icon(self.dlg_lot.btn_feature_insert, "111")
@@ -345,10 +344,6 @@ class AddNewLot(ParentManage):
         self.manage_widget_lot(lot_id)
 
         # Fill ComboBox cmb_visit_class
-        # sql = ("SELECT id, idval, feature_type"
-        #        " FROM " + self.schema_name + ".om_visit_class "
-        #        " WHERE ismultifeature is False AND feature_type IS NOT null "
-        #        " ORDER BY idval")
         sql = ("SELECT DISTINCT(om_visit_class.id), om_visit_class.idval, feature_type, tablename "
                " FROM " + self.schema_name + ".om_visit_class"
                " INNER JOIN " + self.schema_name + ".om_visit_class_x_wo ON om_visit_class_x_wo.visitclass_id = om_visit_class.id "
