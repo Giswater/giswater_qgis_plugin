@@ -153,27 +153,41 @@ BEGIN
 	v_visitclass = ((p_data ->>'data')::json->>'fields')::json->>'class_id';
 	v_inputtablename = ((p_data ->>'feature')::json->>'tableName');
 	v_tab_data = (((p_data ->>'form')::json->>'tabData')::json->>'active')::text;
-	v_offline = (((p_data ->>'data')::json->>'isOffline')::boolean;
+	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
+
+
+	-- Check if exists some open visit on related feature with the class configured as vdefault for user  (0 for finished visits and 4 for suspended visit)
+	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
+		EXECUTE ('SELECT v.id FROM om_visit_x_'|| (v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
+			' WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0) ' ||
+			' AND status != 4 AND user_name = current_user ORDER BY startdate DESC LIMIT 1')
+			INTO v_existvisit_id;
+	END IF;
+
+	IF v_existvisit_id IS NOT NULL THEN
+		v_id = v_existvisit_id;
+	END IF;
 	
 	--  get visitclass
 	IF v_visitclass IS NULL THEN
-	
+		
 		-- infraestructure visit
 		IF v_featuretype IS NOT NULL THEN
 		
 			--new visit
 			IF v_id IS NULL OR (SELECT id FROM om_visit WHERE id=v_id::bigint) IS NULL THEN
 
-
+				
 				IF p_visittype='planned' THEN
 				
 					IF v_offline THEN
 						-- in case offline project client get value from system (feature has one vdefault planned visitclass defined on om_visit_class table	)
 						-- TODO
+						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type = UPPER(v_featuretype) AND param_options->>'offlineDefault' = 'true')::integer;
 				
 					ELSE
 						-- in case of online project client get value from config_param_user (feature has one vdefault visitclas defined for user
-						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;		
+						v_visitclass := (SELECT value FROM config_param_user WHERE parameter = concat('visitclass_vdefault_', v_featuretype) AND cur_user=current_user)::integer;	
 					
 					END IF;
 
@@ -184,7 +198,8 @@ BEGIN
 				ELSE
 					IF v_offline THEN
 						-- in case offline project client get value from system (feature has one vdefault unexpected visitclass defined on om_visit_class table	)
-						-- TODO
+						-- TODO vdefault unexpected
+						v_visitclass := (SELECT id FROM om_visit_class WHERE feature_type = UPPER(v_featuretype) AND param_options->>'offlineDefault' = 'true')::integer;
 					END IF;
 
 					IF v_visitclass IS NULL THEN
@@ -218,10 +233,11 @@ BEGIN
 	END IF;
 	
 	--  get formname and tablename
+	
 	v_formname := (SELECT formname FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_tablename := (SELECT tablename FROM config_api_visit WHERE visitclass_id=v_visitclass);
 	v_ismultievent := (SELECT ismultievent FROM om_visit_class WHERE id=v_visitclass);
-	
+
 	-- getting if is new visit
 	IF (SELECT id FROM om_visit WHERE id=v_id::int8) IS NULL OR v_id IS NULL THEN
 
@@ -252,18 +268,7 @@ BEGIN
 		v_noinfra = TRUE;
 	END IF;
 	
-	-- Check if exists some open visit on related feature with the class configured as vdefault for user  (0 for finished visits and 4 for suspended visit)
-	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL AND v_visitclass IS NOT NULL THEN
-		EXECUTE ('SELECT v.id FROM om_visit_x_'|| (v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
-			' WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0) ' ||
-			' AND status != 4 AND class_id = ' || quote_literal(v_visitclass) || 
-			' ORDER BY startdate DESC LIMIT 1')
-			INTO v_existvisit_id;
-	END IF;
 
-	IF v_existvisit_id IS NOT NULL THEN
-		v_id = v_existvisit_id;
-	END IF;
 
 	IF isnewvisit IS FALSE THEN
 		v_extvisitclass := (SELECT class_id FROM om_visit WHERE id=v_id::int8);
@@ -362,10 +367,13 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 
 		RAISE NOTICE '--- UPSERT VISIT CALLED gw_api_setvisit WITH MESSAGE: % ---', v_message;
 	END IF;
-
+	
 	-- manage actions
+
+	--IF v_offline != 'true' THEN
+	
 	v_filefeature = '{"featureType":"file", "tableName":"om_visit_event_photo", "idName": "id"}';	
- 
+	
 	IF v_addfile IS NOT NULL THEN
 
 		RAISE NOTICE '--- ACTION ADD FILE /PHOTO ---';
@@ -402,16 +410,16 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 		v_message = (v_deletefile ->>'message')::json;
 		
 	END IF;
-   
+	
+	--END IF;
 	--  Create tabs array	
 	v_formtabs := '[';
-       
+     
 		-- Data tab
 		-----------
 		IF v_activedatatab OR v_activefilestab IS NOT TRUE THEN
-
+		 
 			IF isnewvisit THEN
-
 				IF v_formname IS NULL THEN
 					RAISE EXCEPTION 'Api is bad configured. There is no form related to tablename';
 				END IF;
@@ -478,6 +486,12 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 
 						
 					END IF;
+					
+					-- disable visit type if project is offline
+					IF (aux_json->>'column_id') = 'class_id' AND v_offline = 'true' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
+					END IF;
+					
 				END LOOP;
 			ELSE 
 				SELECT gw_api_get_formfields( v_formname, 'visit', 'data', null, null, null, null, 'INSERT', null, v_device) INTO v_fields;
@@ -531,7 +545,13 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 					-- Disable class_id
 					IF (aux_json->>'column_id') = 'class_id' THEN
 						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
-					END IF;										
+					END IF;	
+
+					-- disable visit type if project is offline
+					IF (aux_json->>'column_id') = 'class_id' AND v_offline = 'true' THEN
+						v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'disabled', True);
+					END IF;
+									
 				END LOOP;			
 			END IF;	
 
@@ -550,21 +570,24 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 			SELECT * INTO v_tab FROM config_api_form_tabs WHERE formname='visit' AND tabname='tabData' LIMIT 1;
 		END IF;
 
-		IF v_status = 0 THEN
+		IF v_status = 0 or v_offline = 'true' THEN
+			v_tab.tabfunction = '{}';
 			v_tab.tabactions = '{}';
 		END IF;
-		
-		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);
+
+
+		v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction',v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active',v_activedatatab);
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		v_formtabs := v_formtabs || v_tabaux::text;
 
 		RAISE NOTICE ' --- BUILDING tabData with v_tabaux % ---', v_tabaux;
 
-		/*
+		
 		-- Files tab
 		------------
-		--show tab only if it is not new visit
-		--IF isnewvisit IS FALSE OR v_addfile IS NOT NULL OR v_status=0 THEN
+		
+		--show tab only if it is not new visit or offline is true
+		IF (isnewvisit IS FALSE OR v_addfile IS NOT NULL OR v_status=0) OR v_offline = 'true' THEN
 
 			--filling tab (only if it's active)
 			IF v_activefilestab THEN
@@ -615,17 +638,19 @@ raise notice 'v_extvisitclass %', v_extvisitclass;
 			IF v_status = 0 THEN
 				v_tab.tabactions = '{}';
 			END IF;
-		
+
+
 			v_tabaux := json_build_object('tabName',v_tab.tabname,'tabLabel',v_tab.tablabel, 'tabText',v_tab.tabtext, 'tabFunction', v_tab.tabfunction::json, 'tabActions', v_tab.tabactions::json, 'active', v_activefilestab);
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
+
 
 			RAISE NOTICE ' --- BUILDING tabFiles with v_tabaux  ---';
 
 	 		-- setting pageInfo
 			v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'pageInfo', v_pageinfo);
 			v_formtabs := v_formtabs  || ',' || v_tabaux::text;
-		--END IF; 		
-		*/
+		END IF; 		
+		
 	--closing tabs array
 	v_formtabs := (v_formtabs ||']');
 
