@@ -150,6 +150,13 @@ class AuditCheckProjectResult(QDialog, FORM_CLASS):
         self.setupUi(self)
 
 
+FORM_CLASS = get_ui_class('basic_table.ui')
+class BasicTable(QDialog, FORM_CLASS):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+
 FORM_CLASS = get_ui_class('cad_add_circle.ui')
 class Cad_add_circle(QDialog, FORM_CLASS):
     def __init__(self):
