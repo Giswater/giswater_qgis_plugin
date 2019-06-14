@@ -37,6 +37,7 @@ from .parent_manage import ParentManage
 from ..ui_manager import AddLot
 from ..ui_manager import LotManagement
 
+from ..ui_manager import BasicTable
 
 class AddNewLot(ParentManage):
 
@@ -151,6 +152,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot.rejected.connect(partial(self.manage_rejected))
         self.dlg_lot.rejected.connect(partial(self.reset_rb_list, self.rb_list))
         self.dlg_lot.btn_accept.clicked.connect(partial(self.save_lot))
+        self.dlg_lot.cmb_man_team.clicked.connect(self.manage_team)
 
         self.set_headers()
         self.set_active_layer()
@@ -185,6 +187,82 @@ class AddNewLot(ParentManage):
         self.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
 
+    def manage_team(self):
+        self.dlg_basic_table = BasicTable()
+        self.load_settings(self.dlg_basic_table)
+        table_name = 'cat_team'
+        #@setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        model = QSqlTableModel()
+        #model = QStandardItemModel()
+        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, model, QSqlTableModel.OnManualSubmit)
+
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table, model))
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, model))
+        self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, model))
+        self.open_dialog(self.dlg_basic_table)
+    def cancel_changes(self, model):
+        model.revertAll()
+        model.database().rollback()
+
+    def add_row(self, model):
+
+        list_id = []
+        exist = None
+        for x in range(0, model.rowCount()):
+            # for c in range(0, model.columnCount()-1):
+            index = model.index(x, 0)
+            item = model.data(index)
+
+            if item not in list_id:
+                list_id.append(item)
+            else:
+                exist = item
+                break
+        print(list_id)
+        print(exist)
+        for x in range(0, model.rowCount()):
+            index = model.index(x, 0)
+            item = model.data(index)
+            if item == exist:
+                # model.setData(index, QtCore.Qt.red, 9)
+                p = self.dlg_basic_table.tbl_basic.palette()
+                p.setColor(QPalette.Base, QColor("yellow"))
+                self.dlg_basic_table.tbl_basic.setPalette(p)
+                print("TEST")
+
+
+
+        record = model.record()
+        model.insertRecord(model.rowCount(), record)
+
+    def save_basic_table(self, model):
+
+        if model.submitAll():
+            print("ok")
+            # model.database().commit()
+        else:
+            print("KO ")
+
+
+
+    def fill_table(self, qtable, table_name, model, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model.setTable(table_name)
+        model.setEditStrategy(set_edit_strategy)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+        # Attach model to table view
+        qtable.setModel(model)
 
 
 
@@ -770,6 +848,7 @@ class AddNewLot(ParentManage):
 
         feature_type = utils_giswater.get_item_data(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         object_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.txt_filter)
+        lot_id = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.lot_id, False, False)
         visit_start = self.dlg_lot.date_event_from.date()
         visit_end = self.dlg_lot.date_event_to.date()
         # Get selected dates
@@ -796,14 +875,13 @@ class AddNewLot(ParentManage):
         interval = "'{}'::timestamp AND '{}'::timestamp".format(
             visit_start.toString(format_low), visit_end.toString(format_high))
 
-        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0})".format(interval))
+        expr_filter = ("(startdate BETWEEN {0}) AND (enddate BETWEEN {0}"
+                       " OR enddate is NULL)".format(interval))
+
         if object_id != 'null':
             expr_filter += " AND " + str(feature_type) + "_id::TEXT ILIKE '%" + str(object_id) + "%'"
-
-        expr_filter += " AND " + str(feature_type) + "_id IN ('0', "
-        for i in range(len(self.ids)):
-            expr_filter += "'" + str(self.ids[i]) + "', "
-        expr_filter = expr_filter[:-2] + ")"
+        if lot_id != '':
+            expr_filter += " AND lot_id='"+lot_id+"'"
 
         model = QSqlTableModel()
         model.setTable(table_name)
@@ -1272,9 +1350,9 @@ class AddNewLot(ParentManage):
         if adreca != '':
             expr_filter += " AND adreca ILIKE '%" + str(adreca) + "%' "
         if status != '':
-            expr_filter += " AND (\"Estat\"::TEXT ILIKE '%" + str(status) + "%' OR \"Estat\" IS NULL)"
+            expr_filter += " AND \"Estat\"::TEXT ILIKE '%" + str(status) + "%'"
         if assignat:
-            expr_filter += " AND \"Equip\" IS NULL "
+            expr_filter += " AND \"Serie\" IS NULL "
 
         # Refresh model with selected filter
         self.dlg_lot_man.tbl_lots.model().setFilter(expr_filter)
