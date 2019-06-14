@@ -21,7 +21,7 @@ from qgis.PyQt.QtWidgets import QAbstractButton, QHeaderView, QListView, QFrame,
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import QSettings, Qt
 from qgis.gui import QgsDateTimeEdit
-from qgis.PyQt.QtSql import QSqlQueryModel
+from qgis.PyQt.QtSql import QSqlTableModel
 
 import os
 import sys
@@ -2247,6 +2247,8 @@ class UpdateSQL(ApiParent):
         self.dlg_manage_fields = ManageFields()
         self.load_settings(self.dlg_manage_fields)
 
+        self.model_update_table = None
+
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str(action):
@@ -2268,7 +2270,7 @@ class UpdateSQL(ApiParent):
             self.manage_delete_field(form_name)
 
         # Set listeners
-        self.dlg_manage_fields.btn_accept.clicked.connect(partial(self.manage_accept, action, form_name))
+        self.dlg_manage_fields.btn_accept.clicked.connect(partial(self.manage_accept, action, form_name, self.model_update_table))
         self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_fields))
 
         self.dlg_manage_fields.show()
@@ -2296,18 +2298,23 @@ class UpdateSQL(ApiParent):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
-        print(str("aaaaa"))
-        query = "SELECT * FROM " + schema_name + ".config_api_form_fields WHERE formname = '" + form_name + "'"
-        qtable = self.dlg_manage_fields.tbl_update
-
-        # self.fill_table_by_query(qtable, query)
+        qtable = self.dlg_manage_fields.findChild(QTableView, "tbl_update")
+        self.model_update_table = QSqlTableModel()
+        expr_filter = "formname ='" + form_name + "'"
+        self.fill_table(qtable, 'config_api_form_fields', self.model_update_table, expr_filter)
 
 
     def manage_delete_field(self, form_name):
-        return
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        # Populate widgettype combo
+        sql = ("SELECT DISTINCT(column_id), column_id FROM " + schema_name + ".config_api_form_fields WHERE formname = '"
+               + form_name + "'")
+        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        utils_giswater.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
 
 
-    def manage_accept(self, action, form_name):
+    def manage_accept(self, action, form_name, model=None):
 
         schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
@@ -2330,12 +2337,68 @@ class UpdateSQL(ApiParent):
                         _json[str(widget.objectName())] = value
                         result_json = json.dumps(_json)
 
-            self.controller.log_info(str(result_json))
+            # Create body
+            feature = '"catFeature":"' + form_name + '"'
+            extras = '"action":"CREATE", ' + result_json + ''
+            body = self.create_body(feature=feature, extras=extras)
+
+
+            # Execute manage add fields function
+            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
+            print(str(sql))
+            return
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
 
         elif action == 'Update':
-            return
+
+            if model is not None and model.submitAll():
+                msg = "Update executed successfully."
+                self.controller.show_info_box(msg, "Info")
+            else:
+                msg = "Some failed in update execute. No changes have been made. \n "
+                self.controller.show_info_box(msg, "Info")
+
         elif action == 'Delete':
+            self.controller.log_info(str("DELETE"))
+
+            field_value = utils_giswater.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
+
+            # Create body
+            feature = '"catFeature":"' + form_name + '"'
+            extras = '"action":"DELETE", "field":"' + field_value + '"'
+            body = self.create_body(feature=feature, extras=extras)
+
+
+            # Execute manage add fields function
+            sql = ("SELECT " + schema_name + ".gw_fct_admin_manage_addfields($${" + body + "}$$)::text")
+            print(str(sql))
             return
+            row = self.controller.get_row(sql, log_sql=True, commit=True)
+
+        # Close dialog
+        self.close_dialog(self.dlg_manage_fields)
+
+
+    def fill_table(self, qtable, table_name, model, expr_filter, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+        schema_name = utils_giswater.getWidgetText(self.dlg_readsql, 'project_schema_name')
+
+        if schema_name not in table_name:
+            table_name = schema_name + "." + table_name
+
+        # Set model
+        model.setTable(table_name)
+        model.setEditStrategy(set_edit_strategy)
+        if expr_filter is not None:
+            model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+        # Attach model to table view
+        qtable.setModel(model)
 
 
     def filter_typeahead(self, schema_name, form_name, widget, completer, model):
