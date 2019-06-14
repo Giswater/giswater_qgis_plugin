@@ -316,7 +316,9 @@ BEGIN
 		-- Done visits tab
 		------------------
 		IF v_activedonetab THEN
-
+			IF v_isfeaturemanager THEN
+				v_featuretype = NULL;
+			END IF;
 			IF v_featuretype IS NULL THEN
 				-- setting table feature	
 				v_feature := '{"tableName":"om_visit"}';
@@ -378,8 +380,8 @@ BEGIN
 		v_tabaux := gw_fct_json_object_set_key(v_tabaux, 'fields', v_fields_json);
 		IF v_isusermanager THEN
 			v_formtabs := v_formtabs || ',' || v_tabaux::text;
-		ELSIF v_isfeaturemanager THEN 
-			v_formtabs := v_formtabs || v_tabaux::text;
+		/*ELSIF v_isfeaturemanager THEN 
+			v_formtabs := v_formtabs || v_tabaux::text;*/
 		END IF;
 	
 		--closing tabs array
@@ -388,8 +390,8 @@ BEGIN
 		-- header form
 		IF v_isusermanager THEN
 			v_formheader :=concat('VISIT MANAGER - ',UPPER(current_user));	
-		ELSIF v_isfeaturemanager THEN 
-			v_formheader :=concat('VISIT MANAGER - ', v_featureid);	
+		/*ELSIF v_isfeaturemanager THEN 
+			v_formheader :=concat('VISIT MANAGER - ', v_featureid);	*/
 		END IF;
 	
 		-- actions and layermanager
