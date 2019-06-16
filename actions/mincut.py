@@ -2294,10 +2294,6 @@ class MincutParent(ParentAction, MultipleSelection):
 
 
     def open_composer(self):
-        
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT > 29900:
-            return
 
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
@@ -2317,43 +2313,70 @@ class MincutParent(ParentAction, MultipleSelection):
         index = self.get_composer_index(str(self.template))
 
         if index == len(composers):
-            # Create new composer with template selected in combobox(self.template)
-            template_file = file(template_path, 'rt')
-            template_content = template_file.read()
-            template_file.close()
-            document = QDomDocument()
-            document.setContent(template_content)
             # TODO 3.x
             if Qgis.QGIS_VERSION_INT < 29900:
+                # Create new composer with template selected in combobox(self.template)
+                template_file = file(template_path, 'rt')
+                template_content = template_file.read()
+                template_file.close()
+                document = QDomDocument()
+                document.setContent(template_content)
                 comp_view = self.iface.createNewComposer(str(self.template))
                 comp_view.composition().loadFromTemplate(document)
             
         index = self.get_composer_index(str(self.template))
         comp_view = composers[index]
 
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT < 29900:
-            comp_view.composerWindow().setWindowFlags(Qt.WindowStaysOnTopHint)
-            composition = comp_view.composition()
-            comp_view.composerWindow().show()
+        # Manage mincut layout
+        self.manage_mincut_layout(comp_view)
 
-            # Refresh map, zoom map to extent
+
+    def manage_mincut_layout(self, layout):
+        """ Manage mincut layout """
+
+        if layout is None:
+            self.controller.log_warning("Layout not found")
+            return
+
+        title = self.dlg_comp.title.text()
+        rotation = float(self.dlg_comp.rotation.text())
+
+        if Qgis.QGIS_VERSION_INT < 29900:
+
+            main_window = layout.composerWindow()   # QMainWindow
+            main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
+            main_window.show()
+
+            # Zoom map to extent, rotation, title
+            composition = layout.composition()   # QgsComposition
             map_item = composition.getComposerItemById('Mapa')
             map_item.setMapCanvas(self.canvas)
             map_item.zoomToExtent(self.canvas.extent())
-
-            title = self.dlg_comp.title.text()
+            map_item.setMapRotation(rotation)
             profile_title = composition.getComposerItemById('title')
             profile_title.setText(str(title))
 
+            # Preview Atlas and refresh items
             composition.setAtlasMode(QgsComposition.PreviewAtlas)
-            rotation = float(self.dlg_comp.rotation.text())
-            map_item.setMapRotation(rotation)
-
             composition.refreshItems()
             composition.update()
 
-        
+        # TODO: Test it!
+        else:
+
+            # Zoom map to extent, rotation, title
+            map_item = layout.itemById('Mapa')
+            #map_item.setMapCanvas(self.canvas)
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+            profile_title = layout.itemById('title')
+            profile_title.setText(str(title))
+
+            # Refresh items
+            layout.refresh()
+            layout.updateBounds()
+
+
     def enable_widgets(self, state):
         """ Enable/Disable widget depending @state """
         
