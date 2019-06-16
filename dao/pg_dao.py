@@ -29,7 +29,6 @@ class PgDao(object):
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
         except psycopg2.DatabaseError as e:
-            # fix_print_with_import
             print('{pg_dao} Error %s' % e)
             self.last_error = e            
             status = False
@@ -128,7 +127,7 @@ class PgDao(object):
         try:
             name = self.cursor.description[index][0]
         except Exception as e:
-            # fix_print_with_import
+            self.last_error = e
             print("get_column_name: {0}".format(e))        
         finally:
             return name
@@ -141,7 +140,7 @@ class PgDao(object):
         try:
             total = len(self.cursor.description)
         except Exception as e:
-            # fix_print_with_import
+            self.last_error = e
             print("get_columns_length: {0}".format(e))        
         finally:
             return total
@@ -165,7 +164,7 @@ class PgDao(object):
             return status 
 
 
-    def execute_returning(self, sql, autocommit=True):
+    def execute_returning(self, sql, commit=True):
         """ Execute selected query and return RETURNING field """
 
         self.last_error = None
@@ -173,7 +172,7 @@ class PgDao(object):
         try:
             self.cursor.execute(sql)
             value = self.cursor.fetchone()
-            if autocommit:
+            if commit:
                 self.commit()
         except Exception as e:
             self.last_error = e

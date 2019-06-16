@@ -359,10 +359,10 @@ class DaoController(object):
         msg_box.setText(detail_text)
         if title:
             title = self.tr(title)
-            msg_box.setWindowTitle(title);        
+            msg_box.setWindowTitle(title)
         if inf_text:
             inf_text = self.tr(inf_text)            
-            msg_box.setInformativeText(inf_text); 
+            msg_box.setInformativeText(inf_text)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)        
@@ -379,10 +379,10 @@ class DaoController(object):
         msg_box.setText(msg)
         if title:
             title = self.tr(title, context_name)
-            msg_box.setWindowTitle(title);        
+            msg_box.setWindowTitle(title)
         if inf_text:
             inf_text = self.tr(inf_text, context_name)
-            msg_box.setInformativeText(inf_text);        
+            msg_box.setInformativeText(inf_text)
         msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)  
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -406,10 +406,10 @@ class DaoController(object):
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         if title:
             title = self.tr(title, context_name)            
-            msg_box.setWindowTitle(title);        
+            msg_box.setWindowTitle(title)
         if inf_text:
             inf_text = self.tr(inf_text, context_name)            
-            msg_box.setInformativeText(inf_text);        
+            msg_box.setInformativeText(inf_text)
         msg_box.setDefaultButton(QMessageBox.No)        
         msg_box.exec_()
                           
@@ -448,12 +448,11 @@ class DaoController(object):
         return row
 
 
-    def get_rows(self, sql, log_info=True, log_sql=False, commit=False):
+    def get_rows(self, sql, log_info=True, log_sql=False, commit=False, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
         
-        if log_sql:
-            self.log_info(sql, stack_level_increase=1)        
-        rows = self.dao.get_rows(sql, commit=commit)   
+        sql = self.get_sql(sql, log_sql, params)
+        rows = self.dao.get_rows(sql, commit)
         self.last_error = self.dao.last_error 
         if not rows:
             # Check if any error has been raised
@@ -473,7 +472,7 @@ class DaoController(object):
 
         if log_sql:
             self.log_info(sql, stack_level_increase=1)        
-        result = self.dao.execute_sql(sql, commit=commit)
+        result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
             if log_error:
@@ -486,7 +485,7 @@ class DaoController(object):
         else:
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit(commit=commit)
+                return self.get_error_from_audit(commit)
 
         return True
 
@@ -496,7 +495,7 @@ class DaoController(object):
 
         if log_sql:
             self.log_info(sql, stack_level_increase=1)
-        value = self.dao.execute_returning(sql, autocommit=commit)
+        value = self.dao.execute_returning(sql, commit)
         self.last_error = self.dao.last_error
         if not value:
             if log_error:
@@ -509,7 +508,7 @@ class DaoController(object):
         else:
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit()
+                return self.get_error_from_audit(commit)
 
         return value
            
@@ -558,7 +557,7 @@ class DaoController(object):
 
         # Execute sql
         self.log_info(sql, stack_level_increase=1)
-        result = self.dao.execute_sql(sql, commit=commit)
+        result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
             text = "Undefined error"
@@ -578,7 +577,7 @@ class DaoController(object):
             self.get_postgresql_version()
 
         if int(self.postgresql_version) < 90500:   
-            self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values, commit=commit)
+            self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values, commit)
             return True
          
         # Set SQL for INSERT               
@@ -610,7 +609,7 @@ class DaoController(object):
         
         # Execute UPSERT
         self.log_info(sql, stack_level_increase=1)
-        result = self.dao.execute_sql(sql, commit=commit)
+        result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error         
         if not result:
             text = "Undefined error"
@@ -654,13 +653,13 @@ class DaoController(object):
                " ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
                " WHERE audit_cat_error.id != 0 AND debug_info is null"
                " ORDER BY audit_function_actions.id DESC LIMIT 1")
-        result = self.dao.get_row(sql, commit=commit)
+        result = self.dao.get_row(sql, commit)
         if result:
             if result['log_level'] <= 2:
                 sql = ("UPDATE " + self.schema_name + ".audit_function_actions"
                        " SET debug_info = 'showed'"
                        " WHERE id = " + str(result['id']))
-                self.dao.execute_sql(sql, commit=commit)
+                self.dao.execute_sql(sql, commit)
                 if result['show_user']:
                     self.show_message(result['error_message'], result['log_level'])
                 return False    
@@ -1234,9 +1233,10 @@ class DaoController(object):
 
         schemaname = schemaname.replace('"', '')
         sql = ("SELECT column_name FROM information_schema.columns "
-               "WHERE table_schema = '{}' AND table_name = '{}' "
-               "ORDER BY ordinal_position".format(schemaname, tablename))
-        column_names = self.get_rows(sql)
+               "WHERE table_schema = %s AND table_name = %s "
+               "ORDER BY ordinal_position")
+        params = [schemaname, tablename]
+        column_names = self.get_rows(sql, params=params)
         return column_names
     
     
