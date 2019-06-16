@@ -42,12 +42,14 @@ class ApiManageComposer(ApiParent):
 
 
     def composer(self):
+
         self.my_json = {}
         composers_list = self.get_composer()
         if composers_list == '"{}"':
             msg = "No composers found."
-            result = self.controller.show_info_box(msg, "Info")
+            self.controller.show_info_box(msg, "Info")
             return
+
         self.dlg_composer = ApiComposerUi()
         self.load_settings(self.dlg_composer)
 
@@ -106,6 +108,7 @@ class ApiManageComposer(ApiParent):
 
     def check_whidget_exist(self, dialog):
         """ Check if widget exist in composer """
+
         selected_com = self.get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
@@ -141,8 +144,10 @@ class ApiManageComposer(ApiParent):
                     if type(item) == QgsLayoutItemLabel:
                         widget.setText(str(item.text()))
 
+
     def open_composer(self, dialog):
         """ Open selected composer and load values from composer into form dialog """
+
         selected_com = self.get_current_composer()
         if selected_com is not None:
             if Qgis.QGIS_VERSION_INT < 29900:
@@ -157,7 +162,7 @@ class ApiManageComposer(ApiParent):
         """ Export values from widgets(only QLineEdit) into dialog, to selected composer
             if composer.widget.id == dialog.widget.property('column_id')
         """
-        composition = None
+
         selected_com = self.get_current_composer()
         widget_list = dialog.findChildren(QLineEdit)
 
@@ -178,6 +183,7 @@ class ApiManageComposer(ApiParent):
                     item.refresh()
         if show:
             self.open_composer(dialog)
+
 
     def destructor(self):
 
@@ -233,6 +239,7 @@ class ApiManageComposer(ApiParent):
                 if composer.name() == self.my_json['composer']:
                     selected_com = composer
                     break
+
         return selected_com
 
 
@@ -261,11 +268,13 @@ class ApiManageComposer(ApiParent):
             print_ = getattr(actual_printer, 'print')
             success = print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
+
     def update_rectangle(self, dialog, my_json):
         pass
 
 
     def gw_api_setprint(self, dialog, my_json):
+
         if my_json['composer'] != '-1':
             self.check_whidget_exist(self.dlg_composer)
             self.load_composer_values(dialog)
@@ -273,6 +282,7 @@ class ApiManageComposer(ApiParent):
 
 
     def gw_api_set_composer(self, dialog, my_json):
+
         if my_json['composer'] != '-1':
             self.preview(dialog, False)
             self.accept(dialog, my_json)

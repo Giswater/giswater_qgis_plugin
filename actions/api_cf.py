@@ -12,20 +12,21 @@ except:
     from qgis.core import QGis as Qgis
 
 if Qgis.QGIS_VERSION_INT < 29900:
+    from qgis.PyQt.QtGui import QStringListModel
     import urlparse as parse
 else:
-    import urllib.parse
+    from qgis.PyQt.QtCore import QStringListModel
+    import urllib.parse as parse
     from qgis.core import QgsPointXY
 
 from qgis.PyQt.QtCore import QDate, QPoint, Qt
-from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel, QStringListModel
+from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QDateEdit
-from qgis.PyQt.QtWidgets import QFrame, QGridLayout, QGroupBox, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
+from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu
 from qgis.PyQt.QtWidgets import QPushButton, QSizePolicy, QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget
 from qgis.PyQt.QtWidgets import QTextEdit
-
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsMapToPixel, QgsPoint, QgsGeometry
+from qgis.core import QgsMapToPixel, QgsPoint, QgsGeometry
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
 import json
@@ -53,6 +54,7 @@ class ApiCF(ApiParent):
 
     def __init__(self, iface, settings, controller, plugin_dir, tab_type):
         """ Class constructor """
+
         ApiParent.__init__(self, iface, settings, controller, plugin_dir)
         self.iface = iface
         self.settings = settings
