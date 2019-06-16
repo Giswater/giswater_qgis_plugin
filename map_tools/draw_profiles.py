@@ -1260,10 +1260,6 @@ class DrawProfiles(ParentMapTool):
 
     def generate_composer(self):
 
-        # TODO 3.x
-        if Qgis.QGIS_VERSION_INT > 29900:
-            return
-
         # Check if template is selected
         if str(self.dlg_draw_profile.cbx_template.currentText()) == "":
             message = "You need to select a template"
@@ -1278,45 +1274,59 @@ class DrawProfiles(ParentMapTool):
             self.controller.show_warning(message, parameter=template_path)
             return
 
-        # Check if title
-        title = self.dlg_draw_profile.title.text()
-
         # Check if composer exist
         composers = self.get_composers_list()
         index = self.get_composer_index(str(self.template))
 
         if index == len(composers):
-            # Create new composer with template selected in combobox(self.template)
-            template_file = file(template_path, 'rt')
-            template_content = template_file.read()
-            template_file.close()
-            document = QDomDocument()
-            document.setContent(template_content)
             # TODO 3.x
             if Qgis.QGIS_VERSION_INT < 29900:
+                # Create new composer with template selected in combobox(self.template)
+                template_file = file(template_path, 'rt')
+                template_content = template_file.read()
+                template_file.close()
+                document = QDomDocument()
+                document.setContent(template_content)
                 comp_view = self.iface.createNewComposer(str(self.template))
                 comp_view.composition().loadFromTemplate(document)
 
         index = self.get_composer_index(str(self.template))
         comp_view = composers[index]
 
-        # TODO 3.x
+        # Manage profile layout
+        self.manage_profile_layout(comp_view, plugin_path)
+
+
+    def manage_profile_layout(self, layout, plugin_path):
+        """ Manage profile layout """
+
+        if layout is None:
+            self.controller.log_warning("Layout not found")
+            return
+
+        # Get values from dialog
+        profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
+        title = self.dlg_draw_profile.title.text()
+        rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
+        first_node = self.dlg_draw_profile.start_point.text()
+        end_node = self.dlg_draw_profile.end_point.text()
+
         if Qgis.QGIS_VERSION_INT < 29900:
-            composition = comp_view.composition()
-            comp_view.composerWindow().show()
-        
+
+            main_window = layout.composerWindow()  # QMainWindow
+            #main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
+            main_window.show()
+
             # Set profile
+            composition = layout.composition()   # QgsComposition
             picture_item = composition.getComposerItemById('profile')
-            profile = plugin_path + os.sep + "templates" + os.sep + "profile.png"
             picture_item.setPictureFile(profile)
 
-            # Refresh map, zoom map to extent
+            # Zoom map to extent, rotation
             map_item = composition.getComposerItemById('Mapa')
             map_item.setMapCanvas(self.canvas)
             map_item.zoomToExtent(self.canvas.extent())
-
-            first_node = self.dlg_draw_profile.start_point.text()
-            end_node = self.dlg_draw_profile.end_point.text()
+            map_item.setMapRotation(rotation)
 
             # Fill data in composer template
             first_node_item = composition.getComposerItemById('first_node')
@@ -1328,12 +1338,36 @@ class DrawProfiles(ParentMapTool):
             profile_title = composition.getComposerItemById('title')
             profile_title.setText(str(title))
 
+            # Preview Atlas and refresh items
             composition.setAtlasMode(QgsComposition.PreviewAtlas)
-            rotation = float(utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.rotation))
-            map_item.setMapRotation(rotation)
-
             composition.refreshItems()
             composition.update()
+
+        # TODO: Test it!
+        else:
+
+            # Set profile
+            picture_item = layout.itemById('profile')
+            picture_item.setPictureFile(profile)
+
+            # Zoom map to extent, rotation
+            map_item = layout.itemById('Mapa')
+            map_item.zoomToExtent(self.canvas.extent())
+            map_item.setMapRotation(rotation)
+
+            # Fill data in composer template
+            first_node_item = layout.itemById('first_node')
+            first_node_item.setText(str(first_node))
+            end_node_item = layout.itemById('end_node')
+            end_node_item.setText(str(end_node))
+            length_item = layout.itemById('length')
+            length_item.setText(str(self.start_point[-1]))
+            profile_title = layout.itemById('title')
+            profile_title.setText(str(title))
+
+            # Refresh items
+            layout.refresh()
+            layout.updateBounds()
 
 
     def set_template(self):
