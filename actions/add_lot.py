@@ -32,13 +32,14 @@ from .manage_visit import ManageVisit
 from .parent_manage import ParentManage
 from ..ui_manager import AddLot
 from ..ui_manager import LotManagement
-
 from ..ui_manager import BasicTable
+
 
 class AddNewLot(ParentManage):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
+
         ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         self.ids = []
         self.rb_red = QgsRubberBand(self.canvas)
@@ -46,6 +47,7 @@ class AddNewLot(ParentManage):
         self.rb_red.setIconSize(20)
         self.rb_list = []
         self.lot_date_format = 'yyyy-MM-dd'
+
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
 
@@ -77,7 +79,6 @@ class AddNewLot(ParentManage):
         self.dropdown.addAction(action_by_expression)
         self.dropdown.addAction(action_by_polygon)
         self.dropdown.setDefaultAction(action_by_expression)
-
 
         # Set icons
         self.set_icon(self.dlg_lot.btn_feature_insert, "111")
@@ -184,6 +185,7 @@ class AddNewLot(ParentManage):
 
 
     def manage_team(self):
+
         self.dlg_basic_table = BasicTable()
         self.load_settings(self.dlg_basic_table)
         table_name = 'cat_team'
@@ -197,9 +199,13 @@ class AddNewLot(ParentManage):
         self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_basic_table, model))
         self.dlg_basic_table.btn_add_row.clicked.connect(partial(self.add_row, model))
         self.open_dialog(self.dlg_basic_table)
+
+
     def cancel_changes(self, model):
+
         model.revertAll()
         model.database().rollback()
+
 
     def add_row(self, model):
 
@@ -227,10 +233,9 @@ class AddNewLot(ParentManage):
                 self.dlg_basic_table.tbl_basic.setPalette(p)
                 print("TEST")
 
-
-
         record = model.record()
         model.insertRecord(model.rowCount(), record)
+
 
     def save_basic_table(self, model):
 
@@ -239,7 +244,6 @@ class AddNewLot(ParentManage):
             # model.database().commit()
         else:
             print("KO ")
-
 
 
     def fill_table(self, qtable, table_name, model, set_edit_strategy=QSqlTableModel.OnManualSubmit):
@@ -259,7 +263,6 @@ class AddNewLot(ParentManage):
             self.controller.show_warning(model.lastError().text())
         # Attach model to table view
         qtable.setModel(model)
-
 
 
     def manage_widget_lot(self, lot_id):
@@ -314,7 +317,9 @@ class AddNewLot(ParentManage):
         completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
         widget.setCompleter(completer)
 
+
     def check_dates_consistency(self):
+
         # Get dates as text
         startdate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.startdate)
         enddate = utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.enddate, False, False)

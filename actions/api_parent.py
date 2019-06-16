@@ -23,7 +23,6 @@ else:
     from qgis.PyQt.QtCore import QStringListModel
     from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
-
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsExpressionContextUtils, QgsRectangle, QgsPoint, QgsGeometry
 from qgis.core import QgsPointLocator, QgsProject
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
@@ -44,7 +43,6 @@ from collections import OrderedDict
 from functools import partial
 
 import utils_giswater
-
 from giswater.actions.parent import ParentAction
 from giswater.actions.HyperLinkLabel import HyperLinkLabel
 
@@ -69,7 +67,6 @@ class ApiParent(ParentAction):
         self.rubber_polygon.setColor(Qt.darkRed)
         self.rubber_polygon.setIconSize(20)
         self.list_update = []
-
 
 
     def get_editable_project(self):
@@ -189,8 +186,9 @@ class ApiParent(ParentAction):
         if expr.hasParserError():
             message = "Expression Error"
             self.controller.log_warning(message, parameter=expr_filter)
-            return (False, expr)
-        return (True, expr)
+            return False, expr
+
+        return True, expr
 
 
     def select_features_by_expr(self, layer, expr):
@@ -214,25 +212,30 @@ class ApiParent(ParentAction):
 
 
     def get_feature_by_id(self, layer, id, field_id):
-        iter = layer.getFeatures()
-        for feature in iter:
+
+        features = layer.getFeatures()
+        for feature in features:
             if feature[field_id] == id:
                 return feature
+
         return False
 
 
     def check_actions(self, action, enabled):
+
         action.setChecked(enabled)
 
 
     def api_action_centered(self, feature, canvas, layer):
         """ Center map to current feature """
+
         layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
 
 
     def api_action_zoom_in(self, feature, canvas, layer):
         """ Zoom in """
+
         layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomIn()
@@ -240,6 +243,7 @@ class ApiParent(ParentAction):
 
     def api_action_zoom_out(self, feature, canvas, layer):
         """ Zoom out """
+
         layer.selectByIds([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
@@ -273,6 +277,7 @@ class ApiParent(ParentAction):
                 message = "File not found"
                 self.controller.show_warning(message, parameter=pdf_path)
 
+
     def action_rotation(self, dialog):
 
         # Set map tool emit point and signals
@@ -283,6 +288,7 @@ class ApiParent(ParentAction):
 
 
     def action_rotation_canvas_clicked(self, dialog, point, btn):
+
         if btn == Qt.RightButton:
             self.canvas.setMapTool(self.previous_map_tool)
             return
@@ -304,6 +310,7 @@ class ApiParent(ParentAction):
         if not status:
             self.canvas.setMapTool(self.previous_map_tool)
             return
+
         sql = ("SELECT rotation FROM " + self.schema_name + ".node "
                " WHERE node_id='" + str(self.feature_id) + "'")
         row = self.controller.get_row(sql)
@@ -318,6 +325,7 @@ class ApiParent(ParentAction):
             message = "Hemisphere of the node has been updated. Value is"
             self.controller.show_info(message, parameter=str(row[0]))
         self.api_disable_rotation(dialog)
+
 
     def api_disable_rotation(self, dialog):
         """ Disable actionRotation and set action 'Identify' """
@@ -334,6 +342,7 @@ class ApiParent(ParentAction):
 
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
+
         # Set map tool emit point and signals
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -725,6 +734,7 @@ class ApiParent(ParentAction):
 
     def add_tableview(self, complet_result, field):
         """ Add widgets QTableView type """
+
         widget = QTableView()
         widget.setObjectName(field['widgetname'])
         if 'column_id' in field:
@@ -745,11 +755,13 @@ class ApiParent(ParentAction):
 
 
     def no_function_associated(self, widget=None, message_level=1):
+
         msg = "No function associated to {} {}: ".format(str(type(widget)), str(widget.objectName()))
         self.controller.show_message(msg, message_level)
 
 
     def set_headers(self, widget, field):
+
         standar_model = widget.model()
         if standar_model is None:
             standar_model = QStandardItemModel()
@@ -765,7 +777,9 @@ class ApiParent(ParentAction):
         standar_model.setHorizontalHeaderLabels(headers)
         return widget
 
+
     def populate_table(self, widget, field):
+
         standar_model = widget.model()
         for item in field['value']:
             row = []
@@ -775,8 +789,10 @@ class ApiParent(ParentAction):
                 standar_model.appendRow(row)
         return widget
 
+
     def set_columns_config(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
+
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = ("SELECT column_index, width, alias, status"
@@ -812,6 +828,7 @@ class ApiParent(ParentAction):
 
 
     def add_checkbox(self, dialog, field):
+
         widget = QCheckBox()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('column_id', field['column_id'])
@@ -820,6 +837,7 @@ class ApiParent(ParentAction):
                 widget.setChecked(True)
         widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
+
 
     def add_combobox(self, field):
     

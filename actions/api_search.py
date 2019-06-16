@@ -6,28 +6,32 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
-
 try:
     from qgis.core import Qgis
 except:
     from qgis.core import QGis as Qgis
 
-if Qgis.QGIS_VERSION_INT >= 20000 and Qgis.QGIS_VERSION_INT < 29900:
+if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.PyQt.QtGui import QStringListModel
 else:
     from qgis.core import QgsPointXY
     from qgis.PyQt.QtCore import QStringListModel
 
 from qgis.core import QgsPoint
-
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QLabel, QLineEdit
 from qgis.PyQt.QtWidgets import QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
-import csv, json, operator, os, re, sys
+
+import csv
+import json
+import operator
+import os
+import re
+import sys
 from functools import partial
+from collections import OrderedDict
 
 import utils_giswater
 from giswater.actions.api_cf import ApiCF
@@ -549,7 +553,6 @@ class ApiSearch(ApiParent):
                 all_rows.append(row)
 
         # Write list into csv file
-
         try:
             if os.path.exists(folder_path):
                 msg = "Are you sure you want to overwrite this file?"
@@ -563,6 +566,7 @@ class ApiSearch(ApiParent):
             self.controller.show_warning(msg)
             pass
 
+
     def write_to_csv(self, dialog, folder_path=None, all_rows=None):
 
         with open(folder_path, "w") as output:
@@ -571,6 +575,8 @@ class ApiSearch(ApiParent):
         self.controller.plugin_settings_set_value("search_csv_path", utils_giswater.getWidgetText(dialog, 'txt_path'))
         message = "Values has been updated"
         self.controller.show_info(message)
+
+
     def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """ Filter list of workcats by workcat_id and field_id """
 

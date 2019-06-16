@@ -10,7 +10,7 @@ try:
     from qgis.core import Qgis
 except:
     from qgis.core import QGis as Qgis
-from functools import partial
+
 from giswater.actions.api_cf import ApiCF
 from giswater.actions.manage_element import ManageElement        
 from giswater.actions.manage_document import ManageDocument      

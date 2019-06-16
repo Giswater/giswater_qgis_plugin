@@ -19,14 +19,14 @@
 from builtins import next
 
 # -*- coding: utf-8 -*-
+from qgis.core import QgsPoint, QgsFeatureRequest
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QCursor
-from qgis.core import QgsPoint, QgsFeatureRequest
-from qgis.PyQt.QtCore import QPoint, Qt, QDate
+from qgis.PyQt.QtCore import QPoint, Qt
 
 from map_tools.parent import ParentMapTool
-
 from giswater.actions.manage_visit import ManageVisit
+
 
 class OpenVisit(ParentMapTool):
     """ Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' """
@@ -77,6 +77,7 @@ class OpenVisit(ParentMapTool):
 
 
     def activate(self):
+
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
@@ -107,7 +108,9 @@ class OpenVisit(ParentMapTool):
             message = "Select visit to open"
             self.controller.show_info(message)
 
+
     def deactivate(self):
+
         # Call parent method
         ParentMapTool.deactivate(self)
         if self.current_layer is not None:
