@@ -20,8 +20,10 @@ except ImportError:
 
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
+else:
+    from qgis.core import QgsLayout
 
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsVectorLayer
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsVectorLayer, QgsProject
 from qgis.gui import  QgsMapToolEmitPoint
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem, QLineEdit
@@ -1278,20 +1280,29 @@ class DrawProfiles(ParentMapTool):
         composers = self.get_composers_list()
         index = self.get_composer_index(str(self.template))
 
+        # Composer not found
         if index == len(composers):
-            # TODO 3.x
+
+            # Create new composer with template selected in combobox(self.template)
+            template_file = open(template_path, 'rt')
+            template_content = template_file.read()
+            template_file.close()
+            document = QDomDocument()
+            document.setContent(template_content)
+
+            # TODO: Test it!
             if Qgis.QGIS_VERSION_INT < 29900:
-                # Create new composer with template selected in combobox(self.template)
-                template_file = file(template_path, 'rt')
-                template_content = template_file.read()
-                template_file.close()
-                document = QDomDocument()
-                document.setContent(template_content)
                 comp_view = self.iface.createNewComposer(str(self.template))
                 comp_view.composition().loadFromTemplate(document)
+            else:
+                project = QgsProject.instance()
+                comp_view = QgsLayout(project)
+                comp_view.loadFromTemplate(document)
+                layout_manager = project.layoutManager()
+                layout_manager.addLayout(comp_view)
 
-        index = self.get_composer_index(str(self.template))
-        comp_view = composers[index]
+        else:
+            comp_view = composers[index]
 
         # Manage profile layout
         self.manage_profile_layout(comp_view, plugin_path)
