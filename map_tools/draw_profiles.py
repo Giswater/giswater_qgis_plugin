@@ -1324,12 +1324,13 @@ class DrawProfiles(ParentMapTool):
 
         if Qgis.QGIS_VERSION_INT < 29900:
 
-            main_window = layout.composerWindow()  # QMainWindow
+            # Show layout
+            main_window = layout.composerWindow()
             #main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
             main_window.show()
 
             # Set profile
-            composition = layout.composition()   # QgsComposition
+            composition = layout.composition()
             picture_item = composition.getComposerItemById('profile')
             picture_item.setPictureFile(profile)
 
@@ -1356,6 +1357,9 @@ class DrawProfiles(ParentMapTool):
 
         # TODO: Test it!
         else:
+
+            # Show layout
+            self.iface.openLayoutDesigner(layout)
 
             # Set profile
             picture_item = layout.itemById('profile')

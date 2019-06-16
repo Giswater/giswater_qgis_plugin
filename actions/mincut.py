@@ -2353,12 +2353,13 @@ class MincutParent(ParentAction, MultipleSelection):
 
         if Qgis.QGIS_VERSION_INT < 29900:
 
-            main_window = layout.composerWindow()   # QMainWindow
+            # Show layout
+            main_window = layout.composerWindow()
             main_window.setWindowFlags(Qt.WindowStaysOnTopHint)
             main_window.show()
 
             # Zoom map to extent, rotation, title
-            composition = layout.composition()   # QgsComposition
+            composition = layout.composition()
             map_item = composition.getComposerItemById('Mapa')
             map_item.setMapCanvas(self.canvas)
             map_item.zoomToExtent(self.canvas.extent())
@@ -2373,6 +2374,9 @@ class MincutParent(ParentAction, MultipleSelection):
 
         # TODO: Test it!
         else:
+
+            # Show layout
+            self.iface.openLayoutDesigner(layout)
 
             # Zoom map to extent, rotation, title
             map_item = layout.itemById('Mapa')
