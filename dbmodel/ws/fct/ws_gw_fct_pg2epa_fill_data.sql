@@ -27,15 +27,16 @@ BEGIN
    DELETE FROM rpt_inp_arc WHERE result_id=result_id_var;
 
 -- Insert on node rpt_inp table
+-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
 	INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom)
 	SELECT 
 	result_id_var,
 	v_node.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, v_node.sector_id, v_node.state, v_node.state_type, annotation, the_geom
-	FROM inp_selector_sector, v_node 
+	FROM v_node 
 		LEFT JOIN value_state_type ON id=state_type
-		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL)) AND
-		v_node.sector_id=inp_selector_sector.sector_id AND inp_selector_sector.cur_user=current_user;
-
+		JOIN SCHEMA_NAME.v_edit_inp_pipe a ON node_1=v_node.node_id
+		JOIN SCHEMA_NAME.v_edit_inp_pipe b ON b.node_2=v_node.node_id;
+		WHERE ((is_operative IS TRUE) OR (is_operative IS NULL)) 
 	UPDATE rpt_inp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE rpt_inp_node.node_id=inp_junction.node_id AND result_id=result_id_var;
 	
 
