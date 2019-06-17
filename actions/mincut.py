@@ -13,11 +13,13 @@ except ImportError:
 if Qgis.QGIS_VERSION_INT < 29900:
     from qgis.core import QgsComposition
     from qgis.PyQt.QtGui import QStringListModel
+    from giswater.map_tools.snapping_utils_v2 import SnappingConfigManager
 else:
     from qgis.PyQt.QtCore import QStringListModel
     from qgis.core import QgsLayout
     from builtins import next
     from builtins import range
+    from giswater.map_tools.snapping_utils_v3 import SnappingConfigManager
 
 from qgis.core import QgsFeatureRequest, QgsExpression, QgsPoint, QgsExpressionContextUtils, QgsProject, QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
@@ -61,6 +63,7 @@ class MincutParent(ParentAction):
         self.hydro_list = []
         self.deleted_list = []
         self.connec_list = []
+
         # Serialize data of table 'anl_mincut_cat_state'
         self.set_states()
         self.current_state = None
@@ -88,10 +91,14 @@ class MincutParent(ParentAction):
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.get_snapper()
         self.connec_list = []
         self.hydro_list = []
         self.deleted_list = []
+
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+
         # Refresh canvas, remove all old selections
         self.remove_selection()      
 
@@ -1323,8 +1330,7 @@ class MincutParent(ParentAction):
 
     def auto_mincut_snapping(self, point, btn):  #@UnusedVariable
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
-        
-        snapper = self.get_snapper()
+
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1332,9 +1338,7 @@ class MincutParent(ParentAction):
         snapping_position = QgsPoint(point.x(), point.y())
 
         # Snapping
-        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
         if not result:
             return
 
@@ -1349,7 +1353,6 @@ class MincutParent(ParentAction):
 
             if elem_type:
                 # Get the point. Leave selection
-                point = QgsPoint(snap_point.snappedVertex)
                 snapp_feature = next(snap_point.layer.getFeatures(
                     QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
                 element_id = snapp_feature.attribute(elem_type + '_id')
@@ -1388,7 +1391,6 @@ class MincutParent(ParentAction):
 
     def snapping_node_arc_real_location(self, point, btn):  #@UnusedVariable
 
-        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1408,56 +1410,42 @@ class MincutParent(ParentAction):
             self.controller.show_info(message)
 
         # Snapping
-        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+        (retval, result) = self.snapper_manager.snap_to_background_layers(event_point)
+        if not result:
+            return
 
-        # That's the snapped point
-        if result:
+        node_exist = False
+        # Check feature
+        for snap_point in result:
+            if snap_point.layer == self.layer_node:
+                node_exist = True
+                snapp_feature = next(snap_point.layer.getFeatures(
+                    QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                # Leave selection
+                snap_point.layer.select([snap_point.snappedAtGeometry])
+                break
 
-            # Check feature
+        if not node_exist:
+            layers_arc = self.controller.get_group_layers('arc')
+            self.layernames_arc = []
+            for layer in layers_arc:
+                self.layernames_arc.append(layer.name())
             for snap_point in result:
-
                 element_type = snap_point.layer.name()
-
-                if snap_point.layer == self.layer_node:  
-                    feat_type = 'node'
-
-                    # Get the point
-                    point = QgsPoint(snap_point.snappedVertex)
+                if element_type in self.layernames_arc:
                     snapp_feature = next(snap_point.layer.getFeatures(
                         QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-
                     # Leave selection
                     snap_point.layer.select([snap_point.snappedAtGeometry])
-
                     break
-                
-            else:
-                node_exist = '0'
-
-            if node_exist == '0':
-                layers_arc = self.controller.get_group_layers('arc')
-                self.layernames_arc = []
-                for layer in layers_arc:
-                    self.layernames_arc.append(layer.name())
-                for snap_point in result:
-                    element_type = snap_point.layer.name()
-                    if element_type in self.layernames_arc:
-                        # Get the point
-                        point = QgsPoint(snap_point.snappedVertex)
-                        snapp_feature = next(snap_point.layer.getFeatures(
-                            QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                        # Leave selection
-                        snap_point.layer.select([snap_point.snappedAtGeometry])
-                        break
 
 
     def auto_mincut_execute(self, elem_id, elem_type, snapping_position):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
-
         srid = self.controller.plugin_settings_value('srid')
 
-        if self.is_new == True:
+        if self.is_new:
             self.set_id_val()
             self.is_new = False
 
@@ -1478,6 +1466,7 @@ class MincutParent(ParentAction):
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return False
+
         complet_result = row[0]
 
         if 'mincutOverlap' in complet_result:
@@ -1487,6 +1476,7 @@ class MincutParent(ParentAction):
             else:
                 message = "Mincut done successfully"
                 self.controller.show_info(message)
+
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['geometry']
             polygon = polygon[9:len(polygon)-2]
@@ -1538,7 +1528,6 @@ class MincutParent(ParentAction):
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.get_snapper()
 
         # Disconnect previous connections
         self.disconnect_snapping(False)
@@ -1569,33 +1558,25 @@ class MincutParent(ParentAction):
         map_point = self.canvas.getCoordinateTransform().transform(p)
         x = map_point.x()
         y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(eventPoint, 2)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point, True)
         if result:
             # Check feature
             for snapped_point in result:
                 viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
                 if viewname == 'v_anl_mincut_result_valve':
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
                     break
 
 
     def mouse_move_node_arc(self, p):
-       
-        viewname = "v_edit_arc"     
-        self.layer_arc = self.controller.get_layer_by_tablename(viewname, log_info=True)
+
         if not self.layer_arc:
             return
         
         # Set active layer
-        layername = self.layer_arc.name()
         self.iface.setActiveLayer(self.layer_arc)
 
         self.vertex_marker.hide()
@@ -1605,33 +1586,26 @@ class MincutParent(ParentAction):
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToCurrentLayer(event_point, 2)  # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point, True)
         if result:
             # Check feature
-            for snapped_point in result:              
-                if snapped_point.layer.name() == layername:
-                    point = QgsPoint(snapped_point.snappedVertex)
-                    # Add marker
-                    self.vertex_marker.setCenter(point)
-                    self.vertex_marker.show()
+            for snapped_point in result:
+                viewname = self.controller.get_layer_source_table_name(snapped_point.layer)
+                if viewname == 'v_edit_arc':
+                    self.snapper_manager.add_marker(snapped_point, self.vertex_marker)
                     break
 
 
     def custom_mincut_snapping(self, point, btn): # @UnusedVariable
         """ Custom mincut snapping function """
 
-        snapper = self.get_snapper()
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
         event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = snapper.snapToCurrentLayer(event_point, 2)   # @UnusedVariable
-
-        # That's the snapped point
+        (retval, result) = self.snapper_manager.snap_to_current_layer(event_point, True)
         if result:
             # Check feature
             for snapped_point in result:

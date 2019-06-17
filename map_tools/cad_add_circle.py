@@ -16,7 +16,7 @@ if Qgis.QGIS_VERSION_INT < 29900:
 else:
     from qgis.core import  QgsPointXY
 
-from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel, QgsPointLocator
+from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QDoubleValidator

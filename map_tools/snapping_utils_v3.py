@@ -177,3 +177,10 @@ class SnappingConfigManager(object):
 
         return retval, result
 
+
+    def add_marker(self, result, vertex_marker):
+
+        point = QgsPointXY(result.snappedVertex)
+        vertex_marker.setCenter(point)
+        vertex_marker.show()
+
