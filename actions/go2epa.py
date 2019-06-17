@@ -1113,7 +1113,7 @@ class Go2Epa(ApiParent):
                                                             'rpt_cat_result', 'result_id'))
         self.dlg_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.textChanged.connect(self.filter_by_result_id)
+        self.dlg_manager.txt_result_id.editTextChanged.connect(self.filter_by_result_id)
 
         # Open form
         self.open_dialog(self.dlg_manager)
